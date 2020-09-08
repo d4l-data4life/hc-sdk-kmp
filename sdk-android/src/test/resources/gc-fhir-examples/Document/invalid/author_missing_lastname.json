@@ -1,0 +1,38 @@
+{
+  "status": "current",
+  "author": [
+    {
+      "reference": "#contained-author-id"
+    }
+  ],
+  "content": [],
+  "contained": [
+    {
+      "id": "contained-author-id",
+      "resourceType": "Practitioner",
+      "name": [
+        {
+          "given": [
+            "some-firstname"
+          ]
+        }
+      ]
+    }
+  ],
+  "indexed": "2018-08-21T12:08:37.5024Z",
+  "context": {
+    "practiceSetting": {
+      "coding": [
+        {
+          "display": "Cardiology",
+          "code": "394579002"
+        }
+      ]
+    }
+  },
+  "type": {
+    "text": "some-type"
+  },
+  "resourceType": "DocumentReference",
+  "description": "some-title"
+} 

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+  ~
+  ~ D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
+  ~ including any intellectual property rights that subsist in the SDK.
+  ~
+  ~ The SDK and its documentation may be accessed and used for viewing/review purposes only.
+  ~ Any usage of the SDK for other purposes, including usage for the development of
+  ~ applications/third-party applications shall require the conclusion of a license agreement
+  ~ between you and D4L.
+  ~
+  ~ If you are interested in licensing the SDK for your own applications/third-party
+  ~ applications and/or if you’d like to contribute to the development of the SDK, please
+  ~ contact D4L by email to help@data4life.care.
+  -->
+
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="care.data4life.sample"
+    >
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:name=".SampleApplication"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning"
+        tools:replace="android:allowBackup"
+        >
+
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait"
+            >
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".DocumentsActivity"
+            android:screenOrientation="portrait"
+            />
+        <activity
+            android:name=".DocumentDetailsActivity"
+            android:screenOrientation="portrait"
+            />
+        <activity
+            android:name=".AttachmentPreviewActivity"
+            android:screenOrientation="portrait"
+            />
+
+    </application>
+
+</manifest>

@@ -1,0 +1,64 @@
+{
+  "status": "current",
+  "author": [
+    {
+      "reference": "#contained-author-id"
+    }
+  ],
+  "content": [],
+  "contained": [
+    {
+      "id": "contained-author-id",
+      "resourceType": "Practitioner",
+      "telecom": [
+        {
+          "system": "phone",
+          "value": "some-telephone-number"
+        },
+        {
+          "system": "url",
+          "value": "https:\/\/example.com"
+        }
+      ],
+      "name": [
+        {
+          "family": "some-lastname",
+          "prefix": [
+            "Mr."
+          ],
+          "suffix": [
+            "Dr. Sc."
+          ],
+          "given": [
+            "some-firstname"
+          ]
+        }
+      ],
+      "address": [
+        {
+          "line": [
+            "street"
+          ],
+          "city": "city",
+          "postalCode": "postalCode"
+        }
+      ]
+    }
+  ],
+  "indexed": "2018-08-21T12:12:58.3782Z",
+  "context": {
+    "practiceSetting": {
+      "coding": [
+        {
+          "display": "Cardiology",
+          "code": "394579002"
+        }
+      ]
+    }
+  },
+  "type": {
+    "text": "some-type"
+  },
+  "resourceType": "DocumentReference",
+  "description": "some-title"
+}

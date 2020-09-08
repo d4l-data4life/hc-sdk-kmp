@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+  ~
+  ~ D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
+  ~ including any intellectual property rights that subsist in the SDK.
+  ~
+  ~ The SDK and its documentation may be accessed and used for viewing/review purposes only.
+  ~ Any usage of the SDK for other purposes, including usage for the development of
+  ~ applications/third-party applications shall require the conclusion of a license agreement
+  ~ between you and D4L.
+  ~
+  ~ If you are interested in licensing the SDK for your own applications/third-party
+  ~ applications and/or if you’d like to contribute to the development of the SDK, please
+  ~ contact D4L by email to help@data4life.care.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportHeight="108.0"
+    android:viewportWidth="108.0">
+    <path
+        android:fillColor="#26A69A"
+        android:pathData="M0,0h108v108h-108z"
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M19,0L19,108"
+        android:strokeColor="#33FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M9,0L9,108"
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M39,0L39,108"
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M29,0L29,108"
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M59,0L59,108"
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M49,0L49,108"
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M79,0L79,108"
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M69,0L69,108"
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M89,0L89,108"
+        android:strokeColor="#33FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M99,0L99,108"
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,89L108,89"
+        android:strokeColor="#33FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,99L108,99"
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,69L108,69"
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,79L108,79"
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,49L108,49"
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,59L108,59"
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,29L108,29"
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,39L108,39"
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,19L108,19"
+        android:strokeColor="#33FFFFFF"
+        android:strokeWidth="0.8" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,9L108,9"
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="0.8" />
+</vector>
+

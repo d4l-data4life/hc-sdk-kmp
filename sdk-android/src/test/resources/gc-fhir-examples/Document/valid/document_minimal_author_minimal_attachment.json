@@ -1,0 +1,48 @@
+{
+  "status": "current",
+  "author": [
+    {
+      "reference": "#contained-author-id"
+    }
+  ],
+  "content": [
+    {
+      "attachment": {
+        "id": "A088C4DA-E476-4BE4-AA20-C47C27327F9F",
+        "title": "some-attachment-title",
+        "creation": "2018-08-21T12:15:23.7115Z",
+        "contentType": "application\/octet-stream"
+      }
+    }
+  ],
+  "contained": [
+    {
+      "id": "contained-author-id",
+      "resourceType": "Practitioner",
+      "name": [
+        {
+          "given": [
+            "some-lastname"
+          ],
+          "family": "some-firstname"
+        }
+      ]
+    }
+  ],
+  "indexed": "2018-08-21T12:15:23.7112Z",
+  "context": {
+    "practiceSetting": {
+      "coding": [
+        {
+          "display": "Cardiology",
+          "code": "394579002"
+        }
+      ]
+    }
+  },
+  "type": {
+    "text": "some-type"
+  },
+  "resourceType": "DocumentReference",
+  "description": "some-title"
+}

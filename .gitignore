@@ -1,0 +1,31 @@
+# Project config
+d4l-client-config-android.json
+d4l-test-config-android.json
+**/test_config.json
+**/client_config.json
+
+# Gradle
+.gradle/
+build/
+local.properties
+
+# IDEA/Android Studio ignores
+*iml
+.idea/*
+
+# IDEA/Android Studio includes
+!.idea/vcs.xml
+!.idea/fileTemplates/
+!.idea/inspectionProfiles/
+!.idea/scopes/
+!.idea/codeStyles/
+!.idea/encoding.xml
+!.idea/copyright/
+!.idea/compiler.xml
+
+# Others
+captures/
+
+.asciidoctor/
+
+.DS_Store

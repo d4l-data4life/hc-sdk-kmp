@@ -1,0 +1,24 @@
+{
+  "code": {
+    "coding": [
+      {
+        "system": "some-system",
+        "display": "some-name",
+        "code": "some-code"
+      }
+    ]
+  },
+  "status": "final",
+  "resourceType": "Observation",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://hl7.org/fhir/observation-category",
+          "display": "Laboratory",
+          "code": "laboratory"
+        }
+      ]
+    }
+  ]
+}

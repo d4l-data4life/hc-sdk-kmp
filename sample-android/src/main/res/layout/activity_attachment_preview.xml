@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+  ~
+  ~ D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
+  ~ including any intellectual property rights that subsist in the SDK.
+  ~
+  ~ The SDK and its documentation may be accessed and used for viewing/review purposes only.
+  ~ Any usage of the SDK for other purposes, including usage for the development of
+  ~ applications/third-party applications shall require the conclusion of a license agreement
+  ~ between you and D4L.
+  ~
+  ~ If you are interested in licensing the SDK for your own applications/third-party
+  ~ applications and/or if you’d like to contribute to the development of the SDK, please
+  ~ contact D4L by email to help@data4life.care.
+  -->
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:id="@+id/rootCL"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AttachmentPreviewActivity"
+    >
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/barLayoutABL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/rootCL"
+        >
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbarT"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_collapseMode="pin"
+            app:theme="@style/ToolBarStyle"
+            app:titleTextColor="#FFF"
+            />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.github.chrisbanes.photoview.PhotoView
+        android:id="@+id/photoView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:layout_marginTop="?attr/actionBarSize"
+        tools:src="@tools:sample/backgrounds/scenic"
+        />
+
+    <com.github.barteksc.pdfviewer.PDFView
+        android:id="@+id/pdfView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:visibility="gone"
+        />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:indeterminate="true"
+        android:visibility="gone"
+        tools:visibility="visible"
+        />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

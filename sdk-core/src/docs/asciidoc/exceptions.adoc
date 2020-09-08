@@ -1,0 +1,205 @@
+// Settings:
+:doctype: book
+:toc:
+:toclevels: 4
+:icons: font
+:source-highlighter: prettify
+//:numbered:
+:stylesdir: styles/
+:imagesdir: images/
+:linkcss:
+// Variables:
+:icons: font
+:toc:
+:compname-short: D4L
+:compname-legal: D4L data4life gGmbH
+:compname: Data4Life
+:email-contact: we@data4life.care
+:email-docs: docs@data4life.care
+:url-company: https://www.data4life.care
+:url-docs: https://d4l.io
+:prod-name: Data4Life
+:app-name: Data4Life
+:app-plat: Android
+:phdp-plat: Personal Health Data Platform
+:sw-name: {compname} {prod-name}
+:sw-version: 1.7.0
+:pub-type: Internal
+:pub-version: 1.00
+:pub-status: draft
+:pub-title: {software-name} {pub-type}
+:copyright-year: 2020
+:copyright-statement: (C) {copyright-year} {compname-legal}. All rights reserved.
+
+== About SDK exceptions
+
+The following section gives you an overview of the exceptions the SDK can throw.
+All exceptions that are passed to one of the callbacks are a `D4LException`.
+Every other exception that is thrown, and that doesn't inherit from the `D4LException` class, is wrapped by a `D4LException` exception.
+
+=== Recoverable exceptions
+
+Depending on the operation, the SDK can throw the exceptions which are passed to the integrator application in the `onError` method of the respective callback.
+The exceptions can occur during the following operations:
+
+- Authorization
+- Encryption and decryption
+- File operations
+- Data validation
+
+==== Authorization exceptions
+
+Authorization exceptions can occur during any SDK operation that requires network requests, because all network requests are access-controlled and depend on a valid access token.
+When users are logged in and one of the exceptions is passed back to the callback function, the integrator application must log out the user.
+Afterwards, the user must log in again.
+During authorization, the SDK has these cases of exceptions.
+
+[cols=2*,options=header]
+|===
+|Exception
+|Description
+
+|`AuthorizationException.Unknown`
+|Thrown when the cause is unknown.
+
+|`AuthorizationException.Canceled`
+|Thrown when the user canceled the authorization/login request.
+
+|`AuthorizationException.FailedToRestoreAccessToken`
+|Thrown when the access token can't be restored.
+
+|`AuthorizationException.FailedToRestoreRefreshToken`
+|Thrown when the refresh token can't be restored.
+
+|`AuthorizationException.FailedToRefreshAccessToken`
+|Thrown when the access token can't be refreshed.
+
+|`AuthorizationException.FailedToRestoreAuthState`
+|Thrown when the authorization state can't be restored.
+
+|`AuthorizationException.FailedToRestoreTokenState`
+|Thrown when the token state can't be restored.
+
+|`AuthorizationException.FailedToLogin`
+|Thrown when the user can't log in.
+
+|===
+
+==== Cryptographic exceptions
+
+During encryption and decryption, the SDK has these cases of exceptions.
+
+[cols=2*,options=header]
+|===
+|Exception
+|Description
+
+| `CryptoException.InvalidKeyType`
+| Thrown when the key type is invalid
+
+| `CryptoException.InvalidKeyVersion`
+| Thrown when the key version is invalid
+
+| `CryptoException.EncryptionFailed`
+| Thrown when the encryption fails.
+
+| `CryptoException.DecryptionFailed`
+| Thrown when the decryption fails.
+
+| `CryptoException.KeyEncryptionFailed`
+| Thrown when the key encryption fails.
+
+| `CryptoException.KeyDecryptionFailed`
+| Thrown when the key decryption fails.
+
+| `CryptoException.KeyGenerationFailed`
+| Thrown when the key generation fails.
+
+| `CryptoException.KeyFetchingFailed`
+| Thrown when fetching the key fails.
+
+|===
+
+To recover from some of the cryptographic exceptions, follow these steps:
+
+. Delete all stored cryptography keys.
++
+The integrator app displays the login screen again.
+
+. Authorize the user again during login and the SDK generates new key pairs.
++
+Using the new key pairs, the user can run the operation again which led to the exception.
+
+==== File exceptions
+
+All files are stored encrypted in a BLOB storage service.
+
+- Each individual file is uploaded when a record is created or updated.
+- Files are downloaded when a record or attachment is downloaded.
+
+During the upload and download of files, the SDK has these cases of exceptions.
+
+[cols=2*,options=header]
+|===
+|Exception
+|Description
+
+|`FileException.DownloadFailed`
+| Thrown when the download fails.
+
+|`FileException.UploadFailed`
+| Thrown when the upload fails.
+
+|===
+
+==== Data validation exceptions
+
+During data validation, the SDK has these cases of exceptions.
+
+[cols=2*,options=header]
+|===
+|Exception
+|Description
+
+|`DataValidationException.ModelVersionNotSupported`
+| Thrown when the SDK decrypts a record and the model version is higher than the version supported by the SDK. In this case, the integrator application must update the SDK and release a new version of the application to work with the previously unsupported record.
+
+|`DataValidationException.IdUsageViolation`
+| Thrown when the SDK uploads or downloads a record to the BLOB storage. When creating or updating a record with a new `Attachment` where the integrator application explicitly set an `id` attribute for the `Attachment` object with the message
+`Attachment.id should be null`.
+The exception is also thrown during the download of an `Attachment` object from the BLOB storage when the `Attachment.id` attribute isn't set. The error message is `Attachment.id expected`.
+
+|`DataValidationException.ExpectedFieldViolation`
+| Thrown when an expected field is missing for an upload or a download. The required field is needed to check the integrity of a file or attachment by using the attachment hash and attachment size for a document.
+
+
+|`DataValidationException.InvalidAttachmentPayloadHash`
+| Thrown when the hash attachment is different from the hash obtained from the binary data. This validation is for an upload,update or a download. The hash validation failure indicates that the file integrity has been compromised.
+|===
+
+=== Unrecoverable exceptions
+
+The SDK can throw exceptions from which the integrator application can't recover.
+These exceptions are a subclass of the `D4LRuntimeException` class when the SDK explicitly throws them.
+Or the exceptions are general `java.lang.RuntimeException` exceptions if something unexpectedly fails within the SDK.
+
+The SDK explicitly throws these exceptions.
+
+[cols=2*,options=header]
+|===
+|Exception
+|Description
+
+|`InvalidManifest`
+|(Android only) Thrown when one of the parameters `CLIENT_ID`, `CLIENT_SECRET`, or `REDIRECT_URL` isn't defined in the _AndroidManifest.xml_ file.
+
+|`ClientIdMalformed`
+| Thrown when the passed client ID has an incorrect format. The client ID has two parts, separated by the `#` sign and the correct format is: `partnerId#platformName`.
+
+|`ApplicationMetadataInaccessible`
+|(Android only) Thrown when during the SDK initialization, the SDK can't access the applications metadata using the the `PackageManager`.
+
+|`UnsupportedOperation`
+| Thrown when there's an attempt to execute an operation that the SDK doesn't support.
+
+|===

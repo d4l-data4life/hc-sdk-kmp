@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+  ~
+  ~ D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
+  ~ including any intellectual property rights that subsist in the SDK.
+  ~
+  ~ The SDK and its documentation may be accessed and used for viewing/review purposes only.
+  ~ Any usage of the SDK for other purposes, including usage for the development of
+  ~ applications/third-party applications shall require the conclusion of a license agreement
+  ~ between you and D4L.
+  ~
+  ~ If you are interested in licensing the SDK for your own applications/third-party
+  ~ applications and/or if you’d like to contribute to the development of the SDK, please
+  ~ contact D4L by email to help@data4life.care.
+  -->
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF"
+    >
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/detailsABL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_collapseMode="pin"
+            app:theme="@style/ToolBarStyle"
+            app:title="Record details"
+            app:titleTextColor="#FFF"
+            />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/attachmentsRL"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:listitem="@layout/item_attachment"
+        />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:visibility="gone"
+        tools:visibility="visible"
+        />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

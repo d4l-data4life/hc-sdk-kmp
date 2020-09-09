@@ -107,7 +107,7 @@ dependencies {
         exclude(module = "crypto-jvm")
         exclude(module = "crypto-jvm")
         exclude(module = "auth-jvm")
-        exclude(group = "com.github.d4l-data4life.mpp-util-sdk", module = "util-jvm")
+        exclude(group = "com.github.d4l-data4life.hc-util-sdk-kmp", module = "util-jvm")
     }
     implementation(project(":securestore-android"))
     implementation(project(":crypto-android"))
@@ -148,7 +148,7 @@ dependencies {
     testImplementation(Dependency.Android.Test.jsonAssert)
 
     testImplementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
-        exclude(group = "com.github.d4l-data4life.mpp-util-sdk", module = "util-android")
+        exclude(group = "com.github.d4l-data4life.hc-util-sdk-kmp", module = "util-android")
     }
 
     androidTestImplementation(Dependency.Android.AndroidX.constraintLayout)
@@ -158,7 +158,7 @@ dependencies {
     androidTestImplementation(Dependency.Multiplatform.Coroutines.android)
 
     androidTestImplementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
-        exclude(group = "com.github.d4l-data4life.mpp-util-sdk", module = "util-android")
+        exclude(group = "com.github.d4l-data4life.hc-util-sdk-kmp", module = "util-android")
     }
 
     androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
@@ -178,7 +178,7 @@ dependencies {
     androidTestImplementation(Dependency.Android.googlePlayServicesBase)
     androidTestImplementation(Dependency.Android.AndroidTest.truth)
 
-    compatibilityBase("care.data4life:mpp-sdk:${LibraryConfig.referenceSdkVersion}") {
+    compatibilityBase("care.data4life:hc-sdk-kmp:${LibraryConfig.referenceSdkVersion}") {
         isTransitive = false
         isForce = true
     }
@@ -199,7 +199,7 @@ val genReferenceJar by tasks.creating {
         copy {
             from(compatibilityBase)
             into("$buildDir/outputs/jar/")
-            rename("mpp-sdk-${LibraryConfig.referenceSdkVersion}.jar", "reference-sdk.zip")
+            rename("hc-sdk-kmp-${LibraryConfig.referenceSdkVersion}.jar", "reference-sdk.zip")
         }
 
         copy {

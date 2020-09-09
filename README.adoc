@@ -29,7 +29,7 @@ The SDK has the following dependencies:
 
 * link:https://github.com/square/retrofit[retrofit2]
 * link:https://github.com/ReactiveX/RxJava[rxjava2]
-* link:https://github.com/d4l-data4life/mpp-fhir-sdk[D4L FHIR STU3]
+* link:https://github.com/d4l-data4life/hc-fhir-sdk-java[D4L FHIR STU3]
 * link:https://github.com/ThreeTen/threetenbp[ThreeTen Java 8 Time backport]
 * link:http://bouncycastle.org/[BouncyCastle] *
 * link:https://github.com/google/tink[Tink]
@@ -54,21 +54,21 @@ allprojects {
     repositories {
         ...
         maven {
-            url = uri("https://maven.pkg.github.com/d4l-data4life/mpp-util-sdk")
+            url = uri("https://maven.pkg.github.com/d4l-data4life/hc-util-sdk-kmp")
             credentials {
                 username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
                 password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
             }
         }
         maven {
-            url = uri("https://maven.pkg.github.com/d4l-data4life/mpp-fhir-sdk")
+            url = uri("https://maven.pkg.github.com/d4l-data4life/hc-fhir-sdk-java")
             credentials {
                 username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
                 password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
             }
         }
         maven {
-            url = uri("https://maven.pkg.github.com/d4l-data4life/mpp-fhir-helper-sdk")
+            url = uri("https://maven.pkg.github.com/d4l-data4life/hc-fhir-helper-sdk-kmp")
             credentials {
                 username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
                 password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
@@ -94,11 +94,11 @@ Add the following dependencies to your app `build.gradle` file.
 [source,gradle]
 ----
 dependencies {
-    implementation('com.github.d4l-data4life.mpp-sdk:sdk-jvm:${latestVersion}') {
-            exclude group: 'com.github.d4l-data4life.mpp-sdk', module: 'securestore-android'
-            exclude group: 'com.github.d4l-data4life.mpp-sdk', module: 'crypto-android'
-            exclude group: 'com.github.d4l-data4life.mpp-sdk', module: 'auth-android'
-            exclude group: 'com.github.d4l-data4life.mpp-util-sdk', module: 'util-android'
+    implementation('com.github.d4l-data4life.hc-sdk-kmp:sdk-jvm:${latestVersion}') {
+            exclude group: 'com.github.d4l-data4life.hc-sdk-kmp', module: 'securestore-android'
+            exclude group: 'com.github.d4l-data4life.hc-sdk-kmp', module: 'crypto-android'
+            exclude group: 'com.github.d4l-data4life.hc-sdk-kmp', module: 'auth-android'
+            exclude group: 'com.github.d4l-data4life.hc-util-sdk-kmp', module: 'util-android'
     }
 }
 ----
@@ -108,11 +108,11 @@ dependencies {
 [source,gradle]
 ----
 dependencies {
-    implementation('com.github.d4l-data4life.mpp-sdk:sdk-android:${latestVersion}') {
-        exclude group: 'com.github.d4l-data4life.mpp-sdk', module: 'securestore-jvm'
-        exclude group: 'com.github.d4l-data4life.mpp-sdk', module: 'crypto-jvm'
-        exclude group: 'com.github.d4l-data4life.mpp-sdk', module: 'auth-jvm'
-        exclude group: 'com.github.d4l-data4life.mpp-util-sdk', module: 'util-jvm'
+    implementation('com.github.d4l-data4life.hc-sdk-kmp:sdk-android:${latestVersion}') {
+        exclude group: 'com.github.d4l-data4life.hc-sdk-kmp', module: 'securestore-jvm'
+        exclude group: 'com.github.d4l-data4life.hc-sdk-kmp', module: 'crypto-jvm'
+        exclude group: 'com.github.d4l-data4life.hc-sdk-kmp', module: 'auth-jvm'
+        exclude group: 'com.github.d4l-data4life.hc-util-sdk-kmp', module: 'util-jvm'
     }
 }
 ----
@@ -122,7 +122,7 @@ The SDK ships with link:https://github.com/ThreeTen/threetenbp[ThreeTenBP] a Jav
 [source,gradle]
 ----
 dependencies {
-    implementation("com.github.d4l-data4life.mpp-sdk:sdk-android:${latestVersion}") {
+    implementation("com.github.d4l-data4life.hc-sdk-kmp:sdk-android:${latestVersion}") {
         ...
         // exclude the threetenbp dependency from the `sdk`
         exclude group: 'org.threeten', module: 'threetenbp'
@@ -170,14 +170,14 @@ For release management, we use link:https://help.github.com/articles/creating-re
 ==== Testing the SDK
 
 For testing purposes, you could use the latest main commit by adding the `{latestCommitHashOnMain}` as version number to your app `build.gradle` dependency.
-Please use the latest commit id from link:https://github.com/d4l-data4life/mpp-sdk/commits/main[main] which should be truncated to the first 8 characters.
+Please use the latest commit id from link:https://github.com/d4l-data4life/hc-sdk-kmp/commits/main[main] which should be truncated to the first 8 characters.
 
 ===== Java
 
 [source,gradle]
 ----
 dependencies {
-    implementation("com.github.d4l-data4life.mpp-sdk:sdk-jvm:{latestCommitHashOnMain}") {
+    implementation("com.github.d4l-data4life.hc-sdk-kmp:sdk-jvm:{latestCommitHashOnMain}") {
         ...
     }
 }
@@ -188,7 +188,7 @@ dependencies {
 [source,gradle]
 ----
 dependencies {
-    implementation("com.github.d4l-data4life.mpp-sdk:sdk-android:{latestCommitHashOnMain}") {
+    implementation("com.github.d4l-data4life.hc-sdk-kmp:sdk-android:{latestCommitHashOnMain}") {
         ...
     }
 }

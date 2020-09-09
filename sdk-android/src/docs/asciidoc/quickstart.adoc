@@ -104,4 +104,4 @@ client = Data4LifeClient.getInstance();
 
 
 === Example app
-To see it in action, check out the sample app in https://github.com/d4l-data4life/mpp-sdk/tree/master/sample-android/[*sample-android*^, window="_blank].
+To see it in action, check out the sample app in https://github.com/d4l-data4life/hc-sdk-kmp/tree/master/sample-android/[*sample-android*^, window="_blank].

@@ -38,7 +38,7 @@ dependencies {
         exclude(group = "com.github.d4l-data4life", module = "securestore-android")
         exclude(group = "com.github.d4l-data4life", module = "crypto-android")
         exclude(group = "com.github.d4l-data4life", module = "auth-android")
-        exclude(group = "com.github.d4l-data4life.mpp-util-sdk", module = "util-android")
+        exclude(group = "com.github.d4l-data4life.hc-util-sdk-kmp", module = "util-android")
     }
     implementation(project(":securestore-jvm"))
     implementation(project(":crypto-jvm"))

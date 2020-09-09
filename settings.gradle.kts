@@ -1,4 +1,4 @@
-rootProject.name = "mpp-sdk"
+rootProject.name = "hc-sdk-kmp"
 
 include(
         ":sample-android", ":sample-jvm",

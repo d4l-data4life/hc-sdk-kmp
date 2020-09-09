@@ -61,21 +61,21 @@ allprojects {
         jcenter()
         maven("https://jitpack.io")
         maven {
-            url = URI("https://maven.pkg.github.com/d4l-data4life/mpp-util-sdk")
+            url = URI("https://maven.pkg.github.com/d4l-data4life/hc-util-sdk-kmp")
             credentials {
                 username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
                 password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
             }
         }
         maven {
-            url = URI("https://maven.pkg.github.com/d4l-data4life/mpp-fhir-sdk")
+            url = URI("https://maven.pkg.github.com/d4l-data4life/hc-fhir-sdk-java")
             credentials {
                 username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
                 password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
             }
         }
         maven {
-            url = URI("https://maven.pkg.github.com/d4l-data4life/mpp-fhir-helper-sdk")
+            url = URI("https://maven.pkg.github.com/d4l-data4life/hc-fhir-helper-sdk-kmp")
             credentials {
                 username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
                 password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")

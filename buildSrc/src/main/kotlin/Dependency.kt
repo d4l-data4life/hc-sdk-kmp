@@ -44,15 +44,15 @@ object Dependency {
         }
 
         object D4L {
-            const val utilCommon = "com.github.d4l-data4life.mpp-util-sdk:util-metadata:${Version.sdkUtil}"
-            const val utilJvm = "com.github.d4l-data4life.mpp-util-sdk:util-jvm:${Version.sdkUtil}"
-            const val utilAndroid = "com.github.d4l-data4life.mpp-util-sdk:util-android:${Version.sdkUtil}"
+            const val utilCommon = "com.github.d4l-data4life.hc-util-sdk-kmp:util-metadata:${Version.sdkUtil}"
+            const val utilJvm = "com.github.d4l-data4life.hc-util-sdk-kmp:util-jvm:${Version.sdkUtil}"
+            const val utilAndroid = "com.github.d4l-data4life.hc-util-sdk-kmp:util-android:${Version.sdkUtil}"
 
-            const val fhirSdk = "com.github.d4l-data4life:mpp-fhir-sdk:${Version.fhirSdk}"
+            const val fhirSdk = "com.github.d4l-data4life:hc-fhir-sdk-java:${Version.fhirSdk}"
 
-            const val fhirHelperCommon = "com.github.d4l-data4life.mpp-fhir-helper-sdk:fhir-helper-metadata:${Version.fhirHelper}"
-            const val fhirHelperAndroid = "com.github.d4l-data4life.mpp-fhir-helper-sdk:fhir-helper-android:${Version.fhirHelper}"
-            const val fhirHelperJvm = "com.github.d4l-data4life.mpp-fhir-helper-sdk:fhir-helper-jvm:${Version.fhirHelper}"
+            const val fhirHelperCommon = "com.github.d4l-data4life.hc-fhir-helper-sdk-kmp:fhir-helper-metadata:${Version.fhirHelper}"
+            const val fhirHelperAndroid = "com.github.d4l-data4life.hc-fhir-helper-sdk-kmp:fhir-helper-android:${Version.fhirHelper}"
+            const val fhirHelperJvm = "com.github.d4l-data4life.hc-fhir-helper-sdk-kmp:fhir-helper-jvm:${Version.fhirHelper}"
         }
 
         object Test {

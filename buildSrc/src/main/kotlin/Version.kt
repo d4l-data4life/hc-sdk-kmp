@@ -19,7 +19,7 @@ object Version {
     const val sdkUtil = "1.5.0"
 
     /**
-     * [mpp-fhir-sdk](https://github.com/d4l-data4life/mpp-fhir-sdk)
+     * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)
      */
     const val fhirSdk = "0.6.1"
     const val fhirHelper = "1.2.4"

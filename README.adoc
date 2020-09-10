@@ -1,9 +1,60 @@
-= The Data4Life Android SDK
+:library_version: 0.0.1
+:toc: macro
+:toclevels: 2
+:toc-title:
+ifdef::env-github[]
+:imagesdir: https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/assets/images/
+:link-license: https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/LICENSE
+:link-contribution: https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/CONTRIBUTION.adoc
+:warning-caption: :warning:
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+endif::[]
+ifndef::env-github[]
+:icons: font
+:imagesdir: ./assets/images
+:link-license: ./LICENCE
+:link-contribution: ./CONTRIBUTION.adoc
+endif::[]
 
+++++
+<div align="center">
+    <!-- PROJECT LOGO -->
+    <p>
+        <a><img src="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/assets/images/d4l-logo.svg" width="150"/></a>
+    </p>
+    <!-- PROJECT HEADER -->
+    <h1>The Data4Life Android and Java SDK</h1>
+    <p><!-- PROJECT DESCRIPTION -->
+        This is the Android and Java SDK of Data4Life.The SDK encapsulates the backend functionality of the Data4Life Personal Health Data Platform (PHDP) and enables end-to-end encryption of patient data.It allows users to store sensitive health data on the secure platform and share it to authorized people and applications.
 
-This is the Android and Java SDK of Data4Life.The SDK encapsulates the backend functionality of the Data4Life Personal Health Data Platform (PHDP) and enables end-to-end encryption of patient data.It allows users to store sensitive health data on the secure platform and share it to authorized people and applications.
+For more information about the platform, visit our website <a href="https://www.d4l.io/">www.d4l.io</a>.
+    </p>
+    <p><!-- PROJECT DOCUMENTATION -->
+        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp"><strong>Explore the docs »</strong></a>
+    </p>
+    <p><!-- PROJECT ISSUES/FEATURES -->
+        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/issues">Report Bug</a>
+        ·
+        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/issues">Request Feature</a>
+    </p>
+    <p><!-- PROJECT BADGES -->
+        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/actions">
+            <img src="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/workflows/D4L%20CI%20KMP/badge.svg" alt="Build Status"/>
+        </a>
+        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/LICENSE">
+            <img src="https://img.shields.io/badge/license-PRIVATE-blue.svg"/>
+        </a>
+    </p>
+</div>
+++++
 
-For more information about the platform, visit our website link:https://www.d4l.io/[www.d4l.io].
+[discrete]
+=== Table Of Contents
+toc::[]
+
 
 == Documentation
 
@@ -94,11 +145,11 @@ Add the following dependencies to your app `build.gradle` file.
 [source,gradle]
 ----
 dependencies {
-    implementation('com.github.d4l-data4life.hc-sdk-kmp:sdk-jvm:${latestVersion}') {
-            exclude group: 'com.github.d4l-data4life.hc-sdk-kmp', module: 'securestore-android'
-            exclude group: 'com.github.d4l-data4life.hc-sdk-kmp', module: 'crypto-android'
-            exclude group: 'com.github.d4l-data4life.hc-sdk-kmp', module: 'auth-android'
-            exclude group: 'com.github.d4l-data4life.hc-util-sdk-kmp', module: 'util-android'
+    implementation('care.data4life.hc-sdk-kmp:sdk-jvm:${latestVersion}') {
+            exclude group: 'care.data4life.hc-sdk-kmp', module: 'securestore-android'
+            exclude group: 'care.data4life.hc-sdk-kmp', module: 'crypto-android'
+            exclude group: 'care.data4life.hc-sdk-kmp', module: 'auth-android'
+            exclude group: 'care.data4life.hc-util-sdk-kmp', module: 'util-android'
     }
 }
 ----
@@ -108,11 +159,11 @@ dependencies {
 [source,gradle]
 ----
 dependencies {
-    implementation('com.github.d4l-data4life.hc-sdk-kmp:sdk-android:${latestVersion}') {
-        exclude group: 'com.github.d4l-data4life.hc-sdk-kmp', module: 'securestore-jvm'
-        exclude group: 'com.github.d4l-data4life.hc-sdk-kmp', module: 'crypto-jvm'
-        exclude group: 'com.github.d4l-data4life.hc-sdk-kmp', module: 'auth-jvm'
-        exclude group: 'com.github.d4l-data4life.hc-util-sdk-kmp', module: 'util-jvm'
+    implementation('care.data4life.hc-sdk-kmp:sdk-android:${latestVersion}') {
+        exclude group: 'care.data4life.hc-sdk-kmp', module: 'securestore-jvm'
+        exclude group: 'care.data4life.hc-sdk-kmp', module: 'crypto-jvm'
+        exclude group: 'care.data4life.hc-sdk-kmp', module: 'auth-jvm'
+        exclude group: 'care.data4life.hc-util-sdk-kmp', module: 'util-jvm'
     }
 }
 ----
@@ -122,7 +173,7 @@ The SDK ships with link:https://github.com/ThreeTen/threetenbp[ThreeTenBP] a Jav
 [source,gradle]
 ----
 dependencies {
-    implementation("com.github.d4l-data4life.hc-sdk-kmp:sdk-android:${latestVersion}") {
+    implementation("care.data4life.hc-sdk-kmp:sdk-android:${latestVersion}") {
         ...
         // exclude the threetenbp dependency from the `sdk`
         exclude group: 'org.threeten', module: 'threetenbp'
@@ -177,7 +228,7 @@ Please use the latest commit id from link:https://github.com/d4l-data4life/hc-sd
 [source,gradle]
 ----
 dependencies {
-    implementation("com.github.d4l-data4life.hc-sdk-kmp:sdk-jvm:{latestCommitHashOnMain}") {
+    implementation("care.data4life.hc-sdk-kmp:sdk-jvm:{latestCommitHashOnMain}") {
         ...
     }
 }
@@ -188,7 +239,7 @@ dependencies {
 [source,gradle]
 ----
 dependencies {
-    implementation("com.github.d4l-data4life.hc-sdk-kmp:sdk-android:{latestCommitHashOnMain}") {
+    implementation("care.data4life.hc-sdk-kmp:sdk-android:{latestCommitHashOnMain}") {
         ...
     }
 }

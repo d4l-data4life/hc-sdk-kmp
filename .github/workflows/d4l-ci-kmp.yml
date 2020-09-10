@@ -1,4 +1,4 @@
-name: D4L CI Android
+name: D4L CI KMP
 
 on:
   push:

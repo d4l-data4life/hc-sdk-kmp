@@ -99,15 +99,15 @@ dependencies {
 
     implementation(project(":sdk-android")) {
         exclude(group = "org.threeten", module = "threetenbp")
-        exclude(group = "com.github.d4l-data4life", module = "securestore-jvm")
-        exclude(group = "com.github.d4l-data4life", module = "crypto-jvm")
-        exclude(group = "com.github.d4l-data4life", module = "auth-jvm")
-        exclude(group = "com.github.d4l-data4life.hc-util-sdk-kmp", module = "util-jvm")
-        exclude(group = "com.github.d4l-data4life.hc-fhir-helper-sdk-kmp", module = "fhir-helper-jvm")
+        exclude(group = "care.data4life", module = "securestore-jvm")
+        exclude(group = "care.data4life", module = "crypto-jvm")
+        exclude(group = "care.data4life", module = "auth-jvm")
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
+        exclude(group = "care.data4life.hc-fhir-helper-sdk-kmp", module = "fhir-helper-jvm")
     }
 
     implementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
-        exclude(group = "com.github.d4l-data4life.hc-util-sdk-kmp", module = "util-android")
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
     }
 
     implementation(Dependency.Multiplatform.D4L.utilAndroid)

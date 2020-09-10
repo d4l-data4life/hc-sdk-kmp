@@ -114,7 +114,7 @@ dependencies {
     api(Dependency.Multiplatform.D4L.utilAndroid)
 
     implementation(project(":securestore-android")) {
-        exclude(group = "com.github.d4l-data4life.hc-util-sdk-kmp", module = "util-jvm")
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
     }
     implementation(Dependency.Multiplatform.Kotlin.stdlibAndroid)
     implementation(Dependency.Multiplatform.Coroutines.android)

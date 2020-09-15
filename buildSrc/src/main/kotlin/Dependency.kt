@@ -48,7 +48,7 @@ object Dependency {
             const val utilJvm = "care.data4life.hc-util-sdk-kmp:util-jvm:${Version.sdkUtil}"
             const val utilAndroid = "care.data4life.hc-util-sdk-kmp:util-android:${Version.sdkUtil}"
 
-            const val fhirSdk = "care.data4life:hc-fhir-sdk-java:${Version.fhirSdk}"
+            const val fhirSdk = "care.data4life.hc-fhir-sdk-java:hc-fhir-sdk-java:${Version.fhirSdk}"
 
             const val fhirHelperCommon = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-metadata:${Version.fhirHelper}"
             const val fhirHelperAndroid = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-android:${Version.fhirHelper}"

@@ -202,6 +202,15 @@ public interface SdkContract {
          */
         Task downloadAttachments(String recordId, List<String> attachmentIds, DownloadType type, ResultListener<List<Attachment>> listener);
 
+
+        void createAppData(AppDataResource appData, ResultListener<AppDataResource> resultListener);
+
+        void downloadAppData(String appDataId, ResultListener<AppDataResource> resultListener);
+
+        void updateAppData(AppDataResource appData, ResultListener<AppDataResource> resultListener);
+
+        void deleteAppData(String appDataId, Callback callback);
+
     }
 
     interface ErrorHandler {

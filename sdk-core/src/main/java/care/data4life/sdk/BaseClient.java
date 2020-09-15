@@ -184,6 +184,29 @@ abstract class BaseClient implements SdkContract.Client {
         return executeSingle(operation, listener);
     }
 
+    @Override
+    public void createAppData(AppDataResource appData, ResultListener<AppDataResource> resultListener) {
+        Single<AppDataResource> operation = userService.finishLogin(true)
+                .flatMap(ignore -> userService.getUID())
+                .flatMap(uid -> recordService.createAppData(appData, uid));
+        executeSingle(operation, resultListener);
+    }
+
+    @Override
+    public void downloadAppData(String appDataId, ResultListener<AppDataResource> resultListener) {
+
+    }
+
+    @Override
+    public void updateAppData(AppDataResource appData, ResultListener<AppDataResource> resultListener) {
+
+    }
+
+    @Override
+    public void deleteAppData(String appDataId, Callback callback) {
+
+    }
+
     private void deleteAttachment(String attachmentId, ResultListener<Boolean> listener) {
         Single<Boolean> operation = userService.getUID()
                 .flatMap(uid -> recordService.deleteAttachment(attachmentId, uid));

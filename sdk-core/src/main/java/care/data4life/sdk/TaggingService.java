@@ -30,6 +30,8 @@ class TaggingService {
     static final String TAG_DELIMITER = "=";
     static final String TAG_RESOURCE_TYPE = "resourceType".toLowerCase(US_LOCALE);
     static final String TAG_CLIENT = "client";
+    private static final String TAG_APPDATA_KEY = "flag";
+    private static final String TAG_APPDATA_VALUE = "appData";
     private static final String TAG_UPDATED_BY_CLIENT = "updatedByClient".toLowerCase(US_LOCALE);
     private static final String TAG_PARTNER = "partner";
     private static final String TAG_UPDATED_BY_PARTNER = "updatedByPartner".toLowerCase(US_LOCALE);
@@ -44,7 +46,7 @@ class TaggingService {
         this.partnerId = clientId.split(SEPARATOR)[0];
     }
 
-    HashMap<String, String> appendDefaultTags(String resourceType, @Nullable HashMap<String, String> oldTags) {
+    HashMap<String, String> appendDefaultTags(String resourceType, boolean appdata, @Nullable HashMap<String, String> oldTags) {
         HashMap<String, String> tags = new HashMap<>();
         if (oldTags != null && !oldTags.isEmpty()) {
             tags.putAll(oldTags);
@@ -70,7 +72,15 @@ class TaggingService {
             tags.put(TAG_FHIR_VERSION, FHIR_VERSION);
         }
 
+        if(resourceType == null && appdata) {
+            tags.put(TAG_APPDATA_KEY,TAG_APPDATA_VALUE);
+        }
+
         return tags;
+    }
+
+    HashMap<String, String> appendDefaultTags(String resourceType, @Nullable HashMap<String, String> oldTags) {
+        return appendDefaultTags(resourceType, false, oldTags);
     }
 
     HashMap<String, String> getTagFromType(String resourceType) {

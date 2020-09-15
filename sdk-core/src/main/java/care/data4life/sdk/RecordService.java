@@ -426,6 +426,68 @@ class RecordService {
                 r.getModelVersion());
     }
 
+    EncryptedRecord encryptAppDataRecord(DecryptedAppDataRecord record) throws IOException {
+        String resource = record.getAppData_().getResource();
+
+        List<String> encryptedTags = tagEncryptionService.encryptTags(record.getTags());
+        String encryptedResource = cryptoService.encryptString(record.getDataKey(), resource).blockingGet();
+
+        GCKey commonKey = cryptoService.fetchCurrentCommonKey();
+        String currentCommonKeyId = cryptoService.getCurrentCommonKeyId();
+
+        EncryptedKey encryptedDataKey = cryptoService.encryptSymmetricKey(commonKey, KeyType.DATA_KEY, record.getDataKey()).blockingGet();
+
+        return new EncryptedRecord(
+                currentCommonKeyId,
+                record.getIdentifier(),
+                encryptedTags,
+                encryptedResource,
+                record.getCustomCreationDate(),
+                encryptedDataKey,
+                null,
+                record.getModelVersion());
+
+    }
+
+    DecryptedAppDataRecord decryptAppDataRecord(EncryptedRecord r, String userId) throws IOException, DataValidationException.ModelVersionNotSupported {
+        if (!ModelVersion.isModelVersionSupported(r.getModelVersion())) {
+            throw new DataValidationException.ModelVersionNotSupported("Please update SDK to latest version!");
+        }
+        HashMap<String, String> tags = tagEncryptionService.decryptTags(r.getEncryptedTags());
+
+        String commonKeyId = r.getCommonKeyId();
+
+        boolean commonKeyStored = cryptoService.hasCommonKey(commonKeyId);
+        GCKey commonKey;
+        if (commonKeyStored) {
+            commonKey = cryptoService.getCommonKeyById(commonKeyId);
+        } else {
+            CommonKeyResponse commonKeyResponse = apiService.fetchCommonKey(alias, userId, commonKeyId).blockingGet();
+            EncryptedKey encryptedKey = commonKeyResponse.getCommonKey();
+
+            GCKeyPair gcKeyPair = cryptoService.fetchGCKeyPair().blockingGet();
+            commonKey = cryptoService.asymDecryptSymetricKey(gcKeyPair, encryptedKey).blockingGet();
+            cryptoService.storeCommonKey(commonKeyId, commonKey);
+        }
+
+        GCKey dataKey = cryptoService.symDecryptSymmetricKey(commonKey, r.getEncryptedDataKey()).blockingGet();
+
+
+        String resource = null;
+        if (r.getEncryptedBody() != null && !r.getEncryptedBody().isEmpty()) {
+            resource = cryptoService.decryptString(dataKey, r.getEncryptedBody()).blockingGet();
+        }
+
+        return new DecryptedAppDataRecord(
+                r.getIdentifier(),
+                new AppDataResource(resource),
+                tags,
+                r.getCustomCreationDate(),
+                r.getUpdatedDate(),
+                dataKey,
+                r.getModelVersion());
+    }
+
     <T extends DomainResource> HashMap<Attachment, String> extractUploadData(T resource) {
         List<Attachment> attachments = FhirAttachmentHelper.getAttachment(resource);
         if (attachments == null || attachments.isEmpty()) return null;
@@ -666,10 +728,44 @@ class RecordService {
         return record;
     }
 
+    DecryptedAppDataRecord assignAppDataResourceId(DecryptedAppDataRecord record) {
+        record.getAppData_().setId(record.getIdentifier());
+        return record;
+    }
+
+
     Meta buildMeta(DecryptedRecord record) {
         LocalDate createdDate = LocalDate.parse(record.getCustomCreationDate(), DATE_FORMATTER);
         LocalDateTime updatedDate = LocalDateTime.parse(record.getUpdatedDate(), DATE_TIME_FORMATTER);
         return new Meta(createdDate, updatedDate);
+    }
+
+    Meta buildMeta(DecryptedAppDataRecord record) {
+        LocalDate createdDate = LocalDate.parse(record.getCustomCreationDate(), DATE_FORMATTER);
+        LocalDateTime updatedDate = LocalDateTime.parse(record.getUpdatedDate(), DATE_TIME_FORMATTER);
+        return new Meta(createdDate, updatedDate);
+    }
+
+
+    Single<AppDataRecord> createAppDataRecord(AppDataResource resource, String userId) throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
+
+
+        String createdDate = DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID));
+
+        Single<DecryptedAppDataRecord> createRecord = Single.just(createdDate)
+                .map(createdAt -> {
+                    HashMap<String, String> tags = taggingService.appendDefaultTags(null,true, null);
+                    GCKey dataKey = cryptoService.generateGCKey().blockingGet();
+                    return new DecryptedAppDataRecord(null, resource, tags, createdAt, null, dataKey, ModelVersion.CURRENT);
+                });
+
+        return createRecord
+                .map(this::encryptAppDataRecord)
+                .flatMap(encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord))
+                .map((EncryptedRecord r) -> (DecryptedAppDataRecord) decryptAppDataRecord(r, userId))
+                .map(this::assignAppDataResourceId)
+                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData_(), buildMeta(decryptedRecord)));
+
     }
     //endregion
 }

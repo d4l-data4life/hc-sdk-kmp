@@ -185,26 +185,31 @@ abstract class BaseClient implements SdkContract.Client {
     }
 
     @Override
-    public void createAppData(AppDataResource appData, ResultListener<AppDataResource> resultListener) {
-        Single<AppDataResource> operation = userService.finishLogin(true)
+    public void createAppData(AppDataResource appData, ResultListener<AppDataRecord> resultListener) {
+        Single<AppDataRecord> operation = userService.finishLogin(true)
                 .flatMap(ignore -> userService.getUID())
-                .flatMap(uid -> recordService.createAppData(appData, uid));
+                .flatMap(uid -> recordService.createAppDataRecord(appData, uid));
         executeSingle(operation, resultListener);
     }
 
     @Override
-    public void downloadAppData(String appDataId, ResultListener<AppDataResource> resultListener) {
-
+    public Task downloadAppData(String appDataId, ResultListener<AppDataRecord> resultListener) {
+        Single<AppDataRecord> operation = userService.getUID()
+                .flatMap(uid -> recordService.downloadAppDataRecord(appDataId, uid));
+        return executeSingle(operation, resultListener);
     }
 
     @Override
-    public void updateAppData(AppDataResource appData, ResultListener<AppDataResource> resultListener) {
-
+    public void updateAppData(AppDataResource appData, ResultListener<AppDataRecord> resultListener) {
+        Single<AppDataRecord> operation = userService.finishLogin(true)
+                .flatMap(ignore -> userService.getUID())
+                .flatMap(uid -> recordService.updateAppDataRecord(appData, uid));
+        executeSingle(operation, resultListener);
     }
 
     @Override
     public void deleteAppData(String appDataId, Callback callback) {
-
+        deleteRecord(appDataId,callback);
     }
 
     private void deleteAttachment(String attachmentId, ResultListener<Boolean> listener) {

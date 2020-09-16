@@ -41,7 +41,11 @@ data class DecryptedAppDataRecord(
         val updatedDate: String?,
         val dataKey: GCKey,
         val modelVersion: Int
-)
+) {
+    fun copyWithResource(appData_: AppDataResource) = copy(appData_ = appData_)
+}
+
+
 
 fun SdkContract.Client.createRecord(vararg data: String, resultListener: ResultListener<AppData>) {
     val records = data.map { data ->

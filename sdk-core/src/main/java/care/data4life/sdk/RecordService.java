@@ -480,7 +480,7 @@ class RecordService {
 
         return new DecryptedAppDataRecord(
                 r.getIdentifier(),
-                new AppDataResource(resource),
+                new AppDataResource(resource,r.getIdentifier()),
                 tags,
                 r.getCustomCreationDate(),
                 r.getUpdatedDate(),
@@ -766,6 +766,28 @@ class RecordService {
                 .map(this::assignAppDataResourceId)
                 .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData_(), buildMeta(decryptedRecord)));
 
+    }
+
+    Single<AppDataRecord> updateAppDataRecord(AppDataResource resource, String userId)  {
+        String recordId = resource.getId();
+
+        return apiService
+                .fetchRecord(alias, userId, recordId)
+                .map((EncryptedRecord encryptedRecord) -> (DecryptedAppDataRecord) decryptAppDataRecord(encryptedRecord, userId))
+                .map( (DecryptedAppDataRecord decryptedRecord) -> decryptedRecord.copyWithResource(resource))
+                .map(this::encryptAppDataRecord)
+                .flatMap((EncryptedRecord encryptedRecord) -> apiService.updateRecord(alias, userId, recordId, encryptedRecord))
+                .map((EncryptedRecord encryptedRecord) -> (DecryptedAppDataRecord) decryptAppDataRecord(encryptedRecord, userId))
+                .map(this::assignAppDataResourceId)
+                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData_(), buildMeta(decryptedRecord)));
+    }
+
+    Single<AppDataRecord> downloadAppDataRecord(String recordId, String userId) {
+        return apiService
+                .fetchRecord(alias, userId, recordId)
+                .map((EncryptedRecord encryptedRecord) -> (DecryptedAppDataRecord) decryptAppDataRecord(encryptedRecord, userId))
+                .map(this::assignAppDataResourceId)
+                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData_(), buildMeta(decryptedRecord)));
     }
     //endregion
 }

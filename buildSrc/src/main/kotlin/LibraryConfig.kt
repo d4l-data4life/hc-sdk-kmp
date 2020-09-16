@@ -15,7 +15,7 @@
  */
 
 object LibraryConfig {
-    const val version = "1.7.0"
+    const val version = "1.7.1"
     const val githubGroup = "care.data4life.hc-sdk-kmp"
     const val group = githubGroup
     const val artifactId = "hc-sdk-kmp"
@@ -25,7 +25,7 @@ object LibraryConfig {
     const val year = "2020"
     const val description = "Android SDK for interacting with the Data4Life Personal Health Data Platform."
 
-    const val referenceSdkVersion = "1.6.1"
+    const val referenceSdkVersion = "1.7.0"
 
     // DEVELOPER
     const val developerId = "d4l-data4life"

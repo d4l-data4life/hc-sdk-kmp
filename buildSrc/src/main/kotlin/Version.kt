@@ -22,7 +22,7 @@ object Version {
      * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)
      */
     const val fhirSdk = "0.7.0"
-    const val fhirHelper = "1.2.4"
+    const val fhirHelper = "1.3.0"
 
     // kotlin
     const val kotlin = "1.3.72"

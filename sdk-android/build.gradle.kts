@@ -48,15 +48,6 @@ android {
             timeOutInMs(10 * 60 * 1000)
             installOptions("-d")
         }
-
-        manifestPlaceholders = mapOf<String, Any>(
-                "clientId" to d4lClientConfig[Environment.DEVELOPMENT].id,
-                "clientSecret" to d4lClientConfig[Environment.DEVELOPMENT].secret,
-                "redirectScheme" to d4lClientConfig[Environment.DEVELOPMENT].redirectScheme,
-                "environment" to "${Environment.DEVELOPMENT}",
-                "platform" to d4lClientConfig.platform,
-                "debug" to "true"
-        )
     }
 
     buildTypes {

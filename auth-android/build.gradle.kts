@@ -42,14 +42,6 @@ android {
             installOptions("-d")
         }
 
-        manifestPlaceholders = mapOf<String, Any>(
-                "clientId" to d4lClientConfig[Environment.DEVELOPMENT].id,
-                "clientSecret" to d4lClientConfig[Environment.DEVELOPMENT].secret,
-                "redirectScheme" to d4lClientConfig[Environment.DEVELOPMENT].redirectScheme,
-                "environment" to "${Environment.DEVELOPMENT}",
-                "platform" to d4lClientConfig.platform,
-                "debug" to "true"
-        )
     }
 
     resourcePrefix("d4l_auth_")
@@ -143,24 +135,3 @@ dependencies {
 }
 
 apply(from = "${project.rootDir}/gradle/deploy-android.gradle")
-
-val androidTestAssetsPath = "${projectDir}/src/androidTest/assets"
-val unitTestAssetsPath = "${projectDir}/src/test/assets"
-
-val provideTestConfig: Task by tasks.creating {
-    doLast {
-        val androidTestAsset = File(androidTestAssetsPath)
-        if (!androidTestAsset.exists()) androidTestAsset.mkdirs()
-        File(androidTestAssetsPath, "test_config.json").writeText(D4LConfigHelper.toJson(d4LTestConfig))
-        val unitTestAsset = File(unitTestAssetsPath)
-        if (!unitTestAsset.exists()) unitTestAsset.mkdirs()
-        File(unitTestAssetsPath, "test_config.json").writeText(D4LConfigHelper.toJson(d4LTestConfig))
-    }
-}
-
-tasks.named("clean") {
-    doLast {
-        delete("${androidTestAssetsPath}/test_config.json")
-        delete("${unitTestAssetsPath}/test_config.json")
-    }
-}

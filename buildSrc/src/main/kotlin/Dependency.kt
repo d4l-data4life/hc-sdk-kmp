@@ -44,7 +44,7 @@ object Dependency {
         }
 
         object D4L {
-            const val utilCommon = "care.data4life.hc-util-sdk-kmp:util-metadata:${Version.sdkUtil}"
+            const val utilCommon = "care.data4life.hc-util-sdk-kmp:util:${Version.sdkUtil}"
             const val utilJvm = "care.data4life.hc-util-sdk-kmp:util-jvm:${Version.sdkUtil}"
             const val utilAndroid = "care.data4life.hc-util-sdk-kmp:util-android:${Version.sdkUtil}"
 

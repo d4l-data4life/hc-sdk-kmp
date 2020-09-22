@@ -47,6 +47,7 @@ android {
     buildTypes {
         getByName("debug") {
             isTestCoverageEnabled = false
+            matchingFallbacks = listOf("debug", "release")
         }
         getByName("release") {
             isMinifyEnabled = false

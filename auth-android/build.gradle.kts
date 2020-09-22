@@ -42,6 +42,14 @@ android {
             installOptions("-d")
         }
 
+        buildTypes {
+            buildTypes {
+                getByName("debug"){
+                    matchingFallbacks = listOf("debug","release")
+                }
+            }
+        }
+
     }
 
     resourcePrefix("d4l_auth_")

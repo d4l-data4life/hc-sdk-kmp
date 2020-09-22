@@ -38,6 +38,14 @@ android {
             timeOutInMs(10 * 60 * 1000)
             installOptions("-d")
         }
+
+        buildTypes {
+            buildTypes {
+                getByName("debug"){
+                    matchingFallbacks = listOf("debug","release")
+                }
+            }
+        }
     }
 
     resourcePrefix("d4l_crypto_")

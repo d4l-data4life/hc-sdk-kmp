@@ -56,6 +56,11 @@ android {
     }
 
     buildTypes {
+        buildTypes {
+            getByName("debug") {
+                matchingFallbacks = listOf("debug", "release")
+            }
+        }
         getByName("release") {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")

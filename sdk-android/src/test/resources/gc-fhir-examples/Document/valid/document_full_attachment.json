@@ -1,0 +1,27 @@
+{
+  "status": "current",
+  "content": [
+    {
+      "attachment": {
+        "id": "C92D428B-8A38-4DE2-B3AA-BD4A3E0314EA",
+        "title": "some-attachment-title",
+        "creation": "2018-08-21T12:22:03.17273Z",
+        "contentType": "application\/octet-stream"
+      }
+    }
+  ],
+  "indexed": "2018-08-21T12:22:03.17237Z",
+  "identifier": [
+    {
+      "value": "custom-identifer",
+      "assigner": {
+        "reference": "ios"
+      }
+    }
+  ],
+  "type": {
+    "text": "some-type"
+  },
+  "resourceType": "DocumentReference",
+  "description": "some-title"
+}

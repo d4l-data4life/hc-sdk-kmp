@@ -1,0 +1,20 @@
+{
+  "code": {
+    "coding": [
+      {
+        "system": "some-system",
+        "display": "some-displayname",
+        "code": "some-code"
+      }
+    ]
+  },
+  "resourceType": "DiagnosticReport",
+  "status": "final",
+  "performer": [
+    {
+      "actor": {
+        "display": "some-lab-name"
+      }
+    }
+  ]
+}

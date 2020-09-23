@@ -1,0 +1,13 @@
+{
+  "code": {
+    "coding": [
+      {
+        "system": "some-system",
+        "display": "some-name",
+        "code": "some-code"
+      }
+    ]
+  },
+  "status": "final",
+  "resourceType": "Observation"
+}

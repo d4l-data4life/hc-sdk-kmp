@@ -1,0 +1,10 @@
+{
+  "test": "tekEncrypt",
+  "input": "data4life",
+  "output": "71U2i1XGCxN80zB1Pyt2qI2nCbIaLvk/uKj63EJ4+Cs=",
+  "key": {
+    "t": "tek",
+    "sym": "dHJiuu+8BvbYV4AKiDuMpCNh3ZWBH7EBbUi5IDK3BHg=",
+    "v": 1
+  }
+}

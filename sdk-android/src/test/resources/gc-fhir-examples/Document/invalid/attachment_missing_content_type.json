@@ -1,0 +1,18 @@
+{
+  "status": "current",
+  "content": [
+    {
+      "attachment": {
+        "id": "DC14D75B-B053-4D2B-AE87-D81E052025CF",
+        "title": "some-attachment-title",
+        "creation": "2018-08-21T12:06:01.12806Z"
+      }
+    }
+  ],
+  "indexed": "2018-08-21T12:06:01.12728Z",
+  "type": {
+    "text": "some-type"
+  },
+  "resourceType": "DocumentReference",
+  "description": "some-title"
+}

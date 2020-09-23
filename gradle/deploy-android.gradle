@@ -1,0 +1,94 @@
+/*
+ * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+ *
+ * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
+ * including any intellectual property rights that subsist in the SDK.
+ *
+ * The SDK and its documentation may be accessed and used for viewing/review purposes only.
+ * Any usage of the SDK for other purposes, including usage for the development of
+ * applications/third-party applications shall require the conclusion of a license agreement
+ * between you and D4L.
+ *
+ * If you are interested in licensing the SDK for your own applications/third-party
+ * applications and/or if you’d like to contribute to the development of the SDK, please
+ * contact D4L by email to help@data4life.care.
+ */
+
+apply plugin: 'maven-publish'
+
+version = LibraryConfig.version
+group = LibraryConfig.group
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+task androidJavadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    options.linkSource true
+    options.addStringOption('encoding', 'UTF-8')
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    failOnError false
+}
+
+task androidJavadocJar(type: Jar, dependsOn: androidJavadoc) {
+    classifier = 'javadoc'
+    from androidJavadoc.destinationDir
+}
+
+artifacts {
+    archives androidSourcesJar
+    archives androidJavadocJar
+}
+
+androidJavadoc {
+    failOnError false
+}
+
+afterEvaluate {
+    publishing {
+        repositories {
+            maven {
+                name = "GithubPackages"
+                url = uri("https://maven.pkg.github.com/d4l-data4life/hc-sdk-kmp")
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
+                    password = project.findProperty("gpr.key") ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+                }
+            }
+        }
+        publications {
+            gpr(MavenPublication) {
+
+                from(components["release"])
+                artifact(tasks["androidSourcesJar"])
+                pom {
+                    name.set(LibraryConfig.name)
+                    description.set(LibraryConfig.description)
+                    url.set(LibraryConfig.url)
+
+                    scm {
+                        connection.set(LibraryConfig.scmConnection)
+                        developerConnection.set(LibraryConfig.scmDeveloperConnection)
+                        url.set(LibraryConfig.scmUrl)
+                    }
+                    licenses {
+                        license {
+                            name.set("${LibraryConfig.licenseName}")
+                            url.set("${LibraryConfig.licenseUrl}")
+                            distribution.set("${LibraryConfig.licenseDistribution}")
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set("${LibraryConfig.developerId}")
+                            name.set("${LibraryConfig.developerName}")
+                            email.set("${LibraryConfig.developerEmail}")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

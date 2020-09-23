@@ -1,0 +1,282 @@
+:library_version: 0.0.1
+:toc: macro
+:toclevels: 2
+:toc-title:
+ifdef::env-github[]
+:imagesdir: https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/assets/images/
+:link-license: https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/LICENSE
+:link-contribution: https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/CONTRIBUTION.adoc
+:warning-caption: :warning:
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+endif::[]
+ifndef::env-github[]
+:icons: font
+:imagesdir: ./assets/images
+:link-license: ./LICENCE
+:link-contribution: ./CONTRIBUTION.adoc
+endif::[]
+
+++++
+<div align="center">
+    <!-- PROJECT LOGO -->
+    <p>
+        <a><img src="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/assets/images/d4l-logo.svg" width="150"/></a>
+    </p>
+    <!-- PROJECT HEADER -->
+    <h1>The Data4Life Android and Java SDK</h1>
+    <p><!-- PROJECT DESCRIPTION -->
+        This is the Android and Java SDK of Data4Life.The SDK encapsulates the backend functionality of the Data4Life Personal Health Data Platform (PHDP) and enables end-to-end encryption of patient data.It allows users to store sensitive health data on the secure platform and share it to authorized people and applications.
+
+For more information about the platform, visit our website <a href="https://www.d4l.io/">www.d4l.io</a>.
+    </p>
+    <p><!-- PROJECT DOCUMENTATION -->
+        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp"><strong>Explore the docs »</strong></a>
+    </p>
+    <p><!-- PROJECT ISSUES/FEATURES -->
+        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/issues">Report Bug</a>
+        ·
+        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/issues">Request Feature</a>
+    </p>
+    <p><!-- PROJECT BADGES -->
+        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/actions">
+            <img src="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/workflows/D4L%20CI%20KMP/badge.svg" alt="Build Status"/>
+        </a>
+        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/LICENSE">
+            <img src="https://img.shields.io/badge/license-PRIVATE-blue.svg"/>
+        </a>
+    </p>
+</div>
+++++
+
+[discrete]
+=== Table Of Contents
+toc::[]
+
+
+== Documentation
+
+For the current documentation, see link:https://www.d4l.io/[documentation]
+
+
+== Before you start
+
+To use the Data4Life SDK, you must obtain a partner ID from Data4Life. To receive a partner ID, get in touch with us at contact@data4life.care.
+
+If you just want to explore the SDK you'll find a test configuration in `sample-android` or `sample-java` to start with.
+
+=== Software requirements
+
+* Android 5.0.1 (API 21) to Android 10 (API 29)
+* Kotlin 1.3.72
+* Java 8 link:https://developer.android.com/studio/write/java8-support[Limitations] link:https://jakewharton.com/d8-library-desugaring/[Desugaring]
+* Gradle 6.4.1
+
+=== Dependencies
+
+The SDK has the following dependencies:
+
+* link:https://github.com/square/retrofit[retrofit2]
+* link:https://github.com/ReactiveX/RxJava[rxjava2]
+* link:https://github.com/d4l-data4life/hc-fhir-sdk-java[D4L FHIR STU3]
+* link:https://github.com/ThreeTen/threetenbp[ThreeTen Java 8 Time backport]
+* link:http://bouncycastle.org/[BouncyCastle] *
+* link:https://github.com/google/tink[Tink]
+* link:https://github.com/openid/AppAuth-Android[AppAuth] **
+
+**Notes:**
+
+\* The SDK ships with BouncyCastle 1.64 and will replace the BouncyCastle version provided by the Android system.Ensure that if you're using or depend on BouncyCastle CryptoProvider, you're still compatible. <br />
+\** The SDK ships with a forked version of the AppAuth lib which includes a compatibility fix for working with `androidx` libs and a synchronous token refresh call for better thread handling.
+
+
+== Install Gradle
+
+Add the following maven repository url to your root build.gradle:
+
+Please take a look over at Github https://docs.github.com/en/packages/publishing-and-managing-packages/about-github-packages#about-tokens[aboout-github-packages#tokens, window="_blank"] on how to generate your private token for accessing the Github Package Registry.
+Add `gpr.user = {your Github username}` and `gpr.key = {private github access token}` to your `gradle.properties`
+
+[source,gradle]
+----
+allprojects {
+    repositories {
+        ...
+        maven {
+            url = uri("https://maven.pkg.github.com/d4l-data4life/hc-util-sdk-kmp")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+            }
+        }
+        maven {
+            url = uri("https://maven.pkg.github.com/d4l-data4life/hc-fhir-sdk-java")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+            }
+        }
+        maven {
+            url = uri("https://maven.pkg.github.com/d4l-data4life/hc-fhir-helper-sdk-kmp")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+            }
+        }
+    }
+}
+----
+
+Your GitHub **username** and **token** needs to be stored in your global Gradle properties: `~/.gradle/gradle.properties`
+
+NOTICE:: You need to have *read* access to this repository and generate a link:https://github.com/settings/tokens/new[personal access token] with `repo`, `write:packages` and `read:packages` scope.
+
+----
+gpr.user=github-username
+gpr.key=github-token
+----
+
+=== Java
+
+Add the following dependencies to your app `build.gradle` file.
+
+[source,gradle]
+----
+dependencies {
+    implementation('care.data4life.hc-sdk-kmp:sdk-jvm:${latestVersion}') {
+            exclude group: 'care.data4life.hc-sdk-kmp', module: 'securestore-android'
+            exclude group: 'care.data4life.hc-sdk-kmp', module: 'crypto-android'
+            exclude group: 'care.data4life.hc-sdk-kmp', module: 'auth-android'
+            exclude group: 'care.data4life.hc-util-sdk-kmp', module: 'util-android'
+    }
+}
+----
+
+=== Android
+
+[source,gradle]
+----
+dependencies {
+    implementation('care.data4life.hc-sdk-kmp:sdk-android:${latestVersion}') {
+        exclude group: 'care.data4life.hc-sdk-kmp', module: 'securestore-jvm'
+        exclude group: 'care.data4life.hc-sdk-kmp', module: 'crypto-jvm'
+        exclude group: 'care.data4life.hc-sdk-kmp', module: 'auth-jvm'
+        exclude group: 'care.data4life.hc-util-sdk-kmp', module: 'util-jvm'
+    }
+}
+----
+
+The SDK ships with link:https://github.com/ThreeTen/threetenbp[ThreeTenBP] a Java 8 Time backport.For Android, its loading mechanism of time zone information is inefficient.So we recommend to provide your favorite Android ThreeTen library here, for example link:https://github.com/JakeWharton/ThreeTenABP[ThreeTenABP].
+
+[source,gradle]
+----
+dependencies {
+    implementation("care.data4life.hc-sdk-kmp:sdk-android:${latestVersion}") {
+        ...
+        // exclude the threetenbp dependency from the `sdk`
+        exclude group: 'org.threeten', module: 'threetenbp'
+    }
+    // provide your favorite ThreeTen library here
+    implementation 'com.jakewharton.threetenabp:threetenabp:1.2.2'
+}
+----
+
+To ensure Java 8 compatibility, add compile options to app `build.gradle`:
+
+[source,gradle]
+----
+android {
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+}
+----
+
+
+== Building the SDK
+
+There are several requirements for building the SDK.
+
+=== Requirements
+
+* Android 5.0.1 (API 21) to Android 10 (API 29)
+* Kotlin 1.3.72
+* Java 8 link:https://developer.android.com/studio/write/java8-support[Limitations] link:https://jakewharton.com/d8-library-desugaring/[Desugaring]
+* Gradle 6.5
+* link:https://developer.android.com/studio#downloads[Android Studio 4.0.0]
+* Android Emulator 21 - 29
+
+**Note:** Disable Instant Run in Android Studio, or the project fails to compile.
+
+
+=== SDK
+
+==== Releasing the SDK
+
+For release management, we use link:https://help.github.com/articles/creating-releases/[GitHub Releases].So just create a new release, set the tag according to link:https://semver.org/[Semantic Versioning] and publish.
+
+==== Testing the SDK
+
+For testing purposes, you could use the latest main commit by adding the `{latestCommitHashOnMain}` as version number to your app `build.gradle` dependency.
+Please use the latest commit id from link:https://github.com/d4l-data4life/hc-sdk-kmp/commits/main[main] which should be truncated to the first 8 characters.
+
+===== Java
+
+[source,gradle]
+----
+dependencies {
+    implementation("care.data4life.hc-sdk-kmp:sdk-jvm:{latestCommitHashOnMain}") {
+        ...
+    }
+}
+----
+
+===== Android
+
+[source,gradle]
+----
+dependencies {
+    implementation("care.data4life.hc-sdk-kmp:sdk-android:{latestCommitHashOnMain}") {
+        ...
+    }
+}
+----
+
+==== Maintainer
+Certificate pinning is done by providing a set of certificates by hash of the public key. To get the hash from certificate use the following:
+
+[source,bash]
+----
+openssl x509 -inform der -in sandbox.hpihc.de.cer -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64
+----
+
+==== Certificate Pin
+To get the Base64 encoded sha256 of the HTTPS public key pinning use the following command in the terminal
+
+[source,bash]
+----
+openssl s_client -servername api.data4life.care -connect app.data4life.care:443 | openssl x509 -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64
+----
+See link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Public_Key_Pinning[HTTP Public Key Pinning] for more information.
+
+
+=== About Data4Life documentation
+We use link:https://asciidoctor.org/[AsciiDoctor], a fast, open source text processor and publishing toolchain for converting AsciiDoc content to HTML5, DocBook, PDF, and other formats.In this case HTML5.
+
+To build the project documentation we use the link:https://github.com/asciidoctor/asciidoctor-gradle-plugin[Asciidoctor Gradle Plugin] that fits our Gradle build chain.
+
+Additionally, we use the link:https://github.com/asciidoctor/asciidoctor-diagram[AsciiDoctor Diagramm extension] which adds support for BlockDiag (BlockDiag, SeqDiag, ActDiag, NwDiag), Ditaa, Erd, GraphViz, Mermaid, Msc, PlantUML, Shaape, SvgBob, Syntrax, UMLet, Vega, Vega-Lite and WaveDrom.
+
+==== Documentation structure
+The base for the documentation is located in the `sdk-doc` module.It's main purpose is to configure Asciidoctor and define the style and distribution.
+You will find a `index.adoc` under `sdk-doc/src/docs/asciidoc` which is used to include documentation of other modules in one single book documentation.
+
+Every project module has a `{module-name}/src/docs/asciidoc` folder where all documentation files will be located.So every module will host it's own documentation.
+
+==== Generating the documentation
+To generate the latest documentation just call `./gradlew asciidoctor` this will build the `sdk-doc` module and replace the documentation for the current SDK version in the `docs` folder.
+
+

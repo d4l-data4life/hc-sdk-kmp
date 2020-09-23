@@ -1,0 +1,25 @@
+{
+  "code": {
+    "coding": [
+      {
+        "system": "some-system",
+        "display": "some-displayname",
+        "code": "some-code"
+      }
+    ]
+  },
+  "resourceType": "DiagnosticReport",
+  "status": "final",
+  "result": [
+    {
+      "id": "08E3414C-F942-4452-BA14-93D43794B0FA"
+    }
+  ],
+  "performer": [
+    {
+      "actor": {
+        "display": "some-lab-name"
+      }
+    }
+  ]
+}

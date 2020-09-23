@@ -1,0 +1,22 @@
+{
+  "code": {
+    "coding": [
+      {
+        "system": "some-system",
+        "display": "some-name",
+        "code": "some-code"
+      }
+    ]
+  },
+  "resourceType": "Observation",
+  "category": [
+    {
+      "coding": [
+        {
+          "display": "Laboratory",
+          "code": "laboratory"
+        }
+      ]
+    }
+  ]
+}

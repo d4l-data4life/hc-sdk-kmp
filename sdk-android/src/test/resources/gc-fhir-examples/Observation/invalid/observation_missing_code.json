@@ -1,0 +1,14 @@
+{
+  "status": "final",
+  "resourceType": "Observation",
+  "category": [
+    {
+      "coding": [
+        {
+          "display": "Laboratory",
+          "code": "laboratory"
+        }
+      ]
+    }
+  ]
+}

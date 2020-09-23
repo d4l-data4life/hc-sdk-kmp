@@ -1,0 +1,69 @@
+{
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "some-system",
+          "display": "some-display",
+          "code": "some-code"
+        }
+      ]
+    }
+  ],
+  "issued": "2018-08-21T12:58:24.3477Z",
+  "code": {
+    "coding": [
+      {
+        "system": "some-system",
+        "display": "some-display",
+        "code": "some-code"
+      }
+    ]
+  },
+  "component": [
+    {
+      "valueString": "60",
+      "code": {
+        "coding": [
+          {
+            "system": "http://loinc.org",
+            "display": "Genetic analysis master panel",
+            "code": "55233-1"
+          }
+        ]
+      }
+    },
+    {
+      "valueQuantity": {
+        "value": 80,
+        "unit": "bpm"
+      },
+      "code": {
+        "coding": [
+          {
+            "system": "http://loinc.org",
+            "display": "Genetic analysis master panel",
+            "code": "55233-1"
+          }
+        ]
+      }
+    }
+  ],
+  "referenceRange": [
+    {
+      "low": {
+        "value": 70,
+        "unit": "bpm",
+        "comparator": ">="
+      },
+      "high": {
+        "value": 110,
+        "unit": "bpm",
+        "comparator": "<="
+      }
+    }
+  ],
+  "effectiveDateTime": "2018-08-21T12:58:24.3477Z",
+  "resourceType": "Observation"
+}

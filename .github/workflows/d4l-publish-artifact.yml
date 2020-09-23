@@ -8,7 +8,7 @@ on:
 jobs:
   build:
 
-    runs-on: [self-hosted, macos]
+    runs-on: ubuntu-latest
 
     env:
       D4L_CLIENT_CONFIG_ANDROID: ${{ secrets.D4L_CLIENT_CONFIG_ANDROID }}

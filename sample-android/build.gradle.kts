@@ -25,6 +25,7 @@ val d4LTestConfig = D4LConfigHelper.loadTestConfigAndroid("$rootDir")
 
 android {
     compileSdkVersion(AndroidConfig.compileSdkVersion)
+    ndkVersion = "21.3.6528147"
 
     defaultConfig {
         minSdkVersion(AndroidConfig.minSdkVersion)

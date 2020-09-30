@@ -42,10 +42,12 @@ public final class Data4LifeClient extends BaseClient {
     private static final String ALIAS = "broker";
     private static final String DUMMY_CLIENT_SECRET = "secret";
     private static final String DUMMY_REDIRECT_URL = "dummy";
-
+    /* Since this client get an OAuth access token directly and never makes
+    * any requests to the OAuth endpoint, we let the set of scopes be empty. */
+    private static final Set<String> EMPTY_SCOPES = new HashSet<>();
 
     /**
-     * Hidden constructor for the client.
+     * Hidden constructor for the ingestion client.
      *
      * @param alias         Alias
      * @param userService   User service
@@ -60,7 +62,12 @@ public final class Data4LifeClient extends BaseClient {
     }
 
     /**
-     * Factory method for creating a write-only manual auth SDK client instance.
+     * Factory method for creating an ingestion SDK client instance.
+     *
+     * Unlike a normal SDK client, the ingestion SDK client does not handle OAuth authorization.
+     * Instead, the OAuth flow must be handled by the system using the client and a valid OAuth
+     * access token must be passed in. Likewise, the service must be passed the private key that
+     * is to be used for the exchange of the symmetric PHDP common key.
      *
      * @param accessToken   Valid OAuth access token
      * @param capPrivateKey Private key (used for common key exchange) in PEM format (not base 64 encoded)
@@ -72,10 +79,7 @@ public final class Data4LifeClient extends BaseClient {
                                        byte[] capPrivateKey,
                                        Environment environment,
                                        String platform) {
-        // TODO: Correct, confirm?!?!?! Scopes are fixed
-        Set<String> scopes = new HashSet<>(Arrays.asList("perm:r", "rec:w", "attachment:w", "user:r", "user:q"));
-
-        Log.info(String.format("Initializing SDK for alias(%s) with scopes(%s)", ALIAS, scopes));
+        Log.info("Initializing ingestion SDK client SDK");
 
         // Need the client ID for tags etc.
         final AccessTokenDecoder accessTokenDecoder = new AccessTokenDecoder();
@@ -87,7 +91,7 @@ public final class Data4LifeClient extends BaseClient {
                 environment.getApiBaseURL(platform),
                 environment.getApiBaseURL(platform),
                 DUMMY_REDIRECT_URL,
-                scopes
+                EMPTY_SCOPES
         );
 
         SecureStoreContract.SecureStore secureStore = new SecureStore(new SecureStoreCryptor(), new SecureStoreStorage());

@@ -90,7 +90,7 @@ final class ApiService {
      * @param clientSecret        Client secret
      * @param platform            Usage platform (D4L, S4H)
      * @param connectivityService Connectivity service
-     * @param clientName          CLlent name
+     * @param clientName          Client name
      * @param useStaticToken      FLag indicating if a static OAuth token should be used (no token reneval)
      * @param debug               Debug flag
      */
@@ -161,12 +161,8 @@ final class ApiService {
             return chain.proceed(request);
         };
 
-        Interceptor authorizationInterceptor;
-        if (this.useStaticToken) {
-            authorizationInterceptor = this::staticTokenIntercept;
-        } else {
-            authorizationInterceptor = this::intercept;
-        }
+        // Pick authentication interceptor based on whether a static access token is used or not
+        Interceptor authorizationInterceptor = this.useStaticToken ? this::staticTokenIntercept : this::intercept;
 
         Interceptor retryInterceptor = chain -> {
             Request request = chain.request();
@@ -295,10 +291,24 @@ final class ApiService {
                 .subscribeOn(Schedulers.io());
     }
 
+    /**
+     * Carry out needed logout actions.
+     *
+     * When using refresh token, this will revoke the OAuth access.
+     * Wnen using a static access token, nothing will be done.
+     *
+     * @param alias Alias
+     * @return Completable
+     */
     Completable logout(String alias) {
-        return Single
-                .fromCallable(() -> oAuthService.getRefreshToken(alias))
-                .flatMapCompletable(token -> service.logout(alias, token));
+        if (this.useStaticToken) {
+            // Return with immediate completion
+            return Completable.complete();
+        } else {
+            return Single
+                    .fromCallable(() -> oAuthService.getRefreshToken(alias))
+                    .flatMapCompletable(token -> service.logout(alias, token));
+        }
     }
 
     private Response intercept(Interceptor.Chain chain) throws IOException {

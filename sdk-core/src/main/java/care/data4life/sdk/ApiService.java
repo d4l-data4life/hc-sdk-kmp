@@ -79,8 +79,21 @@ final class ApiService {
     private OkHttpClient client;
     private final String clientName;
     private final boolean debug;
+    private final boolean useStaticToken;
 
-
+    /**
+     * Full constructor.
+     *
+     * @param oAuthService        OAuth service
+     * @param environment         Deployment environment
+     * @param clientID            Client ID
+     * @param clientSecret        Client secret
+     * @param platform            Usage platform (D4L, S4H)
+     * @param connectivityService Connectivity service
+     * @param clientName          CLlent name
+     * @param useStaticToken      FLag indicating if a static OAuth token should be used (no token reneval)
+     * @param debug               Debug flag
+     */
     ApiService(OAuthService oAuthService,
                Environment environment,
                String clientID,
@@ -88,6 +101,7 @@ final class ApiService {
                String platform,
                NetworkConnectivityService connectivityService,
                String clientName,
+               boolean useStaticToken,
                boolean debug) {
         this.oAuthService = oAuthService;
         this.environment = environment;
@@ -97,7 +111,38 @@ final class ApiService {
         this.connectivityService = connectivityService;
         this.clientName = clientName;
         this.debug = debug;
+        this.useStaticToken = useStaticToken;
         configureService();
+    }
+
+    /**
+     * Convenience constructor for instances that uses dynamic OAuth token retrieval.
+     *
+     * @param oAuthService        OAuth service
+     * @param environment         Deployment environment
+     * @param clientID            Client ID
+     * @param clientSecret        Client secret
+     * @param platform            Usage platform (D4L, S4H)
+     * @param connectivityService Connectivity service
+     * @param clientName          Client name
+     * @param debug               Debug flag
+     */
+    ApiService(OAuthService oAuthService,
+               Environment environment,
+               String clientID,
+               String clientSecret,
+               String platform,
+               NetworkConnectivityService connectivityService,
+               String clientName,
+               boolean debug) {
+        this(oAuthService,
+                environment,
+                clientID,
+                clientSecret,
+                platform,
+                connectivityService,
+                clientName,
+                false, debug);
     }
 
     private void configureService() {
@@ -116,7 +161,12 @@ final class ApiService {
             return chain.proceed(request);
         };
 
-        Interceptor authorizationInterceptor = this::intercept;
+        Interceptor authorizationInterceptor;
+        if (this.useStaticToken) {
+            authorizationInterceptor = this::staticTokenIntercept;
+        } else {
+            authorizationInterceptor = this::intercept;
+        }
 
         Interceptor retryInterceptor = chain -> {
             Request request = chain.request();
@@ -287,6 +337,31 @@ final class ApiService {
             }
             return response;
         }
+        return chain.proceed(request);
+    }
+
+    /**
+     * Interceptor that attaches an OAuth access token to a request (without testing
+     * if it works or trying to get a new access token upon failure).
+     *
+     * @param chain OkHttp interceptor chain
+     * @return OkHttp response
+     * @throws IOException
+     */
+    private Response staticTokenIntercept(Interceptor.Chain chain) throws IOException {
+        Request request = chain.request();
+        String alias = request.header(HEADER_ALIAS);
+        String authHeader = request.headers().get(HEADER_AUTHORIZATION);
+        String tokenKey;
+        try {
+            tokenKey = oAuthService.getAccessToken(alias);
+        } catch (D4LException e) {
+            throw new IOException("Failed to attach access token");
+        }
+        request = request.newBuilder()
+                .removeHeader(HEADER_AUTHORIZATION)
+                .removeHeader(HEADER_ALIAS)
+                .addHeader(HEADER_AUTHORIZATION, String.format(FORMAT_BEARER_TOKEN, tokenKey)).build();
         return chain.proceed(request);
     }
 }

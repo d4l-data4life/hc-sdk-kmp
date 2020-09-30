@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import care.data4life.sdk.lang.D4LException;
+import care.data4life.sdk.lang.D4LRuntimeException;
 import care.data4life.sdk.network.Environment;
 import care.data4life.sdk.network.IHCService;
 import care.data4life.sdk.network.model.CommonKeyResponse;
@@ -116,7 +117,7 @@ final class ApiService {
     }
 
     /**
-     * Convenience constructor for instances that uses dynamic OAuth token retrieval.
+     * Convenience constructor for instances that handle the OAuth flow themselves.
      *
      * @param oAuthService        OAuth service
      * @param environment         Deployment environment
@@ -142,7 +143,8 @@ final class ApiService {
                 platform,
                 connectivityService,
                 clientName,
-                false, debug);
+                false,
+                debug);
     }
 
     private void configureService() {
@@ -293,24 +295,35 @@ final class ApiService {
 
     /**
      * Carry out needed logout actions.
-     *
+     * <p>
      * When using refresh token, this will revoke the OAuth access.
-     * Wnen using a static access token, nothing will be done.
+     * When using a static access token, nothing will be done.
      *
      * @param alias Alias
      * @return Completable
      */
     Completable logout(String alias) {
         if (this.useStaticToken) {
-            // Return with immediate completion
-            return Completable.complete();
-        } else {
-            return Single
-                    .fromCallable(() -> oAuthService.getRefreshToken(alias))
-                    .flatMapCompletable(token -> service.logout(alias, token));
+            throw new D4LRuntimeException("Cannot log out when using a static access token!");
         }
+        return Single
+                .fromCallable(() -> oAuthService.getRefreshToken(alias))
+                .flatMapCompletable(token -> service.logout(alias, token));
+
     }
 
+    /**
+     * Interceptor that attaches an authorization header to a request.
+     * <p>
+     * The authorization can be basic auth or OAuth. In the OAuth case, the
+     * interceptor will try the request snd if it comes back with a status code
+     * 401 (unauthorized), it will update the OAuth access token using the
+     * refresh token.
+     *
+     * @param chain OkHttp interceptor chain
+     * @return OkHttp response
+     * @throws IOException
+     */
     private Response intercept(Interceptor.Chain chain) throws IOException {
         Request request = chain.request();
         String alias = request.header(HEADER_ALIAS);
@@ -351,8 +364,12 @@ final class ApiService {
     }
 
     /**
-     * Interceptor that attaches an OAuth access token to a request (without testing
-     * if it works or trying to get a new access token upon failure).
+     * Interceptor that attaches an OAuth access token to a request.
+     * <p>
+     * This interceptor is used for the case where the SDK client does not
+     * handle the OAuth flow itself and merely gets an access token injected.
+     * Accordingly this interceptor does not attempt to refresh the access token
+     * if the request should fail.
      *
      * @param chain OkHttp interceptor chain
      * @return OkHttp response

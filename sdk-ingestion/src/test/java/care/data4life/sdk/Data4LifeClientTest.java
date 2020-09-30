@@ -66,4 +66,6 @@ public class Data4LifeClientTest {
                 errorHandler);
     }
 
+    // TODO Need to define new tests
+
 }

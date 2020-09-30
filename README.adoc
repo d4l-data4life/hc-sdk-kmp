@@ -104,6 +104,7 @@ Add `gpr.user = {your Github username}` and `gpr.key = {private github access to
 allprojects {
     repositories {
         ...
+        maven("https://jitpack.io")
         maven {
             url = uri("https://maven.pkg.github.com/d4l-data4life/hc-util-sdk-kmp")
             credentials {

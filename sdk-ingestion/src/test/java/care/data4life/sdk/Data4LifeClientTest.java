@@ -61,29 +61,9 @@ public class Data4LifeClientTest {
 
         instance = new Data4LifeClient(
                 ALIAS,
-                authorizationService,
-                cryptoService,
                 userService,
                 recordService,
                 errorHandler);
-    }
-
-    @Test
-    public void authorizationUrl() {
-        String pubKey = "Pubkey";
-        String authorizationUrl = "authorizationUrl";
-        GCKeyPair mockPair = mock(GCKeyPair.class);
-
-        doReturn(mock(GCAsymmetricKey.class)).when(mockPair).getPublicKey();
-        doReturn(Single.just(mockPair)).when(cryptoService).generateGCKeyPair();
-        doReturn(Single.just(pubKey)).when(cryptoService).convertAsymmetricKeyToBase64ExchangeKey(any(GCAsymmetricKey.class));
-        doReturn(authorizationUrl).when(authorizationService).createAuthorizationUrl(ALIAS, pubKey);
-
-
-        String actualUrl = instance.getAuthorizationUrl();
-
-
-        assertEquals(actualUrl, authorizationUrl);
     }
 
 }

@@ -17,12 +17,13 @@
 package care.data4life.sdk;
 
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
-import care.data4life.auth.Authorization;
 import care.data4life.auth.AuthorizationConfiguration;
 import care.data4life.auth.AuthorizationContract;
-import care.data4life.auth.AuthorizationException;
 import care.data4life.auth.AuthorizationService;
 import care.data4life.auth.storage.InMemoryAuthStorage;
 import care.data4life.sdk.log.Log;
@@ -37,63 +38,45 @@ public final class Data4LifeClient extends BaseClient {
     private static final String CLIENT_NAME = "SDK";
     private static final boolean DEBUG = true;
 
-
-    private AuthorizationService authorizationService;
-    private CryptoService cryptoService;
+    private static final String ALIAS = "broker";
+    private static final String DUMMY_CLIENT_SECRET = "secret";
+    private static final String DUMMY_REDIRECT_URL = "dummy";
 
 
     protected Data4LifeClient(String alias,
-                              AuthorizationService authorizationService,
-                              CryptoService cryptoService,
                               UserService userService,
                               RecordService recordService,
                               SdkContract.ErrorHandler errorHandler) {
         super(alias, userService, recordService, errorHandler);
-        this.authorizationService = authorizationService;
-        this.cryptoService = cryptoService;
     }
 
-    public static Data4LifeClient init(String alias,
-                                       String clientId,
-                                       String clientSecret,
+    public static Data4LifeClient init(byte[] accessToken,
+                                       byte[] capPrivateKey,
                                        Environment environment,
-                                       String redirectUrl,
                                        String platform) {
-        return init(alias, clientId, clientSecret, environment, redirectUrl, platform, Authorization.Companion.getDefaultScopes(), new SecureStore(new SecureStoreCryptor(), new SecureStoreStorage()), new InMemoryAuthStorage());
-    }
+        // TODO: Correct, confirm?!?!?! Scopes are fixed
+        Set<String> scopes = new HashSet<>(Arrays.asList("perm:r", "rec:w", "attachment:w", "user:r", "user:q"));
 
-    public static Data4LifeClient init(String alias,
-                                       String clientId,
-                                       String clientSecret,
-                                       Environment environment,
-                                       String redirectUrl,
-                                       String platform,
-                                       Set<String> scopes) {
-        return init(alias, clientId, clientSecret, environment, redirectUrl, platform, scopes, new SecureStore(new SecureStoreCryptor(), new SecureStoreStorage()), new InMemoryAuthStorage());
-    }
+        Log.info(String.format("Initializing SDK for alias(%s) with scopes(%s)", ALIAS, scopes));
 
-    public static Data4LifeClient init(String alias,
-                                       String clientId,
-                                       String clientSecret,
-                                       Environment environment,
-                                       String redirectUrl,
-                                       String platform,
-                                       Set<String> scopes,
-                                       SecureStoreContract.SecureStore secureStore,
-                                       AuthorizationContract.Storage authorizationStore) {
-        Log.info(String.format("Initializing SDK for alias(%s) with scopes(%s)", alias, scopes));
+        // Need the client ID for tags etc.
+        final AccessTokenDecoder accessTokenDecoder = new AccessTokenDecoder();
+        String clientId = accessTokenDecoder.extractClientId(accessToken);
 
         AuthorizationConfiguration configuration = new AuthorizationConfiguration(
                 clientId,
-                clientSecret,
+                DUMMY_CLIENT_SECRET,
                 environment.getApiBaseURL(platform),
                 environment.getApiBaseURL(platform),
-                redirectUrl,
+                DUMMY_REDIRECT_URL,
                 scopes
         );
 
+        SecureStoreContract.SecureStore secureStore = new SecureStore(new SecureStoreCryptor(), new SecureStoreStorage());
+        AuthorizationContract.Storage authorizationStore= new InMemoryAuthStorage();
+
         AuthorizationService authorizationService = new AuthorizationService(
-                alias,
+                ALIAS,
                 configuration,
                 authorizationStore
         );
@@ -102,22 +85,26 @@ public final class Data4LifeClient extends BaseClient {
         NetworkConnectivityService networkConnectivityService = () -> true;
 
         // Create ApiService that uses a static token
-        ApiService apiService = new ApiService(oAuthService, environment, clientId, clientSecret, platform, networkConnectivityService, CLIENT_NAME, true, DEBUG);
+        ApiService apiService = new ApiService(oAuthService, environment, clientId, DUMMY_CLIENT_SECRET, platform, networkConnectivityService, CLIENT_NAME, true, DEBUG);
 
         CryptoSecureStore cryptoSecureStore = new CryptoSecureStore(secureStore);
-        CryptoService cryptoService = new CryptoService(alias, cryptoSecureStore);
-        UserService userService = new UserService(alias, oAuthService, apiService, cryptoSecureStore, cryptoService);
+        CryptoService cryptoService = new CryptoService(ALIAS, cryptoSecureStore);
+
+        // Inject private key
+        cryptoService.setGCKeyPairFromPemPrivateKey(new String(capPrivateKey, StandardCharsets.UTF_8));
+
+        UserService userService = new UserService(ALIAS, oAuthService, apiService, cryptoSecureStore, cryptoService);
 
         TagEncryptionService tagEncryptionService = new TagEncryptionService(cryptoService);
         TaggingService taggingService = new TaggingService(clientId);
         FhirService fhirService = new FhirService(cryptoService);
-        FileService fileService = new FileService(alias, apiService, cryptoService);
-        AttachmentService attachmentService = new AttachmentService(alias, fileService, new JvmImageResizer());
+        FileService fileService = new FileService(ALIAS, apiService, cryptoService);
+        AttachmentService attachmentService = new AttachmentService(ALIAS, fileService, new JvmImageResizer());
         D4LErrorHandler errorHandler = new D4LErrorHandler();
         String partnerId = clientId.split(CLIENT_ID_SPLIT_CHAR)[PARTNER_ID_INDEX];
-        RecordService recordService = new RecordService(partnerId, alias, apiService, tagEncryptionService, taggingService, fhirService, attachmentService, cryptoService, errorHandler);
+        RecordService recordService = new RecordService(partnerId, ALIAS, apiService, tagEncryptionService, taggingService, fhirService, attachmentService, cryptoService, errorHandler);
 
-        return new Data4LifeClient(alias, authorizationService, cryptoService, userService, recordService, errorHandler);
+        return new Data4LifeClient(ALIAS, userService, recordService, errorHandler);
     }
 
     /**

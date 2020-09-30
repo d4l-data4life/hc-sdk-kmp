@@ -38,11 +38,20 @@ public final class Data4LifeClient extends BaseClient {
     private static final String CLIENT_NAME = "SDK";
     private static final boolean DEBUG = true;
 
+    // Fixed dummy parameters for ingestion client
     private static final String ALIAS = "broker";
     private static final String DUMMY_CLIENT_SECRET = "secret";
     private static final String DUMMY_REDIRECT_URL = "dummy";
 
 
+    /**
+     * Hidden constructor for the client.
+     *
+     * @param alias         Alias
+     * @param userService   User service
+     * @param recordService Record service
+     * @param errorHandler  Error handler
+     */
     protected Data4LifeClient(String alias,
                               UserService userService,
                               RecordService recordService,
@@ -50,6 +59,15 @@ public final class Data4LifeClient extends BaseClient {
         super(alias, userService, recordService, errorHandler);
     }
 
+    /**
+     * Factory method for creating a write-only manual auth SDK client instance.
+     *
+     * @param accessToken   Valid OAuth access token
+     * @param capPrivateKey Private key (used for common key exchange) in PEM format (not base 64 encoded)
+     * @param environment   PHPD environment to be used by SDK client
+     * @param platform      Platform to be used (S4H/D4L)
+     * @return SDK client instance
+     */
     public static Data4LifeClient init(byte[] accessToken,
                                        byte[] capPrivateKey,
                                        Environment environment,
@@ -73,7 +91,7 @@ public final class Data4LifeClient extends BaseClient {
         );
 
         SecureStoreContract.SecureStore secureStore = new SecureStore(new SecureStoreCryptor(), new SecureStoreStorage());
-        AuthorizationContract.Storage authorizationStore= new InMemoryAuthStorage();
+        AuthorizationContract.Storage authorizationStore = new InMemoryAuthStorage();
 
         AuthorizationService authorizationService = new AuthorizationService(
                 ALIAS,

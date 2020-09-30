@@ -101,6 +101,7 @@ public final class Data4LifeClient extends BaseClient {
 
         NetworkConnectivityService networkConnectivityService = () -> true;
 
+        // Create ApiService that uses a static token
         ApiService apiService = new ApiService(oAuthService, environment, clientId, clientSecret, platform, networkConnectivityService, CLIENT_NAME, true, DEBUG);
 
         CryptoSecureStore cryptoSecureStore = new CryptoSecureStore(secureStore);
@@ -119,24 +120,17 @@ public final class Data4LifeClient extends BaseClient {
         return new Data4LifeClient(alias, authorizationService, cryptoService, userService, recordService, errorHandler);
     }
 
-
-    public String getAuthorizationUrl() {
-        return cryptoService
-                .generateGCKeyPair()
-                .flatMap(gcKeyPair -> cryptoService.convertAsymmetricKeyToBase64ExchangeKey(gcKeyPair.getPublicKey()))
-                .map(pubKey -> authorizationService.createAuthorizationUrl(this.alias, pubKey))
-                .blockingGet();
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    public boolean finishLogin(String url) throws Throwable {
-        boolean authorized = authorizationService.finishAuthorization(this.alias, url);
-
-        if (!authorized) {
-            throw (Throwable) new AuthorizationException.FailedToLogin();
-        }
-
-        return userService.finishLogin(authorized).blockingGet();
+    /**
+     * Retrieve and store the keys necessary for encrypting data for upload to PHDP.
+     * <p>
+     * This is the equivalent of the method finishLogin() the standard client service. However,
+     * since this use service is meant for clients that do not handle login themselves, the name
+     * has been changed to better reflect the functionality.
+     *
+     * @return True if fetching and storing succeeded
+     */
+    public boolean fetchKeys() {
+        return userService.finishLogin(true).blockingGet();
     }
 
 }

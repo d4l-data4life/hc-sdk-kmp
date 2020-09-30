@@ -86,28 +86,4 @@ public class Data4LifeClientTest {
         assertEquals(actualUrl, authorizationUrl);
     }
 
-    @Test
-    public void finishLogin() throws Throwable {
-        String callbackUrl = "callbackUrl";
-        doReturn(IS_LOGGED_IN).when(authorizationService).finishAuthorization(ALIAS, callbackUrl);
-        doReturn(Single.just(IS_LOGGED_IN)).when(userService).finishLogin(IS_LOGGED_IN);
-
-        boolean actual = instance.finishLogin(callbackUrl);
-
-        assertTrue(actual);
-
-        verify(authorizationService).finishAuthorization(eq(ALIAS), eq(callbackUrl));
-        verify(userService).finishLogin(eq(IS_LOGGED_IN));
-    }
-
-    @Test(expected = Throwable.class)
-    public void finishLoginShouldFail_whenNotLoggedIn() throws Throwable {
-        String callbackUrl = "callbackUrl";
-        doReturn(IS_LOGGED_OUT).when(authorizationService).finishAuthorization(ALIAS, callbackUrl);
-
-        boolean result = instance.finishLogin(callbackUrl);
-
-        verify(authorizationService).finishAuthorization(eq(ALIAS), eq(callbackUrl));
-        assertEquals(result, IS_LOGGED_OUT);
-    }
 }

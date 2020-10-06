@@ -184,11 +184,21 @@ dependencies {
 }
 ----
 
-To ensure Java 8 compatibility, add compile options to app `build.gradle`:
+To ensure Java 8 compatibility, add compile options to app `build.gradle` as well as the provided client configuration information you got after getting in touch with us:
 
 [source,gradle]
 ----
 android {
+    defaultConfig {
+        manifestPlaceholders = mapOf<String, Any>(
+                "clientId" to "CLIENT_ID",
+                "clientSecret" to "CLIENT_SECRET",
+                "redirectScheme" to "REDIRECT_SCHEME",
+                "environment" to "PRODUCTION",
+                "platform" to "PLATFORM",
+                "debug" to "false"
+        )
+    }
     compileOptions {
         sourceCompatibility 1.8
         targetCompatibility 1.8
@@ -212,13 +222,13 @@ There are several requirements for building the SDK.
 
 **Note:** Disable Instant Run in Android Studio, or the project fails to compile.
 
-==== Usage
+=== Client and test config setup
 
 Before you start you need to add `d4l-client-config-android.json` and `d4l-test-config-android.json` files in the project root folder and add following content.
 
 `d4l-client-config-android.json` needs to contain a config for every environment LOCAL, DEVELOPMENT, STAGING, SANDBOX, PRODUCTION.
 
-NOTE: The CI expects this configuration from environment variables stored in GitHub secrets: `D4L_CLIENT_CONFIG_ANDROID` and `D4L_CLIENT_CONFIG_IOS`
+NOTE: The CI expects this configuration from environment variables stored in GitHub secrets: `D4L_CLIENT_CONFIG_ANDROID` and `D4L_TEST_CONFIG_ANDROID`
 
 [source,json,d4l-client-config-android.json]
 ----

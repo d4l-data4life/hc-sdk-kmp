@@ -108,7 +108,7 @@ public class UserServiceTest {
     @Test
     public void getSessionToken_shouldReturnTrue() throws Exception {
         // given
-        when(oAuthService.getAccessToken(USER_ALIAS)).thenReturn(AUTH_TOKEN);
+        when(oAuthService.refreshAccessToken(USER_ALIAS)).thenReturn(AUTH_TOKEN);
 
         // when
         TestObserver<String> testSubscriber = userService.getSessionToken(USER_ALIAS)
@@ -123,7 +123,7 @@ public class UserServiceTest {
     @Test
     public void getSessionToken_shouldThrowError() throws Exception {
         // given
-        when(oAuthService.getAccessToken(USER_ALIAS)).thenReturn(null);
+        when(oAuthService.refreshAccessToken(USER_ALIAS)).thenReturn(null);
 
         // when
         TestObserver<String> testSubscriber = userService.getSessionToken(USER_ALIAS)

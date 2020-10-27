@@ -92,7 +92,7 @@ final class ApiService {
      * @param platform            Usage platform (D4L, S4H)
      * @param connectivityService Connectivity service
      * @param clientName          Client name
-     * @param useStaticToken      FLag indicating if a static OAuth token should be used (no token reneval)
+     * @param useStaticToken      Flag indicating if a static OAuth token should be used (no token renewal)
      * @param debug               Debug flag
      */
     ApiService(OAuthService oAuthService,

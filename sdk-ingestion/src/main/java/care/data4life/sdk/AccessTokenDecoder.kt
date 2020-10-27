@@ -43,11 +43,10 @@ internal class AccessTokenDecoder {
      * Extract the client ID from the OAuth access token.
      *
      * @param accessToken Full access token
-     *
      * @return Client ID
      */
     fun extractClientId(accessToken: ByteArray?): String {
-        var clientId: String? = null
+        var clientId: String?
         try {
             /*
             Access token is a JWT of the form

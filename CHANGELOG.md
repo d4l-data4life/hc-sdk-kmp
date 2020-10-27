@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - SDKContract method to get active user session token
 ### Changed
+- User service getSessionToken method now returns with an active token not the last known.
 ### Removed
 ### Fixed
 ### Updated

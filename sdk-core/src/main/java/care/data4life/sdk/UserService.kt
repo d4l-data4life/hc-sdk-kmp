@@ -65,7 +65,7 @@ internal class UserService(private val alias: String,
     }
 
     fun getSessionToken(alias: String): Single<String> {
-        return Single.fromCallable { oAuthService.getAccessToken(alias) }
+        return Single.fromCallable { oAuthService.refreshAccessToken(alias) }
     }
 
 }

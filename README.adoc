@@ -229,12 +229,12 @@ On Java side the client config will be passed as arguments to the `init` functio
 
 [source,java]
 ----
-Data4LifeClient.init(alias,
-                    clientId,
-                    clientSecret,
-                    environment,
-                    redirectUrl,
-                    platform);
+Data4LifeClient.init("userAlias",
+                    "CLIENT_ID",
+                    "CLIENT_SECRET",
+                    Environment.PRODUCTION,
+                    "REDIRECT_SCHEME",
+                    "D4L");
 ----
 
 == Building and Working with the SDK

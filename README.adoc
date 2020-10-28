@@ -254,7 +254,7 @@ There are several requirements for building the SDK.
 
 === Config files
 
-Before you start you need to add `d4l-client-config-android.json` and `d4l-test-config-android.json` files in the project root folder and add following content.
+Before you can start to compile the SDK you need to add `d4l-client-config-android.json` and `d4l-test-config-android.json` files in the project root folder and add following content.
 
 `d4l-client-config-android.json` needs to contain a config for every environment LOCAL, DEVELOPMENT, STAGING, SANDBOX, PRODUCTION.
 
@@ -301,7 +301,7 @@ NOTE: The CI expects this configuration from environment variables stored in Git
 To provide the test config to the different modules run the following gradle task in the root directory of the project.
 [source,bash]
 ----
-/gradlew provideTestConfig
+./gradlew provideTestConfig
 ----
 
 

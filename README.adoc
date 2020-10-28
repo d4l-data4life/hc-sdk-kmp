@@ -264,6 +264,7 @@ NOTE: The CI expects this configuration from environment variables stored in Git
 ----
 // d4l-client-config-android.json
 {
+  "platform": "d4l",
   "configs": {
     "LOCAL": {
       "id": "{CLIENT_ID}",

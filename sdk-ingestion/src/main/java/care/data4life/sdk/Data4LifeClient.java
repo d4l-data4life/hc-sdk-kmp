@@ -107,7 +107,7 @@ public final class Data4LifeClient extends BaseClient {
         NetworkConnectivityService networkConnectivityService = () -> true;
 
         // Create ApiService that uses a static token
-        ApiService apiService = new ApiService(oAuthService, environment, clientId, DUMMY_CLIENT_SECRET, platform, networkConnectivityService, CLIENT_NAME, true, DEBUG);
+        ApiService apiService = new ApiService(oAuthService, environment, clientId, DUMMY_CLIENT_SECRET, platform, networkConnectivityService, CLIENT_NAME, accessToken, DEBUG);
 
         CryptoSecureStore cryptoSecureStore = new CryptoSecureStore(secureStore);
         CryptoService cryptoService = new CryptoService(ALIAS, cryptoSecureStore);

@@ -80,10 +80,16 @@ final class ApiService {
     private OkHttpClient client;
     private final String clientName;
     private final boolean debug;
-    private final boolean useStaticToken;
+    private final String staticAccessToken;
 
     /**
      * Full constructor.
+     *
+     * If the staticToken parameter is set to null, the SDK will handle the full OAuth flow
+     * and fetch  access and retrieval tokens, renewing the former as needed for later
+     * requests.
+     * If the a non-null staticToken is passed, the SDK will use this value as an access token.
+     * In this case, it will not dynamical fetch or renew tokens.
      *
      * @param oAuthService        OAuth service
      * @param environment         Deployment environment
@@ -92,7 +98,7 @@ final class ApiService {
      * @param platform            Usage platform (D4L, S4H)
      * @param connectivityService Connectivity service
      * @param clientName          Client name
-     * @param useStaticToken      Flag indicating if a static OAuth token should be used (no token renewal)
+     * @param staticAccessToken   Prefetched OAuth token - if not null, it will be used directly (no token renewal).
      * @param debug               Debug flag
      */
     ApiService(OAuthService oAuthService,
@@ -102,7 +108,7 @@ final class ApiService {
                String platform,
                NetworkConnectivityService connectivityService,
                String clientName,
-               boolean useStaticToken,
+               byte[] staticAccessToken,
                boolean debug) {
         this.oAuthService = oAuthService;
         this.environment = environment;
@@ -112,7 +118,7 @@ final class ApiService {
         this.connectivityService = connectivityService;
         this.clientName = clientName;
         this.debug = debug;
-        this.useStaticToken = useStaticToken;
+        this.staticAccessToken = staticAccessToken == null ? null : new String(staticAccessToken);
         configureService();
     }
 
@@ -143,7 +149,7 @@ final class ApiService {
                 platform,
                 connectivityService,
                 clientName,
-                false,
+                null,
                 debug);
     }
 
@@ -164,7 +170,7 @@ final class ApiService {
         };
 
         // Pick authentication interceptor based on whether a static access token is used or not
-        Interceptor authorizationInterceptor = this.useStaticToken ? this::staticTokenIntercept : this::intercept;
+        Interceptor authorizationInterceptor = this.staticAccessToken != null ? this::staticTokenIntercept : this::intercept;
 
         Interceptor retryInterceptor = chain -> {
             Request request = chain.request();
@@ -303,13 +309,12 @@ final class ApiService {
      * @return Completable
      */
     Completable logout(String alias) {
-        if (this.useStaticToken) {
+        if (this.staticAccessToken != null) {
             throw new D4LRuntimeException("Cannot log out when using a static access token!");
         }
         return Single
                 .fromCallable(() -> oAuthService.getRefreshToken(alias))
                 .flatMapCompletable(token -> service.logout(alias, token));
-
     }
 
     /**
@@ -379,16 +384,10 @@ final class ApiService {
         Request request = chain.request();
         String alias = request.header(HEADER_ALIAS);
         String authHeader = request.headers().get(HEADER_AUTHORIZATION);
-        String tokenKey;
-        try {
-            tokenKey = oAuthService.getAccessToken(alias);
-        } catch (D4LException e) {
-            throw new IOException("Failed to attach access token");
-        }
         request = request.newBuilder()
                 .removeHeader(HEADER_AUTHORIZATION)
                 .removeHeader(HEADER_ALIAS)
-                .addHeader(HEADER_AUTHORIZATION, String.format(FORMAT_BEARER_TOKEN, tokenKey)).build();
+                .addHeader(HEADER_AUTHORIZATION, String.format(FORMAT_BEARER_TOKEN, this.staticAccessToken)).build();
         return chain.proceed(request);
     }
 }

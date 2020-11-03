@@ -19,6 +19,7 @@ package care.data4life.sdk;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import care.data4life.crypto.GCKey;
 import care.data4life.crypto.error.CryptoException;
@@ -48,7 +49,7 @@ class TagEncryptionService {
         iv = new byte[IV_SIZE];
     }
 
-    List<String> encryptTags(HashMap<String, String> tags) throws IOException {
+    List<String> encryptTags(Map<String, String> tags) throws IOException {
         GCKey tek = cryptoService.fetchTagEncryptionKey();
         return Observable
                 .fromIterable(TagHelper.convertToTagList(tags))

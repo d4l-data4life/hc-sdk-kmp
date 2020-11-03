@@ -29,7 +29,7 @@ public final class TagHelper {
     private static final String TAG_DELIMITER = "=";
 
 
-    public static List<String> convertToTagList(HashMap<String, String> tags) {
+    public static List<String> convertToTagList(Map<String, String> tags) {
         List<String> tagList = new ArrayList<>();
         for (Map.Entry<String, String> entry : tags.entrySet()) {
             tagList.add(entry.getKey() + TAG_DELIMITER + entry.getValue());

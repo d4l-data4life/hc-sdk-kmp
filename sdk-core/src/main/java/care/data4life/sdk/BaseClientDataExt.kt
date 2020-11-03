@@ -24,14 +24,37 @@ import care.data4life.sdk.listener.ResultListener
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.Record
 
-//TODO: Replace with basic data record(id,dates,tags etc.)
-typealias AppData = String
-
-
 //TODO: Move to appropriate place
-data class AppDataResource(val resource: String?, var id: String? = null)
+data class AppDataResource(
+        val resource: ByteArray?,
+        var id: String? = null,
+        val userInfo: Map<String, String>
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-data class AppDataRecord(val appDataResource: AppDataResource, val meta: Meta)
+        other as AppDataResource
+
+        if (resource != null) {
+            if (other.resource == null) return false
+            if (!resource.contentEquals(other.resource)) return false
+        } else if (other.resource != null) return false
+        if (id != other.id) return false
+        if (userInfo != other.userInfo) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = resource?.contentHashCode() ?: 0
+        result = 31 * result + (id?.hashCode() ?: 0)
+        result = 31 * result + userInfo.hashCode()
+        return result
+    }
+}
+
+data class AppDataRecord(val appDataResource: AppDataResource,val meta: Meta)
 
 data class DecryptedAppDataRecord(
         val identifier: String?,
@@ -44,47 +67,3 @@ data class DecryptedAppDataRecord(
 ) {
     fun copyWithResource(appData_: AppDataResource) = copy(appData_ = appData_)
 }
-
-
-
-fun SdkContract.Client.createRecord(vararg data: String, resultListener: ResultListener<AppData>) {
-    val records = data.map { data ->
-        DomainResource().apply {
-            extension = listOf(Extension("appData").apply {
-                valueString = data })
-        }
-    }
-
-    records.forEach {
-        createRecord(it, wrapResultListener(resultListener))
-    }
-}
-
-fun SdkContract.Client.downloadRecord(vararg id: String, resultListener: ResultListener<AppData>) {
-    id.forEach {
-        downloadRecord(it,wrapResultListener(resultListener))
-    }
-}
-
-fun SdkContract.Client.updateRecord(vararg data:String, resultListener: ResultListener<AppData>) {
-    data.forEach {
-        updateRecord(TODO(), wrapResultListener(resultListener))
-    }
-}
-
-fun SdkContract.Client.deleteRecord(vararg id: String, resultListener: ResultListener<AppData>) {
-    id.forEach {
-        deleteRecord(it, TODO())
-    }
-}
-
-private fun wrapResultListener(resultListener: ResultListener<AppData>) =
-    object : ResultListener<Record<DomainResource>> {
-        override fun onError(exception: D4LException?) {
-            resultListener.onError(exception)
-        }
-
-        override fun onSuccess(t: Record<DomainResource>?) {
-            resultListener.onSuccess(t!!.fhirResource.extension!!.first().valueString)
-        }
-    }

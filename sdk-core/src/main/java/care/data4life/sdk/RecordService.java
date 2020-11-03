@@ -23,11 +23,7 @@ import org.threeten.bp.format.DateTimeFormatter;
 import org.threeten.bp.format.DateTimeFormatterBuilder;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import javax.annotation.Nullable;
 
@@ -427,10 +423,13 @@ class RecordService {
     }
 
     EncryptedRecord encryptAppDataRecord(DecryptedAppDataRecord record) throws IOException {
-        String resource = record.getAppData_().getResource();
+        byte[] resource = record.getAppData_().getResource();
 
         List<String> encryptedTags = tagEncryptionService.encryptTags(record.getTags());
-        String encryptedResource = cryptoService.encryptString(record.getDataKey(), resource).blockingGet();
+        List<String> encryptedUserTags = tagEncryptionService.encryptTags(record.getAppData_().getUserInfo());
+        byte[] encryptedResource = cryptoService.encrypt(record.getDataKey(), resource).blockingGet();
+
+        encryptedTags.addAll(encryptedUserTags);
 
         GCKey commonKey = cryptoService.fetchCurrentCommonKey();
         String currentCommonKeyId = cryptoService.getCurrentCommonKeyId();
@@ -453,7 +452,10 @@ class RecordService {
         if (!ModelVersion.isModelVersionSupported(r.getModelVersion())) {
             throw new DataValidationException.ModelVersionNotSupported("Please update SDK to latest version!");
         }
-        HashMap<String, String> tags = tagEncryptionService.decryptTags(r.getEncryptedTags());
+        int userTagsIndex = r.getEncryptedTags().indexOf("");
+
+        HashMap<String, String> tags = tagEncryptionService.decryptTags(r.getEncryptedTags().subList(0,userTagsIndex));
+        Map<String, String> userTags = tagEncryptionService.decryptTags(r.getEncryptedTags().subList(userTagsIndex,r.getEncryptedTags().size()));
 
         String commonKeyId = r.getCommonKeyId();
 
@@ -478,9 +480,10 @@ class RecordService {
             resource = cryptoService.decryptString(dataKey, r.getEncryptedBody()).blockingGet();
         }
 
+
         return new DecryptedAppDataRecord(
                 r.getIdentifier(),
-                new AppDataResource(resource,r.getIdentifier()),
+                new AppDataResource(resource,r.getIdentifier(),userTags),
                 tags,
                 r.getCustomCreationDate(),
                 r.getUpdatedDate(),

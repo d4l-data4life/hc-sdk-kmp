@@ -43,8 +43,8 @@ public final class Data4LifeClient extends BaseClient {
     private static final String DUMMY_CLIENT_SECRET = "secret";
     private static final String DUMMY_REDIRECT_URL = "dummy";
     /* Since this client get an OAuth access token directly and never makes
-    * any requests to the OAuth endpoint, we let the set of scopes be empty. */
-    private static final Set<String> EMPTY_SCOPES = new HashSet<>();
+    * any requests to the OAuth endpoint, we just add a single, dummy scope. */
+    private static final Set<String> DUMMY_SCOPES = new HashSet<String>(Arrays.asList("fakescope"));
 
     /**
      * Hidden constructor for the ingestion client.
@@ -91,7 +91,7 @@ public final class Data4LifeClient extends BaseClient {
                 environment.getApiBaseURL(platform),
                 environment.getApiBaseURL(platform),
                 DUMMY_REDIRECT_URL,
-                EMPTY_SCOPES
+                DUMMY_SCOPES
         );
 
         SecureStoreContract.SecureStore secureStore = new SecureStore(new SecureStoreCryptor(), new SecureStoreStorage());

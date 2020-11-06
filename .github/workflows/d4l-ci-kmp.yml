@@ -35,7 +35,3 @@ jobs:
         run: ./gradlew provideTestConfig
       - name: Run tests with code coverage
         run: ./gradlew jacocoTestReport
-      - name: Upload coverage report to Codecov
-        uses: codecov/codecov-action@v1.0.4
-        with:
-          token: ${{secrets.CODECOV_TOKEN}}

@@ -29,13 +29,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.squareup.moshi.Moshi;
 
 import org.threeten.bp.LocalDate;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import androidx.annotation.Nullable;
@@ -49,6 +52,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.DocumentReference;
+import care.data4life.sdk.AppDataRecord;
+import care.data4life.sdk.AppDataResource;
 import care.data4life.sdk.Data4LifeClient;
 import care.data4life.sdk.Task;
 import care.data4life.sdk.config.DataRestrictionException;
@@ -56,6 +61,7 @@ import care.data4life.sdk.helpers.DocumentReferenceExtension;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.Callback;
 import care.data4life.sdk.listener.ResultListener;
+import care.data4life.sdk.model.DonorKey;
 import care.data4life.sdk.model.Record;
 
 public class DocumentsActivity extends AppCompatActivity {
@@ -67,6 +73,7 @@ public class DocumentsActivity extends AppCompatActivity {
     private Data4LifeClient client;
     private CRUDBenchmark benchmark;
     private FloatingActionButton mAddFAB;
+    private FloatingActionButton addFabAppData;
     private CoordinatorLayout mRootCL;
     private TextView mLogout;
     private RecyclerView mDocumentsRV;
@@ -93,6 +100,7 @@ public class DocumentsActivity extends AppCompatActivity {
         mLogout = findViewById(R.id.logoutBTN);
         mDocumentsRV = findViewById(R.id.documentsRV);
         mDocumentsSRL = findViewById(R.id.documentsSRL);
+        addFabAppData = findViewById(R.id.addFABAppData);
         Toolbar toolbar = findViewById(R.id.toolbar);
 
         mLayoutManager = new LinearLayoutManager(DocumentsActivity.this, LinearLayoutManager.VERTICAL, false);
@@ -126,6 +134,11 @@ public class DocumentsActivity extends AppCompatActivity {
                     startActivityForResult(Intent.createChooser(intent, "Select images"), INTENT_FILE_PICKER);
                 }
         );
+
+        addFabAppData.setOnClickListener(view -> {
+            fetchDataRecord();
+            createNewAppDataRecord();
+        });
 
         setSupportActionBar(toolbar);
         Snackbar.make(mRootCL, "You have signed in with Data4Life", Snackbar.LENGTH_SHORT).show();
@@ -251,6 +264,55 @@ public class DocumentsActivity extends AppCompatActivity {
             }
         });
     }
+
+    AppDataRecord appdata;
+    DonorKey donorKey;
+    private void createNewAppDataRecord() {
+        if(appdata!=null) {
+            return;
+        }
+        mDocumentsSRL.setRefreshing(true);
+
+        DonorKey donorkey = new DonorKey("testT".toCharArray(), "testPriv".toCharArray(), "testPub".toCharArray(), "testV".toCharArray(), "testScope".toCharArray());
+        char[] chars = donorkey.toJsonChars();
+        Toast.makeText(getApplicationContext(),String.valueOf(chars),Toast.LENGTH_LONG).show();
+        client.createAppData(new AppDataResource(chars, null, Collections.emptyMap()), new ResultListener<AppDataRecord>() {
+            @Override
+            public void onSuccess(AppDataRecord appDataRecord) {
+                appdata = appDataRecord;
+                mDocumentsSRL.setRefreshing(false);
+            }
+            @Override
+            public void onError(D4LException exception) {
+                mDocumentsSRL.setRefreshing(false);
+            }
+        });
+    }
+
+    private void fetchDataRecord() {
+        if(appdata==null) {
+            return;
+        }
+        mDocumentsSRL.setRefreshing(true);
+        client.downloadAppData(appdata.getAppDataResource().getId(), new ResultListener<AppDataRecord>() {
+            @Override
+            public void onSuccess(AppDataRecord appDataRecord) {
+                runOnUiThread(()->{
+                    boolean equal = DonorKey.Companion.fromJsonChars(appDataRecord.getAppDataResource().getResource()).equals(donorKey);
+                    Toast.makeText(getApplicationContext(), "DonorKey test successful: " + equal,Toast.LENGTH_LONG).show();
+                    mDocumentsSRL.setRefreshing(false);
+                });
+            }
+
+            @Override
+            public void onError(D4LException exception) {
+                Toast.makeText(getApplicationContext(), exception.getMessage(),Toast.LENGTH_LONG).show();
+                mDocumentsSRL.setRefreshing(false);
+            }
+        });
+    }
+
+
 
     private void fetchDocuments(int offset) {
         mDocumentsSRL.setRefreshing(true);

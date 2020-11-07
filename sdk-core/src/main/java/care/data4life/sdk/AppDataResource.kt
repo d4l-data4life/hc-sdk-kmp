@@ -20,13 +20,11 @@ import care.data4life.crypto.GCKey
 import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.fhir.stu3.model.Extension
 import care.data4life.sdk.lang.D4LException
-import care.data4life.sdk.listener.ResultListener
 import care.data4life.sdk.model.Meta
-import care.data4life.sdk.model.Record
 
-//TODO: Move to appropriate place
+
 data class AppDataResource(
-        val resource: ByteArray?,
+        val resource: CharArray?,
         var id: String? = null,
         val userInfo: Map<String, String>
 ) {
@@ -58,12 +56,12 @@ data class AppDataRecord(val appDataResource: AppDataResource,val meta: Meta)
 
 data class DecryptedAppDataRecord(
         val identifier: String?,
-        val appData_: AppDataResource,
+        val appData: AppDataResource,
         val tags: HashMap<String, String>,
         val customCreationDate: String,
         val updatedDate: String?,
         val dataKey: GCKey,
         val modelVersion: Int
 ) {
-    fun copyWithResource(appData_: AppDataResource) = copy(appData_ = appData_)
+    fun copyWithResource(appData: AppDataResource) = copy(appData = appData)
 }

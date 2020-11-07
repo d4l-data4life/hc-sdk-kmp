@@ -423,13 +423,10 @@ class RecordService {
     }
 
     EncryptedRecord encryptAppDataRecord(DecryptedAppDataRecord record) throws IOException {
-        byte[] resource = record.getAppData_().getResource();
+        char[] resource = record.getAppData().getResource();
 
         List<String> encryptedTags = tagEncryptionService.encryptTags(record.getTags());
-        List<String> encryptedUserTags = tagEncryptionService.encryptTags(record.getAppData_().getUserInfo());
-        byte[] encryptedResource = cryptoService.encrypt(record.getDataKey(), resource).blockingGet();
-
-        encryptedTags.addAll(encryptedUserTags);
+        String encryptedResource = cryptoService.encryptCharArray(record.getDataKey(), resource).blockingGet();
 
         GCKey commonKey = cryptoService.fetchCurrentCommonKey();
         String currentCommonKeyId = cryptoService.getCurrentCommonKeyId();
@@ -452,10 +449,8 @@ class RecordService {
         if (!ModelVersion.isModelVersionSupported(r.getModelVersion())) {
             throw new DataValidationException.ModelVersionNotSupported("Please update SDK to latest version!");
         }
-        int userTagsIndex = r.getEncryptedTags().indexOf("");
 
-        HashMap<String, String> tags = tagEncryptionService.decryptTags(r.getEncryptedTags().subList(0,userTagsIndex));
-        Map<String, String> userTags = tagEncryptionService.decryptTags(r.getEncryptedTags().subList(userTagsIndex,r.getEncryptedTags().size()));
+        HashMap<String, String> tags = tagEncryptionService.decryptTags(r.getEncryptedTags());
 
         String commonKeyId = r.getCommonKeyId();
 
@@ -475,15 +470,14 @@ class RecordService {
         GCKey dataKey = cryptoService.symDecryptSymmetricKey(commonKey, r.getEncryptedDataKey()).blockingGet();
 
 
-        String resource = null;
+        char[] resource = null;
         if (r.getEncryptedBody() != null && !r.getEncryptedBody().isEmpty()) {
-            resource = cryptoService.decryptString(dataKey, r.getEncryptedBody()).blockingGet();
+            resource = cryptoService.decryptToCharArray(dataKey, r.getEncryptedBody()).blockingGet();
         }
-
 
         return new DecryptedAppDataRecord(
                 r.getIdentifier(),
-                new AppDataResource(resource,r.getIdentifier(),userTags),
+                new AppDataResource(resource,r.getIdentifier(),tags),
                 tags,
                 r.getCustomCreationDate(),
                 r.getUpdatedDate(),
@@ -732,7 +726,7 @@ class RecordService {
     }
 
     DecryptedAppDataRecord assignAppDataResourceId(DecryptedAppDataRecord record) {
-        record.getAppData_().setId(record.getIdentifier());
+        record.getAppData().setId(record.getIdentifier());
         return record;
     }
 
@@ -767,7 +761,7 @@ class RecordService {
                 .flatMap(encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord))
                 .map((EncryptedRecord r) -> (DecryptedAppDataRecord) decryptAppDataRecord(r, userId))
                 .map(this::assignAppDataResourceId)
-                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData_(), buildMeta(decryptedRecord)));
+                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), buildMeta(decryptedRecord)));
 
     }
 
@@ -782,7 +776,7 @@ class RecordService {
                 .flatMap((EncryptedRecord encryptedRecord) -> apiService.updateRecord(alias, userId, recordId, encryptedRecord))
                 .map((EncryptedRecord encryptedRecord) -> (DecryptedAppDataRecord) decryptAppDataRecord(encryptedRecord, userId))
                 .map(this::assignAppDataResourceId)
-                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData_(), buildMeta(decryptedRecord)));
+                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), buildMeta(decryptedRecord)));
     }
 
     Single<AppDataRecord> downloadAppDataRecord(String recordId, String userId) {
@@ -790,7 +784,7 @@ class RecordService {
                 .fetchRecord(alias, userId, recordId)
                 .map((EncryptedRecord encryptedRecord) -> (DecryptedAppDataRecord) decryptAppDataRecord(encryptedRecord, userId))
                 .map(this::assignAppDataResourceId)
-                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData_(), buildMeta(decryptedRecord)));
+                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), buildMeta(decryptedRecord)));
     }
     //endregion
 }

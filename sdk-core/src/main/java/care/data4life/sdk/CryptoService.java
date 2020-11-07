@@ -19,6 +19,9 @@ package care.data4life.sdk;
 import com.squareup.moshi.Moshi;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
@@ -140,6 +143,27 @@ class CryptoService extends CryptoProtocol {
                 .fromCallable(() -> base64.decode(dataBase64))
                 .flatMap(decoded -> decrypt(key, decoded))
                 .map(decrypted -> new String(decrypted, "UTF-8"))
+                .onErrorResumeNext(error -> {
+                    error(error, "Failed to decrypt string");
+                    return Single.error((D4LException) new CryptoException.DecryptionFailed("Failed to decrypt string"));
+                });
+    }
+
+    public Single<String> encryptCharArray(GCKey key, char[] data) {
+        byte[] bytes = StandardCharsets.UTF_8.encode(CharBuffer.wrap(data)).array();
+        return encrypt(key, bytes)
+                .map(base64::encodeToString)
+                .onErrorResumeNext(error -> {
+                    error(error, "Failed to encrypt string");
+                    return Single.error((D4LException) new CryptoException.EncryptionFailed("Failed to encrypt string"));
+                });
+    }
+
+    public Single<char[]> decryptToCharArray(GCKey key, String dataBase64) {
+        return Single
+                .fromCallable(() -> base64.decode(dataBase64))
+                .flatMap(decoded -> decrypt(key, decoded))
+                .map(decrypted -> StandardCharsets.UTF_8.decode(ByteBuffer.wrap(decrypted)).array())
                 .onErrorResumeNext(error -> {
                     error(error, "Failed to decrypt string");
                     return Single.error((D4LException) new CryptoException.DecryptionFailed("Failed to decrypt string"));

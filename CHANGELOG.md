@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased](https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.7.3...main)
 ### Added
+- Add ingestion SDK client (relies on external OAuth handling).
 ### Changed
 ### Removed
 ### Fixed

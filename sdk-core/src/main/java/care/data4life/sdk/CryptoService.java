@@ -37,6 +37,7 @@ import care.data4life.crypto.error.CryptoException;
 import care.data4life.sdk.crypto.CommonKeyService;
 import care.data4life.sdk.crypto.KeyFactory;
 import care.data4life.sdk.lang.D4LException;
+import care.data4life.sdk.lang.D4LRuntimeException;
 import care.data4life.sdk.network.model.EncryptedKey;
 import care.data4life.sdk.util.Base64;
 import io.reactivex.Single;
@@ -223,6 +224,32 @@ class CryptoService extends CryptoProtocol {
                     return gcKeyPair;
                 });
     }
+
+
+    /**
+     * Set the stored asymmetric key pair to have the private key equal to the passed key and
+     * a random, non-matching public key.
+     * <p>
+     * This is meant for usage in scenarios where keys are generated and managed externally.
+     *
+     * @param privateKeyAsPem Private key encoded in PEM format
+     * @throws D4LRuntimeException Thrown if any step of the parsing fails
+     */
+    public void setGCKeyPairFromPemPrivateKey(String privateKeyAsPem) throws D4LRuntimeException {
+        try {
+            // Removing any existing key pair
+            this.deleteGCKeyPair();
+            // Create a new key pair based on the passed private key
+            GCRSAKeyAlgorithm algorithm = new GCRSAKeyAlgorithm();
+            GCKeyPair gcKeyPair = care.data4life.crypto.PemParserKt.convertPrivateKeyPemStringToGCKeyPair(privateKeyAsPem, algorithm, KEY_VERSION.getAsymmetricKeySize());
+            // Store new key pair
+            this.saveGCKeyPair(gcKeyPair);
+        } catch (Exception e) {
+            error(e, "Error during PEM key parsing");
+            throw new D4LRuntimeException("Error during PEM key parsing");
+        }
+    }
+
 
     void saveGCKeyPair(GCKeyPair keyPair) {
         storage.storeKey(prefix() + GC_KEYPAIR, keyPair);

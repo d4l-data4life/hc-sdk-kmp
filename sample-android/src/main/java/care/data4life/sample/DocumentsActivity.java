@@ -33,11 +33,11 @@ import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.squareup.moshi.Moshi;
 
 import org.threeten.bp.LocalDate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -53,7 +53,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.DocumentReference;
 import care.data4life.sdk.AppDataRecord;
-import care.data4life.sdk.AppDataResource;
 import care.data4life.sdk.Data4LifeClient;
 import care.data4life.sdk.Task;
 import care.data4life.sdk.config.DataRestrictionException;
@@ -61,7 +60,6 @@ import care.data4life.sdk.helpers.DocumentReferenceExtension;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.Callback;
 import care.data4life.sdk.listener.ResultListener;
-import care.data4life.sdk.model.DonorKey;
 import care.data4life.sdk.model.Record;
 
 public class DocumentsActivity extends AppCompatActivity {
@@ -266,22 +264,20 @@ public class DocumentsActivity extends AppCompatActivity {
     }
 
     AppDataRecord appdata;
-    DonorKey donorKey;
+
     private void createNewAppDataRecord() {
         if(appdata!=null) {
             return;
         }
         mDocumentsSRL.setRefreshing(true);
-
-        DonorKey donorkey = new DonorKey("testT".toCharArray(), "testPriv".toCharArray(), "testPub".toCharArray(), "testV".toCharArray(), "testScope".toCharArray());
-        char[] chars = donorkey.toJsonChars();
-        Toast.makeText(getApplicationContext(),String.valueOf(chars),Toast.LENGTH_LONG).show();
-        client.createAppData(new AppDataResource(chars, null, Collections.emptyMap()), new ResultListener<AppDataRecord>() {
+        byte[] bytearray = new byte[1];
+        client.createAppData(bytearray, new ArrayList<>(), new ResultListener<AppDataRecord>() {
             @Override
             public void onSuccess(AppDataRecord appDataRecord) {
                 appdata = appDataRecord;
                 mDocumentsSRL.setRefreshing(false);
             }
+
             @Override
             public void onError(D4LException exception) {
                 mDocumentsSRL.setRefreshing(false);
@@ -294,11 +290,14 @@ public class DocumentsActivity extends AppCompatActivity {
             return;
         }
         mDocumentsSRL.setRefreshing(true);
-        client.downloadAppData(appdata.getAppDataResource().getId(), new ResultListener<AppDataRecord>() {
+        client.fetchAppData(appdata.getId(), new ResultListener<AppDataRecord>() {
             @Override
             public void onSuccess(AppDataRecord appDataRecord) {
                 runOnUiThread(()->{
-                    boolean equal = DonorKey.Companion.fromJsonChars(appDataRecord.getAppDataResource().getResource()).equals(donorKey);
+                    boolean equal = Arrays.equals(
+                            appDataRecord.getAppDataResource(),
+                            appdata.getAppDataResource()
+                    );
                     Toast.makeText(getApplicationContext(), "DonorKey test successful: " + equal,Toast.LENGTH_LONG).show();
                     mDocumentsSRL.setRefreshing(false);
                 });

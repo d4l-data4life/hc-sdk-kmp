@@ -36,6 +36,8 @@ import care.data4life.sdk.model.DownloadType;
 import care.data4life.sdk.model.FetchResult;
 import care.data4life.sdk.model.Record;
 import care.data4life.sdk.model.UpdateResult;
+import care.data4life.sdk.network.model.DecryptedRecord;
+import care.data4life.sdk.network.model.EncryptedRecord;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
@@ -185,31 +187,38 @@ abstract class BaseClient implements SdkContract.Client {
     }
 
     @Override
-    public void createAppData(AppDataResource appData, ResultListener<AppDataRecord> resultListener) {
+    public void createAppData(byte[] appData, List<String> annotations, ResultListener<AppDataRecord> resultListener) {
         Single<AppDataRecord> operation = userService.finishLogin(true)
                 .flatMap(ignore -> userService.getUID())
-                .flatMap(uid -> recordService.createAppDataRecord(appData, uid));
+                .flatMap(uid -> recordService.createAppDataRecord(appData, annotations, uid));
         executeSingle(operation, resultListener);
     }
 
     @Override
-    public Task downloadAppData(String appDataId, ResultListener<AppDataRecord> resultListener) {
+    public Task fetchAppData(String appDataId, ResultListener<AppDataRecord> resultListener) {
         Single<AppDataRecord> operation = userService.getUID()
-                .flatMap(uid -> recordService.downloadAppDataRecord(appDataId, uid));
+                .flatMap(uid -> recordService.fetchAppDataRecord(appDataId, uid));
         return executeSingle(operation, resultListener);
     }
 
     @Override
-    public void updateAppData(AppDataResource appData, ResultListener<AppDataRecord> resultListener) {
+    public Task fetchAppData(List<String> annotations, @Nullable LocalDate startDate, @Nullable LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<AppDataRecord>> listener) {
+        Single<List<AppDataRecord>> operation = userService.getUID()
+                .flatMap(uid -> recordService.fetchAppDataRecords(uid, startDate, endDate, pageSize, offset));
+        return executeSingle(operation, listener);
+    }
+
+    @Override
+    public void updateAppData(byte[] appData, String recordId, ResultListener<AppDataRecord> resultListener) {
         Single<AppDataRecord> operation = userService.finishLogin(true)
                 .flatMap(ignore -> userService.getUID())
-                .flatMap(uid -> recordService.updateAppDataRecord(appData, uid));
+                .flatMap(uid -> recordService.updateAppDataRecord(appData, recordId, uid));
         executeSingle(operation, resultListener);
     }
 
     @Override
     public void deleteAppData(String appDataId, Callback callback) {
-        deleteRecord(appDataId,callback);
+        deleteRecord(appDataId, callback);
     }
 
     private void deleteAttachment(String attachmentId, ResultListener<Boolean> listener) {

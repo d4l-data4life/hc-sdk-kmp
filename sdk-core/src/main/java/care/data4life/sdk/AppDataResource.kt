@@ -17,51 +17,19 @@
 package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
-import care.data4life.fhir.stu3.model.DomainResource
-import care.data4life.fhir.stu3.model.Extension
-import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.model.Meta
 
 
-data class AppDataResource(
-        val resource: CharArray?,
-        var id: String? = null,
-        val userInfo: Map<String, String>
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as AppDataResource
-
-        if (resource != null) {
-            if (other.resource == null) return false
-            if (!resource.contentEquals(other.resource)) return false
-        } else if (other.resource != null) return false
-        if (id != other.id) return false
-        if (userInfo != other.userInfo) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = resource?.contentHashCode() ?: 0
-        result = 31 * result + (id?.hashCode() ?: 0)
-        result = 31 * result + userInfo.hashCode()
-        return result
-    }
-}
-
-data class AppDataRecord(val appDataResource: AppDataResource,val meta: Meta)
+data class AppDataRecord(val appDataResource: ByteArray,val id: String, val meta: Meta)
 
 data class DecryptedAppDataRecord(
-        val identifier: String?,
-        val appData: AppDataResource,
+        var id: String?,
+        val appData: ByteArray,
         val tags: HashMap<String, String>,
         val customCreationDate: String,
         val updatedDate: String?,
         val dataKey: GCKey,
         val modelVersion: Int
 ) {
-    fun copyWithResource(appData: AppDataResource) = copy(appData = appData)
+    fun copyWithResource(appData: ByteArray) = copy(appData = appData)
 }

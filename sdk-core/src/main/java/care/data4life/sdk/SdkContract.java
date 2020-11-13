@@ -203,11 +203,13 @@ public interface SdkContract {
         Task downloadAttachments(String recordId, List<String> attachmentIds, DownloadType type, ResultListener<List<Attachment>> listener);
 
 
-        void createAppData(AppDataResource appData, ResultListener<AppDataRecord> resultListener);
+        void createAppData(byte[] appData, List<String> annotations, ResultListener<AppDataRecord> resultListener);
 
-        Task downloadAppData(String appDataId, ResultListener<AppDataRecord> resultListener);
+        Task fetchAppData(String appDataId, ResultListener<AppDataRecord> resultListener);
 
-        void updateAppData(AppDataResource appData, ResultListener<AppDataRecord> resultListener);
+        Task fetchAppData(List<String> annotations, @Nullable LocalDate startDate, @Nullable LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<AppDataRecord>> listener);
+
+        void updateAppData(byte[] appData, String recordId, ResultListener<AppDataRecord> resultListener);
 
         void deleteAppData(String appDataId, Callback callback);
 

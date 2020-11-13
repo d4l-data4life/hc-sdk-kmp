@@ -423,21 +423,26 @@ class RecordService {
     }
 
     EncryptedRecord encryptAppDataRecord(DecryptedAppDataRecord record) throws IOException {
-        char[] resource = record.getAppData().getResource();
+
+        System.out.println(27);
+        byte[] resource = record.getAppData();
 
         List<String> encryptedTags = tagEncryptionService.encryptTags(record.getTags());
-        String encryptedResource = cryptoService.encryptCharArray(record.getDataKey(), resource).blockingGet();
-
+        System.out.println(31);
+        byte[] encryptedResource = cryptoService.encrypt(record.getDataKey(), resource).blockingGet();
+        System.out.println(33);
+        String encodedResource = Base64.INSTANCE.encodeToString(encryptedResource);
+        System.out.println(35);
         GCKey commonKey = cryptoService.fetchCurrentCommonKey();
         String currentCommonKeyId = cryptoService.getCurrentCommonKeyId();
-
+        System.out.println(37);
         EncryptedKey encryptedDataKey = cryptoService.encryptSymmetricKey(commonKey, KeyType.DATA_KEY, record.getDataKey()).blockingGet();
 
         return new EncryptedRecord(
                 currentCommonKeyId,
-                record.getIdentifier(),
+                record.getId(),
                 encryptedTags,
-                encryptedResource,
+                encodedResource,
                 record.getCustomCreationDate(),
                 encryptedDataKey,
                 null,
@@ -449,14 +454,17 @@ class RecordService {
         if (!ModelVersion.isModelVersionSupported(r.getModelVersion())) {
             throw new DataValidationException.ModelVersionNotSupported("Please update SDK to latest version!");
         }
-
+        int i = 0;
+        System.out.println(i++);
         HashMap<String, String> tags = tagEncryptionService.decryptTags(r.getEncryptedTags());
 
         String commonKeyId = r.getCommonKeyId();
-
+        System.out.println(i++);
         boolean commonKeyStored = cryptoService.hasCommonKey(commonKeyId);
+        System.out.println(i++);
         GCKey commonKey;
         if (commonKeyStored) {
+            System.out.println(i++);
             commonKey = cryptoService.getCommonKeyById(commonKeyId);
         } else {
             CommonKeyResponse commonKeyResponse = apiService.fetchCommonKey(alias, userId, commonKeyId).blockingGet();
@@ -466,18 +474,18 @@ class RecordService {
             commonKey = cryptoService.asymDecryptSymetricKey(gcKeyPair, encryptedKey).blockingGet();
             cryptoService.storeCommonKey(commonKeyId, commonKey);
         }
-
+        System.out.println(i++);
         GCKey dataKey = cryptoService.symDecryptSymmetricKey(commonKey, r.getEncryptedDataKey()).blockingGet();
 
-
-        char[] resource = null;
+        byte [] resource = Base64.INSTANCE.decode(r.getEncryptedBody());
         if (r.getEncryptedBody() != null && !r.getEncryptedBody().isEmpty()) {
-            resource = cryptoService.decryptToCharArray(dataKey, r.getEncryptedBody()).blockingGet();
+            resource = cryptoService.decrypt(dataKey, resource).blockingGet();
         }
+        System.out.println(i++);
 
         return new DecryptedAppDataRecord(
                 r.getIdentifier(),
-                new AppDataResource(resource,r.getIdentifier(),tags),
+                resource,
                 tags,
                 r.getCustomCreationDate(),
                 r.getUpdatedDate(),
@@ -725,11 +733,6 @@ class RecordService {
         return record;
     }
 
-    DecryptedAppDataRecord assignAppDataResourceId(DecryptedAppDataRecord record) {
-        record.getAppData().setId(record.getIdentifier());
-        return record;
-    }
-
 
     Meta buildMeta(DecryptedRecord record) {
         LocalDate createdDate = LocalDate.parse(record.getCustomCreationDate(), DATE_FORMATTER);
@@ -744,7 +747,7 @@ class RecordService {
     }
 
 
-    Single<AppDataRecord> createAppDataRecord(AppDataResource resource, String userId) throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
+    Single<AppDataRecord> createAppDataRecord(byte[] resource, List<String> annotations, String userId) throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
 
 
         String createdDate = DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID));
@@ -760,13 +763,11 @@ class RecordService {
                 .map(this::encryptAppDataRecord)
                 .flatMap(encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord))
                 .map((EncryptedRecord r) -> (DecryptedAppDataRecord) decryptAppDataRecord(r, userId))
-                .map(this::assignAppDataResourceId)
-                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), buildMeta(decryptedRecord)));
+                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), decryptedRecord.getId(), buildMeta(decryptedRecord)));
 
     }
 
-    Single<AppDataRecord> updateAppDataRecord(AppDataResource resource, String userId)  {
-        String recordId = resource.getId();
+    Single<AppDataRecord> updateAppDataRecord(byte[] resource, String recordId, String userId)  {
 
         return apiService
                 .fetchRecord(alias, userId, recordId)
@@ -775,16 +776,25 @@ class RecordService {
                 .map(this::encryptAppDataRecord)
                 .flatMap((EncryptedRecord encryptedRecord) -> apiService.updateRecord(alias, userId, recordId, encryptedRecord))
                 .map((EncryptedRecord encryptedRecord) -> (DecryptedAppDataRecord) decryptAppDataRecord(encryptedRecord, userId))
-                .map(this::assignAppDataResourceId)
-                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), buildMeta(decryptedRecord)));
+                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), decryptedRecord.getId(), buildMeta(decryptedRecord)));
     }
 
-    Single<AppDataRecord> downloadAppDataRecord(String recordId, String userId) {
+    <T> Single<AppDataRecord> fetchAppDataRecord(String recordId, String userId) {
         return apiService
                 .fetchRecord(alias, userId, recordId)
                 .map((EncryptedRecord encryptedRecord) -> (DecryptedAppDataRecord) decryptAppDataRecord(encryptedRecord, userId))
-                .map(this::assignAppDataResourceId)
-                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), buildMeta(decryptedRecord)));
+                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), decryptedRecord.getId(), buildMeta(decryptedRecord)));
+    }
+
+    Single<List<AppDataRecord>> fetchAppDataRecords(String userId, @Nullable LocalDate startDate, @Nullable LocalDate endDate, Integer pageSize, Integer offset) {
+        String startTime = startDate != null ? DATE_FORMATTER.format(startDate) : null;
+        String endTime = endDate != null ? DATE_FORMATTER.format(endDate) : null;
+        return apiService
+                .fetchRecords(alias, userId, startTime, endTime, pageSize, offset, new ArrayList<String>())
+                .flatMapIterable(records->records)
+                .map(encryptedRecord -> decryptAppDataRecord(encryptedRecord,userId))
+                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), decryptedRecord.getId(),buildMeta(decryptedRecord)))
+                .toList();
     }
     //endregion
 }

@@ -103,6 +103,7 @@ public class RecordServiceTest {
     private static final String PREVIEW_ID = "previewId";
     private static final String ASSIGNER = "assigner";
     private static final String ADDITIONAL_ID = DOWNSCALED_ATTACHMENT_IDS_FMT + SPLIT_CHAR + ATTACHMENT_ID + SPLIT_CHAR + PREVIEW_ID + SPLIT_CHAR + THUMBNAIL_ID;
+    private static final byte[] ENCRYPTION_RESULT = new byte[1];
 
     //SUT
     private RecordService recordService;
@@ -1696,6 +1697,43 @@ public class RecordServiceTest {
         inOrder.verify(mockTagEncryptionService).encryptTags(mockTags);
         inOrder.verify(mockApiService).getCount(ALIAS, USER_ID, mockEncryptedTags);
         inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test public void createAppDataRecord_createsAndReturnsAppDataRecord() throws IOException, DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation, InterruptedException {
+
+        //Given
+        byte[] appData = "Test AppData".getBytes();
+        String currentCommonKeyId = "currentCommonKeyId";
+        when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey));
+        when(mockCryptoService.fetchCurrentCommonKey()).thenReturn(mockCommonKey);
+        when(mockCryptoService.getCurrentCommonKeyId()).thenReturn(currentCommonKeyId);
+        when(mockCryptoService.encrypt(any(), any(byte[].class))).thenReturn(Single.just(ENCRYPTION_RESULT));
+        when(mockCryptoService.encryptSymmetricKey(mockCommonKey, KeyType.DATA_KEY, mockDataKey)).thenReturn(Single.just(mockEncryptedDataKey));
+        when(mockCryptoService.decrypt(any(), any(byte[].class))).thenReturn(Single.just(appData));
+        when(mockApiService.createRecord(any(), any(), any())).thenReturn(Single.just(mockEncryptedRecord));
+        when(mockTagEncryptionService.decryptTags(mockEncryptedTags)).thenReturn(mockTags);when(mockTagEncryptionService.decryptTags(mockEncryptedTags)).thenReturn(mockTags);
+        when(mockCryptoService.hasCommonKey(any())).thenReturn(true);
+        when(mockCryptoService.symDecryptSymmetricKey(eq(mockCommonKey), any())).thenReturn(Single.just(mockDataKey));
+        when(mockCryptoService.getCommonKeyById(any())).thenReturn(mockCommonKey);
+        when(mockEncryptedRecord.getEncryptedBody()).thenReturn("");
+        when(mockEncryptedRecord.getCustomCreationDate()).thenReturn("2020-01-01");
+        when(mockEncryptedRecord.getUpdatedDate()).thenReturn("2020-01-01T12:00:00");
+
+        //When
+        TestObserver<AppDataRecord> appDataRecord = recordService.createAppDataRecord(appData, new ArrayList<>(), USER_ID).test().await();
+
+        //Then
+        AppDataRecord result = appDataRecord
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()
+                .get(0);
+
+        assertThat(result.getAppDataResource().length==0);
+
+        inOrder.verify(mockCryptoService).encrypt(any(),eq(appData));
+        inOrder.verify(mockApiService).createRecord(any(),any(),any());
     }
 
     public static DocumentReference buildDocumentReference() {

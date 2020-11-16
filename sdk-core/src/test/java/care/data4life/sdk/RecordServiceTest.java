@@ -126,6 +126,7 @@ public class RecordServiceTest {
     private EncryptedKey mockEncryptedDataKey;
     private EncryptedRecord mockEncryptedRecord;
     private DecryptedRecord mockDecryptedRecord;
+    private DecryptedAppDataRecord mockDecryptedAppDataRecord;
     private Meta mockMeta;
     private D4LException mockD4LException;
     private Record<CarePlan> mockRecord;
@@ -163,6 +164,7 @@ public class RecordServiceTest {
         mockEncryptedDataKey = mock(EncryptedKey.class);
         mockEncryptedRecord = mock(EncryptedRecord.class);
         mockDecryptedRecord = mock(DecryptedRecord.class);
+        mockDecryptedAppDataRecord = mock(DecryptedAppDataRecord.class);
         mockMeta = mock(Meta.class);
         mockD4LException = mock(D4LException.class);
         mockRecord = mock(Record.class);
@@ -1734,6 +1736,64 @@ public class RecordServiceTest {
 
         inOrder.verify(mockCryptoService).encrypt(any(),eq(appData));
         inOrder.verify(mockApiService).createRecord(any(),any(),any());
+    }
+
+    @Test
+    public void updateAppDataRecord_shouldReturnUpdatedRecord() throws InterruptedException, IOException, DataValidationException.ModelVersionNotSupported, DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
+        // Given
+        byte[] appData = new byte[1];
+        when(mockApiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)).thenReturn(Single.just(mockEncryptedRecord));
+        doReturn(mockDecryptedAppDataRecord).when(recordService).decryptAppDataRecord(mockEncryptedRecord, USER_ID);
+        doReturn(mockEncryptedRecord).when(recordService).encryptAppDataRecord(mockDecryptedAppDataRecord);
+        when(mockApiService.updateRecord(ALIAS, USER_ID, RECORD_ID, mockEncryptedRecord)).thenReturn(Single.just(mockEncryptedRecord));
+        doReturn(mockMeta).when(recordService).buildMeta(mockDecryptedAppDataRecord);
+        doReturn(mockDecryptedAppDataRecord).when(mockDecryptedAppDataRecord).copyWithResource(appData);
+        doReturn(appData).when(mockDecryptedAppDataRecord).getAppData();
+        doReturn("").when(mockDecryptedAppDataRecord).getId();
+
+        // When
+        TestObserver<AppDataRecord> observer = recordService.updateAppDataRecord(appData,RECORD_ID, USER_ID).test().await();
+
+        // Then
+        AppDataRecord result = observer.assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values().get(0);
+
+        assertThat(result.getMeta()).isEqualTo(mockMeta);
+        assertThat(result.getAppDataResource()).isEqualTo(appData);
+
+        inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID);
+        inOrder.verify(recordService).decryptAppDataRecord(mockEncryptedRecord, USER_ID);
+        inOrder.verify(recordService).encryptAppDataRecord(mockDecryptedAppDataRecord);
+        inOrder.verify(mockApiService).updateRecord(ALIAS, USER_ID, RECORD_ID, mockEncryptedRecord);
+        inOrder.verify(recordService).buildMeta(mockDecryptedAppDataRecord);
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void fetchAppDataRecord_shouldReturnFetchedRecord() throws InterruptedException, IOException, DataValidationException.ModelVersionNotSupported {
+        // Given
+        when(mockApiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)).thenReturn(Single.just(mockEncryptedRecord));
+        doReturn(mockDecryptedRecord).when(recordService).decryptRecord(mockEncryptedRecord, USER_ID);
+        doReturn(mockMeta).when(recordService).buildMeta(mockDecryptedRecord);
+
+        // When
+        TestObserver<AppDataRecord> observer = recordService.fetchAppDataRecord(RECORD_ID, USER_ID).test().await();
+
+        // Then
+        AppDataRecord record = observer
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values().get(0);
+
+        assertThat(record.getMeta()).isEqualTo(mockMeta);
+
+        inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID);
+        inOrder.verify(recordService).decryptRecord(mockEncryptedRecord, USER_ID);
+        inOrder.verify(recordService).buildMeta(mockDecryptedRecord);
+        inOrder.verifyNoMoreInteractions();
     }
 
     public static DocumentReference buildDocumentReference() {

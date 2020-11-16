@@ -8,6 +8,7 @@ d4l-test-config-android.json
 .gradle/
 build/
 local.properties
+gradle.properties
 
 # IDEA/Android Studio ignores
 *iml
@@ -18,10 +19,10 @@ local.properties
 !.idea/fileTemplates/
 !.idea/inspectionProfiles/
 !.idea/scopes/
-!.idea/codeStyles/
 !.idea/encoding.xml
 !.idea/copyright/
 !.idea/compiler.xml
+
 
 # Others
 captures/

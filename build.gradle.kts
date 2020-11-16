@@ -61,6 +61,13 @@ allprojects {
         jcenter()
         maven("https://jitpack.io")
         maven {
+            url = uri("https://maven.pkg.github.com/d4l-data4life/hc-sdk-kmp")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+            }
+        }
+        maven {
             url = URI("https://maven.pkg.github.com/d4l-data4life/hc-util-sdk-kmp")
             credentials {
                 username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")

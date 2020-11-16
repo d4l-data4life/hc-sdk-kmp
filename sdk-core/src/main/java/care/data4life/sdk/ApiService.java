@@ -32,6 +32,7 @@ import care.data4life.sdk.network.model.CommonKeyResponse;
 import care.data4life.sdk.network.model.DocumentUploadResponse;
 import care.data4life.sdk.network.model.EncryptedRecord;
 import care.data4life.sdk.network.model.UserInfo;
+import care.data4life.sdk.network.model.VersionInfo;
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter;
 import care.data4life.sdk.util.Base64;
 import io.reactivex.Completable;
@@ -249,6 +250,12 @@ final class ApiService {
         return Single
                 .fromCallable(() -> oAuthService.getRefreshToken(alias))
                 .flatMapCompletable(token -> service.logout(alias, token));
+    }
+
+    Single<VersionInfo> fetchVersionInfo(String alias) {
+        return service
+                .getVersionUpdateInfo(alias)
+                .subscribeOn(Schedulers.io());
     }
 
     private Response intercept(Interceptor.Chain chain) throws IOException {

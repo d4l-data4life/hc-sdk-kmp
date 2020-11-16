@@ -18,6 +18,7 @@ package care.data4life.sdk
 
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.network.model.UserInfo
+import care.data4life.sdk.network.model.VersionInfo
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -68,4 +69,10 @@ internal class UserService(private val alias: String,
         return Single.fromCallable { oAuthService.getAccessToken(alias) }
     }
 
+    fun getVersionInfo(currentVersion: Int): Single<Boolean>? {
+        return Single.just(currentVersion)
+                .flatMap { apiService.fetchVersionInfo(alias + "_user_id") }
+                .map { versionInfo: VersionInfo -> versionInfo.isSupported(currentVersion) }
+                .doOnError { throwable: Throwable -> Log.error(throwable, "Version not supported") }
+    }
 }

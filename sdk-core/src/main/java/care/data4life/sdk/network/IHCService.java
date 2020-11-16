@@ -23,6 +23,7 @@ import care.data4life.sdk.network.model.CommonKeyResponse;
 import care.data4life.sdk.network.model.DocumentUploadResponse;
 import care.data4life.sdk.network.model.EncryptedRecord;
 import care.data4life.sdk.network.model.UserInfo;
+import care.data4life.sdk.network.model.VersionInfo;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -157,4 +158,12 @@ public interface IHCService {
             @Header(HEADER_ALIAS) String alias,
             @Field("token") String refresh_token
     );
+
+    @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
+    @GET("/sdk/v1/android/versions.json")
+    Single<VersionInfo> getVersionUpdateInfo(
+            @Header(HEADER_ALIAS) String alias
+    );
+
 }
+

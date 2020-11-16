@@ -14,6 +14,14 @@
  * contact D4L by email to help@data4life.care.
  */
 
+package care.data4life.sdk.network.model;
+
+import com.squareup.moshi.Json;
+
+import java.util.List;
+
+import static care.data4life.sdk.network.model.Version.KEY_UNSUPPORTED;
+
 public class VersionInfo {
     @Json(name = "versions")
     private List<Version> versionsList;
@@ -34,3 +42,4 @@ public class VersionInfo {
         return isSupported;
     }
 }
+

@@ -44,6 +44,9 @@ Read operations are divided into a simple `fetch` and a full `download` of the r
 
 - *Downloading* a resource returns the resource with all its attachments.
 
+Create, Fetch and Update operations also have additional methods that accept List<String> annotations parameter.
+It is an optional parameter that can be used to filter records by a provided string annoation.
+
 ==== Creating a new record
 
 To create a new record, the API provides the `createRecord(resource, listener)` method with the resource and the result listener as arguments.
@@ -180,6 +183,7 @@ For example, when a client has no data and initially fetches records after a new
 The method lets you specify the following:
 
 - Fetch records by type
+- Fetch records by annotations
 - Order records by date
 - Paginate loaded records by providing the `pageSize` and an `offset`.
 
@@ -474,4 +478,22 @@ sdk.logout(new Callback() {
         // Failed to log out user
     }
 });
+----
+
+==== Arbitrary data support
+
+SDK supports records that are not FHIR Documents.
+
+[source,java]
+----
+//appData is arbitrary data provided to SDK, serialized as byte array.
+//Annotations are recommended to use for AppData to differentiate between different types
+sdk.createAppData(byte[] appData, List<String> annotations, ResultListener<AppDataRecord> resultListener)
+
+//Provide null as annotations parameter to skip updating annotations
+sdk.updateAppData(byte[] appData, List<String> annotations, String recordId, ResultListener<AppDataRecord> resultListener)
+
+//These methods behave the same way as the usual FHIR Record methos
+sdk.fetchAppData(List<String> annotations, @Nullable LocalDate startDate, @Nullable LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<AppDataRecord>> listener)
+sdk.deleteAppData(String appDataId, Callback callback)
 ----

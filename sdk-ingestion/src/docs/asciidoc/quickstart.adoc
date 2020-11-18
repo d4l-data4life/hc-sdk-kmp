@@ -1,0 +1,55 @@
+// Settings:
+:doctype: book
+:toc: left
+:toclevels: 4
+:icons: font
+:source-highlighter: prettify
+:numbered:
+:stylesdir: styles/
+:imagesdir: images/
+:linkcss:
+
+// Variables:
+:icons: font
+:toc:
+:compname-short: D4L
+:compname-legal: D4L data4life gGmbH
+:compname: Data4Life
+:email-contact: contact@data4life.care
+:email-docs: docs@data4life.care
+:url-company: https://www.data4life.care
+:url-docs: https://d4l.io
+:prod-name: Data4Life
+:app-name: Data4Life
+:app-plat: JVM
+:phdp-plat: Personal Health Data Platform
+:sw-name: {compname} {prod-name}
+:sw-version: 1.7.0
+:pub-type: Internal 
+:pub-version: 1.00
+:pub-status: draft
+:pub-title: {software-name} {pub-type}
+:copyright-year: 2020
+:copyright-statement: (C) {copyright-year} {compname-legal}. All rights reserved.
+
+
+== Quickstart
+
+=== Using the {compname} {app-plat} ingestion SDK
+
+The Java Virtual Machine (JVM) ingestion SDK only supports a single-user use case. For every individual user, the SDK must be instantiated with the user alias.
+
+. To instantiate the SDK.
++
+[source,java]
+----
+Data4LifeClient client = Data4LifeClient.init(
+    userAlias,
+    clientId,
+    clientSecret,
+    environment,
+    redirectUrl,
+    secureStore,
+    authorizationStore
+);
+----

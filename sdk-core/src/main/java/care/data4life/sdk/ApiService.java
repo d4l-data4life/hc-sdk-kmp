@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import care.data4life.sdk.lang.D4LException;
+import care.data4life.sdk.lang.D4LRuntimeException;
 import care.data4life.sdk.network.Environment;
 import care.data4life.sdk.network.IHCService;
 import care.data4life.sdk.network.model.CommonKeyResponse;
@@ -79,8 +80,27 @@ final class ApiService {
     private OkHttpClient client;
     private final String clientName;
     private final boolean debug;
+    private final String staticAccessToken;
 
-
+    /**
+     * Full constructor.
+     *
+     * If the staticToken parameter is set to null, the SDK will handle the full OAuth flow
+     * and fetch  access and retrieval tokens, renewing the former as needed for later
+     * requests.
+     * If the a non-null staticToken is passed, the SDK will use this value as an access token.
+     * In this case, it will not dynamical fetch or renew tokens.
+     *
+     * @param oAuthService        OAuth service
+     * @param environment         Deployment environment
+     * @param clientID            Client ID
+     * @param clientSecret        Client secret
+     * @param platform            Usage platform (D4L, S4H)
+     * @param connectivityService Connectivity service
+     * @param clientName          Client name
+     * @param staticAccessToken   Prefetched OAuth token - if not null, it will be used directly (no token renewal).
+     * @param debug               Debug flag
+     */
     ApiService(OAuthService oAuthService,
                Environment environment,
                String clientID,
@@ -88,6 +108,7 @@ final class ApiService {
                String platform,
                NetworkConnectivityService connectivityService,
                String clientName,
+               byte[] staticAccessToken,
                boolean debug) {
         this.oAuthService = oAuthService;
         this.environment = environment;
@@ -97,7 +118,39 @@ final class ApiService {
         this.connectivityService = connectivityService;
         this.clientName = clientName;
         this.debug = debug;
+        this.staticAccessToken = staticAccessToken == null ? null : new String(staticAccessToken);
         configureService();
+    }
+
+    /**
+     * Convenience constructor for instances that handle the OAuth flow themselves.
+     *
+     * @param oAuthService        OAuth service
+     * @param environment         Deployment environment
+     * @param clientID            Client ID
+     * @param clientSecret        Client secret
+     * @param platform            Usage platform (D4L, S4H)
+     * @param connectivityService Connectivity service
+     * @param clientName          Client name
+     * @param debug               Debug flag
+     */
+    ApiService(OAuthService oAuthService,
+               Environment environment,
+               String clientID,
+               String clientSecret,
+               String platform,
+               NetworkConnectivityService connectivityService,
+               String clientName,
+               boolean debug) {
+        this(oAuthService,
+                environment,
+                clientID,
+                clientSecret,
+                platform,
+                connectivityService,
+                clientName,
+                null,
+                debug);
     }
 
     private void configureService() {
@@ -116,7 +169,8 @@ final class ApiService {
             return chain.proceed(request);
         };
 
-        Interceptor authorizationInterceptor = this::intercept;
+        // Pick authentication interceptor based on whether a static access token is used or not
+        Interceptor authorizationInterceptor = this.staticAccessToken != null ? this::staticTokenIntercept : this::intercept;
 
         Interceptor retryInterceptor = chain -> {
             Request request = chain.request();
@@ -245,12 +299,36 @@ final class ApiService {
                 .subscribeOn(Schedulers.io());
     }
 
+    /**
+     * Carry out needed logout actions.
+     * <p>
+     * When using refresh token, this will revoke the OAuth access.
+     * When using a static access token, nothing will be done.
+     *
+     * @param alias Alias
+     * @return Completable
+     */
     Completable logout(String alias) {
+        if (this.staticAccessToken != null) {
+            throw new D4LRuntimeException("Cannot log out when using a static access token!");
+        }
         return Single
                 .fromCallable(() -> oAuthService.getRefreshToken(alias))
                 .flatMapCompletable(token -> service.logout(alias, token));
     }
 
+    /**
+     * Interceptor that attaches an authorization header to a request.
+     * <p>
+     * The authorization can be basic auth or OAuth. In the OAuth case, the
+     * interceptor will try the request snd if it comes back with a status code
+     * 401 (unauthorized), it will update the OAuth access token using the
+     * refresh token.
+     *
+     * @param chain OkHttp interceptor chain
+     * @return OkHttp response
+     * @throws IOException
+     */
     private Response intercept(Interceptor.Chain chain) throws IOException {
         Request request = chain.request();
         String alias = request.header(HEADER_ALIAS);
@@ -287,6 +365,29 @@ final class ApiService {
             }
             return response;
         }
+        return chain.proceed(request);
+    }
+
+    /**
+     * Interceptor that attaches an OAuth access token to a request.
+     * <p>
+     * This interceptor is used for the case where the SDK client does not
+     * handle the OAuth flow itself and merely gets an access token injected.
+     * Accordingly this interceptor does not attempt to refresh the access token
+     * if the request should fail.
+     *
+     * @param chain OkHttp interceptor chain
+     * @return OkHttp response
+     * @throws IOException
+     */
+    private Response staticTokenIntercept(Interceptor.Chain chain) throws IOException {
+        Request request = chain.request();
+        String alias = request.header(HEADER_ALIAS);
+        String authHeader = request.headers().get(HEADER_AUTHORIZATION);
+        request = request.newBuilder()
+                .removeHeader(HEADER_AUTHORIZATION)
+                .removeHeader(HEADER_ALIAS)
+                .addHeader(HEADER_AUTHORIZATION, String.format(FORMAT_BEARER_TOKEN, this.staticAccessToken)).build();
         return chain.proceed(request);
     }
 }

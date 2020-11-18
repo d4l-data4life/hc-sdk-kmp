@@ -15,9 +15,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased](https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.7.3...v1.8.0)
 ### Added
 - Add ingestion SDK client (relies on external OAuth handling).
+- Add arbitrary data support
+- Add annotations support
 
 ## [1.7.3](https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.7.2...v1.7.3)
 ### Added
 - SDKContract method to get active user session token
 ### Changed
 - User service getSessionToken method now returns with an active token not the last known.
+

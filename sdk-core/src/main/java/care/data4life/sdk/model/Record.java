@@ -16,6 +16,7 @@
 
 package care.data4life.sdk.model;
 
+import java.util.List;
 import java.util.Objects;
 
 import care.data4life.fhir.stu3.model.DomainResource;
@@ -23,8 +24,9 @@ import care.data4life.fhir.stu3.model.DomainResource;
 public class Record<T extends DomainResource> {
     private T fhirResource;
     private Meta meta;
+    private List<String> annotations;
 
-    public Record(T fhirResource, Meta meta) {
+    public Record(T fhirResource, Meta meta, List<String> annotations) {
         this.fhirResource = fhirResource;
         this.meta = meta;
     }

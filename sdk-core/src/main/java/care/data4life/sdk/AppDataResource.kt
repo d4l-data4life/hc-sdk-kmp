@@ -19,17 +19,31 @@ package care.data4life.sdk
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.model.Meta
 
+/**
+ * AppDataRecord is used to store arbitrary data, analogous to Record
+ * @see care.data4life.sdk.model.Record
+ */
+data class AppDataRecord(
+        val appDataResource: ByteArray,
+        val id: String,
+        val meta: Meta,
+        val annotations: List<String>
+)
 
-data class AppDataRecord(val appDataResource: ByteArray,val id: String, val meta: Meta)
-
+/**
+ * DecryptedAppDataRecord is an internal decrypted form of AppDataRecord, analogous to DecryptedRecord
+ * @see care.data4life.sdk.network.model.DecryptedRecord
+ */
 data class DecryptedAppDataRecord(
         var id: String?,
         val appData: ByteArray,
         val tags: HashMap<String, String>,
+        val annotations: List<String>,
         val customCreationDate: String,
         val updatedDate: String?,
         val dataKey: GCKey,
         val modelVersion: Int
 ) {
-    fun copyWithResource(appData: ByteArray) = copy(appData = appData)
+    fun copyWithResourceAnnotaions(appData: ByteArray, annotations: List<String>?) =
+            copy(appData = appData, annotations = annotations ?: this.annotations)
 }

@@ -34,6 +34,7 @@ import static care.data4life.sdk.TaggingService.TAG_DELIMITER;
 class TagEncryptionService {
 
     static final int IV_SIZE = 16;
+    private static String ANNOTATION_KEY = "custom=";
 
     private final byte[] iv;
     private CryptoService cryptoService;
@@ -64,8 +65,27 @@ class TagEncryptionService {
                 .fromIterable(encryptedTags)
                 .map(encryptedTag -> decryptTag(tek, encryptedTag).blockingGet())
                 .filter(decryptedTag -> decryptedTag.contains(TAG_DELIMITER))
+                .filter(decryptedTag -> !decryptedTag.contains(ANNOTATION_KEY))
                 .toList()
                 .map(TagHelper::convertToTagMap)
+                .blockingGet();
+    }
+
+    List<String> encryptAnnotations(List<String> annotations) throws IOException {
+        GCKey tek = cryptoService.fetchTagEncryptionKey();
+        return Observable.fromIterable(annotations)
+                .map(tag->encryptTag(tek,ANNOTATION_KEY+tag).blockingGet())
+                .toList()
+                .blockingGet();
+    }
+
+    List<String> decryptAnnotations(List<String> annotations) throws IOException {
+        GCKey tek = cryptoService.fetchTagEncryptionKey();
+        return Observable.fromIterable(annotations)
+                .map(tag->decryptTag(tek,tag).blockingGet())
+                .filter(decryptedTag->decryptedTag.contains(ANNOTATION_KEY))
+                .map(tag->tag.replace(ANNOTATION_KEY,""))
+                .toList()
                 .blockingGet();
     }
 

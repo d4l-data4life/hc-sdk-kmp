@@ -25,6 +25,7 @@ import org.threeten.bp.LocalDateTime;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -1747,12 +1748,12 @@ public class RecordServiceTest {
         doReturn(mockEncryptedRecord).when(recordService).encryptAppDataRecord(mockDecryptedAppDataRecord);
         when(mockApiService.updateRecord(ALIAS, USER_ID, RECORD_ID, mockEncryptedRecord)).thenReturn(Single.just(mockEncryptedRecord));
         doReturn(mockMeta).when(recordService).buildMeta(mockDecryptedAppDataRecord);
-        doReturn(mockDecryptedAppDataRecord).when(mockDecryptedAppDataRecord).copyWithResource(appData);
+        doReturn(mockDecryptedAppDataRecord).when(mockDecryptedAppDataRecord).copyWithResourceAnnotaions(appData, Collections.emptyList());
         doReturn(appData).when(mockDecryptedAppDataRecord).getAppData();
         doReturn("").when(mockDecryptedAppDataRecord).getId();
 
         // When
-        TestObserver<AppDataRecord> observer = recordService.updateAppDataRecord(appData,RECORD_ID, USER_ID).test().await();
+        TestObserver<AppDataRecord> observer = recordService.updateAppDataRecord(appData,Collections.emptyList(),RECORD_ID, USER_ID).test().await();
 
         // Then
         AppDataRecord result = observer.assertNoErrors()
@@ -1774,10 +1775,12 @@ public class RecordServiceTest {
     @Test
     public void fetchAppDataRecord_shouldReturnFetchedRecord() throws InterruptedException, IOException, DataValidationException.ModelVersionNotSupported {
         // Given
+        byte[] appData = "Test AppData".getBytes();
         when(mockApiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)).thenReturn(Single.just(mockEncryptedRecord));
-        doReturn(mockDecryptedRecord).when(recordService).decryptRecord(mockEncryptedRecord, USER_ID);
-        doReturn(mockMeta).when(recordService).buildMeta(mockDecryptedRecord);
-
+        doReturn(mockDecryptedAppDataRecord).when(recordService).decryptAppDataRecord(mockEncryptedRecord, USER_ID);
+        doReturn(mockMeta).when(recordService).buildMeta(mockDecryptedAppDataRecord);
+        doReturn("").when(mockDecryptedAppDataRecord).getId();
+        doReturn(appData).when(mockDecryptedAppDataRecord).getAppData();
         // When
         TestObserver<AppDataRecord> observer = recordService.fetchAppDataRecord(RECORD_ID, USER_ID).test().await();
 
@@ -1789,10 +1792,11 @@ public class RecordServiceTest {
                 .values().get(0);
 
         assertThat(record.getMeta()).isEqualTo(mockMeta);
+        assertThat(record.getAppDataResource()).isEqualTo(appData);
 
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID);
-        inOrder.verify(recordService).decryptRecord(mockEncryptedRecord, USER_ID);
-        inOrder.verify(recordService).buildMeta(mockDecryptedRecord);
+        inOrder.verify(recordService).decryptAppDataRecord(mockEncryptedRecord, USER_ID);
+        inOrder.verify(recordService).buildMeta(mockDecryptedAppDataRecord);
         inOrder.verifyNoMoreInteractions();
     }
 

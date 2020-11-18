@@ -22,6 +22,6 @@ import care.data4life.sdk.model.Record;
 
 class EmptyRecord<T extends DomainResource> extends Record<T> {
     EmptyRecord() {
-        super(null, null);
+        super(null, null, null);
     }
 }

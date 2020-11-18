@@ -64,6 +64,17 @@ public interface SdkContract {
          * Creates a record.
          *
          * @param resource the resource that shall be created
+         * @param annotations custom annotations added as tags to the record
+         * @param listener result contains either record or Error
+         * @param <T>      the type of the created {@link Record} as a subclass of {@link DomainResource}
+         * @throws D4LException if {@param resource} is DocumentReference and {@link care.data4life.fhir.stu3.model.Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
+         */
+        <T extends DomainResource> void createRecord(T resource, List<String> annotations, ResultListener<Record<T>> listener);
+
+        /**
+         * Creates a record.
+         *
+         * @param resource the resource that shall be created
          * @param listener result contains either record or Error
          * @param <T>      the type of the created {@link Record} as a subclass of {@link DomainResource}
          * @throws D4LException if {@param resource} is DocumentReference and {@link care.data4life.fhir.stu3.model.Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
@@ -105,6 +116,15 @@ public interface SdkContract {
         Task countRecords(@Nullable Class<? extends DomainResource> clazz, ResultListener<Integer> listener);
 
         /**
+         * Get the count of stored records per record type
+         * @param annotations custom annotations added as tags to the record
+         * @param clazz    the type of the record - it can be null(than all records count would be returned)
+         * @param listener either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
+         * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
+         */
+        Task countRecords(@Nullable Class<? extends DomainResource> clazz, List<String> annotations, ResultListener<Integer> listener);
+
+        /**
          * Fetch a record
          *
          * @param recordId the id of the record which shall be fetched
@@ -123,6 +143,21 @@ public interface SdkContract {
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
         <T extends DomainResource> Task fetchRecords(List<String> recordIds, ResultListener<FetchResult<T>> listener);
+
+        /**
+         * Fetch records with filters
+         *
+         * @param resourceType The class type of the record to fetch
+         * @param annotations custom annotations added as tags to the record
+         * @param startDate    the filtered records have a creation date after the start date
+         * @param endDate      the filtered records have a creation date before the endDate
+         * @param pageSize     define the size page result
+         * @param offset       the offset of the records list
+         * @param listener     either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
+         * @param <T>          the type of {@link Record} as a subclass of {@link DomainResource}
+         * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
+         */
+        <T extends DomainResource> Task fetchRecords(Class<T> resourceType, List<String> annotations, LocalDate startDate, LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<Record<T>>> listener);
 
         /**
          * Fetch records with filters
@@ -163,11 +198,12 @@ public interface SdkContract {
          * Update a record
          *
          * @param resource the updated resource that shall be uploaded
+         * @param annotations custom annotations added as tags to the record
          * @param listener either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
          * @param <T>      the type of {@link Record} as a subclass of {@link DomainResource}
          * @throws care.data4life.sdk.config.DataRestrictionException if {@param resource} is DocumentReference and {@link care.data4life.fhir.stu3.model.Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
          */
-        <T extends DomainResource> void updateRecord(T resource, ResultListener<Record<T>> listener);
+        <T extends DomainResource> void updateRecord(T resource, List<String> annotations, ResultListener<Record<T>> listener);
 
         /**
          * Update a list of records
@@ -203,14 +239,49 @@ public interface SdkContract {
         Task downloadAttachments(String recordId, List<String> attachmentIds, DownloadType type, ResultListener<List<Attachment>> listener);
 
 
+        /**
+         * Creates an {@link AppDataRecord} record.
+         *
+         * @param appData the app data that will be created
+         * @param annotations custom annotations added as tags to the record
+         * @param resultListener result contains either record or Error
+         */
         void createAppData(byte[] appData, List<String> annotations, ResultListener<AppDataRecord> resultListener);
 
+        /**
+         * @param appDataId the id of the app data record which shall be fetched
+         * @param resultListener either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
+         * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
+         */
         Task fetchAppData(String appDataId, ResultListener<AppDataRecord> resultListener);
 
+        /**
+         * Fetch AppData records with filters
+         *
+         * @param annotations  custom annotations added as tags to the record
+         * @param startDate    the filtered records have a creation date after the start date
+         * @param endDate      the filtered records have a creation date before the endDate
+         * @param pageSize     define the size page result
+         * @param offset       the offset of the records list
+         * @param listener     either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
+         * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
+         */
         Task fetchAppData(List<String> annotations, @Nullable LocalDate startDate, @Nullable LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<AppDataRecord>> listener);
 
-        void updateAppData(byte[] appData, String recordId, ResultListener<AppDataRecord> resultListener);
+        /**
+         * @param appData the updated appData byte array thaat shall be uploaded
+         * @param annotations custom annotations added as tags to the record
+         * @param recordId the id of the {@link AppDataRecord} that shall be update
+         * @param resultListener either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
+         */
+        void updateAppData(byte[] appData, @Nullable List<String> annotations, String recordId, ResultListener<AppDataRecord> resultListener);
 
+        /**
+         * Delete an appData record
+         *
+         * @param appDataId the id of the record that shall be deleted
+         * @param callback either {@link Callback#onSuccess()} or {@link Callback#onError(D4LException)} will be called
+         */
         void deleteAppData(String appDataId, Callback callback);
 
     }

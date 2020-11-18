@@ -131,6 +131,10 @@ class RecordService {
     }
 
     <T extends DomainResource> Single<Record<T>> createRecord(T resource, String userId) throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
+        return createRecord(resource, userId, Collections.emptyList());
+    }
+
+    <T extends DomainResource> Single<Record<T>> createRecord(T resource, String userId, List<String> annotations) throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
         checkDataRestrictions(resource);
         HashMap<Attachment, String> data = extractUploadData(resource);
         String createdDate = DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID));
@@ -139,7 +143,7 @@ class RecordService {
                 .map(createdAt -> {
                     HashMap<String, String> tags = taggingService.appendDefaultTags(resource.getResourceType(), null);
                     GCKey dataKey = cryptoService.generateGCKey().blockingGet();
-                    return new DecryptedRecord<>(null, resource, tags, createdAt, null, dataKey, null, ModelVersion.CURRENT);
+                    return new DecryptedRecord<>(null, resource, tags, annotations, createdAt, null, dataKey, null, ModelVersion.CURRENT);
                 });
 
         return createRecord
@@ -150,7 +154,7 @@ class RecordService {
                 .map((EncryptedRecord r) -> (DecryptedRecord<T>) decryptRecord(r, userId))
                 .map(record -> restoreUploadData(record, resource, data))
                 .map(this::assignResourceId)
-                .map(decryptedRecord -> new Record<>(decryptedRecord.getResource(), buildMeta(decryptedRecord)));
+                .map(decryptedRecord -> new Record<>(decryptedRecord.getResource(), buildMeta(decryptedRecord),decryptedRecord.getAnnotations()));
 
     }
 
@@ -195,7 +199,7 @@ class RecordService {
                 .fetchRecord(alias, userId, recordId)
                 .map((EncryptedRecord encryptedRecord) -> (DecryptedRecord<T>) decryptRecord(encryptedRecord, userId))
                 .map(this::assignResourceId)
-                .map(decryptedRecord -> new Record<>(decryptedRecord.getResource(), buildMeta(decryptedRecord)));
+                .map(decryptedRecord -> new Record<>(decryptedRecord.getResource(), buildMeta(decryptedRecord),decryptedRecord.getAnnotations()));
     }
 
     <T extends DomainResource> Single<FetchResult<T>> fetchRecords(List<String> recordIds, String userId) {
@@ -216,18 +220,27 @@ class RecordService {
     }
 
     <T extends DomainResource> Single<List<Record<T>>> fetchRecords(String userId, Class<T> resourceType, LocalDate startDate, LocalDate endDate, Integer pageSize, Integer offset) {
+        return fetchRecords(userId, resourceType, Collections.emptyList(), startDate, endDate, pageSize, offset);
+    }
+
+    <T extends DomainResource> Single<List<Record<T>>> fetchRecords(String userId, Class<T> resourceType, List<String> annotations, LocalDate startDate, LocalDate endDate, Integer pageSize, Integer offset) {
         String startTime = startDate != null ? DATE_FORMATTER.format(startDate) : null;
         String endTime = endDate != null ? DATE_FORMATTER.format(endDate) : null;
 
         return Observable
                 .fromCallable(() -> taggingService.getTagFromType(FhirElementFactory.getFhirTypeForClass(resourceType)))
                 .map(tags -> tagEncryptionService.encryptTags(tags))
+                .map(tags-> {
+                    tags.addAll(tagEncryptionService.encryptAnnotations(annotations));
+                    return tags;
+                })
                 .flatMap(encryptedTags -> apiService.fetchRecords(alias, userId, startTime, endTime, pageSize, offset, encryptedTags))
                 .flatMapIterable(encryptedRecords -> encryptedRecords)
                 .map((EncryptedRecord encryptedRecord) -> (DecryptedRecord<T>) decryptRecord(encryptedRecord, userId))
                 .filter(decryptedRecord -> resourceType.isAssignableFrom(decryptedRecord.getResource().getClass()))
+                .filter(decryptedRecord -> decryptedRecord.getAnnotations().containsAll(annotations))
                 .map(this::assignResourceId)
-                .map(decryptedRecord -> new Record<>(decryptedRecord.getResource(), buildMeta(decryptedRecord)))
+                .map(decryptedRecord -> new Record<>(decryptedRecord.getResource(), buildMeta(decryptedRecord),decryptedRecord.getAnnotations()))
                 .toList();
     }
 
@@ -283,7 +296,7 @@ class RecordService {
                     return decryptedRecord;
                 })
                 .map(this::assignResourceId)
-                .map(decryptedRecord -> new Record<>(decryptedRecord.getResource(), buildMeta(decryptedRecord)));
+                .map(decryptedRecord -> new Record<>(decryptedRecord.getResource(), buildMeta(decryptedRecord),decryptedRecord.getAnnotations()));
     }
 
     <T extends DomainResource> Single<DownloadResult<T>> downloadRecords(List<String> recordIds, String userId) {
@@ -304,6 +317,10 @@ class RecordService {
     }
 
     <T extends DomainResource> Single<Record<T>> updateRecord(T resource, String userId) throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
+        return updateRecord(resource,null,userId);
+    }
+
+    <T extends DomainResource> Single<Record<T>> updateRecord(T resource,List<String> annotations, String userId) throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
         checkDataRestrictions(resource);
         HashMap<Attachment, String> data = extractUploadData(resource);
         String recordId = resource.id;
@@ -315,6 +332,9 @@ class RecordService {
                 .map(decryptedRecord -> {
                     cleanObsoleteAdditionalIdentifiers(resource);
                     decryptedRecord.setResource(resource);
+                    if(annotations!=null) {
+                        decryptedRecord.setAnnotations(annotations);
+                    }
                     return decryptedRecord;
                 })
                 .map(this::removeUploadData)
@@ -323,7 +343,7 @@ class RecordService {
                 .map((EncryptedRecord encryptedRecord) -> (DecryptedRecord<T>) decryptRecord(encryptedRecord, userId))
                 .map(decryptedRecord -> restoreUploadData(decryptedRecord, resource, data))
                 .map(this::assignResourceId)
-                .map(decryptedRecord -> new Record<>(decryptedRecord.getResource(), buildMeta(decryptedRecord)));
+                .map(decryptedRecord -> new Record<>(decryptedRecord.getResource(), buildMeta(decryptedRecord),decryptedRecord.getAnnotations()));
     }
 
     <T extends DomainResource> Single<UpdateResult<T>> updateRecords(List<T> resources, String userId) {
@@ -344,11 +364,18 @@ class RecordService {
     }
 
     Single<Integer> countRecords(Class<? extends DomainResource> type, String userId) {
+        return countRecords(type,userId,Collections.emptyList());
+    }
+    Single<Integer> countRecords(Class<? extends DomainResource> type, String userId, List<String> annotations) {
         if (type == null) return apiService.getCount(alias, userId, null);
 
         return Single
                 .fromCallable(() -> taggingService.getTagFromType(FhirElementFactory.getFhirTypeForClass(type)))
                 .map(tags -> tagEncryptionService.encryptTags(tags))
+                .map(tags -> {
+                    tags.addAll(tagEncryptionService.encryptAnnotations(annotations));
+                    return tags;
+                })
                 .flatMap(encryptedTags -> apiService.getCount(alias, userId, encryptedTags));
     }
 
@@ -357,6 +384,8 @@ class RecordService {
         T resource = record.getResource();
 
         List<String> encryptedTags = tagEncryptionService.encryptTags(record.getTags());
+        List<String> encryptedAnnotations = tagEncryptionService.encryptAnnotations(record.getAnnotations());
+        encryptedTags.addAll(encryptedAnnotations);
         String encryptedResource = fhirService.encryptResource(record.getDataKey(), resource);
 
         GCKey commonKey = cryptoService.fetchCurrentCommonKey();
@@ -384,6 +413,7 @@ class RecordService {
             throw new DataValidationException.ModelVersionNotSupported("Please update SDK to latest version!");
         }
         HashMap<String, String> tags = tagEncryptionService.decryptTags(r.getEncryptedTags());
+        List<String> annotations = tagEncryptionService.decryptAnnotations(r.getEncryptedTags());
 
         String commonKeyId = r.getCommonKeyId();
 
@@ -415,6 +445,7 @@ class RecordService {
                 r.getIdentifier(),
                 resource,
                 tags,
+                annotations,
                 r.getCustomCreationDate(),
                 r.getUpdatedDate(),
                 dataKey,
@@ -427,6 +458,8 @@ class RecordService {
         byte[] resource = record.getAppData();
 
         List<String> encryptedTags = tagEncryptionService.encryptTags(record.getTags());
+        List<String> encryptedAnnotations = tagEncryptionService.encryptAnnotations(record.getAnnotations());
+        encryptedTags.addAll(encryptedAnnotations);
         byte[] encryptedResource = cryptoService.encrypt(record.getDataKey(), resource).blockingGet();
         String encodedResource = Base64.INSTANCE.encodeToString(encryptedResource);
         GCKey commonKey = cryptoService.fetchCurrentCommonKey();
@@ -445,11 +478,12 @@ class RecordService {
 
     }
 
-    DecryptedAppDataRecord decryptAppDataRecord(EncryptedRecord r, String userId) throws IOException, DataValidationException.ModelVersionNotSupported {
+    DecryptedAppDataRecord  decryptAppDataRecord(EncryptedRecord r, String userId) throws IOException, DataValidationException.ModelVersionNotSupported {
         if (!ModelVersion.isModelVersionSupported(r.getModelVersion())) {
             throw new DataValidationException.ModelVersionNotSupported("Please update SDK to latest version!");
         }
         HashMap<String, String> tags = tagEncryptionService.decryptTags(r.getEncryptedTags());
+        List<String> annotations = tagEncryptionService.decryptAnnotations(r.getEncryptedTags());
 
         String commonKeyId = r.getCommonKeyId();
         boolean commonKeyStored = cryptoService.hasCommonKey(commonKeyId);
@@ -475,6 +509,7 @@ class RecordService {
                 r.getIdentifier(),
                 resource,
                 tags,
+                annotations,
                 r.getCustomCreationDate(),
                 r.getUpdatedDate(),
                 dataKey,
@@ -744,34 +779,34 @@ class RecordService {
                 .map(createdAt -> {
                     HashMap<String, String> tags = taggingService.appendDefaultTags(null,true, null);
                     GCKey dataKey = cryptoService.generateGCKey().blockingGet();
-                    return new DecryptedAppDataRecord(null, resource, tags, createdAt, null, dataKey, ModelVersion.CURRENT);
+                    return new DecryptedAppDataRecord(null, resource, tags, annotations, createdAt, null, dataKey, ModelVersion.CURRENT);
                 });
 
         return createRecord
                 .map(this::encryptAppDataRecord)
                 .flatMap(encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord))
                 .map((EncryptedRecord r) -> (DecryptedAppDataRecord) decryptAppDataRecord(r, userId))
-                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), decryptedRecord.getId(), buildMeta(decryptedRecord)));
+                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), decryptedRecord.getId(), buildMeta(decryptedRecord), annotations));
 
     }
 
-    Single<AppDataRecord> updateAppDataRecord(byte[] resource, String recordId, String userId)  {
+    Single<AppDataRecord> updateAppDataRecord(byte[] resource, @Nullable List<String> annotations, String recordId, String userId)  {
 
         return apiService
                 .fetchRecord(alias, userId, recordId)
                 .map((EncryptedRecord encryptedRecord) -> (DecryptedAppDataRecord) decryptAppDataRecord(encryptedRecord, userId))
-                .map( (DecryptedAppDataRecord decryptedRecord) -> decryptedRecord.copyWithResource(resource))
+                .map( (DecryptedAppDataRecord decryptedRecord) -> decryptedRecord.copyWithResourceAnnotaions(resource,annotations))
                 .map(this::encryptAppDataRecord)
                 .flatMap((EncryptedRecord encryptedRecord) -> apiService.updateRecord(alias, userId, recordId, encryptedRecord))
                 .map((EncryptedRecord encryptedRecord) -> (DecryptedAppDataRecord) decryptAppDataRecord(encryptedRecord, userId))
-                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), decryptedRecord.getId(), buildMeta(decryptedRecord)));
+                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), decryptedRecord.getId(), buildMeta(decryptedRecord),decryptedRecord.getAnnotations()));
     }
 
     <T> Single<AppDataRecord> fetchAppDataRecord(String recordId, String userId) {
         return apiService
                 .fetchRecord(alias, userId, recordId)
                 .map((EncryptedRecord encryptedRecord) -> (DecryptedAppDataRecord) decryptAppDataRecord(encryptedRecord, userId))
-                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), decryptedRecord.getId(), buildMeta(decryptedRecord)));
+                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), decryptedRecord.getId(), buildMeta(decryptedRecord),decryptedRecord.getAnnotations()));
     }
 
     Single<List<AppDataRecord>> fetchAppDataRecords(String userId, @Nullable LocalDate startDate, @Nullable LocalDate endDate, Integer pageSize, Integer offset) {
@@ -781,7 +816,7 @@ class RecordService {
                 .fetchRecords(alias, userId, startTime, endTime, pageSize, offset, new ArrayList<String>())
                 .flatMapIterable(records->records)
                 .map(encryptedRecord -> decryptAppDataRecord(encryptedRecord,userId))
-                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), decryptedRecord.getId(),buildMeta(decryptedRecord)))
+                .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), decryptedRecord.getId(),buildMeta(decryptedRecord),decryptedRecord.getAnnotations()))
                 .toList();
     }
     //endregion

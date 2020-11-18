@@ -264,6 +264,7 @@ public class DocumentsActivity extends AppCompatActivity {
     }
 
     AppDataRecord appdata;
+    List<String> annotations = new ArrayList<String>();
 
     private void createNewAppDataRecord() {
         if(appdata!=null) {
@@ -271,7 +272,11 @@ public class DocumentsActivity extends AppCompatActivity {
         }
         mDocumentsSRL.setRefreshing(true);
         byte[] bytearray = new byte[1];
-        client.createAppData(bytearray, new ArrayList<>(), new ResultListener<AppDataRecord>() {
+        annotations.add("test");
+        annotations.add("test2");
+        annotations.add("test3");
+
+        client.createAppData(bytearray,annotations , new ResultListener<AppDataRecord>() {
             @Override
             public void onSuccess(AppDataRecord appDataRecord) {
                 appdata = appDataRecord;
@@ -297,7 +302,7 @@ public class DocumentsActivity extends AppCompatActivity {
                     boolean equal = Arrays.equals(
                             appDataRecord.getAppDataResource(),
                             appdata.getAppDataResource()
-                    );
+                    ) && annotations.equals(appDataRecord.getAnnotations());
                     Toast.makeText(getApplicationContext(), "DonorKey test successful: " + equal,Toast.LENGTH_LONG).show();
                     mDocumentsSRL.setRefreshing(false);
                 });

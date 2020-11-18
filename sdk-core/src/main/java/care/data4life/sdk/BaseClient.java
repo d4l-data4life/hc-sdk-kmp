@@ -18,6 +18,7 @@ package care.data4life.sdk;
 
 import org.threeten.bp.LocalDate;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -85,11 +86,16 @@ abstract class BaseClient implements SdkContract.Client {
     }
 
     @Override
-    public <T extends DomainResource> void createRecord(T resource, ResultListener<Record<T>> listener) {
+    public <T extends DomainResource> void createRecord(T resource, List<String> annotations, ResultListener<Record<T>> listener) {
         Single<Record<T>> operation = userService.finishLogin(true)
                 .flatMap(ignore -> userService.getUID())
-                .flatMap(uid -> recordService.createRecord(resource, uid));
+                .flatMap(uid -> recordService.createRecord(resource, uid, annotations));
         executeSingle(operation, listener);
+    }
+
+    @Override
+    public <T extends DomainResource> void createRecord(T resource, ResultListener<Record<T>> listener) {
+        createRecord(resource,Collections.emptyList(),listener);
     }
 
     @Override
@@ -100,11 +106,15 @@ abstract class BaseClient implements SdkContract.Client {
         executeSingle(operation, listener);
     }
 
-    @Override
     public <T extends DomainResource> void updateRecord(T resource, ResultListener<Record<T>> listener) {
+        updateRecord(resource, null, listener);
+    }
+
+    @Override
+    public <T extends DomainResource> void updateRecord(T resource, List<String> annotations, ResultListener<Record<T>> listener) {
         Single<Record<T>> operation = userService.finishLogin(true)
                 .flatMap(ignore -> userService.getUID())
-                .flatMap(uid -> recordService.updateRecord(resource, uid));
+                .flatMap(uid -> recordService.updateRecord(resource, annotations, uid));
         executeSingle(operation, listener);
     }
 
@@ -131,10 +141,15 @@ abstract class BaseClient implements SdkContract.Client {
     }
 
     @Override
-    public Task countRecords(@Nullable Class<? extends DomainResource> clazz, ResultListener<Integer> listener) {
+    public Task countRecords(@Nullable Class<? extends DomainResource> clazz, List<String> annotations, ResultListener<Integer> listener) {
         Single<Integer> operation = userService.getUID()
-                .flatMap(uid -> recordService.countRecords(clazz, uid));
+                .flatMap(uid -> recordService.countRecords(clazz, uid, annotations));
         return executeSingle(operation, listener);
+    }
+
+    @Override
+    public Task countRecords(@Nullable Class<? extends DomainResource> clazz, ResultListener<Integer> listener) {
+        return countRecords(clazz,Collections.emptyList(),listener);
     }
 
     @Override
@@ -152,10 +167,15 @@ abstract class BaseClient implements SdkContract.Client {
     }
 
     @Override
-    public <T extends DomainResource> Task fetchRecords(Class<T> resourceType, @Nullable LocalDate startDate, @Nullable LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<Record<T>>> listener) {
+    public <T extends DomainResource> Task fetchRecords(Class<T> resourceType, List<String> annotations, @Nullable LocalDate startDate, @Nullable LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<Record<T>>> listener) {
         Single<List<Record<T>>> operation = userService.getUID()
-                .flatMap(uid -> recordService.fetchRecords(uid, resourceType, startDate, endDate, pageSize, offset));
+                .flatMap(uid -> recordService.fetchRecords(uid, resourceType, annotations, startDate, endDate, pageSize, offset));
         return executeSingle(operation, listener);
+    }
+
+    @Override
+    public <T extends DomainResource> Task fetchRecords(Class<T> resourceType, @Nullable LocalDate startDate, @Nullable LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<Record<T>>> listener) {
+        return fetchRecords(resourceType,Collections.emptyList(),startDate,endDate,pageSize,offset,listener);
     }
 
     @Override
@@ -209,10 +229,10 @@ abstract class BaseClient implements SdkContract.Client {
     }
 
     @Override
-    public void updateAppData(byte[] appData, String recordId, ResultListener<AppDataRecord> resultListener) {
+    public void updateAppData(byte[] appData, @Nullable List<String> annotations, String recordId, ResultListener<AppDataRecord> resultListener) {
         Single<AppDataRecord> operation = userService.finishLogin(true)
                 .flatMap(ignore -> userService.getUID())
-                .flatMap(uid -> recordService.updateAppDataRecord(appData, recordId, uid));
+                .flatMap(uid -> recordService.updateAppDataRecord(appData, annotations, recordId, uid));
         executeSingle(operation, resultListener);
     }
 

@@ -14,19 +14,21 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.crypto
+package care.data4life.securestore
 
-import care.data4life.sdk.util.Serializable
+fun CharArray.toBytes(): ByteArray {
+    val bytes = ByteArray(this.size)
+    this.forEachIndexed { index, c ->
+        bytes[index] = c.toByte()
+    }
 
+    return bytes
+}
 
-expect class GCKeyPair(
-        algorithm: GCRSAKeyAlgorithm,
-        privateKey: GCAsymmetricKey,
-        publicKey: GCAsymmetricKey,
-        keyVersion: Int
-) : Serializable {
-
-    fun getPublicKeyBase64(): CharArray
-
-    fun getPrivateKeyBase64(): CharArray
+fun ByteArray.toChars(): CharArray {
+    val chars = CharArray(this.size)
+    this.forEachIndexed { index, c ->
+        chars[index] = c.toChar()
+    }
+    return chars
 }

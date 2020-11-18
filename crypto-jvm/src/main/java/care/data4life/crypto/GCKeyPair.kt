@@ -31,8 +31,8 @@ actual class GCKeyPair actual constructor(
 ) : Serializable {
 
 
-    private var privateKeyBase64: String? = null
-    private var publicKeyBase64: String? = null
+    private var privateKeyBase64: CharArray = charArrayOf()
+    private var publicKeyBase64: CharArray = charArrayOf()
 
 
     @Transient
@@ -41,7 +41,7 @@ actual class GCKeyPair actual constructor(
             if (field == null) {
                 try {
                     val keyFactory = KeyFactory.getInstance(algorithm.cipher)
-                    val encodedKeySpec = PKCS8EncodedKeySpec(Base64.decode(privateKeyBase64!!))
+                    val encodedKeySpec = PKCS8EncodedKeySpec(Base64.decode(privateKeyBase64.toString()))
                     val privKey = keyFactory.generatePrivate(encodedKeySpec)
                     this.privateKey = GCAsymmetricKey(privKey, GCAsymmetricKey.Type.Private)
                 } catch (e: Exception) {
@@ -57,7 +57,7 @@ actual class GCKeyPair actual constructor(
             if (field == null) {
                 try {
                     val keyFactory = KeyFactory.getInstance(algorithm.cipher)
-                    val pkcs1PublicKey = RSAPublicKey.getInstance(Base64.decode(publicKeyBase64!!))
+                    val pkcs1PublicKey = RSAPublicKey.getInstance(Base64.decode(publicKeyBase64.toString()))
                     val modulus = pkcs1PublicKey.modulus
                     val publicExponent = pkcs1PublicKey.publicExponent
                     val pubKeySpec = RSAPublicKeySpec(modulus, publicExponent)
@@ -71,12 +71,21 @@ actual class GCKeyPair actual constructor(
             return field
         }
 
-    actual fun getPublicKeyBase64(): String = publicKeyBase64
-            ?: Base64.encodeToString(publicKey!!.value.encoded).also { publicKeyBase64 = it }
+    actual fun getPublicKeyBase64(): CharArray{
+        return if(publicKeyBase64.isEmpty())
+            Base64.encodeToString(String(publicKey!!.value.encoded)).toCharArray().also { publicKeyBase64 = it }
+        else
+            publicKeyBase64
+    }
 
-    actual fun getPrivateKeyBase64(): String = privateKeyBase64
-            ?: Base64.encodeToString(privateKey!!.value.encoded).also { privateKeyBase64 = it }
 
+
+    actual fun getPrivateKeyBase64(): CharArray{
+        return if(privateKeyBase64.isEmpty())
+            Base64.encodeToString(String(privateKey!!.value.encoded)).toCharArray().also { privateKeyBase64 = it }
+        else
+            privateKeyBase64
+    }
 
     init {
         this.privateKey = privateKey

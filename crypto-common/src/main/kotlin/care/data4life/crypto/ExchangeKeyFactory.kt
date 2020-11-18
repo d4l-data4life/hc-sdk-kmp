@@ -20,7 +20,7 @@ import care.data4life.crypto.error.CryptoException
 
 object ExchangeKeyFactory {
 
-    fun createKey(keyVersion: KeyVersion, type: KeyType, encryptedKeyBase64: String): ExchangeKey {
+    fun createKey(keyVersion: KeyVersion, type: KeyType, encryptedKeyBase64: CharArray): ExchangeKey {
         if (keyVersion !== KeyVersion.VERSION_1) {
             throw CryptoException.InvalidKeyVersion(keyVersion.value)
         }
@@ -37,42 +37,42 @@ object ExchangeKeyFactory {
     }
 
 
-    private fun createPublicAppKey(encryptedAppPublicKeyBase64: String): ExchangeKey {
+    private fun createPublicAppKey(encryptedAppPublicKeyBase64: CharArray): ExchangeKey {
         return ExchangeKey(
                 KeyType.APP_PUBLIC_KEY,
-                null,
-                encryptedAppPublicKeyBase64, null,
+                charArrayOf(),
+                encryptedAppPublicKeyBase64, charArrayOf(),
                 KeyVersion.VERSION_1
         )
     }
 
-    private fun createCommonKey(encryptedCommonKeyBase64: String): ExchangeKey {
+    private fun createCommonKey(encryptedCommonKeyBase64: CharArray): ExchangeKey {
         return ExchangeKey(
-                KeyType.COMMON_KEY, null, null,
+                KeyType.COMMON_KEY, charArrayOf(), charArrayOf(),
                 encryptedCommonKeyBase64,
                 KeyVersion.VERSION_1
         )
     }
 
-    private fun createDataKey(encryptedDataKeyBase64: String): ExchangeKey {
+    private fun createDataKey(encryptedDataKeyBase64: CharArray): ExchangeKey {
         return ExchangeKey(
-                KeyType.DATA_KEY, null, null,
+                KeyType.DATA_KEY, charArrayOf(), charArrayOf(),
                 encryptedDataKeyBase64,
                 KeyVersion.VERSION_1
         )
     }
 
-    private fun createAttachmentKey(encryptedAttachmentKeyBase64: String): ExchangeKey {
+    private fun createAttachmentKey(encryptedAttachmentKeyBase64: CharArray): ExchangeKey {
         return ExchangeKey(
-                KeyType.ATTACHMENT_KEY, null, null,
+                KeyType.ATTACHMENT_KEY, charArrayOf(), charArrayOf(),
                 encryptedAttachmentKeyBase64,
                 KeyVersion.VERSION_1
         )
     }
 
-    private fun createTagKey(encryptedTagKeyBase64: String): ExchangeKey {
+    private fun createTagKey(encryptedTagKeyBase64: CharArray ): ExchangeKey {
         return ExchangeKey(
-                KeyType.TAG_KEY, null, null,
+                KeyType.TAG_KEY, charArrayOf(), charArrayOf(),
                 encryptedTagKeyBase64,
                 KeyVersion.VERSION_1
         )

@@ -41,7 +41,7 @@ class KeyFactory(
         }
 
         val symmetricKey = GCSymmetricKey(
-                SecretKeySpec(base64.decode(exchangeKey.symmetricKey!!),
+                SecretKeySpec(base64.decode(String(exchangeKey.symmetricKey)),
                         algorithm.transformation
                 ))
 
@@ -53,8 +53,8 @@ class KeyFactory(
         val algorithm = GCRSAKeyAlgorithm()
         val privateKeyBase64 = exchangeKey.privateKey
         val publicKeyBase64 = exchangeKey.publicKey
-        val pkcs8EncodedKeySpec = PKCS8EncodedKeySpec(base64.decode(privateKeyBase64!!))
-        val x509EncodedKeySpec = X509EncodedKeySpec(base64.decode(publicKeyBase64!!))
+        val pkcs8EncodedKeySpec = PKCS8EncodedKeySpec(base64.decode(String(privateKeyBase64)))
+        val x509EncodedKeySpec = X509EncodedKeySpec(base64.decode(String(publicKeyBase64)))
         val keyFactory = java.security.KeyFactory.getInstance(algorithm.cipher)
         val privateKey = keyFactory.generatePrivate(pkcs8EncodedKeySpec)
         val publicKey = keyFactory.generatePublic(x509EncodedKeySpec)

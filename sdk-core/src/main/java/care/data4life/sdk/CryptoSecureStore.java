@@ -92,8 +92,8 @@ public final class CryptoSecureStore {
 
     public void storeKey(String alias, GCKey key, KeyType keyType) {
         ExchangeKey exchangeKey = new ExchangeKey(keyType,
-                null,
-                null,
+                new char[0],
+                new char[0],
                 key.getKeyBase64(),
                 key.getKeyVersion());
         String json = moshi.adapter(ExchangeKey.class).toJson(exchangeKey);
@@ -104,7 +104,7 @@ public final class CryptoSecureStore {
         ExchangeKey exchangeKey = new ExchangeKey(KeyType.APP_PRIVATE_KEY,
                 key.getPrivateKeyBase64(),
                 key.getPublicKeyBase64(),
-                null,
+                new char[0],
                 key.getKeyVersion());
         String json = moshi.adapter(ExchangeKey.class).toJson(exchangeKey);
         secureStore.addData(alias, json.toCharArray());

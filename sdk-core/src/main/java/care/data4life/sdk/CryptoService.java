@@ -189,10 +189,11 @@ class CryptoService extends CryptoProtocol {
                 });
     }
 
+    //TODO encodedKey not a string
     public Single<String> convertAsymmetricKeyToBase64ExchangeKey(GCAsymmetricKey gcAsymmetricKey) {
         return Single.fromCallable(() -> gcAsymmetricKey.getValue().getEncoded()) //SPKI
                 .map(base64::encodeToString)
-                .map(encodedKey -> ExchangeKeyFactory.INSTANCE.createKey(KEY_VERSION, KeyType.APP_PUBLIC_KEY, encodedKey))
+                .map(encodedKey -> ExchangeKeyFactory.INSTANCE.createKey(KEY_VERSION, KeyType.APP_PUBLIC_KEY, encodedKey.toString().toCharArray()))
                 .map(exchangeKey -> moshi.adapter(ExchangeKey.class).toJson(exchangeKey))
                 .map(base64::encodeToString);
     }

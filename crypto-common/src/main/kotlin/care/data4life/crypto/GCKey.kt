@@ -25,16 +25,21 @@ class GCKey(val algorithm: GCAESKeyAlgorithm,
 
 
     @Json("key")
-    private var keyBase64: String? = null
+    private var keyBase64: CharArray = charArrayOf()
 
 
     fun getSymmetricKey(): GCSymmetricKey {
         return symmetricKey
-                ?: GCSymmetricKey(SecretKeySpec(Base64.decode(keyBase64!!), algorithm.transformation)).also { symmetricKey = it }
+                ?: GCSymmetricKey(SecretKeySpec(Base64.decode(String(keyBase64)), algorithm.transformation)).also { symmetricKey = it }
     }
 
-    fun getKeyBase64(): String = keyBase64
-            ?: Base64.encodeToString(symmetricKey!!.value.getEncoded()).also { keyBase64 = it }
+    @ExperimentalStdlibApi
+    fun getKeyBase64(): CharArray {
+        return if (keyBase64.isEmpty())
+            Base64.encodeToString(symmetricKey!!.value.getEncoded()).toCharArray().also { keyBase64 = it };
+        else
+            keyBase64;
+    }
 
 
     override fun equals(other: Any?): Boolean {

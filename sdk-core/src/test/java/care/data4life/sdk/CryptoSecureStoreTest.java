@@ -162,8 +162,8 @@ public class CryptoSecureStoreTest {
         GCKeyPair key = mock(GCKeyPair.class);
         GCRSAKeyAlgorithm algorithm = new GCRSAKeyAlgorithm();
         when(key.getAlgorithm()).thenReturn(algorithm);
-        when(key.getPublicKeyBase64()).thenReturn(DATA);
-        when(key.getPrivateKeyBase64()).thenReturn(DATA);
+        when(key.getPublicKeyBase64()).thenReturn(DATA.toCharArray());
+        when(key.getPrivateKeyBase64()).thenReturn(DATA.toCharArray());
         when(key.getKeyVersion()).thenReturn(1);
         when(moshi.adapter(any(Type.class))).thenReturn(adapter);
         when(adapter.toJson(any())).thenReturn(DATA);

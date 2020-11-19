@@ -809,11 +809,15 @@ class RecordService {
                 .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), decryptedRecord.getId(), buildMeta(decryptedRecord),decryptedRecord.getAnnotations()));
     }
 
-    Single<List<AppDataRecord>> fetchAppDataRecords(String userId, @Nullable LocalDate startDate, @Nullable LocalDate endDate, Integer pageSize, Integer offset) {
+    Single<List<AppDataRecord>> fetchAppDataRecords(String userId, @Nullable LocalDate startDate, @Nullable LocalDate endDate, Integer pageSize, Integer offset, List<String> annotations) throws IOException {
         String startTime = startDate != null ? DATE_FORMATTER.format(startDate) : null;
         String endTime = endDate != null ? DATE_FORMATTER.format(endDate) : null;
+        annotations = tagEncryptionService.encryptAnnotations(annotations);
+        Map<String, String> tags = taggingService.appendAppDataTags(new HashMap<>());
+        List<String> encryptedTags = tagEncryptionService.encryptTags(tags);
+        encryptedTags.addAll(tagEncryptionService.encryptAnnotations(annotations));
         return apiService
-                .fetchRecords(alias, userId, startTime, endTime, pageSize, offset, new ArrayList<String>())
+                .fetchRecords(alias, userId, startTime, endTime, pageSize, offset, encryptedTags)
                 .flatMapIterable(records->records)
                 .map(encryptedRecord -> decryptAppDataRecord(encryptedRecord,userId))
                 .map(decryptedRecord -> new AppDataRecord(decryptedRecord.getAppData(), decryptedRecord.getId(),buildMeta(decryptedRecord),decryptedRecord.getAnnotations()))

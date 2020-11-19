@@ -19,6 +19,7 @@ package care.data4life.sdk;
 
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -31,7 +32,7 @@ class TaggingService {
     static final String TAG_RESOURCE_TYPE = "resourceType".toLowerCase(US_LOCALE);
     static final String TAG_CLIENT = "client";
     private static final String TAG_APPDATA_KEY = "flag";
-    private static final String TAG_APPDATA_VALUE = "appData";
+    private static final String TAG_APPDATA_VALUE = "appdata";
     private static final String TAG_UPDATED_BY_CLIENT = "updatedByClient".toLowerCase(US_LOCALE);
     private static final String TAG_PARTNER = "partner";
     private static final String TAG_UPDATED_BY_PARTNER = "updatedByPartner".toLowerCase(US_LOCALE);
@@ -68,7 +69,7 @@ class TaggingService {
             tags.put(TAG_UPDATED_BY_PARTNER, partnerId);
         }
 
-        if (!tags.containsKey(TAG_FHIR_VERSION)) {
+        if (!appdata && !tags.containsKey(TAG_FHIR_VERSION)) {
             tags.put(TAG_FHIR_VERSION, FHIR_VERSION);
         }
 
@@ -76,6 +77,11 @@ class TaggingService {
             tags.put(TAG_APPDATA_KEY,TAG_APPDATA_VALUE);
         }
 
+        return tags;
+    }
+
+    Map<String,String> appendAppDataTags(HashMap<String, String> tags) {
+        tags.put(TAG_APPDATA_KEY,TAG_APPDATA_VALUE);
         return tags;
     }
 

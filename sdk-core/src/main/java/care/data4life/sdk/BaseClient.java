@@ -224,7 +224,7 @@ abstract class BaseClient implements SdkContract.Client {
     @Override
     public Task fetchAppData(List<String> annotations, @Nullable LocalDate startDate, @Nullable LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<AppDataRecord>> listener) {
         Single<List<AppDataRecord>> operation = userService.getUID()
-                .flatMap(uid -> recordService.fetchAppDataRecords(uid, startDate, endDate, pageSize, offset));
+                .flatMap(uid -> recordService.fetchAppDataRecords(uid, startDate, endDate, pageSize, offset, annotations));
         return executeSingle(operation, listener);
     }
 

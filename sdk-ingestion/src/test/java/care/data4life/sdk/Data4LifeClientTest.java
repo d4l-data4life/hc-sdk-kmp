@@ -48,7 +48,7 @@ public class Data4LifeClientTest {
     private CryptoService cryptoService;
     private RecordService recordService;
     private Data4LifeClient instance;
-    private SdkContract.ErrorHandler errorHandler;
+    private CallHandler callHandler;
 
     @Before
     public void setUp() {
@@ -56,14 +56,14 @@ public class Data4LifeClientTest {
         cryptoService = mock(CryptoService.class);
         userService = mock(UserService.class);
         recordService = mock(RecordService.class);
-        errorHandler = mock(SdkContract.ErrorHandler.class);
+        callHandler = mock(CallHandler.class);
 
 
         instance = new Data4LifeClient(
                 ALIAS,
                 userService,
                 recordService,
-                errorHandler);
+                callHandler);
     }
 
     // TODO Need to define new tests

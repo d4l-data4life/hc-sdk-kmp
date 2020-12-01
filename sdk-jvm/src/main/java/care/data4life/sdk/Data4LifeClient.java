@@ -47,8 +47,8 @@ public final class Data4LifeClient extends BaseClient {
                               CryptoService cryptoService,
                               UserService userService,
                               RecordService recordService,
-                              SdkContract.ErrorHandler errorHandler) {
-        super(alias, userService, recordService, errorHandler);
+                              CallHandler callHandler) {
+        super(alias, userService, recordService, callHandler);
         this.authorizationService = authorizationService;
         this.cryptoService = cryptoService;
     }
@@ -113,10 +113,11 @@ public final class Data4LifeClient extends BaseClient {
         FileService fileService = new FileService(alias, apiService, cryptoService);
         AttachmentService attachmentService = new AttachmentService(alias, fileService, new JvmImageResizer());
         D4LErrorHandler errorHandler = new D4LErrorHandler();
+        CallHandler callHandler = new CallHandler(errorHandler);
         String partnerId = clientId.split(CLIENT_ID_SPLIT_CHAR)[PARTNER_ID_INDEX];
         RecordService recordService = new RecordService(partnerId, alias, apiService, tagEncryptionService, taggingService, fhirService, attachmentService, cryptoService, errorHandler);
 
-        return new Data4LifeClient(alias, authorizationService, cryptoService, userService, recordService, errorHandler);
+        return new Data4LifeClient(alias, authorizationService, cryptoService, userService, recordService, callHandler);
     }
 
 

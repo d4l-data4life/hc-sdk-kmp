@@ -52,13 +52,13 @@ public final class Data4LifeClient extends BaseClient {
      * @param alias         Alias
      * @param userService   User service
      * @param recordService Record service
-     * @param errorHandler  Error handler
+     * @param callHandler  Call handler
      */
     protected Data4LifeClient(String alias,
                               UserService userService,
                               RecordService recordService,
-                              SdkContract.ErrorHandler errorHandler) {
-        super(alias, userService, recordService, errorHandler);
+                              CallHandler callHandler) {
+        super(alias, userService, recordService, callHandler);
     }
 
     /**
@@ -123,10 +123,11 @@ public final class Data4LifeClient extends BaseClient {
         FileService fileService = new FileService(ALIAS, apiService, cryptoService);
         AttachmentService attachmentService = new AttachmentService(ALIAS, fileService, new JvmImageResizer());
         D4LErrorHandler errorHandler = new D4LErrorHandler();
+        CallHandler callHandler = new CallHandler(errorHandler);
         String partnerId = clientId.split(CLIENT_ID_SPLIT_CHAR)[PARTNER_ID_INDEX];
         RecordService recordService = new RecordService(partnerId, ALIAS, apiService, tagEncryptionService, taggingService, fhirService, attachmentService, cryptoService, errorHandler);
 
-        return new Data4LifeClient(ALIAS, userService, recordService, errorHandler);
+        return new Data4LifeClient(ALIAS, userService, recordService, callHandler);
     }
 
     /**

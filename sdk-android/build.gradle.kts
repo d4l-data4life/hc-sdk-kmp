@@ -38,7 +38,7 @@ android {
 
         // Workaround BuildConfig for Libraries not anymore containing VERSION_NAME
         // https://commonsware.com/blog/2020/10/14/android-studio-4p1-library-modules-version-code.html
-        buildConfigField("String", "VERSION_NAME", LibraryConfig.versionName)
+        buildConfigField("String", "VERSION_NAME", "\"${LibraryConfig.versionName}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments(mapOf(
@@ -92,7 +92,6 @@ dependencies {
     api(project(":sdk-core")) {
         exclude(group = "org.threeten", module = "threetenbp")
         exclude(module = "securestore-jvm")
-        exclude(module = "crypto-jvm")
         exclude(module = "crypto-jvm")
         exclude(module = "auth-jvm")
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")

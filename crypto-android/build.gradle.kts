@@ -34,15 +34,10 @@ android {
                 "clearPackageData" to "true"
         ))
 
-        adbOptions {
-            timeOutInMs(10 * 60 * 1000)
-            installOptions("-d")
-        }
-
         buildTypes {
             buildTypes {
                 getByName("debug"){
-                    matchingFallbacks = listOf("debug","release")
+                    setMatchingFallbacks("debug","release")
                 }
             }
         }
@@ -60,13 +55,11 @@ android {
     testOptions {
         animationsDisabled = true
 
-        unitTests.all(KotlinClosure1<Any, Test>({
-            (this as Test).also { testTask ->
-                testTask.testLogging {
-                    events("passed", "skipped", "failed", "standardOut", "standardError")
-                }
+        unitTests.all {
+            it.testLogging {
+                events("passed", "skipped", "failed", "standardOut", "standardError")
             }
-        }, unitTests))
+        }
 
         execution = "ANDROID_TEST_ORCHESTRATOR"
     }
@@ -76,7 +69,7 @@ android {
     }
 
     compileOptions {
-        coreLibraryDesugaringEnabled = false
+        isCoreLibraryDesugaringEnabled = false
 
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8

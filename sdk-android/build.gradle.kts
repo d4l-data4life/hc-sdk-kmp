@@ -36,23 +36,19 @@ android {
         minSdkVersion(AndroidConfig.minSdkVersion)
         targetSdkVersion(AndroidConfig.targetSdkVersion)
 
-        versionCode = LibraryConfig.versionCode
-        versionName = LibraryConfig.versionName
+        // Workaround BuildConfig for Libraries not anymore containing VERSION_NAME
+        // https://commonsware.com/blog/2020/10/14/android-studio-4p1-library-modules-version-code.html
+        buildConfigField("String", "VERSION_NAME", LibraryConfig.versionName)
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments(mapOf(
                 "clearPackageData" to "true"
         ))
-
-        adbOptions {
-            timeOutInMs(10 * 60 * 1000)
-            installOptions("-d")
-        }
     }
 
     buildTypes {
         getByName("debug"){
-            matchingFallbacks = listOf("debug","release")
+            setMatchingFallbacks("debug","release")
         }
         getByName("release") {
             isMinifyEnabled = false
@@ -65,13 +61,11 @@ android {
     testOptions {
         animationsDisabled = true
 
-        unitTests.all(KotlinClosure1<Any, Test>({
-            (this as Test).also { testTask ->
-                testTask.testLogging {
-                    events("passed", "skipped", "failed", "standardOut", "standardError")
-                }
+        unitTests.all {
+            it.testLogging {
+                events("passed", "skipped", "failed", "standardOut", "standardError")
             }
-        }, unitTests))
+        }
 
         execution = "ANDROID_TEST_ORCHESTRATOR"
     }
@@ -81,7 +75,7 @@ android {
     }
 
     compileOptions {
-        coreLibraryDesugaringEnabled = false
+        isCoreLibraryDesugaringEnabled = false
 
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8

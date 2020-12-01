@@ -24,9 +24,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import care.data4life.fhir.stu3.model.CodeSystemDocumentReferenceStatus;
+import care.data4life.fhir.stu3.model.CodeSystemObservationStatus;
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.CarePlan;
-import care.data4life.fhir.stu3.model.CodeSystems;
 import care.data4life.fhir.stu3.model.CodeableConcept;
 import care.data4life.fhir.stu3.model.Coding;
 import care.data4life.fhir.stu3.model.DiagnosticReport;
@@ -43,15 +44,15 @@ import care.data4life.fhir.stu3.model.Practitioner;
 import care.data4life.fhir.stu3.model.Quantity;
 import care.data4life.fhir.stu3.model.SampledData;
 import care.data4life.fhir.stu3.util.FhirDateTimeParser;
-import care.data4life.sdk.helpers.CarePlanBuilder;
-import care.data4life.sdk.helpers.DiagnosticReportBuilder;
-import care.data4life.sdk.helpers.DocumentReferenceBuilder;
-import care.data4life.sdk.helpers.DosageHelper;
-import care.data4life.sdk.helpers.MedicationHelper;
-import care.data4life.sdk.helpers.MedicationRequestHelper;
-import care.data4life.sdk.helpers.ObservationBuilder;
-import care.data4life.sdk.helpers.PatientHelper;
-import care.data4life.sdk.helpers.PractitionerBuilder;
+import care.data4life.sdk.helpers.stu3.CarePlanBuilder;
+import care.data4life.sdk.helpers.stu3.DiagnosticReportBuilder;
+import care.data4life.sdk.helpers.stu3.DocumentReferenceBuilder;
+import care.data4life.sdk.helpers.stu3.DosageHelper;
+import care.data4life.sdk.helpers.stu3.MedicationHelper;
+import care.data4life.sdk.helpers.stu3.MedicationRequestHelper;
+import care.data4life.sdk.helpers.stu3.ObservationBuilder;
+import care.data4life.sdk.helpers.stu3.PatientHelper;
+import care.data4life.sdk.helpers.stu3.PractitionerBuilder;
 import care.data4life.sdk.util.MimeType;
 
 public final class FHIRModelFactory {
@@ -84,7 +85,7 @@ public final class FHIRModelFactory {
                 observationCode,
                 26f,
                 "breaths/minute",
-                CodeSystems.ObservationStatus.FINAL,
+                CodeSystemObservationStatus.FINAL,
                 issuedDate,
                 effectiveDate,
                 categoryCode,
@@ -134,7 +135,7 @@ public final class FHIRModelFactory {
                 observationCode,
                 sampledData,
                 "breaths/minute",
-                CodeSystems.ObservationStatus.FINAL,
+                CodeSystemObservationStatus.FINAL,
                 issuedDate,
                 effectiveDate,
                 categoryCode,
@@ -186,7 +187,7 @@ public final class FHIRModelFactory {
         return DocumentReferenceBuilder.buildWith(
                 "Physical",
                 indexed,
-                CodeSystems.DocumentReferenceStatus.CURRENT,
+                CodeSystemDocumentReferenceStatus.CURRENT,
                 Arrays.asList(attachment),
                 docTypeCode,
                 author,
@@ -209,7 +210,7 @@ public final class FHIRModelFactory {
 
         return DiagnosticReportBuilder.buildWith(
                 reportCode,
-                CodeSystems.DiagnosticReportStatus.FINAL,
+                CodeSystemDiagnosticReportStatus.FINAL,
                 "Acme Laboratory, Inc",
                 issuedDate,
                 observations);

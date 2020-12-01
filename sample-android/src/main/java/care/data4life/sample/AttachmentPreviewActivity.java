@@ -34,7 +34,7 @@ import androidx.appcompat.widget.Toolbar;
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.sdk.Data4LifeClient;
 import care.data4life.sdk.Task;
-import care.data4life.sdk.helpers.AttachmentExtension;
+import care.data4life.sdk.helpers.stu3.AttachmentExtension;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.ResultListener;
 import care.data4life.sdk.model.DownloadType;

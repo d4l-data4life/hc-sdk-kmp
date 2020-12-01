@@ -56,9 +56,9 @@ object ClientConfigLoader {
             val json = input.bufferedReader().use(BufferedReader::readText)
             return Moshi.Builder().build().adapter(D4LClientConfig::class.java).fromJson(json)!!
         } catch (e: FileNotFoundException) {
-            throw IllegalStateException("Please run '/gradlew provideTestConfig' before running the tests", e)
+            throw IllegalStateException("Please run './gradlew provideTestConfig' before running the tests", e)
         } catch (e: IllegalStateException) {
-            throw IllegalStateException("Please run '/gradlew provideTestConfig' before running the tests", e)
+            throw IllegalStateException("Please run './gradlew provideTestConfig' before running the tests", e)
         }
     }
 }

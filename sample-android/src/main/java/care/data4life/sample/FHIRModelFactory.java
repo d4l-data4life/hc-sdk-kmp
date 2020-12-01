@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import care.data4life.fhir.stu3.model.CodeSystemDiagnosticReportStatus;
 import care.data4life.fhir.stu3.model.CodeSystemDocumentReferenceStatus;
 import care.data4life.fhir.stu3.model.CodeSystemObservationStatus;
 import care.data4life.fhir.stu3.model.Attachment;
@@ -129,7 +130,7 @@ public final class FHIRModelFactory {
             stringBuilder.append(string).append(" ");
         }
 
-        SampledData sampledData = new SampledData(stringBuilder.toString(), 1, quantity, period);
+        SampledData sampledData = new SampledData(quantity, period, 1, stringBuilder.toString());
 
         return ObservationBuilder.buildWith(
                 observationCode,

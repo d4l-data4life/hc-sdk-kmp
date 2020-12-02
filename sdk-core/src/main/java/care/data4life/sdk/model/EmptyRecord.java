@@ -14,14 +14,14 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk;
+package care.data4life.sdk.model;
 
 
 import care.data4life.fhir.stu3.model.DomainResource;
 import care.data4life.sdk.model.Record;
 
-class EmptyRecord<T extends DomainResource> extends Record<T> {
-    EmptyRecord() {
+public class EmptyRecord<T extends DomainResource> extends Record<T> {
+    public EmptyRecord() {
         super(null, null);
     }
 }

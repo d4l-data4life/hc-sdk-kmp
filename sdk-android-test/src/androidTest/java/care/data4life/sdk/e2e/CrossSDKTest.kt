@@ -19,20 +19,21 @@ package care.data4life.sdk.e2e
 
 import androidx.test.runner.AndroidJUnit4
 import care.data4life.fhir.stu3.model.Attachment
-import care.data4life.fhir.stu3.model.CodeSystems
+import care.data4life.fhir.stu3.model.CodeSystemContactPointSystem
+import care.data4life.fhir.stu3.model.CodeSystemDocumentReferenceStatus
 import care.data4life.fhir.stu3.model.CodeableConcept
 import care.data4life.fhir.stu3.model.Coding
 import care.data4life.fhir.stu3.model.DocumentReference
 import care.data4life.fhir.stu3.model.FhirInstant
 import care.data4life.fhir.stu3.model.Practitioner
 import care.data4life.fhir.stu3.util.FhirDateTimeParser
-import care.data4life.sdk.helpers.AttachmentBuilder
-import care.data4life.sdk.helpers.DocumentReferenceBuilder
-import care.data4life.sdk.helpers.PractitionerBuilder
-import care.data4life.sdk.helpers.addAdditionalId
-import care.data4life.sdk.helpers.getAdditionalIds
-import care.data4life.sdk.helpers.getAttachments
-import care.data4life.sdk.helpers.getPractitioner
+import care.data4life.sdk.helpers.stu3.AttachmentBuilder
+import care.data4life.sdk.helpers.stu3.DocumentReferenceBuilder
+import care.data4life.sdk.helpers.stu3.PractitionerBuilder
+import care.data4life.sdk.helpers.stu3.addAdditionalId
+import care.data4life.sdk.helpers.stu3.getAdditionalIds
+import care.data4life.sdk.helpers.stu3.getAttachments
+import care.data4life.sdk.helpers.stu3.getPractitioner
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.listener.Callback
 import care.data4life.sdk.listener.ResultListener
@@ -65,7 +66,7 @@ class CrossSDKTest : BaseTestLogin() {
 
     private val title = "Physical"
     private val indexed: FhirInstant = FhirDateTimeParser.parseInstant("2013-04-03T15:30:10+01:00")
-    private val status = CodeSystems.DocumentReferenceStatus.CURRENT
+    private val status = CodeSystemDocumentReferenceStatus.CURRENT
     private val documentCode = "34108-1"
     private val documentDisplay = "Outpatient Note"
     private val documentSystem = "http://loinc.org"
@@ -104,7 +105,6 @@ class CrossSDKTest : BaseTestLogin() {
     var expectedClientIds = mutableSetOf(ANDROID_ID, "ios", "web")
 
 
-    @Ignore
     @Test
     fun t01_fetchRecords_shouldFetchRecords() {
         clientCallSuccessful = true
@@ -139,7 +139,6 @@ class CrossSDKTest : BaseTestLogin() {
         }
     }
 
-    @Ignore
     @Test
     fun t02_downloadRecords_shouldDownloadRecords() {
         clientCallSuccessful = true
@@ -171,7 +170,6 @@ class CrossSDKTest : BaseTestLogin() {
         assertTrue(expectedClientIds.isEmpty())
     }
 
-    @Ignore
     @Test
     fun t03_createRecord_shouldCreateRecord() {
         androidRecordId?.let {
@@ -263,9 +261,9 @@ class CrossSDKTest : BaseTestLogin() {
         assertEquals(POSTAL_CODE, practitioner.address!![0].postalCode)
         assertEquals(CITY, practitioner.address!![0].city)
         assertEquals(2, practitioner.telecom?.size)
-        assertEquals(CodeSystems.ContactPointSystem.PHONE, practitioner.telecom!![0].system)
+        assertEquals(CodeSystemContactPointSystem.PHONE, practitioner.telecom!![0].system)
         assertEquals(TELEPHONE, practitioner.telecom!![0].value)
-        assertEquals(CodeSystems.ContactPointSystem.URL, practitioner.telecom!![1].system)
+        assertEquals(CodeSystemContactPointSystem.URL, practitioner.telecom!![1].system)
         assertEquals(WEBSITE, practitioner.telecom!![1].value)
     }
 

@@ -16,16 +16,19 @@
 
 package care.data4life.sdk
 
+import care.data4life.sdk.auth.OAuthService
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.network.model.UserInfo
 import io.reactivex.Completable
 import io.reactivex.Single
 
-internal class UserService(private val alias: String,
-                           private val oAuthService: OAuthService,
-                           private val apiService: ApiService,
-                           private val secureStore: CryptoSecureStore,
-                           private val cryptoService: CryptoService) {
+internal class UserService(
+        private val alias: String,
+        private val oAuthService: OAuthService,
+        private val apiService: ApiService,
+        private val secureStore: CryptoSecureStore,
+        private val cryptoService: CryptoService
+) {
     val uID: Single<String>
         get() = Single.fromCallable { secureStore.getSecret("${alias}_user_id", String::class.java) }
 

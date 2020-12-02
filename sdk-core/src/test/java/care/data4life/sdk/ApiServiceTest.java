@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
+import care.data4life.sdk.auth.OAuthService;
 import care.data4life.sdk.network.Environment;
 import care.data4life.sdk.network.IHCService;
 import care.data4life.sdk.network.model.EncryptedRecord;

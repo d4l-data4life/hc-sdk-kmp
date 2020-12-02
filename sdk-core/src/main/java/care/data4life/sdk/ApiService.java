@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import care.data4life.sdk.auth.OAuthService;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.lang.D4LRuntimeException;
 import care.data4life.sdk.network.Environment;

@@ -29,6 +29,7 @@ import care.data4life.auth.AuthorizationService;
 import care.data4life.auth.AuthorizationService.AuthorizationListener;
 import care.data4life.auth.storage.SharedPrefsAuthStorage;
 import care.data4life.crypto.GCKeyPair;
+import care.data4life.sdk.auth.OAuthService;
 import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.lang.CoreRuntimeException;
 import care.data4life.sdk.lang.D4LException;

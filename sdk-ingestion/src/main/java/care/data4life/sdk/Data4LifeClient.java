@@ -26,6 +26,7 @@ import care.data4life.auth.AuthorizationConfiguration;
 import care.data4life.auth.AuthorizationContract;
 import care.data4life.auth.AuthorizationService;
 import care.data4life.auth.storage.InMemoryAuthStorage;
+import care.data4life.sdk.auth.OAuthService;
 import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.log.Log;
 import care.data4life.sdk.network.Environment;

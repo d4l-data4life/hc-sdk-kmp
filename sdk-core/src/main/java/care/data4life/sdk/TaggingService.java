@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import static care.data4life.sdk.model.ModelVersion.FHIR_VERSION;
 
@@ -34,6 +35,8 @@ class TaggingService {
     private static final String TAG_PARTNER = "partner";
     private static final String TAG_UPDATED_BY_PARTNER = "updatedByPartner".toLowerCase(US_LOCALE);
     private static final String TAG_FHIR_VERSION = "fhirVersion".toLowerCase(US_LOCALE);
+    private static final String TAG_APPDATA_KEY = "flag";
+    private static final String TAG_APPDATA_VALUE = "appdata";
     private static final String SEPARATOR = "#";
 
     private final String clientId;
@@ -44,7 +47,10 @@ class TaggingService {
         this.partnerId = clientId.split(SEPARATOR)[0];
     }
 
-    HashMap<String, String> appendDefaultTags(String resourceType, @Nullable HashMap<String, String> oldTags) {
+    private HashMap<String, String> appendCommonDefaultTags(
+            String resourceType,
+            @Nullable HashMap<String, String> oldTags
+    ) {
         HashMap<String, String> tags = new HashMap<>();
         if (oldTags != null && !oldTags.isEmpty()) {
             tags.putAll(oldTags);
@@ -66,11 +72,33 @@ class TaggingService {
             tags.put(TAG_UPDATED_BY_PARTNER, partnerId);
         }
 
+        return tags;
+    }
+
+    HashMap<String, String> appendDefaultTags(String resourceType, @Nullable HashMap<String, String> oldTags) {
+        HashMap<String, String> tags = this.appendCommonDefaultTags(resourceType, oldTags);
+
         if (!tags.containsKey(TAG_FHIR_VERSION)) {
             tags.put(TAG_FHIR_VERSION, FHIR_VERSION);
         }
 
         return tags;
+    }
+
+    HashMap<String,String> appendAppDataTags(HashMap<String, String> tags) {
+        if(tags != null ) {
+            tags.put(TAG_APPDATA_KEY, TAG_APPDATA_VALUE);
+        }
+        return tags;
+    }
+
+    HashMap<String, String> appendDefaultAnnotatedTags(
+            String resourceType,
+            @Nullable HashMap<String, String> oldTags
+    ) {
+        return this.appendAppDataTags(
+                this.appendCommonDefaultTags(resourceType, oldTags)
+        );
     }
 
     HashMap<String, String> getTagFromType(String resourceType) {

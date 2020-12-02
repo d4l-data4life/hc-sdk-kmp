@@ -23,6 +23,8 @@ import java.util.HashMap;
 
 import static care.data4life.sdk.model.ModelVersion.FHIR_VERSION;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class TaggingServiceTest {
@@ -37,6 +39,8 @@ public class TaggingServiceTest {
     private static final String TAG_UPDATED_BY_CLIENT = "updatedbyclient";
     private static final String TAG_FHIR_VERSION = "fhirversion";
 
+    private static final String TAG_APPDATA_KEY = "flag";
+    private static final String TAG_APPDATA_VALUE = "appdata";
 
     // SUT
     private TaggingService taggingService;
@@ -64,6 +68,7 @@ public class TaggingServiceTest {
         assertEquals(CLIENT_ID, result.get(TAG_CLIENT));
         assertTrue(result.containsKey(TAG_PARTNER));
         assertEquals(PARTNER_ID, result.get(TAG_PARTNER));
+        assertFalse(result.containsKey(TAG_APPDATA_KEY));
         assertTrue(result.containsKey(TAG_FHIR_VERSION));
         assertEquals(FHIR_VERSION, result.get(TAG_FHIR_VERSION));
     }
@@ -82,6 +87,7 @@ public class TaggingServiceTest {
         assertEquals(CLIENT_ID, result.get(TAG_CLIENT));
         assertTrue(result.containsKey(TAG_PARTNER));
         assertEquals(PARTNER_ID, result.get(TAG_PARTNER));
+        assertFalse(result.containsKey(TAG_APPDATA_KEY));
         assertTrue(result.containsKey(TAG_FHIR_VERSION));
         assertEquals(FHIR_VERSION, result.get(TAG_FHIR_VERSION));
     }
@@ -109,6 +115,7 @@ public class TaggingServiceTest {
         assertEquals(CLIENT_ID, result.get(TAG_CLIENT));
         assertTrue(result.containsKey(TAG_PARTNER));
         assertEquals(PARTNER_ID, result.get(TAG_PARTNER));
+        assertFalse(result.containsKey(TAG_APPDATA_KEY));
         assertTrue(result.containsKey(TAG_FHIR_VERSION));
         assertEquals(FHIR_VERSION, result.get(TAG_FHIR_VERSION));
     }
@@ -132,9 +139,124 @@ public class TaggingServiceTest {
         assertEquals(CLIENT_ID, result.get(TAG_UPDATED_BY_CLIENT));
         assertTrue(result.containsKey(TAG_PARTNER));
         assertEquals(PARTNER_ID, result.get(TAG_PARTNER));
+        assertFalse(result.containsKey(TAG_APPDATA_KEY));
         assertTrue(result.containsKey(TAG_FHIR_VERSION));
         assertEquals(FHIR_VERSION, result.get(TAG_FHIR_VERSION));
     }
+
+
+    @Test
+    public void annotatedTag_shouldReturnMapWithResourceAndClientTag() {
+        // Given
+        String type = "type";
+
+        // When
+        HashMap<String, String> result = taggingService.appendDefaultAnnotatedTags(type, null);
+
+        // Then
+        assertEquals(4, result.size());
+        assertTrue(result.containsKey(TAG_RESOURCE_TYPE));
+        assertEquals(type, result.get(TAG_RESOURCE_TYPE));
+        assertTrue(result.containsKey(TAG_CLIENT));
+        assertEquals(CLIENT_ID, result.get(TAG_CLIENT));
+        assertTrue(result.containsKey(TAG_PARTNER));
+        assertEquals(PARTNER_ID, result.get(TAG_PARTNER));
+        assertFalse(result.containsKey(TAG_FHIR_VERSION));
+        assertTrue(result.containsKey(TAG_APPDATA_KEY));
+        assertEquals(TAG_APPDATA_VALUE, result.get(TAG_APPDATA_KEY));
+    }
+
+    @Test
+    public void annotatedTag_shouldReturnMapWithClientTag_whenTypeInvalid() {
+        // Given
+        String type = "";
+
+        // When
+        HashMap<String, String> result = taggingService.appendDefaultAnnotatedTags(type, null);
+
+        // Then
+        assertEquals(3, result.size());
+        assertTrue(result.containsKey(TAG_CLIENT));
+        assertEquals(CLIENT_ID, result.get(TAG_CLIENT));
+        assertTrue(result.containsKey(TAG_PARTNER));
+        assertEquals(PARTNER_ID, result.get(TAG_PARTNER));
+        assertFalse(result.containsKey(TAG_FHIR_VERSION));
+        assertTrue(result.containsKey(TAG_APPDATA_KEY));
+        assertEquals(TAG_APPDATA_VALUE, result.get(TAG_APPDATA_KEY));
+    }
+
+    @Test
+    public void annotatedTag_shouldPreserveExistingTagsAndUpdate() {
+        // Given
+        String type = "type";
+
+        HashMap<String, String> existingTags = new HashMap<>();
+        existingTags.put("tag_1_key", "tag_1_value");
+        existingTags.put("tag_2_key", "tag_2_value");
+        existingTags.put(TAG_RESOURCE_TYPE, "old_typ");
+
+        // When
+        HashMap<String, String> result = taggingService.appendDefaultAnnotatedTags(type, existingTags);
+
+        // Then
+        assertEquals(6, result.size());
+        assertTrue(result.containsKey("tag_1_key"));
+        assertTrue(result.containsKey("tag_2_key"));
+        assertTrue(result.containsKey(TAG_RESOURCE_TYPE));
+        assertEquals(type, result.get(TAG_RESOURCE_TYPE));
+        assertTrue(result.containsKey(TAG_CLIENT));
+        assertEquals(CLIENT_ID, result.get(TAG_CLIENT));
+        assertTrue(result.containsKey(TAG_PARTNER));
+        assertEquals(PARTNER_ID, result.get(TAG_PARTNER));
+        assertFalse(result.containsKey(TAG_FHIR_VERSION));
+        assertTrue(result.containsKey(TAG_APPDATA_KEY));
+        assertEquals(TAG_APPDATA_VALUE, result.get(TAG_APPDATA_KEY));
+    }
+
+    @Test
+    public void annotatedTag_shouldSetUpdatedByClientTag_whenClientAlreadySet() {
+        // Given
+        String type = "type";
+
+        HashMap<String, String> existingTags = new HashMap<>();
+        existingTags.put(TAG_CLIENT, OTHER_CLIENT_ID);
+
+        // When
+        HashMap<String, String> result = taggingService.appendDefaultAnnotatedTags(type, existingTags);
+
+        // Then
+        assertEquals(5, result.size());
+        assertTrue(result.containsKey(TAG_CLIENT));
+        assertEquals(OTHER_CLIENT_ID, result.get(TAG_CLIENT));
+        assertTrue(result.containsKey(TAG_UPDATED_BY_CLIENT));
+        assertEquals(CLIENT_ID, result.get(TAG_UPDATED_BY_CLIENT));
+        assertTrue(result.containsKey(TAG_PARTNER));
+        assertEquals(PARTNER_ID, result.get(TAG_PARTNER));
+        assertFalse(result.containsKey(TAG_FHIR_VERSION));
+        assertTrue(result.containsKey(TAG_APPDATA_KEY));
+        assertEquals(TAG_APPDATA_VALUE, result.get(TAG_APPDATA_KEY));
+    }
+
+
+    @Test
+    public void appendAppDataTags_returnsAppDataTaggedList() {
+        // Given
+        HashMap<String, String> tags = new HashMap();
+
+        // When
+        HashMap<String, String> result = taggingService.appendAppDataTags(tags);
+
+        // Then
+        assertEquals(1, result.size());
+        assertTrue(result.containsKey(TAG_APPDATA_KEY));
+        assertEquals(TAG_APPDATA_VALUE, result.get(TAG_APPDATA_KEY));
+    }
+
+    @Test
+    public void appendAppDataTags_returnsNull_whenTheTagsHadBeenNull() {
+        assertNull(taggingService.appendAppDataTags(null));
+    }
+
 
     @Test
     public void getTagFromType_shouldReturnListWithResourceTypeTag() {
@@ -150,7 +272,6 @@ public class TaggingServiceTest {
         assertEquals(type, result.get(TAG_RESOURCE_TYPE));
     }
 
-
     @Test
     public void getTagFromType_shouldReturnEmptyList_whenResourceTypeNull() {
         // When
@@ -159,5 +280,4 @@ public class TaggingServiceTest {
         // Then
         assertTrue(result.isEmpty());
     }
-
 }

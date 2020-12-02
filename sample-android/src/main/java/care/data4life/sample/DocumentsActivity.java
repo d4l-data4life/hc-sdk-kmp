@@ -50,7 +50,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.DocumentReference;
 import care.data4life.sdk.Data4LifeClient;
-import care.data4life.sdk.Task;
+import care.data4life.sdk.call.Task;
 import care.data4life.sdk.config.DataRestrictionException;
 import care.data4life.sdk.helpers.stu3.DocumentReferenceExtension;
 import care.data4life.sdk.lang.D4LException;

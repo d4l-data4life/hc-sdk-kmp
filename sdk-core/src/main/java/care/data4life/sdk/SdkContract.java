@@ -24,6 +24,7 @@ import javax.annotation.Nullable;
 
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.DomainResource;
+import care.data4life.sdk.call.Task;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.Callback;
 import care.data4life.sdk.listener.ResultListener;

@@ -14,8 +14,9 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk;
+package care.data4life.sdk.call;
 
+import care.data4life.sdk.SdkContract;
 import care.data4life.sdk.lang.TaskException;
 import care.data4life.sdk.listener.Callback;
 import care.data4life.sdk.listener.ResultListener;
@@ -26,9 +27,9 @@ import io.reactivex.schedulers.Schedulers;
 
 public class CallHandler {
 
-    protected SdkContract.ErrorHandler errorHandler;
+    public SdkContract.ErrorHandler errorHandler;
 
-    CallHandler(
+    public CallHandler(
             SdkContract.ErrorHandler errorHandler
     ) {
         this.errorHandler = errorHandler;

@@ -24,6 +24,8 @@ import javax.annotation.Nullable;
 
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.DomainResource;
+import care.data4life.sdk.call.CallHandler;
+import care.data4life.sdk.call.Task;
 import care.data4life.sdk.listener.Callback;
 import care.data4life.sdk.listener.ResultListener;
 import care.data4life.sdk.log.Log;
@@ -52,7 +54,8 @@ abstract class BaseClient implements SdkContract.Client {
             String alias,
             UserService userService,
             RecordService recordService,
-            CallHandler handler) {
+            CallHandler handler
+    ) {
         this.alias = alias;
         this.userService = userService;
         this.recordService = recordService;

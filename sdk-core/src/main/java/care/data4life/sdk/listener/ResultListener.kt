@@ -13,18 +13,16 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
+package care.data4life.sdk.listener
 
-package care.data4life.sdk.listener;
-
-import care.data4life.sdk.lang.D4LException;
+import care.data4life.sdk.lang.D4LException
 
 /**
  * Result which you get when uploading, downloading or deleting a Record.
  *
- * @param <T> type of Record
- */
-public interface ResultListener<T> {
-    void onSuccess(T t);
-
-    void onError(D4LException exception);
+ * @param <T> type of Record</T>
+ **/
+interface ResultListener<T> {
+    fun onSuccess(t: T)
+    fun onError(exception: D4LException)
 }

@@ -13,33 +13,14 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
-package care.data4life.sdk
+package care.data4life.sdk.listener
 
-import io.mockk.mockk
-import junit.framework.Assert.assertTrue
-import org.junit.Before
-import org.junit.Ignore
-import org.junit.Test
+import care.data4life.sdk.lang.D4LException
 
-class CallHandlerTest {
-
-    private lateinit var errorHandler: SdkContract.ErrorHandler
-
-
-    // SUT
-    private lateinit var callHandler: CallHandler
-
-
-    @Before
-    fun setup() {
-        errorHandler = mockk()
-
-        callHandler = CallHandler(errorHandler)
-    }
-
-    @Test
-    @Ignore
-    fun test() {
-        assertTrue(false)
-    }
+/**
+ * Callback is a listener used when there is only success or error.
+ */
+interface Callback {
+    fun onSuccess()
+    fun onError(exception: D4LException)
 }

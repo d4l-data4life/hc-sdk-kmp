@@ -18,13 +18,10 @@ package care.data4life.sdk;
 
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
 
 import care.data4life.auth.AuthorizationService;
-import care.data4life.crypto.GCAsymmetricKey;
-import care.data4life.crypto.GCKeyPair;
+import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.test.util.TestSchedulerRule;
-import io.reactivex.Single;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

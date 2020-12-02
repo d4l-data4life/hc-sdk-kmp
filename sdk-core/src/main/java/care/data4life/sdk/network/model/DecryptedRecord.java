@@ -23,7 +23,7 @@ import java.util.Objects;
 import care.data4life.crypto.GCKey;
 import care.data4life.fhir.stu3.model.DomainResource;
 
-public class DecryptedRecord<T extends DomainResource> implements Serializable {
+public class DecryptedRecord<T extends DomainResource> implements DecryptedRecordBase, Serializable {
 
     private String identifier;
     private T resource;
@@ -61,34 +61,38 @@ public class DecryptedRecord<T extends DomainResource> implements Serializable {
         this.resource = resource;
     }
 
+    @Override
     public HashMap<String, String> getTags() {
         return tags;
     }
-
+    @Override
     public void setTags(HashMap<String, String> tags) {
         this.tags = tags;
     }
 
+    @Override
     public String getCustomCreationDate() {
         return customCreationDate;
     }
-
+    @Override
     public void setCustomCreationDate(String customCreationDate) {
         this.customCreationDate = customCreationDate;
     }
 
+    @Override
     public String getUpdatedDate() {
         return updatedDate;
     }
-
+    @Override
     public void setUpdatedDate(String updatedDate) {
         this.updatedDate = updatedDate;
     }
 
+    @Override
     public GCKey getDataKey() {
         return dataKey;
     }
-
+    @Override
     public void setDataKey(GCKey dataKey) {
         this.dataKey = dataKey;
     }
@@ -101,10 +105,12 @@ public class DecryptedRecord<T extends DomainResource> implements Serializable {
         this.attachmentsKey = attachmentsKey;
     }
 
+    @Override
     public int getModelVersion() {
         return modelVersion;
     }
 
+    @Override
     public void setModelVersion(int modelVersion) {
         this.modelVersion = modelVersion;
     }

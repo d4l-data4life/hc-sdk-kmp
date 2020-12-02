@@ -20,7 +20,7 @@ import java.util.Objects;
 
 import care.data4life.fhir.stu3.model.DomainResource;
 
-public class Record<T extends DomainResource> {
+public class Record<T extends DomainResource> implements RecordBase {
     private T fhirResource;
     private Meta meta;
 

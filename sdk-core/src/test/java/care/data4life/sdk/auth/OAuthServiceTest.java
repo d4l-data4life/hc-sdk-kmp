@@ -14,10 +14,11 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk;
+package care.data4life.sdk.auth;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import care.data4life.auth.AuthorizationException;
 import care.data4life.auth.AuthorizationService;
@@ -48,7 +49,7 @@ public class OAuthServiceTest {
     public void setUp() {
         mockAuthorizationService = mock(AuthorizationService.class);
 
-        oAuthService = spy(new OAuthService(mockAuthorizationService));
+        oAuthService = Mockito.spy(new OAuthService(mockAuthorizationService));
     }
 
     @Test

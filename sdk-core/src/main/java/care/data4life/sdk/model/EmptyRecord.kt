@@ -13,9 +13,12 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
-
 package care.data4life.sdk.model
 
-internal interface RecordBase {
-    val meta: Meta?
-}
+import care.data4life.fhir.stu3.model.DomainResource
+
+internal data class EmptyRecord<T : DomainResource>(
+        override val fhirResource: T? = null,
+        override val meta: Meta? = null,
+        override val annotations: List<String>? = null
+): Record<T>(null, null, null), FhirRecord<T>

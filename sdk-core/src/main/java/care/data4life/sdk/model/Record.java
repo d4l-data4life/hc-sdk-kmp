@@ -16,26 +16,44 @@
 
 package care.data4life.sdk.model;
 
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 import java.util.Objects;
 
 import care.data4life.fhir.stu3.model.DomainResource;
 
-public class Record<T extends DomainResource> implements RecordBase {
+public class Record<T extends DomainResource> implements FhirRecord<T> {
     private T fhirResource;
     private Meta meta;
+    private List<String> annotations;
 
     public Record(T fhirResource, Meta meta) {
         this.fhirResource = fhirResource;
         this.meta = meta;
     }
 
+    public Record(T fhirResource, Meta meta, List<String> annotations) {
+        this.fhirResource = fhirResource;
+        this.meta = meta;
+        this.annotations = annotations;
+    }
+
+    @Nullable
+    @Override
     public T getFhirResource() {
         return fhirResource;
     }
 
+    @Nullable
+    @Override
     public Meta getMeta() {
         return meta;
     }
+
+    @Nullable
+    @Override
+    public List<String> getAnnotations() { return annotations; }
 
     @Override
     public boolean equals(Object o) {
@@ -43,11 +61,12 @@ public class Record<T extends DomainResource> implements RecordBase {
         if (o == null || getClass() != o.getClass()) return false;
         Record<?> record = (Record<?>) o;
         return Objects.equals(fhirResource, record.fhirResource) &&
-                Objects.equals(meta, record.meta);
+                Objects.equals(meta, record.meta) &&
+                Objects.equals(annotations, record.annotations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fhirResource, meta);
+        return Objects.hash(fhirResource, meta, annotations);
     }
 }

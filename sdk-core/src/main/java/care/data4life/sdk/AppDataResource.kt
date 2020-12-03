@@ -30,7 +30,7 @@ data class AppDataRecord(
         val appDataResource: ByteArray,
         val id: String,
         override val meta: Meta,
-        val annotations: List<String>
+        override val annotations: List<String>
 ): RecordBase {
     override fun equals(other: Any?): Boolean {
         return when {

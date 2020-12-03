@@ -17,7 +17,7 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    id("com.getkeepsafe.dexcount")
+//    id("com.getkeepsafe.dexcount")
 }
 
 val d4lClientConfig = D4LConfigHelper.loadClientConfigAndroid("$rootDir")
@@ -42,24 +42,19 @@ android {
                 "clearPackageData" to "true"
         ))
 
-        adbOptions {
-            timeOutInMs(10 * 60 * 1000)
-            installOptions("-d")
-        }
-
-        manifestPlaceholders = mapOf<String, Any>(
+        manifestPlaceholders(mapOf<String, Any>(
                 "clientId" to d4lClientConfig[Environment.DEVELOPMENT].id,
                 "clientSecret" to d4lClientConfig[Environment.DEVELOPMENT].secret,
                 "redirectScheme" to d4lClientConfig[Environment.DEVELOPMENT].redirectScheme,
                 "environment" to "${Environment.DEVELOPMENT}",
                 "platform" to d4lClientConfig.platform,
                 "debug" to "true"
-        )
+        ))
     }
 
     buildTypes {
         getByName("debug") {
-            matchingFallbacks = listOf("release")
+            setMatchingFallbacks("release")
         }
         getByName("release") {
             isMinifyEnabled = false
@@ -68,7 +63,7 @@ android {
     }
 
     compileOptions {
-        coreLibraryDesugaringEnabled = false
+        isCoreLibraryDesugaringEnabled = false
 
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -86,13 +81,11 @@ android {
     testOptions {
         animationsDisabled = true
 
-        unitTests.all(KotlinClosure1<Any, Test>({
-            (this as Test).also { testTask ->
-                testTask.testLogging {
-                    events("passed", "skipped", "failed", "standardOut", "standardError")
-                }
+        unitTests.all {
+            it.testLogging {
+                events("passed", "skipped", "failed", "standardOut", "standardError")
             }
-        }, unitTests))
+        }
 
         execution = "ANDROID_TEST_ORCHESTRATOR"
     }

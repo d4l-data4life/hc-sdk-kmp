@@ -150,6 +150,7 @@ public final class Data4LifeClient extends BaseClient {
         ApiService apiService = new ApiService(oAuthService, environment, clientId, clientSecret, platform, connectivityService, BuildConfig.VERSION_NAME, debug);
         CryptoService cryptoService = new CryptoService(initConfig.getAlias(), store);
         TagEncryptionService tagEncryptionService = new TagEncryptionService(cryptoService);
+        //noinspection KotlinInternalInJava
         UserService userService = new UserService(initConfig.getAlias(), oAuthService, apiService, store, cryptoService);
         TaggingService taggingService = new TaggingService(clientId);
         FhirService fhirService = new FhirService(cryptoService);

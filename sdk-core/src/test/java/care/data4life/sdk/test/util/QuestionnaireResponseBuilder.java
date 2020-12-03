@@ -21,13 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import care.data4life.fhir.stu3.model.Attachment;
-import care.data4life.fhir.stu3.model.CodeSystems;
+import care.data4life.fhir.stu3.model.CodeSystemQuestionnaireResponseStatus;
 import care.data4life.fhir.stu3.model.QuestionnaireResponse;
 import care.data4life.sdk.util.Base64;
 
 public class QuestionnaireResponseBuilder {
 
-    public static QuestionnaireResponse buildWith(CodeSystems.QuestionnaireResponseStatus status, List<Attachment> attachments) {
+    public static QuestionnaireResponse buildWith(CodeSystemQuestionnaireResponseStatus status, List<Attachment> attachments) {
 
         QuestionnaireResponse questionnaire = new QuestionnaireResponse(status);
         QuestionnaireResponse.QuestionnaireResponseItem questionnaireResponseItem = buildItem("", attachments.get(0));

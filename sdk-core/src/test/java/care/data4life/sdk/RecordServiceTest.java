@@ -292,7 +292,7 @@ public class RecordServiceTest {
     public void extractUploadData_shouldReturnNull_whenContentIsNull() {
         // Given
         List<DocumentReference.DocumentReferenceContent> content = null;
-        DocumentReference document = new DocumentReference(content, null, null, null);
+        DocumentReference document = new DocumentReference(null, null, null, content);
 
         // When
         HashMap<Attachment, String> data = recordService.extractUploadData(document);
@@ -310,7 +310,7 @@ public class RecordServiceTest {
         // Given
         Attachment attachment = null;
         DocumentReference.DocumentReferenceContent content = new DocumentReference.DocumentReferenceContent(attachment);
-        DocumentReference document = new DocumentReference(asList(content), null, null, null);
+        DocumentReference document = new DocumentReference(null, null, null, asList(content));
 
         // When
         HashMap<Attachment, String> data = recordService.extractUploadData(document);
@@ -1702,7 +1702,7 @@ public class RecordServiceTest {
         DocumentReference.DocumentReferenceContent content = buildDocRefContent(AttachmentBuilder.buildAttachment(null));
         List<DocumentReference.DocumentReferenceContent> contents = new ArrayList<>();
         contents.add(content);
-        return new DocumentReference(contents, null, null, null);
+        return new DocumentReference(null, null, null, contents);
     }
 
     public static DocumentReference.DocumentReferenceContent buildDocRefContent(Attachment attachment) {

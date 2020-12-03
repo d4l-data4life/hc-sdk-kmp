@@ -19,7 +19,6 @@ plugins {
     id("kotlin-platform-android")
     id("com.github.dcendents.android-maven")
 }
-//apply plugin: "jacoco" //FIXME
 
 android {
     compileSdkVersion(AndroidConfig.compileSdkVersion)
@@ -35,11 +34,6 @@ android {
         testInstrumentationRunnerArguments(mapOf(
                 "clearPackageData" to "true"
         ))
-
-        adbOptions {
-            timeOutInMs(10 * 60 * 1000)
-            installOptions("-d")
-        }
     }
 
     resourcePrefix("d4l_securestore_")
@@ -47,7 +41,7 @@ android {
     buildTypes {
         getByName("debug") {
             isTestCoverageEnabled = false
-            matchingFallbacks = listOf("debug", "release")
+            setMatchingFallbacks("debug", "release")
         }
         getByName("release") {
             isMinifyEnabled = false
@@ -58,13 +52,11 @@ android {
     testOptions {
         animationsDisabled = true
 
-        unitTests.all(KotlinClosure1<Any, Test>({
-            (this as Test).also { testTask ->
-                testTask.testLogging {
-                    events("passed", "skipped", "failed", "standardOut", "standardError")
-                }
+        unitTests.all {
+            it.testLogging {
+                events("passed", "skipped", "failed", "standardOut", "standardError")
             }
-        }, unitTests))
+        }
 
         execution = "ANDROID_TEST_ORCHESTRATOR"
     }
@@ -74,7 +66,7 @@ android {
     }
 
     compileOptions {
-        coreLibraryDesugaringEnabled = false
+        isCoreLibraryDesugaringEnabled = false
 
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8

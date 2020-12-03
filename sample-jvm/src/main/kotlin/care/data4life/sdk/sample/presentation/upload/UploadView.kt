@@ -16,14 +16,14 @@
 
 package care.data4life.sdk.sample.presentation.upload
 
-import care.data4life.fhir.stu3.model.CodeSystems
+import care.data4life.fhir.stu3.model.CodeSystemDocumentReferenceStatus
 import care.data4life.fhir.stu3.model.CodeableConcept
 import care.data4life.fhir.stu3.model.DocumentReference
 import care.data4life.fhir.stu3.model.Organization
 import care.data4life.fhir.stu3.util.FhirDateTimeConverter
 import care.data4life.sdk.Data4LifeClient
-import care.data4life.sdk.helpers.AttachmentBuilder
-import care.data4life.sdk.helpers.DocumentReferenceBuilder
+import care.data4life.sdk.helpers.stu3.AttachmentBuilder
+import care.data4life.sdk.helpers.stu3.DocumentReferenceBuilder
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.listener.ResultListener
 import care.data4life.sdk.model.Record
@@ -80,7 +80,7 @@ class UploadView(private val alias: String, private val isMulti: Boolean = false
         val record = DocumentReferenceBuilder.buildWith(
                 titleInput,
                 indexed,
-                CodeSystems.DocumentReferenceStatus.CURRENT,
+                CodeSystemDocumentReferenceStatus.CURRENT,
                 attachments,
                 CodeableConcept(),
                 Organization()

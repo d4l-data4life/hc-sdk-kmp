@@ -23,7 +23,7 @@ import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.CodeableConcept;
 import care.data4life.fhir.stu3.model.Medication;
 import care.data4life.fhir.util.Preconditions;
-import care.data4life.sdk.helpers.FhirHelpers;
+import care.data4life.sdk.helpers.stu3.FhirHelpers;
 import care.data4life.sdk.util.Base64;
 
 //TODO move builder to Fhir Helper project

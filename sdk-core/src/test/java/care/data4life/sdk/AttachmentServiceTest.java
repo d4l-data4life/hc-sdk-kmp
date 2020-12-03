@@ -28,7 +28,7 @@ import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.FhirDateTime;
 import care.data4life.fhir.stu3.util.FhirDateTimeParser;
 import care.data4life.sdk.config.DataRestrictionException;
-import care.data4life.sdk.helpers.AttachmentBuilder;
+import care.data4life.sdk.helpers.stu3.AttachmentBuilder;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.lang.DataValidationException;
 import io.reactivex.Single;

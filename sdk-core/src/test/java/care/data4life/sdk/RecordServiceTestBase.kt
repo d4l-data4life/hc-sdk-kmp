@@ -59,7 +59,7 @@ abstract class RecordServiceTestBase {
     internal lateinit var mockAttachmentKey: GCKey
     internal lateinit var mockEncryptedDataKey: EncryptedKey
     internal lateinit var mockEncryptedRecord: EncryptedRecord
-    internal lateinit var mockAnnotattedEncryptedRecord: EncryptedRecord
+    internal lateinit var mockAnnotatedEncryptedRecord: EncryptedRecord
     internal lateinit var mockDecryptedRecord: DecryptedRecord<DomainResource>
     internal lateinit var mockAnnotatedDecryptedRecord: DecryptedRecord<DomainResource>
     internal lateinit var mockMeta: Meta
@@ -102,7 +102,7 @@ abstract class RecordServiceTestBase {
         mockCommonKey = Mockito.mock(GCKey::class.java)
         mockEncryptedDataKey = Mockito.mock(EncryptedKey::class.java)
         mockEncryptedRecord = Mockito.mock(EncryptedRecord::class.java)
-        mockAnnotattedEncryptedRecord = Mockito.mock(EncryptedRecord::class.java)
+        mockAnnotatedEncryptedRecord = Mockito.mock(EncryptedRecord::class.java)
         mockDecryptedRecord = Mockito.mock(DecryptedRecord::class.java) as DecryptedRecord<DomainResource>
         mockAnnotatedDecryptedRecord = Mockito.mock(DecryptedRecord::class.java) as DecryptedRecord<DomainResource>
         mockMeta = Mockito.mock(Meta::class.java)
@@ -131,11 +131,11 @@ abstract class RecordServiceTestBase {
         Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
         Mockito.`when`(mockEncryptedRecord.identifier).thenReturn(RECORD_ID)
 
-        Mockito.`when`(mockAnnotattedEncryptedRecord.encryptedTags).thenReturn(mockEncryptedTags)
-        Mockito.`when`(mockAnnotattedEncryptedRecord.encryptedDataKey).thenReturn(mockEncryptedDataKey)
-        Mockito.`when`(mockAnnotattedEncryptedRecord.encryptedBody).thenReturn(ENCRYPTED_RESOURCE)
-        Mockito.`when`(mockAnnotattedEncryptedRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
-        Mockito.`when`(mockAnnotattedEncryptedRecord.identifier).thenReturn(RECORD_ID)
+        Mockito.`when`(mockAnnotatedEncryptedRecord.encryptedTags).thenReturn(mockEncryptedTags)
+        Mockito.`when`(mockAnnotatedEncryptedRecord.encryptedDataKey).thenReturn(mockEncryptedDataKey)
+        Mockito.`when`(mockAnnotatedEncryptedRecord.encryptedBody).thenReturn(ENCRYPTED_RESOURCE)
+        Mockito.`when`(mockAnnotatedEncryptedRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
+        Mockito.`when`(mockAnnotatedEncryptedRecord.identifier).thenReturn(RECORD_ID)
 
         Mockito.`when`(mockErrorHandler.handleError(ArgumentMatchers.any(Exception::class.java))).thenReturn(mockD4LException)
         inOrder = Mockito.inOrder(

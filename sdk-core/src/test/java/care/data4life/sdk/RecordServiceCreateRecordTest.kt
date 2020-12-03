@@ -348,15 +348,15 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         Mockito.doReturn(mockAnnotatedDecryptedRecord).`when`(recordService)
                 .removeUploadData(ArgumentMatchers.any<DecryptedRecord<DomainResource>>())
         
-        Mockito.doReturn(mockAnnotattedEncryptedRecord)
+        Mockito.doReturn(mockAnnotatedEncryptedRecord)
                 .`when`(recordService).encryptRecord<DomainResource>(
                         mockAnnotatedDecryptedRecord
                 )
-        Mockito.`when`(mockApiService.createRecord(ALIAS, USER_ID, mockAnnotattedEncryptedRecord))
-                .thenReturn(Single.just(mockAnnotattedEncryptedRecord))
+        Mockito.`when`(mockApiService.createRecord(ALIAS, USER_ID, mockAnnotatedEncryptedRecord))
+                .thenReturn(Single.just(mockAnnotatedEncryptedRecord))
         Mockito.doReturn(mockAnnotatedDecryptedRecord)
                 .`when`(recordService)
-                .decryptRecord<DomainResource>(mockAnnotattedEncryptedRecord, USER_ID)
+                .decryptRecord<DomainResource>(mockAnnotatedEncryptedRecord, USER_ID)
         Mockito.doReturn(mockAnnotatedDecryptedRecord)
                 .`when`(recordService).restoreUploadData<DomainResource>(
                         mockAnnotatedDecryptedRecord,
@@ -396,8 +396,8 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         inOrder.verify(recordService).encryptRecord<DomainResource>(
                 mockAnnotatedDecryptedRecord
         )
-        inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockAnnotattedEncryptedRecord)
-        inOrder.verify(recordService).decryptRecord<DomainResource>(mockAnnotattedEncryptedRecord, USER_ID)
+        inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockAnnotatedEncryptedRecord)
+        inOrder.verify(recordService).decryptRecord<DomainResource>(mockAnnotatedEncryptedRecord, USER_ID)
         inOrder.verify(recordService).restoreUploadData<DomainResource>(
                 mockAnnotatedDecryptedRecord,
                 mockCarePlan,
@@ -441,14 +441,14 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
                 .`when`(recordService)
                 .removeUploadData(ArgumentMatchers.same(mockAnnotatedDecryptedRecord))
         
-        Mockito.doReturn(mockAnnotattedEncryptedRecord).`when`(recordService)
+        Mockito.doReturn(mockAnnotatedEncryptedRecord).`when`(recordService)
                 .encryptRecord<DomainResource>(mockAnnotatedDecryptedRecord)
-        Mockito.`when`(mockApiService.createRecord(ALIAS, USER_ID, mockAnnotattedEncryptedRecord))
-                .thenReturn(Single.just(mockAnnotattedEncryptedRecord))
+        Mockito.`when`(mockApiService.createRecord(ALIAS, USER_ID, mockAnnotatedEncryptedRecord))
+                .thenReturn(Single.just(mockAnnotatedEncryptedRecord))
         Mockito.doReturn(mockAnnotatedDecryptedRecord)
                 .`when`(recordService)
                 .decryptRecord<DomainResource>(
-                        mockAnnotattedEncryptedRecord,
+                        mockAnnotatedEncryptedRecord,
                         USER_ID
                 )
         Mockito.doReturn(mockAnnotatedDecryptedRecord)
@@ -498,8 +498,8 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         inOrder.verify(recordService).encryptRecord<DomainResource>(
                 mockAnnotatedDecryptedRecord
         )
-        inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockAnnotattedEncryptedRecord)
-        inOrder.verify(recordService).decryptRecord<DomainResource>(mockAnnotattedEncryptedRecord, USER_ID)
+        inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockAnnotatedEncryptedRecord)
+        inOrder.verify(recordService).decryptRecord<DomainResource>(mockAnnotatedEncryptedRecord, USER_ID)
         inOrder.verify(recordService).restoreUploadData(
                 mockAnnotatedDecryptedRecord,
                 mockCarePlan,

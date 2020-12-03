@@ -33,11 +33,12 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
     @Before
     fun setUp() {
         init()
+        Mockito.reset(recordService)
     }
 
     @Test
     @Throws(InterruptedException::class, IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    fun fetchRecord_shouldReturnFetchedRecord() {
+    fun `Given a RecordId and UserId, it returns a Record`() {
         // Given
         Mockito.`when`(mockApiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)).thenReturn(Single.just(mockEncryptedRecord))
         Mockito.doReturn(mockDecryptedRecord).`when`(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
@@ -62,7 +63,7 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
 
     @Test
     @Throws(InterruptedException::class)
-    fun fetchRecordsByUserIds_shouldReturnFetchedRecords() {
+    fun `Given multiple RecordIds and a UserId, it returns FetchedRecords`() {
         // Given
         Mockito.doReturn(Single.just(mockRecord)).`when`(recordService).fetchRecord<DomainResource>(RECORD_ID, USER_ID)
         val ids = Arrays.asList(RECORD_ID, RECORD_ID)
@@ -85,13 +86,28 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
 
     @Test
     @Throws(InterruptedException::class, IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    fun fetchRecordsByResourceType_shouldReturnFetchedRecords() {
+    fun `Given a UserId, a ResourceType, a StartDate, a EndDate, the PageSize and Offset, it returns FetchedRecords`() {
         // Given
-        val encryptedRecords = Arrays.asList(mockEncryptedRecord, mockEncryptedRecord)
+        val encryptedRecords = listOf(mockEncryptedRecord, mockEncryptedRecord)
         Mockito.`when`(mockTaggingService.getTagFromType(CarePlan.resourceType)).thenReturn(mockTags)
         Mockito.`when`(mockTagEncryptionService.encryptTags(mockTags)).thenReturn(mockEncryptedTags)
-        Mockito.`when`(mockApiService.fetchRecords(ArgumentMatchers.eq(ALIAS), ArgumentMatchers.eq(USER_ID), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.eq(10), ArgumentMatchers.eq(0), ArgumentMatchers.eq(mockEncryptedTags))).thenReturn(Observable.just(encryptedRecords))
-        Mockito.doReturn(mockDecryptedRecord).`when`(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
+        Mockito.`when`(
+                mockTagEncryptionService.encryptAnnotations(ArgumentMatchers.anyList())
+        ).thenReturn(mockEncryptedAnnotations)
+        Mockito.`when`(
+                mockApiService.fetchRecords(
+                    ArgumentMatchers.eq(ALIAS),
+                    ArgumentMatchers.eq(USER_ID),
+                    ArgumentMatchers.isNull(),
+                    ArgumentMatchers.isNull(),
+                    ArgumentMatchers.eq(10),
+                    ArgumentMatchers.eq(0),
+                    ArgumentMatchers.eq(mockEncryptedTags)
+                )
+        ).thenReturn(Observable.just(encryptedRecords))
+        Mockito.doReturn(mockDecryptedRecord)
+                .`when`(recordService)
+                .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
         Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedRecord)
 
         // When
@@ -101,7 +117,8 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
                 null,
                 null,
                 10,
-                0).test().await()
+                0
+        ).test().await()
 
         // Then
         val fetched = observer
@@ -116,11 +133,87 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
         Truth.assertThat(fetched[1].fhirResource).isEqualTo(mockCarePlan)
         inOrder.verify(mockTaggingService).getTagFromType(CarePlan.resourceType)
         inOrder.verify(mockTagEncryptionService).encryptTags(mockTags)
-        inOrder.verify(mockApiService).fetchRecords(ArgumentMatchers.eq(ALIAS), ArgumentMatchers.eq(USER_ID), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.eq(10), ArgumentMatchers.eq(0), ArgumentMatchers.eq(mockEncryptedTags))
+        inOrder.verify(mockTagEncryptionService).encryptAnnotations(ArgumentMatchers.anyList())
+        inOrder.verify(mockApiService).fetchRecords(
+                ArgumentMatchers.eq(ALIAS),
+                ArgumentMatchers.eq(USER_ID),
+                ArgumentMatchers.isNull(),
+                ArgumentMatchers.isNull(),
+                ArgumentMatchers.eq(10),
+                ArgumentMatchers.eq(0),
+                ArgumentMatchers.eq(mockEncryptedTags)
+        )
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).buildMeta(mockDecryptedRecord)
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).buildMeta(mockDecryptedRecord)
+        inOrder.verifyNoMoreInteractions()
+    }
+
+    @Test
+    @Throws(InterruptedException::class, IOException::class, DataValidationException.ModelVersionNotSupported::class)
+    fun `Given a UserId, a ResourceType, Annotations, a StartDate, a EndDate, the PageSize and Offset, it returns FetchedRecords`() {
+        // Given
+        val encryptedRecords = listOf(mockEncryptedRecord, mockEncryptedRecord)
+        Mockito.`when`(mockTaggingService.getTagFromType(CarePlan.resourceType)).thenReturn(mockTags)
+        Mockito.`when`(mockTagEncryptionService.encryptTags(mockTags)).thenReturn(mockEncryptedTags)
+        Mockito.`when`(
+                mockTagEncryptionService.encryptAnnotations(ArgumentMatchers.anyList())
+        ).thenReturn(mockEncryptedAnnotations)
+        Mockito.`when`(
+                mockApiService.fetchRecords(
+                        ArgumentMatchers.eq(ALIAS),
+                        ArgumentMatchers.eq(USER_ID),
+                        ArgumentMatchers.isNull(),
+                        ArgumentMatchers.isNull(),
+                        ArgumentMatchers.eq(10),
+                        ArgumentMatchers.eq(0),
+                        ArgumentMatchers.eq(mockEncryptedTags)
+                )
+        ).thenReturn(Observable.just(encryptedRecords))
+        Mockito.doReturn(mockAnnotatedDecryptedRecord)
+                .`when`(recordService)
+                .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
+        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockAnnotatedDecryptedRecord)
+
+        // When
+        val observer = recordService.fetchRecords(
+                USER_ID,
+                CarePlan::class.java,
+                ANNOTATIONS,
+                null,
+                null,
+                10,
+                0
+        ).test().await()
+
+        // Then
+        val fetched = observer
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
+        Truth.assertThat(fetched).hasSize(2)
+        Truth.assertThat(fetched[0].meta).isEqualTo(mockMeta)
+        Truth.assertThat(fetched[0].fhirResource).isEqualTo(mockCarePlan)
+        Truth.assertThat(fetched[1].meta).isEqualTo(mockMeta)
+        Truth.assertThat(fetched[1].fhirResource).isEqualTo(mockCarePlan)
+        inOrder.verify(mockTaggingService).getTagFromType(CarePlan.resourceType)
+        inOrder.verify(mockTagEncryptionService).encryptTags(mockTags)
+        inOrder.verify(mockTagEncryptionService).encryptAnnotations(ArgumentMatchers.anyList())
+        inOrder.verify(mockApiService).fetchRecords(
+                ArgumentMatchers.eq(ALIAS),
+                ArgumentMatchers.eq(USER_ID),
+                ArgumentMatchers.isNull(),
+                ArgumentMatchers.isNull(),
+                ArgumentMatchers.eq(10),
+                ArgumentMatchers.eq(0),
+                ArgumentMatchers.eq(mockEncryptedTags)
+        )
+        inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).buildMeta(mockAnnotatedDecryptedRecord)
+        inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).buildMeta(mockAnnotatedDecryptedRecord)
         inOrder.verifyNoMoreInteractions()
     }
 }

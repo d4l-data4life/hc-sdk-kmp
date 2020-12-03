@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.annotation.Nullable;
 
@@ -250,19 +251,70 @@ class RecordService {
                 .map(successfulFetches -> new FetchResult<>(successfulFetches, failedFetches));
     }
 
-    <T extends DomainResource> Single<List<Record<T>>> fetchRecords(String userId, Class<T> resourceType, LocalDate startDate, LocalDate endDate, Integer pageSize, Integer offset) {
+    <T extends DomainResource> Single<List<Record<T>>> fetchRecords(
+            String userId,
+            Class<T> resourceType,
+            LocalDate startDate,
+            LocalDate endDate,
+            Integer pageSize,
+            Integer offset
+    ) {
+        return fetchRecords(userId, resourceType, Collections.emptyList(), startDate, endDate, pageSize, offset);
+    }
+
+    <T extends DomainResource> Single<List<Record<T>>> fetchRecords(
+            String userId,
+            Class<T> resourceType,
+            List<String> annotations,
+            LocalDate startDate,
+            LocalDate endDate,
+            Integer pageSize,
+            Integer offset
+    ) {
         String startTime = startDate != null ? DATE_FORMATTER.format(startDate) : null;
         String endTime = endDate != null ? DATE_FORMATTER.format(endDate) : null;
 
         return Observable
-                .fromCallable(() -> taggingService.getTagFromType(FhirElementFactory.getFhirTypeForClass(resourceType)))
+                .fromCallable(
+                        () -> taggingService
+                                .getTagFromType(
+                                        FhirElementFactory.getFhirTypeForClass(resourceType)
+                                )
+                )
                 .map(tags -> tagEncryptionService.encryptTags(tags))
-                .flatMap(encryptedTags -> apiService.fetchRecords(alias, userId, startTime, endTime, pageSize, offset, encryptedTags))
+                .map(tags -> {
+                        tags.addAll(tagEncryptionService.encryptAnnotations(annotations));
+                        return tags;
+                })
+                .flatMap(
+                         encryptedTags -> apiService.fetchRecords(
+                                alias,
+                                userId,
+                                startTime,
+                                endTime,
+                                pageSize,
+                                offset,
+                                encryptedTags
+                         )
+                )
                 .flatMapIterable(encryptedRecords -> encryptedRecords)
                 .map((EncryptedRecord encryptedRecord) -> (DecryptedRecord<T>) decryptRecord(encryptedRecord, userId))
-                .filter(decryptedRecord -> resourceType.isAssignableFrom(decryptedRecord.getResource().getClass()))
+                .filter(
+                        decryptedRecord -> resourceType.isAssignableFrom(
+                                Objects.requireNonNull(decryptedRecord.getResource())
+                                        .getClass()
+                        )
+                )
+                .filter( decryptedRecord -> Objects.requireNonNull(
+                            decryptedRecord.getAnnotations()
+                    ).containsAll(annotations)
+                )
                 .map(this::assignResourceId)
-                .map(decryptedRecord -> new Record<>(decryptedRecord.getResource(), buildMeta(decryptedRecord)))
+                .map(decryptedRecord -> new Record<>(
+                        decryptedRecord.getResource(),
+                        buildMeta(decryptedRecord),
+                        decryptedRecord.getAnnotations()
+                ))
                 .toList();
     }
 

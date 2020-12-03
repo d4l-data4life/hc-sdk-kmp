@@ -40,6 +40,7 @@ import care.data4life.sdk.model.DownloadResult
 import care.data4life.sdk.model.Record
 import org.junit.Assert.assertTrue
 import org.junit.FixMethodOrder
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
@@ -52,6 +53,7 @@ import kotlin.test.assertNotNull
 
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Ignore
 class CrossSDKTest : BaseTestLogin() {
     //region document properties
     private val attachmentTitle = "Brain MRI"

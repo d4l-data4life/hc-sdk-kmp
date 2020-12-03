@@ -87,8 +87,6 @@ android {
             }
         }
 
-        // TODO enable when test orchestrator is fixed, broken 1.1.1
-        // if enabled no tests are found and executed
          execution = "ANDROID_TEST_ORCHESTRATOR"
     }
 }

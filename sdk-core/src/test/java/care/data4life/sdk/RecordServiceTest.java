@@ -33,7 +33,6 @@ import care.data4life.crypto.KeyType;
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.CarePlan;
 import care.data4life.fhir.stu3.model.DocumentReference;
-import care.data4life.fhir.stu3.model.DomainResource;
 import care.data4life.fhir.stu3.model.Identifier;
 import care.data4life.fhir.stu3.model.Organization;
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper;
@@ -41,7 +40,6 @@ import care.data4life.sdk.config.DataRestriction;
 import care.data4life.sdk.config.DataRestrictionException;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.lang.DataValidationException;
-import care.data4life.sdk.model.CreateResult;
 import care.data4life.sdk.model.DeleteResult;
 import care.data4life.sdk.model.DownloadResult;
 import care.data4life.sdk.model.DownloadType;
@@ -1085,155 +1083,6 @@ public class RecordServiceTest {
         inOrder.verifyNoMoreInteractions();
     }
     //endregion
-
-    @Test
-    public void createRecord_shouldReturnCreatedRecord() throws InterruptedException, IOException, DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation, DataValidationException.ModelVersionNotSupported, DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
-        // Given
-        doReturn(mockUploadData).when(recordService).extractUploadData(mockCarePlan);
-        when(mockCarePlan.getResourceType()).thenReturn(CarePlan.resourceType);
-        when(mockTaggingService.appendDefaultTags(eq(CarePlan.resourceType), any())).thenReturn(mockTags);
-        when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey));
-        doReturn(mockDecryptedRecord).when(recordService).uploadData(any(), eq(null), eq(USER_ID));
-        doReturn(mockDecryptedRecord).when(recordService).removeUploadData(any());
-        doReturn(mockEncryptedRecord).when(recordService).encryptRecord(mockDecryptedRecord);
-        when(mockApiService.createRecord(ALIAS, USER_ID, mockEncryptedRecord)).thenReturn(Single.just(mockEncryptedRecord));
-        doReturn(mockDecryptedRecord).when(recordService).decryptRecord(mockEncryptedRecord, USER_ID);
-        doReturn(mockDecryptedRecord).when(recordService).restoreUploadData(mockDecryptedRecord, mockCarePlan, mockUploadData);
-        doReturn(mockMeta).when(recordService).buildMeta(mockDecryptedRecord);
-
-        // When
-        TestObserver<Record<CarePlan>> subscriber = recordService.createRecord(mockCarePlan, USER_ID).test().await();
-
-        // Then
-        Record<CarePlan> record = subscriber
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values().get(0);
-        assertThat(record.getMeta()).isEqualTo(mockMeta);
-        assertThat(record.getFhirResource()).isEqualTo(mockCarePlan);
-
-        inOrder.verify(mockTaggingService).appendDefaultTags(anyString(), any());
-        inOrder.verify(mockCryptoService).generateGCKey();
-        inOrder.verify(recordService).uploadData(any(), eq(null), eq(USER_ID));
-        inOrder.verify(recordService).removeUploadData(any());
-        inOrder.verify(recordService).encryptRecord(mockDecryptedRecord);
-        inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockEncryptedRecord);
-        inOrder.verify(recordService).decryptRecord(mockEncryptedRecord, USER_ID);
-        inOrder.verify(recordService).restoreUploadData(mockDecryptedRecord, mockCarePlan, mockUploadData);
-        inOrder.verify(recordService).buildMeta(mockDecryptedRecord);
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void createRecordWithoutAttachment_shouldReturnCreatedRecord() throws InterruptedException, IOException, DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation, DataValidationException.ModelVersionNotSupported, DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
-        // Given
-        doReturn(null).when(recordService).extractUploadData(mockCarePlan);
-        when(mockCarePlan.getResourceType()).thenReturn(CarePlan.resourceType);
-        when(mockTaggingService.appendDefaultTags(eq(CarePlan.resourceType), any())).thenReturn(mockTags);
-        when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey));
-        doReturn(mockDecryptedRecord).when(recordService).removeUploadData(any());
-        doReturn(mockEncryptedRecord).when(recordService).encryptRecord(mockDecryptedRecord);
-        when(mockApiService.createRecord(ALIAS, USER_ID, mockEncryptedRecord)).thenReturn(Single.just(mockEncryptedRecord));
-        doReturn(mockDecryptedRecord).when(recordService).decryptRecord(mockEncryptedRecord, USER_ID);
-        doReturn(mockDecryptedRecord).when(recordService).restoreUploadData(mockDecryptedRecord, mockCarePlan, mockUploadData);
-        doReturn(mockDecryptedRecord).when(recordService).uploadData(mockDecryptedRecord, null, USER_ID);
-        doReturn(mockMeta).when(recordService).buildMeta(mockDecryptedRecord);
-
-        // When
-        TestObserver<Record<CarePlan>> subscriber = recordService.createRecord(mockCarePlan, USER_ID).test().await();
-
-        // Then
-        Record<CarePlan> record = subscriber
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values().get(0);
-        assertThat(record.getMeta()).isEqualTo(mockMeta);
-        assertThat(record.getFhirResource()).isEqualTo(mockCarePlan);
-
-        inOrder.verify(mockTaggingService).appendDefaultTags(anyString(), any());
-        inOrder.verify(mockCryptoService).generateGCKey();
-        inOrder.verify(recordService).uploadData(any(), eq(null), eq(USER_ID));
-        inOrder.verify(recordService).removeUploadData(any());
-        inOrder.verify(recordService).encryptRecord(mockDecryptedRecord);
-        inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockEncryptedRecord);
-        inOrder.verify(recordService).decryptRecord(mockEncryptedRecord, USER_ID);
-        inOrder.verify(recordService).restoreUploadData(mockDecryptedRecord, mockCarePlan, null);
-        inOrder.verify(recordService).buildMeta(mockDecryptedRecord);
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void createRecord_shouldThrow_forUnsupportedData() throws InterruptedException, DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
-        // Given
-        byte[] invalidData = {0x00};
-        DocumentReference doc = buildDocumentReference(invalidData);
-
-        // When
-        try {
-            recordService.createRecord(doc, USER_ID).test().await();
-            fail("Exception expected!");
-        } catch (D4LException ex) {
-
-            // Then
-            assertThat(ex.getClass()).isEqualTo(DataRestrictionException.UnsupportedFileType.class);
-        }
-
-        inOrder.verify(recordService).createRecord(doc, USER_ID);
-        inOrder.verify(recordService).checkDataRestrictions(doc);
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void createRecord_shouldThrow_forFileSizeLimitationBreach() throws InterruptedException, DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
-        // Given
-        Byte[] invalidSizePdf = new Byte[DataRestriction.DATA_SIZE_MAX_BYTES + 1];
-        System.arraycopy(MimeType.PDF.byteSignature()[0], 0, invalidSizePdf, 0, MimeType.PDF.byteSignature()[0].length);
-        DocumentReference doc = buildDocumentReference(unboxByteArray(invalidSizePdf));
-
-        // When
-        try {
-            recordService.createRecord(doc, USER_ID).test().await();
-            fail("Exception expected!");
-        } catch (D4LException ex) {
-
-            // Then
-            assertThat(ex.getClass()).isEqualTo(DataRestrictionException.MaxDataSizeViolation.class);
-        }
-
-        inOrder.verify(recordService).createRecord(doc, USER_ID);
-        inOrder.verify(recordService).checkDataRestrictions(doc);
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void createRecords_shouldReturnCreatedRecords() throws InterruptedException, DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
-        // Given
-        List<DomainResource> resources = asList(mockCarePlan, mockCarePlan);
-        doReturn(Single.just(mockRecord)).when(recordService).createRecord(mockCarePlan, USER_ID);
-
-        // When
-        TestObserver<CreateResult<DomainResource>> observer = recordService.createRecords(resources, USER_ID).test().await();
-
-        // Then
-        CreateResult<DomainResource> result = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values().get(0);
-
-        assertThat(result.getFailedOperations()).isEmpty();
-        assertThat(result.getSuccessfulOperations()).hasSize(2);
-        assertThat(result.getSuccessfulOperations().get(0).getFhirResource()).isEqualTo(mockCarePlan);
-        assertThat(result.getSuccessfulOperations().get(0).getMeta()).isEqualTo(mockMeta);
-        assertThat(result.getSuccessfulOperations().get(1).getFhirResource()).isEqualTo(mockCarePlan);
-        assertThat(result.getSuccessfulOperations().get(1).getMeta()).isEqualTo(mockMeta);
-
-        inOrder.verify(recordService).createRecords(resources, USER_ID);
-        inOrder.verify(recordService, times(2)).createRecord(mockCarePlan, USER_ID);
-        inOrder.verifyNoMoreInteractions();
-    }
 
     @Test
     public void deleteRecord_shouldDeleteRecord() throws InterruptedException {

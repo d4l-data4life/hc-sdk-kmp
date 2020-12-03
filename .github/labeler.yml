@@ -1,0 +1,30 @@
+build:
+  - .github/**/*
+
+dependencies:
+  - buildSrc/**/*
+
+documentation:
+  - docs/**/*
+  - sdk-doc/**/*
+  - README.adoc
+  - LICENSE
+  - CHANGELOG.adoc
+  - CODE-OF-CONDUCT.adoc
+  - CONTRIBUTION.adoc
+  - readmeOSS.adoc
+
+# Platform
+library:
+  - sdk-android/**/*
+  - sdk-android-test/**/*
+  - sdk-core/**/*
+  - sdk-ingestion/**/*
+  - sdk-jvm/**/*
+
+# Sample
+sample-android:
+  - sample-android/**/*
+
+sample-jvm:
+  - sample-jvm/**/*

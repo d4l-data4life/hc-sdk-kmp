@@ -1,0 +1,76 @@
+- name: bug
+  description: Something isn't working
+  color: d73a4a
+- name: build
+  description: CI/CD or build tools
+  color: dce775
+- name: dependencies
+  description: Pull requests that update a dependency file
+  color: dce775
+- name: documentation
+  description: Improvements or additions to documentation
+  color: 0075ca
+- name: enhancement
+  description: New feature or request
+  color: 64b5f6
+- name: feature
+  description: A new feature!
+  color: 81c784
+- name: good first issue
+  description: Good for newcomers
+  color: ffd54f
+- name: help wanted
+  description: Extra attention is needed
+  color: ffd54f
+- name: performance
+  description: Performance topics
+  color: 64b5f6
+- name: question
+  description: Further information is requested
+  color: ba68c8
+- name: security
+  description: Security issue or vulnerability
+  color: e57373
+- name: breaking
+  description: Breaking change
+  color: f21d32
+
+# meta
+- name: blocked
+  description: This is blocked
+  color: f7ae7e
+- name: duplicate
+  description: This issue or pull request already exists
+  color: cfd3d7
+- name: invalid
+  description: This doesn't seem right
+  color: cfd3d7
+- name: wontfix
+  description: This will not be worked on
+  color: cfd3d7
+- name: DO NOT MERGE
+  description: Not ready yet!
+  color: e56992
+
+# library
+- name: android
+  description: Android changes
+  color: 008672
+- name: jvm
+  description: JVM changes
+  color: 008672
+- name: ingestion
+  description: Ingestion changes
+  color: 008672
+- name: library
+  description: Library changes
+  color: 008672
+
+# sample
+- name: sample-android
+  description: SampleApp Android
+  color: 4514b7
+- name: sample-jvm
+  description: SampleApp JVM
+  color: 4514b7
+

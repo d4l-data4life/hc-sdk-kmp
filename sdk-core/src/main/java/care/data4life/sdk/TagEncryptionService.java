@@ -19,6 +19,8 @@ package care.data4life.sdk;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 import care.data4life.crypto.GCKey;
 import care.data4life.crypto.error.CryptoException;
@@ -31,8 +33,17 @@ import io.reactivex.Single;
 import static care.data4life.sdk.TaggingService.TAG_DELIMITER;
 
 class TagEncryptionService {
+    interface Transformer<T> {
+        T run(List<String> decryptedList);
+    }
+
+    interface Condition {
+        Boolean run(String decryptedItem);
+    }
+
 
     static final int IV_SIZE = 16;
+    private final static String ANNOTATION_KEY = "custom" + TAG_DELIMITER;
 
     private final byte[] iv;
     private CryptoService cryptoService;
@@ -48,24 +59,59 @@ class TagEncryptionService {
         iv = new byte[IV_SIZE];
     }
 
-    List<String> encryptTags(HashMap<String, String> tags) throws IOException {
+    private List<String> encryptList(List<String> list, String prefix) throws IOException {
         GCKey tek = cryptoService.fetchTagEncryptionKey();
         return Observable
-                .fromIterable(TagHelper.convertToTagList(tags))
-                .map(tag -> encryptTag(tek, tag).blockingGet())
+                .fromIterable(list)
+                .map(tag -> encryptTag(tek, prefix+tag).blockingGet())
                 .toList()
                 .blockingGet();
     }
 
-    HashMap<String, String> decryptTags(List<String> encryptedTags) throws IOException {
+    private<T extends Object> T decryptList(
+            List<String> encryptedList,
+            Condition condition,
+            Transformer<T> transform
+    ) throws IOException {
         GCKey tek = cryptoService.fetchTagEncryptionKey();
         return Observable
-                .fromIterable(encryptedTags)
+                .fromIterable(encryptedList)
                 .map(encryptedTag -> decryptTag(tek, encryptedTag).blockingGet())
-                .filter(decryptedTag -> decryptedTag.contains(TAG_DELIMITER))
+                .filter(condition::run)
                 .toList()
-                .map(TagHelper::convertToTagMap)
+                .map(transform::run)
                 .blockingGet();
+    }
+
+    List<String> encryptTags(HashMap<String, String> tags) throws IOException {
+        return encryptList(TagHelper.convertToTagList(tags), "");
+    }
+
+    HashMap<String, String> decryptTags(List<String> encryptedTags) throws IOException {
+        return decryptList(
+                encryptedTags,
+                (String d) -> !d.startsWith(ANNOTATION_KEY) && d.contains(TAG_DELIMITER),
+                TagHelper::convertToTagMap
+        );
+    }
+
+    List<String> encryptAnnotations(List<String> annotations) throws IOException {
+        return encryptList(annotations, ANNOTATION_KEY);
+    }
+
+    private static List<String> removeAnnotationKey(List<String> list) {
+        for(int idx = 0; idx < list.size(); idx++) {
+            list.set(idx, list.get(idx).replaceFirst(ANNOTATION_KEY, ""));
+        }
+        return list;
+    }
+
+    List<String> decryptAnnotations(List<String> encryptedAnnotations) throws IOException {
+        return decryptList(
+                encryptedAnnotations,
+                (d) -> d.startsWith(ANNOTATION_KEY),
+                TagEncryptionService::removeAnnotationKey
+        );
     }
 
     Single<String> encryptTag(GCKey key, String tag) {

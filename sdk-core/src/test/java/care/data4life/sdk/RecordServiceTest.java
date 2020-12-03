@@ -30,7 +30,6 @@ import care.data4life.crypto.KeyType;
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.CarePlan;
 import care.data4life.fhir.stu3.model.DocumentReference;
-import care.data4life.fhir.stu3.model.DomainResource;
 import care.data4life.fhir.stu3.model.Identifier;
 import care.data4life.fhir.stu3.model.Organization;
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper;
@@ -41,19 +40,15 @@ import care.data4life.sdk.lang.DataValidationException;
 import care.data4life.sdk.model.DeleteResult;
 import care.data4life.sdk.model.DownloadResult;
 import care.data4life.sdk.model.DownloadType;
-import care.data4life.sdk.model.FetchResult;
 import care.data4life.sdk.model.Meta;
 import care.data4life.sdk.model.ModelVersion;
 import care.data4life.sdk.model.Record;
-import care.data4life.sdk.model.UpdateResult;
 import care.data4life.sdk.network.model.DecryptedRecord;
-import care.data4life.sdk.network.model.EncryptedKey;
 import care.data4life.sdk.network.model.EncryptedRecord;
 import care.data4life.sdk.test.util.AttachmentBuilder;
 import care.data4life.sdk.util.Base64;
 import care.data4life.sdk.util.MimeType;
 import io.reactivex.Completable;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import kotlin.Pair;
@@ -76,7 +71,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
@@ -1266,106 +1260,6 @@ public class RecordServiceTest extends RecordServiceTestBase {
         assertThat(errors).hasSize(1);
         assertThat(errors.get(0)).isInstanceOf(DataValidationException.IdUsageViolation.class);
         assertThat(errors.get(0).getMessage()).isEqualTo("Please provide correct attachment ids!");
-    }
-
-    @Test
-    public void updateRecord_shouldReturnUpdatedRecord() throws InterruptedException, IOException, DataValidationException.ModelVersionNotSupported, DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
-        // Given
-        mockCarePlan.id = RECORD_ID;
-        when(mockCarePlan.getResourceType()).thenReturn(CarePlan.resourceType);
-        when(mockApiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)).thenReturn(Single.just(mockEncryptedRecord));
-        doReturn(mockDecryptedRecord).when(recordService).decryptRecord(mockEncryptedRecord, USER_ID);
-        doReturn(mockEncryptedRecord).when(recordService).encryptRecord(mockDecryptedRecord);
-        when(mockApiService.updateRecord(ALIAS, USER_ID, RECORD_ID, mockEncryptedRecord)).thenReturn(Single.just(mockEncryptedRecord));
-        doReturn(mockMeta).when(recordService).buildMeta(mockDecryptedRecord);
-
-        // When
-        TestObserver<Record<CarePlan>> observer = recordService.updateRecord(mockCarePlan, USER_ID).test().await();
-
-        // Then
-        Record<CarePlan> result = observer.assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values().get(0);
-
-        assertThat(result.getMeta()).isEqualTo(mockMeta);
-        assertThat(result.getFhirResource()).isEqualTo(mockCarePlan);
-
-        inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID);
-        inOrder.verify(recordService).decryptRecord(mockEncryptedRecord, USER_ID);
-        inOrder.verify(recordService).encryptRecord(mockDecryptedRecord);
-        inOrder.verify(mockApiService).updateRecord(ALIAS, USER_ID, RECORD_ID, mockEncryptedRecord);
-        inOrder.verify(recordService).buildMeta(mockDecryptedRecord);
-        inOrder.verifyNoMoreInteractions();
-
-        // Cleanup
-        mockCarePlan.id = null;
-    }
-
-    @Test
-    public void updateRecord_shouldThrow_forUnsupportedData() throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
-        // Given
-        byte[] invalidData = {0x00};
-        DocumentReference doc = buildDocumentReference(invalidData);
-
-        // When
-        try {
-            recordService.updateRecord(doc, USER_ID).test().await();
-            fail("Exception expected!");
-        } catch (Exception ex) {
-            // Then
-            assertThat(ex).isInstanceOf(DataRestrictionException.UnsupportedFileType.class);
-        }
-
-        inOrder.verify(recordService).updateRecord(doc, USER_ID);
-        inOrder.verify(recordService).checkDataRestrictions(doc);
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void updateRecord_shouldThrow_forFileSizeLimitationBreach() throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
-        // Given
-        Byte[] invalidSizePdf = new Byte[DataRestriction.DATA_SIZE_MAX_BYTES + 1];
-        System.arraycopy(MimeType.PDF.byteSignature()[0], 0, invalidSizePdf, 0, MimeType.PDF.byteSignature()[0].length);
-        DocumentReference doc = buildDocumentReference(unboxByteArray(invalidSizePdf));
-
-        // When
-        try {
-            recordService.updateRecord(doc, USER_ID).test().await();
-            fail("Exception expected!");
-        } catch (Exception ex) {
-            // Then
-            assertThat(ex).isInstanceOf(DataRestrictionException.MaxDataSizeViolation.class);
-        }
-
-        inOrder.verify(recordService).updateRecord(doc, USER_ID);
-        inOrder.verify(recordService).checkDataRestrictions(doc);
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void updateRecords_shouldReturnUpdatedRecords() throws InterruptedException, DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
-        // Given
-        List<CarePlan> resources = asList(mockCarePlan, mockCarePlan);
-        doReturn(Single.just(mockRecord)).when(recordService).updateRecord(mockCarePlan, USER_ID);
-
-        // When
-        TestObserver<UpdateResult<CarePlan>> observer = recordService.updateRecords(resources, USER_ID).test().await();
-
-        // Then
-        UpdateResult<CarePlan> result = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values().get(0);
-
-        assertThat(result.getFailedUpdates()).hasSize(0);
-        assertThat(result.getSuccessfulUpdates()).hasSize(2);
-        assertThat(result.getSuccessfulUpdates()).containsExactly(mockRecord, mockRecord);
-
-        inOrder.verify(recordService).updateRecords(resources, USER_ID);
-        inOrder.verify(recordService, times(2)).updateRecord(mockCarePlan, USER_ID);
-        inOrder.verifyNoMoreInteractions();
     }
 
     public static DocumentReference buildDocumentReference() {

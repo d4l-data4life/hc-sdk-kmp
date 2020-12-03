@@ -618,7 +618,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
                 .assertValueCount(1)
                 .values()[0]
         Truth.assertThat(record.meta).isEqualTo(mockMeta)
-        Truth.assertThat(record.appDataResource).isEqualTo(mockAppData)
+        Truth.assertThat(record.resource).isEqualTo(mockAppData)
         Truth.assertThat(record.annotations).isEqualTo(ANNOTATIONS)
         inOrder.verify(mockTaggingService).appendDefaultAnnotatedTags(null, null)
         inOrder.verify(mockCryptoService).generateGCKey()

@@ -51,6 +51,7 @@ import care.data4life.sdk.model.CreateResult;
 import care.data4life.sdk.model.DeleteResult;
 import care.data4life.sdk.model.DownloadResult;
 import care.data4life.sdk.model.DownloadType;
+import care.data4life.sdk.model.EmptyRecord;
 import care.data4life.sdk.model.FetchResult;
 import care.data4life.sdk.model.Meta;
 import care.data4life.sdk.model.ModelVersion;

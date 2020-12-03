@@ -322,7 +322,7 @@ class RecordServiceUpdateRecordTest: RecordServiceTestBase() {
                 .assertValueCount(1)
                 .values()[0]
         Truth.assertThat(result.meta).isEqualTo(mockMeta)
-        Truth.assertThat(result.appDataResource).isEqualTo(mockAppData)
+        Truth.assertThat(result.resource).isEqualTo(mockAppData)
         Truth.assertThat(result.annotations).isEqualTo(ANNOTATIONS)
 
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
@@ -382,7 +382,7 @@ class RecordServiceUpdateRecordTest: RecordServiceTestBase() {
                 .assertValueCount(1)
                 .values()[0]
         Truth.assertThat(result.meta).isEqualTo(mockMeta)
-        Truth.assertThat(result.appDataResource).isEqualTo(mockAppData)
+        Truth.assertThat(result.resource).isEqualTo(mockAppData)
 
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
         inOrder.verify(recordService).decryptAppDataRecord(mockEncryptedRecord, USER_ID)

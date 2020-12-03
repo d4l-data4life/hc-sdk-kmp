@@ -31,14 +31,14 @@ class AppDataRecordTest {
         val annotations = listOf("a", "b", "c")
 
         val record1 = AppDataRecord(
-                appDataResource = resource,
+                resource = resource,
                 identifier = identifier,
                 meta = meta,
                 annotations = annotations
         )
 
         val record2 = AppDataRecord(
-                appDataResource = resource,
+                resource = resource,
                 identifier = identifier,
                 meta = meta,
                 annotations = annotations
@@ -50,7 +50,7 @@ class AppDataRecordTest {
     @Test
     fun `Given a AppDataRecord and something else, it returns false on a compare`() {
         val record = AppDataRecord(
-                appDataResource =  "test".toByteArray(),
+                resource =  "test".toByteArray(),
                 identifier = "1234",
                 meta = mockkClass(Meta::class),
                 annotations = listOf("a", "b", "c")
@@ -67,14 +67,14 @@ class AppDataRecordTest {
         val annotations = listOf("a", "b", "c")
 
         val record1 = AppDataRecord(
-                appDataResource = "test1".toByteArray(),
+                resource = "test1".toByteArray(),
                 identifier = identifier,
                 meta = meta,
                 annotations = annotations
         )
 
         val record2 = AppDataRecord(
-                appDataResource = "test2".toByteArray(),
+                resource = "test2".toByteArray(),
                 identifier = identifier,
                 meta = meta,
                 annotations = annotations
@@ -90,14 +90,14 @@ class AppDataRecordTest {
         val annotations = listOf("a", "b", "c")
 
         val record1 = AppDataRecord(
-                appDataResource = resource,
+                resource = resource,
                 identifier = "123",
                 meta = meta,
                 annotations = annotations
         )
 
         val record2 = AppDataRecord(
-                appDataResource = resource,
+                resource = resource,
                 identifier = "345",
                 meta = meta,
                 annotations = annotations
@@ -113,14 +113,14 @@ class AppDataRecordTest {
         val annotations = listOf("a", "b", "c")
 
         val record1 = AppDataRecord(
-                appDataResource = resource,
+                resource = resource,
                 identifier = identifier,
                 meta = mockk(),
                 annotations = annotations
         )
 
         val record2 = AppDataRecord(
-                appDataResource = resource,
+                resource = resource,
                 identifier = identifier,
                 meta = mockk(),
                 annotations = annotations
@@ -136,14 +136,14 @@ class AppDataRecordTest {
         val meta = mockkClass(Meta::class)
 
         val record1 = AppDataRecord(
-                appDataResource = resource,
+                resource = resource,
                 identifier = identifier,
                 meta = meta,
                 annotations = listOf("a", "b", "c")
         )
 
         val record2 = AppDataRecord(
-                appDataResource = resource,
+                resource = resource,
                 identifier = identifier,
                 meta = meta,
                 annotations = listOf("d", "e", "f")
@@ -160,14 +160,14 @@ class AppDataRecordTest {
         val annotations = listOf("a", "b", "c")
 
         val record1 = AppDataRecord(
-                appDataResource = resource,
+                resource = resource,
                 identifier = identifier,
                 meta = meta,
                 annotations = annotations
         )
 
         val record2 = record1.copy()
-        val record3 = record1.copy(appDataResource = "resource".toByteArray())
+        val record3 = record1.copy(resource = "resource".toByteArray())
         val record4 = record1.copy(identifier = "23")
         val record5 = record1.copy(meta = mockk())
         val record6 = record1.copy(annotations = listOf("e","f","g"))

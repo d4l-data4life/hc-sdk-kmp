@@ -16,6 +16,7 @@
 
 package care.data4life.sdk.model;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -25,25 +26,34 @@ import care.data4life.fhir.stu3.model.DomainResource;
 import care.data4life.sdk.model.definitions.FhirRecord;
 
 public class Record<T extends DomainResource> implements FhirRecord<T> {
-    private final T fhirResource;
+    private final String identifier = "";
+    private final T resource;
     private final Meta meta;
     private List<String> annotations;
 
     public Record(T fhirResource, Meta meta) {
-        this.fhirResource = fhirResource;
+        this.resource = fhirResource;
         this.meta = meta;
     }
 
     public Record(T fhirResource, Meta meta, List<String> annotations) {
-        this.fhirResource = fhirResource;
+        this.resource = fhirResource;
         this.meta = meta;
         this.annotations = annotations;
     }
 
+    @NotNull
+    @Override
+    public String getIdentifier() { return identifier; }
+
     @Nullable
     @Override
-    public T getFhirResource() {
-        return fhirResource;
+    public T getFhirResource() { return resource; }
+
+    @Nullable
+    @Override
+    public T getResource() {
+        return resource;
     }
 
     @Nullable
@@ -61,13 +71,14 @@ public class Record<T extends DomainResource> implements FhirRecord<T> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Record<?> record = (Record<?>) o;
-        return Objects.equals(fhirResource, record.fhirResource) &&
+        return identifier.equals(record.identifier) &&
+                Objects.equals(resource, record.resource) &&
                 Objects.equals(meta, record.meta) &&
                 Objects.equals(annotations, record.annotations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fhirResource, meta, annotations);
+        return Objects.hash(identifier, resource, meta, annotations);
     }
 }

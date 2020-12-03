@@ -25,7 +25,7 @@ import java.util.*
  */
 data class AppDataRecord(
         override val identifier: String,
-        override val appDataResource: ByteArray,
+        override val resource: ByteArray,
         override val meta: Meta,
         override val annotations: List<String>
 ): DataRecord {
@@ -35,9 +35,9 @@ data class AppDataRecord(
             identifier != other.identifier ||
             meta != other.meta ||
             annotations != other.annotations    -> false
-            else                                -> appDataResource.contentEquals(other.appDataResource)
+            else                                -> resource.contentEquals(other.resource)
         }
     }
 
-    override fun hashCode(): Int = Objects.hash(identifier, meta, annotations, appDataResource.contentToString())
+    override fun hashCode(): Int = Objects.hash(identifier, meta, annotations, resource.contentToString())
 }

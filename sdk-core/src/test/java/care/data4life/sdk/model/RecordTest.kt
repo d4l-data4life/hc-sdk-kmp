@@ -19,6 +19,7 @@ package care.data4life.sdk.model
 import care.data4life.fhir.stu3.model.DomainResource
 import io.mockk.mockk
 import io.mockk.mockkClass
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
@@ -27,19 +28,47 @@ import org.junit.Test
 
 class RecordTest {
     @Test
-    fun `Given a Record it has no FhirResource by default`() {
+    fun `Given a Record it has an empty string identifier by default`() {
         val record = Record<DomainResource>(null, null)
 
-        assertNull(record.fhirResource)
+        assertEquals(
+                "",
+                record.identifier
+        )
     }
 
     @Test
-    fun `Given a Record returns a given FhirResource`() {
+    fun `Given a Record it has no Resource by default`() {
+        val record = Record<DomainResource>(null, null)
+
+        assertNull(record.resource)
+    }
+
+    @Test
+    fun `Given a Record returns a given Resource`() {
         val resource = mockkClass(DomainResource::class)
         val record = Record<DomainResource>(resource, null)
 
         assertSame(
-                record.fhirResource,
+                record.resource,
+                resource
+        )
+    }
+
+    @Test
+    fun `Given a Record it FhireResource is a alias of Resource`() {
+        val resource = mockkClass(DomainResource::class)
+        val record1 = Record<DomainResource>(null, null)
+        val record2 = Record<DomainResource>(resource, null)
+
+        assertNull(record1.resource)
+        assertNull(record1.fhirResource)
+        assertSame(
+                record2.resource,
+                resource
+        )
+        assertSame(
+                record2.fhirResource,
                 resource
         )
     }

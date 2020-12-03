@@ -21,8 +21,9 @@ import care.data4life.crypto.GCKey
 internal interface DecryptedRecordBase {
     var identifier: String?
     var tags: HashMap<String, String>?
+    var annotations: List<String>?
     var customCreationDate: String?
     var updatedDate: String?
     var dataKey: GCKey?
-    var modelVersion: Int
+    var modelVersion: Int?
 }

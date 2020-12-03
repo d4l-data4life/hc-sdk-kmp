@@ -18,8 +18,6 @@ package care.data4life.sdk;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InOrder;
-import org.mockito.Mockito;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.LocalDateTime;
 
@@ -28,11 +26,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import care.data4life.crypto.GCKey;
 import care.data4life.crypto.KeyType;
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.CarePlan;
 import care.data4life.fhir.stu3.model.DocumentReference;
+import care.data4life.fhir.stu3.model.DomainResource;
 import care.data4life.fhir.stu3.model.Identifier;
 import care.data4life.fhir.stu3.model.Organization;
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper;
@@ -80,112 +78,19 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 
-public class RecordServiceTest {
-    private static final String PARTNER_ID = "partnerId";
-    private static final String USER_ID = "userId";
-    private static final String ENCRYPTED_RESOURCE = "encryptedResource";
-    private static final String RESOURCE_TYPE = "resourcetype";
-    private static final String RECORD_ID = "recordId";
-    private static final String ALIAS = "alias";
-    private static final String DATA = "data";
-    private static final String DATA_HASH = "dataHash";
-    private static final String ATTACHMENT_ID = "attachmentId";
-    private static final String THUMBNAIL_ID = "thumbnailId";
-    private static final String PREVIEW_ID = "previewId";
-    private static final String ASSIGNER = "assigner";
-    private static final String ADDITIONAL_ID = DOWNSCALED_ATTACHMENT_IDS_FMT + SPLIT_CHAR + ATTACHMENT_ID + SPLIT_CHAR + PREVIEW_ID + SPLIT_CHAR + THUMBNAIL_ID;
+public class RecordServiceTest extends RecordServiceTestBase {
 
-    //SUT
-    private RecordService recordService;
-    private ApiService mockApiService;
-    private TagEncryptionService mockTagEncryptionService;
-    private TaggingService mockTaggingService;
-    private FhirService mockFhirService;
-    private AttachmentService mockAttachmentService;
-    private CryptoService mockCryptoService;
-    private D4LErrorHandler mockErrorHandler;
-
-    private CarePlan mockCarePlan;
-    private DocumentReference mockDocumentReference;
-    private HashMap<String, String> mockTags;
-    private HashMap<Attachment, String> mockUploadData;
-    private List<String> mockEncryptedTags;
-    private GCKey mockDataKey;
-    private GCKey mockCommonKey;
-    private GCKey mockAttachmentKey;
-    private EncryptedKey mockEncryptedDataKey;
-    private EncryptedRecord mockEncryptedRecord;
-    private DecryptedRecord mockDecryptedRecord;
-    private Meta mockMeta;
-    private D4LException mockD4LException;
-    private Record<CarePlan> mockRecord;
-
-    private InOrder inOrder;
+    public RecordServiceTest() {
+        super();
+    }
 
     @Before
     public void setup() {
-        mockApiService = mock(ApiService.class);
-        mockTagEncryptionService = mock(TagEncryptionService.class);
-        mockTaggingService = mock(TaggingService.class);
-        mockFhirService = mock(FhirService.class);
-        mockAttachmentService = mock(AttachmentService.class);
-        mockCryptoService = mock(CryptoService.class);
-        mockErrorHandler = mock(D4LErrorHandler.class);
-        recordService = spy(new RecordService(
-                PARTNER_ID,
-                ALIAS,
-                mockApiService,
-                mockTagEncryptionService,
-                mockTaggingService,
-                mockFhirService,
-                mockAttachmentService,
-                mockCryptoService,
-                mockErrorHandler));
-
-        mockCarePlan = mock(CarePlan.class);
-        mockDocumentReference = mock(DocumentReference.class);
-        mockTags = mock(HashMap.class);
-        mockUploadData = mock(HashMap.class);
-        mockEncryptedTags = mock(List.class);
-        mockDataKey = mock(GCKey.class);
-        mockAttachmentKey = mock(GCKey.class);
-        mockCommonKey = mock(GCKey.class);
-        mockEncryptedDataKey = mock(EncryptedKey.class);
-        mockEncryptedRecord = mock(EncryptedRecord.class);
-        mockDecryptedRecord = mock(DecryptedRecord.class);
-        mockMeta = mock(Meta.class);
-        mockD4LException = mock(D4LException.class);
-        mockRecord = mock(Record.class);
-
-        when(mockRecord.getFhirResource()).thenReturn(mockCarePlan);
-        when(mockRecord.getMeta()).thenReturn(mockMeta);
-        when(mockDecryptedRecord.getTags()).thenReturn(mockTags);
-        when(mockDecryptedRecord.getDataKey()).thenReturn(mockDataKey);
-        when(mockDecryptedRecord.getResource()).thenReturn(mockCarePlan);
-        when(mockDecryptedRecord.getModelVersion()).thenReturn(ModelVersion.CURRENT);
-        when(mockTags.get(RESOURCE_TYPE)).thenReturn(CarePlan.resourceType);
-        when(mockEncryptedRecord.getEncryptedTags()).thenReturn(mockEncryptedTags);
-        when(mockEncryptedRecord.getEncryptedDataKey()).thenReturn(mockEncryptedDataKey);
-        when(mockEncryptedRecord.getEncryptedBody()).thenReturn(ENCRYPTED_RESOURCE);
-        when(mockEncryptedRecord.getModelVersion()).thenReturn(ModelVersion.CURRENT);
-        when(mockEncryptedRecord.getIdentifier()).thenReturn(RECORD_ID);
-        when(mockErrorHandler.handleError(any(Exception.class))).thenReturn(mockD4LException);
-
-        inOrder = Mockito.inOrder(
-                mockApiService,
-                mockTagEncryptionService,
-                mockTaggingService,
-                mockFhirService,
-                mockAttachmentService,
-                mockCryptoService,
-                mockErrorHandler,
-                recordService);
+        init();
     }
 
     //region utility methods
@@ -354,16 +259,36 @@ public class RecordServiceTest {
     @Test
     public void restoreUploadData_shouldCall_removeOrRestoreUploadData() {
         // Given
-        doReturn(mockDecryptedRecord).when(recordService).removeOrRestoreUploadData(RESTORE, mockDecryptedRecord, mockDocumentReference, mockUploadData);
+        doReturn(mockDecryptedRecord)
+                .when(recordService)
+                .removeOrRestoreUploadData(
+                    RESTORE,
+                    (DecryptedRecord)mockDecryptedRecord,
+                    mockDocumentReference,
+                    mockUploadData
+                );
 
         // When
-        DecryptedRecord record = recordService.restoreUploadData(mockDecryptedRecord, mockDocumentReference, mockUploadData);
+        DecryptedRecord record = recordService.restoreUploadData(
+                (DecryptedRecord)mockDecryptedRecord,
+                mockDocumentReference,
+                mockUploadData
+        );
 
         // Then
         assertThat(record).isEqualTo(mockDecryptedRecord);
 
-        inOrder.verify(recordService).restoreUploadData(mockDecryptedRecord, mockDocumentReference, mockUploadData);
-        inOrder.verify(recordService).removeOrRestoreUploadData(RESTORE, mockDecryptedRecord, mockDocumentReference, mockUploadData);
+        inOrder.verify(recordService).restoreUploadData(
+                (DecryptedRecord)mockDecryptedRecord,
+                mockDocumentReference,
+                mockUploadData
+        );
+        inOrder.verify(recordService).removeOrRestoreUploadData(
+                RESTORE,
+                (DecryptedRecord)mockDecryptedRecord,
+                mockDocumentReference,
+                mockUploadData
+        );
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -371,7 +296,16 @@ public class RecordServiceTest {
     public void removeOrRestoreUploadData_shouldRemoveUploadData() {
         // Given
         DocumentReference document = buildDocumentReference();
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(null, document, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                null,
+                document,
+                null,
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
 
         // When
         DecryptedRecord record = recordService.removeOrRestoreUploadData(REMOVE, decryptedRecord, document, mockUploadData);
@@ -390,7 +324,16 @@ public class RecordServiceTest {
         // Given
         DocumentReference document = buildDocumentReference();
         document.content.get(0).attachment.data = null;
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(null, null, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
         HashMap<Attachment, String> uploadData = new HashMap<>();
         uploadData.put(document.content.get(0).attachment, DATA);
 
@@ -425,16 +368,34 @@ public class RecordServiceTest {
     @Test
     public void uploadData_shouldCall_uploadOrDownloadData_asUPDATE() throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
         // Given
-        doReturn(mockDecryptedRecord).when(recordService).uploadOrDownloadData(UPDATE, mockDecryptedRecord, mockDocumentReference, USER_ID);
+        doReturn(mockDecryptedRecord).when(recordService).uploadOrDownloadData(
+                UPDATE,
+                (DecryptedRecord)mockDecryptedRecord,
+                mockDocumentReference,
+                USER_ID
+        );
 
         // When
-        DecryptedRecord record = recordService.uploadData(mockDecryptedRecord, mockDocumentReference, USER_ID);
+        DecryptedRecord record = recordService.uploadData(
+                (DecryptedRecord)mockDecryptedRecord,
+                mockDocumentReference,
+                USER_ID
+        );
 
         // Then
         assertThat(record).isEqualTo(mockDecryptedRecord);
 
-        inOrder.verify(recordService).uploadData(mockDecryptedRecord, mockDocumentReference, USER_ID);
-        inOrder.verify(recordService).uploadOrDownloadData(UPDATE, mockDecryptedRecord, mockDocumentReference, USER_ID);
+        inOrder.verify(recordService).uploadData(
+                (DecryptedRecord)mockDecryptedRecord,
+                mockDocumentReference,
+                USER_ID
+        );
+        inOrder.verify(recordService).uploadOrDownloadData(
+                UPDATE,
+                (DecryptedRecord)mockDecryptedRecord,
+                mockDocumentReference,
+                USER_ID
+        );
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -1497,52 +1458,6 @@ public class RecordServiceTest {
 
         inOrder.verify(recordService).updateRecords(resources, USER_ID);
         inOrder.verify(recordService, times(2)).updateRecord(mockCarePlan, USER_ID);
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void countRecords_shouldReturnRecordsCount() throws InterruptedException {
-        // Given
-        when(mockApiService.getCount(ALIAS, USER_ID, null)).thenReturn(Single.just(2));
-
-        // When
-        TestObserver<Integer> observer = recordService.countRecords(null, USER_ID).test().await();
-
-        // Then
-        Integer result = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values().get(0);
-
-        assertThat(result).isEqualTo(2);
-
-        inOrder.verify(mockApiService).getCount(ALIAS, USER_ID, null);
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void countRecordsForType_shouldReturnRecordsCount() throws InterruptedException, IOException {
-        // Given
-        when(mockTaggingService.getTagFromType(CarePlan.resourceType)).thenReturn(mockTags);
-        when(mockTagEncryptionService.encryptTags(mockTags)).thenReturn(mockEncryptedTags);
-        when(mockApiService.getCount(ALIAS, USER_ID, mockEncryptedTags)).thenReturn(Single.just(2));
-
-        // When
-        TestObserver<Integer> observer = recordService.countRecords(CarePlan.class, USER_ID).test().await();
-
-        // Then
-        Integer result = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values().get(0);
-
-        assertThat(result).isEqualTo(2);
-
-        inOrder.verify(mockTaggingService).getTagFromType(CarePlan.resourceType);
-        inOrder.verify(mockTagEncryptionService).encryptTags(mockTags);
-        inOrder.verify(mockApiService).getCount(ALIAS, USER_ID, mockEncryptedTags);
         inOrder.verifyNoMoreInteractions();
     }
 

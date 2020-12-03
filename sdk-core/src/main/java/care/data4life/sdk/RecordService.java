@@ -24,6 +24,7 @@ import org.threeten.bp.format.DateTimeFormatterBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -135,28 +136,57 @@ class RecordService {
         this.errorHandler = errorHandler;
     }
 
-    <T extends DomainResource> Single<Record<T>> createRecord(T resource, String userId) throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
+    <T extends DomainResource> Single<Record<T>> createRecord(T resource, String userId)
+            throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
+        return createRecord(resource, userId, Collections.emptyList());
+    }
+
+    <T extends DomainResource> Single<Record<T>> createRecord(
+            T resource,
+            String userId,
+            List<String> annotations
+    ) throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation
+    {
         checkDataRestrictions(resource);
         HashMap<Attachment, String> data = extractUploadData(resource);
         String createdDate = DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID));
-
         Single<DecryptedRecord<T>> createRecord = Single.just(createdDate)
                 .map(createdAt -> {
-                    HashMap<String, String> tags = taggingService.appendDefaultTags(resource.getResourceType(), null);
+                    HashMap<String, String> tags = taggingService.appendDefaultTags(
+                            resource.getResourceType(),
+                            null
+                    );
                     GCKey dataKey = cryptoService.generateGCKey().blockingGet();
-                    return new DecryptedRecord<>(null, resource, tags, createdAt, null, dataKey, null, ModelVersion.CURRENT);
+                    return new DecryptedRecord<>(
+                            null,
+                            resource,
+                            tags,
+                            annotations,
+                            createdAt,
+                            null,
+                            dataKey,
+                            null,
+                            ModelVersion.CURRENT
+                    );
                 });
 
         return createRecord
                 .map(record -> uploadData(record, null, userId))
                 .map(this::removeUploadData)
                 .map(this::encryptRecord)
-                .flatMap(encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord))
+                .flatMap(
+                        encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord)
+                )
                 .map((EncryptedRecord r) -> (DecryptedRecord<T>) decryptRecord(r, userId))
                 .map(record -> restoreUploadData(record, resource, data))
                 .map(this::assignResourceId)
-                .map(decryptedRecord -> new Record<>(decryptedRecord.getResource(), buildMeta(decryptedRecord)));
-
+                .map(
+                        decryptedRecord -> new Record<>(
+                                decryptedRecord.getResource(),
+                                buildMeta(decryptedRecord),
+                                decryptedRecord.getAnnotations()
+                        )
+                );
     }
 
     <T extends DomainResource> Single<CreateResult<T>> createRecords(List<T> resources, String userId) {

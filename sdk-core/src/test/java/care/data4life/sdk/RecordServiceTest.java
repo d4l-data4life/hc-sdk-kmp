@@ -94,7 +94,6 @@ public class RecordServiceTest {
     private static final String RECORD_ID = "recordId";
     private static final String ALIAS = "alias";
     private static final String DATA = "data";
-    private static final Integer DATA_SIZE = 42;
     private static final String DATA_HASH = "dataHash";
     private static final String ATTACHMENT_ID = "attachmentId";
     private static final String THUMBNAIL_ID = "thumbnailId";

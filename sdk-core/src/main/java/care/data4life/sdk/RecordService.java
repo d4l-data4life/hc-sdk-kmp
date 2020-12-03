@@ -379,11 +379,18 @@ class RecordService {
     }
 
     Single<Integer> countRecords(Class<? extends DomainResource> type, String userId) {
+        return countRecords(type,userId,Collections.emptyList());
+    }
+    Single<Integer> countRecords(Class<? extends DomainResource> type, String userId, List<String> annotations) {
         if (type == null) return apiService.getCount(alias, userId, null);
 
         return Single
                 .fromCallable(() -> taggingService.getTagFromType(FhirElementFactory.getFhirTypeForClass(type)))
                 .map(tags -> tagEncryptionService.encryptTags(tags))
+                .map(tags -> {
+                    tags.addAll(tagEncryptionService.encryptAnnotations(annotations));
+                    return tags;
+                })
                 .flatMap(encryptedTags -> apiService.getCount(alias, userId, encryptedTags));
     }
 

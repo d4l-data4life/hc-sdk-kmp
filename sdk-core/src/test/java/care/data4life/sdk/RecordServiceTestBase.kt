@@ -53,6 +53,7 @@ abstract class RecordServiceTestBase {
     internal lateinit var mockTags: HashMap<String, String>
     internal lateinit var mockUploadData: HashMap<Attachment, String>
     internal lateinit var mockEncryptedTags: List<String>
+    internal lateinit var mockEncryptedAnnotations: List<String>
     internal lateinit var mockDataKey: GCKey
     internal lateinit var mockCommonKey: GCKey
     internal lateinit var mockAttachmentKey: GCKey
@@ -95,6 +96,7 @@ abstract class RecordServiceTestBase {
         mockTags = Mockito.mock<HashMap<*, *>>(HashMap::class.java) as HashMap<String, String>
         mockUploadData = Mockito.mock<HashMap<*, *>>(HashMap::class.java) as HashMap<Attachment, String>
         mockEncryptedTags = Mockito.mock<MutableList<*>>(MutableList::class.java) as List<String>
+        mockEncryptedAnnotations = Mockito.mock<MutableList<*>>(MutableList::class.java) as List<String>
         mockDataKey = Mockito.mock(GCKey::class.java)
         mockAttachmentKey = Mockito.mock(GCKey::class.java)
         mockCommonKey = Mockito.mock(GCKey::class.java)

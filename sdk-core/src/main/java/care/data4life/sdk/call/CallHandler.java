@@ -36,7 +36,7 @@ public class CallHandler {
     }
 
     public <T> Task executeSingle(Single<T> operation, ResultListener<T> listener) {
-        final Task task = new Task(null);
+        final Task task = new Task();
 
         Disposable operationHandle =
                 operation
@@ -55,11 +55,12 @@ public class CallHandler {
                         );
 
         task.setOperationHandle(operationHandle);
+
         return task;
     }
 
     public Task executeCompletable(Completable operation, Callback listener) {
-        final Task task = new Task(null);
+        final Task task = new Task();
 
         Disposable operationHandle =
                 operation
@@ -78,6 +79,7 @@ public class CallHandler {
                         );
 
         task.setOperationHandle(operationHandle);
+
         return task;
     }
 }

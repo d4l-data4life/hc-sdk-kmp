@@ -16,8 +16,7 @@
 
 package care.data4life.sdk.e2e
 
-
-import androidx.test.runner.AndroidJUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.fhir.stu3.model.CodeSystemContactPointSystem
 import care.data4life.fhir.stu3.model.CodeSystemDocumentReferenceStatus

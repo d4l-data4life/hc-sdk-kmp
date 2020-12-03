@@ -89,7 +89,7 @@ android {
 
         // TODO enable when test orchestrator is fixed, broken 1.1.1
         // if enabled no tests are found and executed
-        // execution = "ANDROID_TEST_ORCHESTRATOR"
+         execution = "ANDROID_TEST_ORCHESTRATOR"
     }
 }
 
@@ -119,17 +119,19 @@ dependencies {
 
     testImplementation(Dependency.Android.Test.junit)
 
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
+    androidTestUtil(Dependency.Android.AndroidTest.orchestrator)
 
+    androidTestImplementation(Dependency.Android.AndroidTest.core)
     androidTestImplementation(Dependency.Android.AndroidTest.runner)
     androidTestImplementation(Dependency.Android.AndroidTest.rules)
-    androidTestImplementation(Dependency.Android.AndroidTest.orchestrator)
+    androidTestImplementation(Dependency.Android.AndroidTest.extJUnit)
+
+    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
+    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
 
     androidTestImplementation(Dependency.Android.AndroidTest.espressoCore)
     androidTestImplementation(Dependency.Android.AndroidTest.espressoIntents)
     androidTestImplementation(Dependency.Android.AndroidTest.espressoWeb)
-    androidTestImplementation(Dependency.Android.moshi)
 
     androidTestImplementation(Dependency.Android.AndroidTest.uiAutomator)
     androidTestImplementation(Dependency.Android.AndroidTest.kakao)
@@ -137,6 +139,8 @@ dependencies {
     androidTestImplementation(Dependency.Android.okHttp)
     androidTestImplementation(Dependency.Android.okHttpLoggingInterceptor)
     androidTestImplementation(Dependency.Android.retrofit)
+
+    androidTestImplementation(Dependency.Android.moshi)
     androidTestImplementation(Dependency.Android.gson)
 
     androidTestImplementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {

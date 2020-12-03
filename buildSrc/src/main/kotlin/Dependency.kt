@@ -137,7 +137,7 @@ object Dependency {
 
         // Test
         object Test {
-            const val core = "androidx.test:core:${Version.androidTestCore}"
+            const val core = "androidx.test:core:${Version.androidXTestCore}"
 
             const val robolectric = "org.robolectric:robolectric:${Version.robolectric}"
 
@@ -153,15 +153,16 @@ object Dependency {
 
         // AndroidTest
         object AndroidTest {
-            const val core = "androidx.test:core:${Version.androidTestCore}"
-            const val runner = "androidx.test:runner:${Version.androidTest}"
-            const val rules = "androidx.test:rules:${Version.androidTest}"
+            const val core = "androidx.test:core:${Version.androidXTestCore}"
+            const val runner = "androidx.test:runner:${Version.androidXTest}"
+            const val rules = "androidx.test:rules:${Version.androidXTest}"
+            const val orchestrator = "androidx.test:orchestrator:${Version.androidXTest}"
 
-            const val orchestrator = "androidx.test:orchestrator:${Version.androidTest}"
+            const val extJUnit = "androidx.test.ext:junit:${Version.androidXTestExtJUnit}"
 
-            const val espressoCore = "androidx.test.espresso:espresso-core:${Version.androidTestEspresso}"
-            const val espressoIntents = "androidx.test.espresso:espresso-intents:${Version.androidTestEspresso}"
-            const val espressoWeb = "androidx.test.espresso:espresso-web:${Version.androidTestEspresso}"
+            const val espressoCore = "androidx.test.espresso:espresso-core:${Version.androidXEspresso}"
+            const val espressoIntents = "androidx.test.espresso:espresso-intents:${Version.androidXEspresso}"
+            const val espressoWeb = "androidx.test.espresso:espresso-web:${Version.androidXEspresso}"
 
             const val uiAutomator = "androidx.test.uiautomator:uiautomator:${Version.androidXUiAutomator}"
 

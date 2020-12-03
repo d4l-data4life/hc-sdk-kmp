@@ -62,7 +62,7 @@ open class BaseTestLogin {
             loginLogoutPage = HomePage()
                     .isVisible()
                     .openLoginPage()
-                    .doLogin(user.email, user.password)
+                    .doLogin(user)
                     .isVisible()
         }
 

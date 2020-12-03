@@ -122,6 +122,13 @@ object Version {
      */
     const val moshi = "1.8.0"
 
+    /**
+     *
+     *[gson](https://github.com/square/retrofit/tree/master/retrofit-converters/gson)
+     */
+    const val gson = "2.9.0"
+
+
     // Date
 
     /**

@@ -41,7 +41,6 @@ import care.data4life.sdk.model.DownloadResult
 import care.data4life.sdk.model.Record
 import org.junit.Assert.assertTrue
 import org.junit.FixMethodOrder
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters

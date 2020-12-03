@@ -131,6 +131,8 @@ object Dependency {
         const val retrofit = "com.squareup.retrofit2:retrofit:${Version.retrofit}"
         const val retrofitConverterMoshi = "com.squareup.retrofit2:converter-moshi:${Version.retrofit}"
         const val retrofitAdapterRxJava = "com.squareup.retrofit2:adapter-rxjava2:${Version.retrofit}"
+        const val gson = "com.squareup.retrofit2:converter-gson:${Version.gson}"
+
 
 
         // Test

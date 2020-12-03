@@ -88,7 +88,7 @@ android {
         }
 
         // TODO enable when test orchestrator is fixed, broken 1.1.1
-        // if enabled no tests are found
+        // if enabled no tests are found and executed
         // execution = "ANDROID_TEST_ORCHESTRATOR"
     }
 }
@@ -133,6 +133,11 @@ dependencies {
 
     androidTestImplementation(Dependency.Android.AndroidTest.uiAutomator)
     androidTestImplementation(Dependency.Android.AndroidTest.kakao)
+
+    androidTestImplementation(Dependency.Android.okHttp)
+    androidTestImplementation(Dependency.Android.okHttpLoggingInterceptor)
+    androidTestImplementation(Dependency.Android.retrofit)
+    androidTestImplementation(Dependency.Android.gson)
 
     androidTestImplementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")

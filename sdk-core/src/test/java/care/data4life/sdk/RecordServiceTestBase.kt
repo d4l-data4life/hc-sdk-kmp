@@ -30,6 +30,8 @@ import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import io.mockk.every
 import io.mockk.mockkStatic
+import io.mockk.unmockkAll
+import io.reactivex.Single
 import org.mockito.ArgumentMatchers
 import org.mockito.InOrder
 import org.mockito.Mockito
@@ -47,8 +49,9 @@ abstract class RecordServiceTestBase {
     internal lateinit var mockFhirService: FhirService
     internal lateinit var mockAttachmentService: AttachmentService
     internal lateinit var mockCryptoService: CryptoService
-    internal lateinit var mockErrorHandler: D4LErrorHandler
+    private lateinit var mockErrorHandler: D4LErrorHandler
     internal lateinit var mockCarePlan: CarePlan
+    internal lateinit var mockAppData: ByteArray
     internal lateinit var mockDocumentReference: DocumentReference
     internal lateinit var mockTags: HashMap<String, String>
     internal lateinit var mockUploadData: HashMap<Attachment, String>
@@ -61,10 +64,11 @@ abstract class RecordServiceTestBase {
     internal lateinit var mockEncryptedAttachmentKey: EncryptedKey
     internal lateinit var mockEncryptedRecord: EncryptedRecord
     internal lateinit var mockAnnotatedEncryptedRecord: EncryptedRecord
+    internal lateinit var mockAnnotatedDecryptedAppDataRecord: DecryptedAppDataRecord
     internal lateinit var mockDecryptedRecord: DecryptedRecord<DomainResource>
     internal lateinit var mockAnnotatedDecryptedRecord: DecryptedRecord<DomainResource>
     internal lateinit var mockMeta: Meta
-    internal lateinit var mockD4LException: D4LException
+    private lateinit var mockD4LException: D4LException
     internal lateinit var mockRecord: Record<CarePlan>
     internal lateinit var inOrder: InOrder
     internal lateinit var decryptedRecordIndicator: DecryptedRecord<DomainResource>
@@ -93,6 +97,7 @@ abstract class RecordServiceTestBase {
                 )
         )
         mockCarePlan = Mockito.mock(CarePlan::class.java)
+        mockAppData = ByteArray(23)
         mockDocumentReference = Mockito.mock(DocumentReference::class.java)
         mockTags = Mockito.mock<HashMap<*, *>>(HashMap::class.java) as HashMap<String, String>
         mockUploadData = Mockito.mock<HashMap<*, *>>(HashMap::class.java) as HashMap<Attachment, String>
@@ -107,6 +112,7 @@ abstract class RecordServiceTestBase {
         mockAnnotatedEncryptedRecord = Mockito.mock(EncryptedRecord::class.java)
         mockDecryptedRecord = Mockito.mock(DecryptedRecord::class.java) as DecryptedRecord<DomainResource>
         mockAnnotatedDecryptedRecord = Mockito.mock(DecryptedRecord::class.java) as DecryptedRecord<DomainResource>
+        mockAnnotatedDecryptedAppDataRecord = Mockito.mock(DecryptedAppDataRecord::class.java)
         mockMeta = Mockito.mock(Meta::class.java)
         mockD4LException = Mockito.mock(D4LException::class.java)
         mockRecord = Mockito.mock<Record<*>>(Record::class.java) as Record<CarePlan>
@@ -124,6 +130,12 @@ abstract class RecordServiceTestBase {
         Mockito.`when`(mockAnnotatedDecryptedRecord.resource).thenReturn(mockCarePlan)
         Mockito.`when`(mockAnnotatedDecryptedRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
         Mockito.`when`(mockAnnotatedDecryptedRecord.annotations).thenReturn(ANNOTATIONS)
+
+        Mockito.`when`<HashMap<*, *>?>(mockAnnotatedDecryptedAppDataRecord.tags).thenReturn(mockTags)
+        Mockito.`when`(mockAnnotatedDecryptedAppDataRecord.dataKey).thenReturn(mockDataKey)
+        Mockito.`when`(mockAnnotatedDecryptedAppDataRecord.appData).thenReturn(mockAppData)
+        Mockito.`when`(mockAnnotatedDecryptedAppDataRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
+        Mockito.`when`(mockAnnotatedDecryptedAppDataRecord.annotations).thenReturn(ANNOTATIONS)
 
         Mockito.`when`(mockTags[RESOURCE_TYPE]).thenReturn(CarePlan.resourceType)
 
@@ -181,10 +193,15 @@ abstract class RecordServiceTestBase {
         every { LocalDate.now(any() as Clock) } returns LOCAL_DATE
     }
 
+    fun stop() {
+        unmockkAll()
+    }
+
     companion object {
         internal const val PARTNER_ID = "partnerId"
         internal const val USER_ID = "userId"
         internal const val ENCRYPTED_RESOURCE = "encryptedResource"
+        internal val ENCRYPTED_APPDATA = Single.just(ByteArray(42))
         internal const val RESOURCE_TYPE = "resourcetype"
         internal const val RECORD_ID = "recordId"
         internal const val ALIAS = "alias"

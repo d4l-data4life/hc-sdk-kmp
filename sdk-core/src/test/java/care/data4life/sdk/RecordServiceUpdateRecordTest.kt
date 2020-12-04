@@ -24,6 +24,7 @@ import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.util.MimeType
 import com.google.common.truth.Truth
 import io.reactivex.Single
+import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -35,6 +36,11 @@ class RecordServiceUpdateRecordTest: RecordServiceTestBase() {
     @Before
     fun setUp() {
         init()
+    }
+
+    @After
+    fun tearDown() {
+        stop()
     }
 
     @Test

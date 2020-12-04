@@ -19,6 +19,7 @@ package care.data4life.sdk
 import care.data4life.fhir.stu3.model.CarePlan
 import com.google.common.truth.Truth
 import io.reactivex.Single
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers
@@ -29,6 +30,11 @@ class RecordServiceCountRecordsTest: RecordServiceTestBase() {
     @Before
     fun setup() {
         init()
+    }
+
+    @After
+    fun tearDown() {
+        stop()
     }
 
     @Test

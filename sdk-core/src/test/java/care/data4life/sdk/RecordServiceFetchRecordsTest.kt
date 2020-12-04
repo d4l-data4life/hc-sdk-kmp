@@ -22,6 +22,7 @@ import care.data4life.sdk.lang.DataValidationException
 import com.google.common.truth.Truth
 import io.reactivex.Observable
 import io.reactivex.Single
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers
@@ -34,6 +35,11 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
     fun setUp() {
         init()
         Mockito.reset(recordService)
+    }
+
+    @After
+    fun tearDown() {
+        stop()
     }
 
     @Test

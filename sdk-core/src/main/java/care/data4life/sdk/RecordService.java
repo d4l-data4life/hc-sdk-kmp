@@ -57,6 +57,7 @@ import care.data4life.sdk.model.Record;
 import care.data4life.sdk.model.UpdateResult;
 import care.data4life.sdk.network.model.CommonKeyResponse;
 import care.data4life.sdk.network.model.DecryptedRecord;
+import care.data4life.sdk.network.model.DecryptedRecordBase;
 import care.data4life.sdk.network.model.EncryptedKey;
 import care.data4life.sdk.network.model.EncryptedRecord;
 import care.data4life.sdk.model.EmptyRecord;
@@ -87,6 +88,24 @@ class RecordService {
     enum RemoveRestoreOperation {
         REMOVE,
         RESTORE
+    }
+
+    private interface GetEncryptedResource {
+        String run();
+    }
+
+    private interface GetEncryptedAttachment {
+        @Nullable
+        EncryptedKey run(GCKey commonKey);
+    }
+
+    private interface DecryptSource<T> {
+        T run(
+                HashMap<String, String>tags,
+                List<String> annotations,
+                GCKey dataKey,
+                GCKey commonKey
+        );
     }
 
     private static final String DATE_FORMAT = "yyyy-MM-dd";
@@ -460,14 +479,16 @@ class RecordService {
     }
 
     //region utility methods
-    <T extends DomainResource> EncryptedRecord encryptRecord(DecryptedRecord<T> record) throws IOException {
-        T resource = record.getResource();
-
+    private EncryptedRecord encrypt(
+            DecryptedRecordBase record,
+            GetEncryptedResource getEncryptedResource,
+            GetEncryptedAttachment getEncryptedAttachment
+    ) throws IOException {
         List<String> encryptedTags = tagEncryptionService.encryptTags(record.getTags());
         List<String> encryptedAnnotations = tagEncryptionService.encryptAnnotations(record.getAnnotations());
         encryptedTags.addAll(encryptedAnnotations);
 
-        String encryptedResource = fhirService.encryptResource(record.getDataKey(), resource);
+        String encryptedResource = getEncryptedResource.run();
 
         GCKey commonKey = cryptoService.fetchCurrentCommonKey();
         String currentCommonKeyId = cryptoService.getCurrentCommonKeyId();
@@ -478,14 +499,7 @@ class RecordService {
                 record.getDataKey()
         ).blockingGet();
 
-        EncryptedKey encryptedAttachmentsKey = null;
-        if (record.getAttachmentsKey() != null) {
-            encryptedAttachmentsKey = cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.ATTACHMENT_KEY,
-                    record.getAttachmentsKey()
-            ).blockingGet();
-        }
+        EncryptedKey encryptedAttachmentsKey = getEncryptedAttachment.run(commonKey);
 
         return new EncryptedRecord(
                 currentCommonKeyId,
@@ -498,15 +512,36 @@ class RecordService {
                 record.getModelVersion());
     }
 
-    <T extends DomainResource> DecryptedRecord<T> decryptRecord(EncryptedRecord r, String userId)
-            throws IOException, DataValidationException.ModelVersionNotSupported {
-        if (!ModelVersion.isModelVersionSupported(r.getModelVersion())) {
+    <T extends DomainResource> EncryptedRecord encryptRecord(DecryptedRecord<T> record) throws IOException {
+        return encrypt(
+                record,
+                () -> fhirService.encryptResource(record.getDataKey(), record.getResource()),
+                (commonKey) -> {
+                    if (record.getAttachmentsKey() == null) {
+                        return null;
+                    } else {
+                        return cryptoService.encryptSymmetricKey(
+                                commonKey,
+                                KeyType.ATTACHMENT_KEY,
+                                record.getAttachmentsKey()
+                        ).blockingGet();
+                    }
+                }
+        );
+    }
+
+    private <T> T decrypt(
+            EncryptedRecord record,
+            String userId,
+            DecryptSource<T> decryptSource
+    ) throws IOException, DataValidationException.ModelVersionNotSupported {
+        if (!ModelVersion.isModelVersionSupported(record.getModelVersion())) {
             throw new DataValidationException.ModelVersionNotSupported("Please update SDK to latest version!");
         }
-        HashMap<String, String> tags = tagEncryptionService.decryptTags(r.getEncryptedTags());
-        List<String> annotations = tagEncryptionService.decryptAnnotations(r.getEncryptedTags());
+        HashMap<String, String> tags = tagEncryptionService.decryptTags(record.getEncryptedTags());
+        List<String> annotations = tagEncryptionService.decryptAnnotations(record.getEncryptedTags());
 
-        String commonKeyId = r.getCommonKeyId();
+        String commonKeyId = record.getCommonKeyId();
 
         boolean commonKeyStored = cryptoService.hasCommonKey(commonKeyId);
         GCKey commonKey;
@@ -525,30 +560,87 @@ class RecordService {
             cryptoService.storeCommonKey(commonKeyId, commonKey);
         }
 
-        GCKey dataKey = cryptoService.symDecryptSymmetricKey(commonKey, r.getEncryptedDataKey()).blockingGet();
-        GCKey attachmentsKey = null;
-        if (r.getEncryptedAttachmentsKey() != null) {
-            attachmentsKey = cryptoService.symDecryptSymmetricKey(
-                    commonKey,
-                    r.getEncryptedAttachmentsKey()
-            ).blockingGet();
-        }
+        GCKey dataKey = cryptoService.symDecryptSymmetricKey(commonKey, record.getEncryptedDataKey()).blockingGet();
 
-        T resource = null;
-        if (r.getEncryptedBody() != null && !r.getEncryptedBody().isEmpty()) {
-            resource = fhirService.decryptResource(dataKey, tags.get(TAG_RESOURCE_TYPE), r.getEncryptedBody());
-        }
-
-        return new DecryptedRecord<>(
-                r.getIdentifier(),
-                resource,
+        return decryptSource.run(
                 tags,
                 annotations,
-                r.getCustomCreationDate(),
-                r.getUpdatedDate(),
                 dataKey,
-                attachmentsKey,
-                r.getModelVersion()
+                commonKey
+        );
+    }
+
+    <T extends DomainResource> DecryptedRecord<T> decryptRecord(EncryptedRecord record, String userId)
+            throws IOException, DataValidationException.ModelVersionNotSupported {
+
+        return decrypt(
+                record,
+                userId,
+                (HashMap<String, String>tags, List<String> annotations, GCKey dataKey, GCKey commonKey ) -> {
+                    GCKey attachmentsKey = null;
+                    if (record.getEncryptedAttachmentsKey() != null) {
+                        attachmentsKey = cryptoService.symDecryptSymmetricKey(
+                                commonKey,
+                                record.getEncryptedAttachmentsKey()
+                        ).blockingGet();
+                    }
+
+                    T resource = null;
+                    if (record.getEncryptedBody() != null && !record.getEncryptedBody().isEmpty()) {
+                        resource = fhirService.decryptResource(
+                                dataKey,
+                                tags.get(TAG_RESOURCE_TYPE),
+                                record.getEncryptedBody()
+                        );
+                    }
+
+                    return new DecryptedRecord<>(
+                            record.getIdentifier(),
+                            resource,
+                            tags,
+                            annotations,
+                            record.getCustomCreationDate(),
+                            record.getUpdatedDate(),
+                            dataKey,
+                            attachmentsKey,
+                            record.getModelVersion()
+                    );
+                }
+        );
+    }
+
+    EncryptedRecord encryptAppDataRecord(DecryptedAppDataRecord record) throws IOException {
+        return encrypt(
+                record,
+                () -> Base64.INSTANCE.encodeToString(
+                        cryptoService.encrypt(record.getDataKey(), record.getAppData()).blockingGet()
+                ),
+                (i) -> null
+        );
+    }
+
+    DecryptedAppDataRecord decryptAppDataRecord(EncryptedRecord record, String userId)
+            throws IOException, DataValidationException.ModelVersionNotSupported {
+        return decrypt(
+                record,
+                userId,
+                (HashMap<String, String>tags, List<String> annotations, GCKey dataKey, GCKey commonKey ) -> {
+                    byte [] resource = Base64.INSTANCE.decode(record.getEncryptedBody());
+                    if (record.getEncryptedBody() != null && !record.getEncryptedBody().isEmpty()) {
+                        resource = cryptoService.decrypt(dataKey, resource).blockingGet();
+                    }
+
+                    return new DecryptedAppDataRecord(
+                            record.getIdentifier(),
+                            resource,
+                            tags,
+                            annotations,
+                            record.getCustomCreationDate(),
+                            record.getUpdatedDate(),
+                            dataKey,
+                            record.getModelVersion()
+                    );
+                }
         );
     }
 

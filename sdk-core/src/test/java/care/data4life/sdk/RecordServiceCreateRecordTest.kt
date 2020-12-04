@@ -29,6 +29,7 @@ import java.util.*
 
 import com.google.common.truth.Truth
 import io.reactivex.Single
+import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -39,6 +40,11 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
     @Before
     fun setup() {
         init()
+    }
+
+    @After
+    fun tearDown() {
+        stop()
     }
 
     @Test

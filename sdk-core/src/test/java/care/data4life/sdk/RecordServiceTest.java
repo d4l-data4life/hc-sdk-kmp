@@ -229,6 +229,7 @@ public class RecordServiceTest extends RecordServiceTestBase {
                 null,
                 document,
                 null,
+                new ArrayList<>(),
                 null,
                 null,
                 null,
@@ -257,6 +258,7 @@ public class RecordServiceTest extends RecordServiceTestBase {
                 null,
                 null,
                 null,
+                new ArrayList<>(),
                 null,
                 null,
                 null,
@@ -349,7 +351,17 @@ public class RecordServiceTest extends RecordServiceTestBase {
         // Given
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
         DocumentReference document = buildDocumentReference();
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(null, document, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                null,
+                document,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
         decryptedRecord.setIdentifier(RECORD_ID);
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
         List<Pair<Attachment, List<String>>> uploadResult = new ArrayList<>();
@@ -379,7 +391,17 @@ public class RecordServiceTest extends RecordServiceTestBase {
         // Given
         DocumentReference document = buildDocumentReference();
         document.content.get(0).attachment.id = "unexpectedId";
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(null, document, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                null,
+                document,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
         decryptedRecord.setIdentifier(RECORD_ID);
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
 
@@ -405,7 +427,17 @@ public class RecordServiceTest extends RecordServiceTestBase {
         DocumentReference document = buildDocumentReference();
         document.content.get(0).attachment.id = null;
         document.content.get(0).attachment.hash = "hash";
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(RECORD_ID, document, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                document,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
         decryptedRecord.setIdentifier(RECORD_ID);
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
 
@@ -431,7 +463,17 @@ public class RecordServiceTest extends RecordServiceTestBase {
         // Given
         DocumentReference document = buildDocumentReference();
         document.content.get(0).attachment.id = "id";
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(RECORD_ID, document, null, null, null, null, mockAttachmentKey, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                document,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        );
         when(mockAttachmentService.downloadAttachments(any(), eq(mockAttachmentKey), eq(USER_ID))).thenReturn(Single.just(new ArrayList<>()));
 
         // When
@@ -450,7 +492,17 @@ public class RecordServiceTest extends RecordServiceTestBase {
         // Given
         DocumentReference document = buildDocumentReference();
         document.content.get(0).attachment.id = null;
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(RECORD_ID, document, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                document,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
 
         // When
         try {
@@ -471,7 +523,17 @@ public class RecordServiceTest extends RecordServiceTestBase {
     public void uploadOrDownloadData_shouldThrow_whenAttachmentHashOrSizeNotPresent() throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
         // Given
         DocumentReference document = buildDocumentReference();
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(RECORD_ID, document, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                document,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
 
         // When
         try {
@@ -506,7 +568,17 @@ public class RecordServiceTest extends RecordServiceTestBase {
     public void uploadOrDownloadData_shouldThrow_whenInvalidHashAttachmentDuringUpdateFlow() throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
         // Given
         DocumentReference document = buildDocumentReference();
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(RECORD_ID, document, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                document,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
 
         // When
         try {
@@ -541,7 +613,17 @@ public class RecordServiceTest extends RecordServiceTestBase {
         updatedAttachment.size = 0;
         updatedAttachment.hash = "hash";
 
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(RECORD_ID, oldDocument, null, null, null, null, mockAttachmentKey, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                oldDocument,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        );
         List<Pair<Attachment, List<String>>> uploadResult = new ArrayList<>();
         List<String> downscaledIds = new ArrayList<>();
         downscaledIds.add("downscaledId_1");
@@ -582,7 +664,17 @@ public class RecordServiceTest extends RecordServiceTestBase {
         updatedAttachment.size = 0;
         updatedAttachment.hash = "newHash";
 
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(RECORD_ID, oldDocument, null, null, null, null, mockAttachmentKey, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                oldDocument,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        );
         List<Pair<Attachment, List<String>>> uploadResult = new ArrayList<>();
         List<String> downscaledIds = new ArrayList<>();
         downscaledIds.add("downscaledId_1");
@@ -624,7 +716,17 @@ public class RecordServiceTest extends RecordServiceTestBase {
         updatedAttachment.hash = "hash";
 
         when(recordService.getValidHash(updatedDocument.content.get(0).attachment)).thenReturn("hash");
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(RECORD_ID, oldDocument, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                oldDocument,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
 
         // When
         try {
@@ -658,7 +760,17 @@ public class RecordServiceTest extends RecordServiceTestBase {
         updatedAttachment.hash = "hash";
 
         when(recordService.getValidHash(updatedDocument.content.get(0).attachment)).thenReturn("hash");
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(RECORD_ID, oldDocument, null, null, null, null, mockAttachmentKey, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                oldDocument,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        );
 
         // When
         recordService.uploadOrDownloadData(UPDATE, decryptedRecord, updatedDocument, USER_ID);
@@ -684,7 +796,17 @@ public class RecordServiceTest extends RecordServiceTestBase {
         uploadResult.add(new Pair<>(firstAttachment, asList(PREVIEW_ID, THUMBNAIL_ID)));
         uploadResult.add(new Pair<>(secondAttachment, null));
 
-        DecryptedRecord<DocumentReference> dummyDecryptedRecord = new DecryptedRecord<>(RECORD_ID, docRef, null, null, null, null, null, -1);
+        DecryptedRecord<DocumentReference> dummyDecryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                docRef,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
         when(recordService.getValidHash(secondAttachment)).thenReturn(DATA_HASH);
         when(recordService.getValidHash(firstAttachment)).thenReturn(DATA_HASH);
@@ -1125,7 +1247,17 @@ public class RecordServiceTest extends RecordServiceTestBase {
         DocumentReference document = buildDocumentReference();
         Attachment attachment = AttachmentBuilder.buildAttachment(ATTACHMENT_ID);
         document.content.get(0).attachment = attachment;
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(RECORD_ID, document, null, null, null, null, mockAttachmentKey, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                document,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        );
         doReturn(decryptedRecord).when(recordService).decryptRecord(mockEncryptedRecord, USER_ID);
         ArrayList<Attachment> attachments = new ArrayList<>();
         attachments.add(attachment);
@@ -1154,7 +1286,17 @@ public class RecordServiceTest extends RecordServiceTestBase {
         Attachment secondAttachment = AttachmentBuilder.buildAttachment(secondAttachmentId);
         document.content.get(0).attachment = attachment;
         document.content = asList(document.content.get(0), new DocumentReference.DocumentReferenceContent(secondAttachment));
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(RECORD_ID, document, null, null, null, null, mockAttachmentKey, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                document,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        );
         doReturn(decryptedRecord).when(recordService).decryptRecord(mockEncryptedRecord, USER_ID);
         ArrayList<Attachment> attachments = new ArrayList<>();
         attachments.add(attachment);
@@ -1183,7 +1325,17 @@ public class RecordServiceTest extends RecordServiceTestBase {
         DocumentReference document = buildDocumentReference();
         document.content.get(0).attachment.id = ATTACHMENT_ID;
 
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(RECORD_ID, document, null, null, null, null, mockAttachmentKey, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                document,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        );
         doReturn(decryptedRecord).when(recordService).decryptRecord(mockEncryptedRecord, USER_ID);
         List<String> attachmentIds = asList(ATTACHMENT_ID, "invalidAttachmentId");
 

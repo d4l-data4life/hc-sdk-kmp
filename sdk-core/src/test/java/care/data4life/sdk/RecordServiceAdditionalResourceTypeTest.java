@@ -421,7 +421,17 @@ public class RecordServiceAdditionalResourceTypeTest {
     public void removeOrRestoreUploadData_shouldRemoveUploadData_fromPatient() {
         // Given
         Patient patient = PatientBuilder.buildPatient();
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(null, patient, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                null,
+                patient,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
 
         // When
         DecryptedRecord record = recordService.removeOrRestoreUploadData(REMOVE, decryptedRecord, patient, null);
@@ -439,7 +449,17 @@ public class RecordServiceAdditionalResourceTypeTest {
     public void removeOrRestoreUploadData_shouldRemoveUploadData_fromObservation() {
         // Given
         Observation observation = ObservationBuilder.buildObservationWithComponent();
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(null, observation, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                null,
+                observation,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
 
         // When
         DecryptedRecord record = recordService.removeOrRestoreUploadData(REMOVE, decryptedRecord, observation, null);
@@ -458,7 +478,17 @@ public class RecordServiceAdditionalResourceTypeTest {
     public void removeOrRestoreUploadData_shouldRemoveUploadData_fromQuestionnaireResponse() {
         // Given
         QuestionnaireResponse questionnaireResponse = QuestionnaireResponseBuilder.buildQuestionnaireResponse();
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(null, questionnaireResponse, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                null,
+                questionnaireResponse,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
 
         // When
         DecryptedRecord record = recordService.removeOrRestoreUploadData(REMOVE, decryptedRecord, questionnaireResponse, null);
@@ -478,7 +508,17 @@ public class RecordServiceAdditionalResourceTypeTest {
         // Given
         Patient patient = PatientBuilder.buildPatient();
         patient.photo.get(0).data = null;
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(null, null, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                null,
+                null,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
         HashMap<Attachment, String> uploadData = new HashMap<>();
         uploadData.put(patient.photo.get(0), DATA);
 
@@ -499,7 +539,17 @@ public class RecordServiceAdditionalResourceTypeTest {
         // Given
         Observation observation = ObservationBuilder.buildObservationWithComponent();
         observation.component.get(0).valueAttachment.data = null;
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(null, null, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                null,
+                null,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
         HashMap<Attachment, String> uploadData = new HashMap<>();
         uploadData.put(observation.component.get(0).valueAttachment, DATA);
 
@@ -520,7 +570,16 @@ public class RecordServiceAdditionalResourceTypeTest {
         // Given
         QuestionnaireResponse questionnaireResponse = QuestionnaireResponseBuilder.buildQuestionnaireResponse();
         questionnaireResponse.item.get(0).answer.get(0).valueAttachment.data = null;
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(null, null, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                null,
+                null,
+                null,
+                new ArrayList<>(),null,
+                null,
+                null,
+                null,
+                -1
+        );
         HashMap<Attachment, String> uploadData = new HashMap<>();
         uploadData.put(questionnaireResponse.item.get(0).answer.get(0).valueAttachment, DATA);
 
@@ -541,7 +600,17 @@ public class RecordServiceAdditionalResourceTypeTest {
         // Given
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
         Patient patient = PatientBuilder.buildPatient();
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(null, patient, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                null,
+                patient,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
         decryptedRecord.setIdentifier(RECORD_ID);
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
         List<Pair<Attachment, List<String>>> uploadResult = new ArrayList<>();
@@ -570,7 +639,17 @@ public class RecordServiceAdditionalResourceTypeTest {
         // Given
         Patient patient = PatientBuilder.buildPatient();
         patient.photo.get(0).id = "id";
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(RECORD_ID, patient, null, null, null, null, mockAttachmentKey, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                patient,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        );
         when(mockAttachmentService.downloadAttachments(any(), eq(mockAttachmentKey), eq(USER_ID))).thenReturn(Single.just(new ArrayList<>()));
 
         // When
@@ -589,7 +668,17 @@ public class RecordServiceAdditionalResourceTypeTest {
         // Given
         Medication medication = MedicationBuilder.buildMedication();
         medication.image.get(0).id = "id";
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(RECORD_ID, medication, null, null, null, null, mockAttachmentKey, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                medication,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        );
         when(mockAttachmentService.downloadAttachments(any(), eq(mockAttachmentKey), eq(USER_ID))).thenReturn(Single.just(new ArrayList<>()));
 
         // When
@@ -608,7 +697,17 @@ public class RecordServiceAdditionalResourceTypeTest {
         // Given
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
         Medication medication = MedicationBuilder.buildMedication();
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(null, medication, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                null,
+                medication,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
         decryptedRecord.setIdentifier(RECORD_ID);
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
         List<Pair<Attachment, List<String>>> uploadResult = new ArrayList<>();
@@ -635,7 +734,17 @@ public class RecordServiceAdditionalResourceTypeTest {
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
         Observation observation = ObservationBuilder.buildObservationWithComponent();
         observation.component.get(0).valueAttachment.id = null;
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(null, observation, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                null,
+                observation,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
         decryptedRecord.setIdentifier(RECORD_ID);
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
         when(recordService.getValidHash(observation.valueAttachment)).thenReturn(DATA_HASH);
@@ -667,7 +776,17 @@ public class RecordServiceAdditionalResourceTypeTest {
         Observation observation = ObservationBuilder.buildObservationWithComponent();
         observation.component.get(0).valueAttachment.id = "id1";
         observation.valueAttachment.id = "id0";
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(RECORD_ID, observation, null, null, null, null, mockAttachmentKey, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                observation,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        );
         when(mockAttachmentService.downloadAttachments(any(), eq(mockAttachmentKey), eq(USER_ID))).thenReturn(Single.just(new ArrayList<>()));
 
         // When
@@ -686,7 +805,17 @@ public class RecordServiceAdditionalResourceTypeTest {
         // Given
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
         QuestionnaireResponse questionnaireResponse = QuestionnaireResponseBuilder.buildQuestionnaireResponse();
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(null, questionnaireResponse, null, null, null, null, null, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                null,
+                questionnaireResponse,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
         decryptedRecord.setIdentifier(RECORD_ID);
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
         List<Pair<Attachment, List<String>>> uploadResult = new ArrayList<>();
@@ -715,7 +844,17 @@ public class RecordServiceAdditionalResourceTypeTest {
         // Given
         QuestionnaireResponse questionnaireResponse = QuestionnaireResponseBuilder.buildQuestionnaireResponse();
         questionnaireResponse.item.get(0).answer.get(0).valueAttachment.id = "id";
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(RECORD_ID, questionnaireResponse, null, null, null, null, mockAttachmentKey, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                questionnaireResponse,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        );
         when(mockAttachmentService.downloadAttachments(any(), eq(mockAttachmentKey), eq(USER_ID))).thenReturn(Single.just(new ArrayList<>()));
 
         // When
@@ -745,7 +884,17 @@ public class RecordServiceAdditionalResourceTypeTest {
         uploadResult.add(new Pair<>(firstAttachment, asList(PREVIEW_ID, THUMBNAIL_ID)));
         uploadResult.add(new Pair<>(secondAttachment, null));
 
-        DecryptedRecord<Patient> dummyDecryptedRecord = new DecryptedRecord<>(RECORD_ID, patient, null, null, null, null, null, -1);
+        DecryptedRecord<Patient> dummyDecryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                patient,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
         when(recordService.getValidHash(patient.photo.get(0))).thenReturn(DATA_HASH);
         when(recordService.getValidHash(secondAttachment)).thenReturn(DATA_HASH);
@@ -780,7 +929,17 @@ public class RecordServiceAdditionalResourceTypeTest {
         uploadResult.add(new Pair<>(firstAttachment, asList(PREVIEW_ID, THUMBNAIL_ID)));
         uploadResult.add(new Pair<>(secondAttachment, null));
 
-        DecryptedRecord<Medication> dummyDecryptedRecord = new DecryptedRecord<>(RECORD_ID, medication, null, null, null, null, null, -1);
+        DecryptedRecord<Medication> dummyDecryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                medication,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
         when(recordService.getValidHash(firstAttachment)).thenReturn(DATA_HASH);
         when(recordService.getValidHash(secondAttachment)).thenReturn(DATA_HASH);
@@ -819,7 +978,17 @@ public class RecordServiceAdditionalResourceTypeTest {
         uploadResult.add(new Pair<>(secondAttachment, null));
         uploadResult.add(new Pair<>(attachment, null));
 
-        DecryptedRecord<Observation> dummyDecryptedRecord = new DecryptedRecord<>(RECORD_ID, observation, null, null, null, null, null, -1);
+        DecryptedRecord<Observation> dummyDecryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                observation,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
         when(recordService.getValidHash(firstAttachment)).thenReturn(DATA_HASH);
         when(recordService.getValidHash(secondAttachment)).thenReturn(DATA_HASH);
@@ -858,7 +1027,17 @@ public class RecordServiceAdditionalResourceTypeTest {
         uploadResult.add(new Pair<>(firstAttachment, asList(PREVIEW_ID, THUMBNAIL_ID)));
         uploadResult.add(new Pair<>(secondAttachment, null));
 
-        DecryptedRecord<QuestionnaireResponse> dummyDecryptedRecord = new DecryptedRecord<>(RECORD_ID, questionnaireResponse, null, null, null, null, null, -1);
+        DecryptedRecord<QuestionnaireResponse> dummyDecryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                questionnaireResponse,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
         when(recordService.getValidHash(firstAttachment)).thenReturn(DATA_HASH);
         when(recordService.getValidHash(secondAttachment)).thenReturn(DATA_HASH);
@@ -1027,7 +1206,17 @@ public class RecordServiceAdditionalResourceTypeTest {
         Attachment secondAttachment = AttachmentBuilder.buildAttachment(secondAttachmentId);
         medication.image.set(0, attachment);
         medication.image.add(secondAttachment);
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(RECORD_ID, medication, null, null, null, null, mockAttachmentKey, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                medication,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        );
         doReturn(decryptedRecord).when(recordService).decryptRecord(mockEncryptedRecord, USER_ID);
         ArrayList<Attachment> attachments = new ArrayList<>();
         attachments.add(attachment);
@@ -1059,7 +1248,17 @@ public class RecordServiceAdditionalResourceTypeTest {
         Attachment secondAttachment = AttachmentBuilder.buildAttachment(secondAttachmentId);
         patient.photo.set(0, attachment);
         patient.photo.add(secondAttachment);
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(RECORD_ID, patient, null, null, null, null, mockAttachmentKey, -1);
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                patient,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        );
         doReturn(decryptedRecord).when(recordService).decryptRecord(mockEncryptedRecord, USER_ID);
         ArrayList<Attachment> attachments = new ArrayList<>();
         attachments.add(attachment);

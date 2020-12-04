@@ -30,25 +30,4 @@ data class DecryptedRecord<T : DomainResource>(
         override var dataKey: GCKey?,
         var attachmentsKey: GCKey?,
         override var modelVersion: Int?
-): DecryptedRecordBase, Serializable {
-    constructor(
-            identifier: String?,
-            resource: T?,
-            tags: HashMap<String, String>?,
-            customCreationDate: String?,
-            updatedDate: String?,
-            dataKey: GCKey?,
-            attachmentsKey: GCKey?,
-            modelVersion: Int
-    ): this(
-            identifier,
-            resource,
-            tags,
-            listOf(),
-            customCreationDate,
-            updatedDate,
-            dataKey,
-            attachmentsKey,
-            modelVersion
-    )
-}
+): DecryptedRecordBase, Serializable

@@ -16,6 +16,7 @@
 
 package care.data4life.sdk;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -77,102 +78,19 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 
-public class RecordServiceAdditionalResourceTypeTest {
-    private static final String PARTNER_ID = "partnerId";
-    private static final String USER_ID = "userId";
-    private static final String ENCRYPTED_RESOURCE = "encryptedResource";
-    private static final String RESOURCE_TYPE = "resourcetype";
-    private static final String RECORD_ID = "recordId";
-    private static final String ALIAS = "alias";
-    private static final String DATA = "data";
-    private static final String ATTACHMENT_ID = "attachmentId";
-    private static final String THUMBNAIL_ID = "thumbnailId";
-    private static final String PREVIEW_ID = "previewId";
-    private static final String ASSIGNER = "assigner";
-    private static final String ADDITIONAL_ID = DOWNSCALED_ATTACHMENT_IDS_FMT + SPLIT_CHAR + ATTACHMENT_ID + SPLIT_CHAR + PREVIEW_ID + SPLIT_CHAR + THUMBNAIL_ID;
-    private static final String DATA_HASH = "dataHash";
-
-    //SUT
-    private RecordService recordService;
-    private ApiService mockApiService;
-    private TagEncryptionService mockTagEncryptionService;
-    private TaggingService mockTaggingService;
-    private FhirService mockFhirService;
-    private AttachmentService mockAttachmentService;
-    private CryptoService mockCryptoService;
-    private D4LErrorHandler mockErrorHandler;
-
-    private CarePlan mockCarePlan;
-    private HashMap<String, String> mockTags;
-    private HashMap<Attachment, String> mockUploadData;
-    private List<String> mockEncryptedTags;
-    private GCKey mockDataKey;
-    private GCKey mockAttachmentKey;
-    private EncryptedKey mockEncryptedDataKey;
-    private EncryptedRecord mockEncryptedRecord;
-    private DecryptedRecord mockDecryptedRecord;
-    private Meta mockMeta;
-    private D4LException mockD4LException;
-    private Record<CarePlan> mockRecord;
-
-    private InOrder inOrder;
+public class RecordServiceAdditionalResourceTypeTest extends RecordServiceTestBase {
+    public RecordServiceAdditionalResourceTypeTest() {
+        super();
+    }
 
     @Before
     public void setup() {
-        mockApiService = mock(ApiService.class);
-        mockTagEncryptionService = mock(TagEncryptionService.class);
-        mockTaggingService = mock(TaggingService.class);
-        mockFhirService = mock(FhirService.class);
-        mockAttachmentService = mock(AttachmentService.class);
-        mockCryptoService = mock(CryptoService.class);
-        mockErrorHandler = mock(D4LErrorHandler.class);
-        recordService = spy(new RecordService(
-                PARTNER_ID,
-                ALIAS,
-                mockApiService,
-                mockTagEncryptionService,
-                mockTaggingService,
-                mockFhirService,
-                mockAttachmentService,
-                mockCryptoService,
-                mockErrorHandler));
+        init();
+    }
 
-        mockCarePlan = mock(CarePlan.class);
-        mockTags = mock(HashMap.class);
-        mockUploadData = mock(HashMap.class);
-        mockEncryptedTags = mock(List.class);
-        mockDataKey = mock(GCKey.class);
-        mockAttachmentKey = mock(GCKey.class);
-        mockEncryptedDataKey = mock(EncryptedKey.class);
-        mockEncryptedRecord = mock(EncryptedRecord.class);
-        mockDecryptedRecord = mock(DecryptedRecord.class);
-        mockMeta = mock(Meta.class);
-        mockD4LException = mock(D4LException.class);
-        mockRecord = mock(Record.class);
-
-        when(mockRecord.getFhirResource()).thenReturn(mockCarePlan);
-        when(mockRecord.getMeta()).thenReturn(mockMeta);
-        when(mockDecryptedRecord.getTags()).thenReturn(mockTags);
-        when(mockDecryptedRecord.getDataKey()).thenReturn(mockDataKey);
-        when(mockDecryptedRecord.getResource()).thenReturn(mockCarePlan);
-        when(mockDecryptedRecord.getModelVersion()).thenReturn(ModelVersion.CURRENT);
-        when(mockTags.get(RESOURCE_TYPE)).thenReturn(CarePlan.resourceType);
-        when(mockEncryptedRecord.getEncryptedTags()).thenReturn(mockEncryptedTags);
-        when(mockEncryptedRecord.getEncryptedDataKey()).thenReturn(mockEncryptedDataKey);
-        when(mockEncryptedRecord.getEncryptedBody()).thenReturn(ENCRYPTED_RESOURCE);
-        when(mockEncryptedRecord.getModelVersion()).thenReturn(ModelVersion.CURRENT);
-        when(mockEncryptedRecord.getIdentifier()).thenReturn(RECORD_ID);
-        when(mockErrorHandler.handleError(any(Exception.class))).thenReturn(mockD4LException);
-
-        inOrder = Mockito.inOrder(
-                mockApiService,
-                mockTagEncryptionService,
-                mockTaggingService,
-                mockFhirService,
-                mockAttachmentService,
-                mockCryptoService,
-                mockErrorHandler,
-                recordService);
+    @After
+    public void tearDown() {
+        stop();
     }
 
     @Test

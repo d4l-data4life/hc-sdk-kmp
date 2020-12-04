@@ -59,12 +59,12 @@ import care.data4life.sdk.model.Record;
 import care.data4life.sdk.model.UpdateResult;
 import care.data4life.sdk.model.definitions.DataRecord;
 import care.data4life.sdk.network.model.CommonKeyResponse;
-import care.data4life.sdk.network.model.DecryptedRecord;
 import care.data4life.sdk.network.model.DecryptedAppDataRecord;
+import care.data4life.sdk.network.model.DecryptedRecord;
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord;
+import care.data4life.sdk.network.model.definitions.DecryptedDataRecord;
 import care.data4life.sdk.network.model.EncryptedKey;
 import care.data4life.sdk.network.model.EncryptedRecord;
-import care.data4life.sdk.network.model.definitions.DecryptedDataRecord;
 import care.data4life.sdk.network.model.definitions.DecryptedFhirRecord;
 import care.data4life.sdk.util.Base64;
 import care.data4life.sdk.util.HashUtil;
@@ -81,7 +81,6 @@ import static care.data4life.sdk.RecordService.UploadDownloadOperation.UPDATE;
 import static care.data4life.sdk.RecordService.UploadDownloadOperation.UPLOAD;
 import static care.data4life.sdk.TaggingService.TAG_RESOURCE_TYPE;
 
-@SuppressWarnings("unchecked")
 class RecordService {
 
     enum UploadDownloadOperation {
@@ -135,15 +134,15 @@ class RecordService {
     private static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");
 
 
-    private String partnerId;
-    private String alias;
-    private ApiService apiService;
-    private TagEncryptionService tagEncryptionService;
-    private TaggingService taggingService;
-    private FhirService fhirService;
-    private AttachmentService attachmentService;
-    private CryptoService cryptoService;
-    private SdkContract.ErrorHandler errorHandler;
+    private final String partnerId;
+    private final String alias;
+    private final ApiService apiService;
+    private final TagEncryptionService tagEncryptionService;
+    private final TaggingService taggingService;
+    private final FhirService fhirService;
+    private final AttachmentService attachmentService;
+    private final CryptoService cryptoService;
+    private final SdkContract.ErrorHandler errorHandler;
 
     RecordService(String partnerId,
                   String alias,
@@ -257,7 +256,7 @@ class RecordService {
     <T extends DomainResource> Single<Record<T>> fetchRecord(String recordId, String userId) {
         return apiService
                 .fetchRecord(alias, userId, recordId)
-                .map((EncryptedRecord encryptedRecord) -> (DecryptedFhirRecord<T> ) decryptRecord(encryptedRecord, userId))
+                .map(encryptedRecord -> (DecryptedFhirRecord<T> ) decryptRecord(encryptedRecord, userId))
                 .map(this::assignResourceId)
                 .map(decryptedRecord -> new Record<>(decryptedRecord.getResource(), buildMeta(decryptedRecord)));
     }
@@ -287,7 +286,15 @@ class RecordService {
             Integer pageSize,
             Integer offset
     ) {
-        return fetchRecords(userId, resourceType, Collections.emptyList(), startDate, endDate, pageSize, offset);
+        return fetchRecords(
+                userId,
+                resourceType,
+                Collections.emptyList(),
+                startDate,
+                endDate,
+                pageSize,
+                offset
+        );
     }
 
     <T extends DomainResource> Single<List<Record<T>>> fetchRecords(
@@ -308,7 +315,7 @@ class RecordService {
                     offset,
                     () -> taggingService.getTagFromType(FhirElementFactory.getFhirTypeForClass(resourceType))
                 )
-                .map(encryptedRecord -> (DecryptedFhirRecord<T> ) decryptRecord(encryptedRecord, userId))
+                .map(encryptedRecord -> (DecryptedFhirRecord<T>) decryptRecord(encryptedRecord, userId))
                 .filter(
                         decryptedRecord -> resourceType.isAssignableFrom(
                                 Objects.requireNonNull(decryptedRecord.getResource())
@@ -334,14 +341,24 @@ class RecordService {
         return downloadAttachments(recordId, ids, userId, type).map(it -> it.get(0));
     }
 
-    Single<List<Attachment>> downloadAttachments(String recordId, List<String> attachmentIds, String userId, DownloadType type) {
+    Single<List<Attachment>> downloadAttachments(
+            String recordId,
+            List<String> attachmentIds,
+            String userId,
+            DownloadType type
+    ) {
         return apiService
                 .fetchRecord(alias, userId, recordId)
                 .map(encryptedRecord -> decryptRecord(encryptedRecord, userId))
                 .flatMap(decryptedRecord -> downloadAttachmentsFromStorage(attachmentIds, userId, type, decryptedRecord));
     }
 
-    private Single<? extends List<Attachment>> downloadAttachmentsFromStorage(List<String> attachmentIds, String userId, DownloadType type, DecryptedFhirRecord<DomainResource> decryptedRecord) throws DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
+    private Single<? extends List<Attachment>> downloadAttachmentsFromStorage(
+            List<String> attachmentIds,
+            String userId,
+            DownloadType type,
+            DecryptedFhirRecord<DomainResource> decryptedRecord
+    ) throws DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
         if (FhirAttachmentHelper.hasAttachment(decryptedRecord.getResource())) {
             DomainResource resource = decryptedRecord.getResource();
             List<Attachment> attachments = FhirAttachmentHelper.getAttachment(resource);
@@ -426,7 +443,7 @@ class RecordService {
                 .map(this::removeUploadData)
                 .map(this::encryptRecord)
                 .flatMap(encryptedRecord -> apiService.updateRecord(alias, userId, recordId, encryptedRecord))
-                .map(encryptedRecord -> (DecryptedFhirRecord<T>) decryptRecord(encryptedRecord, userId))
+                .map(encryptedRecord -> (DecryptedFhirRecord<T> ) decryptRecord(encryptedRecord, userId))
                 .map(decryptedRecord -> restoreUploadData(decryptedRecord, resource, data))
                 .map(this::assignResourceId)
                 .map(decryptedRecord -> new Record<>(
@@ -461,7 +478,7 @@ class RecordService {
 
         return Single
                 .fromCallable(() -> taggingService.getTagFromType(FhirElementFactory.getFhirTypeForClass(type)))
-                .map(tags -> tagEncryptionService.encryptTags(tags))
+                .map(tagEncryptionService::encryptTags)
                 .map(tags -> {
                     tags.addAll(tagEncryptionService.encryptAnnotations(annotations));
                     return tags;
@@ -579,7 +596,7 @@ class RecordService {
 
         return Observable
                 .fromCallable(getTags::run)
-                .map(tags -> tagEncryptionService.encryptTags(tags))
+                .map(tagEncryptionService::encryptTags)
                 .map(tags -> {
                     tags.addAll(tagEncryptionService.encryptAnnotations(annotations));
                     return tags;
@@ -673,7 +690,7 @@ class RecordService {
         );
     }
 
-    <T extends DomainResource> EncryptedRecord encryptRecord(DecryptedFhirRecord<T>  record) throws IOException {
+    <T extends DomainResource> EncryptedRecord encryptRecord(DecryptedFhirRecord<T> record) throws IOException {
         return encrypt(
                 record,
                 () -> fhirService.encryptResource(record.getDataKey(), record.getResource()),
@@ -799,70 +816,97 @@ class RecordService {
         return record;
     }
 
-    <T extends DomainResource> DecryptedFhirRecord<T>  uploadData(DecryptedFhirRecord<T>  record, T newResource, String userId) throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation, DataValidationException.InvalidAttachmentPayloadHash {
-        return uploadOrDownloadData(newResource == null ? UPLOAD : UPDATE, record, newResource, userId);
-    }
-
-    <T extends DomainResource> DecryptedFhirRecord<T>  downloadData(DecryptedFhirRecord<T>  record, String userId) throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation, DataValidationException.InvalidAttachmentPayloadHash {
-        return uploadOrDownloadData(DOWNLOAD, record, null, userId);
-    }
-
-    <T extends DomainResource> DecryptedFhirRecord<T>  uploadOrDownloadData(UploadDownloadOperation operation, DecryptedFhirRecord<T>  record, T newResource, String userId) throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation, DataValidationException.InvalidAttachmentPayloadHash {
+    protected <T extends DomainResource> DecryptedFhirRecord<T>  _uploadData(
+            DecryptedFhirRecord<T>  record,
+            String userId
+    ) throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation,
+            DataValidationException.InvalidAttachmentPayloadHash {
         DomainResource resource = record.getResource();
 
         if (!FhirAttachmentHelper.hasAttachment(resource)) return record;
+        List<Attachment> attachments = (FhirAttachmentHelper.getAttachment(resource) == null) ?
+                new ArrayList<>() : FhirAttachmentHelper.getAttachment(resource);
 
-        List<Attachment> attachments = (FhirAttachmentHelper.getAttachment(resource) == null) ? new ArrayList<>() : FhirAttachmentHelper.getAttachment(resource);
+        if (attachments == null) return record;
 
-        if ((operation == UPLOAD || operation == DOWNLOAD) && attachments == null) return record;
-
-        if (operation == UPLOAD && record.getAttachmentsKey() == null) {
+        if(record.getAttachmentsKey() == null) {
             record.setAttachmentsKey(cryptoService.generateGCKey().blockingGet());
         }
 
         List<Attachment> validAttachments = new ArrayList<>();
 
-        if (operation == UPLOAD || operation == DOWNLOAD) {
-            for (Attachment attachment : attachments) {
-                if (attachment == null) continue;
-                if (operation == UPLOAD && attachment.id != null) {
+        for (Attachment attachment : attachments) {
+            if (attachment != null) {
+                if (attachment.id != null) {
                     throw new DataValidationException.IdUsageViolation("Attachment.id should be null");
-                } else if (operation == UPLOAD && (attachment.hash == null || attachment.size == null)) {
+                } else if (attachment.hash == null || attachment.size == null) {
                     throw new DataValidationException.ExpectedFieldViolation(
-                            "Attachment.hash and Attachment.size expected");
-                } else if (operation == UPLOAD && !getValidHash(attachment).equals(attachment.hash)) {
+                            "Attachment.hash and Attachment.size expected"
+                    );
+                } else if (!getValidHash(attachment).equals(attachment.hash)) {
                     throw new DataValidationException.InvalidAttachmentPayloadHash(
-                            "Attachment.hash is not valid");
-                } else if (operation == DOWNLOAD && attachment.id == null) {
-                    throw new DataValidationException.IdUsageViolation("Attachment.id expected");
+                            "Attachment.hash is not valid"
+                    );
                 }
                 validAttachments.add(attachment);
             }
-        } else if (operation == UPDATE) {
-            HashMap<String, Attachment> oldAttachments = new HashMap<>();
-            for (Attachment attachment : attachments) {
-                if (attachment == null) continue;
-                else if (attachment.id != null) {
-                    oldAttachments.put(attachment.id, attachment);
-                }
+        }
+
+        if(!validAttachments.isEmpty()) {
+            updateDomainResourceIdentifier(
+                    resource,
+                    attachmentService.uploadAttachments(
+                            validAttachments,
+                            record.getAttachmentsKey(),
+                            userId
+                    ).blockingGet()
+            );
+        }
+
+        return record;
+    }
+
+    <T extends DomainResource> DecryptedFhirRecord<T>  updateData(
+            DecryptedFhirRecord<T>  record,
+            T newResource,
+            String userId
+    ) throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation,
+            DataValidationException.InvalidAttachmentPayloadHash {
+
+        DomainResource resource = record.getResource();
+
+        if (!FhirAttachmentHelper.hasAttachment(resource)) return record;
+        List<Attachment> attachments = (FhirAttachmentHelper.getAttachment(resource) == null) ?
+                new ArrayList<>() : FhirAttachmentHelper.getAttachment(resource);
+
+        List<Attachment> validAttachments = new ArrayList<>();
+
+        HashMap<String, Attachment> oldAttachments = new HashMap<>();
+        for (Attachment attachment : attachments) {
+            if (attachment != null && attachment.id != null) {
+                oldAttachments.put(attachment.id, attachment);
             }
-            resource = newResource;
-            List<Attachment> newAttachments = FhirAttachmentHelper.getAttachment(newResource);
-            for (Attachment newAttachment : newAttachments) {
-                if (newAttachment == null) continue;
-                else if (newAttachment.hash == null || newAttachment.size == null) {
+        }
+        resource = newResource;
+        List<Attachment> newAttachments = FhirAttachmentHelper.getAttachment(newResource);
+        for (Attachment newAttachment : newAttachments) {
+            if (newAttachment != null) {
+                if (newAttachment.hash == null || newAttachment.size == null) {
                     throw new DataValidationException.ExpectedFieldViolation(
-                            "Attachment.hash and Attachment.size expected");
+                        "Attachment.hash and Attachment.size expected"
+                    );
                 } else if (!getValidHash(newAttachment).equals(newAttachment.hash)) {
                     throw new DataValidationException.InvalidAttachmentPayloadHash(
-                            "Attachment.hash is not valid");
+                            "Attachment.hash is not valid"
+                    );
                 } else if (newAttachment.id == null) {
                     validAttachments.add(newAttachment);
                 } else {
                     Attachment oldAttachment = oldAttachments.get(newAttachment.id);
                     if (oldAttachment == null) {
                         throw new DataValidationException.IdUsageViolation(
-                                "Valid Attachment.id expected");
+                                "Valid Attachment.id expected"
+                        );
                     }
                     if (oldAttachment.hash == null || !newAttachment.hash.equals(oldAttachment.hash)) {
                         validAttachments.add(newAttachment);
@@ -870,70 +914,140 @@ class RecordService {
                 }
             }
         }
-        if (validAttachments.isEmpty()) return record;
-        else if (operation == UPLOAD || operation == UPDATE) {
-            List<Pair<Attachment, List<String>>> result = attachmentService.uploadAttachments(validAttachments, record.getAttachmentsKey(), userId).blockingGet();
-            updateDomainResourceIdentifier(resource, result);
-        } else if (operation == DOWNLOAD) {
-            attachmentService.downloadAttachments(attachments, record.getAttachmentsKey(), userId).blockingGet();
-        } else {
-            throw new CoreRuntimeException.UnsupportedOperation();
+
+        if(!validAttachments.isEmpty()) {
+            updateDomainResourceIdentifier(
+                    resource,
+                    attachmentService.uploadAttachments(
+                            validAttachments,
+                            record.getAttachmentsKey(),
+                            userId
+                    ).blockingGet()
+            );
         }
 
         return record;
     }
 
+    @SuppressWarnings("CheckResult")
+    <T extends DomainResource> DecryptedFhirRecord<T>  downloadData(
+            DecryptedFhirRecord<T>  record,
+            String userId
+    ) throws DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
+        DomainResource resource = record.getResource();
+        if (!FhirAttachmentHelper.hasAttachment(resource)) return record;
+
+        List<Attachment> attachments = (FhirAttachmentHelper.getAttachment(resource) == null) ?
+                new ArrayList<>() : FhirAttachmentHelper.getAttachment(resource);
+
+        if (attachments == null) return record;
+
+        for (Attachment attachment : attachments) {
+            if (attachment.id == null) {
+                throw new DataValidationException.IdUsageViolation("Attachment.id expected");
+            }
+        }
+
+        attachmentService.downloadAttachments(
+                attachments,
+                record.getAttachmentsKey(),
+                userId
+        ).blockingGet();
+
+        return record;
+    }
+    // FIXME
+    // This method should not allowed to exist any longer in this shape. _uploadData should take over
+    // as soon as possible so we can get rid of uploadOrDownloadData. This also means uploadData should
+    // not be responsible for the actual upload and a update.
+    <T extends DomainResource> DecryptedFhirRecord<T>  uploadData(DecryptedFhirRecord<T>  record, T newResource, String userId)
+            throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation,
+            DataValidationException.InvalidAttachmentPayloadHash {
+        if(newResource == null) {
+            return _uploadData(record, userId);
+        } else {
+            return updateData(record, newResource, userId);
+        }
+    }
+
+    @Deprecated
+    <T extends DomainResource> DecryptedFhirRecord<T>  uploadOrDownloadData(
+            UploadDownloadOperation operation,
+            DecryptedFhirRecord<T>  record,
+            T newResource,
+            String userId
+    ) throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation,
+            DataValidationException.InvalidAttachmentPayloadHash, CoreRuntimeException.UnsupportedOperation {
+        if (operation == UPDATE) {
+            return updateData(record, newResource, userId);
+        } else if (operation == UPLOAD) {
+            return _uploadData(record, userId);
+        } else if (operation == DOWNLOAD) {
+            return downloadData(record, userId);
+        } else {
+            throw new CoreRuntimeException.UnsupportedOperation();
+        }
+    }
+
     private void updateDomainResourceIdentifier(DomainResource d, List<Pair<Attachment, List<String>>> result) {
         StringBuilder sb = new StringBuilder();
         for (Pair<Attachment, List<String>> pair : result) {
-            if (pair.getSecond() == null) continue; //Attachment is not of image type
-
-            sb.setLength(0);
-            sb.append(DOWNSCALED_ATTACHMENT_IDS_FMT).append(SPLIT_CHAR).append(pair.getFirst().id);
-            for (String additionalId : pair.getSecond()) {
-                sb.append(SPLIT_CHAR).append(additionalId);
+            if (pair.getSecond() != null) {//Attachment is a of image type
+                sb.setLength(0);
+                sb.append(DOWNSCALED_ATTACHMENT_IDS_FMT).append(SPLIT_CHAR).append(pair.getFirst().id);
+                for (String additionalId : pair.getSecond()) {
+                    sb.append(SPLIT_CHAR).append(additionalId);
+                }
+                FhirAttachmentHelper.appendIdentifier(d, sb.toString(), partnerId);
             }
-            FhirAttachmentHelper.appendIdentifier(d, sb.toString(), partnerId);
         }
     }
 
 
-    void setAttachmentIdForDownloadType(List<Attachment> attachments, List<Identifier> identifiers, DownloadType type) throws DataValidationException.IdUsageViolation {
+    void setAttachmentIdForDownloadType(
+            List<Attachment> attachments,
+            List<Identifier> identifiers,
+            DownloadType type
+    ) throws DataValidationException.IdUsageViolation {
         for (Attachment attachment : attachments) {
             String[] additionalIds = extractAdditionalAttachmentIds(identifiers, attachment.id);
-            if (additionalIds == null) continue;
-
-            switch (type) {
-                case Full:
-                    break;
-                case Medium:
-                    attachment.id += SPLIT_CHAR + additionalIds[PREVIEW_ID_POS];
-                    break;
-                case Small:
-                    attachment.id += SPLIT_CHAR + additionalIds[THUMBNAIL_ID_POS];
-                    break;
-                default:
-                    throw new CoreRuntimeException.UnsupportedOperation();
+            if (additionalIds != null) {
+                switch (type) {
+                    case Full:
+                        break;
+                    case Medium:
+                        attachment.id += SPLIT_CHAR + additionalIds[PREVIEW_ID_POS];
+                        break;
+                    case Small:
+                        attachment.id += SPLIT_CHAR + additionalIds[THUMBNAIL_ID_POS];
+                        break;
+                    default:
+                        throw new CoreRuntimeException.UnsupportedOperation();
+                }
             }
         }
     }
 
-    String[] extractAdditionalAttachmentIds(List<Identifier> additionalIds, String attachmentId) throws DataValidationException.IdUsageViolation {
+    String[] extractAdditionalAttachmentIds(
+            List<Identifier> additionalIds,
+            String attachmentId
+    ) throws DataValidationException.IdUsageViolation {
         if (additionalIds == null) return null;
 
         for (Identifier i : additionalIds) {
             String[] parts = splitAdditionalAttachmentId(i);
 
-            if (parts == null) continue;
-            else if (parts[FULL_ATTACHMENT_ID_POS].equals(attachmentId)) return parts;
+            if (parts != null && parts[FULL_ATTACHMENT_ID_POS].equals(attachmentId)) return parts;
         }
+
         return null; //Attachment is not of image type
     }
 
     @Nullable
     String[] splitAdditionalAttachmentId(Identifier identifier) throws DataValidationException.IdUsageViolation {
-        if (identifier.value == null) return null;
-        else if (!identifier.value.startsWith(DOWNSCALED_ATTACHMENT_IDS_FMT)) return null;
+        if (identifier.value == null || !identifier.value.startsWith(DOWNSCALED_ATTACHMENT_IDS_FMT) ) {
+            return null;
+        }
 
         String[] parts = identifier.value.split(SPLIT_CHAR);
 
@@ -956,7 +1070,8 @@ class RecordService {
         return Base64.INSTANCE.encodeToString(HashUtil.INSTANCE.sha1(data));
     }
 
-    <T extends DomainResource> void cleanObsoleteAdditionalIdentifiers(T resource) throws DataValidationException.IdUsageViolation {
+    <T extends DomainResource> void cleanObsoleteAdditionalIdentifiers(T resource)
+            throws DataValidationException.IdUsageViolation {
         if (FhirAttachmentHelper.hasAttachment(resource)&& !FhirAttachmentHelper.getAttachment(resource).isEmpty()) {
             List<Identifier> identifiers = FhirAttachmentHelper.getIdentifier(resource);
 
@@ -982,7 +1097,8 @@ class RecordService {
         }
     }
 
-    <T extends DomainResource> void checkDataRestrictions(T resource) throws DataRestrictionException.MaxDataSizeViolation, DataRestrictionException.UnsupportedFileType {
+    <T extends DomainResource> void checkDataRestrictions(T resource)
+            throws DataRestrictionException.MaxDataSizeViolation, DataRestrictionException.UnsupportedFileType {
 
         if (!FhirAttachmentHelper.hasAttachment(resource)) return;
 

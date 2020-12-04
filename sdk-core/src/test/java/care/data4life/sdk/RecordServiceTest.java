@@ -16,6 +16,7 @@
 
 package care.data4life.sdk;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.threeten.bp.LocalDate;
@@ -23,6 +24,8 @@ import org.threeten.bp.LocalDateTime;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -41,7 +44,6 @@ import care.data4life.sdk.model.DownloadResult;
 import care.data4life.sdk.model.DownloadType;
 import care.data4life.sdk.model.Meta;
 import care.data4life.sdk.model.Record;
-import care.data4life.sdk.model.definitions.FhirRecord;
 import care.data4life.sdk.network.model.DecryptedRecord;
 import care.data4life.sdk.network.model.definitions.DecryptedFhirRecord;
 import care.data4life.sdk.test.util.AttachmentBuilder;
@@ -83,6 +85,11 @@ public class RecordServiceTest extends RecordServiceTestBase {
     @Before
     public void setup() {
         init();
+    }
+
+    @After
+    public void tearDown() {
+        stop();
     }
 
     //region utility methods
@@ -236,7 +243,7 @@ public class RecordServiceTest extends RecordServiceTestBase {
         );
 
         // When
-        DecryptedRecord record = (DecryptedRecord) recordService.removeOrRestoreUploadData(REMOVE, decryptedRecord, document, mockUploadData);
+        DecryptedFhirRecord record = recordService.removeOrRestoreUploadData(REMOVE, decryptedRecord, document, mockUploadData);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -267,7 +274,7 @@ public class RecordServiceTest extends RecordServiceTestBase {
         uploadData.put(document.content.get(0).attachment, DATA);
 
         // When
-        DecryptedRecord record = (DecryptedRecord) recordService.removeOrRestoreUploadData(RESTORE, decryptedRecord, document, uploadData);
+        DecryptedFhirRecord record = recordService.removeOrRestoreUploadData(RESTORE, decryptedRecord, document, uploadData);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -279,9 +286,39 @@ public class RecordServiceTest extends RecordServiceTestBase {
     }
 
     @Test
-    public void uploadData_shouldCall_uploadOrDownloadData() throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
+    public void uploadOrDownloadData_calls__uploadData()
+            throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation,
+            DataValidationException.InvalidAttachmentPayloadHash {
         // Given
-        doReturn(mockDecryptedRecord).when(recordService).uploadOrDownloadData(UPLOAD, mockDecryptedRecord, null, USER_ID);
+        doReturn(mockDecryptedRecord).when(recordService)._uploadData(
+                mockDecryptedRecord,
+                USER_ID
+        );
+
+        // When
+        DecryptedFhirRecord record = recordService.uploadOrDownloadData(
+                UPLOAD,
+                mockDecryptedRecord,
+                null,
+                USER_ID
+        );
+
+        // Then
+        assertThat(record).isEqualTo(mockDecryptedRecord);
+
+        inOrder.verify(recordService)._uploadData(mockDecryptedRecord, USER_ID);
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void uploadData_calls__uploadData_when_no_new_resource_was_given()
+            throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation,
+            DataValidationException.InvalidAttachmentPayloadHash {
+        // Given
+        doReturn(mockDecryptedRecord).when(recordService)._uploadData(
+                mockDecryptedRecord,
+                USER_ID
+        );
 
         // When
         DecryptedFhirRecord record = recordService.uploadData(mockDecryptedRecord, null, USER_ID);
@@ -290,67 +327,18 @@ public class RecordServiceTest extends RecordServiceTestBase {
         assertThat(record).isEqualTo(mockDecryptedRecord);
 
         inOrder.verify(recordService).uploadData(mockDecryptedRecord, null, USER_ID);
-        inOrder.verify(recordService).uploadOrDownloadData(UPLOAD, mockDecryptedRecord, null, USER_ID);
+        inOrder.verify(recordService)._uploadData(mockDecryptedRecord, USER_ID);
         inOrder.verifyNoMoreInteractions();
     }
 
     @Test
-    public void uploadData_shouldCall_uploadOrDownloadData_asUPDATE() throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
+    public void _uploadData_uploads_data()
+            throws DataValidationException.ExpectedFieldViolation,
+            DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
         // Given
-        doReturn(mockDecryptedRecord).when(recordService).uploadOrDownloadData(
-                UPDATE,
-                mockDecryptedRecord,
-                mockDocumentReference,
-                USER_ID
-        );
-
-        // When
-        DecryptedFhirRecord record = recordService.uploadData(
-                mockDecryptedRecord,
-                mockDocumentReference,
-                USER_ID
-        );
-
-        // Then
-        assertThat(record).isEqualTo(mockDecryptedRecord);
-
-        inOrder.verify(recordService).uploadData(
-                mockDecryptedRecord,
-                mockDocumentReference,
-                USER_ID
-        );
-        inOrder.verify(recordService).uploadOrDownloadData(
-                UPDATE,
-                mockDecryptedRecord,
-                mockDocumentReference,
-                USER_ID
-        );
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void downloadData_shouldCall_uploadOrDownloadData() throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
-        // Given
-        doReturn(mockDecryptedRecord).when(recordService).uploadOrDownloadData(DOWNLOAD, mockDecryptedRecord, null, USER_ID);
-
-        // When
-        DecryptedFhirRecord record = recordService.downloadData(mockDecryptedRecord, USER_ID);
-
-        // Then
-        assertThat(record).isEqualTo(mockDecryptedRecord);
-
-        inOrder.verify(recordService).downloadData(mockDecryptedRecord, USER_ID);
-        inOrder.verify(recordService).uploadOrDownloadData(DOWNLOAD, mockDecryptedRecord, null, USER_ID);
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void uploadOrDownloadData_shouldUploadData() throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
-        // Given
-        when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
         DocumentReference document = buildDocumentReference();
         DecryptedRecord decryptedRecord = new DecryptedRecord<>(
-                null,
+                RECORD_ID,
                 document,
                 null,
                 new ArrayList<>(),
@@ -360,37 +348,46 @@ public class RecordServiceTest extends RecordServiceTestBase {
                 null,
                 -1
         );
-        decryptedRecord.setIdentifier(RECORD_ID);
+        List<String> downscaledIds = Arrays.asList("downscaledId_1", "downscaledId_2");
+        List<Pair<Attachment, List<String>>> uploadResult = Arrays.asList(
+                new Pair<>(document.content.get(0).attachment, downscaledIds)
+        );
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
-        List<Pair<Attachment, List<String>>> uploadResult = new ArrayList<>();
-        List<String> downscaledIds = new ArrayList<>();
-        downscaledIds.add("downscaledId_1");
-        downscaledIds.add("downscaledId_2");
-        uploadResult.add(new Pair<>(document.content.get(0).attachment, downscaledIds));
+        when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
         when(recordService.getValidHash(document.content.get(0).attachment)).thenReturn(DATA_HASH);
-        when(mockAttachmentService.uploadAttachments(any(), eq(mockAttachmentKey), eq(USER_ID))).thenReturn(Single.just(uploadResult));
+        when(mockAttachmentService.uploadAttachments(
+                any(),
+                eq(mockAttachmentKey),
+                eq(USER_ID))
+        ).thenReturn(Single.just(uploadResult));
 
         // When
-        DecryptedRecord record = (DecryptedRecord) recordService.uploadOrDownloadData(UPLOAD, decryptedRecord, null, USER_ID);
+        DecryptedFhirRecord record = recordService._uploadData(decryptedRecord, USER_ID);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
         assertThat(record.getAttachmentsKey()).isEqualTo(mockAttachmentKey);
 
-        inOrder.verify(recordService).uploadOrDownloadData(UPLOAD, decryptedRecord, null, USER_ID);
+        inOrder.verify(recordService)._uploadData(decryptedRecord, USER_ID);
         inOrder.verify(mockCryptoService).generateGCKey();
         inOrder.verify(recordService).getValidHash(document.content.get(0).attachment);
-        inOrder.verify(mockAttachmentService).uploadAttachments(any(), eq(mockAttachmentKey), eq(USER_ID));
+        inOrder.verify(mockAttachmentService).uploadAttachments(
+                any(),
+                eq(mockAttachmentKey),
+                eq(USER_ID)
+        );
         inOrder.verifyNoMoreInteractions();
     }
 
     @Test
-    public void uploadOrDownloadData_shouldThrow_whenAttachmentIdIsSetDuringUploadFlow() throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
+    public void _uploadData_throws_whenAttachmentIdIsSetDuringUploadFlow()
+            throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation,
+            DataValidationException.InvalidAttachmentPayloadHash {
         // Given
         DocumentReference document = buildDocumentReference();
         document.content.get(0).attachment.id = "unexpectedId";
-        DecryptedFhirRecord decryptedRecord = new DecryptedRecord<>(
-                null,
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
                 document,
                 null,
                 new ArrayList<>(),
@@ -400,12 +397,12 @@ public class RecordServiceTest extends RecordServiceTestBase {
                 null,
                 -1
         );
-        decryptedRecord.setIdentifier(RECORD_ID);
+
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
 
         // When
         try {
-            recordService.uploadOrDownloadData(UPLOAD, decryptedRecord, null, USER_ID);
+            recordService._uploadData(decryptedRecord, USER_ID);
             fail("Exception expected!");
         } catch (D4LException e) {
 
@@ -414,13 +411,13 @@ public class RecordServiceTest extends RecordServiceTestBase {
             assertThat(e.getMessage()).isEqualTo("Attachment.id should be null");
         }
 
-        inOrder.verify(recordService).uploadOrDownloadData(UPLOAD, decryptedRecord, null, USER_ID);
+        inOrder.verify(recordService)._uploadData(decryptedRecord, USER_ID);
         inOrder.verify(mockCryptoService).generateGCKey();
         inOrder.verifyNoMoreInteractions();
     }
 
     @Test
-    public void uploadOrDownloadData_shouldThrow_whenInvalidHashAttachmentDuringUploadFlow() throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
+    public void _uploadData_throws_whenInvalidHashAttachmentDuringUploadFlow() throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
         // Given
         DocumentReference document = buildDocumentReference();
         document.content.get(0).attachment.id = null;
@@ -436,12 +433,11 @@ public class RecordServiceTest extends RecordServiceTestBase {
                 null,
                 -1
         );
-        decryptedRecord.setIdentifier(RECORD_ID);
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
 
         // When
         try {
-            recordService.uploadOrDownloadData(UPLOAD, decryptedRecord, null, USER_ID);
+            recordService._uploadData(decryptedRecord, USER_ID);
             fail("Exception expected!");
         } catch (D4LException e) {
 
@@ -450,338 +446,16 @@ public class RecordServiceTest extends RecordServiceTestBase {
             assertThat(e.getMessage()).isEqualTo("Attachment.hash is not valid");
         }
 
-        inOrder.verify(recordService).uploadOrDownloadData(UPLOAD, decryptedRecord, null, USER_ID);
+        inOrder.verify(recordService)._uploadData(decryptedRecord, USER_ID);
         inOrder.verify(mockCryptoService).generateGCKey();
         inOrder.verify(recordService).getValidHash(document.content.get(0).attachment);
         inOrder.verifyNoMoreInteractions();
     }
 
     @Test
-    public void uploadOrDownloadData_shouldDownloadData() throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
-        // Given
-        DocumentReference document = buildDocumentReference();
-        document.content.get(0).attachment.id = "id";
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
-                RECORD_ID,
-                document,
-                null,
-                new ArrayList<>(),
-                null,
-                null,
-                null,
-                mockAttachmentKey,
-                -1
-        );
-        when(mockAttachmentService.downloadAttachments(any(), eq(mockAttachmentKey), eq(USER_ID))).thenReturn(Single.just(new ArrayList<>()));
-
-        // When
-        DecryptedRecord record = (DecryptedRecord) recordService.uploadOrDownloadData(DOWNLOAD, decryptedRecord, null, USER_ID);
-
-        // Then
-        assertThat(record).isEqualTo(decryptedRecord);
-
-        inOrder.verify(recordService).uploadOrDownloadData(DOWNLOAD, decryptedRecord, null, USER_ID);
-        inOrder.verify(mockAttachmentService).downloadAttachments(any(), eq(mockAttachmentKey), eq(USER_ID));
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void uploadOrDownloadData_shouldThrow_whenAttachmentIdIsNotSetDuringDownloadFlow() throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
-        // Given
-        DocumentReference document = buildDocumentReference();
-        document.content.get(0).attachment.id = null;
-        DecryptedFhirRecord decryptedRecord = new DecryptedRecord<>(
-                RECORD_ID,
-                document,
-                null,
-                new ArrayList<>(),
-                null,
-                null,
-                null,
-                null,
-                -1
-        );
-
-        // When
-        try {
-            recordService.uploadOrDownloadData(DOWNLOAD, decryptedRecord, document, USER_ID);
-            fail("Exception expected!");
-        } catch (D4LException e) {
-
-            // Then
-            assertThat(e.getClass()).isEqualTo(DataValidationException.IdUsageViolation.class);
-            assertThat(e.getMessage()).isEqualTo("Attachment.id expected");
-        }
-
-        inOrder.verify(recordService).uploadOrDownloadData(DOWNLOAD, decryptedRecord, document, USER_ID);
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void uploadOrDownloadData_shouldThrow_whenAttachmentHashOrSizeNotPresent() throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
-        // Given
-        DocumentReference document = buildDocumentReference();
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
-                RECORD_ID,
-                document,
-                null,
-                new ArrayList<>(),
-                null,
-                null,
-                null,
-                null,
-                -1
-        );
-
-        // When
-        try {
-            document.content.get(0).attachment.hash = null;
-            document.content.get(0).attachment.size = 0;
-            recordService.uploadOrDownloadData(UPDATE, decryptedRecord, document, USER_ID);
-            fail("Exception expected!");
-        } catch (D4LException e) {
-
-            // Then
-            assertThat(e.getClass()).isEqualTo(DataValidationException.ExpectedFieldViolation.class);
-            assertThat(e.getMessage()).isEqualTo("Attachment.hash and Attachment.size expected");
-        }
-
-        try {
-            document.content.get(0).attachment.hash = "hash";
-            document.content.get(0).attachment.size = null;
-            recordService.uploadOrDownloadData(UPDATE, decryptedRecord, document, USER_ID);
-            fail("Exception expected!");
-        } catch (D4LException e) {
-
-            // Then
-            assertThat(e.getClass()).isEqualTo(DataValidationException.ExpectedFieldViolation.class);
-            assertThat(e.getMessage()).isEqualTo("Attachment.hash and Attachment.size expected");
-        }
-
-        inOrder.verify(recordService, times(2)).uploadOrDownloadData(UPDATE, decryptedRecord, document, USER_ID);
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void uploadOrDownloadData_shouldThrow_whenInvalidHashAttachmentDuringUpdateFlow() throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
-        // Given
-        DocumentReference document = buildDocumentReference();
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
-                RECORD_ID,
-                document,
-                null,
-                new ArrayList<>(),
-                null,
-                null,
-                null,
-                null,
-                -1
-        );
-
-        // When
-        try {
-            document.content.get(0).attachment.hash = "hash";
-            recordService.uploadOrDownloadData(UPDATE, decryptedRecord, document, USER_ID);
-            fail("Exception expected!");
-        } catch (D4LException e) {
-
-            // Then
-            assertThat(e.getClass()).isEqualTo(DataValidationException.InvalidAttachmentPayloadHash.class);
-            assertThat(e.getMessage()).isEqualTo("Attachment.hash is not valid");
-        }
-
-        inOrder.verify(recordService).uploadOrDownloadData(UPDATE, decryptedRecord, document, USER_ID);
-        inOrder.verify(recordService).getValidHash(document.content.get(0).attachment);
-        inOrder.verifyNoMoreInteractions();
-    }
-
-
-    @Test
-    public void uploadOrDownloadData_shouldThrow_whenOldAttachmentHashNotPresent() throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation, DataValidationException.InvalidAttachmentPayloadHash {
-        // Given
-        DocumentReference oldDocument = buildDocumentReference();
-        Attachment oldAttachment = oldDocument.content.get(0).attachment;
-        oldAttachment.id = "id";
-        oldAttachment.size = null;
-        oldAttachment.hash = null;
-
-        DocumentReference updatedDocument = buildDocumentReference();
-        Attachment updatedAttachment = updatedDocument.content.get(0).attachment;
-        updatedAttachment.id = "id";
-        updatedAttachment.size = 0;
-        updatedAttachment.hash = "hash";
-
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
-                RECORD_ID,
-                oldDocument,
-                null,
-                new ArrayList<>(),
-                null,
-                null,
-                null,
-                mockAttachmentKey,
-                -1
-        );
-        List<Pair<Attachment, List<String>>> uploadResult = new ArrayList<>();
-        List<String> downscaledIds = new ArrayList<>();
-        downscaledIds.add("downscaledId_1");
-        downscaledIds.add("downscaledId_2");
-        uploadResult.add(new Pair<>(updatedAttachment, downscaledIds));
-        when(mockAttachmentService.uploadAttachments(eq(asList(updatedAttachment)), eq(mockAttachmentKey), eq(USER_ID))).thenReturn(Single.just(uploadResult));
-
-        // When
-        try {
-            recordService.uploadOrDownloadData(UPDATE, decryptedRecord, updatedDocument, USER_ID);
-            fail("Exception expected!");
-        } catch (D4LException e) {
-
-            // Then
-            assertThat(e.getClass()).isEqualTo(DataValidationException.InvalidAttachmentPayloadHash.class);
-            assertThat(e.getMessage()).isEqualTo("Attachment.hash is not valid");
-        }
-
-
-        // Then
-        inOrder.verify(recordService).uploadOrDownloadData(UPDATE, decryptedRecord, updatedDocument, USER_ID);
-        inOrder.verify(recordService).getValidHash(updatedDocument.content.get(0).attachment);
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void uploadOrDownloadData_shouldThrowAttachment_whenHashesDontMatch() throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation, DataValidationException.InvalidAttachmentPayloadHash {
-        // Given
-        DocumentReference oldDocument = buildDocumentReference();
-        Attachment oldAttachment = oldDocument.content.get(0).attachment;
-        oldAttachment.id = "id";
-        oldAttachment.size = 0;
-        oldAttachment.hash = "oldHash";
-
-        DocumentReference updatedDocument = buildDocumentReference();
-        Attachment updatedAttachment = updatedDocument.content.get(0).attachment;
-        updatedAttachment.id = "id";
-        updatedAttachment.size = 0;
-        updatedAttachment.hash = "newHash";
-
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
-                RECORD_ID,
-                oldDocument,
-                null,
-                new ArrayList<>(),
-                null,
-                null,
-                null,
-                mockAttachmentKey,
-                -1
-        );
-        List<Pair<Attachment, List<String>>> uploadResult = new ArrayList<>();
-        List<String> downscaledIds = new ArrayList<>();
-        downscaledIds.add("downscaledId_1");
-        downscaledIds.add("downscaledId_2");
-        uploadResult.add(new Pair<>(updatedAttachment, downscaledIds));
-        when(mockAttachmentService.uploadAttachments(eq(asList(updatedAttachment)), eq(mockAttachmentKey), eq(USER_ID))).thenReturn(Single.just(uploadResult));
-
-
-        // When
-        try {
-            recordService.uploadOrDownloadData(UPDATE, decryptedRecord, updatedDocument, USER_ID);
-            fail("Exception expected!");
-        } catch (D4LException e) {
-
-            // Then
-            assertThat(e.getClass()).isEqualTo(DataValidationException.InvalidAttachmentPayloadHash.class);
-            assertThat(e.getMessage()).isEqualTo("Attachment.hash is not valid");
-        }
-
-        // Then
-        inOrder.verify(recordService).uploadOrDownloadData(UPDATE, decryptedRecord, updatedDocument, USER_ID);
-        inOrder.verify(recordService).getValidHash(updatedDocument.content.get(0).attachment);
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void uploadOrDownloadData_shouldThrow_whenValidAttachmentIdNotPresent() throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
-        // Given
-        DocumentReference oldDocument = buildDocumentReference();
-        Attachment oldAttachment = oldDocument.content.get(0).attachment;
-        oldAttachment.id = "id1";
-        oldAttachment.size = 0;
-        oldAttachment.hash = "hash";
-
-        DocumentReference updatedDocument = buildDocumentReference();
-        Attachment updatedAttachment = updatedDocument.content.get(0).attachment;
-        updatedAttachment.id = "id2";
-        updatedAttachment.size = 0;
-        updatedAttachment.hash = "hash";
-
-        when(recordService.getValidHash(updatedDocument.content.get(0).attachment)).thenReturn("hash");
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
-                RECORD_ID,
-                oldDocument,
-                null,
-                new ArrayList<>(),
-                null,
-                null,
-                null,
-                null,
-                -1
-        );
-
-        // When
-        try {
-            recordService.uploadOrDownloadData(UPDATE, decryptedRecord, updatedDocument, USER_ID);
-            fail("Exception expected!");
-        } catch (D4LException e) {
-
-            // Then
-            assertThat(e.getClass()).isEqualTo(DataValidationException.IdUsageViolation.class);
-            assertThat(e.getMessage()).isEqualTo("Valid Attachment.id expected");
-        }
-
-        inOrder.verify(recordService).uploadOrDownloadData(UPDATE, decryptedRecord, updatedDocument, USER_ID);
-        inOrder.verify(recordService).getValidHash(updatedDocument.content.get(0).attachment);
-        inOrder.verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void uploadOrDownloadData_shouldNotUploadAttachment_whenHashesMatch() throws DataValidationException.InvalidAttachmentPayloadHash, DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation {
-        // Given
-        DocumentReference oldDocument = buildDocumentReference();
-        Attachment oldAttachment = oldDocument.content.get(0).attachment;
-        oldAttachment.id = "id";
-        oldAttachment.size = 0;
-        oldAttachment.hash = "hash";
-
-        DocumentReference updatedDocument = buildDocumentReference();
-        Attachment updatedAttachment = updatedDocument.content.get(0).attachment;
-        updatedAttachment.id = "id";
-        updatedAttachment.size = 0;
-        updatedAttachment.hash = "hash";
-
-        when(recordService.getValidHash(updatedDocument.content.get(0).attachment)).thenReturn("hash");
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
-                RECORD_ID,
-                oldDocument,
-                null,
-                new ArrayList<>(),
-                null,
-                null,
-                null,
-                mockAttachmentKey,
-                -1
-        );
-
-        // When
-        recordService.uploadOrDownloadData(UPDATE, decryptedRecord, updatedDocument, USER_ID);
-
-        // Then
-        inOrder.verify(recordService).uploadOrDownloadData(UPDATE, decryptedRecord, updatedDocument, USER_ID);
-        inOrder.verify(recordService).getValidHash(updatedDocument.content.get(0).attachment);
-        inOrder.verifyNoMoreInteractions();
-    }
-
-
-    @Test
-    public void uploadOrDownloadData_shouldAppendAdditionalIdentifiers() throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation, DataValidationException.InvalidAttachmentPayloadHash {
+    public void _uploadData_appends_AdditionalIdentifiers()
+            throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation,
+            DataValidationException.InvalidAttachmentPayloadHash {
         //given
         DocumentReference docRef = buildDocumentReference();
         docRef.content.add(buildDocRefContent(AttachmentBuilder.buildAttachment(null)));
@@ -808,21 +482,530 @@ public class RecordServiceTest extends RecordServiceTestBase {
         when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
         when(recordService.getValidHash(secondAttachment)).thenReturn(DATA_HASH);
         when(recordService.getValidHash(firstAttachment)).thenReturn(DATA_HASH);
-        when(mockAttachmentService.uploadAttachments(any(), eq(mockAttachmentKey), eq(USER_ID))).thenReturn(Single.fromCallable(() -> {
+        when(mockAttachmentService.uploadAttachments(
+                any(),
+                eq(mockAttachmentKey),
+                eq(USER_ID))
+        ).thenReturn(Single.fromCallable(() -> {
             firstAttachment.id = ATTACHMENT_ID;
             secondAttachment.id = ATTACHMENT_ID;
             return uploadResult;
         }));
 
         //when
-        DecryptedRecord<DocumentReference> result = (DecryptedRecord<DocumentReference>) recordService.uploadOrDownloadData(UPLOAD, dummyDecryptedRecord, null, USER_ID);
+        DecryptedFhirRecord<DocumentReference> result = recordService._uploadData(
+                dummyDecryptedRecord,
+                USER_ID
+        );
 
         //then
         DocumentReference doc = result.getResource();
         assertThat(doc).isEqualTo(docRef);
         assertThat(doc.identifier).hasSize(1);
-        assertThat(doc.identifier.get(0).value).isEqualTo(RecordService.DOWNSCALED_ATTACHMENT_IDS_FMT + "#" + ATTACHMENT_ID + "#" + PREVIEW_ID + "#" + THUMBNAIL_ID);
+        assertThat(doc.identifier.get(0).value).isEqualTo(
+                RecordService.DOWNSCALED_ATTACHMENT_IDS_FMT + "#" + ATTACHMENT_ID + "#" +
+                        PREVIEW_ID + "#" + THUMBNAIL_ID
+        );
         assertThat(doc.identifier.get(0).assigner.reference).isEqualTo(PARTNER_ID);
+    }
+
+    @Test
+    public void uploadOrDownloadData_calls_updateData()
+            throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation,
+            DataValidationException.InvalidAttachmentPayloadHash {
+        // Given
+        doReturn(mockDecryptedRecord).when(recordService).updateData(
+                mockDecryptedRecord,
+                mockDocumentReference,
+                USER_ID
+        );
+
+        // When
+        DecryptedFhirRecord record = recordService.uploadOrDownloadData(
+                UPDATE,
+                mockDecryptedRecord,
+                mockDocumentReference,
+                USER_ID
+        );
+
+        // Then
+        assertThat(record).isEqualTo(mockDecryptedRecord);
+
+        inOrder.verify(recordService).updateData(
+                mockDecryptedRecord,
+                mockDocumentReference,
+                USER_ID
+        );
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void uploadData_calls_updateData_when_a_new_resource_was_given()
+            throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation,
+            DataValidationException.InvalidAttachmentPayloadHash {
+        // Given
+        doReturn(mockDecryptedRecord).when(recordService).updateData(
+                mockDecryptedRecord,
+                mockDocumentReference,
+                USER_ID
+        );
+
+        // When
+        DecryptedFhirRecord record = recordService.uploadData(
+                mockDecryptedRecord,
+                mockDocumentReference,
+                USER_ID
+        );
+
+        // Then
+        assertThat(record).isEqualTo(mockDecryptedRecord);
+
+        inOrder.verify(recordService).uploadData(
+                mockDecryptedRecord,
+                mockDocumentReference,
+                USER_ID
+        );
+        inOrder.verify(recordService).updateData(
+                mockDecryptedRecord,
+                mockDocumentReference,
+                USER_ID
+        );
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void updateData_updates_data()
+            throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation,
+            DataValidationException.InvalidAttachmentPayloadHash {
+        // Given
+        DocumentReference oldDocument = buildDocumentReference();
+        Attachment oldAttachment = oldDocument.content.get(0).attachment;
+        oldAttachment.id = "id";
+        oldAttachment.size = 0;
+        oldAttachment.hash = "hash";
+
+        String updatedHash = "hash2";
+        DocumentReference updatedDocument = buildDocumentReference();
+        Attachment updatedAttachment = updatedDocument.content.get(0).attachment;
+        updatedAttachment.id = "id";
+        updatedAttachment.size = 0;
+        updatedAttachment.hash = updatedHash;
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                oldDocument,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        );
+
+        List<String> downscaledIds = Arrays.asList("downscaledId_1", "downscaledId_2");
+        List<Pair<Attachment, List<String>>> uploadResult = Arrays.asList(
+                new Pair<>(updatedDocument.content.get(0).attachment, downscaledIds)
+        );
+        when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
+        when(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey));
+        when(recordService.getValidHash(updatedDocument.content.get(0).attachment))
+                .thenReturn(DATA_HASH);
+        when(mockAttachmentService.uploadAttachments(
+                eq(Collections.singletonList(updatedAttachment)),
+                eq(mockAttachmentKey),
+                eq(USER_ID))
+        ).thenReturn(Single.just(uploadResult));
+        when(recordService.getValidHash(updatedDocument.content.get(0).attachment)).thenReturn(updatedHash);
+
+        // When
+        recordService.updateData(decryptedRecord, updatedDocument, USER_ID);
+
+        // Then
+        inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID);
+        inOrder.verify(recordService).getValidHash(updatedDocument.content.get(0).attachment);
+        inOrder.verify(mockAttachmentService).uploadAttachments(
+                eq(Collections.singletonList(updatedAttachment)),
+                eq(mockAttachmentKey),
+                eq(USER_ID)
+        );
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void updateData_throws_whenAttachmentHashOrSizeNotPresent()
+            throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation,
+            DataValidationException.InvalidAttachmentPayloadHash {
+        // Given
+        DocumentReference document = buildDocumentReference();
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                document,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
+
+        // When
+        try {
+            document.content.get(0).attachment.hash = null;
+            document.content.get(0).attachment.size = 0;
+            recordService.updateData(decryptedRecord, document, USER_ID);
+            fail("Exception expected!");
+        } catch (D4LException e) {
+
+            // Then
+            assertThat(e.getClass()).isEqualTo(DataValidationException.ExpectedFieldViolation.class);
+            assertThat(e.getMessage()).isEqualTo("Attachment.hash and Attachment.size expected");
+        }
+
+        try {
+            document.content.get(0).attachment.hash = "hash";
+            document.content.get(0).attachment.size = null;
+            recordService.updateData(decryptedRecord, document, USER_ID);
+            fail("Exception expected!");
+        } catch (D4LException e) {
+
+            // Then
+            assertThat(e.getClass()).isEqualTo(DataValidationException.ExpectedFieldViolation.class);
+            assertThat(e.getMessage()).isEqualTo("Attachment.hash and Attachment.size expected");
+        }
+
+        inOrder.verify(recordService, times(2)).updateData(decryptedRecord, document, USER_ID);
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void updateData_throws_whenInvalidHashAttachmentDuringUpdateFlow()
+            throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation,
+            DataValidationException.InvalidAttachmentPayloadHash {
+        // Given
+        DocumentReference document = buildDocumentReference();
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                document,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
+
+        // When
+        try {
+            document.content.get(0).attachment.hash = "hash";
+            recordService.updateData(decryptedRecord, document, USER_ID);
+            fail("Exception expected!");
+        } catch (D4LException e) {
+
+            // Then
+            assertThat(e.getClass()).isEqualTo(DataValidationException.InvalidAttachmentPayloadHash.class);
+            assertThat(e.getMessage()).isEqualTo("Attachment.hash is not valid");
+        }
+
+        inOrder.verify(recordService).updateData(decryptedRecord, document, USER_ID);
+        inOrder.verify(recordService).getValidHash(document.content.get(0).attachment);
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void updateData_throws_whenOldAttachmentHashNotPresent()
+            throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation,
+            DataValidationException.InvalidAttachmentPayloadHash {
+        // Given
+        DocumentReference oldDocument = buildDocumentReference();
+        Attachment oldAttachment = oldDocument.content.get(0).attachment;
+        oldAttachment.id = "id";
+        oldAttachment.size = null;
+        oldAttachment.hash = null;
+
+        DocumentReference updatedDocument = buildDocumentReference();
+        Attachment updatedAttachment = updatedDocument.content.get(0).attachment;
+        updatedAttachment.id = "id";
+        updatedAttachment.size = 0;
+        updatedAttachment.hash = "hash";
+
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                oldDocument,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        );
+        List<Pair<Attachment, List<String>>> uploadResult = new ArrayList<>();
+        List<String> downscaledIds = Arrays.asList("downscaledId_1","downscaledId_2");
+        uploadResult.add(new Pair<>(updatedAttachment, downscaledIds));
+        when(mockAttachmentService.uploadAttachments(
+                eq(asList(updatedAttachment)),
+                eq(mockAttachmentKey),
+                eq(USER_ID))
+        ).thenReturn(Single.just(uploadResult));
+
+        // When
+        try {
+            recordService.updateData(decryptedRecord, updatedDocument, USER_ID);
+            fail("Exception expected!");
+        } catch (D4LException e) {
+
+            // Then
+            assertThat(e.getClass()).isEqualTo(DataValidationException.InvalidAttachmentPayloadHash.class);
+            assertThat(e.getMessage()).isEqualTo("Attachment.hash is not valid");
+        }
+
+
+        // Then
+        inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID);
+        inOrder.verify(recordService).getValidHash(updatedDocument.content.get(0).attachment);
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void updateData_throws_Attachment_whenHashesDontMatch()
+            throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation,
+            DataValidationException.InvalidAttachmentPayloadHash {
+        // Given
+        DocumentReference oldDocument = buildDocumentReference();
+        Attachment oldAttachment = oldDocument.content.get(0).attachment;
+        oldAttachment.id = "id";
+        oldAttachment.size = 0;
+        oldAttachment.hash = "oldHash";
+
+        DocumentReference updatedDocument = buildDocumentReference();
+        Attachment updatedAttachment = updatedDocument.content.get(0).attachment;
+        updatedAttachment.id = "id";
+        updatedAttachment.size = 0;
+        updatedAttachment.hash = "newHash";
+
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                oldDocument,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        );
+        List<Pair<Attachment, List<String>>> uploadResult = new ArrayList<>();
+        List<String> downscaledIds = Arrays.asList("downscaledId_1", "downscaledId_2");
+        uploadResult.add(new Pair<>(updatedAttachment, downscaledIds));
+        when(mockAttachmentService.uploadAttachments(
+                eq(Collections.singletonList(updatedAttachment)),
+                eq(mockAttachmentKey),
+                eq(USER_ID))
+        ).thenReturn(Single.just(uploadResult));
+
+
+        // When
+        try {
+            recordService.updateData(decryptedRecord, updatedDocument, USER_ID);
+            fail("Exception expected!");
+        } catch (D4LException e) {
+
+            // Then
+            assertThat(e.getClass()).isEqualTo(DataValidationException.InvalidAttachmentPayloadHash.class);
+            assertThat(e.getMessage()).isEqualTo("Attachment.hash is not valid");
+        }
+
+        // Then
+        inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID);
+        inOrder.verify(recordService).getValidHash(updatedDocument.content.get(0).attachment);
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void updateData_throws_whenValidAttachmentIdNotPresent()
+            throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation,
+            DataValidationException.InvalidAttachmentPayloadHash {
+        // Given
+        DocumentReference oldDocument = buildDocumentReference();
+        Attachment oldAttachment = oldDocument.content.get(0).attachment;
+        oldAttachment.id = "id1";
+        oldAttachment.size = 0;
+        oldAttachment.hash = "hash";
+
+        DocumentReference updatedDocument = buildDocumentReference();
+        Attachment updatedAttachment = updatedDocument.content.get(0).attachment;
+        updatedAttachment.id = "id2";
+        updatedAttachment.size = 0;
+        updatedAttachment.hash = "hash";
+
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                oldDocument,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
+
+        when(recordService.getValidHash(updatedDocument.content.get(0).attachment))
+                .thenReturn("hash");
+        // When
+        try {
+            recordService.updateData(decryptedRecord, updatedDocument, USER_ID);
+            fail("Exception expected!");
+        } catch (D4LException e) {
+
+            // Then
+            assertThat(e.getClass()).isEqualTo(DataValidationException.IdUsageViolation.class);
+            assertThat(e.getMessage()).isEqualTo("Valid Attachment.id expected");
+        }
+
+        inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID);
+        inOrder.verify(recordService).getValidHash(updatedDocument.content.get(0).attachment);
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void updateData_notUploadsAttachment_whenHashesMatch()
+            throws DataValidationException.InvalidAttachmentPayloadHash, DataValidationException.ExpectedFieldViolation,
+            DataValidationException.IdUsageViolation {
+        // Given
+        DocumentReference oldDocument = buildDocumentReference();
+        Attachment oldAttachment = oldDocument.content.get(0).attachment;
+        oldAttachment.id = "id";
+        oldAttachment.size = 0;
+        oldAttachment.hash = "hash";
+
+        DocumentReference updatedDocument = buildDocumentReference();
+        Attachment updatedAttachment = updatedDocument.content.get(0).attachment;
+        updatedAttachment.id = "id";
+        updatedAttachment.size = 0;
+        updatedAttachment.hash = "hash";
+
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                oldDocument,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        );
+
+        when(recordService.getValidHash(updatedDocument.content.get(0).attachment)).thenReturn("hash");
+        // When
+        recordService.updateData(decryptedRecord, updatedDocument, USER_ID);
+
+        // Then
+        inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID);
+        inOrder.verify(recordService).getValidHash(updatedDocument.content.get(0).attachment);
+        inOrder.verifyNoMoreInteractions();
+    }
+
+
+    @Test
+    public void uploadOrDownloadData_calls_downloadData() throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
+        // Given
+        doReturn(mockDecryptedRecord).when(recordService).downloadData(mockDecryptedRecord, USER_ID);
+
+        // When
+        DecryptedFhirRecord record = recordService.uploadOrDownloadData(
+                DOWNLOAD,
+                mockDecryptedRecord,
+                null,
+                USER_ID
+        );
+
+        // Then
+        assertThat(record).isEqualTo(mockDecryptedRecord);
+
+        inOrder.verify(recordService).uploadOrDownloadData(
+                DOWNLOAD,
+                mockDecryptedRecord,
+                null,
+                USER_ID
+        );
+        inOrder.verify(recordService).downloadData(mockDecryptedRecord, USER_ID);
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void downloadData_shouldDownloadData() throws DataValidationException.IdUsageViolation,
+            DataValidationException.InvalidAttachmentPayloadHash {
+        // Given
+        DocumentReference document = buildDocumentReference();
+        document.content.get(0).attachment.id = "id";
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                document,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        );
+        when(mockAttachmentService.downloadAttachments(
+                any(),
+                eq(mockAttachmentKey),
+                eq(USER_ID))
+        ).thenReturn(Single.just(new ArrayList<>()));
+
+        // When
+        DecryptedFhirRecord record = recordService.downloadData(decryptedRecord, USER_ID);
+
+        // Then
+        assertThat(record).isEqualTo(decryptedRecord);
+
+        inOrder.verify(recordService).downloadData(decryptedRecord, USER_ID);
+        inOrder.verify(mockAttachmentService).downloadAttachments(
+                any(),
+                eq(mockAttachmentKey),
+                eq(USER_ID)
+        );
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void downloadData_shouldThrow_whenAttachmentIdIsNotSetDuringDownloadFlow()
+            throws DataValidationException.ExpectedFieldViolation, DataValidationException.IdUsageViolation,
+            DataValidationException.InvalidAttachmentPayloadHash {
+        // Given
+        DocumentReference document = buildDocumentReference();
+        document.content.get(0).attachment.id = null;
+        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+                RECORD_ID,
+                document,
+                null,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                -1
+        );
+
+        // When
+        try {
+            recordService.downloadData(decryptedRecord, USER_ID);
+            fail("Exception expected!");
+        } catch (D4LException e) {
+
+            // Then
+            assertThat(e.getClass()).isEqualTo(DataValidationException.IdUsageViolation.class);
+            assertThat(e.getMessage()).isEqualTo("Attachment.id expected");
+        }
+
+        inOrder.verify(recordService).downloadData(decryptedRecord, USER_ID);
+        inOrder.verifyNoMoreInteractions();
     }
 
     @Test

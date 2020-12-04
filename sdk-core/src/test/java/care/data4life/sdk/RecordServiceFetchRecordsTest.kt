@@ -40,21 +40,6 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
         stop()
     }
 
-    @After
-    fun tearDown() {
-        stop()
-    }
-
-    @After
-    fun tearDown() {
-        stop()
-    }
-
-    @After
-    fun tearDown() {
-        stop()
-    }
-
     @Test
     @Throws(
             InterruptedException::class,

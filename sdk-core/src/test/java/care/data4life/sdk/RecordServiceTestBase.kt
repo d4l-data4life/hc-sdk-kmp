@@ -30,6 +30,8 @@ import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhirRecord
+import care.data4life.sdk.test.util.AttachmentBuilder
+import care.data4life.sdk.util.Base64
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
@@ -222,5 +224,34 @@ abstract class RecordServiceTestBase {
         internal val LOCAL_DATE = LocalDate.of(2001, 1, 1)
         internal val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US)
         internal val ANNOTATIONS = listOf("potato", "tomato", "soup")
+
+        fun buildDocumentReference(): DocumentReference {
+            val content = buildDocRefContent(AttachmentBuilder.buildAttachment(null))
+            val contents: MutableList<DocumentReference.DocumentReferenceContent> = ArrayList()
+            contents.add(content)
+            return DocumentReference(
+                    null,
+                    null,
+                    null,
+                    contents
+            )
+        }
+
+        fun buildDocRefContent(attachment: Attachment?): DocumentReference.DocumentReferenceContent {
+            return DocumentReference.DocumentReferenceContent(attachment)
+        }
+
+        fun buildDocumentReference(data: ByteArray?): DocumentReference {
+            val doc = buildDocumentReference()
+            doc.content[0].attachment.data = Base64.encodeToString(data!!)
+            return doc
+        }
+
+        fun unboxByteArray(array: Array<Byte?>): ByteArray {
+            val result = ByteArray(array.size)
+            var i = 0
+            for (b in array) result[i++] = b ?: 0
+            return result
+        }
     }
 }

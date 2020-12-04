@@ -242,7 +242,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
     fun `Given with unsupported data, createRecord throws an error`() {
         // Given
         val invalidData = byteArrayOf(0x00)
-        val doc = RecordServiceTest.buildDocumentReference(invalidData)
+        val doc = buildDocumentReference(invalidData)
 
         // When
         try {
@@ -274,7 +274,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
                 0,
                 MimeType.PDF.byteSignature()[0]!!.size
         )
-        val doc = RecordServiceTest.buildDocumentReference(RecordServiceTest.unboxByteArray(invalidSizePdf))
+        val doc = buildDocumentReference(unboxByteArray(invalidSizePdf))
 
         // When
         try {
@@ -521,7 +521,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
     fun `Given a unsupported Data, a UserId and Annotations, createRecord throws an error`() {
         // Given
         val invalidData = byteArrayOf(0x00)
-        val doc = RecordServiceTest.buildDocumentReference(invalidData)
+        val doc = buildDocumentReference(invalidData)
 
         // When
         try {
@@ -553,7 +553,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
                 0,
                 MimeType.PDF.byteSignature()[0]!!.size
         )
-        val doc = RecordServiceTest.buildDocumentReference(RecordServiceTest.unboxByteArray(invalidSizePdf))
+        val doc = buildDocumentReference(unboxByteArray(invalidSizePdf))
 
         // When
         try {

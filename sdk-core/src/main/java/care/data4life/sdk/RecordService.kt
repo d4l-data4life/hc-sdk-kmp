@@ -202,10 +202,7 @@ internal class RecordService(
     ): Single<BaseRecord<T>> {
         return apiService
                 .fetchRecord(alias, userId, recordId)
-                .map { encryptedRecord ->
-                    @Suppress("UNCHECKED_CAST")
-                    decryptRecord<Any>(encryptedRecord, userId) as DecryptedBaseRecord<T>
-                }
+                .map { encryptedRecord -> decryptRecord<Any>(encryptedRecord, userId) }
                 .map { decryptedRecord ->
                     if(decryptedRecord.resource !is ByteArray) {
                         @Suppress("UNCHECKED_CAST")
@@ -214,7 +211,7 @@ internal class RecordService(
                         decryptedRecord
                     }
                 }
-                .map { decryptedRecord: DecryptedBaseRecord<out Any> ->
+                .map { decryptedRecord ->
                     @Suppress("UNCHECKED_CAST")
                     if( decryptedRecord.resource is ByteArray ) {
                         AppDataRecord(
@@ -256,8 +253,7 @@ internal class RecordService(
                     fetchRecord<T>(recordId, userId)
                             .onErrorReturn { error -> EmptyRecord<T>().also {
                                 failedFetches.add(Pair(recordId, errorHandler.handleError(error)))
-                            }
-                            }
+                            } }
                 }
                 .filter { record -> record !is EmptyRecord<*> }
                 .toList()
@@ -314,8 +310,7 @@ internal class RecordService(
                     decryptedRecord.resource,
                     buildMeta(decryptedRecord),
                     decryptedRecord.annotations
-            )
-            }
+            ) }
             .toList()
 
     fun fetchRecords(
@@ -586,7 +581,7 @@ internal class RecordService(
                             encryptedTags
                     )
                 }
-                .flatMapIterable { encryptedRecords: List<EncryptedRecord>? -> encryptedRecords }
+                .flatMapIterable { encryptedRecords -> encryptedRecords }
     }
 
     @Throws(IOException::class)
@@ -681,7 +676,7 @@ internal class RecordService(
         )
 
     @Throws(IOException::class)
-    fun encryptDataRecord(
+    internal fun encryptDataRecord(
             record: DecryptedDataRecord? //FIXME: this a test concern, which should be removed soon as possible
     ): EncryptedRecord = encrypt(
             record!!,
@@ -698,7 +693,7 @@ internal class RecordService(
             record,
             userId
     ) { tags: HashMap<String, String>, annotations: List<String>, dataKey: GCKey, commonKey: GCKey ->
-        return@decrypt if(tags.containsKey(TaggingService.TAG_RESOURCE_TYPE)) {
+        if(tags.containsKey(TaggingService.TAG_RESOURCE_TYPE)) {
             decryptFhirRecord<DomainResource>(
                     record,
                     tags,
@@ -890,7 +885,7 @@ internal class RecordService(
             newResource: T?,
             userId: String?
     ): DecryptedFhirRecord<T> {
-        newResource?: throw CoreRuntimeException.UnsupportedOperation()
+        newResource ?: throw CoreRuntimeException.UnsupportedOperation()
 
         var resource = record.resource
         if (!FhirAttachmentHelper.hasAttachment(resource)) return record
@@ -954,7 +949,7 @@ internal class RecordService(
         val attachments =   if (FhirAttachmentHelper.getAttachment(resource) == null) arrayListOf()
                             else FhirAttachmentHelper.getAttachment(resource)
 
-        attachments?: return record
+        attachments ?: return record
 
         attachments.forEach {
             it.id ?: throw DataValidationException.IdUsageViolation("Attachment.id expected")
@@ -1104,7 +1099,7 @@ internal class RecordService(
         if (!FhirAttachmentHelper.hasAttachment(resource)) return
         val attachments = FhirAttachmentHelper.getAttachment(resource)
         for (attachment in attachments) {
-            attachment?.data?: return
+            attachment?.data ?: return
 
             val data = decode(attachment.data!!)
             if (recognizeMimeType(data) == MimeType.UNKNOWN) {

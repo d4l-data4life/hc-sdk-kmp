@@ -25,7 +25,6 @@ import care.data4life.fhir.stu3.model.Organization
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
-import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.DownloadType
@@ -147,24 +146,24 @@ class RecordServiceTest : RecordServiceTestBase() {
     @Test
     fun removeUploadData_shouldCall_removeOrRestoreUploadData() {
         // Given
-        Mockito.doReturn(mockDecryptedRecord)
+        Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService)
                 .removeOrRestoreUploadData(
                         RecordService.RemoveRestoreOperation.REMOVE,
-                        mockDecryptedRecord,
+                        mockDecryptedFhirRecord,
                         null,
                         null
                 )
 
         // When
-        val record = recordService.removeUploadData(mockDecryptedRecord)
+        val record = recordService.removeUploadData(mockDecryptedFhirRecord)
 
         // Then
-        Truth.assertThat(record).isEqualTo(mockDecryptedRecord)
-        inOrder.verify(recordService).removeUploadData(mockDecryptedRecord)
+        Truth.assertThat(record).isEqualTo(mockDecryptedFhirRecord)
+        inOrder.verify(recordService).removeUploadData(mockDecryptedFhirRecord)
         inOrder.verify(recordService).removeOrRestoreUploadData(
                 RecordService.RemoveRestoreOperation.REMOVE, 
-                mockDecryptedRecord, 
+                mockDecryptedFhirRecord,
                 null,
                 null
         )
@@ -174,30 +173,30 @@ class RecordServiceTest : RecordServiceTestBase() {
     @Test
     fun restoreUploadData_shouldCall_removeOrRestoreUploadData() {
         // Given
-        Mockito.doReturn(mockDecryptedRecord)
+        Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService)
                 .removeOrRestoreUploadData(RecordService.RemoveRestoreOperation.RESTORE,
-                        mockDecryptedRecord,
+                        mockDecryptedFhirRecord,
                         mockDocumentReference,
                         mockUploadData
                 )
 
         // When
         val record = recordService.restoreUploadData(
-                mockDecryptedRecord,
+                mockDecryptedFhirRecord,
                 mockDocumentReference,
                 mockUploadData
         )
 
         // Then
-        Truth.assertThat(record).isEqualTo(mockDecryptedRecord)
+        Truth.assertThat(record).isEqualTo(mockDecryptedFhirRecord)
         inOrder.verify(recordService).restoreUploadData(
-                mockDecryptedRecord,
+                mockDecryptedFhirRecord,
                 mockDocumentReference,
                 mockUploadData
         )
         inOrder.verify(recordService).removeOrRestoreUploadData(RecordService.RemoveRestoreOperation.RESTORE,
-                mockDecryptedRecord,
+                mockDecryptedFhirRecord,
                 mockDocumentReference,
                 mockUploadData
         )
@@ -536,16 +535,16 @@ class RecordServiceTest : RecordServiceTestBase() {
     fun buildMeta_shouldBuildMeta_whenUpdatedDateMillisecondsArePresent() {
         // Given
         val updatedDateWithMilliseconds = "2019-02-28T17:21:08.234123"
-        Mockito.`when`(mockDecryptedRecord.customCreationDate).thenReturn("2019-02-28")
-        Mockito.`when`(mockDecryptedRecord.updatedDate).thenReturn(updatedDateWithMilliseconds)
+        Mockito.`when`(mockDecryptedFhirRecord.customCreationDate).thenReturn("2019-02-28")
+        Mockito.`when`(mockDecryptedFhirRecord.updatedDate).thenReturn(updatedDateWithMilliseconds)
 
         // When
-        val meta = recordService.buildMeta(mockDecryptedRecord)
+        val meta = recordService.buildMeta(mockDecryptedFhirRecord)
 
         // Then
         Truth.assertThat(meta.createdDate).isEqualTo(LocalDate.of(2019, 2, 28))
         Truth.assertThat(meta.updatedDate).isEqualTo(LocalDateTime.of(2019, 2, 28, 17, 21, 8, 234123000))
-        inOrder.verify(recordService).buildMeta(mockDecryptedRecord)
+        inOrder.verify(recordService).buildMeta(mockDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -553,11 +552,11 @@ class RecordServiceTest : RecordServiceTestBase() {
     fun buildMeta_shouldBuildMeta_whenUpdatedDateMillisecondsAreNotPresent() {
         // Given
         val updatedDateWithMilliseconds = "2019-02-28T17:21:08"
-        Mockito.`when`(mockDecryptedRecord.customCreationDate).thenReturn("2019-02-28")
-        Mockito.`when`(mockDecryptedRecord.updatedDate).thenReturn(updatedDateWithMilliseconds)
+        Mockito.`when`(mockDecryptedFhirRecord.customCreationDate).thenReturn("2019-02-28")
+        Mockito.`when`(mockDecryptedFhirRecord.updatedDate).thenReturn(updatedDateWithMilliseconds)
 
         // When
-        val meta = recordService.buildMeta(mockDecryptedRecord)
+        val meta = recordService.buildMeta(mockDecryptedFhirRecord)
 
         // Then
         Truth.assertThat(meta.createdDate).isEqualTo(
@@ -566,7 +565,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         Truth.assertThat(meta.updatedDate).isEqualTo(
                 LocalDateTime.of(2019, 2, 28, 17, 21, 8)
         )
-        inOrder.verify(recordService).buildMeta(mockDecryptedRecord)
+        inOrder.verify(recordService).buildMeta(mockDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -622,13 +621,13 @@ class RecordServiceTest : RecordServiceTestBase() {
         Mockito.`when`(mockApiService.fetchRecord(ALIAS, USER_ID, RECORD_ID))
                 .thenReturn(Single.just(mockEncryptedRecord))
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
-        Mockito.doReturn(mockDecryptedRecord)
+        Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService)
                 .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockDecryptedRecord)
+        Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService)
-                .downloadData(mockDecryptedRecord, USER_ID)
-        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedRecord)
+                .downloadData(mockDecryptedFhirRecord, USER_ID)
+        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedFhirRecord)
 
         // When
         val observer = recordService.downloadRecord<CarePlan>(RECORD_ID, USER_ID).test().await()
@@ -643,7 +642,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         Truth.assertThat(result.fhirResource).isEqualTo(mockCarePlan)
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).buildMeta(mockDecryptedRecord)
+        inOrder.verify(recordService).buildMeta(mockDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -662,13 +661,13 @@ class RecordServiceTest : RecordServiceTestBase() {
         val doc = buildDocumentReference(invalidData)
         Mockito.`when`(mockApiService.fetchRecord(ALIAS, USER_ID, RECORD_ID))
                 .thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedRecord)
+        Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService)
                 .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockDecryptedRecord)
+        Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService).
-                downloadData(mockDecryptedRecord, USER_ID)
-        Mockito.`when`(mockDecryptedRecord.resource).thenReturn(doc)
+                downloadData(mockDecryptedFhirRecord, USER_ID)
+        Mockito.`when`(mockDecryptedFhirRecord.resource).thenReturn(doc)
 
         // When
         val observer = recordService.downloadRecord<DomainResource>(RECORD_ID, USER_ID).test().await()
@@ -679,7 +678,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         Truth.assertThat(errors[0]).isInstanceOf(DataRestrictionException.UnsupportedFileType::class.java)
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).downloadData(mockDecryptedRecord, USER_ID)
+        inOrder.verify(recordService).downloadData(mockDecryptedFhirRecord, USER_ID)
         inOrder.verify(recordService).checkDataRestrictions(doc)
         inOrder.verifyNoMoreInteractions()
     }
@@ -707,13 +706,13 @@ class RecordServiceTest : RecordServiceTestBase() {
         Mockito.`when`(mockApiService
                 .fetchRecord(ALIAS, USER_ID, RECORD_ID))
                 .thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedRecord)
+        Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService)
                 .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockDecryptedRecord)
+        Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService)
-                .downloadData(mockDecryptedRecord, USER_ID)
-        Mockito.`when`(mockDecryptedRecord.resource).thenReturn(doc)
+                .downloadData(mockDecryptedFhirRecord, USER_ID)
+        Mockito.`when`(mockDecryptedFhirRecord.resource).thenReturn(doc)
 
         // When
         val observer = recordService.downloadRecord<DomainResource>(RECORD_ID, USER_ID).test().await()
@@ -724,7 +723,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         Truth.assertThat(errors[0]).isInstanceOf(DataRestrictionException.MaxDataSizeViolation::class.java)
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).downloadData(mockDecryptedRecord, USER_ID)
+        inOrder.verify(recordService).downloadData(mockDecryptedFhirRecord, USER_ID)
         inOrder.verify(recordService).checkDataRestrictions(doc)
         inOrder.verifyNoMoreInteractions()
     }

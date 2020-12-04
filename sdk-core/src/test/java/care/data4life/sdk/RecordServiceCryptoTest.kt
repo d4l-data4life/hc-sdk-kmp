@@ -69,7 +69,7 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
         ).thenReturn(Single.just(mockEncryptedDataKey))
 
         // When
-        val encryptedRecord = recordService.encryptRecord(mockAnnotatedDecryptedRecord)
+        val encryptedRecord = recordService.encryptRecord(mockAnnotatedDecryptedFhirRecord)
 
         // Then
         Truth.assertThat(encryptedRecord.commonKeyId).isEqualTo(currentCommonKeyId)
@@ -90,7 +90,7 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
     fun `Given a DecryptedRecord, encryptRecord adds a encrypted AttachmentKey, if the DecryptedRecord contains a AttachmentKey`() {
         // Given
         val currentCommonKeyId = "currentCommonKeyId"
-        Mockito.`when`(mockAnnotatedDecryptedRecord.attachmentsKey).thenReturn(mockAttachmentKey)
+        Mockito.`when`(mockAnnotatedDecryptedFhirRecord.attachmentsKey).thenReturn(mockAttachmentKey)
         Mockito.`when`(mockTagEncryptionService.encryptTags(mockTags))
                 .thenReturn(mockEncryptedTags)
         Mockito.`when`(mockTagEncryptionService.encryptAnnotations(ANNOTATIONS))
@@ -115,7 +115,7 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
         ).thenReturn(Single.just(mockEncryptedAttachmentKey))
 
         // When
-        val encryptedRecord = recordService.encryptRecord(mockAnnotatedDecryptedRecord)
+        val encryptedRecord = recordService.encryptRecord(mockAnnotatedDecryptedFhirRecord)
 
         // Then
         Truth.assertThat(encryptedRecord.commonKeyId).isEqualTo(currentCommonKeyId)
@@ -265,7 +265,7 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
         ).thenReturn(Single.just(mockEncryptedDataKey))
 
         // When
-        val encryptedRecord = recordService.encryptDataRecord(mockDecryptedAppDataRecord)
+        val encryptedRecord = recordService.encryptDataRecord(mockDecryptedDataRecord)
 
         // Then
         Truth.assertThat(encryptedRecord.commonKeyId).isEqualTo(currentCommonKeyId)

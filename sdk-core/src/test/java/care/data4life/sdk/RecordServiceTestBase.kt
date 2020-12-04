@@ -67,9 +67,9 @@ abstract class RecordServiceTestBase {
     internal lateinit var mockEncryptedAttachmentKey: EncryptedKey
     internal lateinit var mockEncryptedRecord: EncryptedRecord
     internal lateinit var mockAnnotatedEncryptedRecord: EncryptedRecord
-    internal lateinit var mockDecryptedRecord: DecryptedFhirRecord<DomainResource>
-    internal lateinit var mockAnnotatedDecryptedRecord: DecryptedFhirRecord<DomainResource>
-    internal lateinit var mockDecryptedAppDataRecord: DecryptedDataRecord
+    internal lateinit var mockDecryptedFhirRecord: DecryptedFhirRecord<DomainResource>
+    internal lateinit var mockAnnotatedDecryptedFhirRecord: DecryptedFhirRecord<DomainResource>
+    internal lateinit var mockDecryptedDataRecord: DecryptedDataRecord
     internal lateinit var mockMeta: Meta
     private lateinit var mockD4LException: D4LException
     internal lateinit var mockRecord: Record<CarePlan>
@@ -113,9 +113,9 @@ abstract class RecordServiceTestBase {
         mockEncryptedAttachmentKey = Mockito.mock(EncryptedKey::class.java)
         mockEncryptedRecord = Mockito.mock(EncryptedRecord::class.java)
         mockAnnotatedEncryptedRecord = Mockito.mock(EncryptedRecord::class.java)
-        mockDecryptedRecord = Mockito.mock(DecryptedFhirRecord::class.java) as DecryptedFhirRecord<DomainResource>
-        mockAnnotatedDecryptedRecord = Mockito.mock(DecryptedFhirRecord::class.java) as DecryptedFhirRecord<DomainResource>
-        mockDecryptedAppDataRecord = Mockito.mock(DecryptedDataRecord::class.java)
+        mockDecryptedFhirRecord = Mockito.mock(DecryptedFhirRecord::class.java) as DecryptedFhirRecord<DomainResource>
+        mockAnnotatedDecryptedFhirRecord = Mockito.mock(DecryptedFhirRecord::class.java) as DecryptedFhirRecord<DomainResource>
+        mockDecryptedDataRecord = Mockito.mock(DecryptedDataRecord::class.java)
         mockMeta = Mockito.mock(Meta::class.java)
         mockD4LException = Mockito.mock(D4LException::class.java)
         mockRecord = Mockito.mock<Record<*>>(Record::class.java) as Record<CarePlan>
@@ -123,23 +123,23 @@ abstract class RecordServiceTestBase {
         Mockito.`when`(mockRecord.fhirResource).thenReturn(mockCarePlan)
         Mockito.`when`(mockRecord.meta).thenReturn(mockMeta)
 
-        Mockito.`when`<HashMap<*, *>?>(mockDecryptedRecord.tags).thenReturn(mockTags)
-        Mockito.`when`(mockDecryptedRecord.dataKey).thenReturn(mockDataKey)
-        Mockito.`when`(mockDecryptedRecord.resource).thenReturn(mockCarePlan)
-        Mockito.`when`(mockDecryptedRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
+        Mockito.`when`<HashMap<*, *>?>(mockDecryptedFhirRecord.tags).thenReturn(mockTags)
+        Mockito.`when`(mockDecryptedFhirRecord.dataKey).thenReturn(mockDataKey)
+        Mockito.`when`(mockDecryptedFhirRecord.resource).thenReturn(mockCarePlan)
+        Mockito.`when`(mockDecryptedFhirRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
 
-        Mockito.`when`<HashMap<*, *>?>(mockAnnotatedDecryptedRecord.tags).thenReturn(mockTags)
-        Mockito.`when`(mockAnnotatedDecryptedRecord.dataKey).thenReturn(mockDataKey)
-        Mockito.`when`(mockAnnotatedDecryptedRecord.resource).thenReturn(mockCarePlan)
-        Mockito.`when`(mockAnnotatedDecryptedRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
-        Mockito.`when`(mockAnnotatedDecryptedRecord.annotations).thenReturn(ANNOTATIONS)
+        Mockito.`when`<HashMap<*, *>?>(mockAnnotatedDecryptedFhirRecord.tags).thenReturn(mockTags)
+        Mockito.`when`(mockAnnotatedDecryptedFhirRecord.dataKey).thenReturn(mockDataKey)
+        Mockito.`when`(mockAnnotatedDecryptedFhirRecord.resource).thenReturn(mockCarePlan)
+        Mockito.`when`(mockAnnotatedDecryptedFhirRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
+        Mockito.`when`(mockAnnotatedDecryptedFhirRecord.annotations).thenReturn(ANNOTATIONS)
 
-        Mockito.`when`<HashMap<*, *>?>(mockDecryptedAppDataRecord.tags).thenReturn(mockTags)
-        Mockito.`when`(mockDecryptedAppDataRecord.dataKey).thenReturn(mockDataKey)
-        Mockito.`when`(mockDecryptedAppDataRecord.resource).thenReturn(mockAppData)
-        Mockito.`when`(mockDecryptedAppDataRecord.identifier).thenReturn("id")
-        Mockito.`when`(mockDecryptedAppDataRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
-        Mockito.`when`(mockDecryptedAppDataRecord.annotations).thenReturn(ANNOTATIONS)
+        Mockito.`when`<HashMap<*, *>?>(mockDecryptedDataRecord.tags).thenReturn(mockTags)
+        Mockito.`when`(mockDecryptedDataRecord.dataKey).thenReturn(mockDataKey)
+        Mockito.`when`(mockDecryptedDataRecord.resource).thenReturn(mockAppData)
+        Mockito.`when`(mockDecryptedDataRecord.identifier).thenReturn("id")
+        Mockito.`when`(mockDecryptedDataRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
+        Mockito.`when`(mockDecryptedDataRecord.annotations).thenReturn(ANNOTATIONS)
 
 
         Mockito.`when`(mockTags[RESOURCE_TYPE]).thenReturn(CarePlan.resourceType)

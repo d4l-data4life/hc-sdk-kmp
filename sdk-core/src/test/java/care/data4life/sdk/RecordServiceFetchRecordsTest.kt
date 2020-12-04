@@ -51,10 +51,10 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
         Mockito
                 .`when`(mockApiService.fetchRecord(ALIAS, USER_ID, RECORD_ID))
                 .thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedRecord)
+        Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService)
                 .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedRecord)
+        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedFhirRecord)
 
         // When
         val observer = recordService.fetchRecord<CarePlan>(RECORD_ID, USER_ID).test().await()
@@ -69,7 +69,7 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
         Truth.assertThat(record.resource).isEqualTo(mockCarePlan)
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).buildMeta(mockDecryptedRecord)
+        inOrder.verify(recordService).buildMeta(mockDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -119,10 +119,10 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
                     ArgumentMatchers.eq(mockEncryptedTags)
                 )
         ).thenReturn(Observable.just(encryptedRecords))
-        Mockito.doReturn(mockDecryptedRecord)
+        Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService)
                 .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedRecord)
+        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedFhirRecord)
 
         // When
         val observer = recordService.fetchRecords(
@@ -158,9 +158,9 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
                 ArgumentMatchers.eq(mockEncryptedTags)
         )
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).buildMeta(mockDecryptedRecord)
+        inOrder.verify(recordService).buildMeta(mockDecryptedFhirRecord)
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).buildMeta(mockDecryptedRecord)
+        inOrder.verify(recordService).buildMeta(mockDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -185,10 +185,10 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
                         ArgumentMatchers.eq(mockEncryptedTags)
                 )
         ).thenReturn(Observable.just(encryptedRecords))
-        Mockito.doReturn(mockAnnotatedDecryptedRecord)
+        Mockito.doReturn(mockAnnotatedDecryptedFhirRecord)
                 .`when`(recordService)
                 .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockAnnotatedDecryptedRecord)
+        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockAnnotatedDecryptedFhirRecord)
 
         // When
         val observer = recordService.fetchRecords(
@@ -225,9 +225,9 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
                 ArgumentMatchers.eq(mockEncryptedTags)
         )
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).buildMeta(mockAnnotatedDecryptedRecord)
+        inOrder.verify(recordService).buildMeta(mockAnnotatedDecryptedFhirRecord)
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).buildMeta(mockAnnotatedDecryptedRecord)
+        inOrder.verify(recordService).buildMeta(mockAnnotatedDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -240,8 +240,8 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
     fun `Given a RecordId and UserId, fetchAppDataRecord returns a AppDataRecord`() {
         // Given
         Mockito.`when`(mockApiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)).thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedAppDataRecord).`when`(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedAppDataRecord)
+        Mockito.doReturn(mockDecryptedDataRecord).`when`(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
+        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedDataRecord)
 
         // When
         val observer = recordService.fetchAppDataRecord(RECORD_ID, USER_ID).test().await()
@@ -256,7 +256,7 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
         Truth.assertThat(record.resource).isEqualTo(mockAppData)
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
         inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).buildMeta(mockDecryptedAppDataRecord)
+        inOrder.verify(recordService).buildMeta(mockDecryptedDataRecord)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -283,10 +283,10 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
                         ArgumentMatchers.eq(mockEncryptedTags)
                 )
         ).thenReturn(Observable.just(encryptedRecords))
-        Mockito.doReturn(mockDecryptedAppDataRecord)
+        Mockito.doReturn(mockDecryptedDataRecord)
                 .`when`(recordService)
                 .decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedAppDataRecord)
+        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedDataRecord)
 
         // When
         val observer = recordService.fetchRecords(
@@ -322,9 +322,9 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
                 ArgumentMatchers.eq(mockEncryptedTags)
         )
         inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).buildMeta(mockDecryptedAppDataRecord)
+        inOrder.verify(recordService).buildMeta(mockDecryptedDataRecord)
         inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).buildMeta(mockDecryptedAppDataRecord)
+        inOrder.verify(recordService).buildMeta(mockDecryptedDataRecord)
         inOrder.verifyNoMoreInteractions()
     }
 }

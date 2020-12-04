@@ -70,31 +70,31 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
                 ArgumentMatchers.any<HashMap<String, String>>())
         ).thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
-        Mockito.doReturn(mockDecryptedRecord).`when`(recordService)
+        Mockito.doReturn(mockDecryptedFhirRecord).`when`(recordService)
                 .uploadData(
                         decryptedRecordIndicator,
                         null,
                         USER_ID
                 )
-        Mockito.doReturn(mockDecryptedRecord).`when`(recordService)
-                .removeUploadData(mockDecryptedRecord)
+        Mockito.doReturn(mockDecryptedFhirRecord).`when`(recordService)
+                .removeUploadData(mockDecryptedFhirRecord)
         
         Mockito.doReturn(mockEncryptedRecord)
                 .`when`(recordService).encryptRecord<DomainResource>(
-                        mockDecryptedRecord
+                        mockDecryptedFhirRecord
                 )
         Mockito.`when`(mockApiService.createRecord(ALIAS, USER_ID, mockEncryptedRecord))
                 .thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedRecord)
+        Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService)
                 .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockDecryptedRecord)
+        Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService).restoreUploadData<DomainResource>(
-                        mockDecryptedRecord,
+                        mockDecryptedFhirRecord,
                         mockCarePlan,
                         mockUploadData
                 )
-        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedRecord)
+        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedFhirRecord)
 
         // When
         val subscriber = recordService.createRecord(mockCarePlan, USER_ID).test().await()
@@ -118,19 +118,19 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
                 null,
                 USER_ID
         )
-        inOrder.verify(recordService).removeUploadData(mockDecryptedRecord)
+        inOrder.verify(recordService).removeUploadData(mockDecryptedFhirRecord)
         
         inOrder.verify(recordService).encryptRecord<DomainResource>(
-                mockDecryptedRecord
+                mockDecryptedFhirRecord
         )
         inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockEncryptedRecord)
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).restoreUploadData<DomainResource>(
-                mockDecryptedRecord,
+                mockDecryptedFhirRecord,
                 mockCarePlan,
                 mockUploadData
         )
-        inOrder.verify(recordService).buildMeta(mockDecryptedRecord)
+        inOrder.verify(recordService).buildMeta(mockDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -157,43 +157,43 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         ).thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey())
                 .thenReturn(Single.just(mockDataKey))
-        Mockito.doReturn(mockDecryptedRecord)
+        Mockito.doReturn(mockDecryptedFhirRecord)
 		        .`when`(recordService)
                 .uploadData(
                         decryptedRecordIndicator,
                         null,
                         USER_ID
                 )
-        Mockito.doReturn(mockDecryptedRecord)
+        Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService)
-                .removeUploadData(mockDecryptedRecord)
+                .removeUploadData(mockDecryptedFhirRecord)
         
         Mockito.doReturn(mockEncryptedRecord).`when`(recordService)
-                .encryptRecord<DomainResource>(mockDecryptedRecord)
+                .encryptRecord<DomainResource>(mockDecryptedFhirRecord)
         Mockito.`when`(mockApiService.createRecord(ALIAS, USER_ID, mockEncryptedRecord))
                 .thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedRecord)
+        Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService)
                 .decryptRecord<DomainResource>(
                         mockEncryptedRecord,
                         USER_ID
                 )
-        Mockito.doReturn(mockDecryptedRecord)
+        Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService)
                 .restoreUploadData<DomainResource>(
-                        mockDecryptedRecord,
+                        mockDecryptedFhirRecord,
                         mockCarePlan,
                         mockUploadData
                 )
         
-        Mockito.doReturn(mockDecryptedRecord)
+        Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService)
                 .uploadData<DomainResource>(
-                        mockDecryptedRecord,
+                        mockDecryptedFhirRecord,
                         null,
                         USER_ID
                 )
-        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedRecord)
+        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedFhirRecord)
 
         // When
         val subscriber = recordService.createRecord(mockCarePlan, USER_ID).test().await()
@@ -217,19 +217,19 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
                 null,
                 USER_ID
         )
-        inOrder.verify(recordService).removeUploadData(mockDecryptedRecord)
+        inOrder.verify(recordService).removeUploadData(mockDecryptedFhirRecord)
         
         inOrder.verify(recordService).encryptRecord<DomainResource>(
-                mockDecryptedRecord
+                mockDecryptedFhirRecord
         )
         inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockEncryptedRecord)
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).restoreUploadData(
-                mockDecryptedRecord,
+                mockDecryptedFhirRecord,
                 mockCarePlan,
                 null
         )
-        inOrder.verify(recordService).buildMeta(mockDecryptedRecord)
+        inOrder.verify(recordService).buildMeta(mockDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -344,31 +344,31 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
                 ArgumentMatchers.any<HashMap<String, String>>())
         ).thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
-        Mockito.doReturn(mockAnnotatedDecryptedRecord).`when`(recordService)
+        Mockito.doReturn(mockAnnotatedDecryptedFhirRecord).`when`(recordService)
                 .uploadData(
                         annotatedDecryptedRecordIndicator,
                         null,
                         USER_ID
                 )
-        Mockito.doReturn(mockAnnotatedDecryptedRecord).`when`(recordService)
-                .removeUploadData(mockAnnotatedDecryptedRecord)
+        Mockito.doReturn(mockAnnotatedDecryptedFhirRecord).`when`(recordService)
+                .removeUploadData(mockAnnotatedDecryptedFhirRecord)
         
         Mockito.doReturn(mockAnnotatedEncryptedRecord)
                 .`when`(recordService).encryptRecord<DomainResource>(
-                        mockAnnotatedDecryptedRecord
+                        mockAnnotatedDecryptedFhirRecord
                 )
         Mockito.`when`(mockApiService.createRecord(ALIAS, USER_ID, mockAnnotatedEncryptedRecord))
                 .thenReturn(Single.just(mockAnnotatedEncryptedRecord))
-        Mockito.doReturn(mockAnnotatedDecryptedRecord)
+        Mockito.doReturn(mockAnnotatedDecryptedFhirRecord)
                 .`when`(recordService)
                 .decryptRecord<DomainResource>(mockAnnotatedEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockAnnotatedDecryptedRecord)
+        Mockito.doReturn(mockAnnotatedDecryptedFhirRecord)
                 .`when`(recordService).restoreUploadData<DomainResource>(
-                        mockAnnotatedDecryptedRecord,
+                        mockAnnotatedDecryptedFhirRecord,
                         mockCarePlan,
                         mockUploadData
                 )
-        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockAnnotatedDecryptedRecord)
+        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockAnnotatedDecryptedFhirRecord)
 
         // When
         val subscriber = recordService.createRecord(mockCarePlan, USER_ID, ANNOTATIONS).test().await()
@@ -394,19 +394,19 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
                 null,
                 USER_ID
         )
-        inOrder.verify(recordService).removeUploadData(mockAnnotatedDecryptedRecord)
+        inOrder.verify(recordService).removeUploadData(mockAnnotatedDecryptedFhirRecord)
         
         inOrder.verify(recordService).encryptRecord<DomainResource>(
-                mockAnnotatedDecryptedRecord
+                mockAnnotatedDecryptedFhirRecord
         )
         inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockAnnotatedEncryptedRecord)
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockAnnotatedEncryptedRecord, USER_ID)
         inOrder.verify(recordService).restoreUploadData<DomainResource>(
-                mockAnnotatedDecryptedRecord,
+                mockAnnotatedDecryptedFhirRecord,
                 mockCarePlan,
                 mockUploadData
         )
-        inOrder.verify(recordService).buildMeta(mockAnnotatedDecryptedRecord)
+        inOrder.verify(recordService).buildMeta(mockAnnotatedDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -433,43 +433,43 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         ).thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey())
                 .thenReturn(Single.just(mockDataKey))
-        Mockito.doReturn(mockAnnotatedDecryptedRecord)
+        Mockito.doReturn(mockAnnotatedDecryptedFhirRecord)
                 .`when`(recordService)
                 .uploadData(
                         annotatedDecryptedRecordIndicator,
                         null,
                         USER_ID
                 )
-        Mockito.doReturn(mockAnnotatedDecryptedRecord)
+        Mockito.doReturn(mockAnnotatedDecryptedFhirRecord)
                 .`when`(recordService)
-                .removeUploadData(mockAnnotatedDecryptedRecord)
+                .removeUploadData(mockAnnotatedDecryptedFhirRecord)
         
         Mockito.doReturn(mockAnnotatedEncryptedRecord).`when`(recordService)
-                .encryptRecord<DomainResource>(mockAnnotatedDecryptedRecord)
+                .encryptRecord<DomainResource>(mockAnnotatedDecryptedFhirRecord)
         Mockito.`when`(mockApiService.createRecord(ALIAS, USER_ID, mockAnnotatedEncryptedRecord))
                 .thenReturn(Single.just(mockAnnotatedEncryptedRecord))
-        Mockito.doReturn(mockAnnotatedDecryptedRecord)
+        Mockito.doReturn(mockAnnotatedDecryptedFhirRecord)
                 .`when`(recordService)
                 .decryptRecord<DomainResource>(
                         mockAnnotatedEncryptedRecord,
                         USER_ID
                 )
-        Mockito.doReturn(mockAnnotatedDecryptedRecord)
+        Mockito.doReturn(mockAnnotatedDecryptedFhirRecord)
                 .`when`(recordService)
                 .restoreUploadData<DomainResource>(
-                        mockAnnotatedDecryptedRecord,
+                        mockAnnotatedDecryptedFhirRecord,
                         mockCarePlan,
                         mockUploadData
                 )
         
-        Mockito.doReturn(mockAnnotatedDecryptedRecord)
+        Mockito.doReturn(mockAnnotatedDecryptedFhirRecord)
                 .`when`(recordService)
                 .uploadData<DomainResource>(
-                        mockAnnotatedDecryptedRecord,
+                        mockAnnotatedDecryptedFhirRecord,
                         null,
                         USER_ID
                 )
-        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockAnnotatedDecryptedRecord)
+        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockAnnotatedDecryptedFhirRecord)
 
         // When
         val subscriber = recordService.createRecord(mockCarePlan, USER_ID, ANNOTATIONS).test().await()
@@ -495,20 +495,20 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
                 USER_ID
         )
         inOrder.verify(recordService).removeUploadData(
-                mockAnnotatedDecryptedRecord
+                mockAnnotatedDecryptedFhirRecord
         )
         
         inOrder.verify(recordService).encryptRecord<DomainResource>(
-                mockAnnotatedDecryptedRecord
+                mockAnnotatedDecryptedFhirRecord
         )
         inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockAnnotatedEncryptedRecord)
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockAnnotatedEncryptedRecord, USER_ID)
         inOrder.verify(recordService).restoreUploadData(
-                mockAnnotatedDecryptedRecord,
+                mockAnnotatedDecryptedFhirRecord,
                 mockCarePlan,
                 null
         )
-        inOrder.verify(recordService).buildMeta(mockAnnotatedDecryptedRecord)
+        inOrder.verify(recordService).buildMeta(mockAnnotatedDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -592,10 +592,10 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
                 .encryptDataRecord(ArgumentMatchers.argThat { it is DecryptedAppDataRecord } )
         Mockito.`when`(mockApiService.createRecord(ALIAS, USER_ID, mockEncryptedRecord))
                 .thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedAppDataRecord)
+        Mockito.doReturn(mockDecryptedDataRecord)
                 .`when`(recordService)
                 .decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedAppDataRecord)
+        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedDataRecord)
 
         // When
         val subscriber = recordService.createRecord(
@@ -619,7 +619,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
                 .encryptDataRecord(ArgumentMatchers.any(DecryptedAppDataRecord::class.java))
         inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockEncryptedRecord)
         inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).buildMeta(mockDecryptedAppDataRecord)
+        inOrder.verify(recordService).buildMeta(mockDecryptedDataRecord)
         inOrder.verifyNoMoreInteractions()
     }
 }

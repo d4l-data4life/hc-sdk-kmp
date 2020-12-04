@@ -53,21 +53,21 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadOrDownloadData_calls__uploadData() {
         // Given
-        Mockito.doReturn(mockDecryptedRecord).`when`(recordService)._uploadData(
-                mockDecryptedRecord,
+        Mockito.doReturn(mockDecryptedFhirRecord).`when`(recordService)._uploadData(
+                mockDecryptedFhirRecord,
                 USER_ID
         )
 
         // When
         val record = recordService.uploadOrDownloadData(RecordService.UploadDownloadOperation.UPLOAD,
-                mockDecryptedRecord,
+                mockDecryptedFhirRecord,
                 null,
                 USER_ID
         )
 
         // Then
-        Truth.assertThat(record).isEqualTo(mockDecryptedRecord)
-        inOrder.verify(recordService)._uploadData(mockDecryptedRecord, USER_ID)
+        Truth.assertThat(record).isEqualTo(mockDecryptedFhirRecord)
+        inOrder.verify(recordService)._uploadData(mockDecryptedFhirRecord, USER_ID)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -77,18 +77,18 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadData_calls__uploadData_when_no_new_resource_was_given() {
         // Given
-        Mockito.doReturn(mockDecryptedRecord).`when`(recordService)._uploadData(
-                mockDecryptedRecord,
+        Mockito.doReturn(mockDecryptedFhirRecord).`when`(recordService)._uploadData(
+                mockDecryptedFhirRecord,
                 USER_ID
         )
 
         // When
-        val record = recordService.uploadData(mockDecryptedRecord, null, USER_ID)
+        val record = recordService.uploadData(mockDecryptedFhirRecord, null, USER_ID)
 
         // Then
-        Truth.assertThat(record).isEqualTo(mockDecryptedRecord)
-        inOrder.verify(recordService).uploadData(mockDecryptedRecord, null, USER_ID)
-        inOrder.verify(recordService)._uploadData(mockDecryptedRecord, USER_ID)
+        Truth.assertThat(record).isEqualTo(mockDecryptedFhirRecord)
+        inOrder.verify(recordService).uploadData(mockDecryptedFhirRecord, null, USER_ID)
+        inOrder.verify(recordService)._uploadData(mockDecryptedFhirRecord, USER_ID)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -273,23 +273,23 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadOrDownloadData_calls_updateData() {
         // Given
-        Mockito.doReturn(mockDecryptedRecord).`when`(recordService).updateData(
-                mockDecryptedRecord,
+        Mockito.doReturn(mockDecryptedFhirRecord).`when`(recordService).updateData(
+                mockDecryptedFhirRecord,
                 mockDocumentReference,
                 USER_ID
         )
 
         // When
         val record = recordService.uploadOrDownloadData(RecordService.UploadDownloadOperation.UPDATE,
-                mockDecryptedRecord,
+                mockDecryptedFhirRecord,
                 mockDocumentReference,
                 USER_ID
         )
 
         // Then
-        Truth.assertThat(record).isEqualTo(mockDecryptedRecord)
+        Truth.assertThat(record).isEqualTo(mockDecryptedFhirRecord)
         inOrder.verify(recordService).updateData(
-                mockDecryptedRecord,
+                mockDecryptedFhirRecord,
                 mockDocumentReference,
                 USER_ID
         )
@@ -302,28 +302,28 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadData_calls_updateData_when_a_new_resource_was_given() {
         // Given
-        Mockito.doReturn(mockDecryptedRecord).`when`(recordService).updateData(
-                mockDecryptedRecord,
+        Mockito.doReturn(mockDecryptedFhirRecord).`when`(recordService).updateData(
+                mockDecryptedFhirRecord,
                 mockDocumentReference,
                 USER_ID
         )
 
         // When
         val record = recordService.uploadData(
-                mockDecryptedRecord,
+                mockDecryptedFhirRecord,
                 mockDocumentReference,
                 USER_ID
         )
 
         // Then
-        Truth.assertThat(record).isEqualTo(mockDecryptedRecord)
+        Truth.assertThat(record).isEqualTo(mockDecryptedFhirRecord)
         inOrder.verify(recordService).uploadData(
-                mockDecryptedRecord,
+                mockDecryptedFhirRecord,
                 mockDocumentReference,
                 USER_ID
         )
         inOrder.verify(recordService).updateData(
-                mockDecryptedRecord,
+                mockDecryptedFhirRecord,
                 mockDocumentReference,
                 USER_ID
         )
@@ -689,23 +689,23 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadOrDownloadData_calls_downloadData() {
         // Given
-        Mockito.doReturn(mockDecryptedRecord).`when`(recordService).downloadData(mockDecryptedRecord, USER_ID)
+        Mockito.doReturn(mockDecryptedFhirRecord).`when`(recordService).downloadData(mockDecryptedFhirRecord, USER_ID)
 
         // When
         val record = recordService.uploadOrDownloadData(RecordService.UploadDownloadOperation.DOWNLOAD,
-                mockDecryptedRecord,
+                mockDecryptedFhirRecord,
                 null,
                 USER_ID
         )
 
         // Then
-        Truth.assertThat(record).isEqualTo(mockDecryptedRecord)
+        Truth.assertThat(record).isEqualTo(mockDecryptedFhirRecord)
         inOrder.verify(recordService).uploadOrDownloadData(RecordService.UploadDownloadOperation.DOWNLOAD,
-                mockDecryptedRecord,
+                mockDecryptedFhirRecord,
                 null,
                 USER_ID
         )
-        inOrder.verify(recordService).downloadData(mockDecryptedRecord, USER_ID)
+        inOrder.verify(recordService).downloadData(mockDecryptedFhirRecord, USER_ID)
         inOrder.verifyNoMoreInteractions()
     }
 

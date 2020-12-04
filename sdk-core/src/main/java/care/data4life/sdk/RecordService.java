@@ -464,6 +464,7 @@ class RecordService {
         T resource = record.getResource();
 
         List<String> encryptedTags = tagEncryptionService.encryptTags(record.getTags());
+
         String encryptedResource = fhirService.encryptResource(record.getDataKey(), resource);
 
         GCKey commonKey = cryptoService.fetchCurrentCommonKey();

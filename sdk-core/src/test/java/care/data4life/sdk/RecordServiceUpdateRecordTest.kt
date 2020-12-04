@@ -293,11 +293,11 @@ class RecordServiceUpdateRecordTest: RecordServiceTestBase() {
         ).thenReturn(Single.just(mockEncryptedRecord))
         Mockito.doReturn(mockDecryptedAppDataRecord)
                 .`when`(recordService)
-                .decryptAppDataRecord(mockEncryptedRecord, USER_ID)
+                .decryptDataRecord(mockEncryptedRecord, USER_ID)
         Mockito.doReturn(mockDecryptedAppDataRecord)
                 .`when`(mockDecryptedAppDataRecord)
                 .copyWithResourceAnnotations(mockAppData, ANNOTATIONS)
-        Mockito.doReturn(mockEncryptedRecord).`when`(recordService).encryptAppDataRecord(mockDecryptedAppDataRecord)
+        Mockito.doReturn(mockEncryptedRecord).`when`(recordService).encryptDataRecord(mockDecryptedAppDataRecord)
         Mockito.`when`(
                 mockApiService.updateRecord(
                         ALIAS,
@@ -326,8 +326,8 @@ class RecordServiceUpdateRecordTest: RecordServiceTestBase() {
         Truth.assertThat(result.annotations).isEqualTo(ANNOTATIONS)
 
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
-        inOrder.verify(recordService).decryptAppDataRecord(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).encryptAppDataRecord(mockDecryptedAppDataRecord)
+        inOrder.verify(recordService).decryptDataRecord(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).encryptDataRecord(mockDecryptedAppDataRecord)
         inOrder.verify(mockApiService).updateRecord(ALIAS, USER_ID, RECORD_ID, mockEncryptedRecord)
         inOrder.verify(recordService).buildMeta(mockDecryptedAppDataRecord)
         inOrder.verifyNoMoreInteractions()
@@ -353,11 +353,11 @@ class RecordServiceUpdateRecordTest: RecordServiceTestBase() {
         ).thenReturn(Single.just(mockEncryptedRecord))
         Mockito.doReturn(mockDecryptedAppDataRecord)
                 .`when`(recordService)
-                .decryptAppDataRecord(mockEncryptedRecord, USER_ID)
+                .decryptDataRecord(mockEncryptedRecord, USER_ID)
         Mockito.doReturn(mockDecryptedAppDataRecord)
                 .`when`(mockDecryptedAppDataRecord)
                 .copyWithResourceAnnotations(mockAppData, null)
-        Mockito.doReturn(mockEncryptedRecord).`when`(recordService).encryptAppDataRecord(mockDecryptedAppDataRecord)
+        Mockito.doReturn(mockEncryptedRecord).`when`(recordService).encryptDataRecord(mockDecryptedAppDataRecord)
         Mockito.`when`(
                 mockApiService.updateRecord(
                         ALIAS,
@@ -385,8 +385,8 @@ class RecordServiceUpdateRecordTest: RecordServiceTestBase() {
         Truth.assertThat(result.resource).isEqualTo(mockAppData)
 
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
-        inOrder.verify(recordService).decryptAppDataRecord(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).encryptAppDataRecord(mockDecryptedAppDataRecord)
+        inOrder.verify(recordService).decryptDataRecord(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).encryptDataRecord(mockDecryptedAppDataRecord)
         inOrder.verify(mockApiService).updateRecord(ALIAS, USER_ID, RECORD_ID, mockEncryptedRecord)
         inOrder.verify(recordService).buildMeta(mockDecryptedAppDataRecord)
         inOrder.verifyNoMoreInteractions()

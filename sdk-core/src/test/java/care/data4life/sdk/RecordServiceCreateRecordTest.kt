@@ -21,7 +21,6 @@ import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
-import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.util.Base64
 import care.data4life.sdk.util.MimeType
@@ -73,12 +72,12 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockDecryptedRecord).`when`(recordService)
                 .uploadData(
-                        ArgumentMatchers.eq(decryptedRecordIndicator),
-                        ArgumentMatchers.eq<DomainResource?>(null),
-                        ArgumentMatchers.eq(USER_ID)
+                        decryptedRecordIndicator,
+                        null,
+                        USER_ID
                 )
         Mockito.doReturn(mockDecryptedRecord).`when`(recordService)
-                .removeUploadData(ArgumentMatchers.any<DecryptedRecord<DomainResource>>())
+                .removeUploadData(mockDecryptedRecord)
         
         Mockito.doReturn(mockEncryptedRecord)
                 .`when`(recordService).encryptRecord<DomainResource>(
@@ -115,13 +114,11 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         )
         inOrder.verify(mockCryptoService).generateGCKey()
         inOrder.verify(recordService).uploadData(
-                ArgumentMatchers.eq(decryptedRecordIndicator),
-                ArgumentMatchers.eq<DomainResource?>(null),
-                ArgumentMatchers.eq(USER_ID)
+                decryptedRecordIndicator,
+                null,
+                USER_ID
         )
-        inOrder.verify(recordService).removeUploadData(
-                ArgumentMatchers.any<DecryptedRecord<DomainResource>>()
-        )
+        inOrder.verify(recordService).removeUploadData(mockDecryptedRecord)
         
         inOrder.verify(recordService).encryptRecord<DomainResource>(
                 mockDecryptedRecord
@@ -163,13 +160,13 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         Mockito.doReturn(mockDecryptedRecord)
 		        .`when`(recordService)
                 .uploadData(
-                        ArgumentMatchers.eq(decryptedRecordIndicator),
-                        ArgumentMatchers.eq<DomainResource?>(null),
-                        ArgumentMatchers.eq(USER_ID)
+                        decryptedRecordIndicator,
+                        null,
+                        USER_ID
                 )
         Mockito.doReturn(mockDecryptedRecord)
                 .`when`(recordService)
-                .removeUploadData(ArgumentMatchers.any<DecryptedRecord<DomainResource>>())
+                .removeUploadData(mockDecryptedRecord)
         
         Mockito.doReturn(mockEncryptedRecord).`when`(recordService)
                 .encryptRecord<DomainResource>(mockDecryptedRecord)
@@ -216,13 +213,11 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         )
         inOrder.verify(mockCryptoService).generateGCKey()
         inOrder.verify(recordService).uploadData(
-                ArgumentMatchers.eq(decryptedRecordIndicator),
-                ArgumentMatchers.eq<DomainResource?>(null),
-                ArgumentMatchers.eq(USER_ID)
+                decryptedRecordIndicator,
+                null,
+                USER_ID
         )
-        inOrder.verify(recordService).removeUploadData(
-                ArgumentMatchers.same(mockDecryptedRecord)
-        )
+        inOrder.verify(recordService).removeUploadData(mockDecryptedRecord)
         
         inOrder.verify(recordService).encryptRecord<DomainResource>(
                 mockDecryptedRecord
@@ -351,12 +346,12 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockAnnotatedDecryptedRecord).`when`(recordService)
                 .uploadData(
-                        ArgumentMatchers.eq(annotatedDecryptedRecordIndicator),
-                        ArgumentMatchers.eq<DomainResource?>(null),
-                        ArgumentMatchers.eq(USER_ID)
+                        annotatedDecryptedRecordIndicator,
+                        null,
+                        USER_ID
                 )
         Mockito.doReturn(mockAnnotatedDecryptedRecord).`when`(recordService)
-                .removeUploadData(ArgumentMatchers.any<DecryptedRecord<DomainResource>>())
+                .removeUploadData(mockAnnotatedDecryptedRecord)
         
         Mockito.doReturn(mockAnnotatedEncryptedRecord)
                 .`when`(recordService).encryptRecord<DomainResource>(
@@ -395,13 +390,11 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         )
         inOrder.verify(mockCryptoService).generateGCKey()
         inOrder.verify(recordService).uploadData(
-                ArgumentMatchers.eq(annotatedDecryptedRecordIndicator),
-                ArgumentMatchers.eq<DomainResource?>(null),
-                ArgumentMatchers.eq(USER_ID)
+                annotatedDecryptedRecordIndicator,
+                null,
+                USER_ID
         )
-        inOrder.verify(recordService).removeUploadData(
-                ArgumentMatchers.any<DecryptedRecord<DomainResource>>()
-        )
+        inOrder.verify(recordService).removeUploadData(mockAnnotatedDecryptedRecord)
         
         inOrder.verify(recordService).encryptRecord<DomainResource>(
                 mockAnnotatedDecryptedRecord
@@ -443,13 +436,13 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         Mockito.doReturn(mockAnnotatedDecryptedRecord)
                 .`when`(recordService)
                 .uploadData(
-                        ArgumentMatchers.eq(annotatedDecryptedRecordIndicator),
-                        ArgumentMatchers.eq<DomainResource?>(null),
-                        ArgumentMatchers.eq(USER_ID)
+                        annotatedDecryptedRecordIndicator,
+                        null,
+                        USER_ID
                 )
         Mockito.doReturn(mockAnnotatedDecryptedRecord)
                 .`when`(recordService)
-                .removeUploadData(ArgumentMatchers.same(mockAnnotatedDecryptedRecord))
+                .removeUploadData(mockAnnotatedDecryptedRecord)
         
         Mockito.doReturn(mockAnnotatedEncryptedRecord).`when`(recordService)
                 .encryptRecord<DomainResource>(mockAnnotatedDecryptedRecord)
@@ -497,12 +490,12 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         )
         inOrder.verify(mockCryptoService).generateGCKey()
         inOrder.verify(recordService).uploadData(
-                ArgumentMatchers.eq(annotatedDecryptedRecordIndicator),
-                ArgumentMatchers.eq<DomainResource?>(null),
-                ArgumentMatchers.eq(USER_ID)
+                annotatedDecryptedRecordIndicator,
+                null,
+                USER_ID
         )
         inOrder.verify(recordService).removeUploadData(
-                ArgumentMatchers.same(mockAnnotatedDecryptedRecord)
+                mockAnnotatedDecryptedRecord
         )
         
         inOrder.verify(recordService).encryptRecord<DomainResource>(
@@ -596,12 +589,12 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockEncryptedRecord)
                 .`when`(recordService)
-                .encryptAppDataRecord(ArgumentMatchers.any(DecryptedAppDataRecord::class.java))
+                .encryptDataRecord(ArgumentMatchers.argThat { it is DecryptedAppDataRecord } )
         Mockito.`when`(mockApiService.createRecord(ALIAS, USER_ID, mockEncryptedRecord))
                 .thenReturn(Single.just(mockEncryptedRecord))
         Mockito.doReturn(mockDecryptedAppDataRecord)
                 .`when`(recordService)
-                .decryptAppDataRecord(mockEncryptedRecord, USER_ID)
+                .decryptDataRecord(mockEncryptedRecord, USER_ID)
         Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedAppDataRecord)
 
         // When
@@ -623,9 +616,9 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         inOrder.verify(mockTaggingService).appendDefaultAnnotatedTags(null, null)
         inOrder.verify(mockCryptoService).generateGCKey()
         inOrder.verify(recordService)
-                .encryptAppDataRecord(ArgumentMatchers.any(DecryptedAppDataRecord::class.java))
+                .encryptDataRecord(ArgumentMatchers.any(DecryptedAppDataRecord::class.java))
         inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockEncryptedRecord)
-        inOrder.verify(recordService).decryptAppDataRecord(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).decryptDataRecord(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).buildMeta(mockDecryptedAppDataRecord)
         inOrder.verifyNoMoreInteractions()
     }

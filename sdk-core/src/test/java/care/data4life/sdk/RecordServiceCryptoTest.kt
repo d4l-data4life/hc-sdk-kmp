@@ -262,7 +262,7 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
         ).thenReturn(Single.just(mockEncryptedDataKey))
 
         // When
-        val encryptedRecord = recordService.encryptAppDataRecord(mockDecryptedAppDataRecord)
+        val encryptedRecord = recordService.encryptDataRecord(mockDecryptedAppDataRecord)
 
         // Then
         Truth.assertThat(encryptedRecord.commonKeyId).isEqualTo(currentCommonKeyId)
@@ -305,7 +305,7 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
         ).thenReturn(Single.just(mockAppData))
 
         // When
-        val decrypted = recordService.decryptAppDataRecord(mockEncryptedRecord, USER_ID)
+        val decrypted = recordService.decryptDataRecord(mockEncryptedRecord, USER_ID)
 
         // Then
         Truth.assertThat(decrypted.annotations).isEqualTo(ANNOTATIONS)
@@ -329,7 +329,7 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
 
         // When
         try {
-            recordService.decryptAppDataRecord(mockEncryptedRecord, USER_ID)
+            recordService.decryptDataRecord(mockEncryptedRecord, USER_ID)
             Assert.fail("Exception expected!")
         } catch (e: D4LException) {
             // Then

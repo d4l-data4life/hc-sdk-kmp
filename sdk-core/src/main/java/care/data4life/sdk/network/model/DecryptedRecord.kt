@@ -29,6 +29,6 @@ internal data class DecryptedRecord<T : DomainResource?>(
         override var customCreationDate: String?,
         override var updatedDate: String?,
         override var dataKey: GCKey?,
-        var attachmentsKey: GCKey?,
+        override var attachmentsKey: GCKey?,
         override var modelVersion: Int
 ): DecryptedFhirRecord<T>, Serializable

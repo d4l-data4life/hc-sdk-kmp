@@ -24,8 +24,8 @@ import java.util.Objects;
 import care.data4life.fhir.stu3.model.DomainResource;
 
 public class Record<T extends DomainResource> implements FhirRecord<T> {
-    private T fhirResource;
-    private Meta meta;
+    private final T fhirResource;
+    private final Meta meta;
     private List<String> annotations;
 
     public Record(T fhirResource, Meta meta) {

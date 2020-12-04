@@ -27,6 +27,7 @@ import io.reactivex.Single
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import java.io.IOException
 
@@ -44,7 +45,7 @@ class RecordServiceUpdateRecordTest: RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun updateRecord_shouldReturnUpdatedRecord() {
+    fun `Given a resource and a UserId, it updates a Record`() {
         // Given
         mockCarePlan.id = RECORD_ID
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
@@ -55,7 +56,9 @@ class RecordServiceUpdateRecordTest: RecordServiceTestBase() {
                         RECORD_ID
                 )
         ).thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedRecord).`when`(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
+        Mockito.doReturn(mockDecryptedRecord)
+                .`when`(recordService)
+                .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
         Mockito.doReturn(mockEncryptedRecord).`when`(recordService).encryptRecord(mockDecryptedRecord)
         Mockito.`when`(
                 mockApiService.updateRecord(
@@ -84,13 +87,20 @@ class RecordServiceUpdateRecordTest: RecordServiceTestBase() {
         inOrder.verify(recordService).buildMeta(mockDecryptedRecord)
         inOrder.verifyNoMoreInteractions()
 
+        Mockito.verify(mockDecryptedRecord, Mockito.times(4)).resource
+        Mockito.verify(mockDecryptedRecord, Mockito.times(1)).annotations
+        Mockito.verify(
+                mockDecryptedRecord,
+                Mockito.times(0)
+        ).annotations = ArgumentMatchers.any()
+
         // Cleanup
         mockCarePlan.id = null
     }
 
     @Test
     @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
-    fun updateRecord_shouldThrow_forUnsupportedData() {
+    fun `Given a unsupported data and a UserId, it throws an error on update`() {
         // Given
         val invalidData = byteArrayOf(0x00)
         val doc = RecordServiceTest.buildDocumentReference(invalidData)
@@ -110,7 +120,7 @@ class RecordServiceUpdateRecordTest: RecordServiceTestBase() {
 
     @Test
     @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
-    fun updateRecord_shouldThrow_forFileSizeLimitationBreach() {
+    fun `Given data, which exceeds the file size limitations, and a UserId, it throws an error on update`() {
         // Given
         val invalidSizePdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES + 1)
         System.arraycopy(
@@ -138,10 +148,101 @@ class RecordServiceUpdateRecordTest: RecordServiceTestBase() {
     @Test
     @Throws(
             InterruptedException::class,
+            IOException::class,
+            DataValidationException.ModelVersionNotSupported::class,
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun updateRecords_shouldReturnUpdatedRecords() {
+    fun `Given a resource, annotations and a UserId, it updates a Record`() {
+        // Given
+        mockCarePlan.id = RECORD_ID
+        Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
+        Mockito.`when`(
+                mockApiService.fetchRecord(
+                        ALIAS,
+                        USER_ID,
+                        RECORD_ID
+                )
+        ).thenReturn(Single.just(mockEncryptedRecord))
+        Mockito.doReturn(mockDecryptedRecord)
+                .`when`(recordService)
+                .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
+        Mockito.doReturn(mockEncryptedRecord).`when`(recordService).encryptRecord(mockDecryptedRecord)
+        Mockito.`when`(
+                mockApiService.updateRecord(
+                        ALIAS,
+                        USER_ID,
+                        RECORD_ID,
+                        mockEncryptedRecord
+                )
+        ).thenReturn(Single.just(mockEncryptedRecord))
+        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedRecord)
+
+        // When
+        val observer = recordService.updateRecord(mockCarePlan, USER_ID, ANNOTATIONS).test().await()
+
+        // Then
+        val result = observer.assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
+        Truth.assertThat(result.meta).isEqualTo(mockMeta)
+        Truth.assertThat(result.fhirResource).isEqualTo(mockCarePlan)
+
+        inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
+        inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).encryptRecord(mockDecryptedRecord)
+        inOrder.verify(mockApiService).updateRecord(ALIAS, USER_ID, RECORD_ID, mockEncryptedRecord)
+        inOrder.verify(recordService).buildMeta(mockDecryptedRecord)
+        inOrder.verifyNoMoreInteractions()
+
+        Mockito.verify(mockDecryptedRecord, Mockito.times(4)).resource
+        Mockito.verify(mockDecryptedRecord, Mockito.times(1)).annotations
+        Mockito.verify(
+                mockDecryptedRecord,
+                Mockito.times(1)
+        ).annotations = ANNOTATIONS
+
+        // Cleanup
+        mockCarePlan.id = null
+    }
+
+    @Test
+    @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
+    fun `Given data, which exceeds the file size limitations, annotations and a UserId, it throws an error on update`() {
+        // Given
+        val invalidSizePdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES + 1)
+        System.arraycopy(
+                MimeType.PDF.byteSignature()[0] as Any,
+                0,
+                invalidSizePdf,
+                0,
+                MimeType.PDF.byteSignature()[0]!!.size
+        )
+        val doc = RecordServiceTest.buildDocumentReference(RecordServiceTest.unboxByteArray(invalidSizePdf))
+
+        // When
+        try {
+            recordService.updateRecord(doc, USER_ID, ANNOTATIONS).test().await()
+            Assert.fail("Exception expected!")
+        } catch (ex: Exception) {
+            // Then
+            Truth.assertThat(ex).isInstanceOf(DataRestrictionException.MaxDataSizeViolation::class.java)
+        }
+        inOrder.verify(recordService).updateRecord(doc, USER_ID, ANNOTATIONS)
+        inOrder.verify(recordService).checkDataRestrictions(doc)
+        inOrder.verifyNoMoreInteractions()
+    }
+
+
+
+    @Test
+    @Throws(
+            InterruptedException::class,
+            DataRestrictionException.UnsupportedFileType::class,
+            DataRestrictionException.MaxDataSizeViolation::class
+    )
+    fun `Given multiple resources and a UserId, it updates multiple Records`() {
         // Given
         val resources = listOf(mockCarePlan, mockCarePlan)
         Mockito.doReturn(Single.just(mockRecord))

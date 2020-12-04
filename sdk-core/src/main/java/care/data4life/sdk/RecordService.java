@@ -390,7 +390,13 @@ class RecordService {
                 .map(successfulDownloads -> new DownloadResult<>(successfulDownloads, failedDownloads));
     }
 
-    <T extends DomainResource> Single<Record<T>> updateRecord(T resource, String userId) throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
+    <T extends DomainResource> Single<Record<T>> updateRecord(T resource, String userId)
+            throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
+        return updateRecord(resource,userId, null);
+    }
+
+    <T extends DomainResource> Single<Record<T>> updateRecord(T resource, String userId, List<String> annotations)
+            throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
         checkDataRestrictions(resource);
         HashMap<Attachment, String> data = extractUploadData(resource);
         String recordId = resource.id;
@@ -402,15 +408,22 @@ class RecordService {
                 .map(decryptedRecord -> {
                     cleanObsoleteAdditionalIdentifiers(resource);
                     decryptedRecord.setResource(resource);
+                    if(annotations!=null) {
+                        decryptedRecord.setAnnotations(annotations);
+                    }
                     return decryptedRecord;
                 })
                 .map(this::removeUploadData)
                 .map(this::encryptRecord)
                 .flatMap(encryptedRecord -> apiService.updateRecord(alias, userId, recordId, encryptedRecord))
-                .map((EncryptedRecord encryptedRecord) -> (DecryptedRecord<T>) decryptRecord(encryptedRecord, userId))
+                .map(encryptedRecord -> (DecryptedRecord<T>) decryptRecord(encryptedRecord, userId))
                 .map(decryptedRecord -> restoreUploadData(decryptedRecord, resource, data))
                 .map(this::assignResourceId)
-                .map(decryptedRecord -> new Record<>(decryptedRecord.getResource(), buildMeta(decryptedRecord)));
+                .map(decryptedRecord -> new Record<>(
+                        decryptedRecord.getResource(),
+                        buildMeta(decryptedRecord),
+                        decryptedRecord.getAnnotations())
+                );
     }
 
     <T extends DomainResource> Single<UpdateResult<T>> updateRecords(List<T> resources, String userId) {

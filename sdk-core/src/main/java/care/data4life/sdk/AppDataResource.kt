@@ -27,22 +27,22 @@ import java.util.*
  * @see care.data4life.sdk.model.Record
  */
 data class AppDataRecord(
+        val identifier: String,
         val appDataResource: ByteArray,
-        val id: String,
         override val meta: Meta,
         override val annotations: List<String>
 ): RecordBase {
     override fun equals(other: Any?): Boolean {
         return when {
             other !is AppDataRecord             -> false
-            id != other.id ||
+            identifier != other.identifier ||
             meta != other.meta ||
             annotations != other.annotations    -> false
             else                                -> appDataResource.contentEquals(other.appDataResource)
         }
     }
 
-    override fun hashCode(): Int = Objects.hash(id, meta, annotations, appDataResource.contentToString())
+    override fun hashCode(): Int = Objects.hash(identifier, meta, annotations, appDataResource.contentToString())
 }
 
 /**
@@ -86,7 +86,7 @@ internal data class DecryptedAppDataRecord(
             modelVersion
     )
 
-    fun copyWithResourceAnnotaions(
+    fun copyWithResourceAnnotations(
             appData: ByteArray,
             annotations: List<String>? = null
     ) = copy(appData = appData, annotations = annotations ?: this.annotations)

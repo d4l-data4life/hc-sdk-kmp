@@ -22,12 +22,15 @@ import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.DecryptedRecord
+import care.data4life.sdk.util.Base64
 import care.data4life.sdk.util.MimeType
 
 import java.io.IOException
 import java.util.*
 
 import com.google.common.truth.Truth
+import io.mockk.every
+import io.mockk.mockkObject
 import io.reactivex.Single
 import org.junit.After
 import org.junit.Assert
@@ -58,7 +61,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class
     )
-    fun `Given createRecord is called, returns a new Record`() {
+    fun `Given a DomainResource and a UserId, createRecord returns a new Record`() {
         // Given
         Mockito.doReturn(mockUploadData).`when`(recordService).extractUploadData(mockCarePlan)
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
@@ -144,7 +147,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class
     )
-    fun `Given createRecord is called without attachment, returns a new Record`() {
+    fun `Given a DomainResource and a UserId, createRecord is called without attachment, it returns a new Record`() {
         // Given
         Mockito.doReturn(null).`when`(recordService).extractUploadData(mockCarePlan)
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
@@ -240,7 +243,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given createRecord is called with unsupported data, throws an error`() {
+    fun `Given with unsupported data, createRecord throws an error`() {
         // Given
         val invalidData = byteArrayOf(0x00)
         val doc = RecordServiceTest.buildDocumentReference(invalidData)
@@ -265,7 +268,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given createRecord is called with data, which exceeds the file size limitation, throws an error`() {
+    fun `Given data, which exceeds the file size limitation, createData throws an error`() {
         // Given
         val invalidSizePdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES + 1)
         System.arraycopy(
@@ -297,7 +300,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given createRecords is called, it returns a multiple Records`() {
+    fun `Given multiple DomainResource and a UserId, createRecords returns a multiple Records`() {
         // Given
         val resources: List<DomainResource> = listOf(
                 mockCarePlan as DomainResource,
@@ -336,7 +339,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class
     )
-    fun `Given createRecord is called with annotations, it creates a new Record`() {
+    fun `Given a DomainResource, a UserId and Annotations, create creates a new Record`() {
         // Given
         Mockito.doReturn(mockUploadData).`when`(recordService).extractUploadData(mockCarePlan)
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
@@ -424,7 +427,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class
     )
-    fun `Given createRecord is called with annotations and without attachment, it creates a new Record`() {
+    fun `Given a DomainResource and a UserId, Annotations and without attachment, createRecords creates a new Record`() {
         // Given
         Mockito.doReturn(null).`when`(recordService).extractUploadData(mockCarePlan)
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
@@ -521,7 +524,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given createRecord is called with annotations and unsupported Data, it throws an error`() {
+    fun `Given a unsupported Data, a UserId and Annotations, createRecord throws an error`() {
         // Given
         val invalidData = byteArrayOf(0x00)
         val doc = RecordServiceTest.buildDocumentReference(invalidData)
@@ -546,7 +549,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given createRecord is called with annotations and data, which exceeds the file size limitation, throws an error`() {
+    fun `Given data, which exceeds the file size limitation, a UserId and Annotations, createRecord an error`() {
         // Given
         val invalidSizePdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES + 1)
         System.arraycopy(
@@ -569,6 +572,60 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         }
         inOrder.verify(recordService).createRecord(doc, USER_ID, ANNOTATIONS)
         inOrder.verify(recordService).checkDataRestrictions(doc)
+        inOrder.verifyNoMoreInteractions()
+    }
+
+    @Test
+    @Throws(
+            InterruptedException::class,
+            IOException::class,
+            DataRestrictionException.UnsupportedFileType::class,
+            DataRestrictionException.MaxDataSizeViolation::class,
+            DataValidationException.ModelVersionNotSupported::class,
+            DataValidationException.ExpectedFieldViolation::class,
+            DataValidationException.IdUsageViolation::class,
+            DataValidationException.InvalidAttachmentPayloadHash::class
+    )
+    fun `Given a Byte resource, a UserId and Annotations createAppDataRecord returns a new AppDataRecord`() {
+        // Given
+        mockkObject(Base64)
+        every { Base64.decode(mockAppData) } returns ENCRYPTED_APPDATA
+        Mockito.`when`(mockTaggingService.appendDefaultAnnotatedTags(null,null))
+                .thenReturn(mockTags)
+        Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
+        Mockito.doReturn(mockEncryptedRecord)
+                .`when`(recordService)
+                .encryptAppDataRecord(ArgumentMatchers.any(DecryptedAppDataRecord::class.java))
+        Mockito.`when`(mockApiService.createRecord(ALIAS, USER_ID, mockEncryptedRecord))
+                .thenReturn(Single.just(mockEncryptedRecord))
+        Mockito.doReturn(mockDecryptedAppDataRecord)
+                .`when`(recordService)
+                .decryptAppDataRecord(mockEncryptedRecord, USER_ID)
+        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedAppDataRecord)
+
+        // When
+        val subscriber = recordService.createAppDataRecord(
+                mockAppData,
+                USER_ID,
+                ANNOTATIONS
+        ).test().await()
+
+        // Then
+        val record = subscriber
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
+        Truth.assertThat(record.meta).isEqualTo(mockMeta)
+        Truth.assertThat(record.appDataResource).isEqualTo(mockAppData)
+        Truth.assertThat(record.annotations).isEqualTo(ANNOTATIONS)
+        inOrder.verify(mockTaggingService).appendDefaultAnnotatedTags(null, null)
+        inOrder.verify(mockCryptoService).generateGCKey()
+        inOrder.verify(recordService)
+                .encryptAppDataRecord(ArgumentMatchers.any(DecryptedAppDataRecord::class.java))
+        inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockEncryptedRecord)
+        inOrder.verify(recordService).decryptAppDataRecord(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).buildMeta(mockDecryptedAppDataRecord)
         inOrder.verifyNoMoreInteractions()
     }
 }

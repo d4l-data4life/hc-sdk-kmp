@@ -21,7 +21,6 @@ import io.mockk.mockk
 import io.mockk.mockkClass
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -372,7 +371,7 @@ class DecryptedAppDataRecordTest {
                 updatedDate = "yesterday",
                 dataKey = mockkClass(GCKey::class),
                 modelVersion = 42
-        ).copyWithResourceAnnotaions(
+        ).copyWithResourceAnnotations(
                 expectedData.toByteArray()
         )
 
@@ -396,7 +395,7 @@ class DecryptedAppDataRecordTest {
                 updatedDate = "yesterday",
                 dataKey = mockkClass(GCKey::class),
                 modelVersion = 42
-        ).copyWithResourceAnnotaions(
+        ).copyWithResourceAnnotations(
                 expectedData.toByteArray(),
                 expectedAnnotations
         )

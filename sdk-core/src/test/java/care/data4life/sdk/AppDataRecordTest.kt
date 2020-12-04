@@ -26,21 +26,21 @@ import org.junit.Test
 class AppDataRecordTest {
     @Test
     fun `Given tow AppDataRecords, it returns true on a compare, if they are equal`() {
-        val id = "1234"
+        val identifier = "1234"
         val resource = "test".toByteArray()
         val meta = mockkClass(Meta::class)
         val annotations = listOf("a", "b", "c")
 
         val record1 = AppDataRecord(
                 appDataResource = resource,
-                id = id,
+                identifier = identifier,
                 meta = meta,
                 annotations = annotations
         )
 
         val record2 = AppDataRecord(
                 appDataResource = resource,
-                id = id,
+                identifier = identifier,
                 meta = meta,
                 annotations = annotations
         )
@@ -52,7 +52,7 @@ class AppDataRecordTest {
     fun `Given a AppDataRecord and something else, it returns false on a compare`() {
         val record = AppDataRecord(
                 appDataResource =  "test".toByteArray(),
-                id = "1234",
+                identifier = "1234",
                 meta = mockkClass(Meta::class),
                 annotations = listOf("a", "b", "c")
         )
@@ -63,20 +63,20 @@ class AppDataRecordTest {
 
     @Test
     fun `Given tow AppDataRecords, it returns false on a compare, if the resources are different`() {
-        val id = "1234"
+        val identifier = "1234"
         val meta = mockkClass(Meta::class)
         val annotations = listOf("a", "b", "c")
 
         val record1 = AppDataRecord(
                 appDataResource = "test1".toByteArray(),
-                id = id,
+                identifier = identifier,
                 meta = meta,
                 annotations = annotations
         )
 
         val record2 = AppDataRecord(
                 appDataResource = "test2".toByteArray(),
-                id = id,
+                identifier = identifier,
                 meta = meta,
                 annotations = annotations
         )
@@ -85,21 +85,21 @@ class AppDataRecordTest {
     }
 
     @Test
-    fun `Given tow AppDataRecords, it returns false on a compare, if the ids are different`() {
+    fun `Given tow AppDataRecords, it returns false on a compare, if the identifiers are different`() {
         val resource = "test".toByteArray()
         val meta = mockkClass(Meta::class)
         val annotations = listOf("a", "b", "c")
 
         val record1 = AppDataRecord(
                 appDataResource = resource,
-                id = "123",
+                identifier = "123",
                 meta = meta,
                 annotations = annotations
         )
 
         val record2 = AppDataRecord(
                 appDataResource = resource,
-                id = "345",
+                identifier = "345",
                 meta = meta,
                 annotations = annotations
         )
@@ -109,20 +109,20 @@ class AppDataRecordTest {
 
     @Test
     fun `Given tow AppDataRecords, it returns false on a compare, if the metas are different`() {
-        val id = "1234"
+        val identifier = "1234"
         val resource = "test".toByteArray()
         val annotations = listOf("a", "b", "c")
 
         val record1 = AppDataRecord(
                 appDataResource = resource,
-                id = id,
+                identifier = identifier,
                 meta = mockk(),
                 annotations = annotations
         )
 
         val record2 = AppDataRecord(
                 appDataResource = resource,
-                id = id,
+                identifier = identifier,
                 meta = mockk(),
                 annotations = annotations
         )
@@ -132,20 +132,20 @@ class AppDataRecordTest {
 
     @Test
     fun `Given tow AppDataRecords, it returns false on a compare, if the annotations are different`() {
-        val id = "1234"
+        val identifier = "1234"
         val resource = "test".toByteArray()
         val meta = mockkClass(Meta::class)
 
         val record1 = AppDataRecord(
                 appDataResource = resource,
-                id = id,
+                identifier = identifier,
                 meta = meta,
                 annotations = listOf("a", "b", "c")
         )
 
         val record2 = AppDataRecord(
                 appDataResource = resource,
-                id = id,
+                identifier = identifier,
                 meta = meta,
                 annotations = listOf("d", "e", "f")
         )
@@ -155,21 +155,21 @@ class AppDataRecordTest {
 
     @Test
     fun `Given a AppDataRecord, it has a stable HashCode`() {
-        val id = "1234"
+        val identifier = "1234"
         val resource = "test".toByteArray()
         val meta = mockkClass(Meta::class)
         val annotations = listOf("a", "b", "c")
 
         val record1 = AppDataRecord(
                 appDataResource = resource,
-                id = id,
+                identifier = identifier,
                 meta = meta,
                 annotations = annotations
         )
 
         val record2 = record1.copy()
         val record3 = record1.copy(appDataResource = "resource".toByteArray())
-        val record4 = record1.copy(id = "23")
+        val record4 = record1.copy(identifier = "23")
         val record5 = record1.copy(meta = mockk())
         val record6 = record1.copy(annotations = listOf("e","f","g"))
 

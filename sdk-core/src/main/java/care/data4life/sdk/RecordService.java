@@ -90,7 +90,7 @@ class RecordService {
         RESTORE
     }
 
-    private interface GetEncryptedResource {
+    private interface GetDecryptedResource {
         String run();
     }
 
@@ -478,17 +478,52 @@ class RecordService {
                 .flatMap(encryptedTags -> apiService.getCount(alias, userId, encryptedTags));
     }
 
+    Single<AppDataRecord> createAppDataRecord(byte[] resource, String userId, List<String> annotations)
+            throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
+        String createdDate = DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID));
+        Single<DecryptedAppDataRecord> createRecord = Single.just(createdDate)
+                .map(createdAt -> {
+                    HashMap<String, String> tags = taggingService.appendDefaultAnnotatedTags(
+                            null,
+                            null
+                    );
+                    GCKey dataKey = cryptoService.generateGCKey().blockingGet();
+                    return new DecryptedAppDataRecord(
+                            null,
+                            resource,
+                            tags,
+                            annotations,
+                            createdAt,
+                            null,
+                            dataKey,
+                            ModelVersion.CURRENT
+                    );
+                });
+
+        return createRecord
+                .map(this::encryptAppDataRecord)
+                .flatMap(encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord))
+                .map((EncryptedRecord r) -> (DecryptedAppDataRecord) decryptAppDataRecord(r, userId))
+                .map(decryptedRecord -> new AppDataRecord(
+                                Objects.requireNonNull(decryptedRecord.getIdentifier()),
+                                decryptedRecord.getAppData(),
+                                buildMeta(decryptedRecord),
+                                annotations
+                        )
+                );
+    }
+
     //region utility methods
     private EncryptedRecord encrypt(
             DecryptedRecordBase record,
-            GetEncryptedResource getEncryptedResource,
+            GetDecryptedResource getDecryptedResource,
             GetEncryptedAttachment getEncryptedAttachment
     ) throws IOException {
         List<String> encryptedTags = tagEncryptionService.encryptTags(record.getTags());
         List<String> encryptedAnnotations = tagEncryptionService.encryptAnnotations(record.getAnnotations());
         encryptedTags.addAll(encryptedAnnotations);
 
-        String encryptedResource = getEncryptedResource.run();
+        String decryptedResource = getDecryptedResource.run();
 
         GCKey commonKey = cryptoService.fetchCurrentCommonKey();
         String currentCommonKeyId = cryptoService.getCurrentCommonKeyId();
@@ -505,30 +540,15 @@ class RecordService {
                 currentCommonKeyId,
                 record.getIdentifier(),
                 encryptedTags,
-                encryptedResource,
+                decryptedResource,
                 record.getCustomCreationDate(),
                 encryptedDataKey,
                 encryptedAttachmentsKey,
-                record.getModelVersion());
-    }
-
-    <T extends DomainResource> EncryptedRecord encryptRecord(DecryptedRecord<T> record) throws IOException {
-        return encrypt(
-                record,
-                () -> fhirService.encryptResource(record.getDataKey(), record.getResource()),
-                (commonKey) -> {
-                    if (record.getAttachmentsKey() == null) {
-                        return null;
-                    } else {
-                        return cryptoService.encryptSymmetricKey(
-                                commonKey,
-                                KeyType.ATTACHMENT_KEY,
-                                record.getAttachmentsKey()
-                        ).blockingGet();
-                    }
-                }
+                record.getModelVersion()
         );
     }
+
+
 
     private <T> T decrypt(
             EncryptedRecord record,
@@ -567,6 +587,24 @@ class RecordService {
                 annotations,
                 dataKey,
                 commonKey
+        );
+    }
+
+    <T extends DomainResource> EncryptedRecord encryptRecord(DecryptedRecord<T> record) throws IOException {
+        return encrypt(
+                record,
+                () -> fhirService.encryptResource(record.getDataKey(), record.getResource()),
+                (commonKey) -> {
+                    if (record.getAttachmentsKey() == null) {
+                        return null;
+                    } else {
+                        return cryptoService.encryptSymmetricKey(
+                                commonKey,
+                                KeyType.ATTACHMENT_KEY,
+                                record.getAttachmentsKey()
+                        ).blockingGet();
+                    }
+                }
         );
     }
 
@@ -613,7 +651,7 @@ class RecordService {
         return encrypt(
                 record,
                 () -> Base64.INSTANCE.encodeToString(
-                        cryptoService.encrypt(record.getDataKey(), record.getAppData()).blockingGet()
+                        cryptoService.encrypt(record.getDataKey(),record.getAppData()).blockingGet()
                 ),
                 (i) -> null
         );
@@ -884,7 +922,7 @@ class RecordService {
         return record;
     }
 
-    Meta buildMeta(DecryptedRecord record) {
+    Meta buildMeta(DecryptedRecordBase record) {
         LocalDate createdDate = LocalDate.parse(record.getCustomCreationDate(), DATE_FORMATTER);
         LocalDateTime updatedDate = LocalDateTime.parse(record.getUpdatedDate(), DATE_TIME_FORMATTER);
         return new Meta(createdDate, updatedDate);

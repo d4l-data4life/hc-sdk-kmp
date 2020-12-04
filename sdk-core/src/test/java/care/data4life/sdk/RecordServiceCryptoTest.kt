@@ -26,7 +26,6 @@ import care.data4life.sdk.model.ModelVersion
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockkObject
-import io.mockk.unmockkObject
 import io.reactivex.Single
 import org.junit.After
 import org.junit.Assert
@@ -251,7 +250,7 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
         Mockito.`when`(mockTagEncryptionService.encryptAnnotations(ANNOTATIONS))
                 .thenReturn(ANNOTATIONS)
         Mockito.`when`(mockCryptoService.encrypt(mockDataKey, mockAppData))
-                .thenReturn(ENCRYPTED_APPDATA)
+                .thenReturn(Single.just(ENCRYPTED_APPDATA))
         Mockito.`when`(mockCryptoService.fetchCurrentCommonKey()).thenReturn(mockCommonKey)
         Mockito.`when`(mockCryptoService.currentCommonKeyId).thenReturn(currentCommonKeyId)
         Mockito.`when`(
@@ -263,7 +262,7 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
         ).thenReturn(Single.just(mockEncryptedDataKey))
 
         // When
-        val encryptedRecord = recordService.encryptAppDataRecord(mockAnnotatedDecryptedAppDataRecord)
+        val encryptedRecord = recordService.encryptAppDataRecord(mockDecryptedAppDataRecord)
 
         // Then
         Truth.assertThat(encryptedRecord.commonKeyId).isEqualTo(currentCommonKeyId)
@@ -284,7 +283,7 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
     fun `Given a EncryptedRecord and UserId, decryptAppDataRecord returns a DecryptedRecord`() {
         // Given
         mockkObject(Base64)
-        every { Base64.decode(ENCRYPTED_RESOURCE) } returns ENCRYPTED_APPDATA.blockingGet()
+        every { Base64.decode(ENCRYPTED_RESOURCE) } returns ENCRYPTED_APPDATA
         val commonKeyId = "mockCommonKeyId"
         Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(1)
         Mockito.`when`(mockEncryptedRecord.commonKeyId).thenReturn(commonKeyId)
@@ -301,7 +300,7 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
         Mockito.`when`<Any>(
                 mockCryptoService.decrypt(
                         mockDataKey,
-                        ENCRYPTED_APPDATA.blockingGet()
+                        ENCRYPTED_APPDATA
                 )
         ).thenReturn(Single.just(mockAppData))
 
@@ -317,7 +316,7 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
         inOrder.verify(mockCryptoService).symDecryptSymmetricKey(mockCommonKey, mockEncryptedDataKey)
         inOrder.verify(mockCryptoService).decrypt(
                 mockDataKey,
-                ENCRYPTED_APPDATA.blockingGet()
+                ENCRYPTED_APPDATA
         )
         inOrder.verifyNoMoreInteractions()
     }

@@ -25,5 +25,5 @@ internal interface DecryptedRecordBase {
     var customCreationDate: String?
     var updatedDate: String?
     var dataKey: GCKey?
-    var modelVersion: Int?
+    var modelVersion: Int
 }

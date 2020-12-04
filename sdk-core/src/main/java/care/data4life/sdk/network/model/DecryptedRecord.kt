@@ -29,5 +29,5 @@ data class DecryptedRecord<T : DomainResource>(
         override var updatedDate: String?,
         override var dataKey: GCKey?,
         var attachmentsKey: GCKey?,
-        override var modelVersion: Int?
+        override var modelVersion: Int
 ): DecryptedRecordBase, Serializable

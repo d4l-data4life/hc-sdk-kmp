@@ -57,7 +57,7 @@ internal data class DecryptedAppDataRecord(
         override var customCreationDate: String?,
         override var updatedDate: String?,
         override var dataKey: GCKey?,
-        override var modelVersion: Int?
+        override var modelVersion: Int
 ): DecryptedRecordBase {
 
     override fun equals(other: Any?): Boolean {

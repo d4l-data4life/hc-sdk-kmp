@@ -53,7 +53,7 @@ internal data class DecryptedAppDataRecord(
         override var identifier: String?,
         var appData: ByteArray,
         override var tags: HashMap<String, String>?,
-        override var annotations: List<String>?,
+        override var annotations: List<String>,
         override var customCreationDate: String?,
         override var updatedDate: String?,
         override var dataKey: GCKey?,

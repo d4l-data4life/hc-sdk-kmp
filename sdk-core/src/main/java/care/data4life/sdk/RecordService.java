@@ -464,16 +464,27 @@ class RecordService {
         T resource = record.getResource();
 
         List<String> encryptedTags = tagEncryptionService.encryptTags(record.getTags());
+        List<String> encryptedAnnotations = tagEncryptionService.encryptAnnotations(record.getAnnotations());
+        encryptedTags.addAll(encryptedAnnotations);
 
         String encryptedResource = fhirService.encryptResource(record.getDataKey(), resource);
 
         GCKey commonKey = cryptoService.fetchCurrentCommonKey();
         String currentCommonKeyId = cryptoService.getCurrentCommonKeyId();
 
-        EncryptedKey encryptedDataKey = cryptoService.encryptSymmetricKey(commonKey, KeyType.DATA_KEY, record.getDataKey()).blockingGet();
+        EncryptedKey encryptedDataKey = cryptoService.encryptSymmetricKey(
+                commonKey,
+                KeyType.DATA_KEY,
+                record.getDataKey()
+        ).blockingGet();
+
         EncryptedKey encryptedAttachmentsKey = null;
         if (record.getAttachmentsKey() != null) {
-            encryptedAttachmentsKey = cryptoService.encryptSymmetricKey(commonKey, KeyType.ATTACHMENT_KEY, record.getAttachmentsKey()).blockingGet();
+            encryptedAttachmentsKey = cryptoService.encryptSymmetricKey(
+                    commonKey,
+                    KeyType.ATTACHMENT_KEY,
+                    record.getAttachmentsKey()
+            ).blockingGet();
         }
 
         return new EncryptedRecord(
@@ -487,11 +498,13 @@ class RecordService {
                 record.getModelVersion());
     }
 
-    <T extends DomainResource> DecryptedRecord<T> decryptRecord(EncryptedRecord r, String userId) throws IOException, DataValidationException.ModelVersionNotSupported {
+    <T extends DomainResource> DecryptedRecord<T> decryptRecord(EncryptedRecord r, String userId)
+            throws IOException, DataValidationException.ModelVersionNotSupported {
         if (!ModelVersion.isModelVersionSupported(r.getModelVersion())) {
             throw new DataValidationException.ModelVersionNotSupported("Please update SDK to latest version!");
         }
         HashMap<String, String> tags = tagEncryptionService.decryptTags(r.getEncryptedTags());
+        List<String> annotations = tagEncryptionService.decryptAnnotations(r.getEncryptedTags());
 
         String commonKeyId = r.getCommonKeyId();
 
@@ -500,7 +513,11 @@ class RecordService {
         if (commonKeyStored) {
             commonKey = cryptoService.getCommonKeyById(commonKeyId);
         } else {
-            CommonKeyResponse commonKeyResponse = apiService.fetchCommonKey(alias, userId, commonKeyId).blockingGet();
+            CommonKeyResponse commonKeyResponse = apiService.fetchCommonKey(
+                    alias,
+                    userId,
+                    commonKeyId
+            ).blockingGet();
             EncryptedKey encryptedKey = commonKeyResponse.getCommonKey();
 
             GCKeyPair gcKeyPair = cryptoService.fetchGCKeyPair().blockingGet();
@@ -511,7 +528,10 @@ class RecordService {
         GCKey dataKey = cryptoService.symDecryptSymmetricKey(commonKey, r.getEncryptedDataKey()).blockingGet();
         GCKey attachmentsKey = null;
         if (r.getEncryptedAttachmentsKey() != null) {
-            attachmentsKey = cryptoService.symDecryptSymmetricKey(commonKey, r.getEncryptedAttachmentsKey()).blockingGet();
+            attachmentsKey = cryptoService.symDecryptSymmetricKey(
+                    commonKey,
+                    r.getEncryptedAttachmentsKey()
+            ).blockingGet();
         }
 
         T resource = null;
@@ -523,11 +543,13 @@ class RecordService {
                 r.getIdentifier(),
                 resource,
                 tags,
+                annotations,
                 r.getCustomCreationDate(),
                 r.getUpdatedDate(),
                 dataKey,
                 attachmentsKey,
-                r.getModelVersion());
+                r.getModelVersion()
+        );
     }
 
     <T extends DomainResource> HashMap<Attachment, String> extractUploadData(T resource) {

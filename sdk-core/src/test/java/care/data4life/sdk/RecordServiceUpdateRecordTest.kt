@@ -92,7 +92,7 @@ class RecordServiceUpdateRecordTest: RecordServiceTestBase() {
         Mockito.verify(
                 mockDecryptedRecord,
                 Mockito.times(0)
-        ).annotations = ArgumentMatchers.any()
+        ).annotations = ArgumentMatchers.anyList()
 
         // Cleanup
         mockCarePlan.id = null

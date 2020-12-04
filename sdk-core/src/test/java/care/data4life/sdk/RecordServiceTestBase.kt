@@ -58,6 +58,7 @@ abstract class RecordServiceTestBase {
     internal lateinit var mockCommonKey: GCKey
     internal lateinit var mockAttachmentKey: GCKey
     internal lateinit var mockEncryptedDataKey: EncryptedKey
+    internal lateinit var mockEncryptedAttachmentKey: EncryptedKey
     internal lateinit var mockEncryptedRecord: EncryptedRecord
     internal lateinit var mockAnnotatedEncryptedRecord: EncryptedRecord
     internal lateinit var mockDecryptedRecord: DecryptedRecord<DomainResource>
@@ -101,6 +102,7 @@ abstract class RecordServiceTestBase {
         mockAttachmentKey = Mockito.mock(GCKey::class.java)
         mockCommonKey = Mockito.mock(GCKey::class.java)
         mockEncryptedDataKey = Mockito.mock(EncryptedKey::class.java)
+        mockEncryptedAttachmentKey = Mockito.mock(EncryptedKey::class.java)
         mockEncryptedRecord = Mockito.mock(EncryptedRecord::class.java)
         mockAnnotatedEncryptedRecord = Mockito.mock(EncryptedRecord::class.java)
         mockDecryptedRecord = Mockito.mock(DecryptedRecord::class.java) as DecryptedRecord<DomainResource>

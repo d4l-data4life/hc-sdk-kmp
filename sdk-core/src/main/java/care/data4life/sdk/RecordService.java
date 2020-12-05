@@ -99,6 +99,10 @@ class RecordService {
         EncryptedKey run(GCKey commonKey);
     }
 
+    private interface GetTags {
+        HashMap<String, String> run();
+    }
+
     private interface DecryptSource<T> {
         T run(
                 HashMap<String, String>tags,
@@ -290,33 +294,15 @@ class RecordService {
             Integer pageSize,
             Integer offset
     ) {
-        String startTime = startDate != null ? DATE_FORMATTER.format(startDate) : null;
-        String endTime = endDate != null ? DATE_FORMATTER.format(endDate) : null;
-
-        return Observable
-                .fromCallable(
-                        () -> taggingService
-                                .getTagFromType(
-                                        FhirElementFactory.getFhirTypeForClass(resourceType)
-                                )
+        return fetch(
+                    userId,
+                    annotations,
+                    startDate,
+                    endDate,
+                    pageSize,
+                    offset,
+                    () -> taggingService.getTagFromType(FhirElementFactory.getFhirTypeForClass(resourceType))
                 )
-                .map(tags -> tagEncryptionService.encryptTags(tags))
-                .map(tags -> {
-                        tags.addAll(tagEncryptionService.encryptAnnotations(annotations));
-                        return tags;
-                })
-                .flatMap(
-                         encryptedTags -> apiService.fetchRecords(
-                                alias,
-                                userId,
-                                startTime,
-                                endTime,
-                                pageSize,
-                                offset,
-                                encryptedTags
-                         )
-                )
-                .flatMapIterable(encryptedRecords -> encryptedRecords)
                 .map((EncryptedRecord encryptedRecord) -> (DecryptedRecord<T>) decryptRecord(encryptedRecord, userId))
                 .filter(
                         decryptedRecord -> resourceType.isAssignableFrom(
@@ -325,8 +311,8 @@ class RecordService {
                         )
                 )
                 .filter( decryptedRecord -> Objects.requireNonNull(
-                            decryptedRecord.getAnnotations()
-                    ).containsAll(annotations)
+                        decryptedRecord.getAnnotations()
+                        ).containsAll(annotations)
                 )
                 .map(this::assignResourceId)
                 .map(decryptedRecord -> new Record<>(
@@ -513,7 +499,80 @@ class RecordService {
                 );
     }
 
+    Single<AppDataRecord> fetchAppDataRecord(String recordId, String userId) {
+        return apiService
+                .fetchRecord(alias, userId, recordId)
+                .map((EncryptedRecord encryptedRecord) -> decryptAppDataRecord(encryptedRecord, userId))
+                .map(decryptedRecord -> new AppDataRecord(
+                        Objects.requireNonNull(decryptedRecord.getIdentifier()),
+                        decryptedRecord.getAppData(),
+                        buildMeta(decryptedRecord),
+                        decryptedRecord.getAnnotations()
+                ));
+    }
+
+    Single<List<AppDataRecord>> fetchAppDataRecords(
+            String userId,
+            List<String> annotations,
+            LocalDate startDate,
+            LocalDate endDate,
+            Integer pageSize,
+            Integer offset
+    ) {
+        return fetch(
+                userId,
+                annotations,
+                startDate,
+                endDate,
+                pageSize,
+                offset,
+                () -> taggingService.appendAppDataTags(new HashMap<>())
+            )
+            .map(encryptedRecord -> decryptAppDataRecord(encryptedRecord,userId))
+            .map(decryptedRecord -> new AppDataRecord(
+                    Objects.requireNonNull(decryptedRecord.getIdentifier()),
+                    decryptedRecord.getAppData(),
+                    buildMeta(decryptedRecord),
+                    decryptedRecord.getAnnotations()
+            ))
+            .toList();
+    }
+
     //region utility methods
+    private Observable<EncryptedRecord> fetch(
+            String userId,
+            List<String> annotations,
+            LocalDate startDate,
+            LocalDate endDate,
+            Integer pageSize,
+            Integer offset,
+            GetTags getTags
+    ) {
+        String startTime = startDate != null ? DATE_FORMATTER.format(startDate) : null;
+        String endTime = endDate != null ? DATE_FORMATTER.format(endDate) : null;
+
+        return Observable
+                .fromCallable(getTags::run)
+                .map(tags -> tagEncryptionService.encryptTags(tags))
+                .map(tags -> {
+                    tags.addAll(tagEncryptionService.encryptAnnotations(annotations));
+                    return tags;
+                })
+                .flatMap(
+                        encryptedTags -> apiService.fetchRecords(
+                                alias,
+                                userId,
+                                startTime,
+                                endTime,
+                                pageSize,
+                                offset,
+                                encryptedTags
+                        )
+                )
+                .flatMapIterable(encryptedRecords -> encryptedRecords);
+    }
+
+
     private EncryptedRecord encrypt(
             DecryptedRecordBase record,
             GetDecryptedResource getDecryptedResource,
@@ -547,8 +606,6 @@ class RecordService {
                 record.getModelVersion()
         );
     }
-
-
 
     private <T> T decrypt(
             EncryptedRecord record,

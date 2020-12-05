@@ -28,13 +28,11 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import java.io.IOException
-import java.util.*
 
 class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
     @Before
     fun setUp() {
         init()
-        Mockito.reset(recordService)
     }
 
     @After
@@ -50,8 +48,12 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
     )
     fun `Given a RecordId and UserId, fetchRecord returns a Record`() {
         // Given
-        Mockito.`when`(mockApiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)).thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedRecord).`when`(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
+        Mockito
+                .`when`(mockApiService.fetchRecord(ALIAS, USER_ID, RECORD_ID))
+                .thenReturn(Single.just(mockEncryptedRecord))
+        Mockito.doReturn(mockDecryptedRecord)
+                .`when`(recordService)
+                .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
         Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedRecord)
 
         // When
@@ -75,8 +77,10 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
     @Throws(InterruptedException::class)
     fun `Given multiple RecordIds and a UserId, fetchRecords returns FetchedRecords`() {
         // Given
-        Mockito.doReturn(Single.just(mockRecord)).`when`(recordService).fetchRecord<DomainResource>(RECORD_ID, USER_ID)
-        val ids = Arrays.asList(RECORD_ID, RECORD_ID)
+        Mockito.doReturn(Single.just(mockRecord))
+                .`when`(recordService)
+                .fetchRecord<DomainResource>(RECORD_ID, USER_ID)
+        val ids = listOf(RECORD_ID, RECORD_ID)
 
         // When
         val observer = recordService.fetchRecords<CarePlan>(ids, USER_ID).test().await()
@@ -102,7 +106,7 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
         Mockito.`when`(mockTaggingService.getTagFromType(CarePlan.resourceType)).thenReturn(mockTags)
         Mockito.`when`(mockTagEncryptionService.encryptTags(mockTags)).thenReturn(mockEncryptedTags)
         Mockito.`when`(
-                mockTagEncryptionService.encryptAnnotations(ArgumentMatchers.eq(listOf()))
+                mockTagEncryptionService.encryptAnnotations(listOf())
         ).thenReturn(mockEncryptedAnnotations)
         Mockito.`when`(
                 mockApiService.fetchRecords(
@@ -143,7 +147,7 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
         Truth.assertThat(fetched[1].fhirResource).isEqualTo(mockCarePlan)
         inOrder.verify(mockTaggingService).getTagFromType(CarePlan.resourceType)
         inOrder.verify(mockTagEncryptionService).encryptTags(mockTags)
-        inOrder.verify(mockTagEncryptionService).encryptAnnotations(ArgumentMatchers.eq(listOf()))
+        inOrder.verify(mockTagEncryptionService).encryptAnnotations(listOf())
         inOrder.verify(mockApiService).fetchRecords(
                 ArgumentMatchers.eq(ALIAS),
                 ArgumentMatchers.eq(USER_ID),

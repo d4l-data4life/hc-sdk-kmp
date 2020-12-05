@@ -201,7 +201,7 @@ class RecordService {
                 .flatMap(
                         encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord)
                 )
-                .map((EncryptedRecord r) -> (DecryptedRecord<T>) decryptRecord(r, userId))
+                .map(encryptedRecord -> (DecryptedRecord<T>) decryptRecord(encryptedRecord, userId))
                 .map(record -> restoreUploadData(record, resource, data))
                 .map(this::assignResourceId)
                 .map(
@@ -303,7 +303,7 @@ class RecordService {
                     offset,
                     () -> taggingService.getTagFromType(FhirElementFactory.getFhirTypeForClass(resourceType))
                 )
-                .map((EncryptedRecord encryptedRecord) -> (DecryptedRecord<T>) decryptRecord(encryptedRecord, userId))
+                .map(encryptedRecord -> (DecryptedRecord<T>) decryptRecord(encryptedRecord, userId))
                 .filter(
                         decryptedRecord -> resourceType.isAssignableFrom(
                                 Objects.requireNonNull(decryptedRecord.getResource())
@@ -311,7 +311,7 @@ class RecordService {
                         )
                 )
                 .filter( decryptedRecord -> Objects.requireNonNull(
-                        decryptedRecord.getAnnotations()
+                            decryptedRecord.getAnnotations()
                         ).containsAll(annotations)
                 )
                 .map(this::assignResourceId)
@@ -408,7 +408,7 @@ class RecordService {
 
         return apiService
                 .fetchRecord(alias, userId, recordId)
-                .map((EncryptedRecord encryptedRecord) -> (DecryptedRecord<T>) decryptRecord(encryptedRecord, userId))
+                .map(encryptedRecord -> decryptRecord(encryptedRecord, userId))
                 .map(decryptedRecord -> uploadData(decryptedRecord, resource, userId))
                 .map(decryptedRecord -> {
                     cleanObsoleteAdditionalIdentifiers(resource);
@@ -489,7 +489,7 @@ class RecordService {
         return createRecord
                 .map(this::encryptAppDataRecord)
                 .flatMap(encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord))
-                .map((EncryptedRecord r) -> (DecryptedAppDataRecord) decryptAppDataRecord(r, userId))
+                .map(encryptedRecord -> decryptAppDataRecord(encryptedRecord, userId))
                 .map(decryptedRecord -> new AppDataRecord(
                                 Objects.requireNonNull(decryptedRecord.getIdentifier()),
                                 decryptedRecord.getAppData(),
@@ -499,10 +499,32 @@ class RecordService {
                 );
     }
 
+    Single<AppDataRecord> updateAppDataRecord(
+            byte[] resource,
+            String userId,
+            String recordId,
+            @Nullable List<String> annotations
+    )  {
+        return apiService
+                .fetchRecord(alias, userId, recordId)
+                .map(encryptedRecord -> decryptAppDataRecord(encryptedRecord, userId))
+                .map(decryptedRecord -> decryptedRecord.copyWithResourceAnnotations(resource,annotations))
+                .map(this::encryptAppDataRecord)
+                .flatMap(encryptedRecord -> apiService.updateRecord(alias, userId, recordId, encryptedRecord))
+                .map(encryptedRecord -> decryptAppDataRecord(encryptedRecord, userId))
+                .map(decryptedRecord -> new AppDataRecord(
+                        Objects.requireNonNull(decryptedRecord.getIdentifier()),
+                        decryptedRecord.getAppData(),
+                        buildMeta(decryptedRecord),
+                        decryptedRecord.getAnnotations()
+                    )
+                );
+    }
+
     Single<AppDataRecord> fetchAppDataRecord(String recordId, String userId) {
         return apiService
                 .fetchRecord(alias, userId, recordId)
-                .map((EncryptedRecord encryptedRecord) -> decryptAppDataRecord(encryptedRecord, userId))
+                .map(encryptedRecord -> decryptAppDataRecord(encryptedRecord, userId))
                 .map(decryptedRecord -> new AppDataRecord(
                         Objects.requireNonNull(decryptedRecord.getIdentifier()),
                         decryptedRecord.getAppData(),

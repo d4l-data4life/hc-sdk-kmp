@@ -508,7 +508,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         // Given
         Patient patient = PatientBuilder.buildPatient();
         patient.photo.get(0).data = null;
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+        DecryptedRecord decryptedRecord = new DecryptedRecord(
                 null,
                 null,
                 null,
@@ -539,7 +539,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         // Given
         Observation observation = ObservationBuilder.buildObservationWithComponent();
         observation.component.get(0).valueAttachment.data = null;
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+        DecryptedRecord decryptedRecord = new DecryptedRecord(
                 null,
                 null,
                 null,
@@ -570,7 +570,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         // Given
         QuestionnaireResponse questionnaireResponse = QuestionnaireResponseBuilder.buildQuestionnaireResponse();
         questionnaireResponse.item.get(0).answer.get(0).valueAttachment.data = null;
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+        DecryptedRecord decryptedRecord = new DecryptedRecord(
                 null,
                 null,
                 null,

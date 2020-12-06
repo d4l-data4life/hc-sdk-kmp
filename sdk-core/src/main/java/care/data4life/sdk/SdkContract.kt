@@ -16,8 +16,6 @@
 package care.data4life.sdk
 
 import care.data4life.sdk.lang.D4LException
-import care.data4life.sdk.listener.Callback
-import care.data4life.sdk.listener.ResultListener
 
 interface SdkContract {
 
@@ -29,32 +27,18 @@ interface SdkContract {
      * Will be removed in version v2.0.0
      */
     @Deprecated(message = "Deprecated with version v1.9.0 and will be removed in version v2.0.0", level = DeprecationLevel.WARNING)
-    interface LegacyClient : LegacyAuthClient, SdkContractLegacy.Client
+    interface LegacyDataClient : SdkContractLegacy.DataClient
 
-
+    /**
+     * Legacy Client interface
+     *
+     * Deprecated with version v1.9.0
+     * <p>
+     * Will be removed in version v2.0.0
+     */
     @Deprecated(message = "Deprecated with version v1.9.0 and will be removed in version v2.0.0", level = DeprecationLevel.WARNING)
-    interface LegacyAuthClient {
-        /**
-         * Get the currently active User session token if present.
-         *
-         * @param listener result contains either User session token or Error
-         */
-        fun getUserSessionToken(listener: ResultListener<String>)
+    interface LegacyAuthClient : SdkContractLegacy.AuthClient
 
-        /**
-         * Checks if user is logged in.
-         *
-         * @param listener resulting Boolean indicates if the user is logged in or not or Error
-         */
-        fun isUserLoggedIn(listener: ResultListener<Boolean>)
-
-        /**
-         * Logout the user
-         *
-         * @param listener either [Callback.onSuccess] is called or [Callback.onError]
-         */
-        fun logout(listener: Callback)
-    }
 
     interface ErrorHandler {
         fun handleError(error: Throwable?): D4LException?

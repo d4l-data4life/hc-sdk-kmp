@@ -61,7 +61,10 @@ public final class Data4LifeClient extends BaseClient {
                               UserService userService,
                               RecordService recordService,
                               CallHandler callHandler) {
-        super(alias, userService, recordService, callHandler, Data4LifeClient.Companion.createLegacyClient(alias, userService, recordService, callHandler));
+        super(alias, userService, recordService, callHandler,
+                Data4LifeClient.Companion.createLegacyDataClient(alias, userService, recordService, callHandler),
+                Data4LifeClient.Companion.createLegacyAuthClient(alias, userService, recordService, callHandler)
+        );
     }
 
     /**

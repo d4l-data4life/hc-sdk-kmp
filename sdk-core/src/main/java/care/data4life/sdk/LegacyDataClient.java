@@ -28,8 +28,6 @@ import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.call.Task;
 import care.data4life.sdk.listener.Callback;
 import care.data4life.sdk.listener.ResultListener;
-import care.data4life.sdk.log.Log;
-import care.data4life.sdk.log.Logger;
 import care.data4life.sdk.model.CreateResult;
 import care.data4life.sdk.model.DeleteResult;
 import care.data4life.sdk.model.DownloadResult;
@@ -46,7 +44,7 @@ import io.reactivex.Single;
  * Will be removed in version v2.0.0
  */
 @Deprecated
-class LegacyClient implements SdkContract.LegacyClient {
+class LegacyDataClient implements SdkContract.LegacyDataClient {
 
     protected CallHandler handler;
     protected String alias;
@@ -54,7 +52,7 @@ class LegacyClient implements SdkContract.LegacyClient {
     protected RecordService recordService;
 
 
-    LegacyClient(
+    LegacyDataClient(
             String alias,
             UserService userService,
             RecordService recordService,
@@ -64,23 +62,6 @@ class LegacyClient implements SdkContract.LegacyClient {
         this.userService = userService;
         this.recordService = recordService;
         this.handler = handler;
-    }
-
-    @Override
-    public void getUserSessionToken(ResultListener<String> listener) {
-        Single<String> operation = userService.getSessionToken(alias);
-        handler.executeSingle(operation, listener);
-    }
-
-    @Override
-    public void isUserLoggedIn(ResultListener<Boolean> listener) {
-        Single<Boolean> operation = userService.isLoggedIn(alias);
-        handler.executeSingle(operation, listener);
-    }
-
-    @Override
-    public void logout(Callback listener) {
-        handler.executeCompletable(userService.logout(), listener);
     }
 
     @Override

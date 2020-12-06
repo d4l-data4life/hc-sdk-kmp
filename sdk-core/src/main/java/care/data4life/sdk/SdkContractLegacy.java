@@ -50,7 +50,36 @@ public interface SdkContractLegacy {
      * Will be removed in version v2.0.0
      */
     @Deprecated
-    interface Client {
+    interface AuthClient {
+        /**
+         * Get the currently active User session token if present.
+         *
+         * @param listener result contains either User session token or Error
+         */
+        void getUserSessionToken(ResultListener<String> listener);
+
+        /**
+         * Checks if user is logged in.
+         *
+         * @param listener resulting Boolean indicates if the user is logged in or not or Error
+         */
+        void isUserLoggedIn(ResultListener<Boolean> listener);
+
+        /**
+         * Logout the user
+         *
+         * @param listener either [Callback.onSuccess] is called or [Callback.onError]
+         */
+        void logout(Callback listener);
+    }
+
+    /**
+     * Deprecated with version v1.9.0
+     * <p>
+     * Will be removed in version v2.0.0
+     */
+    @Deprecated
+    interface DataClient {
 
         /**
          * Creates a record.

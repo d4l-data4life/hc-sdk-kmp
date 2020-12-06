@@ -40,7 +40,7 @@ import care.data4life.sdk.model.UpdateResult;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 
-abstract class BaseClient implements SdkContract.Client {
+abstract class BaseClient implements SdkContract.LegacyClient {
 
     protected CallHandler handler;
     protected String alias;

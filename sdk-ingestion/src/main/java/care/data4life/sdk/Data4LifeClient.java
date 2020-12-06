@@ -45,8 +45,9 @@ public final class Data4LifeClient extends BaseClient {
     private static final String DUMMY_CLIENT_SECRET = "secret";
     private static final String DUMMY_REDIRECT_URL = "dummy";
     /* Since this client get an OAuth access token directly and never makes
-    * any requests to the OAuth endpoint, we just add a single, dummy scope. */
+     * any requests to the OAuth endpoint, we just add a single, dummy scope. */
     private static final Set<String> DUMMY_SCOPES = new HashSet<String>(Arrays.asList("fakescope"));
+
 
     /**
      * Hidden constructor for the ingestion client.
@@ -54,18 +55,18 @@ public final class Data4LifeClient extends BaseClient {
      * @param alias         Alias
      * @param userService   User service
      * @param recordService Record service
-     * @param callHandler  Call handler
+     * @param callHandler   Call handler
      */
     protected Data4LifeClient(String alias,
                               UserService userService,
                               RecordService recordService,
                               CallHandler callHandler) {
-        super(alias, userService, recordService, callHandler);
+        super(alias, userService, recordService, callHandler, Data4LifeClient.Companion.createLegacyClient(alias, userService, recordService, callHandler));
     }
 
     /**
      * Factory method for creating an ingestion SDK client instance.
-     *
+     * <p>
      * Unlike a normal SDK client, the ingestion SDK client does not handle OAuth authorization.
      * Instead, the OAuth flow must be handled by the system using the client and a valid OAuth
      * access token must be passed in. Likewise, the service must be passed the private key that
@@ -142,7 +143,7 @@ public final class Data4LifeClient extends BaseClient {
      * @return True if fetching and storing succeeded
      */
     public boolean fetchKeys() {
-        return userService.finishLogin(true).blockingGet();
+        return getUserService().finishLogin(true).blockingGet();
     }
 
 }

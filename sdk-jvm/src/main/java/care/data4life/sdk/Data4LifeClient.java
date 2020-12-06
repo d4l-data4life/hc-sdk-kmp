@@ -28,6 +28,7 @@ import care.data4life.auth.storage.InMemoryAuthStorage;
 import care.data4life.sdk.auth.OAuthService;
 import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.log.Log;
+import care.data4life.sdk.log.Logger;
 import care.data4life.sdk.network.Environment;
 import care.data4life.securestore.SecureStore;
 import care.data4life.securestore.SecureStoreContract;
@@ -50,7 +51,7 @@ public final class Data4LifeClient extends BaseClient {
                               UserService userService,
                               RecordService recordService,
                               CallHandler callHandler) {
-        super(alias, userService, recordService, callHandler);
+        super(alias, userService, recordService, callHandler, Data4LifeClient.Companion.createLegacyClient(alias, userService, recordService, callHandler));
         this.authorizationService = authorizationService;
         this.cryptoService = cryptoService;
     }
@@ -127,19 +128,24 @@ public final class Data4LifeClient extends BaseClient {
         return cryptoService
                 .generateGCKeyPair()
                 .flatMap(gcKeyPair -> cryptoService.convertAsymmetricKeyToBase64ExchangeKey(gcKeyPair.getPublicKey()))
-                .map(pubKey -> authorizationService.createAuthorizationUrl(this.alias, pubKey))
+                .map(pubKey -> authorizationService.createAuthorizationUrl(getAlias(), pubKey))
                 .blockingGet();
     }
 
     @SuppressWarnings("ConstantConditions")
     public boolean finishLogin(String url) throws Throwable {
-        boolean authorized = authorizationService.finishAuthorization(this.alias, url);
+        boolean authorized = authorizationService.finishAuthorization(getAlias(), url);
 
         if (!authorized) {
             throw (Throwable) new AuthorizationException.FailedToLogin();
         }
 
-        return userService.finishLogin(authorized).blockingGet();
+        return getUserService().finishLogin(authorized).blockingGet();
+    }
+
+
+    public static void setLogger(Logger logger) {
+        Data4LifeClient.Companion.setLogger(logger);
     }
 
 }

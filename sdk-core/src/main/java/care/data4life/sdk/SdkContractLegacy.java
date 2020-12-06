@@ -36,6 +36,12 @@ import care.data4life.sdk.model.FetchResult;
 import care.data4life.sdk.model.Record;
 import care.data4life.sdk.model.UpdateResult;
 
+/**
+ * Deprecated with version v1.9.0
+ * <p>
+ * Will be removed in version v2.0.0
+ */
+@Deprecated
 public interface SdkContractLegacy {
 
     /**
@@ -45,6 +51,7 @@ public interface SdkContractLegacy {
      */
     @Deprecated
     interface Client {
+
         /**
          * Creates a record.
          *

@@ -40,17 +40,21 @@ import care.data4life.sdk.model.UpdateResult;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 
-abstract class BaseClient implements SdkContract.LegacyClient {
+/**
+ * Deprecated with version v1.9.0
+ * <p>
+ * Will be removed in version v2.0.0
+ */
+@Deprecated
+class LegacyClient implements SdkContract.LegacyClient {
 
     protected CallHandler handler;
     protected String alias;
-    protected UserService userService;
+    public UserService userService;
     protected RecordService recordService;
 
-    protected static final String CLIENT_ID_SPLIT_CHAR = "#";
-    protected static final int PARTNER_ID_INDEX = 0;
 
-    BaseClient(
+    LegacyClient(
             String alias,
             UserService userService,
             RecordService recordService,
@@ -60,10 +64,6 @@ abstract class BaseClient implements SdkContract.LegacyClient {
         this.userService = userService;
         this.recordService = recordService;
         this.handler = handler;
-    }
-
-    public static void setLogger(Logger logger) {
-        Log.setLogger(logger);
     }
 
     @Override

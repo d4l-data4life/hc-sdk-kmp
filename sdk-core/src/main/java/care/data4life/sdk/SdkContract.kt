@@ -29,10 +29,11 @@ interface SdkContract {
      * Will be removed in version v2.0.0
      */
     @Deprecated(message = "Deprecated with version v1.9.0 and will be removed in version v2.0.0", level = DeprecationLevel.WARNING)
-    interface LegacyClient : AuthClient, SdkContractLegacy.Client
+    interface LegacyClient : LegacyAuthClient, SdkContractLegacy.Client
 
 
-    interface AuthClient {
+    @Deprecated(message = "Deprecated with version v1.9.0 and will be removed in version v2.0.0", level = DeprecationLevel.WARNING)
+    interface LegacyAuthClient {
         /**
          * Get the currently active User session token if present.
          *

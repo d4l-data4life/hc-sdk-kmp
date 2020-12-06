@@ -66,7 +66,7 @@ public final class Data4LifeClient extends BaseClient {
             RecordService recordService,
             CallHandler callHandler) {
 
-        super(alias, userService, recordService, callHandler);
+        super(alias, userService, recordService, callHandler, Data4LifeClient.Companion.createLegacyClient(alias, userService, recordService, callHandler));
         this.cryptoService = cryptoService;
         this.authorizationService = authorizationService;
     }
@@ -207,18 +207,18 @@ public final class Data4LifeClient extends BaseClient {
             @SuppressLint("CheckResult")
             @Override
             public void onSuccess() {
-                userService
+                getUserService()
                         .finishLogin(true)
                         .subscribeOn(Schedulers.io())
                         .subscribe(
                                 isLoggedIn -> listener.onSuccess(),
-                                error -> listener.onError(handler.errorHandler.handleError(error))
+                                error -> listener.onError(getHandler().errorHandler.handleError(error))
                         );
             }
 
             @Override
             public void onError(Throwable error) {
-                listener.onError(handler.errorHandler.handleError(error));
+                listener.onError(getHandler().errorHandler.handleError(error));
             }
         });
     }

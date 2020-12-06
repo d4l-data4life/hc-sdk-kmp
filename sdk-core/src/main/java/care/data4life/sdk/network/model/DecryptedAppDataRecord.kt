@@ -14,36 +14,11 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk
+package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.model.Meta
-import care.data4life.sdk.model.RecordBase
-import care.data4life.sdk.network.model.DecryptedRecordBase
+import care.data4life.sdk.network.model.definitions.DecryptedRecordBase
 import java.util.*
-
-/**
- * AppDataRecord is used to store arbitrary data, analogous to Record
- * @see care.data4life.sdk.model.Record
- */
-data class AppDataRecord(
-        val identifier: String,
-        val appDataResource: ByteArray,
-        override val meta: Meta,
-        override val annotations: List<String>
-): RecordBase {
-    override fun equals(other: Any?): Boolean {
-        return when {
-            other !is AppDataRecord             -> false
-            identifier != other.identifier ||
-            meta != other.meta ||
-            annotations != other.annotations    -> false
-            else                                -> appDataResource.contentEquals(other.appDataResource)
-        }
-    }
-
-    override fun hashCode(): Int = Objects.hash(identifier, meta, annotations, appDataResource.contentToString())
-}
 
 /**
  * DecryptedAppDataRecord is an internal decrypted form of AppDataRecord, analogous to DecryptedRecord
@@ -59,18 +34,17 @@ internal data class DecryptedAppDataRecord(
         override var dataKey: GCKey?,
         override var modelVersion: Int
 ): DecryptedRecordBase {
-
     override fun equals(other: Any?): Boolean {
         return when {
             other !is DecryptedAppDataRecord        -> false
             identifier != other.identifier ||
-            !appData.contentEquals(other.appData) ||
-            tags != other.tags ||
-            annotations != other.annotations ||
-            customCreationDate != other.customCreationDate ||
-            updatedDate != other.updatedDate ||
-            dataKey != other.dataKey ||
-            modelVersion != other.modelVersion      -> false
+                    !appData.contentEquals(other.appData) ||
+                    tags != other.tags ||
+                    annotations != other.annotations ||
+                    customCreationDate != other.customCreationDate ||
+                    updatedDate != other.updatedDate ||
+                    dataKey != other.dataKey ||
+                    modelVersion != other.modelVersion      -> false
             else                                    -> true
         }
     }

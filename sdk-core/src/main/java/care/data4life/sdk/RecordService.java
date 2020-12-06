@@ -46,6 +46,7 @@ import care.data4life.sdk.config.DataRestrictionException;
 import care.data4life.sdk.lang.CoreRuntimeException;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.lang.DataValidationException;
+import care.data4life.sdk.model.AppDataRecord;
 import care.data4life.sdk.model.CreateResult;
 import care.data4life.sdk.model.DeleteResult;
 import care.data4life.sdk.model.DownloadResult;
@@ -57,7 +58,8 @@ import care.data4life.sdk.model.Record;
 import care.data4life.sdk.model.UpdateResult;
 import care.data4life.sdk.network.model.CommonKeyResponse;
 import care.data4life.sdk.network.model.DecryptedRecord;
-import care.data4life.sdk.network.model.DecryptedRecordBase;
+import care.data4life.sdk.network.model.DecryptedAppDataRecord;
+import care.data4life.sdk.network.model.definitions.DecryptedRecordBase;
 import care.data4life.sdk.network.model.EncryptedKey;
 import care.data4life.sdk.network.model.EncryptedRecord;
 import care.data4life.sdk.model.EmptyRecord;
@@ -464,8 +466,7 @@ class RecordService {
                 .flatMap(encryptedTags -> apiService.getCount(alias, userId, encryptedTags));
     }
 
-    Single<AppDataRecord> createAppDataRecord(byte[] resource, String userId, List<String> annotations)
-            throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
+    Single<AppDataRecord> createAppDataRecord(byte[] resource, String userId, List<String> annotations) {
         String createdDate = DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID));
         Single<DecryptedAppDataRecord> createRecord = Single.just(createdDate)
                 .map(createdAt -> {

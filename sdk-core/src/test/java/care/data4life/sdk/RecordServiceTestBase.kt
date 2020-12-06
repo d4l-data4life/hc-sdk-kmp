@@ -26,6 +26,7 @@ import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.network.model.DecryptedRecord
+import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import io.mockk.every

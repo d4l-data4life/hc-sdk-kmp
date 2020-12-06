@@ -14,16 +14,21 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network.model
+package care.data4life.sdk.model.definitions
 
-import care.data4life.crypto.GCKey
+import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.model.Meta
 
-internal interface DecryptedRecordBase {
-    var identifier: String?
-    var tags: HashMap<String, String>?
-    var annotations: List<String>
-    var customCreationDate: String?
-    var updatedDate: String?
-    var dataKey: GCKey?
-    var modelVersion: Int
+interface RecordBase {
+    val meta: Meta?
+    val annotations: List<String>?
+}
+
+interface FhirRecord<T: DomainResource>: RecordBase {
+    val fhirResource: T?
+}
+
+interface DataRecord: RecordBase {
+    val identifier: String
+    val appDataResource: ByteArray
 }

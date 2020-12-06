@@ -22,6 +22,7 @@ import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.DecryptedRecord
+import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.util.Base64
 import care.data4life.sdk.util.MimeType
 

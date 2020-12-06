@@ -14,9 +14,8 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk
+package care.data4life.sdk.model
 
-import care.data4life.sdk.model.Meta
 import io.mockk.mockk
 import io.mockk.mockkClass
 import org.junit.Assert.assertFalse

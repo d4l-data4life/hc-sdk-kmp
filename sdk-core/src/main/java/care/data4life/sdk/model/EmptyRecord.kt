@@ -16,6 +16,7 @@
 package care.data4life.sdk.model
 
 import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.model.definitions.FhirRecord
 
 internal data class EmptyRecord<T : DomainResource>(
         override val fhirResource: T? = null,

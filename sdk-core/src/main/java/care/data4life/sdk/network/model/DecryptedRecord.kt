@@ -17,10 +17,11 @@ package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
 import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.network.model.definitions.DecryptedRecordBase
 import java.io.Serializable
 import kotlin.collections.HashMap
 
-data class DecryptedRecord<T : DomainResource>(
+internal data class DecryptedRecord<T : DomainResource>(
         override var identifier: String?,
         var resource: T?,
         override var tags: HashMap<String, String>?,

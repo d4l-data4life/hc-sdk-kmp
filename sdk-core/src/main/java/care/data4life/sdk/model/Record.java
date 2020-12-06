@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 import care.data4life.fhir.stu3.model.DomainResource;
+import care.data4life.sdk.model.definitions.FhirRecord;
 
 public class Record<T extends DomainResource> implements FhirRecord<T> {
     private final T fhirResource;

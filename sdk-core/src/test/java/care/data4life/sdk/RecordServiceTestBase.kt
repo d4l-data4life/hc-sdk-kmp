@@ -26,9 +26,10 @@ import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.network.model.DecryptedRecord
-import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
+import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
+import care.data4life.sdk.network.model.definitions.DecryptedFhirRecord
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
@@ -64,9 +65,9 @@ abstract class RecordServiceTestBase {
     internal lateinit var mockEncryptedAttachmentKey: EncryptedKey
     internal lateinit var mockEncryptedRecord: EncryptedRecord
     internal lateinit var mockAnnotatedEncryptedRecord: EncryptedRecord
-    internal lateinit var mockDecryptedRecord: DecryptedRecord<DomainResource>
-    internal lateinit var mockAnnotatedDecryptedRecord: DecryptedRecord<DomainResource>
-    internal lateinit var mockDecryptedAppDataRecord: DecryptedAppDataRecord
+    internal lateinit var mockDecryptedRecord: DecryptedFhirRecord<DomainResource>
+    internal lateinit var mockAnnotatedDecryptedRecord: DecryptedFhirRecord<DomainResource>
+    internal lateinit var mockDecryptedAppDataRecord: DecryptedDataRecord
     internal lateinit var mockMeta: Meta
     private lateinit var mockD4LException: D4LException
     internal lateinit var mockRecord: Record<CarePlan>
@@ -110,9 +111,9 @@ abstract class RecordServiceTestBase {
         mockEncryptedAttachmentKey = Mockito.mock(EncryptedKey::class.java)
         mockEncryptedRecord = Mockito.mock(EncryptedRecord::class.java)
         mockAnnotatedEncryptedRecord = Mockito.mock(EncryptedRecord::class.java)
-        mockDecryptedRecord = Mockito.mock(DecryptedRecord::class.java) as DecryptedRecord<DomainResource>
-        mockAnnotatedDecryptedRecord = Mockito.mock(DecryptedRecord::class.java) as DecryptedRecord<DomainResource>
-        mockDecryptedAppDataRecord = Mockito.mock(DecryptedAppDataRecord::class.java)
+        mockDecryptedRecord = Mockito.mock(DecryptedFhirRecord::class.java) as DecryptedFhirRecord<DomainResource>
+        mockAnnotatedDecryptedRecord = Mockito.mock(DecryptedFhirRecord::class.java) as DecryptedFhirRecord<DomainResource>
+        mockDecryptedAppDataRecord = Mockito.mock(DecryptedDataRecord::class.java)
         mockMeta = Mockito.mock(Meta::class.java)
         mockD4LException = Mockito.mock(D4LException::class.java)
         mockRecord = Mockito.mock<Record<*>>(Record::class.java) as Record<CarePlan>

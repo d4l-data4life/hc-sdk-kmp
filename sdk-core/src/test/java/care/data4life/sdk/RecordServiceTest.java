@@ -41,7 +41,9 @@ import care.data4life.sdk.model.DownloadResult;
 import care.data4life.sdk.model.DownloadType;
 import care.data4life.sdk.model.Meta;
 import care.data4life.sdk.model.Record;
+import care.data4life.sdk.model.definitions.FhirRecord;
 import care.data4life.sdk.network.model.DecryptedRecord;
+import care.data4life.sdk.network.model.definitions.DecryptedFhirRecord;
 import care.data4life.sdk.test.util.AttachmentBuilder;
 import care.data4life.sdk.util.Base64;
 import care.data4life.sdk.util.MimeType;
@@ -171,7 +173,7 @@ public class RecordServiceTest extends RecordServiceTestBase {
         doReturn(mockDecryptedRecord).when(recordService).removeOrRestoreUploadData(REMOVE, mockDecryptedRecord, null, null);
 
         // When
-        DecryptedRecord record = recordService.removeUploadData(mockDecryptedRecord);
+        DecryptedFhirRecord record = recordService.removeUploadData(mockDecryptedRecord);
 
         // Then
         assertThat(record).isEqualTo(mockDecryptedRecord);
@@ -188,14 +190,14 @@ public class RecordServiceTest extends RecordServiceTestBase {
                 .when(recordService)
                 .removeOrRestoreUploadData(
                     RESTORE,
-                    (DecryptedRecord)mockDecryptedRecord,
+                    mockDecryptedRecord,
                     mockDocumentReference,
                     mockUploadData
                 );
 
         // When
-        DecryptedRecord record = recordService.restoreUploadData(
-                (DecryptedRecord)mockDecryptedRecord,
+        DecryptedFhirRecord record = recordService.restoreUploadData(
+                mockDecryptedRecord,
                 mockDocumentReference,
                 mockUploadData
         );
@@ -204,13 +206,13 @@ public class RecordServiceTest extends RecordServiceTestBase {
         assertThat(record).isEqualTo(mockDecryptedRecord);
 
         inOrder.verify(recordService).restoreUploadData(
-                (DecryptedRecord)mockDecryptedRecord,
+                mockDecryptedRecord,
                 mockDocumentReference,
                 mockUploadData
         );
         inOrder.verify(recordService).removeOrRestoreUploadData(
                 RESTORE,
-                (DecryptedRecord)mockDecryptedRecord,
+                mockDecryptedRecord,
                 mockDocumentReference,
                 mockUploadData
         );
@@ -234,7 +236,7 @@ public class RecordServiceTest extends RecordServiceTestBase {
         );
 
         // When
-        DecryptedRecord record = recordService.removeOrRestoreUploadData(REMOVE, decryptedRecord, document, mockUploadData);
+        DecryptedRecord record = (DecryptedRecord) recordService.removeOrRestoreUploadData(REMOVE, decryptedRecord, document, mockUploadData);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -265,7 +267,7 @@ public class RecordServiceTest extends RecordServiceTestBase {
         uploadData.put(document.content.get(0).attachment, DATA);
 
         // When
-        DecryptedRecord record = recordService.removeOrRestoreUploadData(RESTORE, decryptedRecord, document, uploadData);
+        DecryptedRecord record = (DecryptedRecord) recordService.removeOrRestoreUploadData(RESTORE, decryptedRecord, document, uploadData);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -282,7 +284,7 @@ public class RecordServiceTest extends RecordServiceTestBase {
         doReturn(mockDecryptedRecord).when(recordService).uploadOrDownloadData(UPLOAD, mockDecryptedRecord, null, USER_ID);
 
         // When
-        DecryptedRecord record = recordService.uploadData(mockDecryptedRecord, null, USER_ID);
+        DecryptedFhirRecord record = recordService.uploadData(mockDecryptedRecord, null, USER_ID);
 
         // Then
         assertThat(record).isEqualTo(mockDecryptedRecord);
@@ -297,14 +299,14 @@ public class RecordServiceTest extends RecordServiceTestBase {
         // Given
         doReturn(mockDecryptedRecord).when(recordService).uploadOrDownloadData(
                 UPDATE,
-                (DecryptedRecord)mockDecryptedRecord,
+                mockDecryptedRecord,
                 mockDocumentReference,
                 USER_ID
         );
 
         // When
-        DecryptedRecord record = recordService.uploadData(
-                (DecryptedRecord)mockDecryptedRecord,
+        DecryptedFhirRecord record = recordService.uploadData(
+                mockDecryptedRecord,
                 mockDocumentReference,
                 USER_ID
         );
@@ -313,13 +315,13 @@ public class RecordServiceTest extends RecordServiceTestBase {
         assertThat(record).isEqualTo(mockDecryptedRecord);
 
         inOrder.verify(recordService).uploadData(
-                (DecryptedRecord)mockDecryptedRecord,
+                mockDecryptedRecord,
                 mockDocumentReference,
                 USER_ID
         );
         inOrder.verify(recordService).uploadOrDownloadData(
                 UPDATE,
-                (DecryptedRecord)mockDecryptedRecord,
+                mockDecryptedRecord,
                 mockDocumentReference,
                 USER_ID
         );
@@ -332,7 +334,7 @@ public class RecordServiceTest extends RecordServiceTestBase {
         doReturn(mockDecryptedRecord).when(recordService).uploadOrDownloadData(DOWNLOAD, mockDecryptedRecord, null, USER_ID);
 
         // When
-        DecryptedRecord record = recordService.downloadData(mockDecryptedRecord, USER_ID);
+        DecryptedFhirRecord record = recordService.downloadData(mockDecryptedRecord, USER_ID);
 
         // Then
         assertThat(record).isEqualTo(mockDecryptedRecord);
@@ -369,7 +371,7 @@ public class RecordServiceTest extends RecordServiceTestBase {
         when(mockAttachmentService.uploadAttachments(any(), eq(mockAttachmentKey), eq(USER_ID))).thenReturn(Single.just(uploadResult));
 
         // When
-        DecryptedRecord record = recordService.uploadOrDownloadData(UPLOAD, decryptedRecord, null, USER_ID);
+        DecryptedRecord record = (DecryptedRecord) recordService.uploadOrDownloadData(UPLOAD, decryptedRecord, null, USER_ID);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -387,7 +389,7 @@ public class RecordServiceTest extends RecordServiceTestBase {
         // Given
         DocumentReference document = buildDocumentReference();
         document.content.get(0).attachment.id = "unexpectedId";
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+        DecryptedFhirRecord decryptedRecord = new DecryptedRecord<>(
                 null,
                 document,
                 null,
@@ -473,7 +475,7 @@ public class RecordServiceTest extends RecordServiceTestBase {
         when(mockAttachmentService.downloadAttachments(any(), eq(mockAttachmentKey), eq(USER_ID))).thenReturn(Single.just(new ArrayList<>()));
 
         // When
-        DecryptedRecord record = recordService.uploadOrDownloadData(DOWNLOAD, decryptedRecord, null, USER_ID);
+        DecryptedRecord record = (DecryptedRecord) recordService.uploadOrDownloadData(DOWNLOAD, decryptedRecord, null, USER_ID);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -488,7 +490,7 @@ public class RecordServiceTest extends RecordServiceTestBase {
         // Given
         DocumentReference document = buildDocumentReference();
         document.content.get(0).attachment.id = null;
-        DecryptedRecord decryptedRecord = new DecryptedRecord<>(
+        DecryptedFhirRecord decryptedRecord = new DecryptedRecord<>(
                 RECORD_ID,
                 document,
                 null,
@@ -813,7 +815,7 @@ public class RecordServiceTest extends RecordServiceTestBase {
         }));
 
         //when
-        DecryptedRecord<DocumentReference> result = recordService.uploadOrDownloadData(UPLOAD, dummyDecryptedRecord, null, USER_ID);
+        DecryptedRecord<DocumentReference> result = (DecryptedRecord<DocumentReference>) recordService.uploadOrDownloadData(UPLOAD, dummyDecryptedRecord, null, USER_ID);
 
         //then
         DocumentReference doc = result.getResource();

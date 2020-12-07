@@ -57,6 +57,7 @@ import care.data4life.sdk.model.Meta;
 import care.data4life.sdk.model.ModelVersion;
 import care.data4life.sdk.model.Record;
 import care.data4life.sdk.model.UpdateResult;
+import care.data4life.sdk.model.definitions.DataRecord;
 import care.data4life.sdk.network.model.CommonKeyResponse;
 import care.data4life.sdk.network.model.DecryptedRecord;
 import care.data4life.sdk.network.model.DecryptedAppDataRecord;
@@ -64,6 +65,8 @@ import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord;
 import care.data4life.sdk.network.model.EncryptedKey;
 import care.data4life.sdk.network.model.EncryptedRecord;
 import care.data4life.sdk.model.EmptyRecord;
+import care.data4life.sdk.network.model.definitions.DecryptedDataRecord;
+import care.data4life.sdk.network.model.definitions.DecryptedFhirRecord;
 import care.data4life.sdk.util.Base64;
 import care.data4life.sdk.util.HashUtil;
 import care.data4life.sdk.util.MimeType;
@@ -177,7 +180,7 @@ class RecordService {
         checkDataRestrictions(resource);
         HashMap<Attachment, String> data = extractUploadData(resource);
         String createdDate = DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID));
-        Single<DecryptedRecord<T>> createRecord = Single.just(createdDate)
+        Single<DecryptedFhirRecord<T> > createRecord = Single.just(createdDate)
                 .map(createdAt -> {
                     HashMap<String, String> tags = taggingService.appendDefaultTags(
                             resource.getResourceType(),
@@ -204,7 +207,7 @@ class RecordService {
                 .flatMap(
                         encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord)
                 )
-                .map(encryptedRecord -> (DecryptedRecord<T>) decryptRecord(encryptedRecord, userId))
+                .map(encryptedRecord -> (DecryptedFhirRecord<T> ) decryptRecord(encryptedRecord, userId))
                 .map(record -> restoreUploadData(record, resource, data))
                 .map(this::assignResourceId)
                 .map(
@@ -255,7 +258,7 @@ class RecordService {
     <T extends DomainResource> Single<Record<T>> fetchRecord(String recordId, String userId) {
         return apiService
                 .fetchRecord(alias, userId, recordId)
-                .map((EncryptedRecord encryptedRecord) -> (DecryptedRecord<T>) decryptRecord(encryptedRecord, userId))
+                .map((EncryptedRecord encryptedRecord) -> (DecryptedFhirRecord<T> ) decryptRecord(encryptedRecord, userId))
                 .map(this::assignResourceId)
                 .map(decryptedRecord -> new Record<>(decryptedRecord.getResource(), buildMeta(decryptedRecord)));
     }
@@ -306,7 +309,7 @@ class RecordService {
                     offset,
                     () -> taggingService.getTagFromType(FhirElementFactory.getFhirTypeForClass(resourceType))
                 )
-                .map(encryptedRecord -> (DecryptedRecord<T>) decryptRecord(encryptedRecord, userId))
+                .map(encryptedRecord -> (DecryptedFhirRecord<T> ) decryptRecord(encryptedRecord, userId))
                 .filter(
                         decryptedRecord -> resourceType.isAssignableFrom(
                                 Objects.requireNonNull(decryptedRecord.getResource())
@@ -339,7 +342,7 @@ class RecordService {
                 .flatMap(decryptedRecord -> downloadAttachmentsFromStorage(attachmentIds, userId, type, decryptedRecord));
     }
 
-    private Single<? extends List<Attachment>> downloadAttachmentsFromStorage(List<String> attachmentIds, String userId, DownloadType type, DecryptedRecord<DomainResource> decryptedRecord) throws DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
+    private Single<? extends List<Attachment>> downloadAttachmentsFromStorage(List<String> attachmentIds, String userId, DownloadType type, DecryptedFhirRecord<DomainResource> decryptedRecord) throws DataValidationException.IdUsageViolation, DataValidationException.InvalidAttachmentPayloadHash {
         if (FhirAttachmentHelper.hasAttachment(decryptedRecord.getResource())) {
             DomainResource resource = decryptedRecord.getResource();
             List<Attachment> attachments = FhirAttachmentHelper.getAttachment(resource);
@@ -371,7 +374,7 @@ class RecordService {
     <T extends DomainResource> Single<Record<T>> downloadRecord(String recordId, String userId) {
         return apiService
                 .fetchRecord(alias, userId, recordId)
-                .map((EncryptedRecord encryptedRecord) -> (DecryptedRecord<T>) decryptRecord(encryptedRecord, userId))
+                .map((EncryptedRecord encryptedRecord) -> (DecryptedFhirRecord<T> ) decryptRecord(encryptedRecord, userId))
                 .map(decryptedRecord -> downloadData(decryptedRecord, userId))
                 .map(decryptedRecord -> {
                     checkDataRestrictions(decryptedRecord.getResource());
@@ -424,7 +427,7 @@ class RecordService {
                 .map(this::removeUploadData)
                 .map(this::encryptRecord)
                 .flatMap(encryptedRecord -> apiService.updateRecord(alias, userId, recordId, encryptedRecord))
-                .map(encryptedRecord -> (DecryptedRecord<T>) decryptRecord(encryptedRecord, userId))
+                .map(encryptedRecord -> (DecryptedFhirRecord<T>) decryptRecord(encryptedRecord, userId))
                 .map(decryptedRecord -> restoreUploadData(decryptedRecord, resource, data))
                 .map(this::assignResourceId)
                 .map(decryptedRecord -> new Record<>(
@@ -467,9 +470,9 @@ class RecordService {
                 .flatMap(encryptedTags -> apiService.getCount(alias, userId, encryptedTags));
     }
 
-    Single<AppDataRecord> createAppDataRecord(byte[] resource, String userId, List<String> annotations) {
+    Single<DataRecord> createAppDataRecord(byte[] resource, String userId, List<String> annotations) {
         String createdDate = DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID));
-        Single<DecryptedAppDataRecord> createRecord = Single.just(createdDate)
+        Single<DecryptedDataRecord> createRecord = Single.just(createdDate)
                 .map(createdAt -> {
                     HashMap<String, String> tags = taggingService.appendDefaultAnnotatedTags(
                             null,
@@ -501,7 +504,7 @@ class RecordService {
                 );
     }
 
-    Single<AppDataRecord> updateAppDataRecord(
+    Single<DataRecord> updateAppDataRecord(
             byte[] resource,
             String userId,
             String recordId,
@@ -523,7 +526,7 @@ class RecordService {
                 );
     }
 
-    Single<AppDataRecord> fetchAppDataRecord(String recordId, String userId) {
+    Single<DataRecord> fetchAppDataRecord(String recordId, String userId) {
         return apiService
                 .fetchRecord(alias, userId, recordId)
                 .map(encryptedRecord -> decryptAppDataRecord(encryptedRecord, userId))
@@ -535,7 +538,7 @@ class RecordService {
                 ));
     }
 
-    Single<List<AppDataRecord>> fetchAppDataRecords(
+    Single<List<DataRecord>> fetchAppDataRecords(
             String userId,
             List<String> annotations,
             LocalDate startDate,
@@ -553,7 +556,7 @@ class RecordService {
                 () -> taggingService.appendAppDataTags(new HashMap<>())
             )
             .map(encryptedRecord -> decryptAppDataRecord(encryptedRecord,userId))
-            .map(decryptedRecord -> new AppDataRecord(
+            .map(decryptedRecord -> (DataRecord) new AppDataRecord(
                     Objects.requireNonNull(decryptedRecord.getIdentifier()),
                     decryptedRecord.getResource(),
                     buildMeta(decryptedRecord),
@@ -671,7 +674,7 @@ class RecordService {
         );
     }
 
-    <T extends DomainResource> EncryptedRecord encryptRecord(DecryptedRecord<T> record) throws IOException {
+    <T extends DomainResource> EncryptedRecord encryptRecord(DecryptedFhirRecord<T>  record) throws IOException {
         return encrypt(
                 record,
                 () -> fhirService.encryptResource(record.getDataKey(), record.getResource()),
@@ -689,7 +692,7 @@ class RecordService {
         );
     }
 
-    <T extends DomainResource> DecryptedRecord<T> decryptRecord(EncryptedRecord record, String userId)
+    <T extends DomainResource> DecryptedFhirRecord<T>  decryptRecord(EncryptedRecord record, String userId)
             throws IOException, DataValidationException.ModelVersionNotSupported {
 
         return decrypt(
@@ -728,7 +731,7 @@ class RecordService {
         );
     }
 
-    EncryptedRecord encryptAppDataRecord(DecryptedAppDataRecord record) throws IOException {
+    EncryptedRecord encryptAppDataRecord(DecryptedDataRecord record) throws IOException {
         return encrypt(
                 record,
                 () -> Base64.INSTANCE.encodeToString(
@@ -738,7 +741,7 @@ class RecordService {
         );
     }
 
-    DecryptedAppDataRecord decryptAppDataRecord(EncryptedRecord record, String userId)
+    DecryptedDataRecord decryptAppDataRecord(EncryptedRecord record, String userId)
             throws IOException, DataValidationException.ModelVersionNotSupported {
         return decrypt(
                 record,
@@ -775,15 +778,15 @@ class RecordService {
         return data.isEmpty() ? null : data;
     }
 
-    <T extends DomainResource> DecryptedRecord<T> removeUploadData(DecryptedRecord<T> record) {
+    <T extends DomainResource> DecryptedFhirRecord<T>  removeUploadData(DecryptedFhirRecord<T>  record) {
         return removeOrRestoreUploadData(REMOVE, record, null, null);
     }
 
-    <T extends DomainResource> DecryptedRecord<T> restoreUploadData(DecryptedRecord<T> record, T originalResource, HashMap<Attachment, String> attachmentData) {
+    <T extends DomainResource> DecryptedFhirRecord<T>  restoreUploadData(DecryptedFhirRecord<T>  record, T originalResource, HashMap<Attachment, String> attachmentData) {
         return removeOrRestoreUploadData(RESTORE, record, originalResource, attachmentData);
     }
 
-    <T extends DomainResource> DecryptedRecord<T> removeOrRestoreUploadData(RemoveRestoreOperation operation, DecryptedRecord<T> record, T originalResource, HashMap<Attachment, String> attachmentData) {
+    <T extends DomainResource> DecryptedFhirRecord<T>  removeOrRestoreUploadData(RemoveRestoreOperation operation, DecryptedFhirRecord<T>  record, T originalResource, HashMap<Attachment, String> attachmentData) {
         if (operation == RESTORE) {
             if (originalResource != null) record.setResource(originalResource);
             if (attachmentData == null) return record;
@@ -797,15 +800,15 @@ class RecordService {
         return record;
     }
 
-    <T extends DomainResource> DecryptedRecord<T> uploadData(DecryptedRecord<T> record, T newResource, String userId) throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation, DataValidationException.InvalidAttachmentPayloadHash {
+    <T extends DomainResource> DecryptedFhirRecord<T>  uploadData(DecryptedFhirRecord<T>  record, T newResource, String userId) throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation, DataValidationException.InvalidAttachmentPayloadHash {
         return uploadOrDownloadData(newResource == null ? UPLOAD : UPDATE, record, newResource, userId);
     }
 
-    <T extends DomainResource> DecryptedRecord<T> downloadData(DecryptedRecord<T> record, String userId) throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation, DataValidationException.InvalidAttachmentPayloadHash {
+    <T extends DomainResource> DecryptedFhirRecord<T>  downloadData(DecryptedFhirRecord<T>  record, String userId) throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation, DataValidationException.InvalidAttachmentPayloadHash {
         return uploadOrDownloadData(DOWNLOAD, record, null, userId);
     }
 
-    <T extends DomainResource> DecryptedRecord<T> uploadOrDownloadData(UploadDownloadOperation operation, DecryptedRecord<T> record, T newResource, String userId) throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation, DataValidationException.InvalidAttachmentPayloadHash {
+    <T extends DomainResource> DecryptedFhirRecord<T>  uploadOrDownloadData(UploadDownloadOperation operation, DecryptedFhirRecord<T>  record, T newResource, String userId) throws DataValidationException.IdUsageViolation, DataValidationException.ExpectedFieldViolation, DataValidationException.InvalidAttachmentPayloadHash {
         DomainResource resource = record.getResource();
 
         if (!FhirAttachmentHelper.hasAttachment(resource)) return record;
@@ -998,7 +1001,7 @@ class RecordService {
 
     }
 
-    <T extends DomainResource> DecryptedRecord<T> assignResourceId(DecryptedRecord<T> record) {
+    <T extends DomainResource> DecryptedFhirRecord<T>  assignResourceId(DecryptedFhirRecord<T>  record) {
         record.getResource().id = record.getIdentifier();
         return record;
     }

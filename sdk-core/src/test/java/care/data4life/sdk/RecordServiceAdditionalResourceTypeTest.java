@@ -434,7 +434,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         );
 
         // When
-        DecryptedRecord record = recordService.removeOrRestoreUploadData(REMOVE, decryptedRecord, patient, null);
+        DecryptedRecord record = (DecryptedRecord) recordService.removeOrRestoreUploadData(REMOVE, decryptedRecord, patient, null);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -462,7 +462,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         );
 
         // When
-        DecryptedRecord record = recordService.removeOrRestoreUploadData(REMOVE, decryptedRecord, observation, null);
+        DecryptedRecord record = (DecryptedRecord) recordService.removeOrRestoreUploadData(REMOVE, decryptedRecord, observation, null);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -491,7 +491,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         );
 
         // When
-        DecryptedRecord record = recordService.removeOrRestoreUploadData(REMOVE, decryptedRecord, questionnaireResponse, null);
+        DecryptedRecord record = (DecryptedRecord) recordService.removeOrRestoreUploadData(REMOVE, decryptedRecord, questionnaireResponse, null);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -523,7 +523,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         uploadData.put(patient.photo.get(0), DATA);
 
         // When
-        DecryptedRecord record = recordService.removeOrRestoreUploadData(RESTORE, decryptedRecord, patient, uploadData);
+        DecryptedRecord record = (DecryptedRecord) recordService.removeOrRestoreUploadData(RESTORE, decryptedRecord, patient, uploadData);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -554,7 +554,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         uploadData.put(observation.component.get(0).valueAttachment, DATA);
 
         // When
-        DecryptedRecord record = recordService.removeOrRestoreUploadData(RESTORE, decryptedRecord, observation, uploadData);
+        DecryptedRecord record = (DecryptedRecord) recordService.removeOrRestoreUploadData(RESTORE, decryptedRecord, observation, uploadData);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -584,7 +584,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         uploadData.put(questionnaireResponse.item.get(0).answer.get(0).valueAttachment, DATA);
 
         // When
-        DecryptedRecord record = recordService.removeOrRestoreUploadData(RESTORE, decryptedRecord, questionnaireResponse, uploadData);
+        DecryptedRecord record = (DecryptedRecord) recordService.removeOrRestoreUploadData(RESTORE, decryptedRecord, questionnaireResponse, uploadData);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -622,7 +622,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         when(recordService.getValidHash(patient.photo.get(0))).thenReturn(DATA_HASH);
 
         // When
-        DecryptedRecord record = recordService.uploadOrDownloadData(UPLOAD, decryptedRecord, null, USER_ID);
+        DecryptedRecord record = (DecryptedRecord) recordService.uploadOrDownloadData(UPLOAD, decryptedRecord, null, USER_ID);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -653,7 +653,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         when(mockAttachmentService.downloadAttachments(any(), eq(mockAttachmentKey), eq(USER_ID))).thenReturn(Single.just(new ArrayList<>()));
 
         // When
-        DecryptedRecord record = recordService.uploadOrDownloadData(DOWNLOAD, decryptedRecord, null, USER_ID);
+        DecryptedRecord record = (DecryptedRecord) recordService.uploadOrDownloadData(DOWNLOAD, decryptedRecord, null, USER_ID);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -682,7 +682,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         when(mockAttachmentService.downloadAttachments(any(), eq(mockAttachmentKey), eq(USER_ID))).thenReturn(Single.just(new ArrayList<>()));
 
         // When
-        DecryptedRecord record = recordService.uploadOrDownloadData(DOWNLOAD, decryptedRecord, null, USER_ID);
+        DecryptedRecord record = (DecryptedRecord) recordService.uploadOrDownloadData(DOWNLOAD, decryptedRecord, null, USER_ID);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -716,7 +716,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         when(recordService.getValidHash(medication.image.get(0))).thenReturn(DATA_HASH);
 
         // When
-        DecryptedRecord record = recordService.uploadOrDownloadData(UPLOAD, decryptedRecord, null, USER_ID);
+        DecryptedRecord record = (DecryptedRecord) recordService.uploadOrDownloadData(UPLOAD, decryptedRecord, null, USER_ID);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -758,7 +758,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         when(recordService.getValidHash(observation.component.get(0).valueAttachment)).thenReturn(DATA_HASH);
 
         // When
-        DecryptedRecord record = recordService.uploadOrDownloadData(UPLOAD, decryptedRecord, null, USER_ID);
+        DecryptedRecord record = (DecryptedRecord) recordService.uploadOrDownloadData(UPLOAD, decryptedRecord, null, USER_ID);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -790,7 +790,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         when(mockAttachmentService.downloadAttachments(any(), eq(mockAttachmentKey), eq(USER_ID))).thenReturn(Single.just(new ArrayList<>()));
 
         // When
-        DecryptedRecord record = recordService.uploadOrDownloadData(DOWNLOAD, decryptedRecord, null, USER_ID);
+        DecryptedRecord record = (DecryptedRecord) recordService.uploadOrDownloadData(DOWNLOAD, decryptedRecord, null, USER_ID);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -827,7 +827,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         when(recordService.getValidHash(questionnaireResponse.item.get(0).answer.get(0).valueAttachment)).thenReturn(DATA_HASH);
 
         // When
-        DecryptedRecord record = recordService.uploadOrDownloadData(UPLOAD, decryptedRecord, null, USER_ID);
+        DecryptedRecord record = (DecryptedRecord) recordService.uploadOrDownloadData(UPLOAD, decryptedRecord, null, USER_ID);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -858,7 +858,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         when(mockAttachmentService.downloadAttachments(any(), eq(mockAttachmentKey), eq(USER_ID))).thenReturn(Single.just(new ArrayList<>()));
 
         // When
-        DecryptedRecord record = recordService.uploadOrDownloadData(DOWNLOAD, decryptedRecord, null, USER_ID);
+        DecryptedRecord record = (DecryptedRecord) recordService.uploadOrDownloadData(DOWNLOAD, decryptedRecord, null, USER_ID);
 
         // Then
         assertThat(record).isEqualTo(decryptedRecord);
@@ -905,7 +905,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         }));
 
         //when
-        DecryptedRecord<Patient> result = recordService.uploadOrDownloadData(UPLOAD, dummyDecryptedRecord, null, USER_ID);
+        DecryptedRecord<Patient> result = (DecryptedRecord<Patient>) recordService.uploadOrDownloadData(UPLOAD, dummyDecryptedRecord, null, USER_ID);
 
         //then
         Patient pat = result.getResource();
@@ -950,7 +950,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         }));
 
         //when
-        DecryptedRecord<Medication> result = recordService.uploadOrDownloadData(UPLOAD, dummyDecryptedRecord, null, USER_ID);
+        DecryptedRecord<Medication> result = (DecryptedRecord<Medication>) recordService.uploadOrDownloadData(UPLOAD, dummyDecryptedRecord, null, USER_ID);
 
         //then
         Medication med = result.getResource();
@@ -1001,7 +1001,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         }));
 
         //when
-        DecryptedRecord<Observation> result = recordService.uploadOrDownloadData(UPLOAD, dummyDecryptedRecord, null, USER_ID);
+        DecryptedRecord<Observation> result = (DecryptedRecord<Observation>) recordService.uploadOrDownloadData(UPLOAD, dummyDecryptedRecord, null, USER_ID);
 
         //then
         Observation obs = result.getResource();
@@ -1048,7 +1048,7 @@ public class RecordServiceAdditionalResourceTypeTest {
         }));
 
         //when
-        DecryptedRecord<QuestionnaireResponse> result = recordService.uploadOrDownloadData(UPLOAD, dummyDecryptedRecord, null, USER_ID);
+        DecryptedRecord<QuestionnaireResponse> result = (DecryptedRecord<QuestionnaireResponse>) recordService.uploadOrDownloadData(UPLOAD, dummyDecryptedRecord, null, USER_ID);
 
         //then
         QuestionnaireResponse response = result.getResource();

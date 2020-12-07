@@ -23,6 +23,7 @@ import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.ModelVersion
+import care.data4life.sdk.network.model.DecryptedRecord
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockkObject
@@ -138,6 +139,7 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
     fun `Given a EncryptedRecord and UserId, decryptRecord returns a DecryptedRecord`() {
         // Given
         val commonKeyId = "mockCommonKeyId"
+        Mockito.`when`(mockTags.containsKey(TaggingService.TAG_RESOURCE_TYPE)).thenReturn(true)
         Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(1)
         Mockito.`when`(mockEncryptedRecord.commonKeyId).thenReturn(commonKeyId)
         Mockito.`when`(mockTagEncryptionService.decryptTags(mockEncryptedTags))
@@ -162,7 +164,7 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
 
         // Then
         Truth.assertThat(decrypted.annotations).isEqualTo(ANNOTATIONS)
-        Truth.assertThat(decrypted.attachmentsKey).isNull()
+        Truth.assertThat((decrypted as DecryptedRecord<DomainResource>).attachmentsKey).isNull()
         inOrder.verify(mockTagEncryptionService).decryptTags(mockEncryptedTags)
         inOrder.verify(mockTagEncryptionService).decryptAnnotations(mockEncryptedTags)
         inOrder.verify(mockCryptoService).hasCommonKey(commonKeyId)
@@ -198,6 +200,7 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
     fun `Given a EncryptedRecord and UserId, decryptRecord adds a decrypted AttachmentKey, if the EncryptedRecord contains a encrypted AttachmentKey`() {
         // Given
         val commonKeyId = "mockCommonKeyId"
+        Mockito.`when`(mockTags.containsKey(TaggingService.TAG_RESOURCE_TYPE)).thenReturn(true)
         Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(1)
         Mockito.`when`(mockEncryptedRecord.commonKeyId).thenReturn(commonKeyId)
         Mockito.`when`(mockEncryptedRecord.encryptedAttachmentsKey).thenReturn(mockEncryptedAttachmentKey)
@@ -225,7 +228,7 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
 
         // Then
         Truth.assertThat(decrypted.annotations).isEqualTo(ANNOTATIONS)
-        Truth.assertThat(decrypted.attachmentsKey).isEqualTo(mockAttachmentKey)
+        Truth.assertThat((decrypted as DecryptedRecord<DomainResource>).attachmentsKey).isEqualTo(mockAttachmentKey)
         inOrder.verify(mockTagEncryptionService).decryptTags(mockEncryptedTags)
         inOrder.verify(mockTagEncryptionService).decryptAnnotations(mockEncryptedTags)
         inOrder.verify(mockCryptoService).hasCommonKey(commonKeyId)
@@ -280,7 +283,7 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
 
     @Test
     @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    fun `Given a EncryptedRecord and UserId, decryptAppDataRecord returns a DecryptedRecord`() {
+    fun `Given a EncryptedRecord and UserId, decryptRecord for ByteArray returns a DecryptedRecord`() {
         // Given
         mockkObject(Base64)
         every { Base64.decode(ENCRYPTED_RESOURCE) } returns ENCRYPTED_APPDATA
@@ -305,7 +308,7 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
         ).thenReturn(Single.just(mockAppData))
 
         // When
-        val decrypted = recordService.decryptDataRecord(mockEncryptedRecord, USER_ID)
+        val decrypted = recordService.decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
 
         // Then
         Truth.assertThat(decrypted.annotations).isEqualTo(ANNOTATIONS)
@@ -323,13 +326,13 @@ class RecordServiceCryptoTest: RecordServiceTestBase() {
 
     @Test
     @Throws(IOException::class)
-    fun `Given a EncryptedRecord and UserId, decryptAppDataRecord throws an error, if the ModelVersion is not supported`() {
+    fun `Given a EncryptedRecord and UserId, decryptRecord for ByteArray throws an error, if the ModelVersion is not supported`() {
         // Given
         Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(ModelVersion.CURRENT + 1)
 
         // When
         try {
-            recordService.decryptDataRecord(mockEncryptedRecord, USER_ID)
+            recordService.decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
             Assert.fail("Exception expected!")
         } catch (e: D4LException) {
             // Then

@@ -66,7 +66,7 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
                 .assertValueCount(1)
                 .values()[0]
         Truth.assertThat(record.meta).isEqualTo(mockMeta)
-        Truth.assertThat(record.fhirResource).isEqualTo(mockCarePlan)
+        Truth.assertThat(record.resource).isEqualTo(mockCarePlan)
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).buildMeta(mockDecryptedRecord)
@@ -240,7 +240,7 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
     fun `Given a RecordId and UserId, fetchAppDataRecord returns a AppDataRecord`() {
         // Given
         Mockito.`when`(mockApiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)).thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedAppDataRecord).`when`(recordService).decryptDataRecord(mockEncryptedRecord, USER_ID)
+        Mockito.doReturn(mockDecryptedAppDataRecord).`when`(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
         Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedAppDataRecord)
 
         // When
@@ -255,7 +255,7 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
         Truth.assertThat(record.meta).isEqualTo(mockMeta)
         Truth.assertThat(record.resource).isEqualTo(mockAppData)
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
-        inOrder.verify(recordService).decryptDataRecord(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).buildMeta(mockDecryptedAppDataRecord)
         inOrder.verifyNoMoreInteractions()
     }
@@ -285,11 +285,11 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
         ).thenReturn(Observable.just(encryptedRecords))
         Mockito.doReturn(mockDecryptedAppDataRecord)
                 .`when`(recordService)
-                .decryptDataRecord(mockEncryptedRecord, USER_ID)
+                .decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
         Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedAppDataRecord)
 
         // When
-        val observer = recordService.fetchAppDataRecords(
+        val observer = recordService.fetchRecords(
                 USER_ID,
                 ANNOTATIONS,
                 null,
@@ -321,9 +321,9 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
                 ArgumentMatchers.eq(0),
                 ArgumentMatchers.eq(mockEncryptedTags)
         )
-        inOrder.verify(recordService).decryptDataRecord(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).buildMeta(mockDecryptedAppDataRecord)
-        inOrder.verify(recordService).decryptDataRecord(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).buildMeta(mockDecryptedAppDataRecord)
         inOrder.verifyNoMoreInteractions()
     }

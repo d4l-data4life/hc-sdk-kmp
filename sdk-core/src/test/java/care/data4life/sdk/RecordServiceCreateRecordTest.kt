@@ -594,7 +594,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
                 .thenReturn(Single.just(mockEncryptedRecord))
         Mockito.doReturn(mockDecryptedAppDataRecord)
                 .`when`(recordService)
-                .decryptDataRecord(mockEncryptedRecord, USER_ID)
+                .decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
         Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedAppDataRecord)
 
         // When
@@ -618,7 +618,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         inOrder.verify(recordService)
                 .encryptDataRecord(ArgumentMatchers.any(DecryptedAppDataRecord::class.java))
         inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockEncryptedRecord)
-        inOrder.verify(recordService).decryptDataRecord(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).buildMeta(mockDecryptedAppDataRecord)
         inOrder.verifyNoMoreInteractions()
     }

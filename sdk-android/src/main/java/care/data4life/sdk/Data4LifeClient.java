@@ -219,13 +219,13 @@ public final class Data4LifeClient extends BaseClient {
                         .subscribeOn(Schedulers.io())
                         .subscribe(
                                 isLoggedIn -> listener.onSuccess(),
-                                error -> listener.onError(getHandler().errorHandler.handleError(error))
+                                error -> listener.onError(getHandler().getErrorHandler().handleError(error))
                         );
             }
 
             @Override
             public void onError(Throwable error) {
-                listener.onError(getHandler().errorHandler.handleError(error));
+                listener.onError(getHandler().getErrorHandler().handleError(error));
             }
         });
     }

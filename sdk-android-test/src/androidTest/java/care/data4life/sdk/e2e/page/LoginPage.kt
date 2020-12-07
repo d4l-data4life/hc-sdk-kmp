@@ -59,11 +59,7 @@ class LoginPage : BasePage() {
         // AuthApp
 
         // Page Phone number
-        // FIXME ids missing so disabled it
-//        ensurePageLoaded()
-//        enterText(authAppInputPhoneCountryCode, user.phoneCountryCode, false)
-//        enterText(authAppInputPhoneNumber, user.phoneLocalNumber, false)
-//        clickButton(authAppButtonPhoneNumber, false)
+        // FIXME is not supported as ids missing on the page
 
         // Page 2FA
         ensurePageLoaded()

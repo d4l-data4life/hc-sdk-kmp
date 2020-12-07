@@ -27,8 +27,10 @@ internal abstract class BaseClient(
         protected var recordService: RecordService,
         protected var handler: CallHandler,
 
-        private val legacyDataClient: care.data4life.sdk.LegacyDataClient = createLegacyDataClient(alias, userService, recordService, handler),
-        private val legacyAuthClient: LegacyAuthClient = createLegacyAuthClient(alias, userService, recordService, handler)
+        private val legacyDataClient: care.data4life.sdk.LegacyDataClient =
+                createLegacyDataClient(alias, userService, recordService, handler),
+        private val legacyAuthClient: LegacyAuthClient =
+                createLegacyAuthClient(alias, userService, recordService, handler)
 ) : LegacyDataClient by legacyDataClient, LegacyAuthClient by legacyAuthClient {
 
     companion object {

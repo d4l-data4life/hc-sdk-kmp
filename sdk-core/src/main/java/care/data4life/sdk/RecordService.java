@@ -60,7 +60,7 @@ import care.data4life.sdk.model.UpdateResult;
 import care.data4life.sdk.network.model.CommonKeyResponse;
 import care.data4life.sdk.network.model.DecryptedRecord;
 import care.data4life.sdk.network.model.DecryptedAppDataRecord;
-import care.data4life.sdk.network.model.definitions.DecryptedRecordBase;
+import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord;
 import care.data4life.sdk.network.model.EncryptedKey;
 import care.data4life.sdk.network.model.EncryptedRecord;
 import care.data4life.sdk.model.EmptyRecord;
@@ -494,7 +494,7 @@ class RecordService {
                 .map(encryptedRecord -> decryptAppDataRecord(encryptedRecord, userId))
                 .map(decryptedRecord -> new AppDataRecord(
                                 Objects.requireNonNull(decryptedRecord.getIdentifier()),
-                                decryptedRecord.getAppData(),
+                                decryptedRecord.getResource(),
                                 buildMeta(decryptedRecord),
                                 annotations
                         )
@@ -516,7 +516,7 @@ class RecordService {
                 .map(encryptedRecord -> decryptAppDataRecord(encryptedRecord, userId))
                 .map(decryptedRecord -> new AppDataRecord(
                         Objects.requireNonNull(decryptedRecord.getIdentifier()),
-                        decryptedRecord.getAppData(),
+                        decryptedRecord.getResource(),
                         buildMeta(decryptedRecord),
                         decryptedRecord.getAnnotations()
                     )
@@ -529,7 +529,7 @@ class RecordService {
                 .map(encryptedRecord -> decryptAppDataRecord(encryptedRecord, userId))
                 .map(decryptedRecord -> new AppDataRecord(
                         Objects.requireNonNull(decryptedRecord.getIdentifier()),
-                        decryptedRecord.getAppData(),
+                        decryptedRecord.getResource(),
                         buildMeta(decryptedRecord),
                         decryptedRecord.getAnnotations()
                 ));
@@ -555,7 +555,7 @@ class RecordService {
             .map(encryptedRecord -> decryptAppDataRecord(encryptedRecord,userId))
             .map(decryptedRecord -> new AppDataRecord(
                     Objects.requireNonNull(decryptedRecord.getIdentifier()),
-                    decryptedRecord.getAppData(),
+                    decryptedRecord.getResource(),
                     buildMeta(decryptedRecord),
                     decryptedRecord.getAnnotations()
             ))
@@ -598,7 +598,7 @@ class RecordService {
 
 
     private EncryptedRecord encrypt(
-            DecryptedRecordBase record,
+            DecryptedBaseRecord record,
             GetDecryptedResource getDecryptedResource,
             GetEncryptedAttachment getEncryptedAttachment
     ) throws IOException {
@@ -732,7 +732,7 @@ class RecordService {
         return encrypt(
                 record,
                 () -> Base64.INSTANCE.encodeToString(
-                        cryptoService.encrypt(record.getDataKey(),record.getAppData()).blockingGet()
+                        cryptoService.encrypt(record.getDataKey(),record.getResource()).blockingGet()
                 ),
                 (i) -> null
         );
@@ -1003,7 +1003,7 @@ class RecordService {
         return record;
     }
 
-    Meta buildMeta(DecryptedRecordBase record) {
+    Meta buildMeta(DecryptedBaseRecord record) {
         LocalDate createdDate = LocalDate.parse(record.getCustomCreationDate(), DATE_FORMATTER);
         LocalDateTime updatedDate = LocalDateTime.parse(record.getUpdatedDate(), DATE_TIME_FORMATTER);
         return new Meta(createdDate, updatedDate);

@@ -17,7 +17,7 @@
 package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.network.model.definitions.DecryptedRecordBase
+import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import java.util.*
 
 /**
@@ -26,19 +26,19 @@ import java.util.*
  */
 internal data class DecryptedAppDataRecord(
         override var identifier: String?,
-        var appData: ByteArray,
+        override var resource: ByteArray,
         override var tags: HashMap<String, String>?,
         override var annotations: List<String>,
         override var customCreationDate: String?,
         override var updatedDate: String?,
         override var dataKey: GCKey?,
         override var modelVersion: Int
-): DecryptedRecordBase {
+): DecryptedDataRecord {
     override fun equals(other: Any?): Boolean {
         return when {
             other !is DecryptedAppDataRecord        -> false
             identifier != other.identifier ||
-                    !appData.contentEquals(other.appData) ||
+                    !resource.contentEquals(other.resource) ||
                     tags != other.tags ||
                     annotations != other.annotations ||
                     customCreationDate != other.customCreationDate ||
@@ -51,7 +51,7 @@ internal data class DecryptedAppDataRecord(
 
     override fun hashCode(): Int = Objects.hash(
             identifier,
-            appData.contentToString(),
+            resource.contentToString(),
             tags,
             annotations,
             customCreationDate,
@@ -63,5 +63,5 @@ internal data class DecryptedAppDataRecord(
     fun copyWithResourceAnnotations(
             appData: ByteArray,
             annotations: List<String>? = null
-    ) = copy(appData = appData, annotations = annotations ?: this.annotations)
+    ) = copy(resource = appData, annotations = annotations ?: this.annotations)
 }

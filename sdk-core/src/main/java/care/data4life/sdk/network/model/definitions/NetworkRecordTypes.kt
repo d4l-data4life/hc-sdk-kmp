@@ -17,9 +17,11 @@
 package care.data4life.sdk.network.model.definitions
 
 import care.data4life.crypto.GCKey
+import care.data4life.fhir.stu3.model.DomainResource
 
-internal interface DecryptedRecordBase {
+internal interface DecryptedBaseRecord<T> {
     var identifier: String?
+    var resource: T
     var tags: HashMap<String, String>?
     var annotations: List<String>
     var customCreationDate: String?
@@ -27,3 +29,6 @@ internal interface DecryptedRecordBase {
     var dataKey: GCKey?
     var modelVersion: Int
 }
+
+internal interface DecryptedFhirRecord<T: DomainResource?>: DecryptedBaseRecord<T>
+internal interface DecryptedDataRecord: DecryptedBaseRecord<ByteArray>

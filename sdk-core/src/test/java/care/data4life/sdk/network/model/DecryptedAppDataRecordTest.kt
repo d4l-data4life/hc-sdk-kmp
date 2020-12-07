@@ -17,6 +17,7 @@
 package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
+import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import io.mockk.mockk
 import io.mockk.mockkClass
 import org.junit.Assert.assertEquals
@@ -25,6 +26,22 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class DecryptedAppDataRecordTest {
+    @Test
+    fun `it is a DecryptedBaseRecord`() {
+        assertTrue( (
+                DecryptedAppDataRecord(
+                        identifier = "123",
+                        resource = "potato".toByteArray(),
+                        tags = hashMapOf("soup" to "tomato"),
+                        annotations = listOf(),
+                        customCreationDate = "today",
+                        updatedDate = "yesterday",
+                        dataKey = mockkClass(GCKey::class),
+                        modelVersion = 42
+                ) as Any
+        ) is DecryptedBaseRecord<*> )
+    }
+
     @Test
     fun `Given tow DecryptedAppDataRecord, it returns true on a compare, if they are equal`() {
         val id = "123"
@@ -38,7 +55,7 @@ class DecryptedAppDataRecordTest {
 
         val record1 = DecryptedAppDataRecord(
                 identifier = id,
-                appData = data,
+                resource = data,
                 tags = tags,
                 annotations = annotations,
                 customCreationDate = creation,
@@ -49,7 +66,7 @@ class DecryptedAppDataRecordTest {
 
         val record2 = DecryptedAppDataRecord(
                 identifier = id,
-                appData = data,
+                resource = data,
                 tags = tags,
                 annotations = annotations,
                 customCreationDate = creation,
@@ -65,7 +82,7 @@ class DecryptedAppDataRecordTest {
     fun `Given a DecryptedAppDataRecord and something else, it returns false on a compare, if they are equal`() {
         val record = DecryptedAppDataRecord(
                 identifier = "123",
-                appData = "potato".toByteArray(),
+                resource = "potato".toByteArray(),
                 tags = hashMapOf("soup" to "tomato"),
                 annotations = listOf("a", "b", "c"),
                 customCreationDate = "today",
@@ -90,7 +107,7 @@ class DecryptedAppDataRecordTest {
 
         val record1 = DecryptedAppDataRecord(
                 identifier = "23",
-                appData = data,
+                resource = data,
                 tags = tags,
                 annotations = annotations,
                 customCreationDate = creation,
@@ -101,7 +118,7 @@ class DecryptedAppDataRecordTest {
 
         val record2 = DecryptedAppDataRecord(
                 identifier = "7",
-                appData = data,
+                resource = data,
                 tags = tags,
                 annotations = annotations,
                 customCreationDate = creation,
@@ -125,7 +142,7 @@ class DecryptedAppDataRecordTest {
 
         val record1 = DecryptedAppDataRecord(
                 identifier = id,
-                appData = "potato".toByteArray(),
+                resource = "potato".toByteArray(),
                 tags = tags,
                 annotations = annotations,
                 customCreationDate = creation,
@@ -136,7 +153,7 @@ class DecryptedAppDataRecordTest {
 
         val record2 = DecryptedAppDataRecord(
                 identifier = id,
-                appData = "tomato".toByteArray(),
+                resource = "tomato".toByteArray(),
                 tags = tags,
                 annotations = annotations,
                 customCreationDate = creation,
@@ -160,7 +177,7 @@ class DecryptedAppDataRecordTest {
 
         val record1 = DecryptedAppDataRecord(
                 identifier = id,
-                appData = data,
+                resource = data,
                 tags = hashMapOf("soup" to "tomato"),
                 annotations = annotations,
                 customCreationDate = creation,
@@ -171,7 +188,7 @@ class DecryptedAppDataRecordTest {
 
         val record2 = DecryptedAppDataRecord(
                 identifier = id,
-                appData = data,
+                resource = data,
                 tags = hashMapOf("tomato" to "soup"),
                 annotations = annotations,
                 customCreationDate = creation,
@@ -195,7 +212,7 @@ class DecryptedAppDataRecordTest {
 
         val record1 = DecryptedAppDataRecord(
                 identifier = id,
-                appData = data,
+                resource = data,
                 tags = tags,
                 annotations = listOf("a", "b", "c"),
                 customCreationDate = creation,
@@ -206,7 +223,7 @@ class DecryptedAppDataRecordTest {
 
         val record2 = DecryptedAppDataRecord(
                 identifier = id,
-                appData = data,
+                resource = data,
                 tags = tags,
                 annotations = listOf("c", "d", "e"),
                 customCreationDate = creation,
@@ -230,7 +247,7 @@ class DecryptedAppDataRecordTest {
 
         val record1 = DecryptedAppDataRecord(
                 identifier = id,
-                appData = data,
+                resource = data,
                 tags = tags,
                 annotations = annotations,
                 customCreationDate = "today",
@@ -241,7 +258,7 @@ class DecryptedAppDataRecordTest {
 
         val record2 = DecryptedAppDataRecord(
                 identifier = id,
-                appData = data,
+                resource = data,
                 tags = tags,
                 annotations = annotations,
                 customCreationDate = "tomorrow",
@@ -265,7 +282,7 @@ class DecryptedAppDataRecordTest {
 
         val record1 = DecryptedAppDataRecord(
                 identifier = id,
-                appData = data,
+                resource = data,
                 tags = tags,
                 annotations = annotations,
                 customCreationDate = creation,
@@ -276,7 +293,7 @@ class DecryptedAppDataRecordTest {
 
         val record2 = DecryptedAppDataRecord(
                 identifier = id,
-                appData = data,
+                resource = data,
                 tags = tags,
                 annotations = annotations,
                 customCreationDate = creation,
@@ -300,7 +317,7 @@ class DecryptedAppDataRecordTest {
 
         val record1 = DecryptedAppDataRecord(
                 identifier = id,
-                appData = data,
+                resource = data,
                 tags = tags,
                 annotations = annotations,
                 customCreationDate = creation,
@@ -311,7 +328,7 @@ class DecryptedAppDataRecordTest {
 
         val record2 = DecryptedAppDataRecord(
                 identifier = id,
-                appData = data,
+                resource = data,
                 tags = tags,
                 annotations = annotations,
                 customCreationDate = creation,
@@ -335,7 +352,7 @@ class DecryptedAppDataRecordTest {
 
         val record1 = DecryptedAppDataRecord(
                 identifier = id,
-                appData = data,
+                resource = data,
                 tags = tags,
                 annotations = annotations,
                 customCreationDate = creation,
@@ -346,7 +363,7 @@ class DecryptedAppDataRecordTest {
 
         val record2 = DecryptedAppDataRecord(
                 identifier = id,
-                appData = data,
+                resource = data,
                 tags = tags,
                 annotations = annotations,
                 customCreationDate = creation,
@@ -364,7 +381,7 @@ class DecryptedAppDataRecordTest {
         val expectedAnnotations = listOf("my", "little", "pony")
         val record = DecryptedAppDataRecord(
                 identifier = "123",
-                appData = "potato".toByteArray(),
+                resource = "potato".toByteArray(),
                 tags = hashMapOf("soup" to "tomato"),
                 annotations = expectedAnnotations,
                 customCreationDate = "today",
@@ -375,7 +392,7 @@ class DecryptedAppDataRecordTest {
                 expectedData.toByteArray()
         )
 
-        assertTrue(record.appData.contentEquals(expectedData.toByteArray()))
+        assertTrue(record.resource.contentEquals(expectedData.toByteArray()))
         assertEquals(
                 expectedAnnotations,
                 record.annotations
@@ -388,7 +405,7 @@ class DecryptedAppDataRecordTest {
         val expectedAnnotations = listOf("my", "little", "pony")
         val record = DecryptedAppDataRecord(
                 identifier = "123",
-                appData = "potato".toByteArray(),
+                resource = "potato".toByteArray(),
                 tags = hashMapOf("soup" to "tomato"),
                 annotations = listOf("a", "b", "c"),
                 customCreationDate = "today",
@@ -400,7 +417,7 @@ class DecryptedAppDataRecordTest {
                 expectedAnnotations
         )
 
-        assertTrue(record.appData.contentEquals(expectedData.toByteArray()))
+        assertTrue(record.resource.contentEquals(expectedData.toByteArray()))
         assertEquals(
                 expectedAnnotations,
                 record.annotations
@@ -420,7 +437,7 @@ class DecryptedAppDataRecordTest {
 
         val record1 = DecryptedAppDataRecord(
                 identifier = id,
-                appData = data,
+                resource = data,
                 tags = tags,
                 annotations = annotations,
                 customCreationDate = creation,
@@ -431,7 +448,7 @@ class DecryptedAppDataRecordTest {
 
         val record2 = record1.copy()
         val record3 = record1.copy(identifier = null)
-        val record4 = record1.copy(appData = "something".toByteArray())
+        val record4 = record1.copy(resource = "something".toByteArray())
         val record5 = record1.copy(tags = hashMapOf("tomator" to "soup"))
         val record6 = record1.copy(annotations = listOf("k", "f", "d"))
         val record7 = record1.copy(customCreationDate = "not today")

@@ -133,7 +133,7 @@ abstract class RecordServiceTestBase {
 
         Mockito.`when`<HashMap<*, *>?>(mockDecryptedAppDataRecord.tags).thenReturn(mockTags)
         Mockito.`when`(mockDecryptedAppDataRecord.dataKey).thenReturn(mockDataKey)
-        Mockito.`when`(mockDecryptedAppDataRecord.appData).thenReturn(mockAppData)
+        Mockito.`when`(mockDecryptedAppDataRecord.resource).thenReturn(mockAppData)
         Mockito.`when`(mockDecryptedAppDataRecord.identifier).thenReturn("id")
         Mockito.`when`(mockDecryptedAppDataRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
         Mockito.`when`(mockDecryptedAppDataRecord.annotations).thenReturn(ANNOTATIONS)

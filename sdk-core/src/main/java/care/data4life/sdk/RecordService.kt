@@ -124,6 +124,39 @@ internal class RecordService(
                 }
     }
 
+    fun createRecord(
+            resource: ByteArray,
+            userId: String,
+            annotations: List<String>
+    ): Single<DataRecord> {
+        val createdDate = DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID))
+        val createRecord = Single.just(createdDate)
+                .map { createdAt -> DecryptedAppDataRecord(
+                        null,
+                        resource,
+                        taggingService.appendDefaultAnnotatedTags(
+                                null,
+                                null
+                        ),
+                        annotations,
+                        createdAt,
+                        null,
+                        cryptoService.generateGCKey().blockingGet(),
+                        ModelVersion.CURRENT
+                )
+                }
+        return createRecord
+                .map { record -> encryptDataRecord(record) }
+                .flatMap { encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord) }
+                .map { encryptedRecord -> decryptDataRecord(encryptedRecord, userId) }
+                .map { decryptedRecord -> AppDataRecord(
+                        decryptedRecord.identifier!!,
+                        decryptedRecord.resource,
+                        buildMeta(decryptedRecord),
+                        annotations
+                ) }
+    }
+
     fun <T : DomainResource> createRecords(resources: List<T>, userId: String): Single<CreateResult<T>> {
         val failedOperations: MutableList<Pair<T, D4LException>> = mutableListOf()
         return Observable
@@ -391,6 +424,30 @@ internal class RecordService(
                 ) }
     }
 
+    fun updateRecord(
+            resource: ByteArray,
+            userId: String,
+            recordId: String,
+            annotations: List<String>? = listOf()
+    ): Single<DataRecord> = apiService
+            .fetchRecord(alias, userId, recordId)
+            .map { encryptedRecord -> decryptDataRecord(encryptedRecord, userId) }
+            .map { decryptedRecord -> decryptedRecord.copyWithResourceAnnotations(resource, annotations) }
+            .map { record -> encryptDataRecord(record) }
+            .flatMap { encryptedRecord -> apiService.updateRecord(
+                    alias,
+                    userId,
+                    recordId,
+                    encryptedRecord
+            ) }
+            .map { encryptedRecord -> decryptDataRecord(encryptedRecord, userId) }
+            .map { decryptedRecord -> AppDataRecord(
+                    decryptedRecord.identifier!!,
+                    decryptedRecord.resource,
+                    buildMeta(decryptedRecord),
+                    decryptedRecord.annotations
+            ) }
+
     fun <T : DomainResource> updateRecords(resources: List<T>, userId: String): Single<UpdateResult<T>> {
         val failedUpdates: MutableList<Pair<T, D4LException>> = arrayListOf()
         return Observable
@@ -423,63 +480,6 @@ internal class RecordService(
                     .map { tags -> tags.also { it.addAll(tagEncryptionService.encryptAnnotations(annotations)) } }
                     .flatMap { encryptedTags -> apiService.getCount(alias, userId, encryptedTags) }
             }
-
-    fun createAppDataRecord(
-            resource: ByteArray,
-            userId: String,
-            annotations: List<String>
-    ): Single<DataRecord> {
-        val createdDate = DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID))
-        val createRecord = Single.just(createdDate)
-                .map { createdAt -> DecryptedAppDataRecord(
-                            null,
-                            resource,
-                            taggingService.appendDefaultAnnotatedTags(
-                                    null,
-                                    null
-                            ),
-                            annotations,
-                            createdAt,
-                            null,
-                            cryptoService.generateGCKey().blockingGet(),
-                            ModelVersion.CURRENT
-                    )
-                }
-        return createRecord
-                .map { record -> encryptDataRecord(record) }
-                .flatMap { encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord) }
-                .map { encryptedRecord -> decryptDataRecord(encryptedRecord, userId) }
-                .map { decryptedRecord -> AppDataRecord(
-                        decryptedRecord.identifier!!,
-                        decryptedRecord.resource,
-                        buildMeta(decryptedRecord),
-                        annotations
-                ) }
-    }
-
-    fun updateAppDataRecord(
-            resource: ByteArray,
-            userId: String,
-            recordId: String,
-            annotations: List<String>? = listOf()
-    ): Single<DataRecord> = apiService
-                .fetchRecord(alias, userId, recordId)
-                .map { encryptedRecord -> decryptDataRecord(encryptedRecord, userId) }
-                .map { decryptedRecord -> decryptedRecord.copyWithResourceAnnotations(resource, annotations) }
-                .map { record -> encryptDataRecord(record) }
-                .flatMap { encryptedRecord -> apiService.updateRecord(
-                        alias,
-                        userId,
-                        recordId,
-                        encryptedRecord
-                ) }
-                .map { encryptedRecord -> decryptDataRecord(encryptedRecord, userId) }
-                .map { decryptedRecord -> AppDataRecord(
-                        decryptedRecord.identifier!!,
-                        decryptedRecord.resource,
-                        buildMeta(decryptedRecord),
-                        decryptedRecord.annotations
-                ) }
 
     fun fetchAppDataRecord(
             recordId: String,
@@ -1065,7 +1065,7 @@ internal class RecordService(
             LocalDate.parse(record.customCreationDate, DATE_FORMATTER),
             LocalDateTime.parse(record.updatedDate, DATE_TIME_FORMATTER)
     )
-    //endregion/
+    //endregion
 
     companion object {
         private const val DATE_FORMAT = "yyyy-MM-dd"

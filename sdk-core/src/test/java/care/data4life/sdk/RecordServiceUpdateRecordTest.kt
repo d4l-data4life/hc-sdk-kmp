@@ -282,7 +282,7 @@ class RecordServiceUpdateRecordTest: RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given a byte resource, Annotations and a UserId, updateAppDataRecord returns a updated AppDataRecord`() {
+    fun `Given a byte resource, Annotations and a UserId, updateRecord returns a updated AppDataRecord`() {
         // Given
         Mockito.`when`(
                 mockApiService.fetchRecord(
@@ -309,7 +309,7 @@ class RecordServiceUpdateRecordTest: RecordServiceTestBase() {
         Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedAppDataRecord)
 
         // When
-        val observer = recordService.updateAppDataRecord(
+        val observer = recordService.updateRecord(
                 mockAppData,
                 USER_ID,
                 RECORD_ID,
@@ -342,7 +342,7 @@ class RecordServiceUpdateRecordTest: RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given a byte resource, nulled Annotations and a UserId, updateAppDataRecord returns a updated AppDataRecord`() {
+    fun `Given a byte resource, nulled Annotations and a UserId, updateRecord returns a updated AppDataRecord`() {
         // Given
         Mockito.`when`(
                 mockApiService.fetchRecord(
@@ -369,7 +369,7 @@ class RecordServiceUpdateRecordTest: RecordServiceTestBase() {
         Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedAppDataRecord)
 
         // When
-        val observer = recordService.updateAppDataRecord(
+        val observer = recordService.updateRecord(
                 mockAppData,
                 USER_ID,
                 RECORD_ID,

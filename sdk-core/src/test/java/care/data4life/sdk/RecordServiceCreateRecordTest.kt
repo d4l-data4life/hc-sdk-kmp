@@ -580,7 +580,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class
     )
-    fun `Given a Byte resource, a UserId and Annotations createAppDataRecord returns a new AppDataRecord`() {
+    fun `Given a Byte resource, a UserId and Annotations createRecord returns a new AppDataRecord`() {
         // Given
         mockkObject(Base64)
         every { Base64.decode(mockAppData) } returns ENCRYPTED_APPDATA
@@ -598,7 +598,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedAppDataRecord)
 
         // When
-        val subscriber = recordService.createAppDataRecord(
+        val subscriber = recordService.createRecord(
                 mockAppData,
                 USER_ID,
                 ANNOTATIONS

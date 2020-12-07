@@ -510,7 +510,7 @@ internal class RecordService(
             endDate,
             pageSize,
             offset,
-            { taggingService.appendAppDataTags(HashMap()) }
+            { taggingService.appendAppDataTags( hashMapOf() ) }
         )
         .map { encryptedRecord -> decryptDataRecord(encryptedRecord, userId) }
         .map { decryptedRecord -> AppDataRecord(
@@ -529,7 +529,7 @@ internal class RecordService(
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int,
-            getTags: () ->  HashMap<String, String>
+            getTags: () ->  HashMap<String, String>?
     ): Observable<EncryptedRecord> {
         val startTime = if (startDate != null) DATE_FORMATTER.format(startDate) else null
         val endTime = if (endDate != null) DATE_FORMATTER.format(endDate) else null

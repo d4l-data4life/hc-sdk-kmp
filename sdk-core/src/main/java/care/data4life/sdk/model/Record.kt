@@ -16,14 +16,14 @@
 package care.data4life.sdk.model
 
 import care.data4life.fhir.stu3.model.DomainResource
-import care.data4life.sdk.model.definitions.FhirRecord
+import care.data4life.sdk.model.definitions.Fhir3Record
 import java.util.Objects.hash
 
 open class Record<T : DomainResource>(
         fhirResource: T?,
         meta: Meta?,
         annotations: List<String>? = null
-) : FhirRecord<T?> {
+) : Fhir3Record<T?> {
     constructor(fhirResource: T?, meta: Meta?) : this(
             fhirResource,
             meta,

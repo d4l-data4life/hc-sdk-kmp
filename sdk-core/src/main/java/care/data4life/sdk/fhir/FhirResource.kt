@@ -13,14 +13,8 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
-package care.data4life.sdk.model
 
-import care.data4life.fhir.stu3.model.DomainResource
-import care.data4life.sdk.model.definitions.Fhir3Record
+package care.data4life.sdk.fhir
 
-@Deprecated("")
-open class EmptyRecord<T : DomainResource> : Record<T>(
-        null,
-        null,
-        null
-), Fhir3Record<T?>
+typealias Fhir3Resource = care.data4life.fhir.stu3.model.DomainResource
+typealias Fhir4Resource = care.data4life.fhir.r4.model.DomainResource

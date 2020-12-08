@@ -30,11 +30,12 @@ import io.reactivex.Single
 // TODO use of Single is not necessary as it's finalized with blockingGet()
 internal class FhirService @JvmOverloads constructor(
         private val cryptoService: CryptoService,
-        private val parserFhir3: FhirParser<Any> = Fhir().createStu3Parser()
+        private val parserFhir3: FhirParser<Any> = Fhir().createStu3Parser(),
+        private val parserFhir4: FhirParser<Any> = Fhir().createR4Parser()
 ) {
 
     @Suppress("UNCHECKED_CAST")
-    fun <T : DomainResource> decryptResource(dataKey: GCKey, resourceType: String, encryptedResource: String): T {
+    fun <T : Fhir3Resource> decryptResource(dataKey: GCKey, resourceType: String, encryptedResource: String): T {
         return Single
                 .just(encryptedResource)
                 .filter { encResource: String -> !encResource.isBlank() }
@@ -50,7 +51,9 @@ internal class FhirService @JvmOverloads constructor(
                 .blockingGet() as T
     }
 
-    fun <T : DomainResource> encryptResource(dataKey: GCKey, resource: T): String {
+
+
+    fun <T : Fhir3Resource> encryptResource(dataKey: GCKey, resource: T): String {
         return Single
                 .just(resource)
                 .map { fhirObject: T -> parserFhir3.fromFhir(fhirObject) }

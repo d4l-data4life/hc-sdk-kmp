@@ -17,8 +17,8 @@
 package care.data4life.sdk.network.model.definitions
 
 import care.data4life.crypto.GCKey
-import care.data4life.fhir.stu3.model.DomainResource
-import care.data4life.sdk.Fhir4Resource
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
 
 internal interface DecryptedBaseRecord<T> {
     var identifier: String?
@@ -35,7 +35,10 @@ internal interface DecryptedFhirBaseRecord<T> : DecryptedBaseRecord<T> {
     var attachmentsKey: GCKey?
 }
 
-internal interface DecryptedFhir3Record<T : DomainResource?> : DecryptedFhirBaseRecord<T>
+// FIXME remove nullable type
+internal interface DecryptedFhir3Record<T : Fhir3Resource?> : DecryptedFhirBaseRecord<T>
+internal interface DecryptedFhir4Record<T : Fhir4Resource> : DecryptedFhirBaseRecord<T>
+
 internal interface DecryptedDataRecord : DecryptedBaseRecord<ByteArray> {
     fun copyWithResourceAnnotations(
             data: ByteArray,

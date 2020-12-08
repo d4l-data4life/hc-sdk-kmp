@@ -16,6 +16,7 @@
 package care.data4life.sdk.model.definitions
 
 import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.model.Meta
 
 interface BaseRecord<T> {
@@ -25,9 +26,11 @@ interface BaseRecord<T> {
     val annotations: List<String>?
 }
 
-interface FhirRecord<T : DomainResource?> : BaseRecord<T> {
+interface Fhir3Record<T : DomainResource?> : BaseRecord<T> {
     val fhirResource: T
         get() = resource
 }
+
+interface Fhir4Record<T : Fhir4Resource> : BaseRecord<T>
 
 interface DataRecord : BaseRecord<ByteArray>

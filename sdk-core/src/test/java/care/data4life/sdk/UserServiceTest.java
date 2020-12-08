@@ -178,6 +178,7 @@ public class UserServiceTest {
         // given
         UserInfo userInfo = mock(UserInfo.class);
         when(userInfo.getCommonKey()).thenReturn(mock(EncryptedKey.class));
+        when(userInfo.getCommonKeyId()).thenReturn("mockedCommonKeyId");
         when(userInfo.getTagEncryptionKey()).thenReturn(mock(EncryptedKey.class));
         when(userInfo.getUid()).thenReturn("");
 

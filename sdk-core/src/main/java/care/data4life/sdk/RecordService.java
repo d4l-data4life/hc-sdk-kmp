@@ -64,7 +64,6 @@ import care.data4life.sdk.network.model.DecryptedAppDataRecord;
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord;
 import care.data4life.sdk.network.model.EncryptedKey;
 import care.data4life.sdk.network.model.EncryptedRecord;
-import care.data4life.sdk.model.EmptyRecord;
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord;
 import care.data4life.sdk.network.model.definitions.DecryptedFhirRecord;
 import care.data4life.sdk.util.Base64;

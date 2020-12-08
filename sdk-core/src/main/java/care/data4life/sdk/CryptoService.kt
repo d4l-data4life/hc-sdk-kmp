@@ -290,7 +290,7 @@ internal open class CryptoService : CryptoProtocol {
 
     // Common Key Handling
     @Throws(IOException::class)
-    fun fetchCurrentCommonKey(): GCKey? {
+    fun fetchCurrentCommonKey(): GCKey {
         return commonKeyService.fetchCurrentCommonKey()
     }
 

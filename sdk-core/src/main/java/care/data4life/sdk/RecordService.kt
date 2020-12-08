@@ -634,7 +634,7 @@ internal class RecordService(
         val encryptedDataKey = cryptoService.encryptSymmetricKey(
                 commonKey,
                 KeyType.DATA_KEY,
-                record.dataKey
+                record.dataKey!!
         ).blockingGet()
         val encryptedAttachmentsKey = getEncryptedAttachment(commonKey)
         return EncryptedRecord(
@@ -698,7 +698,7 @@ internal class RecordService(
             record: DecryptedFhirRecord<T>
     ): EncryptedRecord = encrypt(
             record,
-            { fhirService.encryptResource(record.dataKey, record.resource) },
+            { fhirService.encryptResource(record.dataKey!!, record.resource) },
             { commonKey: GCKey ->
                 if (record.attachmentsKey == null) {
                     null
@@ -706,7 +706,7 @@ internal class RecordService(
                     cryptoService.encryptSymmetricKey(
                             commonKey,
                             KeyType.ATTACHMENT_KEY,
-                            record.attachmentsKey
+                            record.attachmentsKey!!
                     ).blockingGet()
                 }
             }
@@ -717,7 +717,7 @@ internal class RecordService(
             record: DecryptedDataRecord? //FIXME: this a test concern, which should be removed soon as possible
     ): EncryptedRecord = encrypt(
             record!!,
-            { encodeToString(cryptoService.encrypt(record.dataKey, record.resource).blockingGet()) },
+            { encodeToString(cryptoService.encrypt(record.dataKey!!, record.resource).blockingGet()) },
             { null }
     )
 
@@ -772,7 +772,7 @@ internal class RecordService(
                 } else {
                     fhirService.decryptResource<T>(
                             dataKey,
-                            tags[TaggingService.TAG_RESOURCE_TYPE],
+                            tags[TaggingService.TAG_RESOURCE_TYPE]!!,
                             record.encryptedBody
                     )
                 }

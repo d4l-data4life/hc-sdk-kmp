@@ -44,6 +44,9 @@ Read operations are divided into a simple `fetch` and a full `download` of the r
 
 - *Downloading* a resource returns the resource with all its attachments.
 
+Create, Fetch and Update operations are overloaded to accept a `List<String> annotations parameter.
+This optional parameter `annotations` will filter records by the provided strings.
+
 ==== Creating a new record
 
 To create a new record, the API provides the `createRecord(resource, listener)` method with the resource and the result listener as arguments.
@@ -64,7 +67,14 @@ The SDK checks the following when users create resources:
 
 [source,java]
 ----
-public <T extends DomainResource> void createRecord(T resource, ResultListener<Record<T>> listener)
+public <T extends DomainResource> void createRecord(T resource, ResultListener<Record<T>> listener);
+----
+
+Additionally you also can create customized Records, which do not relay on the Fhir-Model by the usage of:
+
+[source,java]
+----
+void createDataRecord(byte[] data, ResultListener<DataRecord> resultListener, List<String> annotations);
 ----
 
 The following example shows how you create the `DocumentReference` resource with the `DocumentReferenceBuilder` class.
@@ -102,7 +112,7 @@ The object also includes the individual error message for each failed request.
 
 [source,java]
 ----
-public <T extends DomainResource> void createRecords(List<T> resources, ResultListener<CreateResult<T>> listener)
+public <T extends DomainResource> void createRecords(List<T> resources, ResultListener<CreateResult<T>> listener);
 ----
 
 [source,java]
@@ -130,7 +140,14 @@ The record is returned in the result listener.
 
 [source,java]
 ----
-public <T extends DomainResource> void fetchRecord(String recordId, ResultListener<Record<T>> listener)
+public <T extends DomainResource> void fetchRecord(String recordId, ResultListener<Record<T>> listener);
+----
+
+Additionally you also can fetch customized Records, which do not relay on the Fhir-Model by the usage of:
+
+[source,java]
+----
+Task fetchDataRecord(String dataId, ResultListener<DataRecord> resultListener);
 ----
 
 [source,java]
@@ -155,7 +172,7 @@ To fetch multiple records for the given record IDs, use the `fetchRecords(record
 
 [source,java]
 ----
-public <T extends DomainResource> void fetchRecords(List<String> recordIdList, ResultListener<FetchResult<T>> listener)
+public <T extends DomainResource> void fetchRecords(List<String> recordIdList, ResultListener<FetchResult<T>> listener);
 ----
 
 [source,java]
@@ -180,12 +197,20 @@ For example, when a client has no data and initially fetches records after a new
 The method lets you specify the following:
 
 - Fetch records by type
+- Fetch records by annotations
 - Order records by date
 - Paginate loaded records by providing the `pageSize` and an `offset`.
 
 [source,java]
 ----
-public <T extends DomainResource> void fetchRecords(Class<T> resourceType, LocalDate startDate, LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<Record<T>>> listener)
+public <T extends DomainResource> void fetchRecords(Class<T> resourceType, LocalDate startDate, LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<Record<T>>> listener);
+----
+
+Additionally you also can fetch multiple customized Records, which do not relay on the Fhir-Model by the usage of:
+
+[source,java]
+----
+Task fetchDataRecords(List<String> annotations, @Nullable LocalDate startDate, @Nullable LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<DataRecord>> listener);
 ----
 
 [source,java]
@@ -209,7 +234,7 @@ To download one record for the given ID with all the contained references, use t
 
 [source,java]
 ----
-public <T extends DomainResource> void downloadRecord(String recordId, ResultListener<Record<T>> listener)
+public <T extends DomainResource> void downloadRecord(String recordId, ResultListener<Record<T>> listener);
 ----
 
 [source,java]
@@ -233,7 +258,7 @@ To download records for the given IDs with all their contained references, use t
 
 [source,java]
 ----
-public <T extends DomainResource> void downloadRecords(List<String> recordIds, ResultListener<DownloadResult<T>> listener)
+public <T extends DomainResource> void downloadRecords(List<String> recordIds, ResultListener<DownloadResult<T>> listener);
 ----
 
 [source,java]
@@ -257,7 +282,14 @@ To update the given record with the given updated document, use the `updateRecor
 
 [source,java]
 ----
-public <T extends DomainResource> void updateRecord(T resource, ResultListener<Record<T>> listener)
+public <T extends DomainResource> void updateRecord(T resource, ResultListener<Record<T>> listener);
+----
+
+Additionally you also can update a customized Records, which do not relay on the Fhir-Model by the usage of:
+
+[source,java]
+----
+void updateDataRecord(byte[] data, @Nullable List<String> annotations, String recordId, ResultListener<DataRecord> resultListener);
 ----
 
 [source,java]
@@ -283,7 +315,7 @@ To update records with updated documents, use the `updateRecords` method.
 
 [source,java]
 ----
-public <T extends DomainResource> void updateRecords(List<T> resources, ResultListener<UpdateResult<T>> listener)
+public <T extends DomainResource> void updateRecords(List<T> resources, ResultListener<UpdateResult<T>> listener);
 ----
 
 [source,java]
@@ -309,7 +341,14 @@ To delete a record with its given record ID, use the `deleteRecord` method.
 
 [source,java]
 ----
-public void deleteRecord(String recordId, Callback listener)
+public void deleteRecord(String recordId, Callback listener);
+----
+
+Additionally you also can delete a customized Records, which do not relay on the Fhir-Model by the usage of:
+
+[source,java]
+----
+void deleteDataRecord(String dataId, Callback callback);
 ----
 
 [source,java]
@@ -333,7 +372,7 @@ To delete the records with their given IDs, use the `deleteRecords` method.
 
 [source,java]
 ----
-public <T extends DomainResource> void deleteRecords(List<String> recordIds, ResultListener<DeleteResult<T>> listener)
+public <T extends DomainResource> void deleteRecords(List<String> recordIds, ResultListener<DeleteResult<T>> listener);
 ----
 
 [source,java]
@@ -359,7 +398,7 @@ To download a single attachment from a record by the given attachment ID, use th
 
 [source,java]
 ----
-public void downloadAttachment(String recordId, String attachmentId, ResultListener<Attachment> listener)
+public void downloadAttachment(String recordId, String attachmentId, ResultListener<Attachment> listener);
 ----
 
 [source,java]
@@ -384,7 +423,7 @@ To download specific attachments from a record by the given attachment IDs, use 
 
 [source,java]
 ----
-public void downloadAttachments(String recordId, List<String> attachmentIds, ResultListener<List<Attachment>> listener)
+public void downloadAttachments(String recordId, List<String> attachmentIds, ResultListener<List<Attachment>> listener);
 ----
 
 [source,java]
@@ -409,7 +448,7 @@ To check if a user is currently logged in, use the `isUserLoggedIn` method.
 
 [source,java]
 ----
-public boolean isUserLoggedIn(ResultListener<Boolean> listener)
+public boolean isUserLoggedIn(ResultListener<Boolean> listener);
 ----
 
 [source,java]
@@ -434,7 +473,7 @@ The results are returned in the `onSuccess(Integer count)` method of the result 
 
 [source,java]
 ----
-public <T extends DomainResource> void countRecords(Class<T> clazz, ResultListener<Integer> listener)
+public <T extends DomainResource> void countRecords(Class<T> clazz, ResultListener<Integer> listener);
 ----
 
 [source,java]
@@ -458,7 +497,7 @@ To log out the currently authenticated user, the `logout(listener)` is used wher
 
 [source,java]
 ----
-public void logout(Callback listener)
+public void logout(Callback listener);
 ----
 
 [source,java]

@@ -234,7 +234,7 @@ class LegacyDataClient implements SdkContract.LegacyDataClient {
     }
 
     @Override
-    public void createDataRecord(byte[] data, List<String> annotations, ResultListener<DataRecord> resultListener) {
+    public void createDataRecord(byte[] data, ResultListener<DataRecord> resultListener, List<String> annotations) {
         Single<DataRecord> operation = userService.finishLogin(true)
                 .flatMap(ignore -> userService.getUID())
                 .flatMap(uid -> recordService.createRecord(data, uid, annotations));
@@ -283,7 +283,7 @@ class LegacyDataClient implements SdkContract.LegacyDataClient {
     }
 
     @Override
-    public void deleteDataRecord(String appDataId, Callback callback) {
-        deleteRecord(appDataId, callback);
+    public void deleteDataRecord(String dataId, Callback callback) {
+        deleteRecord(dataId, callback);
     }
 }

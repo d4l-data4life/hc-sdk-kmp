@@ -273,10 +273,10 @@ public interface SdkContractLegacy {
          * Creates an {@link DataRecord} record.
          *
          * @param data the app data that will be created
-         * @param annotations custom annotations added as tags to the record
          * @param resultListener result contains either record or Error
+         * @param annotations custom annotations added as tags to the record
          */
-        void createDataRecord(byte[] data, List<String> annotations, ResultListener<DataRecord> resultListener);
+        void createDataRecord(byte[] data, ResultListener<DataRecord> resultListener, List<String> annotations);
 
         /**
          * @param dataId the id of the app data record which shall be fetched
@@ -309,9 +309,9 @@ public interface SdkContractLegacy {
         /**
          * Delete an DataRecord
          *
-         * @param appDataId the id of the record that shall be deleted
+         * @param dataId the id of the record that shall be deleted
          * @param callback either {@link Callback#onSuccess()} or {@link Callback#onError(D4LException)} will be called
          */
-        void deleteDataRecord(String appDataId, Callback callback);
+        void deleteDataRecord(String dataId, Callback callback);
     }
 }

@@ -396,7 +396,7 @@ public class DocumentsActivity extends AppCompatActivity {
         annotations.add("test2");
         annotations.add("test3");
 
-        client.createDataRecord(data, annotations, new ResultListener<DataRecord>() {
+        client.createDataRecord(data, new ResultListener<DataRecord>() {
             @Override
             public void onSuccess(DataRecord appDataRecord) {
                 appdata = appDataRecord;
@@ -407,7 +407,7 @@ public class DocumentsActivity extends AppCompatActivity {
             public void onError(D4LException exception) {
                 mDocumentsSRL.setRefreshing(false);
             }
-        });
+        }, annotations);
     }
 
     private void fetchDataRecord() {

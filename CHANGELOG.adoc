@@ -30,6 +30,8 @@ toc::[]
 
 
 
+* `TagHelper`, `FhirService`, `ImageResizer`, `FileService`, `NetworkConnectivityService`, `CryptoService` to Kotlin
+
 === Removed
 
 === Fixed

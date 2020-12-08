@@ -13,24 +13,23 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
+package care.data4life.sdk
 
-package care.data4life.sdk;
+import care.data4life.sdk.lang.ImageResizeException
 
-import javax.annotation.Nullable;
+internal interface ImageResizer {
 
-import care.data4life.sdk.lang.ImageResizeException;
+    @Throws(ImageResizeException.JpegWriterMissing::class)
+    fun resizeToWidth(originalImage: ByteArray, targetWidth: Int, targetQuality: Int): ByteArray?
 
+    @Throws(ImageResizeException.JpegWriterMissing::class)
+    fun resizeToHeight(originalImage: ByteArray, targetHeight: Int, targetQuality: Int): ByteArray?
 
-interface ImageResizer {
-    int DEFAULT_THUMBNAIL_SIZE_PX = 200;
-    int DEFAULT_PREVIEW_SIZE_PX = 1000;
-    int DEFAULT_JPEG_QUALITY_PERCENT = 80;
+    fun isResizable(data: ByteArray): Boolean
 
-    @Nullable
-    byte[] resizeToWidth(byte[] originalImage, int targetWidth, int targetQuality) throws ImageResizeException.JpegWriterMissing;
-
-    @Nullable
-    byte[] resizeToHeight(byte[] originalImage, int targetHeight, int targetQuality) throws ImageResizeException.JpegWriterMissing;
-
-    boolean isResizable(byte[] data);
+    companion object {
+        const val DEFAULT_THUMBNAIL_SIZE_PX = 200
+        const val DEFAULT_PREVIEW_SIZE_PX = 1000
+        const val DEFAULT_JPEG_QUALITY_PERCENT = 80
+    }
 }

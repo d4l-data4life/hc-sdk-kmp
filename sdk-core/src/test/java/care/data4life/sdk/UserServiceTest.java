@@ -23,6 +23,7 @@ import org.junit.Test;
 import care.data4life.crypto.GCKey;
 import care.data4life.crypto.GCKeyPair;
 import care.data4life.crypto.GCSymmetricKey;
+import care.data4life.sdk.auth.OAuthService;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.network.model.EncryptedKey;
 import care.data4life.sdk.network.model.UserInfo;

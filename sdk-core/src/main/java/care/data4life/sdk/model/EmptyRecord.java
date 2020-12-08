@@ -14,17 +14,14 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.listener;
+package care.data4life.sdk.model;
 
-import care.data4life.sdk.lang.D4LException;
 
-/**
- * Result which you get when uploading, downloading or deleting a Record.
- *
- * @param <T> type of Record
- */
-public interface ResultListener<T> {
-    void onSuccess(T t);
+import care.data4life.fhir.stu3.model.DomainResource;
+import care.data4life.sdk.model.Record;
 
-    void onError(D4LException exception);
+public class EmptyRecord<T extends DomainResource> extends Record<T> {
+    public EmptyRecord() {
+        super(null, null);
+    }
 }

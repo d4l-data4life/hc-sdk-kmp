@@ -50,6 +50,7 @@ val appModule = module {
             t.printStackTrace()
         }
     })
+
     factory {
         val alias: String = it[0]
         if (!map.contains(alias)) map[alias] = createSDK(alias)

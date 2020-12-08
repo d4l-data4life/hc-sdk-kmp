@@ -117,20 +117,29 @@ dependencies {
 
     testImplementation(Dependency.Android.Test.junit)
 
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
+    androidTestUtil(Dependency.Android.AndroidTest.orchestrator)
 
+    androidTestImplementation(Dependency.Android.AndroidTest.core)
     androidTestImplementation(Dependency.Android.AndroidTest.runner)
     androidTestImplementation(Dependency.Android.AndroidTest.rules)
-    androidTestImplementation(Dependency.Android.AndroidTest.orchestrator)
+    androidTestImplementation(Dependency.Android.AndroidTest.extJUnit)
+
+    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
+    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
 
     androidTestImplementation(Dependency.Android.AndroidTest.espressoCore)
     androidTestImplementation(Dependency.Android.AndroidTest.espressoIntents)
     androidTestImplementation(Dependency.Android.AndroidTest.espressoWeb)
-    androidTestImplementation(Dependency.Android.moshi)
 
     androidTestImplementation(Dependency.Android.AndroidTest.uiAutomator)
     androidTestImplementation(Dependency.Android.AndroidTest.kakao)
+
+    androidTestImplementation(Dependency.Android.okHttp)
+    androidTestImplementation(Dependency.Android.okHttpLoggingInterceptor)
+    androidTestImplementation(Dependency.Android.retrofit)
+
+    androidTestImplementation(Dependency.Android.moshi)
+    androidTestImplementation(Dependency.Android.gson)
 
     androidTestImplementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")

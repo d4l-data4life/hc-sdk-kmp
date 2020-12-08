@@ -57,6 +57,7 @@ import care.data4life.sdk.network.model.CommonKeyResponse;
 import care.data4life.sdk.network.model.DecryptedRecord;
 import care.data4life.sdk.network.model.EncryptedKey;
 import care.data4life.sdk.network.model.EncryptedRecord;
+import care.data4life.sdk.model.EmptyRecord;
 import care.data4life.sdk.util.Base64;
 import care.data4life.sdk.util.HashUtil;
 import care.data4life.sdk.util.MimeType;

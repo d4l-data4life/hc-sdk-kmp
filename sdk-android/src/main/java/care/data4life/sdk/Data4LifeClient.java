@@ -29,6 +29,8 @@ import care.data4life.auth.AuthorizationService;
 import care.data4life.auth.AuthorizationService.AuthorizationListener;
 import care.data4life.auth.storage.SharedPrefsAuthStorage;
 import care.data4life.crypto.GCKeyPair;
+import care.data4life.sdk.auth.OAuthService;
+import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.lang.CoreRuntimeException;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.Callback;
@@ -62,9 +64,16 @@ public final class Data4LifeClient extends BaseClient {
             AuthorizationService authorizationService,
             UserService userService,
             RecordService recordService,
-            D4LErrorHandler errorHandler) {
+            CallHandler callHandler) {
 
-        super(alias, userService, recordService, errorHandler);
+        super(
+                alias,
+                userService,
+                recordService,
+                callHandler,
+                Data4LifeClient.Companion.createLegacyDataClient(alias, userService, recordService, callHandler),
+                Data4LifeClient.Companion.createLegacyAuthClient(alias, userService, recordService, callHandler)
+        );
         this.cryptoService = cryptoService;
         this.authorizationService = authorizationService;
     }
@@ -156,11 +165,12 @@ public final class Data4LifeClient extends BaseClient {
         FhirService fhirService = new FhirService(cryptoService);
         FileService fileService = new FileService(initConfig.getAlias(), apiService, cryptoService);
         AttachmentService attachmentService = new AttachmentService(initConfig.getAlias(), fileService, new AndroidImageResizer());
-        D4LErrorHandler errorHandler = new D4LErrorHandler();
+        SdkContract.ErrorHandler errorHandler = new D4LErrorHandler();
+        CallHandler callHandler = new CallHandler(errorHandler);
         String partnerId = clientId.split(CLIENT_ID_SPLIT_CHAR)[PARTNER_ID_INDEX];
         RecordService recordService = new RecordService(partnerId, initConfig.getAlias(), apiService, tagEncryptionService, taggingService, fhirService, attachmentService, cryptoService, errorHandler);
 
-        return new Data4LifeClient(initConfig.getAlias(), cryptoService, authorizationService, userService, recordService, errorHandler);
+        return new Data4LifeClient(initConfig.getAlias(), cryptoService, authorizationService, userService, recordService, callHandler);
     }
 
     public static Data4LifeClient getInstance() {
@@ -204,18 +214,18 @@ public final class Data4LifeClient extends BaseClient {
             @SuppressLint("CheckResult")
             @Override
             public void onSuccess() {
-                userService
+                getUserService()
                         .finishLogin(true)
                         .subscribeOn(Schedulers.io())
                         .subscribe(
                                 isLoggedIn -> listener.onSuccess(),
-                                error -> listener.onError(errorHandler.handleError(error))
+                                error -> listener.onError(getHandler().getErrorHandler().handleError(error))
                         );
             }
 
             @Override
             public void onError(Throwable error) {
-                listener.onError(errorHandler.handleError(error));
+                listener.onError(getHandler().getErrorHandler().handleError(error));
             }
         });
     }

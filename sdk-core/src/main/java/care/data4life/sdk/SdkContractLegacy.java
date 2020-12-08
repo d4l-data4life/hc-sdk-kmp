@@ -24,6 +24,7 @@ import javax.annotation.Nullable;
 
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.DomainResource;
+import care.data4life.sdk.call.Task;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.Callback;
 import care.data4life.sdk.listener.ResultListener;
@@ -35,10 +36,21 @@ import care.data4life.sdk.model.FetchResult;
 import care.data4life.sdk.model.Record;
 import care.data4life.sdk.model.UpdateResult;
 
-public interface SdkContract {
+/**
+ * Deprecated with version v1.9.0
+ * <p>
+ * Will be removed in version v2.0.0
+ */
+@Deprecated
+public interface SdkContractLegacy {
 
-    interface Client {
-
+    /**
+     * Deprecated with version v1.9.0
+     * <p>
+     * Will be removed in version v2.0.0
+     */
+    @Deprecated
+    interface AuthClient {
         /**
          * Get the currently active User session token if present.
          *
@@ -56,9 +68,18 @@ public interface SdkContract {
         /**
          * Logout the user
          *
-         * @param listener either {@link Callback#onSuccess()} is called or {@link Callback#onError(D4LException)}
+         * @param listener either [Callback.onSuccess] is called or [Callback.onError]
          */
         void logout(Callback listener);
+    }
+
+    /**
+     * Deprecated with version v1.9.0
+     * <p>
+     * Will be removed in version v2.0.0
+     */
+    @Deprecated
+    interface DataClient {
 
         /**
          * Creates a record.
@@ -66,7 +87,7 @@ public interface SdkContract {
          * @param resource the resource that shall be created
          * @param listener result contains either record or Error
          * @param <T>      the type of the created {@link Record} as a subclass of {@link DomainResource}
-         * @throws D4LException if {@param resource} is DocumentReference and {@link care.data4life.fhir.stu3.model.Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
+         * @throws D4LException if {@param resource} is DocumentReference and {@link Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
          */
         <T extends DomainResource> void createRecord(T resource, ResultListener<Record<T>> listener);
 
@@ -139,18 +160,18 @@ public interface SdkContract {
         <T extends DomainResource> Task fetchRecords(Class<T> resourceType, LocalDate startDate, LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<Record<T>>> listener);
 
         /**
-         * Download a record. All {@link care.data4life.fhir.stu3.model.Attachment}s will get downloaded of the requested record.
+         * Download a record. All {@link Attachment}s will get downloaded of the requested record.
          *
          * @param recordId the id of the record that shall be downloaded
          * @param listener either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
          * @param <T>      the type of {@link Record} as a subclass of {@link DomainResource}
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
-         * @throws care.data4life.sdk.config.DataRestrictionException if {@param resource} is DocumentReference and {@link care.data4life.fhir.stu3.model.Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
+         * @throws care.data4life.sdk.config.DataRestrictionException if {@param resource} is DocumentReference and {@link Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
          */
         <T extends DomainResource> Task downloadRecord(String recordId, ResultListener<Record<T>> listener);
 
         /**
-         * Download a list of records. All {@link care.data4life.fhir.stu3.model.Attachment}s will get downloaded of the requested records
+         * Download a list of records. All {@link Attachment}s will get downloaded of the requested records
          *
          * @param recordIds the ids of the records that shall be downloaded
          * @param listener  either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
@@ -165,7 +186,7 @@ public interface SdkContract {
          * @param resource the updated resource that shall be uploaded
          * @param listener either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
          * @param <T>      the type of {@link Record} as a subclass of {@link DomainResource}
-         * @throws care.data4life.sdk.config.DataRestrictionException if {@param resource} is DocumentReference and {@link care.data4life.fhir.stu3.model.Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
+         * @throws care.data4life.sdk.config.DataRestrictionException if {@param resource} is DocumentReference and {@link Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
          */
         <T extends DomainResource> void updateRecord(T resource, ResultListener<Record<T>> listener);
 
@@ -201,10 +222,5 @@ public interface SdkContract {
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status.
          */
         Task downloadAttachments(String recordId, List<String> attachmentIds, DownloadType type, ResultListener<List<Attachment>> listener);
-
-    }
-
-    interface ErrorHandler {
-        D4LException handleError(Throwable error);
     }
 }

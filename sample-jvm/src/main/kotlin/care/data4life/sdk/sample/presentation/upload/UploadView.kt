@@ -87,11 +87,11 @@ class UploadView(private val alias: String, private val isMulti: Boolean = false
         )
 
         client.createRecord(record, object : ResultListener<Record<DocumentReference>> {
-            override fun onSuccess(t: Record<DocumentReference>?) {
+            override fun onSuccess(t: Record<DocumentReference>) {
                 renderMessage(Message("Document created."))
             }
 
-            override fun onError(exception: D4LException?) {
+            override fun onError(exception: D4LException) {
                 renderMessage(Message("Failed to create document"))
                 exception?.printStackTrace()
             }

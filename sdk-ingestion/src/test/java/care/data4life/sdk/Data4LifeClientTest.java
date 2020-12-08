@@ -18,13 +18,10 @@ package care.data4life.sdk;
 
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
 
 import care.data4life.auth.AuthorizationService;
-import care.data4life.crypto.GCAsymmetricKey;
-import care.data4life.crypto.GCKeyPair;
+import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.test.util.TestSchedulerRule;
-import io.reactivex.Single;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -48,7 +45,7 @@ public class Data4LifeClientTest {
     private CryptoService cryptoService;
     private RecordService recordService;
     private Data4LifeClient instance;
-    private SdkContract.ErrorHandler errorHandler;
+    private CallHandler callHandler;
 
     @Before
     public void setUp() {
@@ -56,14 +53,14 @@ public class Data4LifeClientTest {
         cryptoService = mock(CryptoService.class);
         userService = mock(UserService.class);
         recordService = mock(RecordService.class);
-        errorHandler = mock(SdkContract.ErrorHandler.class);
+        callHandler = mock(CallHandler.class);
 
 
         instance = new Data4LifeClient(
                 ALIAS,
                 userService,
                 recordService,
-                errorHandler);
+                callHandler);
     }
 
     // TODO Need to define new tests

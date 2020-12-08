@@ -13,7 +13,7 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
-package care.data4life.sdk
+package care.data4life.sdk.fhir
 
 import care.data4life.crypto.GCKey
 import care.data4life.crypto.error.CryptoException.DecryptionFailed
@@ -22,10 +22,11 @@ import care.data4life.fhir.Fhir
 import care.data4life.fhir.FhirParser
 import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.fhir.stu3.model.FhirElementFactory
+import care.data4life.sdk.CryptoService
 import care.data4life.sdk.lang.D4LException
 import io.reactivex.Single
 
-// TODO remove @JvmOverloads when RecordService and Client changed to Kotlin
+// TODO remove @JvmOverloads when Data4LifeClient changed to Kotlin
 // TODO use of Single is not necessary as it's finalized with blockingGet()
 internal class FhirService @JvmOverloads constructor(
         private val cryptoService: CryptoService,

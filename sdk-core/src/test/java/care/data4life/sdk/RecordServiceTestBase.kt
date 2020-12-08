@@ -21,6 +21,7 @@ import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.fhir.stu3.model.CarePlan
 import care.data4life.fhir.stu3.model.DocumentReference
 import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion

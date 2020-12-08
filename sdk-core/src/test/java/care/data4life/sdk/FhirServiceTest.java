@@ -27,6 +27,7 @@ import care.data4life.fhir.FhirException;
 import care.data4life.fhir.FhirParser;
 import care.data4life.fhir.stu3.model.DocumentReference;
 import care.data4life.fhir.stu3.model.DomainResource;
+import care.data4life.sdk.fhir.FhirService;
 import io.reactivex.Single;
 
 import static com.google.common.truth.Truth.assertThat;

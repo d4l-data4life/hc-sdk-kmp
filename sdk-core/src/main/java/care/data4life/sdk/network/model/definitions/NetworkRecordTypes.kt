@@ -18,6 +18,7 @@ package care.data4life.sdk.network.model.definitions
 
 import care.data4life.crypto.GCKey
 import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.Fhir4Resource
 
 internal interface DecryptedBaseRecord<T> {
     var identifier: String?
@@ -30,10 +31,11 @@ internal interface DecryptedBaseRecord<T> {
     var modelVersion: Int
 }
 
-internal interface DecryptedFhirRecord<T : DomainResource?> : DecryptedBaseRecord<T> {
+internal interface DecryptedFhirBaseRecord<T> : DecryptedBaseRecord<T> {
     var attachmentsKey: GCKey?
 }
 
+internal interface DecryptedFhir3Record<T : DomainResource?> : DecryptedFhirBaseRecord<T>
 internal interface DecryptedDataRecord : DecryptedBaseRecord<ByteArray> {
     fun copyWithResourceAnnotations(
             data: ByteArray,

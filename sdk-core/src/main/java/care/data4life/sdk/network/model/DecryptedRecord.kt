@@ -17,7 +17,7 @@ package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
 import care.data4life.fhir.stu3.model.DomainResource
-import care.data4life.sdk.network.model.definitions.DecryptedFhirRecord
+import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import java.io.Serializable
 import kotlin.collections.HashMap
 
@@ -31,4 +31,4 @@ internal data class DecryptedRecord<T : DomainResource?>(
         override var dataKey: GCKey?,
         override var attachmentsKey: GCKey?,
         override var modelVersion: Int
-) : DecryptedFhirRecord<T>, Serializable
+) : DecryptedFhir3Record<T>, Serializable

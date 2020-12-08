@@ -29,13 +29,13 @@ class CallHandler(
     fun <T> executeSingle(operation: Single<T>, listener: ResultListener<T>): Task {
         val task = Task()
         val operationHandle = operation
-                .doOnDispose { if (task.isCanceled) listener.onError(errorHandler.handleError(TaskException.CancelException())!!) }
+                .doOnDispose { if (task.isCanceled) listener.onError(errorHandler.handleError(TaskException.CancelException())) }
                 .doFinally { task.finish() }
                 .subscribeOn(Schedulers.io())
                 .subscribe({ t: T -> listener.onSuccess(t) }
-                ) { error: Throwable? ->
+                ) { error ->
                     if (!task.isActive) return@subscribe
-                    listener.onError(errorHandler.handleError(error)!!)
+                    listener.onError(errorHandler.handleError(error))
                 }
         task.operationHandle = operationHandle
         return task
@@ -44,13 +44,13 @@ class CallHandler(
     fun executeCompletable(operation: Completable, listener: Callback): Task {
         val task = Task()
         val operationHandle = operation
-                .doOnDispose { if (task.isCanceled) listener.onError(errorHandler.handleError(TaskException.CancelException())!!) }
+                .doOnDispose { if (task.isCanceled) listener.onError(errorHandler.handleError(TaskException.CancelException())) }
                 .doFinally { task.finish() }
                 .subscribeOn(Schedulers.io())
                 .subscribe({ listener.onSuccess() }
-                ) { error: Throwable? ->
+                ) { error ->
                     if (!task.isActive) return@subscribe
-                    listener.onError(errorHandler.handleError(error)!!)
+                    listener.onError(errorHandler.handleError(error))
                 }
         task.operationHandle = operationHandle
         return task

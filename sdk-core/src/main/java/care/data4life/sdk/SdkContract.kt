@@ -41,6 +41,6 @@ interface SdkContract {
 
 
     interface ErrorHandler {
-        fun handleError(error: Throwable?): D4LException?
+        fun handleError(error: Throwable): D4LException
     }
 }

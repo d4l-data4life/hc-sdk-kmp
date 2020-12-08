@@ -67,7 +67,7 @@ internal class TaggingService(private val clientId: String) {
     fun getTagFromType(
             resourceType: String?
     ): HashMap<String, String> = hashMapOf<String, String>().also {
-        if (resourceType != null && !resourceType.isEmpty()) {
+        if (resourceType != null && resourceType.isNotEmpty()) {
             it[TAG_RESOURCE_TYPE] = resourceType.toLowerCase(US_LOCALE)
         }
     }

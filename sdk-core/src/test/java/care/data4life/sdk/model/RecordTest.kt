@@ -47,7 +47,7 @@ class RecordTest {
     @Test
     fun `Given a Record returns a given Resource`() {
         val resource = mockkClass(DomainResource::class)
-        val record = Record<DomainResource>(resource, null)
+        val record = Record(resource, null)
 
         assertSame(
                 record.resource,
@@ -59,7 +59,7 @@ class RecordTest {
     fun `Given a Record it FhireResource is a alias of Resource`() {
         val resource = mockkClass(DomainResource::class)
         val record1 = Record<DomainResource>(null, null)
-        val record2 = Record<DomainResource>(resource, null)
+        val record2 = Record(resource, null)
 
         assertNull(record1.resource)
         assertNull(record1.fhirResource)

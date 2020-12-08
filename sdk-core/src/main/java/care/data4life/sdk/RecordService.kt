@@ -166,6 +166,7 @@ internal class RecordService(
                 .flatMapSingle { resource -> createRecord(resource, userId).onErrorReturn {
                         error -> EmptyRecord<T>().also {
                                 failedOperations.add(Pair(resource, errorHandler.handleError(error)))
+                                Unit
                     } }
                 }
                 .filter { record -> record !is EmptyRecord<*> }
@@ -253,6 +254,7 @@ internal class RecordService(
                     fetchRecord<T>(recordId, userId)
                             .onErrorReturn { error -> EmptyRecord<T>().also {
                                 failedFetches.add(Pair(recordId, errorHandler.handleError(error)))
+                                Unit
                             } }
                 }
                 .filter { record -> record !is EmptyRecord<*> }
@@ -529,6 +531,7 @@ internal class RecordService(
                             .onErrorReturn { error ->
                                 EmptyRecord<T>().also {
                                     failedUpdates.add(Pair(resource, errorHandler.handleError(error)))
+                                    Unit
                                 }
                             }
                 }

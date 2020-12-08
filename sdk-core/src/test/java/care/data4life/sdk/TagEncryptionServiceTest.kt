@@ -23,7 +23,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito
-import java.util.*
 
 class TagEncryptionServiceTest {
     @Rule @JvmField var schedulerRule = TestSchedulerRule()
@@ -128,7 +127,7 @@ class TagEncryptionServiceTest {
                 )
 
         // when
-        val decryptedTags: HashMap<String, String> = sut.decryptTags(encryptedTags)
+        val decryptedTags = sut.decryptTags(encryptedTags)
 
         // then
         Truth.assertThat(decryptedTags).containsExactly("key", "value")
@@ -158,7 +157,7 @@ class TagEncryptionServiceTest {
                 )
 
         // when
-        val decryptedTags: HashMap<String, String> = sut.decryptTags(encryptedTags)
+        val decryptedTags = sut.decryptTags(encryptedTags)
 
         // then
         Truth.assertThat(decryptedTags).containsExactly()
@@ -287,7 +286,7 @@ class TagEncryptionServiceTest {
                 )
 
         // when
-        val decryptedAnnotations: List<String?> = sut.decryptAnnotations(encryptedAnnotations)
+        val decryptedAnnotations = sut.decryptAnnotations(encryptedAnnotations)
 
         // then
         Truth.assertThat(decryptedAnnotations).containsExactly()

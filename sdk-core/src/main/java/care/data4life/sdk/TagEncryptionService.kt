@@ -47,7 +47,7 @@ internal class TagEncryptionService {
         val tek = cryptoService.fetchTagEncryptionKey()
         return Observable
                 .fromIterable(list)
-                .map { tag: String -> encryptTag(tek, prefix + tag).blockingGet() }
+                .map { tag -> encryptTag(tek, prefix + tag).blockingGet() }
                 .toList()
                 .blockingGet()
     }
@@ -61,47 +61,48 @@ internal class TagEncryptionService {
         val tek = cryptoService.fetchTagEncryptionKey()
         return Observable
                 .fromIterable(encryptedList)
-                .map { encryptedTag: String -> decryptTag(tek, encryptedTag).blockingGet() }
-                .filter { decryptedItem: String -> condition(decryptedItem) }
+                .map { encryptedTag -> decryptTag(tek, encryptedTag).blockingGet() }
+                .filter { decryptedItem -> condition(decryptedItem) }
                 .toList()
-                .map { decryptedList: MutableList<String> -> transform(decryptedList) }
+                .map { decryptedList -> transform(decryptedList) }
                 .blockingGet()
     }
 
     @Throws(IOException::class)
-    fun encryptTags(tags: HashMap<String, String>): List<String> {
-        return encryptList(TagHelper.convertToTagList(tags), "")
-    }
+    fun encryptTags(
+            tags: HashMap<String, String>
+    ): List<String> = encryptList(TagHelper.convertToTagList(tags), "")
 
     @Throws(IOException::class)
-    fun decryptTags(encryptedTags: List<String>): HashMap<String, String> {
-        return decryptList(
+    fun decryptTags(
+            encryptedTags: List<String>
+    ): HashMap<String, String> = decryptList(
                 encryptedTags,
-                { d: String -> !d.startsWith(ANNOTATION_KEY) && d.contains(TaggingService.TAG_DELIMITER) },
+                { d -> !d.startsWith(ANNOTATION_KEY) && d.contains(TaggingService.TAG_DELIMITER) },
                 { tagList: List<String> -> TagHelper.convertToTagMap(tagList) }
         )
-    }
+
 
     @Throws(IOException::class)
-    fun encryptAnnotations(annotations: List<String>): List<String> {
-        return encryptList(annotations, ANNOTATION_KEY)
-    }
+    fun encryptAnnotations(
+            annotations: List<String>
+    ): List<String> = encryptList(annotations, ANNOTATION_KEY)
 
     @Throws(IOException::class)
-    fun decryptAnnotations(encryptedAnnotations: List<String>): List<String> {
-        return decryptList(
+    fun decryptAnnotations(
+            encryptedAnnotations: List<String>
+    ): List<String> = decryptList(
                 encryptedAnnotations,
-                { d: String -> d.startsWith(ANNOTATION_KEY) },
-                { list: MutableList<String> -> removeAnnotationKey(list) }
+                { d -> d.startsWith(ANNOTATION_KEY) },
+                { list -> removeAnnotationKey(list) }
         )
-    }
 
     @Throws(D4LException::class)
     fun encryptTag(key: GCKey, tag: String): Single<String> {
         return Single
                 .fromCallable { tag.toByteArray() }
-                .map { d: ByteArray -> cryptoService.symEncrypt(key, d, iv) }
-                .map { data: ByteArray -> base64.encodeToString(data) }
+                .map { d -> cryptoService.symEncrypt(key, d, iv) }
+                .map { data -> base64.encodeToString(data) }
                 .onErrorResumeNext {
                     Single.error(
                             CryptoException.EncryptionFailed("Failed to encrypt tag") as D4LException
@@ -113,8 +114,8 @@ internal class TagEncryptionService {
     fun decryptTag(key: GCKey, base64tag: String): Single<String> {
         return Single
                 .fromCallable { base64.decode(base64tag) }
-                .map { d: ByteArray -> cryptoService.symDecrypt(key, d, iv) }
-                .map { decrypted: ByteArray -> String(decrypted, StandardCharsets.UTF_8) }
+                .map { d -> cryptoService.symDecrypt(key, d, iv) }
+                .map { decrypted -> String(decrypted, StandardCharsets.UTF_8) }
                 .onErrorResumeNext {
                     Single.error(
                             CryptoException.DecryptionFailed("Failed to decrypt tag") as D4LException

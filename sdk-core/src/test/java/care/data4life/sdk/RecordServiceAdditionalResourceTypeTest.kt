@@ -289,7 +289,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
                 null,
                 patient,
                 null,
-                ArrayList(),
+                arrayListOf(),
                 null,
                 null,
                 null,
@@ -325,7 +325,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
                 null,
                 observation,
                 null,
-                ArrayList(),
+                arrayListOf(),
                 null,
                 null,
                 null,
@@ -363,7 +363,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
                 null,
                 questionnaireResponse,
                 null,
-                ArrayList(),
+                arrayListOf(),
                 null,
                 null,
                 null,
@@ -401,7 +401,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
                 null,
                 null,
                 null,
-                ArrayList(),
+                arrayListOf(),
                 null,
                 null,
                 null,
@@ -413,7 +413,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
 
         // When
         @Suppress("UNCHECKED_CAST")
-        val record = recordService.removeOrRestoreUploadData<DomainResource>(
+        val record = recordService.removeOrRestoreUploadData(
                 RecordService.RemoveRestoreOperation.RESTORE,
                 decryptedRecord as DecryptedRecord<DomainResource>,
                 patient,
@@ -442,7 +442,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
                 null,
                 null,
                 null,
-                ArrayList(),
+                arrayListOf(),
                 null,
                 null,
                 null,
@@ -454,7 +454,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
 
         // When
         @Suppress("UNCHECKED_CAST")
-        val record = recordService.removeOrRestoreUploadData<DomainResource>(
+        val record = recordService.removeOrRestoreUploadData(
                 RecordService.RemoveRestoreOperation.RESTORE,
                 decryptedRecord as DecryptedRecord<DomainResource>,
                 observation,
@@ -483,7 +483,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
                 null,
                 null,
                 null,
-                ArrayList(), null,
+                arrayListOf(), null,
                 null,
                 null,
                 null,
@@ -494,7 +494,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
 
         // When
         @Suppress("UNCHECKED_CAST") 
-        val record = recordService.removeOrRestoreUploadData<DomainResource>(
+        val record = recordService.removeOrRestoreUploadData(
                 RecordService.RemoveRestoreOperation.RESTORE,
                 decryptedRecord as DecryptedRecord<DomainResource>, 
                 questionnaireResponse,
@@ -519,7 +519,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         val currentIdentifier = FhirAttachmentHelper.buildIdentifier(currentId, ASSIGNER)
         val obsoleteIdentifier = FhirAttachmentHelper.buildIdentifier(obsoleteId, ASSIGNER)
         val otherIdentifier = FhirAttachmentHelper.buildIdentifier(otherId, ASSIGNER)
-        val identifiers: MutableList<Identifier> = ArrayList()
+        val identifiers: MutableList<Identifier> = arrayListOf()
         identifiers.add(currentIdentifier)
         identifiers.add(obsoleteIdentifier)
         identifiers.add(otherIdentifier)
@@ -562,7 +562,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         val obsoleteIdentifier = FhirAttachmentHelper.buildIdentifier(obsoleteId, ASSIGNER)
         val otherIdentifier = FhirAttachmentHelper.buildIdentifier(otherId, ASSIGNER)
         val valueIdentifier = FhirAttachmentHelper.buildIdentifier(valueId, ASSIGNER)
-        val identifiers: MutableList<Identifier> = ArrayList()
+        val identifiers: MutableList<Identifier> = arrayListOf()
         identifiers.add(currentIdentifier)
         identifiers.add(obsoleteIdentifier)
         identifiers.add(otherIdentifier)
@@ -587,11 +587,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
     fun cleanObsoleteAdditionalIdentifiers_shouldCleanObsoleteIdentifiers_QuestionnaireResponse() {
         //given
         val currentId = ADDITIONAL_ID
-        val obsoleteId = ADDITIONAL_ID.replaceFirst(ATTACHMENT_ID.toRegex(), "obsoleteId")
-        val otherId = "otherId"
         val currentIdentifier = FhirAttachmentHelper.buildIdentifier(currentId, ASSIGNER)
-        val obsoleteIdentifier = FhirAttachmentHelper.buildIdentifier(obsoleteId, ASSIGNER)
-        val otherIdentifier = FhirAttachmentHelper.buildIdentifier(otherId, ASSIGNER)
         val response = QuestionnaireResponseBuilder.buildQuestionnaireResponse()
         response.item!![0].answer!![0].valueAttachment!!.id = ATTACHMENT_ID
         response.identifier = currentIdentifier
@@ -686,7 +682,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
                 RECORD_ID,
                 medication,
                 null,
-                ArrayList(),
+                arrayListOf(),
                 null,
                 null,
                 null,
@@ -740,7 +736,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
                 RECORD_ID,
                 patient,
                 null,
-                ArrayList(),
+                arrayListOf(),
                 null,
                 null,
                 null,

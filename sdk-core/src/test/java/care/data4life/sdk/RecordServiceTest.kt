@@ -44,7 +44,6 @@ import org.mockito.Mockito
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import java.io.IOException
-import java.util.*
 
 class RecordServiceTest : RecordServiceTestBase() {
     @Before
@@ -211,7 +210,7 @@ class RecordServiceTest : RecordServiceTestBase() {
                 null,
                 document,
                 null,
-                ArrayList(),
+                arrayListOf(),
                 null,
                 null,
                 null,
@@ -249,7 +248,7 @@ class RecordServiceTest : RecordServiceTestBase() {
                 null,
                 null,
                 null,
-                ArrayList(),
+                arrayListOf(),
                 null,
                 null,
                 null,
@@ -291,7 +290,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         val currentIdentifier = FhirAttachmentHelper.buildIdentifier(currentId, ASSIGNER)
         val obsoleteIdentifier = FhirAttachmentHelper.buildIdentifier(obsoleteId, ASSIGNER)
         val otherIdentifier = FhirAttachmentHelper.buildIdentifier(otherId, ASSIGNER)
-        val identifiers: MutableList<Identifier> = ArrayList()
+        val identifiers: MutableList<Identifier> = arrayListOf()
         identifiers.add(currentIdentifier)
         identifiers.add(obsoleteIdentifier)
         identifiers.add(otherIdentifier)
@@ -770,7 +769,7 @@ class RecordServiceTest : RecordServiceTestBase() {
                 RECORD_ID,
                 document,
                 null,
-                ArrayList(),
+                arrayListOf(),
                 null,
                 null,
                 null,
@@ -820,7 +819,7 @@ class RecordServiceTest : RecordServiceTestBase() {
                 RECORD_ID,
                 document,
                 null,
-                ArrayList(),
+                arrayListOf(),
                 null,
                 null,
                 null,
@@ -867,7 +866,7 @@ class RecordServiceTest : RecordServiceTestBase() {
                 RECORD_ID,
                 document,
                 null,
-                ArrayList(),
+                arrayListOf(),
                 null,
                 null,
                 null,

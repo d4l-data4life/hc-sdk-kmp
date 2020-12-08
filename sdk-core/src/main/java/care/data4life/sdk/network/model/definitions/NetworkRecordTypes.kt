@@ -35,7 +35,7 @@ internal interface DecryptedFhirRecord<T: DomainResource?>: DecryptedBaseRecord<
 }
 internal interface DecryptedDataRecord: DecryptedBaseRecord<ByteArray> {
     fun copyWithResourceAnnotations(
-            appData: ByteArray,
+            data: ByteArray,
             annotations: List<String>? = null
     ): DecryptedDataRecord
 }

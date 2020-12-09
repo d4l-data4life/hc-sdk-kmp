@@ -17,7 +17,7 @@
 package care.data4life.sdk.model
 
 import care.data4life.sdk.model.definitions.DataRecord
-import java.util.*
+import java.util.Objects.hash
 
 /**
  * AppDataRecord is used to store arbitrary data, analogous to Record
@@ -39,7 +39,7 @@ data class AppDataRecord(
         }
     }
 
-    override fun hashCode(): Int = Objects.hash(
+    override fun hashCode(): Int = hash(
             identifier,
             meta,
             annotations,

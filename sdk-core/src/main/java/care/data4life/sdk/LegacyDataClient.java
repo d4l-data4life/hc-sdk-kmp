@@ -106,8 +106,7 @@ class LegacyDataClient implements SdkContract.LegacyDataClient {
             T resource,
             ResultListener<Record<T>> listener,
             List<String> annotations
-    )
-    {
+    ) {
         Single<Record<T>> operation = userService.finishLogin(true)
                 .flatMap(ignore -> userService.getUID())
                 .flatMap(uid -> recordService.updateRecord(resource, uid, annotations));

@@ -18,7 +18,8 @@ package care.data4life.sdk.model
 import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.sdk.model.definitions.FhirRecord
 
-internal class EmptyRecord<T : DomainResource> : Record<T>(
+@Deprecated("")
+open class EmptyRecord<T : DomainResource> : Record<T>(
         null,
         null,
         null

@@ -18,7 +18,7 @@ package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
-import java.util.*
+import java.util.Objects.hash
 
 /**
  * DecryptedAppDataRecord is an internal decrypted form of AppDataRecord, analogous to DecryptedRecord
@@ -49,7 +49,7 @@ internal data class DecryptedAppDataRecord(
         }
     }
 
-    override fun hashCode(): Int = Objects.hash(
+    override fun hashCode(): Int = hash(
             identifier,
             resource.contentToString(),
             tags,

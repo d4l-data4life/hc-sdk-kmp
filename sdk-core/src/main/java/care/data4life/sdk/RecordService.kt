@@ -36,7 +36,6 @@ import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.AppDataRecord
-import care.data4life.sdk.model.EmptyRecord
 import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.DataRecord
@@ -170,13 +169,13 @@ internal class RecordService(
                 .flatMapIterable { resource -> resource }
                 .flatMapSingle { resource ->
                     createRecord(resource, userId).onErrorReturn { error ->
-                        EmptyRecord<T>().also {
+                        Record<T>(null, null, null).also {
                             failedOperations.add(Pair(resource, errorHandler.handleError(error)))
                             Unit
                         }
                     }
                 }
-                .filter { record -> record !is EmptyRecord<*> }
+                .filter { record -> record != EMPTY_RECORD }
                 .toList()
                 .map { successOperations -> CreateResult(successOperations, failedOperations) }
     }
@@ -222,10 +221,10 @@ internal class RecordService(
                 }
                 .map { decryptedRecord ->
                     @Suppress("UNCHECKED_CAST")
-                    if (decryptedRecord.resource is ByteArray) {
+                    if (decryptedRecord is DecryptedDataRecord) {
                         AppDataRecord(
                                 Objects.requireNonNull(decryptedRecord.identifier)!!,
-                                decryptedRecord.resource as ByteArray,
+                                decryptedRecord.resource,
                                 buildMeta(decryptedRecord),
                                 decryptedRecord.annotations
                         ) as BaseRecord<T>
@@ -261,13 +260,13 @@ internal class RecordService(
                 .flatMapSingle { recordId ->
                     fetchRecord<T>(recordId, userId)
                             .onErrorReturn { error ->
-                                EmptyRecord<T>().also {
+                                Record<T>(null, null, null).also {
                                     failedFetches.add(Pair(recordId, errorHandler.handleError(error)))
                                     Unit
                                 }
                             }
                 }
-                .filter { record -> record != EMTPY_RECORD }
+                .filter { record -> record != EMPTY_RECORD }
                 .toList()
                 .map { successfulFetches ->
                     @Suppress("UNCHECKED_CAST")
@@ -467,10 +466,10 @@ internal class RecordService(
                     downloadRecord<T>(recordId, userId)
                             .onErrorReturn { error ->
                                 failedDownloads.add(Pair(recordId, errorHandler.handleError(error)))
-                                EmptyRecord()
+                                Record<T>(null, null, null)
                             }
                 }
-                .filter { record -> record !is EmptyRecord<*> }
+                .filter { record -> record != EMPTY_RECORD }
                 .toList()
                 .map { successfulDownloads -> DownloadResult(successfulDownloads, failedDownloads) }
     }
@@ -560,13 +559,13 @@ internal class RecordService(
                 .flatMapSingle { resource ->
                     updateRecord(resource, userId)
                             .onErrorReturn { error ->
-                                EmptyRecord<T>().also {
+                                Record<T>(null, null, null).also {
                                     failedUpdates.add(Pair(resource, errorHandler.handleError(error)))
                                     Unit
                                 }
                             }
                 }
-                .filter { record -> record !is EmptyRecord<*> }
+                .filter { record -> record != EMPTY_RECORD }
                 .toList()
                 .map { successfulUpdates -> UpdateResult(successfulUpdates, failedUpdates) }
     }
@@ -997,8 +996,9 @@ internal class RecordService(
         if (!FhirAttachmentHelper.hasAttachment(resource)) return record
         val attachments = if (FhirAttachmentHelper.getAttachment(resource) == null) {
             arrayListOf()
+        } else {
+            FhirAttachmentHelper.getAttachment(resource)
         }
-        else {FhirAttachmentHelper.getAttachment(resource)}
 
         attachments ?: return record
 
@@ -1176,7 +1176,7 @@ internal class RecordService(
     //endregion
 
     companion object {
-        private val EMTPY_RECORD = Record(null, null, null)
+        private val EMPTY_RECORD = Record(null, null, null)
         private const val DATE_FORMAT = "yyyy-MM-dd"
         private const val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss[.SSS]"
         private const val EMPTY_RECORD_ID = ""

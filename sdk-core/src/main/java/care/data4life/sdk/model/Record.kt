@@ -17,7 +17,7 @@ package care.data4life.sdk.model
 
 import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.sdk.model.definitions.FhirRecord
-import java.util.*
+import java.util.Objects.hash
 
 open class Record<T : DomainResource>(
         fhirResource: T?,
@@ -58,5 +58,5 @@ open class Record<T : DomainResource>(
         }
     }
 
-    override fun hashCode(): Int = Objects.hash(resource, meta, annotations)
+    override fun hashCode(): Int = hash(resource, meta, annotations)
 }

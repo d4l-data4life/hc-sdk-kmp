@@ -237,7 +237,7 @@ abstract class RecordServiceTestBase {
             )
         }
 
-        fun buildDocRefContent(attachment: Attachment?): DocumentReference.DocumentReferenceContent {
+        fun buildDocRefContent(attachment: Attachment): DocumentReference.DocumentReferenceContent {
             return DocumentReference.DocumentReferenceContent(attachment)
         }
 

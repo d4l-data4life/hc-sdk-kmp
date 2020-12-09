@@ -622,13 +622,13 @@ internal class RecordService(
     @Throws(IOException::class)
     private fun <T> encrypt(
             record: DecryptedBaseRecord<T>,
-            getDecryptedResource: () -> String,
+            getEncryptedResource: () -> String,
             getEncryptedAttachment: (commonKey: GCKey) -> EncryptedKey?
     ): EncryptedRecord {
         val encryptedTags = tagEncryptionService.encryptTags(record.tags!!).also {
             (it as MutableList<String>).addAll(tagEncryptionService.encryptAnnotations(record.annotations))
         }
-        val decryptedResource = getDecryptedResource()
+        val encryptedResource = getEncryptedResource()
         val commonKey = cryptoService.fetchCurrentCommonKey()
         val currentCommonKeyId = cryptoService.currentCommonKeyId
         val encryptedDataKey = cryptoService.encryptSymmetricKey(
@@ -641,7 +641,7 @@ internal class RecordService(
                 currentCommonKeyId,
                 record.identifier,
                 encryptedTags,
-                decryptedResource,
+                encryptedResource,
                 record.customCreationDate,
                 encryptedDataKey,
                 encryptedAttachmentsKey,

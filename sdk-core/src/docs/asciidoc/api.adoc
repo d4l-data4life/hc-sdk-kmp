@@ -70,7 +70,7 @@ The SDK checks the following when users create resources:
 public <T extends DomainResource> void createRecord(T resource, ResultListener<Record<T>> listener);
 ----
 
-Additionally you also can create customized Records, which do not relay on the Fhir-Model by the usage of:
+Additionally you also can create customized Records, which do not depend on the Fhir-Model by the usage of:
 
 [source,java]
 ----
@@ -143,7 +143,7 @@ The record is returned in the result listener.
 public <T extends DomainResource> void fetchRecord(String recordId, ResultListener<Record<T>> listener);
 ----
 
-Additionally you also can fetch customized Records, which do not relay on the Fhir-Model by the usage of:
+Additionally you also can fetch customized Records, which do not depend on the Fhir-Model by the usage of:
 
 [source,java]
 ----
@@ -206,7 +206,7 @@ The method lets you specify the following:
 public <T extends DomainResource> void fetchRecords(Class<T> resourceType, LocalDate startDate, LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<Record<T>>> listener);
 ----
 
-Additionally you also can fetch multiple customized Records, which do not relay on the Fhir-Model by the usage of:
+Additionally you also can fetch multiple customized Records, which do not depend on the Fhir-Model by the usage of:
 
 [source,java]
 ----
@@ -285,7 +285,7 @@ To update the given record with the given updated document, use the `updateRecor
 public <T extends DomainResource> void updateRecord(T resource, ResultListener<Record<T>> listener);
 ----
 
-Additionally you also can update a customized Records, which do not relay on the Fhir-Model by the usage of:
+Additionally you also can update a customized Records, which do not depend on the Fhir-Model by the usage of:
 
 [source,java]
 ----
@@ -344,7 +344,7 @@ To delete a record with its given record ID, use the `deleteRecord` method.
 public void deleteRecord(String recordId, Callback listener);
 ----
 
-Additionally you also can delete a customized Records, which do not relay on the Fhir-Model by the usage of:
+Additionally you also can delete a customized Records, which do not depend on the Fhir-Model by the usage of:
 
 [source,java]
 ----

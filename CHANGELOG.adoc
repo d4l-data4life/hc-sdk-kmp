@@ -16,7 +16,19 @@ toc::[]
 
 === Added
 
+* Add arbitrary data support
+* Add annotations support
+
 === Changed
+* Converted following classes from Java to Kotlin:
+- RecordService
+- TaggingService
+- TagEncryptionService
+- EmptyRecord
+- Record
+- DecryptedRecord
+
+
 
 === Removed
 
@@ -39,8 +51,6 @@ toc::[]
 === Added
 
 * Add ingestion SDK client (relies on external OAuth handling).
-* Add arbitrary data support
-* Add annotations support
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.7.2...v1.7.3[1.7.3]
 

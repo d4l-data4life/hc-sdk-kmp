@@ -30,13 +30,13 @@ class TagEncryptionServiceTest {
     var schedulerRule = TestSchedulerRule()
     private lateinit var mockCryptoService: CryptoService
     private lateinit var mockBase64: Base64
-    private lateinit var sut: TagEncryptionService
+    private lateinit var subjectUnderTest: TagEncryptionService
 
     @Before
     fun setUp() {
         mockCryptoService = Mockito.mock(CryptoService::class.java)
         mockBase64 = Mockito.mock(Base64::class.java)
-        sut = TagEncryptionService(mockCryptoService, mockBase64)
+        subjectUnderTest = TagEncryptionService(mockCryptoService, mockBase64)
     }
 
     @Test
@@ -65,7 +65,7 @@ class TagEncryptionServiceTest {
 
 
         // when
-        val encryptedTags: List<String> = sut.encryptTags(tags)
+        val encryptedTags: List<String> = subjectUnderTest.encryptTags(tags)
 
         // then
         Truth.assertThat(encryptedTags).containsExactly(encryptedTag)
@@ -102,7 +102,7 @@ class TagEncryptionServiceTest {
                 .encodeToString(symEncrypted)
 
         // when
-        sut.encryptTags(tags)
+        subjectUnderTest.encryptTags(tags)
     }
 
     @Test
@@ -129,7 +129,7 @@ class TagEncryptionServiceTest {
                 )
 
         // when
-        val decryptedTags = sut.decryptTags(encryptedTags)
+        val decryptedTags = subjectUnderTest.decryptTags(encryptedTags)
 
         // then
         Truth.assertThat(decryptedTags).containsExactly("key", "value")
@@ -159,7 +159,7 @@ class TagEncryptionServiceTest {
                 )
 
         // when
-        val decryptedTags = sut.decryptTags(encryptedTags)
+        val decryptedTags = subjectUnderTest.decryptTags(encryptedTags)
 
         // then
         Truth.assertThat(decryptedTags).containsExactly()
@@ -169,7 +169,7 @@ class TagEncryptionServiceTest {
     @Throws(Exception::class)
     fun decryptTags_shouldThrowException() {
         // when
-        sut.decryptTags(mutableListOf("ignore me"))
+        subjectUnderTest.decryptTags(mutableListOf("ignore me"))
     }
 
     @Test
@@ -196,7 +196,7 @@ class TagEncryptionServiceTest {
                 .encodeToString(symEncrypted)
 
         // when
-        val encryptedAnnotations: List<String> = sut.encryptAnnotations(annotations)
+        val encryptedAnnotations: List<String> = subjectUnderTest.encryptAnnotations(annotations)
 
         // then
         Truth.assertThat(encryptedAnnotations).containsExactly(encryptedTag)
@@ -231,7 +231,7 @@ class TagEncryptionServiceTest {
                 .encodeToString(symEncrypted)
 
         // when
-        sut.encryptAnnotations(annotations)
+        subjectUnderTest.encryptAnnotations(annotations)
     }
 
     @Test
@@ -258,7 +258,7 @@ class TagEncryptionServiceTest {
                         IV
                 )
         // when
-        val decryptedAnnotations: List<String> = sut.decryptAnnotations(encryptedAnnotations)
+        val decryptedAnnotations: List<String> = subjectUnderTest.decryptAnnotations(encryptedAnnotations)
 
         // then
         Truth.assertThat(decryptedAnnotations).containsExactly(expected)
@@ -288,7 +288,7 @@ class TagEncryptionServiceTest {
                 )
 
         // when
-        val decryptedAnnotations = sut.decryptAnnotations(encryptedAnnotations)
+        val decryptedAnnotations = subjectUnderTest.decryptAnnotations(encryptedAnnotations)
 
         // then
         Truth.assertThat(decryptedAnnotations).containsExactly()
@@ -298,7 +298,7 @@ class TagEncryptionServiceTest {
     @Throws(Exception::class)
     fun decryptAnnotations_shouldThrowException() {
         // given
-        sut.decryptAnnotations(mutableListOf("ignore me"))
+        subjectUnderTest.decryptAnnotations(mutableListOf("ignore me"))
     }
 
     companion object {

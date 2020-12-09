@@ -39,7 +39,7 @@ class RecordServiceCountRecordsTest : RecordServiceTestBase() {
 
     @Test
     @Throws(InterruptedException::class)
-    fun `Given a DomainResource and a UserId, it returns counts their occurrences`() {
+    fun `Given a DomainResource and a UserId, it returns count of occurrences`() {
         // Given
         Mockito.`when`(mockApiService.getCount(ALIAS, USER_ID, null)).thenReturn(Single.just(2))
         // When
@@ -58,7 +58,7 @@ class RecordServiceCountRecordsTest : RecordServiceTestBase() {
 
     @Test
     @Throws(InterruptedException::class, IOException::class)
-    fun `Given a DomainResource, a UserId and a Tag, it returns counts their occurrences`() {
+    fun `Given a DomainResource, a UserId and a Tag, it returns count of occurrences`() {
         // Given
         Mockito.`when`(mockTaggingService.getTagFromType(CarePlan.resourceType)).thenReturn(mockTags)
         Mockito.`when`(mockTagEncryptionService.encryptTags(mockTags)).thenReturn(mockEncryptedTags)
@@ -86,7 +86,7 @@ class RecordServiceCountRecordsTest : RecordServiceTestBase() {
 
     @Test
     @Throws(InterruptedException::class)
-    fun `Given a DomainResource, a UserId and Annotations, it returns counts their occurrences`() {
+    fun `Given a DomainResource, a UserId and Annotations, it returns count of occurrences`() {
         // Given
         Mockito.`when`(mockApiService.getCount(ALIAS, USER_ID, null)).thenReturn(Single.just(2))
 
@@ -106,7 +106,7 @@ class RecordServiceCountRecordsTest : RecordServiceTestBase() {
 
     @Test
     @Throws(InterruptedException::class, IOException::class)
-    fun `Given a DomainResource, a UserId, a Tag and Annotations, it returns counts their occurrences`() {
+    fun `Given a DomainResource, a UserId, a Tag and Annotations, it returns count of occurrences`() {
         // Given
         Mockito.`when`(mockTaggingService.getTagFromType(CarePlan.resourceType)).thenReturn(mockTags)
         Mockito.`when`(mockTagEncryptionService.encryptTags(mockTags)).thenReturn(mockEncryptedTags)

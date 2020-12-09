@@ -60,7 +60,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class
     )
-    fun `Given a DomainResource and a UserId, createRecord returns a new Record`() {
+    fun `Given, createRecord is called with a DomainResource and a UserId, it returns a new Record`() {
         // Given
         Mockito.doReturn(mockUploadData).`when`(recordService).extractUploadData(mockCarePlan)
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
@@ -144,7 +144,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class
     )
-    fun `Given a DomainResource and a UserId, createRecord is called without attachment, it returns a new Record`() {
+    fun `Given, createRecord is called a DomainResource, a UserId and no attachment, it returns a new Record`() {
         // Given
         Mockito.doReturn(null).`when`(recordService).extractUploadData(mockCarePlan)
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
@@ -263,7 +263,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given createData is called with data, which exceeds the file size limitation, it throws an error`() {
+    fun `Given, createData is called with data, which exceeds the file size limitation, it throws an error`() {
         // Given
         val invalidSizePdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES + 1)
         System.arraycopy(
@@ -295,7 +295,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given multiple DomainResource and a UserId, createRecords returns a multiple Records`() {
+    fun `Given, createRecords is called with multiple DomainResource and a UserId, it returns a multiple Records`() {
         // Given
         val resources = listOf(
                 mockCarePlan as DomainResource,
@@ -334,7 +334,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class
     )
-    fun `Given a DomainResource, a UserId and Annotations, create creates a new Record`() {
+    fun `Given, createRecord is called with a DomainResource, a UserId and Annotations, it returns a new Record`() {
         // Given
         Mockito.doReturn(mockUploadData).`when`(recordService).extractUploadData(mockCarePlan)
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
@@ -420,7 +420,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class
     )
-    fun `Given a DomainResource and a UserId, Annotations and without attachment, createRecords creates a new Record`() {
+    fun `Given, createRecords is called a DomainResource and a UserId, Annotations and without attachment, it returns a new Record`() {
         // Given
         Mockito.doReturn(null).`when`(recordService).extractUploadData(mockCarePlan)
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
@@ -517,7 +517,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given a unsupported Data, a UserId and Annotations, createRecord throws an error`() {
+    fun `Given, createRecord is called with a unsupported Data, a UserId and Annotations, it throws an error`() {
         // Given
         val invalidData = byteArrayOf(0x00)
         val doc = buildDocumentReference(invalidData)
@@ -542,7 +542,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given data, which exceeds the file size limitation, a UserId and Annotations, createRecord an error`() {
+    fun `Given, createRecord is called with  data, which exceeds the file size limitation, a UserId and Annotations, it throws an error`() {
         // Given
         val invalidSizePdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES + 1)
         System.arraycopy(
@@ -579,7 +579,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class
     )
-    fun `Given a Byte resource, a UserId and Annotations createRecord returns a new AppDataRecord`() {
+    fun `Given createRecord is called with a Byte resource, a UserId and Annotations, it returns a new DataRecord`() {
         // Given
         mockkObject(Base64)
         every { Base64.decode(mockAppData) } returns ENCRYPTED_APPDATA

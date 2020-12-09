@@ -842,7 +842,7 @@ internal class RecordService(
         val attachments =   if (FhirAttachmentHelper.getAttachment(resource) == null) arrayListOf()
                             else FhirAttachmentHelper.getAttachment(resource)
 
-        attachments?: return record
+        attachments ?: return record
 
         if (record.attachmentsKey == null) {
             record.attachmentsKey = cryptoService.generateGCKey().blockingGet()

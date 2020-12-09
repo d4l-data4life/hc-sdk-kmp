@@ -35,7 +35,6 @@ import care.data4life.sdk.model.DownloadType;
 import care.data4life.sdk.model.FetchResult;
 import care.data4life.sdk.model.Record;
 import care.data4life.sdk.model.UpdateResult;
-import care.data4life.sdk.model.definitions.BaseRecord;
 import care.data4life.sdk.model.definitions.DataRecord;
 import io.reactivex.Completable;
 import io.reactivex.Single;

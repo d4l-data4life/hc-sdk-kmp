@@ -19,7 +19,7 @@ import care.data4life.sdk.model.ModelVersion
 import java.util.*
 
 internal class TaggingService(private val clientId: String) {
-    private val partnerId: String
+    private val partnerId: String = clientId.split(SEPARATOR.toRegex()).toTypedArray()[0]
     private fun appendCommonDefaultTags(
             resourceType: String?,
             oldTags: HashMap<String, String>?
@@ -86,7 +86,4 @@ internal class TaggingService(private val clientId: String) {
         private const val SEPARATOR = "#"
     }
 
-    init {
-        partnerId = clientId.split(SEPARATOR.toRegex()).toTypedArray()[0]
-    }
 }

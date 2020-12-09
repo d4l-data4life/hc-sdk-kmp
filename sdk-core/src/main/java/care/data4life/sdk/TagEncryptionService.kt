@@ -26,24 +26,12 @@ import java.io.IOException
 import java.nio.charset.StandardCharsets
 
 
-internal class TagEncryptionService {
-    private val cryptoService: CryptoService
-    private val base64: Base64
-    private val iv: ByteArray = ByteArray(IV_SIZE)
-
-    constructor(cryptoService: CryptoService) {
-        this.cryptoService = cryptoService
-        this.base64 = Base64
-    }
-
-    constructor(cryptoService: CryptoService, base64: Base64) {
-        this.cryptoService = cryptoService
-        this.base64 = base64
-    }
-
-
+internal class TagEncryptionService @JvmOverloads constructor(
+        private val cryptoService: CryptoService,
+        private val base64: Base64 = Base64
+) {
     @Throws(IOException::class)
-    private fun encryptList(list: List<String>, prefix: String): List<String> {
+    private fun encryptList(list: List<String>, prefix: String = ""): List<String> {
         val tek = cryptoService.fetchTagEncryptionKey()
         return Observable
                 .fromIterable(list)
@@ -71,7 +59,7 @@ internal class TagEncryptionService {
     @Throws(IOException::class)
     fun encryptTags(
             tags: HashMap<String, String>
-    ): List<String> = encryptList(TagHelper.convertToTagList(tags), "")
+    ): List<String> = encryptList(TagHelper.convertToTagList(tags))
 
     @Throws(IOException::class)
     fun decryptTags(
@@ -101,7 +89,7 @@ internal class TagEncryptionService {
     fun encryptTag(key: GCKey, tag: String): Single<String> {
         return Single
                 .fromCallable { tag.toByteArray() }
-                .map { d -> cryptoService.symEncrypt(key, d, iv) }
+                .map { d -> cryptoService.symEncrypt(key, d, IV) }
                 .map { data -> base64.encodeToString(data) }
                 .onErrorResumeNext {
                     Single.error(
@@ -114,7 +102,7 @@ internal class TagEncryptionService {
     fun decryptTag(key: GCKey, base64tag: String): Single<String> {
         return Single
                 .fromCallable { base64.decode(base64tag) }
-                .map { d -> cryptoService.symDecrypt(key, d, iv) }
+                .map { d -> cryptoService.symDecrypt(key, d, IV) }
                 .map { decrypted -> String(decrypted, StandardCharsets.UTF_8) }
                 .onErrorResumeNext {
                     Single.error(
@@ -124,14 +112,16 @@ internal class TagEncryptionService {
     }
 
     companion object {
-        private const val IV_SIZE = 16
+        private val IV = ByteArray(16)
         private const val ANNOTATION_KEY = "custom" + TaggingService.TAG_DELIMITER
 
-        private fun removeAnnotationKey(list: MutableList<String>): List<String> {
-            for (idx in list.indices) {
-                list[idx] = list[idx].replaceFirst(ANNOTATION_KEY.toRegex(), "")
+        @JvmStatic
+        private fun removeAnnotationKey(
+                list: MutableList<String>
+        ): List<String> = list.also {
+            for (idx in it.indices) {
+                it[idx] = it[idx].replaceFirst(ANNOTATION_KEY.toRegex(), "")
             }
-            return list
         }
     }
 }

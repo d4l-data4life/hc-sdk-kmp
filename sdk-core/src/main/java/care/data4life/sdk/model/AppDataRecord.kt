@@ -31,7 +31,7 @@ data class AppDataRecord(
 ): DataRecord {
     override fun equals(other: Any?): Boolean {
         return when {
-            other !is AppDataRecord -> false
+            other !is AppDataRecord             -> false
             identifier != other.identifier ||
             meta != other.meta ||
             annotations != other.annotations    -> false
@@ -39,5 +39,10 @@ data class AppDataRecord(
         }
     }
 
-    override fun hashCode(): Int = Objects.hash(identifier, meta, annotations, resource.contentToString())
+    override fun hashCode(): Int = Objects.hash(
+            identifier,
+            meta,
+            annotations,
+            resource.contentToString()
+    )
 }

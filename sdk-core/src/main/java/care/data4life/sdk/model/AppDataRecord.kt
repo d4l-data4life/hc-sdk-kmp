@@ -28,14 +28,14 @@ data class AppDataRecord(
         override val resource: ByteArray,
         override val meta: Meta,
         override val annotations: List<String>
-): DataRecord {
+) : DataRecord {
     override fun equals(other: Any?): Boolean {
         return when {
-            other !is AppDataRecord             -> false
+            other !is AppDataRecord -> false
             identifier != other.identifier ||
-            meta != other.meta ||
-            annotations != other.annotations    -> false
-            else                                -> resource.contentEquals(other.resource)
+                    meta != other.meta ||
+                    annotations != other.annotations -> false
+            else -> resource.contentEquals(other.resource)
         }
     }
 

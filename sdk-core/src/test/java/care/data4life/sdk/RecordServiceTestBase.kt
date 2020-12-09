@@ -76,7 +76,7 @@ abstract class RecordServiceTestBase {
     internal lateinit var inOrder: InOrder
     internal lateinit var decryptedRecordIndicator: DecryptedRecord<DomainResource>
     internal lateinit var annotatedDecryptedRecordIndicator: DecryptedRecord<DomainResource>
-    
+
     @Suppress("UNCHECKED_CAST")
     fun init() {
         mockApiService = Mockito.mock(ApiService::class.java)

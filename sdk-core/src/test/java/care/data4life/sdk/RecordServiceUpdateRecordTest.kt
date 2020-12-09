@@ -31,7 +31,7 @@ import org.junit.Test
 import org.mockito.Mockito
 import java.io.IOException
 
-class RecordServiceUpdateRecordTest: RecordServiceTestBase() {
+class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
     @Before
     fun setUp() {
         init()

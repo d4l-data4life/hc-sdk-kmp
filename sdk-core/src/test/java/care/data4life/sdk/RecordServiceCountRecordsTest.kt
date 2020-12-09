@@ -26,7 +26,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import java.io.IOException
 
-class RecordServiceCountRecordsTest: RecordServiceTestBase() {
+class RecordServiceCountRecordsTest : RecordServiceTestBase() {
     @Before
     fun setup() {
         init()

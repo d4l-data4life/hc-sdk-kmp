@@ -65,10 +65,10 @@ internal class TagEncryptionService @JvmOverloads constructor(
     fun decryptTags(
             encryptedTags: List<String>
     ): HashMap<String, String> = decryptList(
-                encryptedTags,
-                { d -> !d.startsWith(ANNOTATION_KEY) && d.contains(TaggingService.TAG_DELIMITER) },
-                { tagList: List<String> -> TagHelper.convertToTagMap(tagList) }
-        )
+            encryptedTags,
+            { d -> !d.startsWith(ANNOTATION_KEY) && d.contains(TaggingService.TAG_DELIMITER) },
+            { tagList: List<String> -> TagHelper.convertToTagMap(tagList) }
+    )
 
 
     @Throws(IOException::class)
@@ -80,10 +80,10 @@ internal class TagEncryptionService @JvmOverloads constructor(
     fun decryptAnnotations(
             encryptedAnnotations: List<String>
     ): List<String> = decryptList(
-                encryptedAnnotations,
-                { d -> d.startsWith(ANNOTATION_KEY) },
-                { list -> removeAnnotationKey(list) }
-        )
+            encryptedAnnotations,
+            { d -> d.startsWith(ANNOTATION_KEY) },
+            { list -> removeAnnotationKey(list) }
+    )
 
     @Throws(D4LException::class)
     fun encryptTag(key: GCKey, tag: String): Single<String> {

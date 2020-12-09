@@ -387,7 +387,7 @@ public class DocumentsActivity extends AppCompatActivity {
     List<String> annotations = new ArrayList<>();
 
     private void createNewDataRecord() {
-        if(appdata!=null) {
+        if (appdata != null) {
             return;
         }
         mDocumentsSRL.setRefreshing(true);
@@ -411,21 +411,21 @@ public class DocumentsActivity extends AppCompatActivity {
     }
 
     private void fetchDataRecord() {
-        if(appdata==null) {
+        if (appdata == null) {
             return;
         }
         mDocumentsSRL.setRefreshing(true);
         client.fetchDataRecord(appdata.getIdentifier(), new ResultListener<DataRecord>() {
             @Override
             public void onSuccess(DataRecord appDataRecord) {
-                runOnUiThread(()->{
+                runOnUiThread(() -> {
                     boolean equal = Arrays.equals(
                             appDataRecord.getResource(),
                             appdata.getResource()
                     ) && annotations.equals(appDataRecord.getAnnotations());
                     Toast.makeText(
                             getApplicationContext(),
-                            "DonorKey test successful: " + equal,Toast.LENGTH_LONG
+                            "DonorKey test successful: " + equal, Toast.LENGTH_LONG
                     ).show();
                     mDocumentsSRL.setRefreshing(false);
                 });
@@ -433,7 +433,7 @@ public class DocumentsActivity extends AppCompatActivity {
 
             @Override
             public void onError(D4LException exception) {
-                Toast.makeText(getApplicationContext(), exception.getMessage(),Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
                 mDocumentsSRL.setRefreshing(false);
             }
         });

@@ -55,14 +55,18 @@ internal class TaggingService(private val clientId: String) {
 
     fun appendAppDataTags(
             tags: HashMap<String, String>?
-    ): HashMap<String, String>? = tags.also { if (it != null) { it[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE } }
+    ): HashMap<String, String>? = tags.also {
+        if (it != null) {
+            it[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE
+        }
+    }
 
     fun appendDefaultAnnotatedTags(
             resourceType: String?,
             oldTags: HashMap<String, String>?
     ): HashMap<String, String>? = appendAppDataTags(
-                appendCommonDefaultTags(resourceType, oldTags)
-        )
+            appendCommonDefaultTags(resourceType, oldTags)
+    )
 
     fun getTagFromType(
             resourceType: String?

@@ -36,7 +36,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import java.io.IOException
 
-class RecordServiceCryptoTest: RecordServiceTestBase() {
+class RecordServiceCryptoTest : RecordServiceTestBase() {
     @Before
     fun setUp() {
         init()

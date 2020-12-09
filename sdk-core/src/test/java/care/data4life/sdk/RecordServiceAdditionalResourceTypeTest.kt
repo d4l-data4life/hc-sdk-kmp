@@ -285,7 +285,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
     fun removeOrRestoreUploadData_shouldRemoveUploadData_fromPatient() {
         // Given
         val patient = PatientBuilder.buildPatient()
-        val decryptedRecord  = DecryptedRecord(
+        val decryptedRecord = DecryptedRecord(
                 null,
                 patient,
                 null,
@@ -299,9 +299,9 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
 
         // When
         val record = recordService.removeOrRestoreUploadData(
-                RecordService.RemoveRestoreOperation.REMOVE, 
+                RecordService.RemoveRestoreOperation.REMOVE,
                 decryptedRecord,
-                patient, 
+                patient,
                 null)
 
         // Then
@@ -309,9 +309,9 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         Truth.assertThat(record.resource).isEqualTo(patient)
         Truth.assertThat(patient.photo!![0].data).isNull()
         inOrder.verify(recordService).removeOrRestoreUploadData(
-                RecordService.RemoveRestoreOperation.REMOVE, 
-                decryptedRecord, 
-                patient, 
+                RecordService.RemoveRestoreOperation.REMOVE,
+                decryptedRecord,
+                patient,
                 null
         )
         inOrder.verifyNoMoreInteractions()
@@ -321,7 +321,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
     fun removeOrRestoreUploadData_shouldRemoveUploadData_fromObservation() {
         // Given
         val observation = ObservationBuilder.buildObservationWithComponent()
-        val decryptedRecord  = DecryptedRecord(
+        val decryptedRecord = DecryptedRecord(
                 null,
                 observation,
                 null,
@@ -336,7 +336,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         // When
         val record = recordService.removeOrRestoreUploadData(
                 RecordService.RemoveRestoreOperation.REMOVE,
-                decryptedRecord, 
+                decryptedRecord,
                 observation,
                 null
         )
@@ -347,9 +347,9 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         Truth.assertThat(observation.component!![0].valueAttachment!!.data).isNull()
         Truth.assertThat(observation.valueAttachment!!.data).isNull()
         inOrder.verify(recordService).removeOrRestoreUploadData(
-                RecordService.RemoveRestoreOperation.REMOVE, 
-                decryptedRecord, 
-                observation, 
+                RecordService.RemoveRestoreOperation.REMOVE,
+                decryptedRecord,
+                observation,
                 null
         )
         inOrder.verifyNoMoreInteractions()
@@ -359,7 +359,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
     fun removeOrRestoreUploadData_shouldRemoveUploadData_fromQuestionnaireResponse() {
         // Given
         val questionnaireResponse = QuestionnaireResponseBuilder.buildQuestionnaireResponse()
-        val decryptedRecord  = DecryptedRecord(
+        val decryptedRecord = DecryptedRecord(
                 null,
                 questionnaireResponse,
                 null,
@@ -373,7 +373,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
 
         // When
         val record = recordService.removeOrRestoreUploadData(
-                RecordService.RemoveRestoreOperation.REMOVE, 
+                RecordService.RemoveRestoreOperation.REMOVE,
                 decryptedRecord,
                 questionnaireResponse,
                 null
@@ -384,9 +384,9 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         Truth.assertThat(record.resource).isEqualTo(questionnaireResponse)
         Truth.assertThat(questionnaireResponse.item!![0].answer!![0].valueAttachment!!.data).isNull()
         inOrder.verify(recordService).removeOrRestoreUploadData(
-                RecordService.RemoveRestoreOperation.REMOVE, 
-                decryptedRecord, 
-                questionnaireResponse, 
+                RecordService.RemoveRestoreOperation.REMOVE,
+                decryptedRecord,
+                questionnaireResponse,
                 null
         )
         inOrder.verifyNoMoreInteractions()
@@ -397,7 +397,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         // Given
         val patient = PatientBuilder.buildPatient()
         patient.photo!![0].data = null
-        val decryptedRecord  = DecryptedRecord(
+        val decryptedRecord = DecryptedRecord(
                 null,
                 null,
                 null,
@@ -417,7 +417,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
                 RecordService.RemoveRestoreOperation.RESTORE,
                 decryptedRecord as DecryptedRecord<DomainResource>,
                 patient,
-                uploadData 
+                uploadData
         )
 
         // Then
@@ -426,7 +426,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         Truth.assertThat(patient.photo!![0].data).isEqualTo(DATA)
         inOrder.verify(recordService).removeOrRestoreUploadData(
                 RecordService.RemoveRestoreOperation.RESTORE,
-                decryptedRecord, 
+                decryptedRecord,
                 patient,
                 uploadData
         )
@@ -438,7 +438,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         // Given
         val observation = ObservationBuilder.buildObservationWithComponent()
         observation.component!![0].valueAttachment!!.data = null
-        val decryptedRecord  = DecryptedRecord(
+        val decryptedRecord = DecryptedRecord(
                 null,
                 null,
                 null,
@@ -468,7 +468,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         inOrder.verify(recordService).removeOrRestoreUploadData(
                 RecordService.RemoveRestoreOperation.RESTORE,
                 decryptedRecord,
-                observation, 
+                observation,
                 uploadData
         )
         inOrder.verifyNoMoreInteractions()
@@ -479,7 +479,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         // Given
         val questionnaireResponse = QuestionnaireResponseBuilder.buildQuestionnaireResponse()
         questionnaireResponse.item!![0].answer!![0].valueAttachment!!.data = null
-        val decryptedRecord  = DecryptedRecord(
+        val decryptedRecord = DecryptedRecord(
                 null,
                 null,
                 null,
@@ -493,10 +493,10 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         uploadData[questionnaireResponse.item!![0].answer!![0].valueAttachment] = DATA
 
         // When
-        @Suppress("UNCHECKED_CAST") 
+        @Suppress("UNCHECKED_CAST")
         val record = recordService.removeOrRestoreUploadData(
                 RecordService.RemoveRestoreOperation.RESTORE,
-                decryptedRecord as DecryptedRecord<DomainResource>, 
+                decryptedRecord as DecryptedRecord<DomainResource>,
                 questionnaireResponse,
                 uploadData as HashMap<Attachment, String?>
         )
@@ -678,7 +678,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         val secondAttachment = AttachmentBuilder.buildAttachment(secondAttachmentId)
         medication.image!![0] = attachment
         medication.image!!.add(secondAttachment)
-        val decryptedRecord  = DecryptedRecord(
+        val decryptedRecord = DecryptedRecord(
                 RECORD_ID,
                 medication,
                 null,
@@ -732,7 +732,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         val secondAttachment = AttachmentBuilder.buildAttachment(secondAttachmentId)
         patient.photo!![0] = attachment
         patient.photo!!.add(secondAttachment)
-        val decryptedRecord  = DecryptedRecord(
+        val decryptedRecord = DecryptedRecord(
                 RECORD_ID,
                 patient,
                 null,

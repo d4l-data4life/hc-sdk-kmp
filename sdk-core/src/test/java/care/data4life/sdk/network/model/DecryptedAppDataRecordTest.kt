@@ -28,7 +28,7 @@ import org.junit.Test
 class DecryptedAppDataRecordTest {
     @Test
     fun `it is a DecryptedBaseRecord`() {
-        assertTrue( (
+        assertTrue((
                 DecryptedAppDataRecord(
                         identifier = "123",
                         resource = "potato".toByteArray(),
@@ -39,7 +39,7 @@ class DecryptedAppDataRecordTest {
                         dataKey = mockkClass(GCKey::class),
                         modelVersion = 42
                 ) as Any
-        ) is DecryptedBaseRecord<*> )
+                ) is DecryptedBaseRecord<*>)
     }
 
     @Test

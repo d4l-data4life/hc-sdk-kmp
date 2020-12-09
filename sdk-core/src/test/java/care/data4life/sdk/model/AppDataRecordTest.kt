@@ -50,7 +50,7 @@ class AppDataRecordTest {
     @Test
     fun `Given a AppDataRecord and something else, it returns false on a compare`() {
         val record = AppDataRecord(
-                resource =  "test".toByteArray(),
+                resource = "test".toByteArray(),
                 identifier = "1234",
                 meta = mockkClass(Meta::class),
                 annotations = listOf("a", "b", "c")
@@ -170,7 +170,7 @@ class AppDataRecordTest {
         val record3 = record1.copy(resource = "resource".toByteArray())
         val record4 = record1.copy(identifier = "23")
         val record5 = record1.copy(meta = mockk())
-        val record6 = record1.copy(annotations = listOf("e","f","g"))
+        val record6 = record1.copy(annotations = listOf("e", "f", "g"))
 
         assertTrue(record1.hashCode() == record2.hashCode())
         assertFalse(record1.hashCode() == record3.hashCode())

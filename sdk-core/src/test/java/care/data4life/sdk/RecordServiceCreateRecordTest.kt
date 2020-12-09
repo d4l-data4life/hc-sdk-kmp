@@ -38,7 +38,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 
-class RecordServiceCreateRecordTest: RecordServiceTestBase() {
+class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     @Before
     fun setup() {
         init()
@@ -77,7 +77,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
                 )
         Mockito.doReturn(mockDecryptedFhirRecord).`when`(recordService)
                 .removeUploadData(mockDecryptedFhirRecord)
-        
+
         Mockito.doReturn(mockEncryptedRecord)
                 .`when`(recordService).encryptRecord(
                         mockDecryptedFhirRecord
@@ -157,7 +157,7 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         Mockito.`when`(mockCryptoService.generateGCKey())
                 .thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockDecryptedFhirRecord)
-		        .`when`(recordService)
+                .`when`(recordService)
                 .uploadData(
                         decryptedRecordIndicator,
                         null,
@@ -583,12 +583,12 @@ class RecordServiceCreateRecordTest: RecordServiceTestBase() {
         // Given
         mockkObject(Base64)
         every { Base64.decode(mockAppData) } returns ENCRYPTED_APPDATA
-        Mockito.`when`(mockTaggingService.appendDefaultAnnotatedTags(null,null))
+        Mockito.`when`(mockTaggingService.appendDefaultAnnotatedTags(null, null))
                 .thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockEncryptedRecord)
                 .`when`(recordService)
-                .encryptDataRecord(ArgumentMatchers.argThat { it is DecryptedAppDataRecord } )
+                .encryptDataRecord(ArgumentMatchers.argThat { it is DecryptedAppDataRecord })
         Mockito.`when`(mockApiService.createRecord(ALIAS, USER_ID, mockEncryptedRecord))
                 .thenReturn(Single.just(mockEncryptedRecord))
         Mockito.doReturn(mockDecryptedDataRecord)

@@ -161,7 +161,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         Truth.assertThat(record).isEqualTo(mockDecryptedFhirRecord)
         inOrder.verify(recordService).removeUploadData(mockDecryptedFhirRecord)
         inOrder.verify(recordService).removeOrRestoreUploadData(
-                RecordService.RemoveRestoreOperation.REMOVE, 
+                RecordService.RemoveRestoreOperation.REMOVE,
                 mockDecryptedFhirRecord,
                 null,
                 null
@@ -232,7 +232,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         Truth.assertThat(document.content[0].attachment.data).isNull()
         inOrder.verify(recordService).removeOrRestoreUploadData(
                 RecordService.RemoveRestoreOperation.REMOVE,
-                decryptedRecord, 
+                decryptedRecord,
                 document,
                 mockUploadData
         )
@@ -259,11 +259,11 @@ class RecordServiceTest : RecordServiceTestBase() {
         uploadData[document.content[0].attachment] = DATA
 
         // When
-        @Suppress("UNCHECKED_CAST") 
+        @Suppress("UNCHECKED_CAST")
         val record = recordService.removeOrRestoreUploadData(
                 RecordService.RemoveRestoreOperation.RESTORE,
-                decryptedRecord as DecryptedRecord<DocumentReference>, 
-                document, 
+                decryptedRecord as DecryptedRecord<DocumentReference>,
+                document,
                 uploadData
         )
 
@@ -273,7 +273,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         Truth.assertThat(document.content[0].attachment.data).isEqualTo(DATA)
         inOrder.verify(recordService).removeOrRestoreUploadData(
                 RecordService.RemoveRestoreOperation.RESTORE,
-                decryptedRecord, 
+                decryptedRecord,
                 document,
                 uploadData
         )
@@ -664,8 +664,7 @@ class RecordServiceTest : RecordServiceTestBase() {
                 .`when`(recordService)
                 .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
         Mockito.doReturn(mockDecryptedFhirRecord)
-                .`when`(recordService).
-                downloadData(mockDecryptedFhirRecord, USER_ID)
+                .`when`(recordService).downloadData(mockDecryptedFhirRecord, USER_ID)
         Mockito.`when`(mockDecryptedFhirRecord.resource).thenReturn(doc)
 
         // When

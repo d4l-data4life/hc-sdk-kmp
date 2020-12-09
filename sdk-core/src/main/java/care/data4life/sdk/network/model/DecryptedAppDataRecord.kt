@@ -33,10 +33,10 @@ internal data class DecryptedAppDataRecord(
         override var updatedDate: String?,
         override var dataKey: GCKey?,
         override var modelVersion: Int
-): DecryptedDataRecord {
+) : DecryptedDataRecord {
     override fun equals(other: Any?): Boolean {
         return when {
-            other !is DecryptedAppDataRecord                    -> false
+            other !is DecryptedAppDataRecord -> false
             identifier != other.identifier ||
                     !resource.contentEquals(other.resource) ||
                     tags != other.tags ||
@@ -44,8 +44,8 @@ internal data class DecryptedAppDataRecord(
                     customCreationDate != other.customCreationDate ||
                     updatedDate != other.updatedDate ||
                     dataKey != other.dataKey ||
-                    modelVersion != other.modelVersion          -> false
-            else                                                -> true
+                    modelVersion != other.modelVersion -> false
+            else -> true
         }
     }
 

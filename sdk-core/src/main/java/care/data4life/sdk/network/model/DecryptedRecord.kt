@@ -31,4 +31,4 @@ internal data class DecryptedRecord<T : DomainResource?>(
         override var dataKey: GCKey?,
         override var attachmentsKey: GCKey?,
         override var modelVersion: Int
-): DecryptedFhirRecord<T>, Serializable
+) : DecryptedFhirRecord<T>, Serializable

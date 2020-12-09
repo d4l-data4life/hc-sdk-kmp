@@ -24,6 +24,7 @@ import java.util.*
 class TaggingServiceTest {
     // SUT
     private lateinit var taggingService: TaggingService
+
     @Before
     fun setUp() {
         taggingService = TaggingService(CLIENT_ID)
@@ -125,7 +126,7 @@ class TaggingServiceTest {
         val type = "type"
 
         // When
-        val result= taggingService.appendDefaultAnnotatedTags(type, null)
+        val result = taggingService.appendDefaultAnnotatedTags(type, null)
 
         // Then
         Assert.assertEquals(4, result!!.size.toLong())
@@ -146,7 +147,7 @@ class TaggingServiceTest {
         val type = ""
 
         // When
-        val result= taggingService.appendDefaultAnnotatedTags(type, null)
+        val result = taggingService.appendDefaultAnnotatedTags(type, null)
 
         // Then
         Assert.assertEquals(3, result!!.size.toLong())
@@ -169,7 +170,7 @@ class TaggingServiceTest {
         existingTags[TAG_RESOURCE_TYPE] = "old_typ"
 
         // When
-        val result= taggingService.appendDefaultAnnotatedTags(type, existingTags)
+        val result = taggingService.appendDefaultAnnotatedTags(type, existingTags)
 
         // Then
         Assert.assertEquals(6, result!!.size.toLong())
@@ -194,7 +195,7 @@ class TaggingServiceTest {
         existingTags[TAG_CLIENT] = OTHER_CLIENT_ID
 
         // When
-        val result= taggingService.appendDefaultAnnotatedTags(type, existingTags)
+        val result = taggingService.appendDefaultAnnotatedTags(type, existingTags)
 
         // Then
         Assert.assertEquals(5, result!!.size.toLong())
@@ -215,7 +216,7 @@ class TaggingServiceTest {
         val tags = hashMapOf<String, String>()
 
         // When
-        val result= taggingService.appendAppDataTags(tags)
+        val result = taggingService.appendAppDataTags(tags)
 
         // Then
         Assert.assertEquals(1, result!!.size.toLong())

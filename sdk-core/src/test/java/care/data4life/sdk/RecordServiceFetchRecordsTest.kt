@@ -29,7 +29,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import java.io.IOException
 
-class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
+class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
     @Before
     fun setUp() {
         init()
@@ -110,13 +110,13 @@ class RecordServiceFetchRecordsTest: RecordServiceTestBase() {
         ).thenReturn(mockEncryptedAnnotations)
         Mockito.`when`(
                 mockApiService.fetchRecords(
-                    ArgumentMatchers.eq(ALIAS),
-                    ArgumentMatchers.eq(USER_ID),
-                    ArgumentMatchers.isNull(),
-                    ArgumentMatchers.isNull(),
-                    ArgumentMatchers.eq(10),
-                    ArgumentMatchers.eq(0),
-                    ArgumentMatchers.eq(mockEncryptedTags)
+                        ArgumentMatchers.eq(ALIAS),
+                        ArgumentMatchers.eq(USER_ID),
+                        ArgumentMatchers.isNull(),
+                        ArgumentMatchers.isNull(),
+                        ArgumentMatchers.eq(10),
+                        ArgumentMatchers.eq(0),
+                        ArgumentMatchers.eq(mockEncryptedTags)
                 )
         ).thenReturn(Observable.just(encryptedRecords))
         Mockito.doReturn(mockDecryptedFhirRecord)

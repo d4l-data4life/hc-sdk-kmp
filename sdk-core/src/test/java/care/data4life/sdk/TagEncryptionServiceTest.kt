@@ -25,7 +25,9 @@ import org.junit.Test
 import org.mockito.Mockito
 
 class TagEncryptionServiceTest {
-    @Rule @JvmField var schedulerRule = TestSchedulerRule()
+    @Rule
+    @JvmField
+    var schedulerRule = TestSchedulerRule()
     private lateinit var mockCryptoService: CryptoService
     private lateinit var mockBase64: Base64
     private lateinit var sut: TagEncryptionService

@@ -30,10 +30,11 @@ internal interface DecryptedBaseRecord<T> {
     var modelVersion: Int
 }
 
-internal interface DecryptedFhirRecord<T: DomainResource?>: DecryptedBaseRecord<T> {
+internal interface DecryptedFhirRecord<T : DomainResource?> : DecryptedBaseRecord<T> {
     var attachmentsKey: GCKey?
 }
-internal interface DecryptedDataRecord: DecryptedBaseRecord<ByteArray> {
+
+internal interface DecryptedDataRecord : DecryptedBaseRecord<ByteArray> {
     fun copyWithResourceAnnotations(
             data: ByteArray,
             annotations: List<String>? = null

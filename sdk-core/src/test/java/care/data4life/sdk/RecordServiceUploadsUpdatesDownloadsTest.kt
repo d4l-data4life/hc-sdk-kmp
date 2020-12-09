@@ -787,7 +787,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         // Given
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
         val patient = PatientBuilder.buildPatient()
-        val decryptedRecord  = DecryptedRecord(
+        val decryptedRecord = DecryptedRecord(
                 null,
                 patient,
                 null,
@@ -847,7 +847,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         // Given
         val patient = PatientBuilder.buildPatient()
         patient.photo!![0].id = "id"
-        val decryptedRecord  = DecryptedRecord(
+        val decryptedRecord = DecryptedRecord(
                 RECORD_ID,
                 patient,
                 null,
@@ -896,7 +896,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         // Given
         val medication = MedicationBuilder.buildMedication()
         medication.image!![0].id = "id"
-        val decryptedRecord  = DecryptedRecord(
+        val decryptedRecord = DecryptedRecord(
                 RECORD_ID,
                 medication,
                 null,
@@ -945,7 +945,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         // Given
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
         val medication = MedicationBuilder.buildMedication()
-        val decryptedRecord  = DecryptedRecord(
+        val decryptedRecord = DecryptedRecord(
                 null,
                 medication,
                 null,
@@ -1002,7 +1002,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
         val observation = ObservationBuilder.buildObservationWithComponent()
         observation.component!![0].valueAttachment!!.id = null
-        val decryptedRecord  = DecryptedRecord(
+        val decryptedRecord = DecryptedRecord(
                 null,
                 observation,
                 null,
@@ -1064,7 +1064,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         val observation = ObservationBuilder.buildObservationWithComponent()
         observation.component!![0].valueAttachment!!.id = "id1"
         observation.valueAttachment!!.id = "id0"
-        val decryptedRecord  = DecryptedRecord(
+        val decryptedRecord = DecryptedRecord(
                 RECORD_ID,
                 observation,
                 null,
@@ -1112,7 +1112,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
     fun uploadOrDownloadData_shouldUploadData_QuestionnaireResponse() {
         // Given
         val questionnaireResponse = QuestionnaireResponseBuilder.buildQuestionnaireResponse()
-        val decryptedRecord  = DecryptedRecord(
+        val decryptedRecord = DecryptedRecord(
                 RECORD_ID,
                 questionnaireResponse,
                 null,
@@ -1174,7 +1174,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         // Given
         val questionnaireResponse = QuestionnaireResponseBuilder.buildQuestionnaireResponse()
         questionnaireResponse.item!![0].answer!![0].valueAttachment!!.id = "id"
-        val decryptedRecord  = DecryptedRecord(
+        val decryptedRecord = DecryptedRecord(
                 RECORD_ID,
                 questionnaireResponse,
                 null,

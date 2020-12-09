@@ -50,7 +50,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given a resource and a UserId, updateRecord returns a updated Record`() {
+    fun `Given, updateRecord is called with a resource and a UserId, it returns a updated Record`() {
         // Given
         mockCarePlan.id = RECORD_ID
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
@@ -106,7 +106,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
 
     @Test
     @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
-    fun `Given a unsupported data and a UserId, updateRecord throws an error on update`() {
+    fun `Given, updateRecord is called with a unsupported data and a UserId, it throws an error on update`() {
         // Given
         val invalidData = byteArrayOf(0x00)
         val doc = buildDocumentReference(invalidData)
@@ -126,7 +126,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
 
     @Test
     @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
-    fun `Given data, which exceeds the file size limitations, and a UserId, updateRecord throws an error on update`() {
+    fun `Given,, updateRecord is called with data, which exceeds the file size limitations and a UserId, it throws an error on update`() {
         // Given
         val invalidSizePdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES + 1)
         System.arraycopy(
@@ -159,7 +159,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given a resource, Annotations and a UserId, updateRecord returns updated a Record`() {
+    fun `Given, updateRecord is called with a resource, Annotations and a UserId, it returns updated a Record`() {
         // Given
         mockCarePlan.id = RECORD_ID
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
@@ -215,7 +215,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
 
     @Test
     @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
-    fun `Given data, which exceeds the file size limitations, Annotations and a UserId, updateRecord throws an error on update`() {
+    fun `Given, updateRecord called with data, which exceeds the file size limitations, Annotations and a UserId, it throws an error on update`() {
         // Given
         val invalidSizePdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES + 1)
         System.arraycopy(
@@ -282,7 +282,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given a byte resource, Annotations and a UserId, updateRecord returns a updated AppDataRecord`() {
+    fun `Given, updateRecord is called with a byte resource, Annotations and a UserId, it returns a updated AppDataRecord`() {
         // Given
         Mockito.`when`(
                 mockApiService.fetchRecord(
@@ -342,7 +342,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given a byte resource, nulled Annotations and a UserId, updateRecord returns a updated AppDataRecord`() {
+    fun `Given, updateRecord is called with a byte resource, nulled Annotations and a UserId, it returns a updated AppDataRecord`() {
         // Given
         Mockito.`when`(
                 mockApiService.fetchRecord(

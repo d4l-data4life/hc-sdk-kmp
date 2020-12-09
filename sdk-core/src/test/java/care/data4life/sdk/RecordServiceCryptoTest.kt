@@ -49,7 +49,7 @@ class RecordServiceCryptoTest : RecordServiceTestBase() {
 
     @Test
     @Throws(IOException::class)
-    fun `Given a DecryptedRecord, encryptRecord returns a EncryptedRecord`() {
+    fun `Given, encryptRecord is called with a DecryptedRecord, it returns a EncryptedRecord`() {
         // Given
         val currentCommonKeyId = "currentCommonKeyId"
         Mockito.`when`(mockTagEncryptionService.encryptTags(mockTags))
@@ -87,7 +87,7 @@ class RecordServiceCryptoTest : RecordServiceTestBase() {
 
     @Test
     @Throws(IOException::class)
-    fun `Given a DecryptedRecord, encryptRecord adds a encrypted AttachmentKey, if the DecryptedRecord contains a AttachmentKey`() {
+    fun `Given, encryptRecord is called with a DecryptedRecord, it adds a encrypted AttachmentKey, if the DecryptedRecord contains a AttachmentKey`() {
         // Given
         val currentCommonKeyId = "currentCommonKeyId"
         Mockito.`when`(mockAnnotatedDecryptedFhirRecord.attachmentsKey).thenReturn(mockAttachmentKey)
@@ -136,7 +136,7 @@ class RecordServiceCryptoTest : RecordServiceTestBase() {
 
     @Test
     @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    fun `Given a EncryptedRecord and UserId, decryptRecord returns a DecryptedRecord`() {
+    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, it returns a DecryptedRecord`() {
         // Given
         val commonKeyId = "mockCommonKeyId"
         Mockito.`when`(mockTags.containsKey(TaggingService.TAG_RESOURCE_TYPE)).thenReturn(true)
@@ -180,7 +180,7 @@ class RecordServiceCryptoTest : RecordServiceTestBase() {
 
     @Test
     @Throws(IOException::class)
-    fun `Given a EncryptedRecord and UserId, decryptRecord throws an error, if the ModelVersion is not supported`() {
+    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, it throws an error, if the ModelVersion is not supported`() {
         // Given
         Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(ModelVersion.CURRENT + 1)
 
@@ -197,7 +197,7 @@ class RecordServiceCryptoTest : RecordServiceTestBase() {
 
     @Test
     @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    fun `Given a EncryptedRecord and UserId, decryptRecord adds a decrypted AttachmentKey, if the EncryptedRecord contains a encrypted AttachmentKey`() {
+    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, it adds a decrypted AttachmentKey, if the EncryptedRecord contains a encrypted AttachmentKey`() {
         // Given
         val commonKeyId = "mockCommonKeyId"
         Mockito.`when`(mockTags.containsKey(TaggingService.TAG_RESOURCE_TYPE)).thenReturn(true)
@@ -245,7 +245,7 @@ class RecordServiceCryptoTest : RecordServiceTestBase() {
 
     @Test
     @Throws(IOException::class)
-    fun `Given a DecryptedAppDataRecord, encryptAppDataRecord returns a EncryptedRecord`() {
+    fun `Given, encryptDataRecord is called with a DecryptedAppDataRecord, it returns a EncryptedRecord`() {
         // Given
         val currentCommonKeyId = "currentCommonKeyId"
         Mockito.`when`(mockTagEncryptionService.encryptTags(mockTags))
@@ -283,7 +283,7 @@ class RecordServiceCryptoTest : RecordServiceTestBase() {
 
     @Test
     @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    fun `Given a EncryptedRecord and UserId, decryptRecord for ByteArray returns a DecryptedRecord`() {
+    fun `Given, decryptRecord for ByteArray is called with a EncryptedRecord and UserId, it returns a DecryptedRecord`() {
         // Given
         mockkObject(Base64)
         every { Base64.decode(ENCRYPTED_RESOURCE) } returns ENCRYPTED_APPDATA
@@ -326,7 +326,7 @@ class RecordServiceCryptoTest : RecordServiceTestBase() {
 
     @Test
     @Throws(IOException::class)
-    fun `Given a EncryptedRecord and UserId, decryptRecord for ByteArray throws an error, if the ModelVersion is not supported`() {
+    fun `Given, decryptRecord for ByteArray is called with a EncryptedRecord and UserId, it throws an error, if the ModelVersion is not supported`() {
         // Given
         Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(ModelVersion.CURRENT + 1)
 

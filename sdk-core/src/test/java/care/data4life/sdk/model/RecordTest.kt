@@ -45,7 +45,7 @@ class RecordTest {
     }
 
     @Test
-    fun `Given a Record returns a given Resource`() {
+    fun `Given a Record, which is initialized with a Resource, it returns a given Resource`() {
         val resource = mockkClass(DomainResource::class)
         val record = Record(resource, null)
 
@@ -56,7 +56,7 @@ class RecordTest {
     }
 
     @Test
-    fun `Given a Record it FhireResource is a alias of Resource`() {
+    fun `Given a Record, which is initialized with a Resource, its FhireResource is a alias of Resource`() {
         val resource = mockkClass(DomainResource::class)
         val record1 = Record<DomainResource>(null, null)
         val record2 = Record(resource, null)
@@ -81,7 +81,7 @@ class RecordTest {
     }
 
     @Test
-    fun `Given a Record returns a given Meta`() {
+    fun `Given a Record, which is initialized with a Meta, it returns a given Meta`() {
         val meta = mockkClass(Meta::class)
         val record = Record<DomainResource>(null, meta)
 
@@ -99,7 +99,7 @@ class RecordTest {
     }
 
     @Test
-    fun `Given a Record returns a given Annotations`() {
+    fun `Given a Record, which is initialized with a Annotations, it returns a given Annotations`() {
         val annotations = listOf<String>()
         val record = Record<DomainResource>(null, null, annotations)
 
@@ -110,7 +110,7 @@ class RecordTest {
     }
 
     @Test
-    fun `Given tow Records, it returns true on a compare, if they are equal`() {
+    fun `Given tow Records, on a compare, it returns true if they are equal`() {
         val resource = mockkClass(DomainResource::class)
         val meta = mockkClass(Meta::class)
         val annotations = listOf("a", "b", "c")
@@ -131,7 +131,7 @@ class RecordTest {
     }
 
     @Test
-    fun `Given tow Records, it returns false on a compare, if they have different resources`() {
+    fun `Given tow Records, on a compare, it returns false if they have different resources`() {
         val meta = mockkClass(Meta::class)
         val annotations = listOf("a", "b", "c")
 
@@ -151,7 +151,7 @@ class RecordTest {
     }
 
     @Test
-    fun `Given tow Records, it returns false on a compare, if they have different Metas`() {
+    fun `Given tow Records, on a compare, it returns false if they have different Metas`() {
         val resource = mockkClass(DomainResource::class)
         val annotations = listOf("a", "b", "c")
 
@@ -171,7 +171,7 @@ class RecordTest {
     }
 
     @Test
-    fun `Given tow Records, it returns false on a compare, if they have different annotations`() {
+    fun `Given tow Records, on a compare, it returns false if they have different annotations`() {
         val resource = mockkClass(DomainResource::class)
         val meta = mockkClass(Meta::class)
 

@@ -238,7 +238,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given with unsupported data, createRecord throws an error`() {
+    fun `Given, createRecord is called with unsupported data, it throws an error`() {
         // Given
         val invalidData = byteArrayOf(0x00)
         val doc = buildDocumentReference(invalidData)
@@ -263,7 +263,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given data, which exceeds the file size limitation, createData throws an error`() {
+    fun `Given createData is called with data, which exceeds the file size limitation, it throws an error`() {
         // Given
         val invalidSizePdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES + 1)
         System.arraycopy(

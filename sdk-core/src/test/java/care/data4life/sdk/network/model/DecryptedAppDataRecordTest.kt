@@ -43,7 +43,7 @@ class DecryptedAppDataRecordTest {
     }
 
     @Test
-    fun `Given two DecryptedAppDataRecord, it returns true on a compare, if they are equal`() {
+    fun `Given two DecryptedAppDataRecord, on a compare, it returns true if they are equal`() {
         val id = "123"
         val data = "potato".toByteArray()
         val tags = hashMapOf("soup" to "tomato")
@@ -79,7 +79,7 @@ class DecryptedAppDataRecordTest {
     }
 
     @Test
-    fun `Given a DecryptedAppDataRecord and something else, it returns false on a compare, if they are equal`() {
+    fun `Given a DecryptedAppDataRecord and something else, on a compare, it returns false if they are equal`() {
         val record = DecryptedAppDataRecord(
                 identifier = "123",
                 resource = "potato".toByteArray(),
@@ -96,7 +96,7 @@ class DecryptedAppDataRecordTest {
     }
 
     @Test
-    fun `Given two DecryptedAppDataRecords, it returns false on a compare, if they have different ids`() {
+    fun `Given two DecryptedAppDataRecords, on a compare, it returns false if they have different ids`() {
         val data = "potato".toByteArray()
         val tags = hashMapOf("soup" to "tomato")
         val annotations = listOf("a", "b", "c")
@@ -131,7 +131,7 @@ class DecryptedAppDataRecordTest {
     }
 
     @Test
-    fun `Given two DecryptedAppDataRecords, it returns false on a compare, if they have different appData`() {
+    fun `Given two DecryptedAppDataRecords, on a compare, it returns false if they have different appData`() {
         val id = "123"
         val tags = hashMapOf("soup" to "tomato")
         val annotations = listOf("a", "b", "c")
@@ -166,7 +166,7 @@ class DecryptedAppDataRecordTest {
     }
 
     @Test
-    fun `Given two DecryptedAppDataRecords, it returns false on a compare, if they have different tags`() {
+    fun `Given two DecryptedAppDataRecords, on a compare, it returns false if they have different tags`() {
         val id = "123"
         val data = "potato".toByteArray()
         val annotations = listOf("a", "b", "c")
@@ -201,7 +201,7 @@ class DecryptedAppDataRecordTest {
     }
 
     @Test
-    fun `Given two DecryptedAppDataRecords, it returns false on a compare, if they have different annotations`() {
+    fun `Given two DecryptedAppDataRecords, on a compare, it returns false if they have different annotations`() {
         val id = "123"
         val data = "potato".toByteArray()
         val tags = hashMapOf("soup" to "tomato")
@@ -236,7 +236,7 @@ class DecryptedAppDataRecordTest {
     }
 
     @Test
-    fun `Given two DecryptedAppDataRecords, it returns false on a compare, if they have different customCreationDates`() {
+    fun `Given two DecryptedAppDataRecords, on a compare, it returns false if they have different customCreationDates`() {
         val id = "123"
         val data = "potato".toByteArray()
         val tags = hashMapOf("soup" to "tomato")
@@ -271,7 +271,7 @@ class DecryptedAppDataRecordTest {
     }
 
     @Test
-    fun `Given two DecryptedAppDataRecords, it returns false on a compare, if they have different updatedDates`() {
+    fun `Given two DecryptedAppDataRecords, on a compare, it returns false if they have different updatedDates`() {
         val id = "123"
         val data = "potato".toByteArray()
         val tags = hashMapOf("soup" to "tomato")
@@ -306,7 +306,7 @@ class DecryptedAppDataRecordTest {
     }
 
     @Test
-    fun `Given two DecryptedAppDataRecords, it returns false on a compare, if they have different dataKeys`() {
+    fun `Given two DecryptedAppDataRecords, on a compare, it returns false if they have different dataKeys`() {
         val id = "123"
         val data = "potato".toByteArray()
         val tags = hashMapOf("soup" to "tomato")
@@ -341,7 +341,7 @@ class DecryptedAppDataRecordTest {
     }
 
     @Test
-    fun `Given two DecryptedAppDataRecords, it returns false on a compare, if they have different versions`() {
+    fun `Given two DecryptedAppDataRecords, on a compare, it returns false if they have different versions`() {
         val id = "123"
         val data = "potato".toByteArray()
         val tags = hashMapOf("soup" to "tomato")
@@ -376,7 +376,7 @@ class DecryptedAppDataRecordTest {
     }
 
     @Test
-    fun `Given a DecryptedAppDataRecord, it is cloneable with new appData, while coping the old annotations`() {
+    fun `Given, copyWithResourceAnnotations is called with new Data, it clones a DecryptedAppDataRecord, while reassigning the data`() {
         val expectedData = "tomato"
         val expectedAnnotations = listOf("my", "little", "pony")
         val record = DecryptedAppDataRecord(
@@ -400,7 +400,7 @@ class DecryptedAppDataRecordTest {
     }
 
     @Test
-    fun `Given a DecryptedAppDataRecord, it is cloneable with new appData and annotations`() {
+    fun `Given, copyWithResourceAnnotations is called with new Data and Annotations, it clones a DecryptedAppDataRecord, while reassigning the Data and Annotations`() {
         val expectedData = "tomato"
         val expectedAnnotations = listOf("my", "little", "pony")
         val record = DecryptedAppDataRecord(

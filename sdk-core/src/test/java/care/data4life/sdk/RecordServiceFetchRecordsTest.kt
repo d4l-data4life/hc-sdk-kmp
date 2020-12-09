@@ -46,7 +46,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
             IOException::class,
             DataValidationException.ModelVersionNotSupported::class
     )
-    fun `Given a RecordId and UserId, fetchRecord returns a Record`() {
+    fun `Given, fetchRecord is called with a RecordId and UserId, it returns a Record`() {
         // Given
         Mockito
                 .`when`(mockApiService.fetchRecord(ALIAS, USER_ID, RECORD_ID))
@@ -75,7 +75,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
 
     @Test
     @Throws(InterruptedException::class)
-    fun `Given multiple RecordIds and a UserId, fetchRecords returns FetchedRecords`() {
+    fun `Given, fetchRecords is called with multiple RecordIds and a UserId, it returns FetchedRecords`() {
         // Given
         Mockito.doReturn(Single.just(mockRecord))
                 .`when`(recordService)
@@ -100,7 +100,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
 
     @Test
     @Throws(InterruptedException::class, IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    fun `Given a UserId, a ResourceType, a StartDate, a EndDate, the PageSize and Offset, fetchRecords returns FetchedRecords`() {
+    fun `Given, fetchRecords called with a UserId, a ResourceType, a StartDate, a EndDate, the PageSize and Offset, it returns FetchedRecords`() {
         // Given
         val encryptedRecords = listOf(mockEncryptedRecord, mockEncryptedRecord)
         Mockito.`when`(mockTaggingService.getTagFromType(CarePlan.resourceType)).thenReturn(mockTags)
@@ -166,7 +166,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
 
     @Test
     @Throws(InterruptedException::class, IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    fun `Given a UserId, a ResourceType, Annotations, a StartDate, a EndDate, the PageSize and Offset, fetchRecords returns FetchedRecords`() {
+    fun `Given, fetchRecords called with a UserId, a ResourceType, Annotations, a StartDate, a EndDate, the PageSize and Offset, it returns FetchedRecords`() {
         // Given
         val encryptedRecords = listOf(mockEncryptedRecord, mockEncryptedRecord)
         Mockito.`when`(mockTaggingService.getTagFromType(CarePlan.resourceType)).thenReturn(mockTags)
@@ -237,7 +237,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
             IOException::class,
             DataValidationException.ModelVersionNotSupported::class
     )
-    fun `Given a RecordId and UserId, fetchAppDataRecord returns a AppDataRecord`() {
+    fun `Given, fetchAppDataRecord is called with a RecordId and UserId, it returns a AppDataRecord`() {
         // Given
         Mockito.`when`(mockApiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)).thenReturn(Single.just(mockEncryptedRecord))
         Mockito.doReturn(mockDecryptedDataRecord).`when`(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
@@ -262,7 +262,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
 
     @Test
     @Throws(InterruptedException::class, IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    fun `Given a UserId, Annotations, a StartDate, a EndDate, the PageSize and Offset, fetchAppDataRecords returns FetchedRecords`() {
+    fun `Given, fetchAppDataRecords is called with a UserId, Annotations, a StartDate, a EndDate, the PageSize and Offset, it returns FetchedRecords`() {
         // Given
         val encryptedRecords = listOf(mockEncryptedRecord, mockEncryptedRecord)
         Mockito

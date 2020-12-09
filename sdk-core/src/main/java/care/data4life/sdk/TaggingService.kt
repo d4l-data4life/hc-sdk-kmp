@@ -18,8 +18,11 @@ package care.data4life.sdk
 import care.data4life.sdk.model.ModelVersion
 import java.util.*
 
-internal class TaggingService(private val clientId: String) {
-    private val partnerId: String = clientId.split(SEPARATOR.toRegex()).toTypedArray()[0]
+internal class TaggingService(
+        private val clientId: String
+) {
+    private val partnerId: String = clientId.substringBefore(SEPARATOR)
+
     private fun appendCommonDefaultTags(
             resourceType: String?,
             oldTags: HashMap<String, String>?

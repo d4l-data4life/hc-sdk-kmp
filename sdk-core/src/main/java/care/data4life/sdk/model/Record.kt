@@ -36,8 +36,6 @@ open class Record<T : DomainResource>(
     private val _resource: T? = fhirResource
     override val resource: T?
         get() = _resource
-    override val fhirResource: T?
-        get() = _resource
 
     private val _meta: Meta? = meta
     override val meta: Meta?

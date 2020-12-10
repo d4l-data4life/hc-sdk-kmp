@@ -126,7 +126,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
 
     @Test
     @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
-    fun `Given,, updateRecord is called with data, which exceeds the file size limitations and a UserId, it throws an error on update`() {
+    fun `Given, updateRecord is called with data, which exceeds the file size limitations and a UserId, it throws an error on update`() {
         // Given
         val invalidSizePdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES + 1)
         System.arraycopy(

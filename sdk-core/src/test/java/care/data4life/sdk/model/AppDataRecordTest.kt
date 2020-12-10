@@ -24,7 +24,7 @@ import org.junit.Test
 
 class AppDataRecordTest {
     @Test
-    fun `Given tow AppDataRecords, on a compare, it returns true if they are equal`() {
+    fun `Given two AppDataRecords, on a compare, it returns true if they are equal`() {
         val identifier = "1234"
         val resource = "test".toByteArray()
         val meta = mockkClass(Meta::class)
@@ -61,7 +61,7 @@ class AppDataRecordTest {
     }
 
     @Test
-    fun `Given tow AppDataRecords, on a compare, it returns false if the resources are different`() {
+    fun `Given two AppDataRecords, on a compare, it returns false if the resources are different`() {
         val identifier = "1234"
         val meta = mockkClass(Meta::class)
         val annotations = listOf("a", "b", "c")
@@ -84,7 +84,7 @@ class AppDataRecordTest {
     }
 
     @Test
-    fun `Given tow AppDataRecords, on a compare, it returns false if the identifiers are different`() {
+    fun `Given two AppDataRecords, on a compare, it returns false if the identifiers are different`() {
         val resource = "test".toByteArray()
         val meta = mockkClass(Meta::class)
         val annotations = listOf("a", "b", "c")
@@ -107,7 +107,7 @@ class AppDataRecordTest {
     }
 
     @Test
-    fun `Given tow AppDataRecords, on a compare, it returns false if the metas are different`() {
+    fun `Given two AppDataRecords, on a compare, it returns false if the metas are different`() {
         val identifier = "1234"
         val resource = "test".toByteArray()
         val annotations = listOf("a", "b", "c")
@@ -130,7 +130,7 @@ class AppDataRecordTest {
     }
 
     @Test
-    fun `Given tow AppDataRecords, on a compare, it returns false if the annotations are different`() {
+    fun `Given two AppDataRecords, on a compare, it returns false if the annotations are different`() {
         val identifier = "1234"
         val resource = "test".toByteArray()
         val meta = mockkClass(Meta::class)

@@ -54,7 +54,7 @@ class DecryptedRecordBuilderOptionalSettersCustomTest : DecryptedRecordBuilderTe
     }
 
     @Test
-    fun `Given, setIdentifier is called with a String, it sets the Identifier on build`() {
+    fun `Given, setIdentifier is called with a String, it sets the Identifier on build ByteArray`() {
         // When
         val builder = DecryptedRecordBuilderImpl()
                 .setIdentifier(identifier)
@@ -84,7 +84,7 @@ class DecryptedRecordBuilderOptionalSettersCustomTest : DecryptedRecordBuilderTe
     }
 
     @Test
-    fun `Given, setIdentifier is called with null, it resets the Identifier on build`() {
+    fun `Given, setIdentifier is called with null, it resets the Identifier on build ByteArray`() {
         // When
         val builder = DecryptedRecordBuilderImpl()
                 .setIdentifier(identifier)
@@ -115,7 +115,7 @@ class DecryptedRecordBuilderOptionalSettersCustomTest : DecryptedRecordBuilderTe
     }
 
     @Test
-    fun `Given, setAnnotations is called with a List of Strings, it sets the Annotations on build`() {
+    fun `Given, setAnnotations is called with a List of Strings, it sets the Annotations on build ByteArray`() {
         // When
         val builder = DecryptedRecordBuilderImpl()
                 .setAnnotations(annotations)
@@ -145,7 +145,7 @@ class DecryptedRecordBuilderOptionalSettersCustomTest : DecryptedRecordBuilderTe
     }
 
     @Test
-    fun `Given, setAnnotations is called with null, it resets the Annotations on build`() {
+    fun `Given, setAnnotations is called with null, it resets the Annotations on build ByteArray`() {
         // When
         val builder = DecryptedRecordBuilderImpl()
                 .setAnnotations(annotations)
@@ -176,7 +176,7 @@ class DecryptedRecordBuilderOptionalSettersCustomTest : DecryptedRecordBuilderTe
     }
 
     @Test
-    fun `Given, setUpdateDate is called with a Strings, it sets the UpdateDate on build`() {
+    fun `Given, setUpdateDate is called with a Strings, it sets the UpdateDate on build ByteArray`() {
         // When
         val builder = DecryptedRecordBuilderImpl()
                 .setUpdateDate(updateDate)
@@ -206,7 +206,7 @@ class DecryptedRecordBuilderOptionalSettersCustomTest : DecryptedRecordBuilderTe
     }
 
     @Test
-    fun `Given, setUpdateDate is called with null, it resets the UpdateDate on build`() {
+    fun `Given, setUpdateDate is called with null, it resets the UpdateDate on build ByteArray`() {
         // When
         val builder = DecryptedRecordBuilderImpl()
                 .setUpdateDate(updateDate)
@@ -237,7 +237,7 @@ class DecryptedRecordBuilderOptionalSettersCustomTest : DecryptedRecordBuilderTe
     }
 
     @Test
-    fun `Given, setAttachmentKey is called with a GCKey, it sets the AttachmentKey on build`() {
+    fun `Given, setAttachmentKey is called with a GCKey, it sets the AttachmentKey on build ByteArray`() {
         // When
         val builder = DecryptedRecordBuilderImpl()
                 .setAttachmentKey(attachmentKey)
@@ -267,7 +267,7 @@ class DecryptedRecordBuilderOptionalSettersCustomTest : DecryptedRecordBuilderTe
     }
 
     @Test
-    fun `Given, setAttachmentKey is called with null, it resets the AttachmentKey on build`() {
+    fun `Given, setAttachmentKey is called with null, it resets the AttachmentKey on build ByteArray`() {
         // When
         val builder = DecryptedRecordBuilderImpl()
                 .setAttachmentKey(attachmentKey)
@@ -298,7 +298,7 @@ class DecryptedRecordBuilderOptionalSettersCustomTest : DecryptedRecordBuilderTe
     }
 
     @Test
-    fun `Given, arbitrary are called, it uses the combination on build`() {
+    fun `Given, arbitrary are called, it uses the combination on build ByteArray`() {
         // When
         val builder = DecryptedRecordBuilderImpl()
                 .setIdentifier(identifier)

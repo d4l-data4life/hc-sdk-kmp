@@ -39,7 +39,7 @@ class RecordServiceCountRecordsTest : RecordServiceTestBase() {
 
     @Test
     @Throws(InterruptedException::class)
-    fun `Given,, countRecords is called with a DomainResource and a UserId, it returns amount of occurrences`() {
+    fun `Given, countRecords is called with a DomainResource and a UserId, it returns amount of occurrences`() {
         // Given
         Mockito.`when`(mockApiService.getCount(ALIAS, USER_ID, null)).thenReturn(Single.just(2))
         // When

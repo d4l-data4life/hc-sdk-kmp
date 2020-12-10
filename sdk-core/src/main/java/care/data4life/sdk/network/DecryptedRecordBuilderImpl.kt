@@ -27,18 +27,24 @@ import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
 
 internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
     private var identifier: String = ""
-    private var tags: HashMap<String, String>? = null
+    private var _tags: HashMap<String, String>? = null
     private var annotations: List<String> = listOf()
     private var creationDate: String? = null
     private var updatedDate: String? = null
     private var attachmentKey: GCKey? = null
-    private var dataKey: GCKey? = null
+    private var _dataKey: GCKey? = null
     private var modelVersion: Int? = null
+
+    override val tags: HashMap<String, String>?
+        get() = this._tags
+
+    override val dataKey: GCKey?
+        get() = this._dataKey
 
     //mandatory
     override fun setTags(
             tags: HashMap<String, String>?
-    ): DecryptedRecordBuilder = this.also { it.tags = tags }
+    ): DecryptedRecordBuilder = this.also { it._tags = tags }
 
     override fun setCreationDate(
             creationDate: String?
@@ -46,7 +52,7 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
 
     override fun setDataKey(
             dataKey: GCKey?
-    ): DecryptedRecordBuilder = this.also { it.dataKey = dataKey }
+    ): DecryptedRecordBuilder = this.also { it._dataKey = dataKey }
 
     override fun setModelVersion(
             modelVersion: Int?
@@ -72,9 +78,9 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
     @Throws(CoreRuntimeException.InternalFailure::class)
     private fun validatePayload() {
         if (
-                this.tags == null ||
+                this._tags == null ||
                 this.creationDate == null ||
-                this.dataKey == null ||
+                this._dataKey == null ||
                 this.modelVersion == null
 
         ) {
@@ -108,9 +114,9 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
     ): DecryptedFhirRecord<T> = this.validatePayload().let {
         this.build(
                 resource,
-                this.tags!!,
+                this._tags!!,
                 this.creationDate!!,
-                this.dataKey!!,
+                this._dataKey!!,
                 this.modelVersion!!
         )
     }
@@ -139,21 +145,21 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
     ): DecryptedDataRecord = this.validatePayload().let {
         this.build(
                 resource,
-                this.tags!!,
+                this._tags!!,
                 this.creationDate!!,
-                this.dataKey!!,
+                this._dataKey!!,
                 this.modelVersion!!
         )
     }
 
     override fun clear(): DecryptedRecordBuilder = this.also {
         it.identifier = ""
-        it.tags = null
+        it._tags = null
         it.annotations = listOf()
         it.creationDate = null
         it.updatedDate = null
         it.attachmentKey = null
-        it.dataKey = null
+        it._dataKey = null
         it.modelVersion = null
     }
 }

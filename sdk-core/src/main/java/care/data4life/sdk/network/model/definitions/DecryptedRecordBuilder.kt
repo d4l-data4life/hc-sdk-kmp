@@ -21,6 +21,9 @@ import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.sdk.lang.CoreRuntimeException
 
 internal interface DecryptedRecordBuilder {
+    val tags: HashMap<String, String>?
+    val dataKey: GCKey?
+
     //mandatory
     fun setTags(tags: HashMap<String, String>?): DecryptedRecordBuilder
     fun setCreationDate(creationDate: String?): DecryptedRecordBuilder

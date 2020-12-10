@@ -22,6 +22,8 @@ import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
 import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
@@ -54,12 +56,53 @@ class DecryptedRecordBuilderTest {
         customResource = ByteArray(42)
     }
 
-
     @Test
     fun `it is a DecryptedRecordBuilder`() {
         val builder: Any = DecryptedRecordBuilderImpl()
 
         Assert.assertTrue(builder is DecryptedRecordBuilder)
+    }
+
+    @Test
+    fun `Given tags are accessed, it returns null by default`() {
+        // Given
+        val builder = DecryptedRecordBuilderImpl()
+
+        // Then
+        assertNull( builder.tags )
+    }
+
+    @Test
+    fun `Given, setTags is called, with its proper payload and tags are accessed, it returns the payload of setTags`() {
+        // Given
+        val builder = DecryptedRecordBuilderImpl().setTags(tags)
+
+        // Then
+        assertEquals(
+              tags,
+              builder.tags
+        )
+    }
+
+    @Test
+    fun `Given dataKey is accessed, it returns null by default`() {
+        // Given
+        val builder = DecryptedRecordBuilderImpl()
+
+        // Then
+        assertNull( builder.dataKey )
+    }
+
+    @Test
+    fun `Given, setDataKey is called, with its proper payload and dataKey is accessed, it returns the payload of setTags`() {
+        // Given
+        val builder = DecryptedRecordBuilderImpl().setDataKey(dataKey)
+
+        // Then
+        assertEquals(
+                dataKey,
+                builder.dataKey
+        )
     }
 
     @Test

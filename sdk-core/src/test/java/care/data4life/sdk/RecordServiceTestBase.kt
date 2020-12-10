@@ -25,14 +25,17 @@ import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
+import care.data4life.sdk.network.DecryptedRecordBuilderImpl
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhirRecord
+import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
 import care.data4life.sdk.test.util.AttachmentBuilder
 import care.data4life.sdk.util.Base64
 import io.mockk.every
+import io.mockk.mockkConstructor
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import org.mockito.ArgumentMatchers
@@ -40,6 +43,7 @@ import org.mockito.InOrder
 import org.mockito.Mockito
 import org.threeten.bp.Clock
 import org.threeten.bp.LocalDate
+import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import java.util.*
 
@@ -74,8 +78,7 @@ abstract class RecordServiceTestBase {
     private lateinit var mockD4LException: D4LException
     internal lateinit var mockRecord: Record<CarePlan>
     internal lateinit var inOrder: InOrder
-    internal lateinit var decryptedRecordIndicator: DecryptedRecord<DomainResource>
-    internal lateinit var annotatedDecryptedRecordIndicator: DecryptedRecord<DomainResource>
+    internal lateinit var mockDecryptedRecordBuilder: DecryptedRecordBuilder
 
     @Suppress("UNCHECKED_CAST")
     fun init() {
@@ -157,6 +160,10 @@ abstract class RecordServiceTestBase {
         Mockito.`when`(mockAnnotatedEncryptedRecord.identifier).thenReturn(RECORD_ID)
 
         Mockito.`when`(mockErrorHandler.handleError(ArgumentMatchers.any(Exception::class.java))).thenReturn(mockD4LException)
+
+        mockDecryptedRecordBuilder = Mockito.mock(DecryptedRecordBuilderImpl::class.java)
+        mockkConstructor(DecryptedRecordBuilderImpl::class)
+
         inOrder = Mockito.inOrder(
                 mockApiService,
                 mockTagEncryptionService,
@@ -165,35 +172,15 @@ abstract class RecordServiceTestBase {
                 mockAttachmentService,
                 mockCryptoService,
                 mockErrorHandler,
+                mockDecryptedRecordBuilder,
                 recordService
-        )
-
-        decryptedRecordIndicator = DecryptedRecord(
-                null,
-                mockCarePlan as DomainResource,
-                mockTags,
-                listOf(),
-                DATE_FORMATTER.format(LOCAL_DATE),
-                null,
-                mockDataKey,
-                null,
-                ModelVersion.CURRENT
-        )
-
-        annotatedDecryptedRecordIndicator = DecryptedRecord(
-                null,
-                mockCarePlan as DomainResource,
-                mockTags,
-                ANNOTATIONS,
-                DATE_FORMATTER.format(LOCAL_DATE),
-                null,
-                mockDataKey,
-                null,
-                ModelVersion.CURRENT
         )
 
         mockkStatic(LocalDate::class)
         every { LocalDate.now(any() as Clock) } returns LOCAL_DATE
+
+        mockkStatic(DateTimeFormatter::class)
+        every { DateTimeFormatter.ofPattern( "yyyy-MM-dd", Locale.US) } returns DATE_FORMATTER
     }
 
     fun stop() {
@@ -223,6 +210,7 @@ abstract class RecordServiceTestBase {
                 THUMBNAIL_ID
         internal val LOCAL_DATE = LocalDate.of(2001, 1, 1)
         internal val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US)
+        internal val UTC_ZONE_ID = ZoneId.of("UTC")
         internal val ANNOTATIONS = listOf("potato", "tomato", "soup")
 
         fun buildDocumentReference(): DocumentReference {

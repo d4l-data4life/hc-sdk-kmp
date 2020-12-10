@@ -129,7 +129,7 @@ class TaggingServiceTest {
         val result = taggingService.appendDefaultAnnotatedTags(type, null)
 
         // Then
-        Assert.assertEquals(4, result!!.size.toLong())
+        Assert.assertEquals(4, result.size.toLong())
         Assert.assertTrue(result.containsKey(TAG_RESOURCE_TYPE))
         Assert.assertEquals(type, result[TAG_RESOURCE_TYPE])
         Assert.assertTrue(result.containsKey(TAG_CLIENT))
@@ -150,7 +150,7 @@ class TaggingServiceTest {
         val result = taggingService.appendDefaultAnnotatedTags(type, null)
 
         // Then
-        Assert.assertEquals(3, result!!.size.toLong())
+        Assert.assertEquals(3, result.size.toLong())
         Assert.assertTrue(result.containsKey(TAG_CLIENT))
         Assert.assertEquals(CLIENT_ID, result[TAG_CLIENT])
         Assert.assertTrue(result.containsKey(TAG_PARTNER))
@@ -173,7 +173,7 @@ class TaggingServiceTest {
         val result = taggingService.appendDefaultAnnotatedTags(type, existingTags)
 
         // Then
-        Assert.assertEquals(6, result!!.size.toLong())
+        Assert.assertEquals(6, result.size.toLong())
         Assert.assertTrue(result.containsKey("tag_1_key"))
         Assert.assertTrue(result.containsKey("tag_2_key"))
         Assert.assertTrue(result.containsKey(TAG_RESOURCE_TYPE))
@@ -198,7 +198,7 @@ class TaggingServiceTest {
         val result = taggingService.appendDefaultAnnotatedTags(type, existingTags)
 
         // Then
-        Assert.assertEquals(5, result!!.size.toLong())
+        Assert.assertEquals(5, result.size.toLong())
         Assert.assertTrue(result.containsKey(TAG_CLIENT))
         Assert.assertEquals(OTHER_CLIENT_ID, result[TAG_CLIENT])
         Assert.assertTrue(result.containsKey(TAG_UPDATED_BY_CLIENT))

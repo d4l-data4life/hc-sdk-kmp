@@ -39,6 +39,7 @@ import care.data4life.sdk.model.AppDataRecord
 import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.DataRecord
+import care.data4life.sdk.network.DecryptedRecordBuilderImpl
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.EncryptedKey
@@ -46,6 +47,7 @@ import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhirRecord
+import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
@@ -81,6 +83,20 @@ internal class RecordService(
         REMOVE, RESTORE
     }
 
+    private fun <T: DomainResource?> createNewDecryptedRecord(
+            builder: DecryptedRecordBuilder,
+            resource: T,
+            tags: HashMap<String, String>,
+            creationDate: String,
+            dataKey: GCKey
+    ): DecryptedFhirRecord<T> = builder.build(
+            resource,
+            tags,
+            creationDate,
+            dataKey,
+            ModelVersion.CURRENT
+    )
+
     @Throws(DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class)
     @JvmOverloads
@@ -90,21 +106,15 @@ internal class RecordService(
             annotations: List<String> = listOf()
     ): Single<Record<T>> {
         checkDataRestrictions(resource)
-        val createdDate = DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID))
-        val createRecord: Single<DecryptedFhirRecord<T>> = Single.just(createdDate)
-                .map { createdAt ->
-                    DecryptedRecord(
-                            null,
+        val createRecord = Single.just(
+                createNewDecryptedRecord(
+                            DecryptedRecordBuilderImpl().setAnnotations(annotations),
                             resource,
                             taggingService.appendDefaultTags(resource.resourceType, null),
-                            annotations,
-                            createdAt,
-                            null,
-                            cryptoService.generateGCKey().blockingGet(),
-                            null,
-                            ModelVersion.CURRENT
-                    )
-                }
+                            DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
+                            cryptoService.generateGCKey().blockingGet()
+                )
+        )
 
         val data = extractUploadData(resource)
         return createRecord
@@ -127,28 +137,35 @@ internal class RecordService(
                 }
     }
 
+    private fun createNewDecryptedRecord(
+            builder: DecryptedRecordBuilder,
+            resource: ByteArray,
+            tags: HashMap<String, String>,
+            creationDate: String,
+            dataKey: GCKey
+    ): DecryptedDataRecord = builder.build(
+            resource,
+            tags,
+            creationDate,
+            dataKey,
+            ModelVersion.CURRENT
+    )
+
     fun createRecord(
             resource: ByteArray,
             userId: String,
             annotations: List<String>
     ): Single<DataRecord> {
-        val createdDate = DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID))
-        val createRecord = Single.just(createdDate)
-                .map { createdAt ->
-                    DecryptedAppDataRecord(
-                            null,
-                            resource,
-                            taggingService.appendDefaultAnnotatedTags(
-                                    null,
-                                    null
-                            ),
-                            annotations,
-                            createdAt,
-                            null,
-                            cryptoService.generateGCKey().blockingGet(),
-                            ModelVersion.CURRENT
-                    )
-                }
+        val createRecord = Single.just(
+                createNewDecryptedRecord(
+                        DecryptedRecordBuilderImpl().setAnnotations(annotations),
+                        resource,
+                        taggingService.appendDefaultTags(null, null),
+                        DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
+                        cryptoService.generateGCKey().blockingGet()
+                )
+        )
+
         return createRecord
                 .map { record -> encryptDataRecord(record) }
                 .flatMap { encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord) }

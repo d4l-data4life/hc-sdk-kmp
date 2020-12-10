@@ -21,15 +21,16 @@ import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
-import care.data4life.sdk.network.model.DecryptedAppDataRecord
-import care.data4life.sdk.util.Base64
+import care.data4life.sdk.model.ModelVersion
+import care.data4life.sdk.network.DecryptedRecordBuilderImpl
+import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
+import care.data4life.sdk.network.model.definitions.DecryptedFhirRecord
 import care.data4life.sdk.util.MimeType
 
 import java.io.IOException
 
 import com.google.common.truth.Truth
 import io.mockk.every
-import io.mockk.mockkObject
 import io.reactivex.Single
 import org.junit.After
 import org.junit.Assert
@@ -37,6 +38,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
+import org.threeten.bp.LocalDate
 
 class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     @Before
@@ -62,6 +64,20 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     )
     fun `Given, createRecord is called with a DomainResource and a UserId, it returns a new Record`() {
         // Given
+        every {
+            anyConstructed<DecryptedRecordBuilderImpl>().setAnnotations(listOf())
+        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilderImpl
+
+        @Suppress("UNCHECKED_CAST")
+        Mockito.`when`(
+                mockDecryptedRecordBuilder.build(
+                        mockCarePlan,
+                        mockTags,
+                        DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
+                        mockDataKey,
+                        ModelVersion.CURRENT
+                )
+        ).thenReturn(mockDecryptedFhirRecord as DecryptedFhirRecord<CarePlan>)
         Mockito.doReturn(mockUploadData).`when`(recordService).extractUploadData(mockCarePlan)
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
         Mockito.`when`(mockTaggingService.appendDefaultTags(
@@ -71,7 +87,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockDecryptedFhirRecord).`when`(recordService)
                 .uploadData(
-                        decryptedRecordIndicator,
+                        mockDecryptedFhirRecord,
                         null,
                         USER_ID
                 )
@@ -107,13 +123,21 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Truth.assertThat(record.meta).isEqualTo(mockMeta)
         Truth.assertThat(record.fhirResource).isEqualTo(mockCarePlan)
         Truth.assertThat(record.annotations).isEqualTo(listOf<String>())
+
         inOrder.verify(mockTaggingService).appendDefaultTags(
                 ArgumentMatchers.anyString(),
                 ArgumentMatchers.any<HashMap<String, String>>()
         )
         inOrder.verify(mockCryptoService).generateGCKey()
+        inOrder.verify(mockDecryptedRecordBuilder).build(
+                mockCarePlan,
+                mockTags,
+                DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
+                mockDataKey,
+                ModelVersion.CURRENT
+        )
         inOrder.verify(recordService).uploadData(
-                decryptedRecordIndicator,
+                mockDecryptedFhirRecord,
                 null,
                 USER_ID
         )
@@ -146,6 +170,20 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     )
     fun `Given, createRecord is called a DomainResource, a UserId and no attachment, it returns a new Record`() {
         // Given
+        every {
+            anyConstructed<DecryptedRecordBuilderImpl>().setAnnotations(listOf())
+        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilderImpl
+
+        @Suppress("UNCHECKED_CAST")
+        Mockito.`when`(
+                mockDecryptedRecordBuilder.build(
+                        mockCarePlan,
+                        mockTags,
+                        DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
+                        mockDataKey,
+                        ModelVersion.CURRENT
+                )
+        ).thenReturn(mockDecryptedFhirRecord as DecryptedFhirRecord<CarePlan>)
         Mockito.doReturn(null).`when`(recordService).extractUploadData(mockCarePlan)
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
         Mockito.`when`(
@@ -159,7 +197,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService)
                 .uploadData(
-                        decryptedRecordIndicator,
+                        mockDecryptedFhirRecord,
                         null,
                         USER_ID
                 )
@@ -211,16 +249,20 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 ArgumentMatchers.any<HashMap<String, String>>()
         )
         inOrder.verify(mockCryptoService).generateGCKey()
+        inOrder.verify(mockDecryptedRecordBuilder).build(
+                mockCarePlan,
+                mockTags,
+                DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
+                mockDataKey,
+                ModelVersion.CURRENT
+        )
         inOrder.verify(recordService).uploadData(
-                decryptedRecordIndicator,
+                mockDecryptedFhirRecord,
                 null,
                 USER_ID
         )
         inOrder.verify(recordService).removeUploadData(mockDecryptedFhirRecord)
-
-        inOrder.verify(recordService).encryptRecord(
-                mockDecryptedFhirRecord
-        )
+        inOrder.verify(recordService).encryptRecord(mockDecryptedFhirRecord)
         inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockEncryptedRecord)
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).restoreUploadData(
@@ -336,6 +378,20 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     )
     fun `Given, createRecord is called with a DomainResource, a UserId and Annotations, it returns a new Record`() {
         // Given
+        every {
+            anyConstructed<DecryptedRecordBuilderImpl>().setAnnotations(ANNOTATIONS)
+        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilderImpl
+
+        @Suppress("UNCHECKED_CAST")
+        Mockito.`when`(
+                mockDecryptedRecordBuilder.build(
+                        mockCarePlan,
+                        mockTags,
+                        DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
+                        mockDataKey,
+                        ModelVersion.CURRENT
+                )
+        ).thenReturn(mockAnnotatedDecryptedFhirRecord as DecryptedFhirRecord<CarePlan>)
         Mockito.doReturn(mockUploadData).`when`(recordService).extractUploadData(mockCarePlan)
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
         Mockito.`when`(mockTaggingService.appendDefaultTags(
@@ -345,7 +401,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockAnnotatedDecryptedFhirRecord).`when`(recordService)
                 .uploadData(
-                        annotatedDecryptedRecordIndicator,
+                        mockAnnotatedDecryptedFhirRecord,
                         null,
                         USER_ID
                 )
@@ -388,8 +444,15 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 ArgumentMatchers.any<HashMap<String, String>>()
         )
         inOrder.verify(mockCryptoService).generateGCKey()
+        inOrder.verify(mockDecryptedRecordBuilder).build(
+                mockCarePlan,
+                mockTags,
+                DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
+                mockDataKey,
+                ModelVersion.CURRENT
+        )
         inOrder.verify(recordService).uploadData(
-                annotatedDecryptedRecordIndicator,
+                mockAnnotatedDecryptedFhirRecord,
                 null,
                 USER_ID
         )
@@ -422,6 +485,20 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     )
     fun `Given, createRecords is called a DomainResource and a UserId, Annotations and without attachment, it returns a new Record`() {
         // Given
+        every {
+            anyConstructed<DecryptedRecordBuilderImpl>().setAnnotations(ANNOTATIONS)
+        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilderImpl
+
+        @Suppress("UNCHECKED_CAST")
+        Mockito.`when`(
+                mockDecryptedRecordBuilder.build(
+                        mockCarePlan,
+                        mockTags,
+                        DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
+                        mockDataKey,
+                        ModelVersion.CURRENT
+                )
+        ).thenReturn(mockAnnotatedDecryptedFhirRecord as DecryptedFhirRecord<CarePlan>)
         Mockito.doReturn(null).`when`(recordService).extractUploadData(mockCarePlan)
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
         Mockito.`when`(
@@ -435,7 +512,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Mockito.doReturn(mockAnnotatedDecryptedFhirRecord)
                 .`when`(recordService)
                 .uploadData(
-                        annotatedDecryptedRecordIndicator,
+                        mockAnnotatedDecryptedFhirRecord,
                         null,
                         USER_ID
                 )
@@ -488,8 +565,15 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 ArgumentMatchers.any<HashMap<String, String>>()
         )
         inOrder.verify(mockCryptoService).generateGCKey()
+        inOrder.verify(mockDecryptedRecordBuilder).build(
+                mockCarePlan,
+                mockTags,
+                DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
+                mockDataKey,
+                ModelVersion.CURRENT
+        )
         inOrder.verify(recordService).uploadData(
-                annotatedDecryptedRecordIndicator,
+                mockAnnotatedDecryptedFhirRecord,
                 null,
                 USER_ID
         )
@@ -581,14 +665,26 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     )
     fun `Given createRecord is called with a Byte resource, a UserId and Annotations, it returns a new DataRecord`() {
         // Given
-        mockkObject(Base64)
-        every { Base64.decode(mockAppData) } returns ENCRYPTED_APPDATA
-        Mockito.`when`(mockTaggingService.appendDefaultAnnotatedTags(null, null))
+        every {
+            anyConstructed<DecryptedRecordBuilderImpl>().setAnnotations(ANNOTATIONS)
+        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilderImpl
+
+        Mockito.`when`(mockTaggingService.appendDefaultTags(null, null))
                 .thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
+        @Suppress("UNCHECKED_CAST")
+        Mockito.`when`(
+                mockDecryptedRecordBuilder.build(
+                        mockAppData,
+                        mockTags,
+                        DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
+                        mockDataKey,
+                        ModelVersion.CURRENT
+                )
+        ).thenReturn(mockDecryptedDataRecord)
         Mockito.doReturn(mockEncryptedRecord)
                 .`when`(recordService)
-                .encryptDataRecord(ArgumentMatchers.argThat { it is DecryptedAppDataRecord })
+                .encryptDataRecord( ArgumentMatchers.argThat { it is DecryptedDataRecord } )
         Mockito.`when`(mockApiService.createRecord(ALIAS, USER_ID, mockEncryptedRecord))
                 .thenReturn(Single.just(mockEncryptedRecord))
         Mockito.doReturn(mockDecryptedDataRecord)
@@ -612,10 +708,18 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Truth.assertThat(record.meta).isEqualTo(mockMeta)
         Truth.assertThat(record.resource).isEqualTo(mockAppData)
         Truth.assertThat(record.annotations).isEqualTo(ANNOTATIONS)
-        inOrder.verify(mockTaggingService).appendDefaultAnnotatedTags(null, null)
+
+        inOrder.verify(mockTaggingService).appendDefaultTags(null, null)
         inOrder.verify(mockCryptoService).generateGCKey()
+        inOrder.verify(mockDecryptedRecordBuilder).build(
+                mockAppData,
+                mockTags,
+                DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
+                mockDataKey,
+                ModelVersion.CURRENT
+        )
         inOrder.verify(recordService)
-                .encryptDataRecord(ArgumentMatchers.any(DecryptedAppDataRecord::class.java))
+                .encryptDataRecord( ArgumentMatchers.argThat { it is DecryptedDataRecord } )//mockDecryptedDataRecord)
         inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockEncryptedRecord)
         inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).buildMeta(mockDecryptedDataRecord)

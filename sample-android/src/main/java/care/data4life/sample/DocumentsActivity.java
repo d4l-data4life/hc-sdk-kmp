@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -36,6 +37,7 @@ import com.google.android.material.snackbar.Snackbar;
 import org.threeten.bp.LocalDate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import androidx.annotation.Nullable;
@@ -57,6 +59,7 @@ import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.Callback;
 import care.data4life.sdk.listener.ResultListener;
 import care.data4life.sdk.model.Record;
+import care.data4life.sdk.model.definitions.DataRecord;
 
 public class DocumentsActivity extends AppCompatActivity {
 
@@ -93,6 +96,7 @@ public class DocumentsActivity extends AppCompatActivity {
         mLogout = findViewById(R.id.logoutBTN);
         mDocumentsRV = findViewById(R.id.documentsRV);
         mDocumentsSRL = findViewById(R.id.documentsSRL);
+        View addFabAppData = findViewById(R.id.addFABAppData);
         Toolbar toolbar = findViewById(R.id.toolbar);
 
         mLayoutManager = new LinearLayoutManager(DocumentsActivity.this, LinearLayoutManager.VERTICAL, false);
@@ -126,6 +130,12 @@ public class DocumentsActivity extends AppCompatActivity {
                     startActivityForResult(Intent.createChooser(intent, "Select images"), INTENT_FILE_PICKER);
                 }
         );
+
+        addFabAppData.setOnClickListener(view -> {
+            fetchDataRecord();
+            createNewDataRecord();
+        });
+
 
         setSupportActionBar(toolbar);
         Snackbar.make(mRootCL, "You have signed in with Data4Life", Snackbar.LENGTH_SHORT).show();
@@ -371,5 +381,61 @@ public class DocumentsActivity extends AppCompatActivity {
                 });
             }
         }
+    }
+
+    DataRecord appdata;
+    List<String> annotations = new ArrayList<>();
+
+    private void createNewDataRecord() {
+        if (appdata != null) {
+            return;
+        }
+        mDocumentsSRL.setRefreshing(true);
+        byte[] data = new byte[1];
+        annotations.add("test");
+        annotations.add("test2");
+        annotations.add("test3");
+
+        client.createDataRecord(data, new ResultListener<DataRecord>() {
+            @Override
+            public void onSuccess(DataRecord appDataRecord) {
+                appdata = appDataRecord;
+                mDocumentsSRL.setRefreshing(false);
+            }
+
+            @Override
+            public void onError(D4LException exception) {
+                mDocumentsSRL.setRefreshing(false);
+            }
+        }, annotations);
+    }
+
+    private void fetchDataRecord() {
+        if (appdata == null) {
+            return;
+        }
+        mDocumentsSRL.setRefreshing(true);
+        client.fetchDataRecord(appdata.getIdentifier(), new ResultListener<DataRecord>() {
+            @Override
+            public void onSuccess(DataRecord appDataRecord) {
+                runOnUiThread(() -> {
+                    boolean equal = Arrays.equals(
+                            appDataRecord.getResource(),
+                            appdata.getResource()
+                    ) && annotations.equals(appDataRecord.getAnnotations());
+                    Toast.makeText(
+                            getApplicationContext(),
+                            "DonorKey test successful: " + equal, Toast.LENGTH_LONG
+                    ).show();
+                    mDocumentsSRL.setRefreshing(false);
+                });
+            }
+
+            @Override
+            public void onError(D4LException exception) {
+                Toast.makeText(getApplicationContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
+                mDocumentsSRL.setRefreshing(false);
+            }
+        });
     }
 }

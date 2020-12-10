@@ -14,14 +14,29 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.model;
+package care.data4life.sdk.network.model.definitions
 
+import care.data4life.crypto.GCKey
+import care.data4life.fhir.stu3.model.DomainResource
 
-import care.data4life.fhir.stu3.model.DomainResource;
-import care.data4life.sdk.model.Record;
+internal interface DecryptedBaseRecord<T> {
+    var identifier: String?
+    var resource: T
+    var tags: HashMap<String, String>?
+    var annotations: List<String>
+    var customCreationDate: String?
+    var updatedDate: String?
+    var dataKey: GCKey?
+    var modelVersion: Int
+}
 
-public class EmptyRecord<T extends DomainResource> extends Record<T> {
-    public EmptyRecord() {
-        super(null, null);
-    }
+internal interface DecryptedFhirRecord<T : DomainResource?> : DecryptedBaseRecord<T> {
+    var attachmentsKey: GCKey?
+}
+
+internal interface DecryptedDataRecord : DecryptedBaseRecord<ByteArray> {
+    fun copyWithResourceAnnotations(
+            data: ByteArray,
+            annotations: List<String>? = null
+    ): DecryptedDataRecord
 }

@@ -16,7 +16,19 @@ toc::[]
 
 === Added
 
+* Add arbitrary data support
+* Add annotations support
+
 === Changed
+* Converted following classes from Java to Kotlin:
+- RecordService
+- TaggingService
+- TagEncryptionService
+- EmptyRecord
+- Record
+- DecryptedRecord
+
+
 
 === Removed
 

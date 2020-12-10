@@ -90,7 +90,6 @@ internal class RecordService(
             annotations: List<String> = listOf()
     ): Single<Record<T>> {
         checkDataRestrictions(resource)
-        val data = extractUploadData(resource)
         val createdDate = DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID))
         val createRecord: Single<DecryptedFhirRecord<T>> = Single.just(createdDate)
                 .map { createdAt ->
@@ -106,6 +105,8 @@ internal class RecordService(
                             ModelVersion.CURRENT
                     )
                 }
+
+        val data = extractUploadData(resource)
         return createRecord
                 .map { record -> uploadData(record, null, userId) }
                 .map { record -> removeUploadData(record) }
@@ -466,7 +467,7 @@ internal class RecordService(
                     downloadRecord<T>(recordId, userId)
                             .onErrorReturn { error ->
                                 failedDownloads.add(Pair(recordId, errorHandler.handleError(error)))
-                                Record<T>(null, null, null)
+                                Record(null, null, null)
                             }
                 }
                 .filter { record -> record != EMPTY_RECORD }
@@ -768,7 +769,7 @@ internal class RecordService(
 
         val resource =
                 if (record.encryptedBody == null || record.encryptedBody.isEmpty()) {
-                    null
+                    null// FIXME: This is a potential Bug, we should throw an error here, like NoValidRecord
                 } else {
                     fhirService.decryptResource<T>(
                             dataKey,

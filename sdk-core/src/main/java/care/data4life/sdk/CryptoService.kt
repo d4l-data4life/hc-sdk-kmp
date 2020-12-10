@@ -127,8 +127,8 @@ internal open class CryptoService : CryptoProtocol {
     fun decryptString(key: GCKey, dataBase64: String): Single<String> {
         return Single
                 .fromCallable { base64.decode(dataBase64) }
-                .flatMap { decoded: ByteArray -> decrypt(key, decoded) }
-                .map { decrypted: ByteArray -> String(decrypted, Charset.forName("UTF-8")) }
+                .flatMap { decoded -> decrypt(key, decoded) }
+                .map { decrypted -> String(decrypted, Charsets.UTF_8) }
                 .onErrorResumeNext { error ->
                     Log.error(error, "Failed to decrypt string")
                     Single.error(CryptoException.DecryptionFailed("Failed to decrypt string") as D4LException)
@@ -139,7 +139,7 @@ internal open class CryptoService : CryptoProtocol {
         return Single.fromCallable { createKey(KEY_VERSION, keyType, gckey.getKeyBase64()) }
                 .map { exchangeKey -> moshi.adapter(ExchangeKey::class.java).toJson(exchangeKey) }
                 .flatMap { jsonKey -> encryptString(key, jsonKey) }
-                .map<EncryptedKey> { encryptedKeyBase64 -> EncryptedKey(encryptedKeyBase64) }
+                .map { encryptedKeyBase64 -> EncryptedKey(encryptedKeyBase64) }
                 .onErrorResumeNext { error ->
                     Log.error(error, "Failed to encrypt GcKey")
                     Single.error(CryptoException.KeyEncryptionFailed("Failed to encrypt GcKey") as D4LException)
@@ -155,7 +155,7 @@ internal open class CryptoService : CryptoProtocol {
     fun asymDecryptSymetricKey(keyPair: GCKeyPair, encryptedKey: EncryptedKey): Single<GCKey> {
         return Single.fromCallable { base64.decode(encryptedKey.encryptedKey) }
                 .map { decoded -> asymDecrypt(keyPair, decoded) }
-                .map { keyJson -> moshi.adapter(ExchangeKey::class.java).fromJson(String(keyJson, Charset.forName("UTF-8"))) }
+                .map { keyJson -> moshi.adapter(ExchangeKey::class.java).fromJson(String(keyJson, Charsets.UTF_8)) }
                 .flatMap { exchangeKey -> convertExchangeKeyToGCKey(exchangeKey) }
     }
 
@@ -182,8 +182,8 @@ internal open class CryptoService : CryptoProtocol {
         return Single.fromCallable { gcAsymmetricKey.value.encoded } //SPKI
                 .map(base64::encodeToString)
                 .map { encodedKey -> createKey(KEY_VERSION, KeyType.APP_PUBLIC_KEY, encodedKey) }
-                .map { exchangeKey: ExchangeKey -> moshi.adapter(ExchangeKey::class.java).toJson(exchangeKey) }
-                .map { data: String -> base64.encodeToString(data) }
+                .map { exchangeKey -> moshi.adapter(ExchangeKey::class.java).toJson(exchangeKey) }
+                .map { data -> base64.encodeToString(data) }
     }
 
     fun generateGCKey(): Single<GCKey> {
@@ -262,42 +262,30 @@ internal open class CryptoService : CryptoProtocol {
     }
 
     @Throws(IOException::class)
-    fun fetchTagEncryptionKey(): GCKey {
-        return getGCKey(TEK_KEY)
-    }
+    fun fetchTagEncryptionKey(): GCKey = getGCKey(TEK_KEY)
 
     private fun storeKey(key: String, value: GCKey, keyType: KeyType) {
         storage.storeKey(prefix() + key, value, keyType)
     }
 
     @Throws(IOException::class)
-    private fun getGCKey(key: String): GCKey {
-        return keyFactory.createGCKey(getExchangeKey(key))
-    }
+    private fun getGCKey(key: String): GCKey = keyFactory.createGCKey(getExchangeKey(key))
 
     @Throws(IOException::class)
-    private fun getExchangeKey(key: String): ExchangeKey {
-        return storage.getExchangeKey(prefix() + key)
-    }
+    private fun getExchangeKey(key: String): ExchangeKey = storage.getExchangeKey(prefix() + key)
 
     private fun deleteSecret(key: String) {
         storage.deleteSecret(prefix() + key)
     }
 
-    private fun prefix(): String {
-        return alias + "_"
-    }
+    private fun prefix(): String = alias + "_"
 
     // Common Key Handling
     @Throws(IOException::class)
-    fun fetchCurrentCommonKey(): GCKey {
-        return commonKeyService.fetchCurrentCommonKey()
-    }
+    fun fetchCurrentCommonKey(): GCKey = commonKeyService.fetchCurrentCommonKey()
 
     @Throws(IOException::class)
-    fun getCommonKeyById(commonKeyId: String): GCKey {
-        return commonKeyService.fetchCommonKey(commonKeyId)
-    }
+    fun getCommonKeyById(commonKeyId: String): GCKey = commonKeyService.fetchCommonKey(commonKeyId)
 
     val currentCommonKeyId: String?
         get() = commonKeyService.fetchCurrentCommonKeyId()
@@ -310,9 +298,7 @@ internal open class CryptoService : CryptoProtocol {
         commonKeyService.storeCommonKey(commonKeyId, commonKey)
     }
 
-    fun hasCommonKey(commonKeyId: String): Boolean {
-        return commonKeyService.hasCommonKey(commonKeyId)
-    }
+    fun hasCommonKey(commonKeyId: String): Boolean = commonKeyService.hasCommonKey(commonKeyId)
 
     companion object {
         private const val TEK_KEY = "crypto_tag_encryption_key"

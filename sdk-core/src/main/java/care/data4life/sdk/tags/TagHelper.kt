@@ -23,22 +23,22 @@ object TagHelper {
 
     @JvmStatic
     fun convertToTagList(tags: HashMap<String, String>): List<String> {
-        val tagList: MutableList<String> = ArrayList()
-        for ((key, value) in tags) {
-            tagList.add(key + TAG_DELIMITER + value)
+        return mutableListOf<String>().also {
+            for ((key, value) in tags) {
+                it.add(key + TAG_DELIMITER + value)
+            }
         }
-        return tagList
     }
 
     @JvmStatic
     fun convertToTagMap(tagList: List<String>): HashMap<String, String> {
         val tags = HashMap<String, String>()
         for (entry in tagList) {
-            val split: Array<String?> = entry.split(TAG_DELIMITER.toRegex()).toTypedArray()
+            val split = entry.split(TAG_DELIMITER)
             if (split.size == 2) {
                 val key = split[0]
                 val value = split[1]
-                if (!key.isNullOrBlank() && !value.isNullOrBlank()) {
+                if (key.isNotBlank() && value.isNotBlank()) {
                     tags[key] = value
                 }
             }

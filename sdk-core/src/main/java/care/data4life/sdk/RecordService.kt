@@ -83,19 +83,19 @@ internal class RecordService(
         REMOVE, RESTORE
     }
 
-    private fun <T: DomainResource?> createNewDecryptedRecord(
+    private fun <T: Any> createNewDecryptedRecord(
             builder: DecryptedRecordBuilder,
             resource: T,
             tags: HashMap<String, String>,
             creationDate: String,
             dataKey: GCKey
-    ): DecryptedFhirRecord<T> = builder.build(
+    ): DecryptedBaseRecord<T> = builder.build(
             resource,
             tags,
             creationDate,
             dataKey,
             ModelVersion.CURRENT
-    ) as DecryptedFhirRecord<T>
+    )
 
     @Throws(DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class)
@@ -113,7 +113,7 @@ internal class RecordService(
                             taggingService.appendDefaultTags(resource.resourceType, null),
                             DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
                             cryptoService.generateGCKey().blockingGet()
-                )
+                ) as DecryptedFhirRecord<T>
         )
 
         val data = extractUploadData(resource)
@@ -137,20 +137,6 @@ internal class RecordService(
                 }
     }
 
-    private fun createNewDecryptedRecord(
-            builder: DecryptedRecordBuilder,
-            resource: ByteArray,
-            tags: HashMap<String, String>,
-            creationDate: String,
-            dataKey: GCKey
-    ): DecryptedDataRecord = builder.build(
-            resource,
-            tags,
-            creationDate,
-            dataKey,
-            ModelVersion.CURRENT
-    ) as DecryptedDataRecord
-
     fun createRecord(
             resource: ByteArray,
             userId: String,
@@ -163,7 +149,7 @@ internal class RecordService(
                         taggingService.appendDefaultTags(null, null),
                         DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
                         cryptoService.generateGCKey().blockingGet()
-                )
+                ) as DecryptedDataRecord
         )
 
         return createRecord

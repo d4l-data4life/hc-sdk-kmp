@@ -17,7 +17,6 @@
 package care.data4life.sdk.network.model.definitions
 
 import care.data4life.crypto.GCKey
-import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.sdk.lang.CoreRuntimeException
 
 internal interface DecryptedRecordBuilder {
@@ -37,32 +36,13 @@ internal interface DecryptedRecordBuilder {
     fun setAttachmentKey(attachmentKey: GCKey?): DecryptedRecordBuilder
 
     @Throws(CoreRuntimeException.InternalFailure::class)
-    fun <T : DomainResource?> build(
+    fun <T: Any?> build(
             resource: T,
-            tags: HashMap<String, String>,
-            creationDate: String,
-            dataKey: GCKey,
-            modelVersion: Int
-    ): DecryptedFhirRecord<T>
-
-    @Throws(CoreRuntimeException.InternalFailure::class)
-    fun <T : DomainResource?> build(
-            resource: T
-    ): DecryptedFhirRecord<T>
-
-    @Throws(CoreRuntimeException.InternalFailure::class)
-    fun build(
-            resource: ByteArray,
-            tags: HashMap<String, String>,
-            creationDate: String,
-            dataKey: GCKey,
-            modelVersion: Int
-    ): DecryptedDataRecord
-
-    @Throws(CoreRuntimeException.InternalFailure::class)
-    fun build(
-            resource: ByteArray
-    ): DecryptedDataRecord
+            tags: HashMap<String, String>? = null,
+            creationDate: String? = null,
+            dataKey: GCKey? = null,
+            modelVersion: Int? = null
+    ): DecryptedBaseRecord<T>
 
     fun clear(): DecryptedRecordBuilder
 }

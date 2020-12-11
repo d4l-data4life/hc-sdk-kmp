@@ -17,50 +17,30 @@
 package care.data4life.sdk.network
 
 import care.data4life.crypto.GCKey
-import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.DecryptedRecord
+import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
+import care.data4life.sdk.network.model.definitions.DecryptedFhirRecord
 import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 
-class DecryptedRecordBuilderTest {
-    private lateinit var identifier: String
-    private lateinit var tags: HashMap<String, String>
-    private lateinit var annotations: List<String>
-    private lateinit var creationDate: String
-    private lateinit var updateDate: String
-    private lateinit var dataKey: GCKey
-    private var attachmentKey: GCKey? = null
-    private var modelVersion: Int = 0
-    private lateinit var fhirResource: DomainResource
-    private lateinit var customResource: ByteArray
-
+class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     @Before
     fun setUp() {
-        identifier = "potato"
-        @Suppress("UNCHECKED_CAST")
-        tags = Mockito.mock(HashMap::class.java) as HashMap<String, String>
-        @Suppress("UNCHECKED_CAST")
-        annotations = Mockito.mock(List::class.java) as List<String>
-        creationDate = "A Date"
-        updateDate = "2020-05-03"
-        dataKey = Mockito.mock(GCKey::class.java)
-        attachmentKey = Mockito.mock(GCKey::class.java)
-        modelVersion = 42
-        fhirResource = Mockito.mock(DomainResource::class.java)
-        customResource = ByteArray(42)
+        init()
     }
 
     @Test
     fun `it is a DecryptedRecordBuilder`() {
         val builder: Any = DecryptedRecordBuilderImpl()
 
-        Assert.assertTrue(builder is DecryptedRecordBuilder)
+        assertTrue(builder is DecryptedRecordBuilder)
     }
 
     @Test
@@ -69,7 +49,7 @@ class DecryptedRecordBuilderTest {
         val builder = DecryptedRecordBuilderImpl()
 
         // Then
-        assertNull( builder.tags )
+        assertNull(builder.tags)
     }
 
     @Test
@@ -79,8 +59,8 @@ class DecryptedRecordBuilderTest {
 
         // Then
         assertEquals(
-              tags,
-              builder.tags
+                tags,
+                builder.tags
         )
     }
 
@@ -90,7 +70,7 @@ class DecryptedRecordBuilderTest {
         val builder = DecryptedRecordBuilderImpl()
 
         // Then
-        assertNull( builder.dataKey )
+        assertNull(builder.dataKey)
     }
 
     @Test
@@ -102,6 +82,346 @@ class DecryptedRecordBuilderTest {
         assertEquals(
                 dataKey,
                 builder.dataKey
+        )
+    }
+
+    @Test
+    fun `Given, build is called with a unknown Resource, Tags, CreationDate, DataKey and ModelVersion, it fails with a InternalFailure`() {
+        try {
+            DecryptedRecordBuilderImpl()
+                    .build(
+                            "something",
+                            tags,
+                            creationDate,
+                            dataKey,
+                            modelVersion
+                    )
+            assertTrue(false)// FIXME: This is stupid
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, build is called with a DomainResource, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedFhirRecord`() {
+        // When
+        val record = DecryptedRecordBuilderImpl().build(
+                fhirResource,
+                tags,
+                creationDate,
+                dataKey,
+                modelVersion
+        )
+
+        // Then
+        assertTrue(record is DecryptedFhirRecord<*>)
+        assertEquals(
+                record,
+                DecryptedRecord(
+                        null,
+                        fhirResource,
+                        tags,
+                        listOf(),
+                        creationDate,
+                        null,
+                        dataKey,
+                        null,
+                        modelVersion
+                )
+        )
+    }
+
+    @Test
+    fun `Given, build is called with null, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedFhirRecord`() {
+        // When
+        val record = DecryptedRecordBuilderImpl().build(
+                null,
+                tags,
+                creationDate,
+                dataKey,
+                modelVersion
+        )
+
+        // Then
+        assertTrue(record is DecryptedFhirRecord<*>)
+        assertEquals(
+                record,
+                DecryptedRecord(
+                        null,
+                        null,
+                        tags,
+                        listOf(),
+                        creationDate,
+                        null,
+                        dataKey,
+                        null,
+                        modelVersion
+                )
+        )
+    }
+
+    @Test
+    fun `Given, build is called with ByteArray, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedDataRecord`() {
+        // When
+        val record = DecryptedRecordBuilderImpl().build(
+                customResource,
+                tags,
+                creationDate,
+                dataKey,
+                modelVersion
+        )
+
+        // Then
+        assertTrue(record is DecryptedDataRecord)
+        assertEquals(
+                record,
+                DecryptedAppDataRecord(
+                        null,
+                        customResource,
+                        tags,
+                        listOf(),
+                        creationDate,
+                        null,
+                        dataKey,
+                        modelVersion
+                )
+        )
+    }
+
+    @Test
+    fun `Given, build is called with a valid Resource, CreationDate, DataKey and ModelVersion, but without using a setter or delegating Tags, it fails with a InternalFailure`() {
+        // When
+        try {
+            DecryptedRecordBuilderImpl()
+                    .build(
+                            customResource,
+                            creationDate = creationDate,
+                            dataKey = dataKey,
+                            modelVersion = modelVersion
+                    )
+            assertTrue(false)// FIXME: This is stupid
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, build is called with a valid Resource, Tags, DataKey and ModelVersion, but without using a setter or delegating a CreationDate, it fails with a InternalFailure`() {
+        // When
+        try {
+            DecryptedRecordBuilderImpl()
+                    .build(
+                            customResource,
+                            tags = tags,
+                            dataKey = dataKey,
+                            modelVersion = modelVersion
+                    )
+            assertTrue(false)// FIXME: This is stupid
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, build is called with a valid Resource, Tags, CreationDate and ModelVersion, but without using a setter or delegating a DataKey, it fails with a InternalFailure`() {
+        // When
+        try {
+            DecryptedRecordBuilderImpl()
+                    .build(
+                            customResource,
+                            tags = tags,
+                            creationDate = creationDate,
+                            modelVersion = modelVersion
+                    )
+            assertTrue(false)// FIXME: This is stupid
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, build is called with a valid Resource, Tags, and CreationDate, but without using a setter or delegating a ModelVersion, it fails with a InternalFailure`() {
+        // When
+        try {
+            DecryptedRecordBuilderImpl()
+                    .build(
+                            customResource,
+                            tags = tags,
+                            creationDate = creationDate,
+                            dataKey = dataKey
+                    )
+            assertTrue(false)// FIXME: This is stupid
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, build is called with a valid Resource, null for Tags, CreationDate, DataKey and ModelVersion, but without using a setter for Tags, it fails with a InternalFailure`() {
+        // When
+        try {
+            DecryptedRecordBuilderImpl()
+                    .build(
+                            customResource,
+                            null,
+                            creationDate,
+                            dataKey,
+                            modelVersion
+                    )
+            assertTrue(false)// FIXME: This is stupid
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, build is called with a valid Resource, Tags, null for a CreationDate, DataKey and ModelVersion, but without using a setter for a CreationDate, it fails with a InternalFailure`() {
+        // When
+        try {
+            DecryptedRecordBuilderImpl()
+                    .build(
+                            customResource,
+                            tags = tags,
+                            creationDate = null,
+                            dataKey = dataKey,
+                            modelVersion = modelVersion
+                    )
+            assertTrue(false)// FIXME: This is stupid
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, build is called with a valid Resource, Tags, CreationDate, null for a DataKey and ModelVersion, but without using a setter for a DataKey, it fails with a InternalFailure`() {
+        // When
+        try {
+            DecryptedRecordBuilderImpl()
+                    .build(
+                            customResource,
+                            tags = tags,
+                            creationDate = creationDate,
+                            dataKey = null,
+                            modelVersion = modelVersion
+                    )
+            assertTrue(false)// FIXME: This is stupid
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, build is called with a valid Resource, Tags, CreationDate, DataKey and null for a ModelVersion, but without using a setter for a ModelVersion, it fails with a InternalFailure`() {
+        try {
+            DecryptedRecordBuilderImpl()
+                    .build(
+                            customResource,
+                            tags = tags,
+                            creationDate = creationDate,
+                            dataKey = dataKey,
+                            modelVersion = null
+                    )
+            assertTrue(false)// FIXME: This is stupid
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, build is called with a valid Resource and Tags, while all mandatory values are already given by setter, it uses the delegated Tags over the setted Tags`() {
+        // Given
+        @Suppress("UNCHECKED_CAST")
+        val delegatedTags = Mockito.mock(HashMap::class.java) as HashMap<String, String>
+        // When
+        val record = DecryptedRecordBuilderImpl()
+                .setTags(tags)
+                .setCreationDate(creationDate)
+                .setDataKey(dataKey)
+                .setModelVersion(modelVersion)
+                .build(
+                        customResource,
+                        tags = delegatedTags
+                )
+
+        // Then
+        assertEquals(
+                record.tags,
+                delegatedTags
+        )
+    }
+
+    @Test
+    fun `Given, build is called with a valid Resource and a CreationDate, while all mandatory values are already given by setter, it uses the delegated CreationDate over the setted CreationDate`() {
+        // Given
+        val delegatedDate = "2011-10-12"
+        // When
+        val record = DecryptedRecordBuilderImpl()
+                .setTags(tags)
+                .setCreationDate(creationDate)
+                .setDataKey(dataKey)
+                .setModelVersion(modelVersion)
+                .build(
+                        customResource,
+                        creationDate = delegatedDate
+                )
+
+        // Then
+        assertEquals(
+                record.customCreationDate,
+                delegatedDate
+        )
+    }
+
+    @Test
+    fun `Given, build is called with a valid Resource and a DataKey, while all mandatory values are already given by setter, it uses the delegated DataKey over the setted DataKey`() {
+        // Given
+        val delegatedDataKey = Mockito.mock(GCKey::class.java)
+        // When
+        val record = DecryptedRecordBuilderImpl()
+                .setTags(tags)
+                .setCreationDate(creationDate)
+                .setDataKey(dataKey)
+                .setModelVersion(modelVersion)
+                .build(
+                        customResource,
+                        dataKey = delegatedDataKey
+                )
+
+        // Then
+        assertEquals(
+                record.dataKey,
+                delegatedDataKey
+        )
+    }
+
+    @Test
+    fun `Given, build is called with a valid Resource and a ModelVersion, while all mandatory values are already given by setter, it uses the delegated ModelVersion over the setted ModelVersion`() {
+        // Given
+        val delegatedModelVersion = 23
+        // When
+        val record = DecryptedRecordBuilderImpl()
+                .setTags(tags)
+                .setCreationDate(creationDate)
+                .setDataKey(dataKey)
+                .setModelVersion(modelVersion)
+                .build(
+                        customResource,
+                        modelVersion = delegatedModelVersion
+                )
+
+        // Then
+        assertEquals(
+                record.modelVersion,
+                delegatedModelVersion
         )
     }
 
@@ -123,7 +443,7 @@ class DecryptedRecordBuilderTest {
                 .build(fhirResource)
 
         // Then
-        Assert.assertEquals(
+        assertEquals(
                 record,
                 DecryptedRecord(
                         identifier,
@@ -156,7 +476,7 @@ class DecryptedRecordBuilderTest {
                 .setModelVersion(modelVersion)
                 .build(customResource)
 
-        Assert.assertEquals(
+        assertEquals(
                 record,
                 DecryptedAppDataRecord(
                         identifier,

@@ -17,26 +17,27 @@
 package care.data4life.sdk.network
 
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.network.model.DecryptedRecord
+import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTestBase() {
+class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase() {
+
     @Before
     fun setUp() {
         init()
     }
 
     @Test
-    fun `Given, no mandatory setters are called, it fails if build is called with a FhirResource`() {
+    fun `Given, no mandatory setters are called, it fails if build is called with a CustomResource`() {
         // Given
         val builder = DecryptedRecordBuilderImpl()
 
         // When
         try {
-            builder.build(fhirResource)
+            builder.build(customResource)
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -44,13 +45,13 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
     }
 
     @Test
-    fun `Given, setTags is called with a HashMap String to String, but the other mandatory setters are not called, it fails if build is called with a FhirResource`() {
+    fun `Given, setTags is called with a HashMap String to String, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
         val builder = DecryptedRecordBuilderImpl()
 
         // When
         try {
-            builder.setTags(tags).build(fhirResource)
+            builder.setTags(tags).build(customResource)
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -58,13 +59,13 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
     }
 
     @Test
-    fun `Given, setCreationDate is called with a String, but the other mandatory setters are not called, it fails if build is called with a FhirResource`() {
+    fun `Given, setCreationDate is called with a String, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
         val builder = DecryptedRecordBuilderImpl()
 
         // When
         try {
-            builder.setCreationDate(creationDate).build(fhirResource)
+            builder.setCreationDate(creationDate).build(customResource)
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -72,13 +73,13 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
     }
 
     @Test
-    fun `Given, setDataKey is called with a GCKey, but the other mandatory setters are not called, it fails if build is called with a FhirResource`() {
+    fun `Given, setDataKey is called with a GCKey, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
         val builder = DecryptedRecordBuilderImpl()
 
         // When
         try {
-            builder.setDataKey(dataKey).build(fhirResource)
+            builder.setDataKey(dataKey).build(customResource)
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -86,13 +87,13 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
     }
 
     @Test
-    fun `Given, setModelVersion is called with a Int, but the other mandatory setters are not called, it fails if build is called with a FhirResource`() {
+    fun `Given, setModelVersion is called with a Int, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
         val builder = DecryptedRecordBuilderImpl()
 
         // When
         try {
-            builder.setModelVersion(modelVersion).build(fhirResource)
+            builder.setModelVersion(modelVersion).build(customResource)
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -100,108 +101,7 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
     }
 
     @Test
-    fun `Given, setTags and setCreationDate are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a FhirResource`() {
-        // Given
-        val builder = DecryptedRecordBuilderImpl()
-
-        // When
-        try {
-            builder
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .build(fhirResource)
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, setTags and setDataKey are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a FhirResource`() {
-        // Given
-        val builder = DecryptedRecordBuilderImpl()
-
-        // When
-        try {
-            builder.setTags(tags)
-                    .setDataKey(dataKey)
-                    .build(fhirResource)
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, setTags and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a FhirResource`() {
-        // Given
-        val builder = DecryptedRecordBuilderImpl()
-
-        // When
-        try {
-            builder
-                    .setTags(tags)
-                    .setModelVersion(modelVersion)
-                    .build(fhirResource)
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, setCreationDate and setDataKey are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a FhirResource`() {
-        // Given
-        val builder = DecryptedRecordBuilderImpl()
-
-        // When
-        try {
-            builder
-                    .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .build(fhirResource)
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, setCreationDate and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a FhirResource`() {
-        // Given
-        val builder = DecryptedRecordBuilderImpl()
-
-        // When
-        try {
-            builder
-                    .setCreationDate(creationDate)
-                    .setModelVersion(modelVersion)
-                    .build(fhirResource)
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, setDataKey and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a FhirResource`() {
-        // Given
-        val builder = DecryptedRecordBuilderImpl()
-
-        // When
-        try {
-            builder
-                    .setDataKey(dataKey)
-                    .setModelVersion(modelVersion)
-                    .build(fhirResource)
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, setTags, setCreationDate and setDataKey are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a FhirResource`() {
+    fun `Given, setTags and setCreationDate are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
         val builder = DecryptedRecordBuilderImpl()
 
@@ -210,8 +110,7 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
             builder
                     .setTags(tags)
                     .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .build(fhirResource)
+                    .build(customResource)
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -219,7 +118,110 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
     }
 
     @Test
-    fun `Given, setTags, setCreationDate and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a FhirResource`() {
+    fun `Given, setTags and setDataKey are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
+        // Given
+        val builder = DecryptedRecordBuilderImpl()
+
+        // When
+        try {
+            builder
+                    .setTags(tags)
+                    .setDataKey(dataKey)
+                    .build(customResource)
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, setTags and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
+        // Given
+        val builder = DecryptedRecordBuilderImpl()
+
+        // When
+        try {
+            builder
+                    .setTags(tags)
+                    .setModelVersion(modelVersion)
+                    .build(customResource)
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, setCreationDate and setDataKey are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
+        // Given
+        val builder = DecryptedRecordBuilderImpl()
+
+        // When
+        try {
+            builder
+                    .setCreationDate(creationDate)
+                    .setDataKey(dataKey)
+                    .build(customResource)
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, setCreationDate and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
+        // Given
+        val builder = DecryptedRecordBuilderImpl()
+
+        // When
+        try {
+            builder
+                    .setCreationDate(creationDate)
+                    .setModelVersion(modelVersion)
+                    .build(customResource)
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, setDataKey and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
+        // Given
+        val builder = DecryptedRecordBuilderImpl()
+
+        // When
+        try {
+            builder
+                    .setDataKey(dataKey)
+                    .setModelVersion(modelVersion)
+                    .build(customResource)
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, setTags, setCreationDate and setDataKey are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
+        // Given
+        val builder = DecryptedRecordBuilderImpl()
+
+        // When
+        try {
+            builder
+                    .setTags(tags)
+                    .setCreationDate(creationDate)
+                    .setDataKey(dataKey)
+                    .build(customResource)
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, setTags, setCreationDate and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
         val builder = DecryptedRecordBuilderImpl()
 
@@ -229,7 +231,7 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
                     .setTags(tags)
                     .setCreationDate(creationDate)
                     .setModelVersion(modelVersion)
-                    .build(fhirResource)
+                    .build(customResource)
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -237,7 +239,7 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
     }
 
     @Test
-    fun `Given, setTags, setDataKey and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a FhirResource`() {
+    fun `Given, setTags, setDataKey and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
         val builder = DecryptedRecordBuilderImpl()
 
@@ -247,7 +249,7 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
                     .setTags(tags)
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
-                    .build(fhirResource)
+                    .build(customResource)
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -255,7 +257,7 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
     }
 
     @Test
-    fun `Given, setCreationDate, setDataKey and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a FhirResource`() {
+    fun `Given, setCreationDate, setDataKey and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
         val builder = DecryptedRecordBuilderImpl()
 
@@ -265,7 +267,7 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
                     .setCreationDate(creationDate)
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
-                    .build(fhirResource)
+                    .build(customResource)
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -273,7 +275,7 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
     }
 
     @Test
-    fun `Given, setTags, setCreationDate, setDataKey and setModelVersion are called with their appropriate payload, it returns a DecryptedFhirRecord if build is called with a FhirResource`() {
+    fun `Given, setTags, setCreationDate, setDataKey and setModelVersion are called with their appropriate payload, it returns a DecryptedDataRecord a CustomResource`() {
         // Given
         val builder = DecryptedRecordBuilderImpl()
 
@@ -283,19 +285,19 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
                 .setCreationDate(creationDate)
                 .setDataKey(dataKey)
                 .setModelVersion(modelVersion)
-                .build(fhirResource)
+                .build(customResource)
 
+        // Then
         assertEquals(
                 record,
-                DecryptedRecord(
-                        "",
-                        fhirResource,
+                DecryptedAppDataRecord(
+                        null,
+                        customResource,
                         tags,
                         listOf(),
                         creationDate,
                         null,
                         dataKey,
-                        null,
                         modelVersion
                 )
         )
@@ -314,7 +316,7 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
                     .setTags(null)
-                    .build(fhirResource)
+                    .build(customResource)
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             // Then
@@ -335,7 +337,7 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
                     .setCreationDate(null)
-                    .build(fhirResource)
+                    .build(customResource)
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             // Then
@@ -356,7 +358,7 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
                     .setDataKey(null)
-                    .build(fhirResource)
+                    .build(customResource)
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             // Then
@@ -377,7 +379,7 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
                     .setModelVersion(null)
-                    .build(fhirResource)
+                    .build(customResource)
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             // Then
@@ -397,7 +399,7 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
                     .clear()
-                    .build(fhirResource)
+                    .build(customResource)
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -411,22 +413,7 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
                     .setModelVersion(modelVersion)
                     .clear()
                     .setTags(tags)
-                    .build(fhirResource)
-            assertTrue(false)// FIXME: This is stupid
-        } catch (e: Exception) {
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-
-        try {
-            builder
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .setModelVersion(modelVersion)
-                    .clear()
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .build(fhirResource)
+                    .build(customResource)
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -441,8 +428,23 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
                     .clear()
                     .setTags(tags)
                     .setCreationDate(creationDate)
+                    .build(customResource)
+            assertTrue(false)// FIXME: This is stupid
+        } catch (e: Exception) {
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+
+        try {
+            builder
+                    .setTags(tags)
+                    .setCreationDate(creationDate)
                     .setDataKey(dataKey)
-                    .build(fhirResource)
+                    .setModelVersion(modelVersion)
+                    .clear()
+                    .setTags(tags)
+                    .setCreationDate(creationDate)
+                    .setDataKey(dataKey)
+                    .build(customResource)
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -458,19 +460,19 @@ class DecryptedRecordBuilderMandatorySettersFhirTest : DecryptedRecordBuilderTes
                 .setCreationDate(creationDate)
                 .setDataKey(dataKey)
                 .setModelVersion(modelVersion)
-                .build(fhirResource)
+                .build(customResource)
+
         // Then
         assertEquals(
                 record,
-                DecryptedRecord(
-                        "",
-                        fhirResource,
+                DecryptedAppDataRecord(
+                        null,
+                        customResource,
                         tags,
                         listOf(),
                         creationDate,
                         null,
                         dataKey,
-                        null,
                         modelVersion
                 )
         )

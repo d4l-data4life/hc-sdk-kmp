@@ -21,7 +21,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class DecryptedRecordBuilderOptionalSettersFhirTest : DecryptedRecordBuilderTestBase() {
+class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase() {
 
     @Before
     fun setUp() {
@@ -42,7 +42,7 @@ class DecryptedRecordBuilderOptionalSettersFhirTest : DecryptedRecordBuilderTest
         assertEquals(
                 record,
                 DecryptedRecord(
-                        "",
+                        null,
                         fhirResource,
                         tags,
                         listOf(),
@@ -105,7 +105,7 @@ class DecryptedRecordBuilderOptionalSettersFhirTest : DecryptedRecordBuilderTest
         assertEquals(
                 record,
                 DecryptedRecord(
-                        "",
+                        null,
                         fhirResource,
                         tags,
                         listOf(),
@@ -136,7 +136,7 @@ class DecryptedRecordBuilderOptionalSettersFhirTest : DecryptedRecordBuilderTest
         assertEquals(
                 record1,
                 DecryptedRecord(
-                        "",
+                        null,
                         fhirResource,
                         tags,
                         annotations,
@@ -169,7 +169,7 @@ class DecryptedRecordBuilderOptionalSettersFhirTest : DecryptedRecordBuilderTest
         assertEquals(
                 record,
                 DecryptedRecord(
-                        "",
+                        null,
                         fhirResource,
                         tags,
                         listOf(),
@@ -200,7 +200,7 @@ class DecryptedRecordBuilderOptionalSettersFhirTest : DecryptedRecordBuilderTest
         assertEquals(
                 record,
                 DecryptedRecord(
-                        "",
+                        null,
                         fhirResource,
                         tags,
                         listOf(),
@@ -232,7 +232,7 @@ class DecryptedRecordBuilderOptionalSettersFhirTest : DecryptedRecordBuilderTest
         assertEquals(
                 record,
                 DecryptedRecord(
-                        "",
+                        null,
                         fhirResource,
                         tags,
                         listOf(),
@@ -263,7 +263,7 @@ class DecryptedRecordBuilderOptionalSettersFhirTest : DecryptedRecordBuilderTest
         assertEquals(
                 record,
                 DecryptedRecord(
-                        "",
+                        null,
                         fhirResource,
                         tags,
                         listOf(),
@@ -295,7 +295,7 @@ class DecryptedRecordBuilderOptionalSettersFhirTest : DecryptedRecordBuilderTest
         assertEquals(
                 record,
                 DecryptedRecord(
-                        "",
+                        null,
                         fhirResource,
                         tags,
                         listOf(),
@@ -364,7 +364,7 @@ class DecryptedRecordBuilderOptionalSettersFhirTest : DecryptedRecordBuilderTest
         assertEquals(
                 record,
                 DecryptedRecord(
-                        "",
+                        null,
                         fhirResource,
                         tags,
                         listOf(),

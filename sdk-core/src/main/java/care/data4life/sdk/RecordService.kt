@@ -95,7 +95,7 @@ internal class RecordService(
             creationDate,
             dataKey,
             ModelVersion.CURRENT
-    )
+    ) as DecryptedFhirRecord<T>
 
     @Throws(DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class)
@@ -149,7 +149,7 @@ internal class RecordService(
             creationDate,
             dataKey,
             ModelVersion.CURRENT
-    )
+    ) as DecryptedDataRecord
 
     fun createRecord(
             resource: ByteArray,

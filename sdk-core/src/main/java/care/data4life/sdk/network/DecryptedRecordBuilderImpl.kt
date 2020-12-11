@@ -21,12 +21,13 @@ import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.DecryptedRecord
+import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhirRecord
 import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
 
 internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
-    private var identifier: String = ""
+    private var identifier: String? = null
     private var _tags: HashMap<String, String>? = null
     private var annotations: List<String> = listOf()
     private var creationDate: String? = null
@@ -61,7 +62,7 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
     //Optional
     override fun setIdentifier(
             identifier: String?
-    ): DecryptedRecordBuilder = this.also { it.identifier = identifier ?: "" }
+    ): DecryptedRecordBuilder = this.also { it.identifier = identifier }
 
     override fun setAnnotations(
             annotations: List<String>?
@@ -76,84 +77,111 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
     ): DecryptedRecordBuilder = this.also { it.attachmentKey = attachmentKey }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
-    private fun validatePayload() {
+    private fun validatePayload(
+            tags: HashMap<String, String>?,
+            creationDate: String?,
+            dataKey: GCKey?,
+            modelVersion: Int?
+    ) {
         if (
-                this._tags == null ||
-                this.creationDate == null ||
-                this._dataKey == null ||
-                this.modelVersion == null
+                this._tags == null && tags == null ||
+                this.creationDate == null && creationDate == null ||
+                this._dataKey == null && dataKey == null ||
+                this.modelVersion == null && modelVersion == null
 
         ) {
-            throw CoreRuntimeException
-                    .InternalFailure()
+            throw CoreRuntimeException.InternalFailure()
         }
     }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
-    override fun <T : DomainResource?> build(
-            resource: T,
+    private fun <T : DomainResource?> buildFhirRecord(
+            resource: T?,
             tags: HashMap<String, String>,
             creationDate: String,
             dataKey: GCKey,
             modelVersion: Int
-    ): DecryptedFhirRecord<T> = DecryptedRecord(
-            this.identifier,
-            resource,
-            tags,
-            this.annotations,
-            creationDate,
-            this.updatedDate,
-            dataKey,
-            this.attachmentKey,
-            modelVersion
-    )
+    ): DecryptedFhirRecord<T?> =
+            DecryptedRecord(
+                    this.identifier,
+                    resource,
+                    tags,
+                    this.annotations,
+                    creationDate,
+                    this.updatedDate,
+                    dataKey,
+                    this.attachmentKey,
+                    modelVersion
+            )
 
     @Throws(CoreRuntimeException.InternalFailure::class)
-    override fun <T : DomainResource?> build(
-            resource: T
-    ): DecryptedFhirRecord<T> = this.validatePayload().let {
-        this.build(
-                resource,
-                this._tags!!,
-                this.creationDate!!,
-                this._dataKey!!,
-                this.modelVersion!!
-        )
-    }
-
-    @Throws(CoreRuntimeException.InternalFailure::class)
-    override fun build(
+    private fun buildCustomRecord(
             resource: ByteArray,
             tags: HashMap<String, String>,
-            creationDate: String,
-            dataKey: GCKey,
-            modelVersion: Int
+            creationDate: String?,
+            dataKey: GCKey?,
+            modelVersion: Int?
     ): DecryptedDataRecord = DecryptedAppDataRecord(
             this.identifier,
             resource,
             tags,
             this.annotations,
-            creationDate,
+            creationDate!!,
             this.updatedDate,
-            dataKey,
-            modelVersion
+            dataKey!!,
+            modelVersion!!
     )
 
+    @Suppress("UNCHECKED_CAST", "NAME_SHADOWING")
     @Throws(CoreRuntimeException.InternalFailure::class)
-    override fun build(
-            resource: ByteArray
-    ): DecryptedDataRecord = this.validatePayload().let {
-        this.build(
-                resource,
-                this._tags!!,
-                this.creationDate!!,
-                this._dataKey!!,
-                this.modelVersion!!
+    override fun <T : Any?> build(
+            resource: T,
+            tags: HashMap<String, String>?,
+            creationDate: String?,
+            dataKey: GCKey?,
+            modelVersion: Int?
+    ): DecryptedBaseRecord<T> {
+        this.validatePayload(
+                tags,
+                creationDate,
+                dataKey,
+                modelVersion
         )
+
+        val tags = tags ?: this._tags!!
+        val creationDate = creationDate ?: this.creationDate!!
+        val dataKey = dataKey ?: this.dataKey!!
+        val modelVersion = modelVersion ?: this.modelVersion!!
+
+        return when (resource) {
+            null -> this.buildFhirRecord(
+                    resource,
+                    tags,
+                    creationDate,
+                    dataKey,
+                    modelVersion
+            )
+            is DomainResource -> this.buildFhirRecord(
+                    resource,
+                    tags,
+                    creationDate,
+                    dataKey,
+                    modelVersion
+            )
+            is ByteArray -> this.buildCustomRecord(
+                    resource,
+                    tags,
+                    creationDate,
+                    dataKey,
+                    modelVersion
+            )
+            else -> throw CoreRuntimeException.InternalFailure()
+
+        } as DecryptedBaseRecord<T>
     }
 
     override fun clear(): DecryptedRecordBuilder = this.also {
-        it.identifier = ""
+        it.identifier = null
         it._tags = null
         it.annotations = listOf()
         it.creationDate = null

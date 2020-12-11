@@ -27,16 +27,13 @@ internal interface DecryptedBaseRecord<T> {
     var customCreationDate: String?
     var updatedDate: String?
     var dataKey: GCKey?
+    var attachmentsKey: GCKey?
     var modelVersion: Int
 }
 
-internal interface DecryptedFhirRecord<T : DomainResource?> : DecryptedBaseRecord<T> {
-    var attachmentsKey: GCKey?
-}
-
+internal interface DecryptedFhirRecord<T : DomainResource?> : DecryptedBaseRecord<T>
 internal interface DecryptedDataRecord : DecryptedBaseRecord<ByteArray> {
-    fun copyWithResourceAnnotations(
-            data: ByteArray,
-            annotations: List<String>? = null
-    ): DecryptedDataRecord
+    override var attachmentsKey: GCKey?
+        get() = null
+        set(_) {}
 }

@@ -23,7 +23,6 @@ import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.network.DecryptedRecordBuilderImpl
-import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhirRecord
 import care.data4life.sdk.util.MimeType
 
@@ -684,7 +683,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         ).thenReturn(mockDecryptedDataRecord)
         Mockito.doReturn(mockEncryptedRecord)
                 .`when`(recordService)
-                .encryptDataRecord( ArgumentMatchers.argThat { it is DecryptedDataRecord } )
+                .encryptRecord(mockDecryptedDataRecord)
         Mockito.`when`(mockApiService.createRecord(ALIAS, USER_ID, mockEncryptedRecord))
                 .thenReturn(Single.just(mockEncryptedRecord))
         Mockito.doReturn(mockDecryptedDataRecord)
@@ -719,7 +718,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 ModelVersion.CURRENT
         )
         inOrder.verify(recordService)
-                .encryptDataRecord( ArgumentMatchers.argThat { it is DecryptedDataRecord } )//mockDecryptedDataRecord)
+                .encryptRecord(mockDecryptedDataRecord)//mockDecryptedDataRecord)
         inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockEncryptedRecord)
         inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).buildMeta(mockDecryptedDataRecord)

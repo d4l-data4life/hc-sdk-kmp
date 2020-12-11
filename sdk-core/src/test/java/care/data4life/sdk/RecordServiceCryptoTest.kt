@@ -54,7 +54,6 @@ class RecordServiceCryptoTest : RecordServiceTestBase() {
         // Given
         val currentCommonKeyId = "currentCommonKeyId"
 
-
         Mockito.`when`(mockTagEncryptionService.encryptTags(mockTags))
                 .thenReturn(mockEncryptedTags)
         Mockito.`when`(mockTagEncryptionService.encryptAnnotations(ANNOTATIONS))
@@ -77,12 +76,13 @@ class RecordServiceCryptoTest : RecordServiceTestBase() {
         // Then
         Truth.assertThat(encryptedRecord.commonKeyId).isEqualTo(currentCommonKeyId)
         Truth.assertThat(encryptedRecord.encryptedAttachmentsKey).isNull()
+
         inOrder.verify(mockTagEncryptionService).encryptTags(mockTags)
         inOrder.verify(mockTagEncryptionService).encryptAnnotations(ANNOTATIONS)
-        inOrder.verify(mockFhirService).encryptResource(mockDataKey, mockCarePlan)
         inOrder.verify(mockCryptoService).fetchCurrentCommonKey()
         inOrder.verify(mockCryptoService)
                 .encryptSymmetricKey(mockCommonKey, KeyType.DATA_KEY, mockDataKey)
+        inOrder.verify(mockFhirService).encryptResource(mockDataKey, mockCarePlan)
         inOrder.verifyNoMoreInteractions()
 
         Mockito.verify((mockEncryptedTags as MutableList)).addAll(ANNOTATIONS)
@@ -126,10 +126,10 @@ class RecordServiceCryptoTest : RecordServiceTestBase() {
 
         inOrder.verify(mockTagEncryptionService).encryptTags(mockTags)
         inOrder.verify(mockTagEncryptionService).encryptAnnotations(ANNOTATIONS)
-        inOrder.verify(mockFhirService).encryptResource(mockDataKey, mockCarePlan)
         inOrder.verify(mockCryptoService).fetchCurrentCommonKey()
         inOrder.verify(mockCryptoService)
                 .encryptSymmetricKey(mockCommonKey, KeyType.DATA_KEY, mockDataKey)
+        inOrder.verify(mockFhirService).encryptResource(mockDataKey, mockCarePlan)
         inOrder.verify(mockCryptoService)
                 .encryptSymmetricKey(mockCommonKey, KeyType.ATTACHMENT_KEY, mockAttachmentKey)
         inOrder.verifyNoMoreInteractions()
@@ -359,7 +359,7 @@ class RecordServiceCryptoTest : RecordServiceTestBase() {
         ).thenReturn(Single.just(mockEncryptedDataKey))
 
         // When
-        val encryptedRecord = recordService.encryptDataRecord(mockDecryptedDataRecord)
+        val encryptedRecord = recordService.encryptRecord(mockDecryptedDataRecord)
 
         // Then
         Truth.assertThat(encryptedRecord.commonKeyId).isEqualTo(currentCommonKeyId)
@@ -367,10 +367,10 @@ class RecordServiceCryptoTest : RecordServiceTestBase() {
 
         inOrder.verify(mockTagEncryptionService).encryptTags(mockTags)
         inOrder.verify(mockTagEncryptionService).encryptAnnotations(ANNOTATIONS)
-        inOrder.verify(mockCryptoService).encrypt(mockDataKey, mockAppData)
         inOrder.verify(mockCryptoService).fetchCurrentCommonKey()
         inOrder.verify(mockCryptoService)
                 .encryptSymmetricKey(mockCommonKey, KeyType.DATA_KEY, mockDataKey)
+        inOrder.verify(mockCryptoService).encrypt(mockDataKey, mockAppData)
         inOrder.verifyNoMoreInteractions()
 
         Mockito.verify((mockEncryptedTags as MutableList)).addAll(ANNOTATIONS)

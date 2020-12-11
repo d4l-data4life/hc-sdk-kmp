@@ -81,20 +81,66 @@ internal class RecordService(
         REMOVE, RESTORE
     }
 
-    private fun <T : Any> createNewDecryptedRecord(
-            builder: DecryptedRecordBuilder,
-            resource: T,
-            tags: HashMap<String, String>,
-            creationDate: String,
-            dataKey: GCKey
-    ): DecryptedBaseRecord<T> = builder.build(
-            resource,
-            tags,
-            creationDate,
-            dataKey,
-            ModelVersion.CURRENT
-    )
+    private fun getTags(resource: Any): HashMap<String, String> {
+        return if (resource is ByteArray) {
+            taggingService.appendDefaultTags(null, null)
+        } else {
+            taggingService.appendDefaultTags((resource as DomainResource).resourceType, null)
+        }
+    }
 
+    private fun <T : Any> createRecord(
+            resource: T,
+            userId: String,
+            annotations: List<String>,
+            uploadData: (decryptedRecord: Single<DecryptedBaseRecord<T>>) -> Single<DecryptedBaseRecord<T>>,
+            createRecord: (decryptedRecord: Single<DecryptedBaseRecord<T>>) -> Single<BaseRecord<T>>
+    ): Single<BaseRecord<T>> {
+        val createdRecord = Single.just(
+                DecryptedRecordBuilderImpl()
+                        .setAnnotations(annotations)
+                        .build(
+                                resource,
+                                this.getTags(resource),
+                                DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
+                                cryptoService.generateGCKey().blockingGet(),
+                                ModelVersion.CURRENT
+                        )
+        )
+
+        return uploadData(createdRecord)
+                .map { record -> encryptRecord(record) }
+                .flatMap { encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord) }
+                .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
+                .let { createRecord(it) }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T : DomainResource?> prepareAndcreateFhirRecord(
+            resource: T,
+            data: HashMap<Attachment, String?>?,
+            record: Single<DecryptedBaseRecord<T>>
+    ): Single<BaseRecord<T>> {
+        return record
+                .map { decryptedRecord ->
+                    resource as DomainResource
+                    restoreUploadData(
+                            decryptedRecord as DecryptedFhirRecord<DomainResource>,
+                            resource,
+                            data
+                    )
+                }
+                .map { r -> assignResourceId(r) }
+                .map { r ->
+                    Record(
+                            r.resource,
+                            buildMeta(r),
+                            r.annotations
+                    ) as BaseRecord<T>
+                }
+    }
+
+    @Suppress("UNCHECKED_CAST")
     @Throws(DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class)
     @JvmOverloads
@@ -104,65 +150,50 @@ internal class RecordService(
             annotations: List<String> = listOf()
     ): Single<Record<T>> {
         checkDataRestrictions(resource)
-        val createRecord = Single.just(
-                createNewDecryptedRecord(
-                        DecryptedRecordBuilderImpl().setAnnotations(annotations),
-                        resource,
-                        taggingService.appendDefaultTags(resource.resourceType, null),
-                        DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
-                        cryptoService.generateGCKey().blockingGet()
-                ) as DecryptedFhirRecord<T>
-        )
-
         val data = extractUploadData(resource)
-        return createRecord
-                .map { record -> uploadData(record, null, userId) }
-                .map { record -> removeUploadData(record) }
-                .map { record -> encryptRecord(record) }
-                .flatMap { encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord) }
-                .map { encryptedRecord ->
-                    @Suppress("UNCHECKED_CAST")
-                    decryptRecord<DomainResource>(encryptedRecord, userId) as DecryptedFhirRecord<T>
-                }
-                .map { record -> restoreUploadData(record, resource, data) }
-                .map { record -> assignResourceId(record) }
-                .map { decryptedRecord ->
-                    Record(
-                            decryptedRecord.resource,
-                            buildMeta(decryptedRecord),
-                            decryptedRecord.annotations
-                    )
-                }
+
+        return createRecord(
+                resource,
+                userId,
+                annotations,
+                { s ->
+                    s
+                            .map { decryptedRecord ->
+                                uploadData(
+                                        decryptedRecord as DecryptedFhirRecord<T>,
+                                        null,
+                                        userId
+                                )
+                            }
+                            .map { decryptedRecord -> removeUploadData(decryptedRecord) }
+                },
+                { record -> prepareAndcreateFhirRecord(resource, data, record) }
+        ) as Single<Record<T>>
     }
 
+    private fun createDataRecord(
+            record: Single<DecryptedBaseRecord<ByteArray>>
+    ): Single<BaseRecord<ByteArray>> = record.map { r ->
+        AppDataRecord(
+                r.identifier!!,
+                r.resource,
+                buildMeta(r),
+                r.annotations
+        ) as BaseRecord<ByteArray>
+    }
+
+    @Suppress("UNCHECKED_CAST")
     fun createRecord(
             resource: ByteArray,
             userId: String,
             annotations: List<String>
-    ): Single<DataRecord> {
-        val createRecord = Single.just(
-                createNewDecryptedRecord(
-                        DecryptedRecordBuilderImpl().setAnnotations(annotations),
-                        resource,
-                        taggingService.appendDefaultTags(null, null),
-                        DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
-                        cryptoService.generateGCKey().blockingGet()
-                ) as DecryptedDataRecord
-        )
-
-        return createRecord
-                .map { record -> encryptDataRecord(record) }
-                .flatMap { encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord) }
-                .map { encryptedRecord -> decryptRecord<ByteArray>(encryptedRecord, userId) }
-                .map { decryptedRecord ->
-                    AppDataRecord(
-                            decryptedRecord.identifier!!,
-                            decryptedRecord.resource,
-                            buildMeta(decryptedRecord),
-                            annotations
-                    )
-                }
-    }
+    ): Single<DataRecord> = createRecord(
+            resource,
+            userId,
+            annotations,
+            { r -> r },
+            { record -> createDataRecord(record) }
+    ) as Single<DataRecord>
 
     fun <T : DomainResource> createRecords(resources: List<T>, userId: String): Single<CreateResult<T>> {
         val failedOperations: MutableList<Pair<T, D4LException>> = mutableListOf()
@@ -238,7 +269,6 @@ internal class RecordService(
                     }
 
                 }
-
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -478,26 +508,46 @@ internal class RecordService(
 
     @Throws(DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class)
-    @JvmOverloads
-    fun <T : DomainResource> updateRecord(
+    fun <T : Any> updateRecord(
+            userId: String,
+            recordId: String,
+            prepareEncryption: (record: Single<DecryptedBaseRecord<T>>) -> Single<DecryptedBaseRecord<T>>,
+            createRecord: (decryptedRecord: Single<DecryptedBaseRecord<T>>) -> Single<BaseRecord<T>>
+    ): Single<BaseRecord<T>> {
+        val unpreparedDecryptedRecord = apiService
+                .fetchRecord(alias, userId, recordId)
+                .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
+
+        return createRecord(
+                prepareEncryption(unpreparedDecryptedRecord)
+                        .map { record -> encryptRecord(record) }
+                        .flatMap { encryptedRecord ->
+                            apiService.updateRecord(
+                                    alias,
+                                    userId,
+                                    recordId,
+                                    encryptedRecord
+                            )
+                        }
+                        .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
+        )
+    }
+
+    private fun <T : DomainResource> prepareDecryptedFhirRecord(
             resource: T,
             userId: String,
-            annotations: List<String>? = null
-    ): Single<Record<T>> {
-        checkDataRestrictions(resource)
-        val data = extractUploadData(resource)
-        val recordId = resource.id
-        return apiService
-                .fetchRecord(alias, userId, recordId)
-                .map { encryptedRecord -> decryptRecord<DomainResource>(encryptedRecord, userId) }
-                .map { decryptedRecord ->
-                    @Suppress("UNCHECKED_CAST")
-                    uploadData(
-                            decryptedRecord as DecryptedFhirRecord<T>,
-                            resource,
-                            userId
-                    )
-                }
+            annotations: List<String>?,
+            record: Single<DecryptedBaseRecord<T>>
+    ): Single<DecryptedBaseRecord<T>> {
+        @Suppress("UNCHECKED_CAST")
+        return record.map { decryptedRecord ->
+            @Suppress("UNCHECKED_CAST")
+            uploadData(
+                    decryptedRecord as DecryptedFhirRecord<T>,
+                    resource,
+                    userId
+            )
+        }
                 .map { decryptedRecord ->
                     decryptedRecord.also {
                         cleanObsoleteAdditionalIdentifiers(resource)
@@ -507,51 +557,66 @@ internal class RecordService(
                         }
                     }
                 }
-                .map { record -> removeUploadData(record) }
-                .map { record -> encryptRecord(record) }
-                .flatMap { encryptedRecord -> apiService.updateRecord(alias, userId, recordId, encryptedRecord) }
-                .map { encryptedRecord ->
-                    @Suppress("UNCHECKED_CAST")
-                    decryptRecord<DomainResource>(encryptedRecord, userId) as DecryptedFhirRecord<T>
-                }
-                .map { decryptedRecord -> restoreUploadData(decryptedRecord, resource, data) }
-                .map { record -> assignResourceId(record) }
                 .map { decryptedRecord ->
-                    Record(
-                            decryptedRecord.resource,
-                            buildMeta(decryptedRecord),
-                            decryptedRecord.annotations
-                    )
-                }
+                    removeUploadData(decryptedRecord)
+                } as Single<DecryptedBaseRecord<T>>
     }
 
+    @Throws(DataRestrictionException.UnsupportedFileType::class,
+            DataRestrictionException.MaxDataSizeViolation::class)
+    @JvmOverloads
+    fun <T : DomainResource> updateRecord(
+            resource: T,
+            userId: String,
+            annotations: List<String>? = null
+    ): Single<Record<T>> {
+        checkDataRestrictions(resource)
+        val data = extractUploadData(resource)
+        val recordId = resource.id
+
+        @Suppress("UNCHECKED_CAST")
+        return updateRecord(
+                userId,
+                recordId!!,
+                { record: Single<DecryptedBaseRecord<T>> ->
+                    prepareDecryptedFhirRecord(
+                            resource,
+                            userId,
+                            annotations,
+                            record
+                    )
+                },
+                { record ->
+                    prepareAndcreateFhirRecord(
+                            resource,
+                            data,
+                            record
+                    )
+                }
+        ) as Single<Record<T>>
+    }
+
+    @Suppress("UNCHECKED_CAST")
     fun updateRecord(
             resource: ByteArray,
             userId: String,
             recordId: String,
             annotations: List<String>? = listOf()
-    ): Single<DataRecord> = apiService
-            .fetchRecord(alias, userId, recordId)
-            .map { encryptedRecord -> decryptRecord<ByteArray>(encryptedRecord, userId) as DecryptedDataRecord }
-            .map { decryptedRecord -> decryptedRecord.copyWithResourceAnnotations(resource, annotations) }
-            .map { record -> encryptDataRecord(record) }
-            .flatMap { encryptedRecord ->
-                apiService.updateRecord(
-                        alias,
-                        userId,
-                        recordId,
-                        encryptedRecord
-                )
-            }
-            .map { encryptedRecord -> decryptRecord<ByteArray>(encryptedRecord, userId) }
-            .map { decryptedRecord ->
-                AppDataRecord(
-                        decryptedRecord.identifier!!,
-                        decryptedRecord.resource,
-                        buildMeta(decryptedRecord),
-                        decryptedRecord.annotations
-                )
-            }
+    ): Single<DataRecord> = updateRecord(
+            userId,
+            recordId,
+            { s: Single<DecryptedBaseRecord<ByteArray>> ->
+                s.map { decryptedRecord ->
+                    decryptedRecord.also {
+                        decryptedRecord.resource = resource
+                        if (annotations != null) {
+                            decryptedRecord.annotations = annotations
+                        }
+                    }
+                }
+            },
+            { decryptedRecord -> createDataRecord(decryptedRecord) }
+    ) as Single<DataRecord>
 
     fun <T : DomainResource> updateRecords(resources: List<T>, userId: String): Single<UpdateResult<T>> {
         val failedUpdates: MutableList<Pair<T, D4LException>> = arrayListOf()
@@ -621,16 +686,41 @@ internal class RecordService(
                 .flatMapIterable { encryptedRecords -> encryptedRecords }
     }
 
-    @Throws(IOException::class)
-    private fun <T> encrypt(
+    private fun <T> getEncryptedResourceAndAttachment(
             record: DecryptedBaseRecord<T>,
-            getEncryptedResource: () -> String,
-            getEncryptedAttachment: (commonKey: GCKey) -> EncryptedKey?
+            commonKey: GCKey
+    ): Pair<String, EncryptedKey?> {
+        return if (record is DecryptedDataRecord) {
+            Pair(
+                    encodeToString(
+                            cryptoService.encrypt(record.dataKey!!, record.resource).blockingGet()
+                    ),
+                    null
+            )
+        } else {
+            Pair(
+                    fhirService.encryptResource(record.dataKey!!, record.resource as DomainResource),
+                    if (record.attachmentsKey == null) {
+                        null
+                    } else {
+                        cryptoService.encryptSymmetricKey(
+                                commonKey,
+                                KeyType.ATTACHMENT_KEY,
+                                record.attachmentsKey!!
+                        ).blockingGet()
+                    }
+            )
+        }
+    }
+
+    @Throws(IOException::class)
+    fun <T> encryptRecord(
+            record: DecryptedBaseRecord<T>
     ): EncryptedRecord {
         val encryptedTags = tagEncryptionService.encryptTags(record.tags!!).also {
             (it as MutableList<String>).addAll(tagEncryptionService.encryptAnnotations(record.annotations))
         }
-        val encryptedResource = getEncryptedResource()
+
         val commonKey = cryptoService.fetchCurrentCommonKey()
         val currentCommonKeyId = cryptoService.currentCommonKeyId
         val encryptedDataKey = cryptoService.encryptSymmetricKey(
@@ -638,7 +728,12 @@ internal class RecordService(
                 KeyType.DATA_KEY,
                 record.dataKey!!
         ).blockingGet()
-        val encryptedAttachmentsKey = getEncryptedAttachment(commonKey)
+
+        val (encryptedResource, encryptedAttachmentsKey) = this.getEncryptedResourceAndAttachment(
+                record,
+                commonKey
+        )
+
         return EncryptedRecord(
                 currentCommonKeyId,
                 record.identifier,
@@ -703,34 +798,6 @@ internal class RecordService(
         )
     }
 
-    @Throws(IOException::class)
-    fun <T : DomainResource> encryptRecord(
-            record: DecryptedFhirRecord<T>
-    ): EncryptedRecord = encrypt(
-            record,
-            { fhirService.encryptResource(record.dataKey!!, record.resource) },
-            { commonKey: GCKey ->
-                if (record.attachmentsKey == null) {
-                    null
-                } else {
-                    cryptoService.encryptSymmetricKey(
-                            commonKey,
-                            KeyType.ATTACHMENT_KEY,
-                            record.attachmentsKey!!
-                    ).blockingGet()
-                }
-            }
-    )
-
-    @Throws(IOException::class)
-    internal fun encryptDataRecord(
-            record: DecryptedDataRecord? //FIXME: this a test concern, which should be removed soon as possible
-    ): EncryptedRecord = encrypt(
-            record!!,
-            { encodeToString(cryptoService.encrypt(record.dataKey!!, record.resource).blockingGet()) },
-            { null }
-    )
-
     @Suppress("UNCHECKED_CAST")
     @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
     fun <T : Any> decryptRecord(
@@ -760,8 +827,7 @@ internal class RecordService(
             )
             else -> builder.build(decode(record.encryptedBody).let {
                 cryptoService.decrypt(builder.dataKey!!, it).blockingGet()
-            }
-            )
+            })
         } as DecryptedBaseRecord<T>
     }
 

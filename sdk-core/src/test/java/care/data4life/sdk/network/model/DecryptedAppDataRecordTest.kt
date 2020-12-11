@@ -376,55 +376,6 @@ class DecryptedAppDataRecordTest {
     }
 
     @Test
-    fun `Given, copyWithResourceAnnotations is called with new Data, it clones a DecryptedAppDataRecord, while reassigning the data`() {
-        val expectedData = "tomato"
-        val expectedAnnotations = listOf("my", "little", "pony")
-        val record = DecryptedAppDataRecord(
-                identifier = "123",
-                resource = "potato".toByteArray(),
-                tags = hashMapOf("soup" to "tomato"),
-                annotations = expectedAnnotations,
-                customCreationDate = "today",
-                updatedDate = "yesterday",
-                dataKey = mockkClass(GCKey::class),
-                modelVersion = 42
-        ).copyWithResourceAnnotations(
-                expectedData.toByteArray()
-        )
-
-        assertTrue(record.resource.contentEquals(expectedData.toByteArray()))
-        assertEquals(
-                expectedAnnotations,
-                record.annotations
-        )
-    }
-
-    @Test
-    fun `Given, copyWithResourceAnnotations is called with new Data and Annotations, it clones a DecryptedAppDataRecord, while reassigning the Data and Annotations`() {
-        val expectedData = "tomato"
-        val expectedAnnotations = listOf("my", "little", "pony")
-        val record = DecryptedAppDataRecord(
-                identifier = "123",
-                resource = "potato".toByteArray(),
-                tags = hashMapOf("soup" to "tomato"),
-                annotations = listOf("a", "b", "c"),
-                customCreationDate = "today",
-                updatedDate = "yesterday",
-                dataKey = mockkClass(GCKey::class),
-                modelVersion = 42
-        ).copyWithResourceAnnotations(
-                expectedData.toByteArray(),
-                expectedAnnotations
-        )
-
-        assertTrue(record.resource.contentEquals(expectedData.toByteArray()))
-        assertEquals(
-                expectedAnnotations,
-                record.annotations
-        )
-    }
-
-    @Test
     fun `Given a DecryptedAppDataRecord, it has a stable HashCode`() {
         val id = "123"
         val data = "potato".toByteArray()

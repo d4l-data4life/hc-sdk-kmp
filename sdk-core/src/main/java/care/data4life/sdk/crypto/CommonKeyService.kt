@@ -56,7 +56,7 @@ class CommonKeyService(
     }
 
     @Throws(IOException::class)
-    override fun fetchCurrentCommonKey(): GCKey? {
+    override fun fetchCurrentCommonKey(): GCKey {
         var commonKeyId = DEFAULT_COMMON_KEY_ID
         try {
             commonKeyId = String(storage.getSecret(aliasCurrentCommonKeyId))

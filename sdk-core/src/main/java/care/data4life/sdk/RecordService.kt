@@ -27,6 +27,7 @@ import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.model.AppDataRecord
 import care.data4life.sdk.model.CreateResult
 import care.data4life.sdk.model.DeleteResult
 import care.data4life.sdk.model.DownloadResult
@@ -35,13 +36,10 @@ import care.data4life.sdk.model.FetchResult
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
-import care.data4life.sdk.model.AppDataRecord
 import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.DataRecord
 import care.data4life.sdk.network.DecryptedRecordBuilderImpl
-import care.data4life.sdk.network.model.DecryptedRecord
-import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
@@ -83,7 +81,7 @@ internal class RecordService(
         REMOVE, RESTORE
     }
 
-    private fun <T: Any> createNewDecryptedRecord(
+    private fun <T : Any> createNewDecryptedRecord(
             builder: DecryptedRecordBuilder,
             resource: T,
             tags: HashMap<String, String>,
@@ -108,11 +106,11 @@ internal class RecordService(
         checkDataRestrictions(resource)
         val createRecord = Single.just(
                 createNewDecryptedRecord(
-                            DecryptedRecordBuilderImpl().setAnnotations(annotations),
-                            resource,
-                            taggingService.appendDefaultTags(resource.resourceType, null),
-                            DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
-                            cryptoService.generateGCKey().blockingGet()
+                        DecryptedRecordBuilderImpl().setAnnotations(annotations),
+                        resource,
+                        taggingService.appendDefaultTags(resource.resourceType, null),
+                        DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
+                        cryptoService.generateGCKey().blockingGet()
                 ) as DecryptedFhirRecord<T>
         )
 
@@ -658,17 +656,25 @@ internal class RecordService(
             record: EncryptedRecord,
             userId: String?,
             decryptSource: (
-                    tags: HashMap<String, String>,
-                    annotations: List<String>,
-                    dataKey: GCKey,
+                    builder: DecryptedRecordBuilder,
                     commonKey: GCKey
             ) -> T
     ): T {
         if (!ModelVersion.isModelVersionSupported(record.modelVersion)) {
             throw DataValidationException.ModelVersionNotSupported("Please update SDK to latest version!")
         }
-        val tags = tagEncryptionService.decryptTags(record.encryptedTags)
-        val annotations = tagEncryptionService.decryptAnnotations(record.encryptedTags)
+        val builder = DecryptedRecordBuilderImpl()
+                .setIdentifier(record.identifier)
+                .setTags(
+                        tagEncryptionService.decryptTags(record.encryptedTags)
+                )
+                .setAnnotations(
+                        tagEncryptionService.decryptAnnotations(record.encryptedTags)
+                )
+                .setCreationDate(record.customCreationDate)
+                .setUpdateDate(record.updatedDate)
+                .setModelVersion(record.modelVersion)
+
         val commonKeyId = record.commonKeyId
         val commonKeyStored = cryptoService.hasCommonKey(commonKeyId)
         val commonKey: GCKey =
@@ -688,11 +694,11 @@ internal class RecordService(
                         cryptoService.storeCommonKey(commonKeyId, it)
                     }
                 }
-        val dataKey = cryptoService.symDecryptSymmetricKey(commonKey, record.encryptedDataKey).blockingGet()
+        builder.setDataKey(
+                cryptoService.symDecryptSymmetricKey(commonKey, record.encryptedDataKey).blockingGet()
+        )
         return decryptSource(
-                tags,
-                annotations,
-                dataKey,
+                builder,
                 commonKey
         )
     }
@@ -733,92 +739,30 @@ internal class RecordService(
     ): DecryptedBaseRecord<T> = decrypt(
             record,
             userId
-    ) { tags: HashMap<String, String>, annotations: List<String>, dataKey: GCKey, commonKey: GCKey ->
-        if (tags.containsKey(TaggingService.TAG_RESOURCE_TYPE)) {
-            decryptFhirRecord<DomainResource>(
-                    record,
-                    tags,
-                    annotations,
-                    dataKey,
-                    commonKey
-            ) as DecryptedBaseRecord<T>
-        } else {
-            decryptDataRecord(
-                    record,
-                    tags,
-                    annotations,
-                    dataKey
-            ) as DecryptedBaseRecord<T>
-        }
-    }
-
-    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    private fun <T : DomainResource> decryptFhirRecord(
-            record: EncryptedRecord,
-            tags: HashMap<String, String>,
-            annotations: List<String>,
-            dataKey: GCKey,
-            commonKey: GCKey
-    ): DecryptedFhirRecord<T?> {
-        val attachmentsKey =
-                if (record.encryptedAttachmentsKey == null) {
-                    null
-                } else {
+    ) { builder: DecryptedRecordBuilder, commonKey: GCKey ->
+        if (record.encryptedAttachmentsKey != null) {
+            builder.setAttachmentKey(
                     cryptoService.symDecryptSymmetricKey(
                             commonKey,
                             record.encryptedAttachmentsKey
                     ).blockingGet()
-                }
-
-        val resource =
-                if (record.encryptedBody == null || record.encryptedBody.isEmpty()) {
-                    null// FIXME: This is a potential Bug, we should throw an error here, like NoValidRecord
-                } else {
-                    fhirService.decryptResource<T>(
-                            dataKey,
-                            tags[TaggingService.TAG_RESOURCE_TYPE]!!,
-                            record.encryptedBody
-                    )
-                }
-
-        return DecryptedRecord(
-                record.identifier,
-                resource,
-                tags,
-                annotations,
-                record.customCreationDate,
-                record.updatedDate,
-                dataKey,
-                attachmentsKey,
-                record.modelVersion
-        )
-    }
-
-    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    private fun decryptDataRecord(
-            record: EncryptedRecord,
-            tags: HashMap<String, String>,
-            annotations: List<String>,
-            dataKey: GCKey
-    ): DecryptedDataRecord {
-        val resource = if (record.encryptedBody == null || record.encryptedBody.isEmpty()) {
-            ByteArray(0)// FIXME: This is a potential Bug, we should throw an error here, like NoValidRecord
-        } else {
-            decode(record.encryptedBody).let {
-                cryptoService.decrypt(dataKey, it).blockingGet()
-            }
+            )
         }
 
-        return DecryptedAppDataRecord(
-                record.identifier,
-                resource,
-                tags,
-                annotations,
-                record.customCreationDate,
-                record.updatedDate,
-                dataKey,
-                record.modelVersion
-        )
+        when {
+            record.encryptedBody == null || record.encryptedBody.isEmpty() -> builder.build(null)
+            builder.tags!!.containsKey(TaggingService.TAG_RESOURCE_TYPE) -> builder.build(
+                    fhirService.decryptResource<DomainResource>(
+                            builder.dataKey!!,
+                            builder.tags!![TaggingService.TAG_RESOURCE_TYPE]!!,
+                            record.encryptedBody
+                    )
+            )
+            else -> builder.build(decode(record.encryptedBody).let {
+                cryptoService.decrypt(builder.dataKey!!, it).blockingGet()
+            }
+            )
+        } as DecryptedBaseRecord<T>
     }
 
     fun <T : DomainResource> extractUploadData(resource: T): HashMap<Attachment, String?>? {

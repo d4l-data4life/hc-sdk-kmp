@@ -26,7 +26,6 @@ import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.network.DecryptedRecordBuilderImpl
-import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
@@ -126,7 +125,7 @@ abstract class RecordServiceTestBase {
         Mockito.`when`(mockRecord.fhirResource).thenReturn(mockCarePlan)
         Mockito.`when`(mockRecord.meta).thenReturn(mockMeta)
 
-        Mockito.`when`<HashMap<*, *>?>(mockDecryptedFhirRecord.tags).thenReturn(mockTags)
+        Mockito.`when`(mockDecryptedFhirRecord.tags).thenReturn(mockTags)
         Mockito.`when`(mockDecryptedFhirRecord.dataKey).thenReturn(mockDataKey)
         Mockito.`when`(mockDecryptedFhirRecord.resource).thenReturn(mockCarePlan)
         Mockito.`when`(mockDecryptedFhirRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
@@ -152,12 +151,14 @@ abstract class RecordServiceTestBase {
         Mockito.`when`(mockEncryptedRecord.encryptedBody).thenReturn(ENCRYPTED_RESOURCE)
         Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
         Mockito.`when`(mockEncryptedRecord.identifier).thenReturn(RECORD_ID)
+        Mockito.`when`(mockEncryptedRecord.customCreationDate).thenReturn(CREATION_DATE)
 
         Mockito.`when`(mockAnnotatedEncryptedRecord.encryptedTags).thenReturn(mockEncryptedTags)
         Mockito.`when`(mockAnnotatedEncryptedRecord.encryptedDataKey).thenReturn(mockEncryptedDataKey)
         Mockito.`when`(mockAnnotatedEncryptedRecord.encryptedBody).thenReturn(ENCRYPTED_RESOURCE)
         Mockito.`when`(mockAnnotatedEncryptedRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
         Mockito.`when`(mockAnnotatedEncryptedRecord.identifier).thenReturn(RECORD_ID)
+        Mockito.`when`(mockAnnotatedEncryptedRecord.customCreationDate).thenReturn(CREATION_DATE)
 
         Mockito.`when`(mockErrorHandler.handleError(ArgumentMatchers.any(Exception::class.java))).thenReturn(mockD4LException)
 
@@ -212,6 +213,7 @@ abstract class RecordServiceTestBase {
         internal val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US)
         internal val UTC_ZONE_ID = ZoneId.of("UTC")
         internal val ANNOTATIONS = listOf("potato", "tomato", "soup")
+        internal const val CREATION_DATE = "2020-05-03"
 
         fun buildDocumentReference(): DocumentReference {
             val content = buildDocRefContent(AttachmentBuilder.buildAttachment(null))

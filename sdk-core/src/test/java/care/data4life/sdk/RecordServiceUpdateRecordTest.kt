@@ -246,7 +246,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given a multiple resources, Annotations and a UserId, updateRecords returns multiple updated Records`() {
+    fun `Given, updateRecords is called with multiple resources, Annotations and a UserId, returns multiple updated Records`() {
         // Given
         val resources = listOf(mockCarePlan, mockCarePlan)
         Mockito.doReturn(Single.just(mockRecord))

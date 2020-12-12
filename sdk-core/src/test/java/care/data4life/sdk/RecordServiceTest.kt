@@ -28,11 +28,14 @@ import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.DownloadType
+import care.data4life.sdk.model.SdkRecordFactory
+import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.test.util.AttachmentBuilder
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.MimeType
 import com.google.common.truth.Truth
+import io.mockk.every
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.junit.After
@@ -626,7 +629,8 @@ class RecordServiceTest : RecordServiceTestBase() {
         Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService)
                 .downloadData(mockDecryptedFhirRecord, USER_ID)
-        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedFhirRecord)
+        @Suppress("UNCHECKED_CAST")
+        every { SdkRecordFactory.getInstance(mockDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
 
         // When
         val observer = recordService.downloadRecord<CarePlan>(RECORD_ID, USER_ID).test().await()
@@ -641,7 +645,9 @@ class RecordServiceTest : RecordServiceTestBase() {
         Truth.assertThat(result.fhirResource).isEqualTo(mockCarePlan)
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).buildMeta(mockDecryptedFhirRecord)
+        inOrder.verify(recordService).downloadData(mockDecryptedFhirRecord, USER_ID)
+        inOrder.verify(recordService).checkDataRestrictions(mockCarePlan)
+        inOrder.verify(recordService).assignResourceId(mockDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
     }
 

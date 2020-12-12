@@ -27,7 +27,6 @@ import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
-import care.data4life.sdk.model.AppDataRecord
 import care.data4life.sdk.model.CreateResult
 import care.data4life.sdk.model.DeleteResult
 import care.data4life.sdk.model.DownloadResult
@@ -36,9 +35,11 @@ import care.data4life.sdk.model.FetchResult
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
+import care.data4life.sdk.model.SdkRecordFactory
 import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.DataRecord
+import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.DecryptedRecordBuilderImpl
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
@@ -81,6 +82,8 @@ internal class RecordService(
         REMOVE, RESTORE
     }
 
+    private val recordFactory: RecordFactory = SdkRecordFactory
+
     private fun getTags(resource: Any): HashMap<String, String> {
         return if (resource is ByteArray) {
             taggingService.appendDefaultTags(null, null)
@@ -116,7 +119,7 @@ internal class RecordService(
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T : DomainResource?> prepareAndcreateFhirRecord(
+    private fun <T : DomainResource?> prepareAndcreateFhirRecord(
             resource: T,
             data: HashMap<Attachment, String?>?,
             record: Single<DecryptedBaseRecord<T>>
@@ -131,13 +134,7 @@ internal class RecordService(
                     )
                 }
                 .map { r -> assignResourceId(r) }
-                .map { r ->
-                    Record(
-                            r.resource,
-                            buildMeta(r),
-                            r.annotations
-                    ) as BaseRecord<T>
-                }
+                .map { r -> recordFactory.getInstance(r) as BaseRecord<T> }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -157,15 +154,14 @@ internal class RecordService(
                 userId,
                 annotations,
                 { s ->
-                    s
-                            .map { decryptedRecord ->
-                                uploadData(
-                                        decryptedRecord as DecryptedFhirRecord<T>,
-                                        null,
-                                        userId
-                                )
-                            }
-                            .map { decryptedRecord -> removeUploadData(decryptedRecord) }
+                    s.map { decryptedRecord ->
+                        uploadData(
+                                decryptedRecord as DecryptedFhirRecord<T>,
+                                null,
+                                userId
+                        )
+                    }
+                    .map { decryptedRecord -> removeUploadData(decryptedRecord) }
                 },
                 { record -> prepareAndcreateFhirRecord(resource, data, record) }
         ) as Single<Record<T>>
@@ -173,14 +169,7 @@ internal class RecordService(
 
     private fun createDataRecord(
             record: Single<DecryptedBaseRecord<ByteArray>>
-    ): Single<BaseRecord<ByteArray>> = record.map { r ->
-        AppDataRecord(
-                r.identifier!!,
-                r.resource,
-                buildMeta(r),
-                r.annotations
-        ) as BaseRecord<ByteArray>
-    }
+    ): Single<BaseRecord<ByteArray>> = record.map { r -> recordFactory.getInstance(r) }
 
     @Suppress("UNCHECKED_CAST")
     fun createRecord(
@@ -254,20 +243,7 @@ internal class RecordService(
                 }
                 .map { decryptedRecord ->
                     @Suppress("UNCHECKED_CAST")
-                    if (decryptedRecord is DecryptedDataRecord) {
-                        AppDataRecord(
-                                Objects.requireNonNull(decryptedRecord.identifier)!!,
-                                decryptedRecord.resource,
-                                buildMeta(decryptedRecord),
-                                decryptedRecord.annotations
-                        ) as BaseRecord<T>
-                    } else {
-                        Record(
-                                decryptedRecord.resource as DomainResource,
-                                buildMeta(decryptedRecord)
-                        ) as BaseRecord<T>
-                    }
-
+                    recordFactory.getInstance(decryptedRecord) as BaseRecord<T>
                 }
     }
 
@@ -350,11 +326,8 @@ internal class RecordService(
             .filter { decryptedRecord -> decryptedRecord.annotations.containsAll(annotations) }
             .map { record -> assignResourceId(record) }
             .map { decryptedRecord ->
-                Record(
-                        decryptedRecord.resource,
-                        buildMeta(decryptedRecord),
-                        decryptedRecord.annotations
-                )
+                @Suppress("UNCHECKED_CAST")
+                recordFactory.getInstance(decryptedRecord) as Record<T>
             }
             .toList()
 
@@ -375,14 +348,7 @@ internal class RecordService(
             { taggingService.appendAppDataTags(HashMap()) }
     )
             .map { encryptedRecord -> decryptRecord<ByteArray>(encryptedRecord, userId) }
-            .map { decryptedRecord ->
-                AppDataRecord(
-                        decryptedRecord.identifier!!,
-                        decryptedRecord.resource,
-                        buildMeta(decryptedRecord),
-                        decryptedRecord.annotations
-                ) as DataRecord
-            }
+            .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) as DataRecord }
             .toList()
 
     fun downloadAttachment(
@@ -480,10 +446,8 @@ internal class RecordService(
             }
             .map { record -> assignResourceId(record) }
             .map { decryptedRecord ->
-                Record(
-                        decryptedRecord.resource,
-                        buildMeta(decryptedRecord)
-                )
+                @Suppress("UNCHECKED_CAST")
+                recordFactory.getInstance(decryptedRecord) as Record<T>
             }
 
     fun <T : DomainResource> downloadRecords(
@@ -1181,6 +1145,7 @@ internal class RecordService(
             record: DecryptedFhirRecord<T>
     ): DecryptedFhirRecord<T> = record.also { record.resource.id = record.identifier }
 
+    @Deprecated("")
     fun buildMeta(
             record: DecryptedBaseRecord<*>
     ): Meta = Meta(

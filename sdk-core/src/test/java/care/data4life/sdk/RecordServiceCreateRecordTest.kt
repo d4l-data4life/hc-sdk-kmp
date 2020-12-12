@@ -22,6 +22,8 @@ import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.ModelVersion
+import care.data4life.sdk.model.SdkRecordFactory
+import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.network.DecryptedRecordBuilderImpl
 import care.data4life.sdk.network.model.definitions.DecryptedFhirRecord
 import care.data4life.sdk.util.MimeType
@@ -108,7 +110,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                         mockCarePlan,
                         mockUploadData
                 )
-        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedFhirRecord)
+        @Suppress("UNCHECKED_CAST")
+        every { SdkRecordFactory.getInstance(mockDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
 
         // When
         val subscriber = recordService.createRecord(mockCarePlan, USER_ID).test().await()
@@ -119,9 +122,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .assertComplete()
                 .assertValueCount(1)
                 .values()[0]
-        Truth.assertThat(record.meta).isEqualTo(mockMeta)
-        Truth.assertThat(record.fhirResource).isEqualTo(mockCarePlan)
-        Truth.assertThat(record.annotations).isEqualTo(listOf<String>())
+        Truth.assertThat(record).isSameInstanceAs(mockRecord)
 
         inOrder.verify(mockTaggingService).appendDefaultTags(
                 ArgumentMatchers.anyString(),
@@ -152,7 +153,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 mockCarePlan,
                 mockUploadData
         )
-        inOrder.verify(recordService).buildMeta(mockDecryptedFhirRecord)
+        inOrder.verify(recordService).assignResourceId(mockDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -229,7 +230,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                         null,
                         USER_ID
                 )
-        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedFhirRecord)
+        @Suppress("UNCHECKED_CAST")
+        every { SdkRecordFactory.getInstance(mockDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
 
         // When
         val subscriber = recordService.createRecord(mockCarePlan, USER_ID).test().await()
@@ -240,9 +242,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .assertComplete()
                 .assertValueCount(1)
                 .values()[0]
-        Truth.assertThat(record.meta).isEqualTo(mockMeta)
-        Truth.assertThat(record.fhirResource).isEqualTo(mockCarePlan)
-        Truth.assertThat(record.annotations).isEqualTo(listOf<String>())
+        Truth.assertThat(record).isSameInstanceAs(mockRecord)
+
         inOrder.verify(mockTaggingService).appendDefaultTags(
                 ArgumentMatchers.anyString(),
                 ArgumentMatchers.any<HashMap<String, String>>()
@@ -269,7 +270,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 mockCarePlan,
                 null
         )
-        inOrder.verify(recordService).buildMeta(mockDecryptedFhirRecord)
+        inOrder.verify(recordService).assignResourceId(mockDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -422,7 +423,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                         mockCarePlan,
                         mockUploadData
                 )
-        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockAnnotatedDecryptedFhirRecord)
+        @Suppress("UNCHECKED_CAST")
+        every { SdkRecordFactory.getInstance(mockAnnotatedDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
 
         // When
         val subscriber = recordService.createRecord(mockCarePlan, USER_ID, ANNOTATIONS).test().await()
@@ -434,9 +436,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .assertValueCount(1)
                 .values()[0]
 
-        Truth.assertThat(record.meta).isEqualTo(mockMeta)
-        Truth.assertThat(record.fhirResource).isEqualTo(mockCarePlan)
-        Truth.assertThat(record.annotations).isSameInstanceAs(ANNOTATIONS)
+        Truth.assertThat(record).isSameInstanceAs(mockRecord)
 
         inOrder.verify(mockTaggingService).appendDefaultTags(
                 ArgumentMatchers.anyString(),
@@ -467,7 +467,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 mockCarePlan,
                 mockUploadData
         )
-        inOrder.verify(recordService).buildMeta(mockAnnotatedDecryptedFhirRecord)
+        inOrder.verify(recordService).assignResourceId(mockAnnotatedDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -544,7 +544,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                         null,
                         USER_ID
                 )
-        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockAnnotatedDecryptedFhirRecord)
+        @Suppress("UNCHECKED_CAST")
+        every { SdkRecordFactory.getInstance(mockAnnotatedDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
 
         // When
         val subscriber = recordService.createRecord(mockCarePlan, USER_ID, ANNOTATIONS).test().await()
@@ -555,9 +556,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .assertComplete()
                 .assertValueCount(1)
                 .values()[0]
-        Truth.assertThat(record.meta).isEqualTo(mockMeta)
-        Truth.assertThat(record.fhirResource).isEqualTo(mockCarePlan)
-        Truth.assertThat(record.annotations).isSameInstanceAs(ANNOTATIONS)
+
+        Truth.assertThat(record).isSameInstanceAs(mockRecord)
 
         inOrder.verify(mockTaggingService).appendDefaultTags(
                 ArgumentMatchers.anyString(),
@@ -590,7 +590,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 mockCarePlan,
                 null
         )
-        inOrder.verify(recordService).buildMeta(mockAnnotatedDecryptedFhirRecord)
+        inOrder.verify(recordService).assignResourceId(mockAnnotatedDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -689,7 +689,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Mockito.doReturn(mockDecryptedDataRecord)
                 .`when`(recordService)
                 .decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedDataRecord)
+        @Suppress("UNCHECKED_CAST")
+        every { SdkRecordFactory.getInstance(mockDecryptedDataRecord) } returns mockDataRecord
 
         // When
         val subscriber = recordService.createRecord(
@@ -704,9 +705,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .assertComplete()
                 .assertValueCount(1)
                 .values()[0]
-        Truth.assertThat(record.meta).isEqualTo(mockMeta)
-        Truth.assertThat(record.resource).isEqualTo(mockAppData)
-        Truth.assertThat(record.annotations).isEqualTo(ANNOTATIONS)
+        Truth.assertThat(record).isSameInstanceAs(mockDataRecord)
 
         inOrder.verify(mockTaggingService).appendDefaultTags(null, null)
         inOrder.verify(mockCryptoService).generateGCKey()
@@ -721,7 +720,6 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .encryptRecord(mockDecryptedDataRecord)//mockDecryptedDataRecord)
         inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockEncryptedRecord)
         inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).buildMeta(mockDecryptedDataRecord)
         inOrder.verifyNoMoreInteractions()
     }
 }

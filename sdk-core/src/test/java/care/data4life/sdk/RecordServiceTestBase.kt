@@ -25,6 +25,10 @@ import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
+import care.data4life.sdk.model.SdkRecordFactory
+import care.data4life.sdk.model.definitions.DataRecord
+import care.data4life.sdk.model.definitions.FhirRecord
+import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.DecryptedRecordBuilderImpl
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
@@ -35,6 +39,7 @@ import care.data4life.sdk.test.util.AttachmentBuilder
 import care.data4life.sdk.util.Base64
 import io.mockk.every
 import io.mockk.mockkConstructor
+import io.mockk.mockkObject
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import org.mockito.ArgumentMatchers
@@ -76,8 +81,10 @@ abstract class RecordServiceTestBase {
     internal lateinit var mockMeta: Meta
     private lateinit var mockD4LException: D4LException
     internal lateinit var mockRecord: Record<CarePlan>
+    internal lateinit var mockDataRecord: DataRecord
     internal lateinit var inOrder: InOrder
     internal lateinit var mockDecryptedRecordBuilder: DecryptedRecordBuilder
+    internal lateinit var mockRecordFactory: RecordFactory
 
     @Suppress("UNCHECKED_CAST")
     fun init() {
@@ -120,7 +127,10 @@ abstract class RecordServiceTestBase {
         mockDecryptedDataRecord = Mockito.mock(DecryptedDataRecord::class.java)
         mockMeta = Mockito.mock(Meta::class.java)
         mockD4LException = Mockito.mock(D4LException::class.java)
-        mockRecord = Mockito.mock<Record<*>>(Record::class.java) as Record<CarePlan>
+        mockRecord = Mockito.mock(Record::class.java) as Record<CarePlan>
+        mockDataRecord = Mockito.mock(DataRecord::class.java)
+        mockDecryptedRecordBuilder = Mockito.mock(DecryptedRecordBuilderImpl::class.java)
+        mockRecordFactory = Mockito.mock(RecordFactory::class.java)
 
         Mockito.`when`(mockRecord.fhirResource).thenReturn(mockCarePlan)
         Mockito.`when`(mockRecord.meta).thenReturn(mockMeta)
@@ -143,7 +153,6 @@ abstract class RecordServiceTestBase {
         Mockito.`when`(mockDecryptedDataRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
         Mockito.`when`(mockDecryptedDataRecord.annotations).thenReturn(ANNOTATIONS)
 
-
         Mockito.`when`(mockTags[RESOURCE_TYPE]).thenReturn(CarePlan.resourceType)
 
         Mockito.`when`(mockEncryptedRecord.encryptedTags).thenReturn(mockEncryptedTags)
@@ -162,8 +171,8 @@ abstract class RecordServiceTestBase {
 
         Mockito.`when`(mockErrorHandler.handleError(ArgumentMatchers.any(Exception::class.java))).thenReturn(mockD4LException)
 
-        mockDecryptedRecordBuilder = Mockito.mock(DecryptedRecordBuilderImpl::class.java)
         mockkConstructor(DecryptedRecordBuilderImpl::class)
+        mockkObject(SdkRecordFactory)
 
         inOrder = Mockito.inOrder(
                 mockApiService,

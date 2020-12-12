@@ -39,6 +39,7 @@ import io.mockk.unmockkAll
 import org.mockito.ArgumentMatchers
 import org.mockito.InOrder
 import org.mockito.Mockito
+import org.mockito.MockitoSession
 import org.threeten.bp.Clock
 import org.threeten.bp.LocalDate
 import org.threeten.bp.format.DateTimeFormatter
@@ -77,6 +78,9 @@ abstract class RecordServiceTestBase {
     internal lateinit var inOrder: InOrder
     internal lateinit var decryptedRecordIndicator: DecryptedRecord<DomainResource>
     internal lateinit var annotatedDecryptedRecordIndicator: DecryptedRecord<DomainResource>
+
+
+    private lateinit var mockitoSession : MockitoSession
 
     @Suppress("UNCHECKED_CAST")
     fun init() {
@@ -195,9 +199,12 @@ abstract class RecordServiceTestBase {
 
         mockkStatic(LocalDate::class)
         every { LocalDate.now(any() as Clock) } returns LOCAL_DATE
+
+        mockitoSession = Mockito.mockitoSession().startMocking()
     }
 
     fun stop() {
+        mockitoSession.finishMocking()
         unmockkAll()
     }
 

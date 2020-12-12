@@ -74,10 +74,12 @@ internal class RecordService(
         private val cryptoService: CryptoService,
         private val errorHandler: SdkContract.ErrorHandler
 ) {
+    @Deprecated("")
     internal enum class UploadDownloadOperation {
         UPLOAD, DOWNLOAD, UPDATE
     }
 
+    @Deprecated("")
     internal enum class RemoveRestoreOperation {
         REMOVE, RESTORE
     }
@@ -808,41 +810,45 @@ internal class RecordService(
         return if (data.isEmpty()) null else data
     }
 
+    private fun <T : DomainResource> setUploadData(
+            record: DecryptedFhirRecord<T>,
+            attachmentData: HashMap<Attachment, String?>?
+    ): DecryptedFhirRecord<T> = record.also {
+        val attachments = FhirAttachmentHelper.getAttachment(record.resource)
+        if (attachments != null && attachments.isNotEmpty()) {
+            FhirAttachmentHelper.updateAttachmentData(record.resource, attachmentData)
+        }
+    }
+
     fun <T : DomainResource> removeUploadData(
             record: DecryptedFhirRecord<T>
-    ): DecryptedFhirRecord<T> = removeOrRestoreUploadData(
-            RemoveRestoreOperation.REMOVE,
-            record,
-            null,
-            null
-    )
+    ): DecryptedFhirRecord<T> = setUploadData(record, null)
 
     fun <T : DomainResource> restoreUploadData(
             record: DecryptedFhirRecord<T>,
-            originalResource: T,
+            originalResource: T?,
             attachmentData: HashMap<Attachment, String?>?
-    ): DecryptedFhirRecord<T> = removeOrRestoreUploadData(
-            RemoveRestoreOperation.RESTORE,
-            record,
-            originalResource,
-            attachmentData
-    )
+    ): DecryptedFhirRecord<T> {
+        if (originalResource != null) record.resource = originalResource
 
+        return if (attachmentData == null) {
+             record
+        } else {
+            setUploadData(record, attachmentData)
+        }
+    }
+
+    @Deprecated("")
     fun <T : DomainResource> removeOrRestoreUploadData(
             operation: RemoveRestoreOperation,
             record: DecryptedFhirRecord<T>,
             originalResource: T?,
             attachmentData: HashMap<Attachment, String?>?
     ): DecryptedFhirRecord<T> {
-        if (operation == RemoveRestoreOperation.RESTORE) {
-            if (originalResource != null) record.resource = originalResource
-            if (attachmentData == null) return record
-        }
-        val attachments = FhirAttachmentHelper.getAttachment(record.resource)
-        return record.also {
-            if (attachments != null && attachments.isNotEmpty()) {
-                FhirAttachmentHelper.updateAttachmentData(record.resource, attachmentData)
-            }
+        return if (operation == RemoveRestoreOperation.RESTORE) {
+            restoreUploadData(record, originalResource, attachmentData)
+        } else {
+            removeUploadData(record)
         }
     }
 
@@ -1126,17 +1132,18 @@ internal class RecordService(
 
     @Throws(DataRestrictionException.MaxDataSizeViolation::class, DataRestrictionException.UnsupportedFileType::class)
     fun <T : DomainResource> checkDataRestrictions(resource: T?) {
-        if (!FhirAttachmentHelper.hasAttachment(resource)) return
-        val attachments = FhirAttachmentHelper.getAttachment(resource)
-        for (attachment in attachments) {
-            attachment?.data ?: return
+        if (FhirAttachmentHelper.hasAttachment(resource)) {
+            val attachments = FhirAttachmentHelper.getAttachment(resource!!)
+            for (attachment in attachments) {
+                attachment?.data ?: return
 
-            val data = decode(attachment.data!!)
-            if (recognizeMimeType(data) == MimeType.UNKNOWN) {
-                throw DataRestrictionException.UnsupportedFileType()
-            }
-            if (data.size > DATA_SIZE_MAX_BYTES) {
-                throw DataRestrictionException.MaxDataSizeViolation()
+                val data = decode(attachment.data!!)
+                if (recognizeMimeType(data) == MimeType.UNKNOWN) {
+                    throw DataRestrictionException.UnsupportedFileType()
+                }
+                if (data.size > DATA_SIZE_MAX_BYTES) {
+                    throw DataRestrictionException.MaxDataSizeViolation()
+                }
             }
         }
     }

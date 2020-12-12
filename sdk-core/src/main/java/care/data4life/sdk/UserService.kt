@@ -16,7 +16,7 @@
 
 package care.data4life.sdk
 
-import care.data4life.sdk.auth.OAuthService
+import care.data4life.auth.AuthorizationService
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.network.model.UserInfo
 import io.reactivex.Completable
@@ -25,7 +25,7 @@ import io.reactivex.Single
 // TODO internal
 class UserService(
         private val alias: String,
-        private val oAuthService: OAuthService,
+        private val authService: AuthorizationService,
         private val apiService: ApiService,
         private val secureStore: CryptoSecureStore,
         private val cryptoService: CryptoService
@@ -57,7 +57,7 @@ class UserService(
     }
 
     fun isLoggedIn(alias: String): Single<Boolean> {
-        return Single.fromCallable { oAuthService.isAuthorized(alias) }
+        return Single.fromCallable { authService.isAuthorized(alias) }
                 .onErrorReturnItem(false)
     }
 
@@ -69,7 +69,7 @@ class UserService(
     }
 
     fun getSessionToken(alias: String): Single<String> {
-        return Single.fromCallable { oAuthService.refreshAccessToken(alias) }
+        return Single.fromCallable { authService.refreshAccessToken(alias) }
     }
 
 }

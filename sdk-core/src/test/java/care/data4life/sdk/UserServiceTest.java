@@ -20,10 +20,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import care.data4life.auth.AuthorizationService;
 import care.data4life.crypto.GCKey;
 import care.data4life.crypto.GCKeyPair;
 import care.data4life.crypto.GCSymmetricKey;
-import care.data4life.sdk.auth.OAuthService;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.network.model.EncryptedKey;
 import care.data4life.sdk.network.model.UserInfo;
@@ -54,23 +54,23 @@ public class UserServiceTest {
     private CryptoSecureStore storage;
     private UserService userService;
     private CryptoService cryptoService;
-    private OAuthService oAuthService;
+    private AuthorizationService authService;
 
     @Before
     public void setUp() {
-        oAuthService = mock(OAuthService.class);
+        authService = mock(AuthorizationService.class);
         userService = mock(UserService.class);
         storage = mock(CryptoSecureStore.class);
         apiService = mock(ApiService.class);
         cryptoService = mock(CryptoService.class);
-        userService = spy(new UserService(USER_ALIAS, oAuthService, apiService, storage, cryptoService));
+        userService = spy(new UserService(USER_ALIAS, authService, apiService, storage, cryptoService));
     }
 
 
     @Test
     public void isLoggedIn_shouldReturnTrue() throws Exception {
         // given
-        when(oAuthService.isAuthorized(USER_ALIAS)).thenReturn(true);
+        when(authService.isAuthorized(USER_ALIAS)).thenReturn(true);
         doAnswer(invocation -> "auth_state").when(storage).getSecret(AUTH_STATE);
         GCKey mockGCKey = mock(GCKey.class);
         when(mockGCKey.getSymmetricKey()).thenReturn(mock(GCSymmetricKey.class));
@@ -109,7 +109,7 @@ public class UserServiceTest {
     @Test
     public void getSessionToken_shouldReturnTrue() throws Exception {
         // given
-        when(oAuthService.refreshAccessToken(USER_ALIAS)).thenReturn(AUTH_TOKEN);
+        when(authService.refreshAccessToken(USER_ALIAS)).thenReturn(AUTH_TOKEN);
 
         // when
         TestObserver<String> testSubscriber = userService.getSessionToken(USER_ALIAS)
@@ -124,7 +124,7 @@ public class UserServiceTest {
     @Test
     public void getSessionToken_shouldThrowError() throws Exception {
         // given
-        when(oAuthService.refreshAccessToken(USER_ALIAS)).thenReturn(null);
+        when(authService.refreshAccessToken(USER_ALIAS)).thenReturn(null);
 
         // when
         TestObserver<String> testSubscriber = userService.getSessionToken(USER_ALIAS)

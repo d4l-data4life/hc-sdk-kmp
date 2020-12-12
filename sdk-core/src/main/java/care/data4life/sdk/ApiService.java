@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import care.data4life.sdk.auth.OAuthService;
+import care.data4life.auth.AuthorizationService;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.lang.D4LRuntimeException;
 import care.data4life.sdk.network.Environment;
@@ -75,7 +75,7 @@ public final class ApiService {
 
     private final String clientID;
     private final String clientSecret;
-    private final OAuthService oAuthService;
+    private final AuthorizationService authService;
     private final Environment environment;
     private String platform;
     private final NetworkConnectivityService connectivityService;
@@ -93,7 +93,7 @@ public final class ApiService {
      * If the a non-null staticToken is passed, the SDK will use this value as an access token.
      * In this case, it will not dynamical fetch or renew tokens.
      *
-     * @param oAuthService        OAuth service
+     * @param authService         AuthorizationService
      * @param environment         Deployment environment
      * @param clientID            Client ID
      * @param clientSecret        Client secret
@@ -103,7 +103,7 @@ public final class ApiService {
      * @param staticAccessToken   Prefetched OAuth token - if not null, it will be used directly (no token renewal).
      * @param debug               Debug flag
      */
-    ApiService(OAuthService oAuthService,
+    ApiService(AuthorizationService authService,
                Environment environment,
                String clientID,
                String clientSecret,
@@ -112,7 +112,7 @@ public final class ApiService {
                String clientName,
                byte[] staticAccessToken,
                boolean debug) {
-        this.oAuthService = oAuthService;
+        this.authService = authService;
         this.environment = environment;
         this.clientID = clientID;
         this.clientSecret = clientSecret;
@@ -127,7 +127,7 @@ public final class ApiService {
     /**
      * Convenience constructor for instances that handle the OAuth flow themselves.
      *
-     * @param oAuthService        OAuth service
+     * @param authService         AuthorizationService
      * @param environment         Deployment environment
      * @param clientID            Client ID
      * @param clientSecret        Client secret
@@ -136,7 +136,7 @@ public final class ApiService {
      * @param clientName          Client name
      * @param debug               Debug flag
      */
-    ApiService(OAuthService oAuthService,
+    ApiService(AuthorizationService authService,
                Environment environment,
                String clientID,
                String clientSecret,
@@ -144,7 +144,7 @@ public final class ApiService {
                NetworkConnectivityService connectivityService,
                String clientName,
                boolean debug) {
-        this(oAuthService,
+        this(authService,
                 environment,
                 clientID,
                 clientSecret,
@@ -315,7 +315,7 @@ public final class ApiService {
             throw new D4LRuntimeException("Cannot log out when using a static access token!");
         }
         return Single
-                .fromCallable(() -> oAuthService.getRefreshToken(alias))
+                .fromCallable(() -> authService.getRefreshToken(alias))
                 .flatMapCompletable(token -> service.logout(alias, token));
     }
 
@@ -343,7 +343,7 @@ public final class ApiService {
         } else if (authHeader != null && authHeader.equals(HEADER_ACCESS_TOKEN)) {
             String tokenKey;
             try {
-                tokenKey = oAuthService.getAccessToken(alias);
+                tokenKey = authService.getAccessToken(alias);
             } catch (D4LException e) {
                 return chain.proceed(request);
             }
@@ -354,9 +354,9 @@ public final class ApiService {
             Response response = chain.proceed(request);
             if (response.code() == HTTP_401_UNAUTHORIZED) {
                 try {
-                    tokenKey = oAuthService.refreshAccessToken(alias);
+                    tokenKey = authService.refreshAccessToken(alias);
                 } catch (D4LException e) {
-                    oAuthService.clearAuthData();
+                    authService.clear();
                     return response;
                 }
                 request = request.newBuilder()

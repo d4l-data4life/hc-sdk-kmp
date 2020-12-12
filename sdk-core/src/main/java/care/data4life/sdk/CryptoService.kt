@@ -42,7 +42,8 @@ import java.nio.charset.Charset
 import java.security.SecureRandom
 
 //TODO internal
-class CryptoService : CryptoProtocol {
+//TODO remove open (only needed for Test)
+open class CryptoService : CryptoProtocol {
 
     private val moshi: Moshi
     private var alias: String

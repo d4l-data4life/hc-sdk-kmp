@@ -17,20 +17,16 @@
 package care.data4life.sdk;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 
 import care.data4life.auth.AuthorizationService;
 import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.test.util.TestSchedulerRule;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
+@Ignore
 public class Data4LifeClientTest {
 
     private static final boolean IS_LOGGED_IN = true;

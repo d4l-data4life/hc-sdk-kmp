@@ -18,6 +18,10 @@ package care.data4life.sdk.network
 
 import care.data4life.crypto.GCKey
 import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.network.model.DecryptedRecordGuard
+import io.mockk.every
+import io.mockk.mockkObject
+import io.mockk.unmockkAll
 import org.mockito.Mockito
 
 abstract class DecryptedRecordBuilderTestBase {
@@ -45,5 +49,13 @@ abstract class DecryptedRecordBuilderTestBase {
         modelVersion = 42
         fhirResource = Mockito.mock(DomainResource::class.java)
         customResource = ByteArray(42)
+
+        mockkObject(DecryptedRecordGuard)
+        every { DecryptedRecordGuard.checkTagsAndAnnotationsLimits(any(), any()) } returns Unit
+        every { DecryptedRecordGuard.checkDataLimit(any()) } returns Unit
+    }
+
+    fun stop() {
+        unmockkAll()
     }
 }

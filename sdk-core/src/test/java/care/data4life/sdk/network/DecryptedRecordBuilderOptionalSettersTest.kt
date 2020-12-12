@@ -17,6 +17,7 @@
 package care.data4life.sdk.network
 
 import care.data4life.sdk.network.model.DecryptedRecord
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -26,6 +27,11 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
     @Before
     fun setUp() {
         init()
+    }
+
+    @After
+    fun tearDown() {
+        stop()
     }
 
     @Test

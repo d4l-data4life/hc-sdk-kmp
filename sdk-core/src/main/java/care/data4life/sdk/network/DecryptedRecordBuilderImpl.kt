@@ -21,10 +21,12 @@ import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.DecryptedRecord
+import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhirRecord
 import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
+import care.data4life.sdk.network.model.definitions.LimitGuard
 
 internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
     private var identifier: String? = null
@@ -35,6 +37,8 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
     private var attachmentKey: GCKey? = null
     private var _dataKey: GCKey? = null
     private var modelVersion: Int? = null
+
+    private val guard: LimitGuard = DecryptedRecordGuard
 
     override val tags: HashMap<String, String>?
         get() = this._tags
@@ -153,6 +157,8 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
         val dataKey = dataKey ?: this.dataKey!!
         val modelVersion = modelVersion ?: this.modelVersion!!
 
+        guard.checkTagsAndAnnotationsLimits(tags, annotations)
+
         return when (resource) {
             null -> this.buildFhirRecord(
                     resource,
@@ -174,7 +180,7 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
                     creationDate,
                     dataKey,
                     modelVersion
-            )
+            ).also { this.guard.checkDataLimit(resource) }
             else -> throw CoreRuntimeException.InternalFailure()
 
         } as DecryptedBaseRecord<T>

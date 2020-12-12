@@ -18,6 +18,7 @@ package care.data4life.sdk.network
 
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.network.model.DecryptedAppDataRecord
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -28,6 +29,11 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Before
     fun setUp() {
         init()
+    }
+
+    @After
+    fun tearDown() {
+        stop()
     }
 
     @Test

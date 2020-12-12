@@ -20,9 +20,13 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.DecryptedRecord
+import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhirRecord
 import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
+import io.mockk.every
+import io.mockk.verify
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -34,6 +38,11 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     @Before
     fun setUp() {
         init()
+    }
+
+    @After
+    fun tearDown() {
+        stop()
     }
 
     @Test
@@ -489,5 +498,122 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
                         modelVersion
                 )
         )
+    }
+
+    @Test
+    fun `Given, build is called with a valid Resource, Tags, CreationDate, DataKey and ModelVersion, it calls the Limit Guard, with the given Tags and empty Annotations`() {
+        // Given
+        every { DecryptedRecordGuard.checkTagsAndAnnotationsLimits(tags, listOf()) } returns Unit
+
+        // When
+        DecryptedRecordBuilderImpl().build(
+                customResource,
+                tags,
+                creationDate,
+                dataKey,
+                modelVersion
+        )
+
+        // Then
+        verify { DecryptedRecordGuard.checkTagsAndAnnotationsLimits(tags, listOf()) }
+    }
+
+    @Test
+    fun `Given, build is called with a valid Resource, Tags, CreationDate, DataKey and ModelVersion, while Tags had been already set, it calls the Limit Guard, with the delegated Tags and empty Annotations`() {
+        // Given
+        @Suppress("UNCHECKED_CAST")
+        val delegatedTags = Mockito.mock(HashMap::class.java) as HashMap<String, String>
+
+        every { DecryptedRecordGuard.checkTagsAndAnnotationsLimits(delegatedTags, listOf()) } returns Unit
+
+        // When
+        DecryptedRecordBuilderImpl()
+                .setTags(tags)
+                .build(
+                    customResource,
+                    delegatedTags,
+                    creationDate,
+                    dataKey,
+                    modelVersion
+                )
+
+        // Then
+        verify { DecryptedRecordGuard.checkTagsAndAnnotationsLimits(delegatedTags, listOf()) }
+    }
+
+    @Test
+    fun `Given, build is called with a valid Resource, Tags, CreationDate, DataKey and ModelVersion, while Annotations had been set, it calls the Limit Guard, with the given Tags and Annotations`() {
+        // When
+        every { DecryptedRecordGuard.checkTagsAndAnnotationsLimits(tags, annotations) } returns Unit
+
+        DecryptedRecordBuilderImpl()
+                .setAnnotations(annotations)
+                .build(
+                    customResource,
+                    tags,
+                    creationDate,
+                    dataKey,
+                    modelVersion
+                )
+
+        // Then
+        verify { DecryptedRecordGuard.checkTagsAndAnnotationsLimits(tags, annotations) }
+    }
+
+    @Test
+    fun `Given, build is called with a ByteArray, Tags, CreationDate, DataKey and ModelVersion, it calls the Limit Guard, with the given Resource`() {
+        // When
+        every { DecryptedRecordGuard.checkDataLimit(customResource) } returns Unit
+
+        DecryptedRecordBuilderImpl()
+                .setAnnotations(annotations)
+                .build(
+                        customResource,
+                        tags,
+                        creationDate,
+                        dataKey,
+                        modelVersion
+                )
+
+        // Then
+        verify { DecryptedRecordGuard.checkDataLimit(customResource) }
+    }
+
+    @Test
+    fun `Given, build is called with null as a Resource, Tags, CreationDate, DataKey and ModelVersion, it does not calls the Limit Guard, with the given Resource`() {
+        // When
+        every { DecryptedRecordGuard.checkDataLimit(any()) } returns Unit
+
+        DecryptedRecordBuilderImpl()
+                .setAnnotations(annotations)
+                .build(
+                        null,
+                        tags,
+                        creationDate,
+                        dataKey,
+                        modelVersion
+                )
+
+        // Then
+        verify(exactly = 0) { DecryptedRecordGuard.checkDataLimit(any()) }
+    }
+
+    @Test
+    fun `Given, build is called with a FhirResource, Tags, CreationDate, DataKey and ModelVersion, it does not calls the Limit Guard, with the given Resource`() {
+        // When
+        every { DecryptedRecordGuard.checkDataLimit(any()) } returns Unit
+
+        DecryptedRecordBuilderImpl()
+                .setAnnotations(annotations)
+                .build(
+                        null,
+                        tags,
+                        creationDate,
+                        dataKey,
+                        modelVersion
+                )
+
+        // Then
+        verify(exactly = 0) { DecryptedRecordGuard.checkDataLimit(any()) }
     }
 }

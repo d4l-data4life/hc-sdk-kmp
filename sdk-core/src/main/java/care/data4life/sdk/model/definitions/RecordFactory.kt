@@ -14,26 +14,12 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network.model.definitions
+package care.data4life.sdk.model.definitions
 
-import care.data4life.crypto.GCKey
-import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.lang.CoreRuntimeException
+import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 
-internal interface DecryptedBaseRecord<T> {
-    var identifier: String?
-    var resource: T
-    var tags: HashMap<String, String>?
-    var annotations: List<String>
-    var customCreationDate: String?
-    var updatedDate: String? //FIXME: This should never be null
-    var dataKey: GCKey?
-    var attachmentsKey: GCKey?
-    var modelVersion: Int
-}
-
-internal interface DecryptedFhirRecord<T : DomainResource?> : DecryptedBaseRecord<T>
-internal interface DecryptedDataRecord : DecryptedBaseRecord<ByteArray> {
-    override var attachmentsKey: GCKey?
-        get() = null
-        set(_) {}
+internal interface RecordFactory {
+    @Throws(CoreRuntimeException.InternalFailure::class)
+    fun <T: Any> getInstance(record: DecryptedBaseRecord<T>): BaseRecord<T>
 }

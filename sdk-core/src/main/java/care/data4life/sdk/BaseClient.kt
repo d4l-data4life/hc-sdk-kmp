@@ -21,7 +21,7 @@ import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.log.Logger
 
-internal abstract class BaseClient(
+abstract class BaseClient(
         protected var alias: String,
         protected var userService: UserService,
         protected var recordService: RecordService,

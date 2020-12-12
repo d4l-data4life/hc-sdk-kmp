@@ -41,7 +41,8 @@ import java.io.IOException
 import java.nio.charset.Charset
 import java.security.SecureRandom
 
-internal open class CryptoService : CryptoProtocol {
+//TODO internal
+class CryptoService : CryptoProtocol {
 
     private val moshi: Moshi
     private var alias: String
@@ -287,7 +288,7 @@ internal open class CryptoService : CryptoProtocol {
     @Throws(IOException::class)
     fun getCommonKeyById(commonKeyId: String): GCKey = commonKeyService.fetchCommonKey(commonKeyId)
 
-    val currentCommonKeyId: String?
+    val currentCommonKeyId: String
         get() = commonKeyService.fetchCurrentCommonKeyId()
 
     fun storeCurrentCommonKeyId(commonKeyId: String) {

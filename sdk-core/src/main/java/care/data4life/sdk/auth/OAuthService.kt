@@ -18,7 +18,8 @@ package care.data4life.sdk.auth
 import care.data4life.auth.AuthorizationService
 import care.data4life.sdk.lang.D4LException
 
-internal class OAuthService(
+// TODO internal
+class OAuthService(
         private val authorizationService: AuthorizationService
 ) {
 

@@ -37,7 +37,8 @@ import static care.data4life.sdk.ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT;
 import static care.data4life.sdk.ImageResizer.DEFAULT_PREVIEW_SIZE_PX;
 import static care.data4life.sdk.ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX;
 
-class AttachmentService {
+// TODO Kotlin and internal
+public class AttachmentService {
     private static final int DOWNSCALED_ATTACHMENT_ID_POS = 1;
     private static final int POSITION_PREVIEW = 0;
     private static final String HASH_VALIDATION_DATE = "2019-09-15";

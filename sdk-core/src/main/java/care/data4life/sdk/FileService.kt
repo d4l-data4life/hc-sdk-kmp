@@ -19,7 +19,8 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.lang.FileException
 import io.reactivex.Single
 
-internal class FileService(
+// TODO internal
+class FileService(
         private val alias: String,
         private val apiService: ApiService,
         private val cryptoService: CryptoService

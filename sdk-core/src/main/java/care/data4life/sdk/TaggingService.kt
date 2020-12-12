@@ -18,7 +18,8 @@ package care.data4life.sdk
 import care.data4life.sdk.model.ModelVersion
 import java.util.*
 
-internal class TaggingService(
+// TODO internal
+class TaggingService(
         private val clientId: String
 ) {
     private val partnerId: String = clientId.substringBefore(SEPARATOR)

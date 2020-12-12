@@ -93,7 +93,7 @@ class UploadView(private val alias: String, private val isMulti: Boolean = false
 
             override fun onError(exception: D4LException) {
                 renderMessage(Message("Failed to create document"))
-                exception?.printStackTrace()
+                exception.printStackTrace()
             }
 
         })

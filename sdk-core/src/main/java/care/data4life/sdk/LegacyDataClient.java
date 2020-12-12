@@ -45,7 +45,7 @@ import io.reactivex.Single;
  * Will be removed in version v2.0.0
  */
 @Deprecated
-class LegacyDataClient implements SdkContract.LegacyDataClient {
+public class LegacyDataClient implements SdkContract.LegacyDataClient {
 
     protected CallHandler handler;
     protected String alias;
@@ -53,7 +53,7 @@ class LegacyDataClient implements SdkContract.LegacyDataClient {
     protected RecordService recordService;
 
 
-    LegacyDataClient(
+    public LegacyDataClient(
             String alias,
             UserService userService,
             RecordService recordService,

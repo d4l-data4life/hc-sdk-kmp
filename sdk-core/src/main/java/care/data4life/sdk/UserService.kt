@@ -22,7 +22,8 @@ import care.data4life.sdk.network.model.UserInfo
 import io.reactivex.Completable
 import io.reactivex.Single
 
-internal class UserService(
+// TODO internal
+class UserService(
         private val alias: String,
         private val oAuthService: OAuthService,
         private val apiService: ApiService,

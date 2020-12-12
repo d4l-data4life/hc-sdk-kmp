@@ -25,8 +25,8 @@ import io.reactivex.Single
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 
-
-internal class TagEncryptionService @JvmOverloads constructor(
+// TODO internal
+class TagEncryptionService @JvmOverloads constructor(
         private val cryptoService: CryptoService,
         private val base64: Base64 = Base64
 ) {

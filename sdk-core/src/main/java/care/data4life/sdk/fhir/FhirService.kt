@@ -28,7 +28,8 @@ import io.reactivex.Single
 
 // TODO remove @JvmOverloads when Data4LifeClient changed to Kotlin
 // TODO use of Single is not necessary as it's finalized with blockingGet()
-internal class FhirService @JvmOverloads constructor(
+// TODO internal
+class FhirService @JvmOverloads constructor(
         private val cryptoService: CryptoService,
         private val parserFhir3: FhirParser<Any> = Fhir().createStu3Parser(),
         private val parserFhir4: FhirParser<Any> = Fhir().createR4Parser()

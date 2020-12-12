@@ -116,7 +116,7 @@ class SingleMainView(private val alias: String) : BaseView(), KoinComponent {
                 }
 
                 override fun onError(exception: D4LException) {
-                    exception?.printStackTrace()
+                    exception.printStackTrace()
                     isLoggedIn = false
                 }
             })

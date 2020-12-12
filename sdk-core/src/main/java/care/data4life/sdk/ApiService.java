@@ -53,7 +53,8 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
-final class ApiService {
+// TODO Kotlin and internal
+public final class ApiService {
 
     private static final String HEADER_ALIAS = "gc_alias";
     private static final String HEADER_ACCESS_TOKEN = "access_token";

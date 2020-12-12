@@ -63,7 +63,8 @@ import org.threeten.bp.format.DateTimeFormatterBuilder
 import java.io.IOException
 import java.util.*
 
-internal class RecordService(
+// TODO internal
+class RecordService(
         private val partnerId: String,
         private val alias: String,
         private val apiService: ApiService,
@@ -695,7 +696,7 @@ internal class RecordService(
     }
 
     @Throws(IOException::class)
-    fun <T : DomainResource> encryptRecord(
+    internal fun <T : DomainResource> encryptRecord(
             record: DecryptedFhir3Record<T>
     ): EncryptedRecord = encrypt(
             record,
@@ -724,7 +725,7 @@ internal class RecordService(
 
     @Suppress("UNCHECKED_CAST")
     @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    fun <T : Any> decryptRecord(
+    internal fun <T : Any> decryptRecord(
             record: EncryptedRecord,
             userId: String
     ): DecryptedBaseRecord<T> = decrypt(
@@ -831,7 +832,7 @@ internal class RecordService(
         return if (data.isEmpty()) null else data
     }
 
-    fun <T : DomainResource> removeUploadData(
+    internal fun <T : DomainResource> removeUploadData(
             record: DecryptedFhir3Record<T>
     ): DecryptedFhir3Record<T> = removeOrRestoreUploadData(
             RemoveRestoreOperation.REMOVE,
@@ -840,7 +841,7 @@ internal class RecordService(
             null
     )
 
-    fun <T : DomainResource> restoreUploadData(
+    internal fun <T : DomainResource> restoreUploadData(
             record: DecryptedFhir3Record<T>,
             originalResource: T,
             attachmentData: HashMap<Attachment, String?>?
@@ -851,7 +852,7 @@ internal class RecordService(
             attachmentData
     )
 
-    fun <T : DomainResource> removeOrRestoreUploadData(
+    internal fun <T : DomainResource> removeOrRestoreUploadData(
             operation: RemoveRestoreOperation,
             record: DecryptedFhir3Record<T>,
             originalResource: T?,
@@ -872,7 +873,7 @@ internal class RecordService(
     @Throws(DataValidationException.IdUsageViolation::class,
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
-    fun <T : DomainResource> _uploadData(
+    internal fun <T : DomainResource> _uploadData(
             record: DecryptedFhir3Record<T>,
             userId: String
     ): DecryptedFhir3Record<T> {
@@ -925,7 +926,7 @@ internal class RecordService(
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class,
             CoreRuntimeException.UnsupportedOperation::class)
-    fun <T : DomainResource> updateData(
+    internal fun <T : DomainResource> updateData(
             record: DecryptedFhir3Record<T>,
             newResource: T?,
             userId: String?
@@ -989,7 +990,7 @@ internal class RecordService(
     }
 
     @Throws(DataValidationException.IdUsageViolation::class, DataValidationException.InvalidAttachmentPayloadHash::class)
-    fun <T : DomainResource> downloadData(
+    internal fun <T : DomainResource> downloadData(
             record: DecryptedFhir3Record<T>,
             userId: String?
     ): DecryptedFhir3Record<T> {
@@ -1023,7 +1024,7 @@ internal class RecordService(
     @Throws(DataValidationException.IdUsageViolation::class,
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
-    fun <T : DomainResource> uploadData(
+    internal fun <T : DomainResource> uploadData(
             record: DecryptedFhir3Record<T>,
             newResource: T?,
             userId: String
@@ -1034,7 +1035,7 @@ internal class RecordService(
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class,
             CoreRuntimeException.UnsupportedOperation::class)
-    fun <T : DomainResource> uploadOrDownloadData(
+    internal fun <T : DomainResource> uploadOrDownloadData(
             operation: UploadDownloadOperation,
             record: DecryptedFhir3Record<T>,
             newResource: T?,
@@ -1164,11 +1165,11 @@ internal class RecordService(
         }
     }
 
-    fun <T : DomainResource> assignResourceId(
+    internal fun <T : DomainResource> assignResourceId(
             record: DecryptedFhir3Record<T>
     ): DecryptedFhir3Record<T> = record.also { record.resource.id = record.identifier }
 
-    fun buildMeta(
+    internal fun buildMeta(
             record: DecryptedBaseRecord<*>
     ): Meta = Meta(
             LocalDate.parse(record.customCreationDate, DATE_FORMATTER),

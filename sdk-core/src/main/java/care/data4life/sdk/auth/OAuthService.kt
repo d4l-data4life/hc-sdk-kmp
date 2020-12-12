@@ -19,6 +19,7 @@ import care.data4life.auth.AuthorizationService
 import care.data4life.sdk.lang.D4LException
 
 // TODO internal
+// TODO could be removed
 class OAuthService(
         private val authorizationService: AuthorizationService
 ) {

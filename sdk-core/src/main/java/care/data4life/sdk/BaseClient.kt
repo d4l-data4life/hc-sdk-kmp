@@ -15,8 +15,7 @@
  */
 package care.data4life.sdk
 
-import care.data4life.sdk.SdkContract.LegacyDataClient
-import care.data4life.sdk.SdkContract.LegacyAuthClient
+import care.data4life.sdk.auth.AuthClient
 import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.log.Logger
@@ -27,11 +26,11 @@ abstract class BaseClient(
         protected var recordService: RecordService,
         protected var handler: CallHandler,
 
-        private val legacyDataClient: care.data4life.sdk.LegacyDataClient =
+        private val legacyDataClient: SdkContract.LegacyDataClient =
                 createLegacyDataClient(alias, userService, recordService, handler),
-        private val legacyAuthClient: LegacyAuthClient =
-                createLegacyAuthClient(alias, userService, recordService, handler)
-) : LegacyDataClient by legacyDataClient, LegacyAuthClient by legacyAuthClient {
+        private val authClient: SdkContract.AuthClient =
+                createAuthClient(alias, userService, handler)
+) : SdkContract.LegacyDataClient by legacyDataClient, SdkContract.AuthClient by authClient {
 
     companion object {
 
@@ -44,13 +43,12 @@ abstract class BaseClient(
             return LegacyDataClient(alias, userService, recordService, handler)
         }
 
-        fun createLegacyAuthClient(
+        fun createAuthClient(
                 alias: String,
                 userService: UserService,
-                recordService: RecordService,
                 handler: CallHandler
-        ): care.data4life.sdk.LegacyAuthClient {
-            return LegacyAuthClient(alias, userService, recordService, handler)
+        ): SdkContract.AuthClient {
+            return AuthClient(alias, userService, handler)
         }
 
         // FIXME refactor into own tool

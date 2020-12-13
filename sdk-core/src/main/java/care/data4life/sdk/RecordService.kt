@@ -19,7 +19,6 @@ import care.data4life.crypto.GCKey
 import care.data4life.crypto.KeyType
 import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.fhir.stu3.model.DomainResource
-import care.data4life.fhir.stu3.model.FhirElementFactory
 import care.data4life.fhir.stu3.model.Identifier
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
@@ -35,10 +34,12 @@ import care.data4life.sdk.model.FetchResult
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
+import care.data4life.sdk.model.SdkFhirElementFactory
 import care.data4life.sdk.model.SdkRecordFactory
 import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.DataRecord
+import care.data4life.sdk.model.definitions.FhirElementFactory
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.DecryptedRecordBuilderImpl
 import care.data4life.sdk.network.model.EncryptedKey
@@ -87,6 +88,7 @@ internal class RecordService(
     }
 
     private val recordFactory: RecordFactory = SdkRecordFactory
+    private val fhirElementFactory: FhirElementFactory = SdkFhirElementFactory
 
     private fun getTagsOnCreate(resource: Any): HashMap<String, String> {
         return if (resource is ByteArray) {
@@ -245,7 +247,7 @@ internal class RecordService(
         } else {
             @Suppress("UNCHECKED_CAST")
             taggingService.getTagFromType(
-                    FhirElementFactory.getFhirTypeForClass(resourceType as Class<out DomainResource>)
+                    fhirElementFactory.getFhirTypeForClass(resourceType as Class<out DomainResource>)
             )
         }
     }
@@ -491,7 +493,7 @@ internal class RecordService(
         apiService.getCount(alias, userId, null)
     } else {
         Single
-                .fromCallable { taggingService.getTagFromType(FhirElementFactory.getFhirTypeForClass(type)) }
+                .fromCallable { taggingService.getTagFromType(fhirElementFactory.getFhirTypeForClass(type)) }
                 .map { tagEncryptionService.encryptTags(it) as MutableList<String> }
                 .map { tags -> tags.also { it.addAll(tagEncryptionService.encryptAnnotations(annotations)) } }
                 .flatMap { apiService.getCount(alias, userId, it) }

@@ -24,8 +24,10 @@ import care.data4life.fhir.stu3.model.Identifier
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.ThumbnailService
+import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
+import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.D4LException
@@ -41,7 +43,6 @@ import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
-import care.data4life.sdk.model.definitions.DataRecord
 import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.EncryptedKey
@@ -134,7 +135,7 @@ class RecordService(
             resource: ByteArray,
             userId: String,
             annotations: List<String>
-    ): Single<DataRecord> {
+    ): Single<care.data4life.sdk.call.DataRecord<DataResource>> {
         val createdDate = DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID))
         val createRecord = Single.just(createdDate)
                 .map { createdAt ->
@@ -157,9 +158,9 @@ class RecordService(
                 .flatMap { encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord) }
                 .map { encryptedRecord -> decryptRecord<ByteArray>(encryptedRecord, userId) }
                 .map { decryptedRecord ->
-                    AppDataRecord(
+                    care.data4life.sdk.call.DataRecord(
                             decryptedRecord.identifier!!,
-                            decryptedRecord.resource,
+                            DataResource(decryptedRecord.resource),
                             buildMeta(decryptedRecord),
                             annotations
                     )
@@ -238,9 +239,7 @@ class RecordService(
                                 buildMeta(decryptedRecord)
                         ) as BaseRecord<T>
                     }
-
                 }
-
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -254,7 +253,17 @@ class RecordService(
     fun fetchAppDataRecord(
             recordId: String,
             userId: String
-    ): Single<DataRecord> = _fetchRecord<ByteArray>(recordId, userId) as Single<DataRecord>
+    ): Single<DataRecord<DataResource>> {
+        return (_fetchRecord<ByteArray>(recordId, userId) as Single<AppDataRecord>)
+                .map { appData ->
+                    DataRecord(
+                            appData.identifier,
+                            DataResource(appData.resource),
+                            appData.meta,
+                            appData.annotations
+                    )
+                }
+    }
 
     fun <T : DomainResource> fetchRecords(recordIds: List<String>, userId: String): Single<FetchResult<T>> {
         val failedFetches: MutableList<Pair<String, D4LException>> = arrayListOf()
@@ -337,7 +346,7 @@ class RecordService(
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int
-    ): Single<List<DataRecord>> = fetch(
+    ): Single<List<DataRecord<DataResource>>> = fetch(
             userId,
             annotations,
             startDate,
@@ -348,12 +357,12 @@ class RecordService(
     )
             .map { encryptedRecord -> decryptRecord<ByteArray>(encryptedRecord, userId) }
             .map { decryptedRecord ->
-                AppDataRecord(
+                DataRecord(
                         decryptedRecord.identifier!!,
-                        decryptedRecord.resource,
+                        DataResource(decryptedRecord.resource),
                         buildMeta(decryptedRecord),
                         decryptedRecord.annotations
-                ) as DataRecord
+                )
             }
             .toList()
 
@@ -529,11 +538,11 @@ class RecordService(
     }
 
     fun updateRecord(
+            recordId: String,
             resource: ByteArray,
             userId: String,
-            recordId: String,
             annotations: List<String>? = listOf()
-    ): Single<DataRecord> = apiService
+    ): Single<DataRecord<DataResource>> = apiService
             .fetchRecord(alias, userId, recordId)
             .map { encryptedRecord -> decryptRecord<ByteArray>(encryptedRecord, userId) as DecryptedDataRecord }
             .map { decryptedRecord -> decryptedRecord.copyWithResourceAnnotations(resource, annotations) }
@@ -548,9 +557,9 @@ class RecordService(
             }
             .map { encryptedRecord -> decryptRecord<ByteArray>(encryptedRecord, userId) }
             .map { decryptedRecord ->
-                AppDataRecord(
+                DataRecord(
                         decryptedRecord.identifier!!,
-                        decryptedRecord.resource,
+                        DataResource(decryptedRecord.resource),
                         buildMeta(decryptedRecord),
                         decryptedRecord.annotations
                 )

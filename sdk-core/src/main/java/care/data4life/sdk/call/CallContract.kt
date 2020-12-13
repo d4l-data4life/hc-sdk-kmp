@@ -13,23 +13,17 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
-package care.data4life.sdk.model.definitions
 
-import care.data4life.fhir.stu3.model.DomainResource
-import care.data4life.sdk.fhir.Fhir4Resource
+package care.data4life.sdk.call
+
 import care.data4life.sdk.model.Meta
 
-interface BaseRecord<T> {
-    val identifier: String
-    val resource: T
-    val meta: Meta?
-    val annotations: List<String>?
-}
+class CallContract {
 
-interface Fhir3Record<T : DomainResource?> : BaseRecord<T> {
-    val fhirResource: T
-        get() = resource
+    interface Record<T> {
+        val identifier: String
+        val resource: T
+        val meta: Meta
+        val annotations: List<String>
+    }
 }
-
-@Deprecated("use the SDK Contract")
-interface DataRecord : BaseRecord<ByteArray>

@@ -253,7 +253,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
                 .assertValueCount(1)
                 .values()[0]
         Truth.assertThat(record.meta).isEqualTo(mockMeta)
-        Truth.assertThat(record.resource).isEqualTo(mockAppData)
+        Truth.assertThat(record.resource).isEqualTo(mockDataResource)
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
         inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).buildMeta(mockDecryptedDataRecord)
@@ -306,9 +306,9 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
                 .values()[0]
         Truth.assertThat(fetched).hasSize(2)
         Truth.assertThat(fetched[0].meta).isEqualTo(mockMeta)
-        Truth.assertThat(fetched[0].resource).isEqualTo(mockAppData)
+        Truth.assertThat(fetched[0].resource).isEqualTo(mockDataResource)
         Truth.assertThat(fetched[1].meta).isEqualTo(mockMeta)
-        Truth.assertThat(fetched[1].resource).isEqualTo(mockAppData)
+        Truth.assertThat(fetched[1].resource).isEqualTo(mockDataResource)
         inOrder.verify(mockTaggingService).appendAppDataTags(ArgumentMatchers.eq(hashMapOf()))
         inOrder.verify(mockTagEncryptionService).encryptTags(mockTags)
         inOrder.verify(mockTagEncryptionService).encryptAnnotations(ANNOTATIONS)

@@ -71,8 +71,8 @@ interface IHCService {
             @Path("userId") userId: String,
             @Query("start_date") startDate: String?,
             @Query("end_date") endDate: String?,
-            @Query("limit") pageSize: Int?,
-            @Query("offset") offset: Int?,
+            @Query("limit") pageSize: Int,
+            @Query("offset") offset: Int,
             @Query("tags") tags: List<String>
     ): Observable<List<EncryptedRecord>>
 

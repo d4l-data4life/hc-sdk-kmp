@@ -23,6 +23,7 @@ import care.data4life.fhir.stu3.model.DocumentReference
 import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
+import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.model.Meta
@@ -58,7 +59,7 @@ abstract class RecordServiceTestBase {
     internal lateinit var mockCryptoService: CryptoService
     private lateinit var mockErrorHandler: D4LErrorHandler
     internal lateinit var mockCarePlan: CarePlan
-    internal lateinit var mockAppData: ByteArray
+    internal lateinit var mockDataResource: DataResource
     internal lateinit var mockDocumentReference: DocumentReference
     internal lateinit var mockTags: HashMap<String, String>
     internal lateinit var mockUploadData: HashMap<Attachment, String?>
@@ -106,7 +107,7 @@ abstract class RecordServiceTestBase {
                 )
         )
         mockCarePlan = Mockito.mock(CarePlan::class.java)
-        mockAppData = ByteArray(23)
+        mockDataResource = DataResource(ByteArray(23))
         mockDocumentReference = Mockito.mock(DocumentReference::class.java)
         mockTags = Mockito.mock<HashMap<*, *>>(HashMap::class.java) as HashMap<String, String>
         mockUploadData = Mockito.mock<HashMap<*, *>>(HashMap::class.java) as HashMap<Attachment, String?>
@@ -142,7 +143,7 @@ abstract class RecordServiceTestBase {
 
         Mockito.`when`<HashMap<*, *>?>(mockDecryptedDataRecord.tags).thenReturn(mockTags)
         Mockito.`when`(mockDecryptedDataRecord.dataKey).thenReturn(mockDataKey)
-        Mockito.`when`(mockDecryptedDataRecord.resource).thenReturn(mockAppData)
+        Mockito.`when`(mockDecryptedDataRecord.resource).thenReturn(mockDataResource.value)
         Mockito.`when`(mockDecryptedDataRecord.identifier).thenReturn("id")
         Mockito.`when`(mockDecryptedDataRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
         Mockito.`when`(mockDecryptedDataRecord.annotations).thenReturn(ANNOTATIONS)

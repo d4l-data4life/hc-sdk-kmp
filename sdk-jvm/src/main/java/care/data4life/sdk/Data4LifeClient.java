@@ -57,8 +57,15 @@ public final class Data4LifeClient extends BaseClient {
                 userService,
                 recordService,
                 callHandler,
-                Data4LifeClient.Companion.createLegacyDataClient(alias, userService, recordService, callHandler),
-                Data4LifeClient.Companion.createAuthClient(alias, userService, callHandler)
+                Data4LifeClient.Companion.createAuthClient(
+                        alias, userService, callHandler
+                ),
+                Data4LifeClient.Companion.createDataClient(
+                        userService, recordService, callHandler
+                ),
+                Data4LifeClient.Companion.createLegacyDataClient(
+                        alias, userService, recordService, callHandler
+                )
         );
         this.authorizationService = authorizationService;
         this.cryptoService = cryptoService;

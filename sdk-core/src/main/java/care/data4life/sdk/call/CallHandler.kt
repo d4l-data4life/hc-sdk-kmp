@@ -17,8 +17,8 @@ package care.data4life.sdk.call
 
 import care.data4life.sdk.SdkContract
 import care.data4life.sdk.lang.TaskException
-import care.data4life.sdk.listener.Callback
-import care.data4life.sdk.listener.ResultListener
+import care.data4life.sdk.listener.Callback as LegacyCallback
+import care.data4life.sdk.listener.ResultListener as LegacyListener
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -26,7 +26,22 @@ import io.reactivex.schedulers.Schedulers
 class CallHandler(
         var errorHandler: SdkContract.ErrorHandler
 ) {
-    fun <T> executeSingle(operation: Single<T>, listener: ResultListener<T>): Task {
+    fun <T> executeSingle(operation: Single<T>, callback: Callback<T>): Task {
+        val task = Task()
+        val operationHandle = operation
+                .doOnDispose { if (task.isCanceled) callback.onError(errorHandler.handleError(TaskException.CancelException())) }
+                .doFinally { task.finish() }
+                .subscribeOn(Schedulers.io())
+                .subscribe({ t: T -> callback.onSuccess(t) }
+                ) { error ->
+                    if (!task.isActive) return@subscribe
+                    callback.onError(errorHandler.handleError(error))
+                }
+        task.operationHandle = operationHandle
+        return task
+    }
+
+    fun <T> executeSingle(operation: Single<T>, listener: LegacyListener<T>): Task {
         val task = Task()
         val operationHandle = operation
                 .doOnDispose { if (task.isCanceled) listener.onError(errorHandler.handleError(TaskException.CancelException())) }
@@ -41,7 +56,7 @@ class CallHandler(
         return task
     }
 
-    fun executeCompletable(operation: Completable, listener: Callback): Task {
+    fun executeCompletable(operation: Completable, listener: LegacyCallback): Task {
         val task = Task()
         val operationHandle = operation
                 .doOnDispose { if (task.isCanceled) listener.onError(errorHandler.handleError(TaskException.CancelException())) }

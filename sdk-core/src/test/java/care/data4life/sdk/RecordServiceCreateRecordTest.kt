@@ -580,7 +580,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun `Given createRecord is called with a Byte resource, a UserId and Annotations, it returns a new DataRecord`() {
         // Given
         mockkObject(Base64)
-        every { Base64.decode(mockAppData) } returns ENCRYPTED_APPDATA
+        every { Base64.decode(mockDataResource.value) } returns ENCRYPTED_APPDATA
         Mockito.`when`(mockTaggingService.appendDefaultAnnotatedTags(null, null))
                 .thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
@@ -596,7 +596,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
 
         // When
         val subscriber = recordService.createRecord(
-                mockAppData,
+                mockDataResource.value,
                 USER_ID,
                 ANNOTATIONS
         ).test().await()
@@ -608,7 +608,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .assertValueCount(1)
                 .values()[0]
         Truth.assertThat(record.meta).isEqualTo(mockMeta)
-        Truth.assertThat(record.resource).isEqualTo(mockAppData)
+        Truth.assertThat(record.resource).isEqualTo(mockDataResource)
         Truth.assertThat(record.annotations).isEqualTo(ANNOTATIONS)
         inOrder.verify(mockTaggingService).appendDefaultAnnotatedTags(null, null)
         inOrder.verify(mockCryptoService).generateGCKey()

@@ -35,7 +35,6 @@ import care.data4life.sdk.model.DownloadType;
 import care.data4life.sdk.model.FetchResult;
 import care.data4life.sdk.model.Record;
 import care.data4life.sdk.model.UpdateResult;
-import care.data4life.sdk.model.definitions.DataRecord;
 
 /**
  * Deprecated with version v1.9.0
@@ -241,50 +240,5 @@ public interface SdkContractLegacy {
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status.
          */
         Task downloadAttachments(String recordId, List<String> attachmentIds, DownloadType type, ResultListener<List<Attachment>> listener);
-
-        /**
-         * Creates an {@link DataRecord} record.
-         *
-         * @param data           the app data that will be created
-         * @param resultListener result contains either record or Error
-         * @param annotations    custom annotations added as tags to the record
-         */
-        void createDataRecord(byte[] data, ResultListener<DataRecord> resultListener, List<String> annotations);
-
-        /**
-         * @param dataId         the id of the app data record which shall be fetched
-         * @param resultListener either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
-         * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
-         */
-        Task fetchDataRecord(String dataId, ResultListener<DataRecord> resultListener);
-
-        /**
-         * Fetch DataRecords with filters
-         *
-         * @param annotations custom annotations added as tags to the record
-         * @param startDate   the filtered records have a creation date after the start date
-         * @param endDate     the filtered records have a creation date before the endDate
-         * @param pageSize    define the size page result
-         * @param offset      the offset of the records list
-         * @param listener    either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
-         * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
-         */
-        Task fetchDataRecords(List<String> annotations, @Nullable LocalDate startDate, @Nullable LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<DataRecord>> listener);
-
-        /**
-         * @param data           the updated appData byte array thaat shall be uploaded
-         * @param annotations    custom annotations added as tags to the record
-         * @param recordId       the id of the {@link care.data4life.sdk.model.definitions.DataRecord} that shall be update
-         * @param resultListener either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
-         */
-        void updateDataRecord(byte[] data, @Nullable List<String> annotations, String recordId, ResultListener<DataRecord> resultListener);
-
-        /**
-         * Delete an DataRecord
-         *
-         * @param dataId   the id of the record that shall be deleted
-         * @param callback either {@link Callback#onSuccess()} or {@link Callback#onError(D4LException)} will be called
-         */
-        void deleteDataRecord(String dataId, Callback callback);
     }
 }

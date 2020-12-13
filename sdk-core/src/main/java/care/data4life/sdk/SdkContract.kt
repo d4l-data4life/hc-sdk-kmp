@@ -15,11 +15,22 @@
  */
 package care.data4life.sdk
 
+import care.data4life.sdk.call.Callback
+import care.data4life.sdk.call.DataRecord
+import care.data4life.sdk.call.Task
+import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.lang.D4LException
-import care.data4life.sdk.listener.Callback
-import care.data4life.sdk.listener.ResultListener
+import org.threeten.bp.LocalDate
+import care.data4life.sdk.listener.Callback as LegacyCallback
+import care.data4life.sdk.listener.ResultListener as LegacyListener
 
 interface SdkContract {
+
+    interface Client {
+
+        val data: DataRecordClient
+
+    }
 
     interface AuthClient {
         /**
@@ -27,24 +38,79 @@ interface SdkContract {
          *
          * @param listener result contains either User session token or Error
          */
-        fun getUserSessionToken(listener: ResultListener<String>)
+        fun getUserSessionToken(listener: LegacyListener<String>)
 
         /**
          * Checks if user is logged in.
          *
          * @param listener resulting Boolean indicates if the user is logged in or not or Error
          */
-        fun isUserLoggedIn(listener: ResultListener<Boolean>)
+        fun isUserLoggedIn(listener: LegacyListener<Boolean>)
 
         /**
          * Logout the user
          *
          * @param listener either [Callback.onSuccess] is called or [Callback.onError]
          */
-        fun logout(listener: Callback)
+        fun logout(listener: LegacyCallback)
 
     }
 
+    interface DataRecordClient {
+        /**
+         * Creates an {@link DataRecord} record.
+         *
+         * @param data           the app data that will be created
+         * @param annotations    custom annotations added as tags to the record
+         * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
+         */
+        fun create(resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>)
+
+        /**
+         * @param recordId       the id of the {@link care.data4life.sdk.model.definitions.DataRecord} that shall be update
+         * @param data           the updated appData byte array thaat shall be uploaded
+         * @param annotations    custom annotations added as tags to the record
+         * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
+         */
+        fun update(recordId: String, resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>)
+
+        /**
+         * Delete an DataRecord
+         *
+         * @param recordId      the id of the record that shall be deleted
+         * @param callback      either {@link Callback#onSuccess()} or {@link Callback#onError(D4LException)} will be called
+         */
+        fun delete(recordId: String, callback: Callback<Boolean>)
+
+        /**
+         * Fetch an DataRecord with given recordId
+         *
+         * @param recordId          the id of the app data record which shall be fetched
+         * @param resultListener    either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
+         * @return                  {@link Task} which can be used to cancel ongoing operation or to query operation status
+         */
+        fun fetch(recordId: String, callback: Callback<DataRecord<DataResource>>): Task
+
+        /**
+         * Search DataRecords with filters
+         *
+         * @param annotations custom annotations added as tags to the record
+         * @param startDate   the filtered records have a creation date after the start date
+         * @param endDate     the filtered records have a creation date before the endDate
+         * @param pageSize    define the size page result
+         * @param offset      the offset of the records list
+         * @param listener    either [ResultListener.onSuccess] or [ResultListener.onError] will be called
+         * @return [Task] which can be used to cancel ongoing operation or to query operation status
+         */
+        fun search(annotations: List<String>,
+                   startDate: LocalDate?,
+                   endDate: LocalDate?,
+                   pageSize: Int,
+                   offset: Int,
+                   callback: Callback<List<DataRecord<DataResource>>>
+        ): Task
+
+    }
 
     /**
      * Legacy Client interface
@@ -53,9 +119,8 @@ interface SdkContract {
      * <p>
      * Will be removed in version v2.0.0
      */
-    @Deprecated(message = "Deprecated with version v1.9.0 and will be removed in version v2.0.0", level = DeprecationLevel.WARNING)
+    @Deprecated(message = "Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     interface LegacyDataClient : SdkContractLegacy.DataClient
-
 
     interface ErrorHandler {
         fun handleError(error: Throwable): D4LException

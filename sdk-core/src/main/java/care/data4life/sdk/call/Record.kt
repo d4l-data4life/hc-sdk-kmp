@@ -13,37 +13,41 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
+package care.data4life.sdk.call
 
-package care.data4life.sdk.model
+import care.data4life.sdk.data.DataContract
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.model.Meta
 
-import care.data4life.sdk.model.definitions.DataRecord
-import java.util.Objects.hash
+sealed class Record
 
-/**
- * AppDataRecord is used to store arbitrary data, analogous to Record
- * @see care.data4life.sdk.model.Record
- */
-@Deprecated(message = "use DataRecord instead")
-data class AppDataRecord(
+data class Fhir3Record<T : Fhir3Resource>(
         override val identifier: String,
-        override val resource: ByteArray,
+        override val resource: T,
         override val meta: Meta,
         override val annotations: List<String>
-) : DataRecord {
-    override fun equals(other: Any?): Boolean {
-        return when {
-            other !is AppDataRecord -> false
-            identifier != other.identifier ||
-                    meta != other.meta ||
-                    annotations != other.annotations -> false
-            else -> resource.contentEquals(other.resource)
-        }
-    }
+) : CallContract.Record<T>, Record()
 
-    override fun hashCode(): Int = hash(
-            identifier,
-            meta,
-            annotations,
-            resource.contentToString()
-    )
-}
+class Fhir4Record<T : Fhir4Resource>(
+        override val identifier: String,
+        override val resource: T,
+        override val meta: Meta,
+        override val annotations: List<String>
+) : CallContract.Record<T>, Record()
+
+data class DataRecord<T : DataContract.Resource>(
+        override val identifier: String,
+        override val resource: T,
+        override val meta: Meta,
+        override val annotations: List<String>
+) : CallContract.Record<T>, Record()
+
+
+
+
+
+
+
+
+

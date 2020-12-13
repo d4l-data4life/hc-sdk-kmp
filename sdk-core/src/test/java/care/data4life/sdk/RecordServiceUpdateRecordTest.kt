@@ -296,7 +296,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
                 .decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
         Mockito.doReturn(mockDecryptedDataRecord)
                 .`when`(mockDecryptedDataRecord)
-                .copyWithResourceAnnotations(mockAppData, ANNOTATIONS)
+                .copyWithResourceAnnotations(mockDataResource.value, ANNOTATIONS)
         Mockito.doReturn(mockEncryptedRecord).`when`(recordService).encryptDataRecord(mockDecryptedDataRecord)
         Mockito.`when`(
                 mockApiService.updateRecord(
@@ -310,9 +310,9 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
 
         // When
         val observer = recordService.updateRecord(
-                mockAppData,
-                USER_ID,
                 RECORD_ID,
+                mockDataResource.value,
+                USER_ID,
                 ANNOTATIONS
         ).test().await()
 
@@ -322,7 +322,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
                 .assertValueCount(1)
                 .values()[0]
         Truth.assertThat(result.meta).isEqualTo(mockMeta)
-        Truth.assertThat(result.resource).isEqualTo(mockAppData)
+        Truth.assertThat(result.resource).isEqualTo(mockDataResource)
         Truth.assertThat(result.annotations).isEqualTo(ANNOTATIONS)
 
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
@@ -333,7 +333,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         inOrder.verifyNoMoreInteractions()
 
         Mockito.verify(mockDecryptedDataRecord, Mockito.times(1))
-                .copyWithResourceAnnotations(mockAppData, ANNOTATIONS)
+                .copyWithResourceAnnotations(mockDataResource.value, ANNOTATIONS)
     }
 
     @Test
@@ -356,7 +356,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
                 .decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
         Mockito.doReturn(mockDecryptedDataRecord)
                 .`when`(mockDecryptedDataRecord)
-                .copyWithResourceAnnotations(mockAppData, null)
+                .copyWithResourceAnnotations(mockDataResource.value, null)
         Mockito.doReturn(mockEncryptedRecord).`when`(recordService).encryptDataRecord(mockDecryptedDataRecord)
         Mockito.`when`(
                 mockApiService.updateRecord(
@@ -370,9 +370,9 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
 
         // When
         val observer = recordService.updateRecord(
-                mockAppData,
-                USER_ID,
                 RECORD_ID,
+                mockDataResource.value,
+                USER_ID,
                 null
         ).test().await()
 
@@ -382,7 +382,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
                 .assertValueCount(1)
                 .values()[0]
         Truth.assertThat(result.meta).isEqualTo(mockMeta)
-        Truth.assertThat(result.resource).isEqualTo(mockAppData)
+        Truth.assertThat(result.resource).isEqualTo(mockDataResource)
 
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
         inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
@@ -392,6 +392,6 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         inOrder.verifyNoMoreInteractions()
 
         Mockito.verify(mockDecryptedDataRecord, Mockito.times(1))
-                .copyWithResourceAnnotations(mockAppData, null)
+                .copyWithResourceAnnotations(mockDataResource.value, null)
     }
 }

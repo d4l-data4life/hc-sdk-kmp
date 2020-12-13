@@ -27,7 +27,7 @@ import org.junit.Test
 import java.util.ArrayList
 
 class FhirElementFactoryTest {
-    fun buildDocumentReference(): DocumentReference {
+    private fun buildDocumentReference(): DocumentReference {
         val content = RecordServiceTestBase.buildDocRefContent(AttachmentBuilder.buildAttachment(null))
         val contents: MutableList<DocumentReference.DocumentReferenceContent> = ArrayList()
         contents.add(content)
@@ -61,10 +61,9 @@ class FhirElementFactoryTest {
 
     @Test
     fun `Given, getFhirTypeForClass is called with a non valid FhirResource Class, it returns fails with CoreRuntimeExceptionInternalFailure`() {
-
         try {
             // When
-            val name = SdkFhirElementFactory.getFhirTypeForClass(String::class.java)
+            SdkFhirElementFactory.getFhirTypeForClass(String::class.java)
             assertTrue(false)//Fixme
         } catch (e: Exception) {
             // Then

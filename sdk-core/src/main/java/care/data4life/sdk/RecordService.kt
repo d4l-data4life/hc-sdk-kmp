@@ -721,7 +721,7 @@ internal class RecordService(
                 record.dataKey!!
         ).blockingGet()
 
-        val (encryptedResource, encryptedAttachmentsKey) = this.getEncryptedResourceAndAttachment(
+        val (encryptedResource, encryptedAttachmentsKey) = getEncryptedResourceAndAttachment(
                 record,
                 commonKey
         )
@@ -738,18 +738,56 @@ internal class RecordService(
         )
     }
 
-    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    private fun <T> decrypt(
+    private fun getCommonKey(commonKeyId: String, userId: String): GCKey {
+        val commonKeyStored = cryptoService.hasCommonKey(commonKeyId)
+        return if (commonKeyStored) {
+            cryptoService.getCommonKeyById(commonKeyId)
+        } else {
+            val commonKeyResponse = apiService.fetchCommonKey(
+                    alias,
+                    userId,
+                    commonKeyId
+            ).blockingGet()
+
+            cryptoService.asymDecryptSymetricKey(
+                    cryptoService.fetchGCKeyPair().blockingGet(),
+                    commonKeyResponse.commonKey
+            ).blockingGet().also {
+                cryptoService.storeCommonKey(commonKeyId, it)
+            }
+        }
+    }
+
+    private fun <T : Any> decryptRecord(
             record: EncryptedRecord,
-            userId: String?,
-            decryptSource: (
-                    builder: DecryptedRecordBuilder,
-                    commonKey: GCKey
-            ) -> T
-    ): T {
+            builder: DecryptedRecordBuilder
+    ): DecryptedBaseRecord<T> {
+        @Suppress("UNCHECKED_CAST")
+        return when {
+            record.encryptedBody == null || record.encryptedBody.isEmpty() -> builder.build(null)
+            builder.tags!!.containsKey(TaggingService.TAG_RESOURCE_TYPE) -> builder.build(
+                    fhirService.decryptResource<DomainResource>(
+                            builder.dataKey!!,
+                            builder.tags!![TaggingService.TAG_RESOURCE_TYPE]!!,
+                            record.encryptedBody
+                    )
+            )
+            else -> builder.build(decode(record.encryptedBody).let {
+                cryptoService.decrypt(builder.dataKey!!, it).blockingGet()
+            })
+        } as DecryptedBaseRecord<T>
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
+    fun <T : Any> decryptRecord(
+            record: EncryptedRecord,
+            userId: String
+    ): DecryptedBaseRecord<T> {
         if (!ModelVersion.isModelVersionSupported(record.modelVersion)) {
             throw DataValidationException.ModelVersionNotSupported("Please update SDK to latest version!")
         }
+
         val builder = DecryptedRecordBuilderImpl()
                 .setIdentifier(record.identifier)
                 .setTags(
@@ -763,42 +801,12 @@ internal class RecordService(
                 .setModelVersion(record.modelVersion)
 
         val commonKeyId = record.commonKeyId
-        val commonKeyStored = cryptoService.hasCommonKey(commonKeyId)
-        val commonKey: GCKey =
-                if (commonKeyStored) {
-                    cryptoService.getCommonKeyById(commonKeyId)
-                } else {
-                    val commonKeyResponse = apiService.fetchCommonKey(
-                            alias,
-                            userId,
-                            commonKeyId
-                    ).blockingGet()
+        val commonKey: GCKey = getCommonKey(commonKeyId, userId)
 
-                    cryptoService.asymDecryptSymetricKey(
-                            cryptoService.fetchGCKeyPair().blockingGet(),
-                            commonKeyResponse.commonKey
-                    ).blockingGet().also {
-                        cryptoService.storeCommonKey(commonKeyId, it)
-                    }
-                }
         builder.setDataKey(
                 cryptoService.symDecryptSymmetricKey(commonKey, record.encryptedDataKey).blockingGet()
         )
-        return decryptSource(
-                builder,
-                commonKey
-        )
-    }
 
-    @Suppress("UNCHECKED_CAST")
-    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    fun <T : Any> decryptRecord(
-            record: EncryptedRecord,
-            userId: String
-    ): DecryptedBaseRecord<T> = decrypt(
-            record,
-            userId
-    ) { builder: DecryptedRecordBuilder, commonKey: GCKey ->
         if (record.encryptedAttachmentsKey != null) {
             builder.setAttachmentKey(
                     cryptoService.symDecryptSymmetricKey(
@@ -808,19 +816,7 @@ internal class RecordService(
             )
         }
 
-        when {
-            record.encryptedBody == null || record.encryptedBody.isEmpty() -> builder.build(null)
-            builder.tags!!.containsKey(TaggingService.TAG_RESOURCE_TYPE) -> builder.build(
-                    fhirService.decryptResource<DomainResource>(
-                            builder.dataKey!!,
-                            builder.tags!![TaggingService.TAG_RESOURCE_TYPE]!!,
-                            record.encryptedBody
-                    )
-            )
-            else -> builder.build(decode(record.encryptedBody).let {
-                cryptoService.decrypt(builder.dataKey!!, it).blockingGet()
-            })
-        } as DecryptedBaseRecord<T>
+        return decryptRecord(record, builder)
     }
 
     fun <T : DomainResource> extractUploadData(resource: T): HashMap<Attachment, String?>? {

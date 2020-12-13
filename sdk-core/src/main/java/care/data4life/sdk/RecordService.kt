@@ -427,84 +427,6 @@ internal class RecordService(
             offset
     ) as Single<List<DataRecord>>
 
-    fun downloadAttachment(
-            recordId: String,
-            attachmentId: String,
-            userId: String,
-            type: DownloadType
-    ): Single<Attachment> = downloadAttachments(
-            recordId,
-            arrayListOf(attachmentId),
-            userId,
-            type
-    ).map { it[0] }
-
-    fun downloadAttachments(
-            recordId: String,
-            attachmentIds: List<String>,
-            userId: String,
-            type: DownloadType
-    ): Single<List<Attachment>> = apiService
-            .fetchRecord(alias, userId, recordId)
-            .map { encryptedRecord -> decryptRecord<DomainResource>(encryptedRecord, userId) }
-            .flatMap { decryptedRecord ->
-                downloadAttachmentsFromStorage(
-                        attachmentIds,
-                        userId,
-                        type,
-                        decryptedRecord as DecryptedFhirRecord<DomainResource>
-                )
-            }
-
-    @Throws(DataValidationException.IdUsageViolation::class,
-            DataValidationException.InvalidAttachmentPayloadHash::class)
-    private fun downloadAttachmentsFromStorage(
-            attachmentIds: List<String>,
-            userId: String,
-            type: DownloadType,
-            decryptedRecord: DecryptedFhirRecord<DomainResource>
-    ): Single<out List<Attachment>> {
-        if (FhirAttachmentHelper.hasAttachment(decryptedRecord.resource)) {
-            val resource = decryptedRecord.resource
-            val attachments = FhirAttachmentHelper.getAttachment(resource)
-            val validAttachments = mutableListOf<Attachment>()
-
-            for (attachment in attachments) {
-                if (attachmentIds.contains(attachment.id)) {
-                    validAttachments.add(attachment)
-                }
-            }
-            if (validAttachments.size != attachmentIds.size)
-                throw DataValidationException.IdUsageViolation("Please provide correct attachment ids!")
-
-            setAttachmentIdForDownloadType(
-                    validAttachments,
-                    FhirAttachmentHelper.getIdentifier(resource),
-                    type
-            )
-
-            return attachmentService.downloadAttachments(
-                    validAttachments,
-                    decryptedRecord.attachmentsKey,
-                    userId
-            )
-                    .flattenAsObservable { items -> items }
-                    .map { attachment ->
-                        attachment.also {
-                            if (attachment.id!!.contains(SPLIT_CHAR)) updateAttachmentMeta(attachment)
-                        }
-                    }
-                    .toList()
-        }
-
-        throw IllegalArgumentException("Expected a record of a type that has attachment")
-    }
-
-    fun deleteAttachment(
-            attachmentId: String,
-            userId: String
-    ): Single<Boolean> = attachmentService.deleteAttachment(attachmentId, userId)
-
     fun <T : DomainResource> downloadRecord(
             recordId: String,
             userId: String
@@ -833,6 +755,84 @@ internal class RecordService(
 
         return decryptRecord(record, builder)
     }
+
+    fun downloadAttachment(
+            recordId: String,
+            attachmentId: String,
+            userId: String,
+            type: DownloadType
+    ): Single<Attachment> = downloadAttachments(
+            recordId,
+            arrayListOf(attachmentId),
+            userId,
+            type
+    ).map { it[0] }
+
+    fun downloadAttachments(
+            recordId: String,
+            attachmentIds: List<String>,
+            userId: String,
+            type: DownloadType
+    ): Single<List<Attachment>> = apiService
+            .fetchRecord(alias, userId, recordId)
+            .map { encryptedRecord -> decryptRecord<DomainResource>(encryptedRecord, userId) }
+            .flatMap { decryptedRecord ->
+                downloadAttachmentsFromStorage(
+                        attachmentIds,
+                        userId,
+                        type,
+                        decryptedRecord as DecryptedFhirRecord<DomainResource>
+                )
+            }
+
+    @Throws(DataValidationException.IdUsageViolation::class,
+            DataValidationException.InvalidAttachmentPayloadHash::class)
+    private fun downloadAttachmentsFromStorage(
+            attachmentIds: List<String>,
+            userId: String,
+            type: DownloadType,
+            decryptedRecord: DecryptedFhirRecord<DomainResource>
+    ): Single<out List<Attachment>> {
+        if (FhirAttachmentHelper.hasAttachment(decryptedRecord.resource)) {
+            val resource = decryptedRecord.resource
+            val attachments = FhirAttachmentHelper.getAttachment(resource)
+            val validAttachments = mutableListOf<Attachment>()
+
+            for (attachment in attachments) {
+                if (attachmentIds.contains(attachment.id)) {
+                    validAttachments.add(attachment)
+                }
+            }
+            if (validAttachments.size != attachmentIds.size)
+                throw DataValidationException.IdUsageViolation("Please provide correct attachment ids!")
+
+            setAttachmentIdForDownloadType(
+                    validAttachments,
+                    FhirAttachmentHelper.getIdentifier(resource),
+                    type
+            )
+
+            return attachmentService.downloadAttachments(
+                    validAttachments,
+                    decryptedRecord.attachmentsKey,
+                    userId
+            )
+                    .flattenAsObservable { items -> items }
+                    .map { attachment ->
+                        attachment.also {
+                            if (attachment.id!!.contains(SPLIT_CHAR)) updateAttachmentMeta(attachment)
+                        }
+                    }
+                    .toList()
+        }
+
+        throw IllegalArgumentException("Expected a record of a type that has attachment")
+    }
+
+    fun deleteAttachment(
+            attachmentId: String,
+            userId: String
+    ): Single<Boolean> = attachmentService.deleteAttachment(attachmentId, userId)
 
     fun <T : DomainResource> extractUploadData(resource: T): HashMap<Attachment, String?>? {
         val attachments = FhirAttachmentHelper.getAttachment(resource)

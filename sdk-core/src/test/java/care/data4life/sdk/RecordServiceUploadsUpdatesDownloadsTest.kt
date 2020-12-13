@@ -96,6 +96,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
     fun `Given, _uploadData is called with a non DecryptedFhirRecord and UserId, it reflects it`() {
         // Given
         val document = buildDocumentReference()
+
         @Suppress("UNCHECKED_CAST")
         val decryptedRecord = Mockito.mock(DecryptedBaseRecord::class.java) as DecryptedBaseRecord<Any>
 
@@ -402,7 +403,6 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
     }
 
 
-
     @Test
     @Throws(DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.IdUsageViolation::class,
@@ -466,7 +466,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun `Given, updateData is called with a DecryptedFhirRecord, a non FhirResource and a UserId, it fails with a CoreRuntimeExceptionUnsupportedOperation`() {
         // Given
-       val document = buildDocumentReference()
+        val document = buildDocumentReference()
+
         @Suppress("UNCHECKED_CAST")
         val decryptedRecord = DecryptedRecord(
                 RECORD_ID,

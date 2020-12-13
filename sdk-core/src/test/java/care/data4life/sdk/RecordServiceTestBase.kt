@@ -28,7 +28,6 @@ import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.SdkRecordFactory
 import care.data4life.sdk.model.definitions.DataRecord
-import care.data4life.sdk.model.definitions.FhirRecord
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.DecryptedRecordBuilderImpl
 import care.data4life.sdk.network.model.EncryptedKey
@@ -191,7 +190,7 @@ abstract class RecordServiceTestBase {
         every { LocalDate.now(any() as Clock) } returns LOCAL_DATE
 
         mockkStatic(DateTimeFormatter::class)
-        every { DateTimeFormatter.ofPattern( "yyyy-MM-dd", Locale.US) } returns DATE_FORMATTER
+        every { DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US) } returns DATE_FORMATTER
 
         mockkStatic(FhirAttachmentHelper::class)
     }

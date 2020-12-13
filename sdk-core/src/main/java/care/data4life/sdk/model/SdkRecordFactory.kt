@@ -29,7 +29,7 @@ import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.DateTimeFormatterBuilder
 import java.util.*
 
-internal object SdkRecordFactory: RecordFactory {
+internal object SdkRecordFactory : RecordFactory {
     private const val DATE_FORMAT = "yyyy-MM-dd"
     private const val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss[.SSS]"
     private val DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.US)
@@ -41,7 +41,7 @@ internal object SdkRecordFactory: RecordFactory {
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun <T : Any> getInstance(record: DecryptedBaseRecord<T>): BaseRecord<T> {
         @Suppress("UNCHECKED_CAST")
-        return when(record) {
+        return when (record) {
             is DecryptedFhirRecord -> Record(
                     record.resource as DomainResource,
                     buildMeta(record),

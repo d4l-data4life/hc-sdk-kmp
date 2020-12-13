@@ -21,5 +21,5 @@ import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 
 internal interface RecordFactory {
     @Throws(CoreRuntimeException.InternalFailure::class)
-    fun <T: Any> getInstance(record: DecryptedBaseRecord<T>): BaseRecord<T>
+    fun <T : Any> getInstance(record: DecryptedBaseRecord<T>): BaseRecord<T>
 }

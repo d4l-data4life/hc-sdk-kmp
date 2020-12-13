@@ -36,7 +36,7 @@ internal interface DecryptedRecordBuilder {
     fun setAttachmentKey(attachmentKey: GCKey?): DecryptedRecordBuilder
 
     @Throws(CoreRuntimeException.InternalFailure::class)
-    fun <T: Any?> build(
+    fun <T : Any?> build(
             resource: T,
             tags: HashMap<String, String>? = null,
             creationDate: String? = null,

@@ -164,6 +164,7 @@ class RecordServiceTest : RecordServiceTestBase() {
     fun `Given, removeOrRestoreUploadData is called with REMOVE, a DecryptedFhirRecord, a Resource and Attachment, it delegates it to removeUploadData`() {
         // Given
         val document = buildDocumentReference()
+
         @Suppress("UNCHECKED_CAST")
         val decryptedRecord = Mockito.mock(DecryptedFhirRecord::class.java) as DecryptedFhirRecord<DomainResource>
 
@@ -261,6 +262,7 @@ class RecordServiceTest : RecordServiceTestBase() {
     fun `Given, removeOrRestoreUploadData is called with RESTORE, a DecryptedFhirRecord, a Resource and Attachment, it delegates it to restoreUploadData`() {
         // Given
         val document = buildDocumentReference()
+
         @Suppress("UNCHECKED_CAST")
         val decryptedRecord = Mockito.mock(DecryptedFhirRecord::class.java) as DecryptedFhirRecord<DomainResource>
 
@@ -315,7 +317,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         // Then
         Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
 
-        verify(exactly = 0) {decryptedRecord.resource = any() }
+        verify(exactly = 0) { decryptedRecord.resource = any() }
     }
 
     @Test
@@ -346,6 +348,7 @@ class RecordServiceTest : RecordServiceTestBase() {
     @Test
     fun `Given, restoreUploadData is called with a DecryptedFhirRecord, a Resource and Attachment, it sets the given Resource to the DecryptedFhirRecord`() {
         val document = buildDocumentReference()
+
         @Suppress("UNCHECKED_CAST")
         val decryptedRecord = Mockito.mock(DecryptedFhirRecord::class.java) as DecryptedFhirRecord<DomainResource>
         val attachments = mutableListOf(
@@ -380,7 +383,7 @@ class RecordServiceTest : RecordServiceTestBase() {
                 Mockito.mock(Attachment::class.java)
         )
 
-        every{ decryptedRecord.resource } returns mockCarePlan
+        every { decryptedRecord.resource } returns mockCarePlan
 
         every { FhirAttachmentHelper.getAttachment(mockCarePlan) } returns attachments
         every { FhirAttachmentHelper.updateAttachmentData(mockCarePlan, any()) } returns Unit
@@ -401,6 +404,7 @@ class RecordServiceTest : RecordServiceTestBase() {
     @Test
     fun `Given, restoreUploadData is called with a DecryptedFhirRecord, a Resource and Attachment, it removes the existing Attachments`() {
         val document = buildDocumentReference()
+
         @Suppress("UNCHECKED_CAST")
         val decryptedRecord = Mockito.mock(DecryptedFhirRecord::class.java) as DecryptedFhirRecord<DomainResource>
         val attachments = mutableListOf(
@@ -430,6 +434,7 @@ class RecordServiceTest : RecordServiceTestBase() {
     @Test
     fun `Given, restoreUploadData is called with a DecryptedFhirRecord, a Resource and Attachment, it does nothing, if no Attachments exists`() {
         val document = buildDocumentReference()
+
         @Suppress("UNCHECKED_CAST")
         val decryptedRecord = Mockito.mock(DecryptedFhirRecord::class.java) as DecryptedFhirRecord<DomainResource>
 
@@ -455,6 +460,7 @@ class RecordServiceTest : RecordServiceTestBase() {
     @Test
     fun `Given, restoreUploadData is called with a DecryptedFhirRecord, a Resource and null as Attachment, it returns the DecryptedFhirRecord without invoking more actions`() {
         val document = buildDocumentReference()
+
         @Suppress("UNCHECKED_CAST")
         val decryptedRecord = Mockito.mock(DecryptedFhirRecord::class.java) as DecryptedFhirRecord<DomainResource>
         val attachments = mutableListOf(

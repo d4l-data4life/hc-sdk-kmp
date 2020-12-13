@@ -27,9 +27,6 @@ import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.network.DecryptedRecordBuilderImpl
 import care.data4life.sdk.network.model.definitions.DecryptedFhirRecord
 import care.data4life.sdk.util.MimeType
-
-import java.io.IOException
-
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.reactivex.Single
@@ -40,6 +37,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import org.threeten.bp.LocalDate
+import java.io.IOException
 
 class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     @Before

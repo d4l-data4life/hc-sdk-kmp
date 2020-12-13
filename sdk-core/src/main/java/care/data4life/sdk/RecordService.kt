@@ -62,6 +62,7 @@ import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.DateTimeFormatterBuilder
 import java.io.IOException
 import java.util.*
+import kotlin.collections.HashMap
 
 internal class RecordService(
         private val partnerId: String,
@@ -90,7 +91,7 @@ internal class RecordService(
         if(resource is DomainResource) checkDataRestrictions(resource)
     }
 
-    private fun getTags(resource: Any): HashMap<String, String> {
+    private fun getTagsOnCreate(resource: Any): HashMap<String, String> {
         return if (resource is ByteArray) {
             taggingService.appendDefaultTags(null, null)
         } else {
@@ -149,7 +150,7 @@ internal class RecordService(
                         .setAnnotations(annotations)
                         .build(
                                 resource,
-                                this.getTags(resource),
+                                this.getTagsOnCreate(resource),
                                 DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
                                 cryptoService.generateGCKey().blockingGet(),
                                 ModelVersion.CURRENT
@@ -312,6 +313,66 @@ internal class RecordService(
                     )
                 }
     }
+    private fun getTagsOnFetch(resourceType: Class<Any>): HashMap<String, String> {
+        return if(resourceType.simpleName == "byte[]") {
+            taggingService.appendAppDataTags(hashMapOf())!!
+        } else {
+            @Suppress("UNCHECKED_CAST")
+            taggingService.getTagFromType(
+                    FhirElementFactory.getFhirTypeForClass(resourceType as Class<out DomainResource>)
+            )
+        }
+    }
+
+    private fun <T : Any> _fetchRecords(
+            userId: String,
+            resourceType: Class<T>,
+            annotations: List<String>,
+            startDate: LocalDate?,
+            endDate: LocalDate?,
+            pageSize: Int,
+            offset: Int
+    ): Single<List<BaseRecord<T>>> {
+        val startTime = if (startDate != null) DATE_FORMATTER.format(startDate) else null
+        val endTime = if (endDate != null) DATE_FORMATTER.format(endDate) else null
+        @Suppress("UNCHECKED_CAST")
+        return Observable
+                .fromCallable {
+                    @Suppress("UNCHECKED_CAST")
+                    getTagsOnFetch(resourceType as Class<Any>)
+                }
+                .map { tags -> tagEncryptionService.encryptTags(tags) as MutableList<String> }
+                .map { tags ->
+                    tags.also {
+                        it.addAll(tagEncryptionService.encryptAnnotations(annotations))
+                    }
+                }
+                .flatMap { encryptedTags ->
+                    apiService.fetchRecords(
+                            alias,
+                            userId,
+                            startTime,
+                            endTime,
+                            pageSize,
+                            offset,
+                            encryptedTags
+                    )
+                }
+                .flatMapIterable { encryptedRecords -> encryptedRecords }
+                .map { encryptedRecord -> decryptRecord<Any>(encryptedRecord, userId) }
+                .let {
+                    if(resourceType.simpleName == "byte[]") {
+                        it
+                    } else {
+                        it
+                            .filter { decryptedRecord -> resourceType.isAssignableFrom(decryptedRecord.resource::class.java) }
+                            .filter { decryptedRecord -> decryptedRecord.annotations.containsAll(annotations) }
+                            .map { record -> assignResourceId(record as DecryptedFhirRecord<DomainResource>) }
+                    }
+                }
+                .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) }
+                .toList() as Single<List<BaseRecord<T>>>
+    }
 
     fun <T : DomainResource> fetchRecords(
             userId: String,
@@ -329,6 +390,7 @@ internal class RecordService(
             offset
     )
 
+    @Suppress("UNCHECKED_CAST")
     fun <T : DomainResource> fetchRecords(
             userId: String,
             resourceType: Class<T>,
@@ -337,28 +399,17 @@ internal class RecordService(
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int
-    ): Single<List<Record<T>>> = fetch(
+    ): Single<List<Record<T>>> = _fetchRecords(
             userId,
+            resourceType,
             annotations,
             startDate,
             endDate,
             pageSize,
-            offset,
-            { taggingService.getTagFromType(FhirElementFactory.getFhirTypeForClass(resourceType)) }
-    )
-            .map { encryptedRecord ->
-                @Suppress("UNCHECKED_CAST")
-                decryptRecord<DomainResource>(encryptedRecord, userId) as DecryptedFhirRecord<T>
-            }
-            .filter { decryptedRecord -> resourceType.isAssignableFrom(decryptedRecord.resource::class.java) }
-            .filter { decryptedRecord -> decryptedRecord.annotations.containsAll(annotations) }
-            .map { record -> assignResourceId(record) }
-            .map { decryptedRecord ->
-                @Suppress("UNCHECKED_CAST")
-                recordFactory.getInstance(decryptedRecord) as Record<T>
-            }
-            .toList()
+            offset
+    ) as Single<List<Record<T>>>
 
+    @Suppress("UNCHECKED_CAST")
     fun fetchRecords(
             userId: String,
             annotations: List<String>,
@@ -366,18 +417,15 @@ internal class RecordService(
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int
-    ): Single<List<DataRecord>> = fetch(
+    ): Single<List<DataRecord>> = _fetchRecords(
             userId,
+            ByteArray::class.java,
             annotations,
             startDate,
             endDate,
             pageSize,
-            offset,
-            { taggingService.appendAppDataTags(HashMap()) }
-    )
-            .map { encryptedRecord -> decryptRecord<ByteArray>(encryptedRecord, userId) }
-            .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) as DataRecord }
-            .toList()
+            offset
+    ) as Single<List<DataRecord>>
 
     fun downloadAttachment(
             recordId: String,
@@ -645,39 +693,6 @@ internal class RecordService(
     }
 
     //region utility methods
-    private fun fetch(
-            userId: String,
-            annotations: List<String>,
-            startDate: LocalDate?,
-            endDate: LocalDate?,
-            pageSize: Int,
-            offset: Int,
-            getTags: () -> HashMap<String, String>?
-    ): Observable<EncryptedRecord> {
-        val startTime = if (startDate != null) DATE_FORMATTER.format(startDate) else null
-        val endTime = if (endDate != null) DATE_FORMATTER.format(endDate) else null
-        return Observable
-                .fromCallable { getTags() }
-                .map { tags -> tagEncryptionService.encryptTags(tags) as MutableList<String> }
-                .map { tags ->
-                    tags.also {
-                        it.addAll(tagEncryptionService.encryptAnnotations(annotations))
-                    }
-                }
-                .flatMap { encryptedTags ->
-                    apiService.fetchRecords(
-                            alias,
-                            userId,
-                            startTime,
-                            endTime,
-                            pageSize,
-                            offset,
-                            encryptedTags
-                    )
-                }
-                .flatMapIterable { encryptedRecords -> encryptedRecords }
-    }
-
     private fun <T> getEncryptedResourceAndAttachment(
             record: DecryptedBaseRecord<T>,
             commonKey: GCKey

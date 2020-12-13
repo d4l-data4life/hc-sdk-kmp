@@ -87,9 +87,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         ).thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockDecryptedFhirRecord).`when`(recordService)
-                .uploadData(
+                ._uploadData(
                         mockDecryptedFhirRecord,
-                        null,
                         USER_ID
                 )
         Mockito.doReturn(mockDecryptedFhirRecord).`when`(recordService)
@@ -136,9 +135,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 mockDataKey,
                 ModelVersion.CURRENT
         )
-        inOrder.verify(recordService).uploadData(
+        inOrder.verify(recordService)._uploadData(
                 mockDecryptedFhirRecord,
-                null,
                 USER_ID
         )
         inOrder.verify(recordService).removeUploadData(mockDecryptedFhirRecord)
@@ -196,9 +194,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockDecryptedFhirRecord)
                 .`when`(recordService)
-                .uploadData(
+                ._uploadData(
                         mockDecryptedFhirRecord,
-                        null,
                         USER_ID
                 )
         Mockito.doReturn(mockDecryptedFhirRecord)
@@ -256,9 +253,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 mockDataKey,
                 ModelVersion.CURRENT
         )
-        inOrder.verify(recordService).uploadData(
+        inOrder.verify(recordService)._uploadData(
                 mockDecryptedFhirRecord,
-                null,
                 USER_ID
         )
         inOrder.verify(recordService).removeUploadData(mockDecryptedFhirRecord)
@@ -400,9 +396,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         ).thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockAnnotatedDecryptedFhirRecord).`when`(recordService)
-                .uploadData(
+                ._uploadData(
                         mockAnnotatedDecryptedFhirRecord,
-                        null,
                         USER_ID
                 )
         Mockito.doReturn(mockAnnotatedDecryptedFhirRecord).`when`(recordService)
@@ -450,9 +445,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 mockDataKey,
                 ModelVersion.CURRENT
         )
-        inOrder.verify(recordService).uploadData(
+        inOrder.verify(recordService)._uploadData(
                 mockAnnotatedDecryptedFhirRecord,
-                null,
                 USER_ID
         )
         inOrder.verify(recordService).removeUploadData(mockAnnotatedDecryptedFhirRecord)
@@ -510,9 +504,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockAnnotatedDecryptedFhirRecord)
                 .`when`(recordService)
-                .uploadData(
+                ._uploadData(
                         mockAnnotatedDecryptedFhirRecord,
-                        null,
                         USER_ID
                 )
         Mockito.doReturn(mockAnnotatedDecryptedFhirRecord)
@@ -539,9 +532,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
 
         Mockito.doReturn(mockAnnotatedDecryptedFhirRecord)
                 .`when`(recordService)
-                .uploadData(
+                ._uploadData(
                         mockAnnotatedDecryptedFhirRecord,
-                        null,
                         USER_ID
                 )
         @Suppress("UNCHECKED_CAST")
@@ -571,9 +563,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 mockDataKey,
                 ModelVersion.CURRENT
         )
-        inOrder.verify(recordService).uploadData(
+        inOrder.verify(recordService)._uploadData(
                 mockAnnotatedDecryptedFhirRecord,
-                null,
                 USER_ID
         )
         inOrder.verify(recordService).removeUploadData(

@@ -88,10 +88,6 @@ internal class RecordService(
 
     private val recordFactory: RecordFactory = SdkRecordFactory
 
-    private fun validateData(resource: Any) {
-        if(resource is DomainResource) checkDataRestrictions(resource)
-    }
-
     private fun getTagsOnCreate(resource: Any): HashMap<String, String> {
         return if (resource is ByteArray) {
             taggingService.appendDefaultTags(null, null)
@@ -100,61 +96,13 @@ internal class RecordService(
         }
     }
 
-    private fun <T : Any> uploadFhirData(
-            record: Single<DecryptedBaseRecord<T>>,
-            resource: T,
-            userId: String
-    ): Single<DecryptedBaseRecord<T>> {
-        @Suppress("UNCHECKED_CAST")
-        return if(resource is DomainResource) {
-            record.map { decryptedRecord ->
-                uploadData(
-                        decryptedRecord as DecryptedFhirRecord<DomainResource>,
-                        null,
-                        userId
-                ) } as Single<DecryptedBaseRecord<T>>
-        } else {
-            record
-        }
-    }
-
-    private fun <T : Any> removeUploadedFhirData(
-            record: Single<DecryptedBaseRecord<T>>,
-            resource: T
-    ): Single<DecryptedBaseRecord<T>> {
-        @Suppress("UNCHECKED_CAST")
-        return if(resource is DomainResource) {
-            record.map { removeUploadData(it as DecryptedFhirRecord<DomainResource>) } as Single<DecryptedBaseRecord<T>>
-        } else {
-            record
-        }
-    }
-
-    private fun <T : Any> restoreUploadedData(
-            record: Single<DecryptedBaseRecord<T>>,
-            resource: T
-    ): Single<DecryptedBaseRecord<T>> {
-        return if(resource is DomainResource) {
-            val data = extractUploadData(resource)
-            @Suppress("UNCHECKED_CAST")
-            record.map {
-                        restoreUploadData(
-                                it as DecryptedFhirRecord<DomainResource>,
-                                resource,
-                                data
-                        )
-            } as Single<DecryptedBaseRecord<T>>
-        } else {
-            record
-        }
-    }
-
     private fun <T : Any> createRecord(
             resource: T,
             userId: String,
             annotations: List<String>
     ): Single<BaseRecord<T>> {
-        validateData(resource)
+        checkDataRestrictions(resource)
+        val data = extractUploadData(resource)
         val createdRecord = Single.just(
                 DecryptedRecordBuilderImpl()
                         .setAnnotations(annotations)
@@ -167,12 +115,13 @@ internal class RecordService(
                         )
         )
 
-        return uploadFhirData(createdRecord, resource, userId)
-                .let { removeUploadedFhirData(it, resource)  }
+        return createdRecord
+                .map{ _uploadData(it, userId) }
+                .map { removeUploadData(it)  }
                 .map { decryptedRecord -> encryptRecord(decryptedRecord) }
                 .flatMap { encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord) }
                 .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
-                .let { restoreUploadedData(it, resource) }
+                .map { restoreUploadData(it, resource, data) }
                 .map { assignResourceId(it) }
                 .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) }
     }
@@ -461,13 +410,14 @@ internal class RecordService(
             recordId: String?,
             annotations: List<String>? = null
     ): Single<BaseRecord<T>> {
-        validateData(resource)
-
+        checkDataRestrictions(resource)
+        val data = extractUploadData(resource)
+        
         @Suppress("UNCHECKED_CAST")
         return apiService
                 .fetchRecord(alias, userId, recordId)
                 .map { decryptRecord<Any>(it, userId) }
-                .let { uploadFhirData(it, resource, userId) }
+                .map { updateData(it, resource, userId) }
                 .map { decryptedRecord ->
                     if( decryptedRecord is DecryptedFhirRecord) {
                         cleanObsoleteAdditionalIdentifiers(resource as DomainResource)
@@ -481,11 +431,11 @@ internal class RecordService(
                     }
 
                 }
-                .let { removeUploadedFhirData(it, resource) }
+                .map { removeUploadData(it) }
                 .map{encryptRecord(it)}
                 .flatMap { apiService.updateRecord(alias, userId, recordId, it) }
                 .map{ decryptRecord<Any>(it, userId) }
-                .let { restoreUploadedData(it, resource) }
+                .map { restoreUploadData(it, resource, data) }
                 .map { assignResourceId(it) }
                 .map { recordFactory.getInstance(it) } as Single<BaseRecord<T>>
     }
@@ -773,17 +723,22 @@ internal class RecordService(
             userId: String
     ): Single<Boolean> = attachmentService.deleteAttachment(attachmentId, userId)
 
-    fun <T : DomainResource> extractUploadData(resource: T): HashMap<Attachment, String?>? {
-        val attachments = FhirAttachmentHelper.getAttachment(resource)
-        if (attachments == null || attachments.isEmpty()) return null
+    fun <T : Any> extractUploadData(resource: T): HashMap<Attachment, String?>? {
+        return if(resource is DomainResource) {
+            val attachments = FhirAttachmentHelper.getAttachment(resource)
+            if (attachments == null || attachments.isEmpty()) return null
 
-        val data = HashMap<Attachment, String?>(attachments.size)
-        for (attachment in attachments) {
-            if (attachment?.data != null) {
-                data[attachment] = attachment.data
+            val data = HashMap<Attachment, String?>(attachments.size)
+            for (attachment in attachments) {
+                if (attachment?.data != null) {
+                    data[attachment] = attachment.data
+                }
             }
+
+            if (data.isEmpty()) null else data
+        } else {
+            null
         }
-        return if (data.isEmpty()) null else data
     }
 
     private fun <T : DomainResource> setUploadData(
@@ -796,21 +751,39 @@ internal class RecordService(
         }
     }
 
-    fun <T : DomainResource> removeUploadData(
-            record: DecryptedFhirRecord<T>
-    ): DecryptedFhirRecord<T> = setUploadData(record, null)
+    fun <T : Any> removeUploadData(
+            record: DecryptedBaseRecord<T>
+    ): DecryptedBaseRecord<T> {
+        @Suppress("UNCHECKED_CAST")
+        return if (record is DecryptedFhirRecord) {
+            setUploadData(
+                    record as DecryptedFhirRecord<DomainResource>, 
+                    null
+            ) as DecryptedBaseRecord<T>
+        } else {
+            record
+        }
+    }
 
-    fun <T : DomainResource> restoreUploadData(
-            record: DecryptedFhirRecord<T>,
+    fun <T : Any> restoreUploadData(
+            record: DecryptedBaseRecord<T>,
             originalResource: T?,
             attachmentData: HashMap<Attachment, String?>?
-    ): DecryptedFhirRecord<T> {
-        if (originalResource != null) record.resource = originalResource
+    ): DecryptedBaseRecord<T> {
+        if (record !is DecryptedFhirRecord || originalResource !is DomainResource) {
+            return record
+        }
 
+        record.resource = originalResource
+
+        @Suppress("UNCHECKED_CAST")
         return if (attachmentData == null) {
              record
         } else {
-            setUploadData(record, attachmentData)
+            setUploadData(
+                    record as DecryptedFhirRecord<DomainResource>,
+                    attachmentData
+            ) as DecryptedBaseRecord<T>
         }
     }
 
@@ -822,20 +795,25 @@ internal class RecordService(
             attachmentData: HashMap<Attachment, String?>?
     ): DecryptedFhirRecord<T> {
         return if (operation == RemoveRestoreOperation.RESTORE) {
-            restoreUploadData(record, originalResource, attachmentData)
+            restoreUploadData(record as DecryptedBaseRecord<T>, originalResource, attachmentData) as DecryptedFhirRecord<T>
         } else {
-            removeUploadData(record)
+            removeUploadData(record as DecryptedBaseRecord<T>) as DecryptedFhirRecord<T>
         }
     }
 
     @Throws(DataValidationException.IdUsageViolation::class,
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
-    fun <T : DomainResource> _uploadData(
-            record: DecryptedFhirRecord<T>,
+    fun <T : Any> _uploadData(
+            record: DecryptedBaseRecord<T>,
             userId: String
-    ): DecryptedFhirRecord<T> {
-        val resource = record.resource
+    ): DecryptedBaseRecord<T> {
+        if( record !is DecryptedFhirRecord ) {
+            return record
+        }
+
+        val resource: DomainResource = record.resource as DomainResource
+
         if (!FhirAttachmentHelper.hasAttachment(resource)) return record
         val attachments = if (FhirAttachmentHelper.getAttachment(resource) == null) {
             arrayListOf()
@@ -884,14 +862,20 @@ internal class RecordService(
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class,
             CoreRuntimeException.UnsupportedOperation::class)
-    fun <T : DomainResource> updateData(
-            record: DecryptedFhirRecord<T>,
+    fun <T : Any> updateData(
+            record: DecryptedBaseRecord<T>,
             newResource: T?,
             userId: String?
-    ): DecryptedFhirRecord<T> {
-        newResource ?: throw CoreRuntimeException.UnsupportedOperation()
+    ): DecryptedBaseRecord<T> {
+        if(record !is DecryptedFhirRecord) {
+            return record
+        }
 
-        var resource = record.resource
+        if(newResource !is DomainResource) {
+            throw CoreRuntimeException.UnsupportedOperation()
+        }
+
+        var resource = record.resource as DomainResource
         if (!FhirAttachmentHelper.hasAttachment(resource)) return record
         val attachments =
                 if (FhirAttachmentHelper.getAttachment(resource) == null) {
@@ -908,7 +892,8 @@ internal class RecordService(
                 oldAttachments[attachment.id] = attachment
             }
         }
-        resource = newResource
+
+        resource = newResource as DomainResource
         val newAttachments = FhirAttachmentHelper.getAttachment(newResource)
         for (newAttachment in newAttachments) {
             if (newAttachment != null) {
@@ -948,11 +933,15 @@ internal class RecordService(
     }
 
     @Throws(DataValidationException.IdUsageViolation::class, DataValidationException.InvalidAttachmentPayloadHash::class)
-    fun <T : DomainResource> downloadData(
-            record: DecryptedFhirRecord<T>,
+    fun <T : Any> downloadData(
+            record: DecryptedBaseRecord<T>,
             userId: String?
-    ): DecryptedFhirRecord<T> {
-        val resource = record.resource
+    ): DecryptedBaseRecord<T> {
+        if(record !is DecryptedFhirRecord) {
+            return record
+        }
+
+        val resource = record.resource as DomainResource
         if (!FhirAttachmentHelper.hasAttachment(resource)) return record
         val attachments = if (FhirAttachmentHelper.getAttachment(resource) == null) {
             arrayListOf()
@@ -986,7 +975,13 @@ internal class RecordService(
             record: DecryptedFhirRecord<T>,
             newResource: T?,
             userId: String
-    ): DecryptedFhirRecord<T> = if (newResource == null) _uploadData(record, userId) else updateData(record, newResource, userId)
+    ): DecryptedFhirRecord<T> {
+        return if (newResource == null) {
+            _uploadData(record, userId) as DecryptedFhirRecord<T>
+        } else {
+            updateData(record, newResource, userId) as DecryptedFhirRecord<T>
+        }
+    }
 
     @Deprecated("")
     @Throws(DataValidationException.IdUsageViolation::class,
@@ -1000,9 +995,9 @@ internal class RecordService(
             userId: String
     ): DecryptedFhirRecord<T> {
         return when (operation) {
-            UploadDownloadOperation.UPDATE -> updateData(record, newResource!!, userId)
-            UploadDownloadOperation.UPLOAD -> _uploadData(record, userId)
-            UploadDownloadOperation.DOWNLOAD -> downloadData(record, userId)
+            UploadDownloadOperation.UPDATE -> updateData(record, newResource!!, userId) as DecryptedFhirRecord
+            UploadDownloadOperation.UPLOAD -> _uploadData(record, userId) as DecryptedFhirRecord<T>
+            UploadDownloadOperation.DOWNLOAD -> downloadData(record, userId) as DecryptedFhirRecord<T>
         }
     }
 
@@ -1107,8 +1102,8 @@ internal class RecordService(
     }
 
     @Throws(DataRestrictionException.MaxDataSizeViolation::class, DataRestrictionException.UnsupportedFileType::class)
-    fun <T : DomainResource> checkDataRestrictions(resource: T?) {
-        if (FhirAttachmentHelper.hasAttachment(resource)) {
+    fun <T : Any> checkDataRestrictions(resource: T?) {
+        if (resource is DomainResource && FhirAttachmentHelper.hasAttachment(resource)) {
             val attachments = FhirAttachmentHelper.getAttachment(resource!!)
             for (attachment in attachments) {
                 attachment?.data ?: return

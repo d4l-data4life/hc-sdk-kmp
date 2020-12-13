@@ -248,6 +248,9 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
         // Given
         Mockito.`when`(mockApiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)).thenReturn(Single.just(mockEncryptedRecord))
         Mockito.doReturn(mockDecryptedDataRecord).`when`(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
+        Mockito.doReturn(mockDecryptedDataRecord)
+                .`when`(recordService)
+                .assignResourceId(mockDecryptedDataRecord)
         @Suppress("UNCHECKED_CAST")
         every { SdkRecordFactory.getInstance(mockDecryptedDataRecord) } returns mockDataRecord
 
@@ -264,6 +267,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
 
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
         inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).assignResourceId(mockDecryptedDataRecord)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -293,6 +297,9 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
         Mockito.doReturn(mockDecryptedDataRecord)
                 .`when`(recordService)
                 .decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
+        Mockito.doReturn(mockDecryptedDataRecord)
+                .`when`(recordService)
+                .assignResourceId(mockDecryptedDataRecord)
         @Suppress("UNCHECKED_CAST")
         every { SdkRecordFactory.getInstance(mockDecryptedDataRecord) } returns mockDataRecord
 
@@ -329,6 +336,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
                 ArgumentMatchers.eq(mockEncryptedTags)
         )
         inOrder.verify(recordService, times(2)).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).assignResourceId(mockDecryptedDataRecord)
         inOrder.verifyNoMoreInteractions()
     }
 }

@@ -64,6 +64,7 @@ import java.io.IOException
 import java.util.*
 import kotlin.collections.HashMap
 
+
 internal class RecordService(
         private val partnerId: String,
         private val alias: String,
@@ -99,41 +100,50 @@ internal class RecordService(
         }
     }
 
-    private fun <T: Any> uploadFhirData(
+    private fun <T : Any> uploadFhirData(
             record: Single<DecryptedBaseRecord<T>>,
             resource: T,
             userId: String
     ): Single<DecryptedBaseRecord<T>> {
         @Suppress("UNCHECKED_CAST")
         return if(resource is DomainResource) {
-            record.map {  decryptedRecord ->
+            record.map { decryptedRecord ->
                 uploadData(
                         decryptedRecord as DecryptedFhirRecord<DomainResource>,
                         null,
                         userId
-                ) }
-                .map { decryptedRecord -> removeUploadData(decryptedRecord) } as Single<DecryptedBaseRecord<T>>
+                ) } as Single<DecryptedBaseRecord<T>>
         } else {
             record
         }
     }
 
-    private fun <T: Any> prepareRecord(
+    private fun <T : Any> removeUploadedFhirData(
+            record: Single<DecryptedBaseRecord<T>>,
+            resource: T
+    ): Single<DecryptedBaseRecord<T>> {
+        @Suppress("UNCHECKED_CAST")
+        return if(resource is DomainResource) {
+            record.map { removeUploadData(it as DecryptedFhirRecord<DomainResource>) } as Single<DecryptedBaseRecord<T>>
+        } else {
+            record
+        }
+    }
+
+    private fun <T : Any> restoreUploadedData(
             record: Single<DecryptedBaseRecord<T>>,
             resource: T
     ): Single<DecryptedBaseRecord<T>> {
         return if(resource is DomainResource) {
             val data = extractUploadData(resource)
             @Suppress("UNCHECKED_CAST")
-            record
-                    .map { decryptedRecord ->
+            record.map {
                         restoreUploadData(
-                                decryptedRecord as DecryptedFhirRecord<DomainResource>,
+                                it as DecryptedFhirRecord<DomainResource>,
                                 resource,
                                 data
                         )
-                    }
-                    .map { decryptedRecord -> assignResourceId(decryptedRecord) } as Single<DecryptedBaseRecord<T>>
+            } as Single<DecryptedBaseRecord<T>>
         } else {
             record
         }
@@ -158,30 +168,13 @@ internal class RecordService(
         )
 
         return uploadFhirData(createdRecord, resource, userId)
+                .let { removeUploadedFhirData(it, resource)  }
                 .map { decryptedRecord -> encryptRecord(decryptedRecord) }
                 .flatMap { encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord) }
                 .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
-                .let { prepareRecord(it, resource) }
+                .let { restoreUploadedData(it, resource) }
+                .map { assignResourceId(it) }
                 .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun <T : DomainResource?> prepareAndcreateFhirRecord(
-            resource: T,
-            data: HashMap<Attachment, String?>?,
-            record: Single<DecryptedBaseRecord<T>>
-    ): Single<BaseRecord<T>> {
-        return record
-                .map { decryptedRecord ->
-                    resource as DomainResource
-                    restoreUploadData(
-                            decryptedRecord as DecryptedFhirRecord<DomainResource>,
-                            resource,
-                            data
-                    )
-                }
-                .map { r -> assignResourceId(r) }
-                .map { r -> recordFactory.getInstance(r) as BaseRecord<T> }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -193,14 +186,10 @@ internal class RecordService(
             userId: String,
             annotations: List<String> = listOf()
     ): Single<Record<T>> = createRecord(
-                resource as Any,
-                userId,
-                annotations
-        ) as Single<Record<T>>
-
-    private fun createDataRecord(
-            record: Single<DecryptedBaseRecord<ByteArray>>
-    ): Single<BaseRecord<ByteArray>> = record.map { r -> recordFactory.getInstance(r) }
+            resource as Any,
+            userId,
+            annotations
+    ) as Single<Record<T>>
 
     @Suppress("UNCHECKED_CAST")
     fun createRecord(
@@ -262,14 +251,7 @@ internal class RecordService(
         return apiService
                 .fetchRecord(alias, userId, recordId)
                 .map { encryptedRecord -> decryptRecord<Any>(encryptedRecord, userId) }
-                .map { decryptedRecord ->
-                    if (decryptedRecord.resource !is ByteArray) {
-                        @Suppress("UNCHECKED_CAST")
-                        assignResourceId(decryptedRecord as DecryptedFhirRecord<DomainResource>)
-                    } else {
-                        decryptedRecord
-                    }
-                }
+                .map { assignResourceId(it) }
                 .map { decryptedRecord ->
                     @Suppress("UNCHECKED_CAST")
                     recordFactory.getInstance(decryptedRecord) as BaseRecord<T>
@@ -313,6 +295,7 @@ internal class RecordService(
                     )
                 }
     }
+
     private fun getTagsOnFetch(resourceType: Class<Any>): HashMap<String, String> {
         return if(resourceType.simpleName == "byte[]") {
             taggingService.appendAppDataTags(hashMapOf())!!
@@ -367,9 +350,10 @@ internal class RecordService(
                         it
                             .filter { decryptedRecord -> resourceType.isAssignableFrom(decryptedRecord.resource::class.java) }
                             .filter { decryptedRecord -> decryptedRecord.annotations.containsAll(annotations) }
-                            .map { record -> assignResourceId(record as DecryptedFhirRecord<DomainResource>) }
+
                     }
                 }
+                .map { assignResourceId(it) }
                 .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) }
                 .toList() as Single<List<BaseRecord<T>>>
     }
@@ -442,7 +426,7 @@ internal class RecordService(
                     checkDataRestrictions(decryptedRecord.resource)
                 }
             }
-            .map { record -> assignResourceId(record) }
+            .map { assignResourceId(it) }
             .map { decryptedRecord ->
                 @Suppress("UNCHECKED_CAST")
                 recordFactory.getInstance(decryptedRecord) as Record<T>
@@ -470,60 +454,43 @@ internal class RecordService(
 
     @Throws(DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class)
+    @JvmOverloads
     fun <T : Any> updateRecord(
-            userId: String,
-            recordId: String,
-            prepareEncryption: (record: Single<DecryptedBaseRecord<T>>) -> Single<DecryptedBaseRecord<T>>,
-            createRecord: (decryptedRecord: Single<DecryptedBaseRecord<T>>) -> Single<BaseRecord<T>>
-    ): Single<BaseRecord<T>> {
-        val unpreparedDecryptedRecord = apiService
-                .fetchRecord(alias, userId, recordId)
-                .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
-
-        return createRecord(
-                prepareEncryption(unpreparedDecryptedRecord)
-                        .map { record -> encryptRecord(record) }
-                        .flatMap { encryptedRecord ->
-                            apiService.updateRecord(
-                                    alias,
-                                    userId,
-                                    recordId,
-                                    encryptedRecord
-                            )
-                        }
-                        .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
-        )
-    }
-
-    private fun <T : DomainResource> prepareDecryptedFhirRecord(
             resource: T,
             userId: String,
-            annotations: List<String>?,
-            record: Single<DecryptedBaseRecord<T>>
-    ): Single<DecryptedBaseRecord<T>> {
+            recordId: String?,
+            annotations: List<String>? = null
+    ): Single<BaseRecord<T>> {
+        validateData(resource)
+
         @Suppress("UNCHECKED_CAST")
-        return record.map { decryptedRecord ->
-            @Suppress("UNCHECKED_CAST")
-            uploadData(
-                    decryptedRecord as DecryptedFhirRecord<T>,
-                    resource,
-                    userId
-            )
-        }
+        return apiService
+                .fetchRecord(alias, userId, recordId)
+                .map { decryptRecord<Any>(it, userId) }
+                .let { uploadFhirData(it, resource, userId) }
                 .map { decryptedRecord ->
+                    if( decryptedRecord is DecryptedFhirRecord) {
+                        cleanObsoleteAdditionalIdentifiers(resource as DomainResource)
+                    }
+
                     decryptedRecord.also {
-                        cleanObsoleteAdditionalIdentifiers(resource)
-                        decryptedRecord.resource = resource
+                        (it as DecryptedBaseRecord<T>).resource = resource
                         if (annotations != null) {
-                            decryptedRecord.annotations = annotations
+                            it.annotations = annotations
                         }
                     }
+
                 }
-                .map { decryptedRecord ->
-                    removeUploadData(decryptedRecord)
-                } as Single<DecryptedBaseRecord<T>>
+                .let { removeUploadedFhirData(it, resource) }
+                .map{encryptRecord(it)}
+                .flatMap { apiService.updateRecord(alias, userId, recordId, it) }
+                .map{ decryptRecord<Any>(it, userId) }
+                .let { restoreUploadedData(it, resource) }
+                .map { assignResourceId(it) }
+                .map { recordFactory.getInstance(it) } as Single<BaseRecord<T>>
     }
 
+    @Suppress("UNCHECKED_CAST")
     @Throws(DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class)
     @JvmOverloads
@@ -531,53 +498,25 @@ internal class RecordService(
             resource: T,
             userId: String,
             annotations: List<String>? = null
-    ): Single<Record<T>> {
-        checkDataRestrictions(resource)
-        val data = extractUploadData(resource)
-        val recordId = resource.id
-
-        @Suppress("UNCHECKED_CAST")
-        return updateRecord(
-                userId,
-                recordId!!,
-                { record: Single<DecryptedBaseRecord<T>> ->
-                    prepareDecryptedFhirRecord(
-                            resource,
-                            userId,
-                            annotations,
-                            record
-                    )
-                },
-                { record ->
-                    prepareAndcreateFhirRecord(
-                            resource,
-                            data,
-                            record
-                    )
-                }
-        ) as Single<Record<T>>
-    }
+    ): Single<Record<T>> = updateRecord(
+            resource as Any,
+            userId,
+            resource.id,
+            annotations
+    ) as Single<Record<T>>
 
     @Suppress("UNCHECKED_CAST")
+    @JvmOverloads
     fun updateRecord(
             resource: ByteArray,
             userId: String,
             recordId: String,
             annotations: List<String>? = listOf()
     ): Single<DataRecord> = updateRecord(
+            resource as Any,
             userId,
             recordId,
-            { s: Single<DecryptedBaseRecord<ByteArray>> ->
-                s.map { decryptedRecord ->
-                    decryptedRecord.also {
-                        decryptedRecord.resource = resource
-                        if (annotations != null) {
-                            decryptedRecord.annotations = annotations
-                        }
-                    }
-                }
-            },
-            { decryptedRecord -> createDataRecord(decryptedRecord) }
+            annotations
     ) as Single<DataRecord>
 
     fun <T : DomainResource> updateRecords(resources: List<T>, userId: String): Single<UpdateResult<T>> {
@@ -1185,9 +1124,16 @@ internal class RecordService(
         }
     }
 
-    fun <T : DomainResource> assignResourceId(
-            record: DecryptedFhirRecord<T>
-    ): DecryptedFhirRecord<T> = record.also { record.resource.id = record.identifier }
+    fun <T : Any> assignResourceId(
+            record: DecryptedBaseRecord<T>
+    ): DecryptedBaseRecord<T> {
+        return record.also {
+            if (record.resource is DomainResource) {
+                @Suppress("UNCHECKED_CAST")
+                (record as DecryptedFhirRecord<DomainResource>).resource.id = record.identifier
+            }
+        }
+    }
 
     @Deprecated("")
     fun buildMeta(

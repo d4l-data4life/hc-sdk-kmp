@@ -77,6 +77,9 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
                         mockEncryptedRecord
                 )
         ).thenReturn(Single.just(mockEncryptedRecord))
+        Mockito.doReturn(mockDecryptedDataRecord)
+                .`when`(recordService)
+                .assignResourceId(mockDecryptedDataRecord)
         @Suppress("UNCHECKED_CAST")
         every { SdkRecordFactory.getInstance(mockDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
 
@@ -104,7 +107,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         inOrder.verify(recordService).assignResourceId(mockDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
 
-        Mockito.verify(mockDecryptedFhirRecord, Mockito.times(3)).resource
+        Mockito.verify(mockDecryptedFhirRecord, Mockito.times(4)).resource
         Mockito.verify(
                 mockDecryptedFhirRecord,
                 Mockito.times(2)
@@ -223,7 +226,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         inOrder.verify(recordService).assignResourceId(mockDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
 
-        Mockito.verify(mockDecryptedFhirRecord, Mockito.times(3)).resource
+        Mockito.verify(mockDecryptedFhirRecord, Mockito.times(4)).resource
         Mockito.verify(
                 mockDecryptedFhirRecord,
                 Mockito.times(2)
@@ -327,6 +330,9 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
                         mockEncryptedRecord
                 )
         ).thenReturn(Single.just(mockEncryptedRecord))
+        Mockito.doReturn(mockDecryptedDataRecord)
+                .`when`(recordService)
+                .assignResourceId(mockDecryptedDataRecord)
         @Suppress("UNCHECKED_CAST")
         every { SdkRecordFactory.getInstance(mockDecryptedDataRecord) } returns mockDataRecord
 
@@ -351,6 +357,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         inOrder.verify(recordService).encryptRecord(mockDecryptedDataRecord)
         inOrder.verify(mockApiService).updateRecord(ALIAS, USER_ID, RECORD_ID, mockEncryptedRecord)
         inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).assignResourceId(mockDecryptedDataRecord)
         inOrder.verifyNoMoreInteractions()
 
         Mockito.verify(
@@ -390,6 +397,9 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
                         mockEncryptedRecord
                 )
         ).thenReturn(Single.just(mockEncryptedRecord))
+        Mockito.doReturn(mockDecryptedDataRecord)
+                .`when`(recordService)
+                .assignResourceId(mockDecryptedDataRecord)
         @Suppress("UNCHECKED_CAST")
         every { SdkRecordFactory.getInstance(mockDecryptedDataRecord) } returns mockDataRecord
 
@@ -414,6 +424,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         inOrder.verify(recordService).encryptRecord(mockDecryptedDataRecord)
         inOrder.verify(mockApiService).updateRecord(ALIAS, USER_ID, RECORD_ID, mockEncryptedRecord)
         inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).assignResourceId(mockDecryptedDataRecord)
         inOrder.verifyNoMoreInteractions()
 
         Mockito.verify(

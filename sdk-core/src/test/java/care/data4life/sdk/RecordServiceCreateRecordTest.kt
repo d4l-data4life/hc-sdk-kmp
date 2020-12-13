@@ -689,6 +689,9 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Mockito.doReturn(mockDecryptedDataRecord)
                 .`when`(recordService)
                 .decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
+        Mockito.doReturn(mockDecryptedDataRecord)
+                .`when`(recordService)
+                .assignResourceId(mockDecryptedDataRecord)
         @Suppress("UNCHECKED_CAST")
         every { SdkRecordFactory.getInstance(mockDecryptedDataRecord) } returns mockDataRecord
 
@@ -720,6 +723,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .encryptRecord(mockDecryptedDataRecord)//mockDecryptedDataRecord)
         inOrder.verify(mockApiService).createRecord(ALIAS, USER_ID, mockEncryptedRecord)
         inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).assignResourceId(mockDecryptedDataRecord)
         inOrder.verifyNoMoreInteractions()
     }
 }

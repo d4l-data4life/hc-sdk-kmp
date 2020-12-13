@@ -86,6 +86,10 @@ internal class RecordService(
 
     private val recordFactory: RecordFactory = SdkRecordFactory
 
+    private fun validateData(resource: Any) {
+        if(resource is DomainResource) checkDataRestrictions(resource)
+    }
+
     private fun getTags(resource: Any): HashMap<String, String> {
         return if (resource is ByteArray) {
             taggingService.appendDefaultTags(null, null)
@@ -94,13 +98,52 @@ internal class RecordService(
         }
     }
 
+    private fun <T: Any> uploadFhirData(
+            record: Single<DecryptedBaseRecord<T>>,
+            resource: T,
+            userId: String
+    ): Single<DecryptedBaseRecord<T>> {
+        @Suppress("UNCHECKED_CAST")
+        return if(resource is DomainResource) {
+            record.map {  decryptedRecord ->
+                uploadData(
+                        decryptedRecord as DecryptedFhirRecord<DomainResource>,
+                        null,
+                        userId
+                ) }
+                .map { decryptedRecord -> removeUploadData(decryptedRecord) } as Single<DecryptedBaseRecord<T>>
+        } else {
+            record
+        }
+    }
+
+    private fun <T: Any> prepareRecord(
+            record: Single<DecryptedBaseRecord<T>>,
+            resource: T
+    ): Single<DecryptedBaseRecord<T>> {
+        return if(resource is DomainResource) {
+            val data = extractUploadData(resource)
+            @Suppress("UNCHECKED_CAST")
+            record
+                    .map { decryptedRecord ->
+                        restoreUploadData(
+                                decryptedRecord as DecryptedFhirRecord<DomainResource>,
+                                resource,
+                                data
+                        )
+                    }
+                    .map { decryptedRecord -> assignResourceId(decryptedRecord) } as Single<DecryptedBaseRecord<T>>
+        } else {
+            record
+        }
+    }
+
     private fun <T : Any> createRecord(
             resource: T,
             userId: String,
-            annotations: List<String>,
-            uploadData: (decryptedRecord: Single<DecryptedBaseRecord<T>>) -> Single<DecryptedBaseRecord<T>>,
-            createRecord: (decryptedRecord: Single<DecryptedBaseRecord<T>>) -> Single<BaseRecord<T>>
+            annotations: List<String>
     ): Single<BaseRecord<T>> {
+        validateData(resource)
         val createdRecord = Single.just(
                 DecryptedRecordBuilderImpl()
                         .setAnnotations(annotations)
@@ -113,11 +156,12 @@ internal class RecordService(
                         )
         )
 
-        return uploadData(createdRecord)
-                .map { record -> encryptRecord(record) }
+        return uploadFhirData(createdRecord, resource, userId)
+                .map { decryptedRecord -> encryptRecord(decryptedRecord) }
                 .flatMap { encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord) }
                 .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
-                .let { createRecord(it) }
+                .let { prepareRecord(it, resource) }
+                .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -147,27 +191,11 @@ internal class RecordService(
             resource: T,
             userId: String,
             annotations: List<String> = listOf()
-    ): Single<Record<T>> {
-        checkDataRestrictions(resource)
-        val data = extractUploadData(resource)
-
-        return createRecord(
-                resource,
+    ): Single<Record<T>> = createRecord(
+                resource as Any,
                 userId,
-                annotations,
-                { s ->
-                    s.map { decryptedRecord ->
-                        uploadData(
-                                decryptedRecord as DecryptedFhirRecord<T>,
-                                null,
-                                userId
-                        )
-                    }
-                    .map { decryptedRecord -> removeUploadData(decryptedRecord) }
-                },
-                { record -> prepareAndcreateFhirRecord(resource, data, record) }
+                annotations
         ) as Single<Record<T>>
-    }
 
     private fun createDataRecord(
             record: Single<DecryptedBaseRecord<ByteArray>>
@@ -179,11 +207,9 @@ internal class RecordService(
             userId: String,
             annotations: List<String>
     ): Single<DataRecord> = createRecord(
-            resource,
+            resource as Any,
             userId,
-            annotations,
-            { r -> r },
-            { record -> createDataRecord(record) }
+            annotations
     ) as Single<DataRecord>
 
     fun <T : DomainResource> createRecords(resources: List<T>, userId: String): Single<CreateResult<T>> {

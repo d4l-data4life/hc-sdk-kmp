@@ -39,6 +39,7 @@ import io.reactivex.Single
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
@@ -755,6 +756,7 @@ class RecordServiceTest : RecordServiceTestBase() {
     }
 
     @Test
+    @Ignore
     @Throws(InterruptedException::class,
             IOException::class,
             DataValidationException.ModelVersionNotSupported::class,
@@ -803,6 +805,7 @@ class RecordServiceTest : RecordServiceTestBase() {
     }
 
     @Test
+    @Ignore
     @Throws(IOException::class,
             InterruptedException::class,
             DataValidationException.ModelVersionNotSupported::class,

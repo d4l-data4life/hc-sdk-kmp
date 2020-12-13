@@ -19,6 +19,7 @@ import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.fhir.stu3.model.Identifier
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper
+import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.lang.DataValidationException
@@ -555,9 +556,9 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         val currentId = ADDITIONAL_ID
         val obsoleteId = ADDITIONAL_ID.replaceFirst(ATTACHMENT_ID.toRegex(), "obsoleteId")
         val otherId = "otherId"
-        val valueId = RecordService.DOWNSCALED_ATTACHMENT_IDS_FMT + RecordService.SPLIT_CHAR +
-                "valueAttachment" + RecordService.SPLIT_CHAR + PREVIEW_ID +
-                RecordService.SPLIT_CHAR + THUMBNAIL_ID
+        val valueId = RecordService.DOWNSCALED_ATTACHMENT_IDS_FMT + SPLIT_CHAR +
+                "valueAttachment" + SPLIT_CHAR + PREVIEW_ID +
+                SPLIT_CHAR + THUMBNAIL_ID
         val currentIdentifier = FhirAttachmentHelper.buildIdentifier(currentId, ASSIGNER)
         val obsoleteIdentifier = FhirAttachmentHelper.buildIdentifier(obsoleteId, ASSIGNER)
         val otherIdentifier = FhirAttachmentHelper.buildIdentifier(otherId, ASSIGNER)
@@ -676,7 +677,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         val attachment = AttachmentBuilder.buildAttachment(ATTACHMENT_ID)
         val secondAttachmentId = "secondId"
         val secondAttachment = AttachmentBuilder.buildAttachment(secondAttachmentId)
-        medication.image!![0] = attachment
+        medication.image!!.add(attachment)
         medication.image!!.add(secondAttachment)
         val decryptedRecord = DecryptedRecord(
                 RECORD_ID,
@@ -698,7 +699,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
                 .thenReturn(Single.just(mockEncryptedRecord))
         Mockito.doReturn(decryptedRecord).`when`(recordService)
                 .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        Mockito.`when`(mockAttachmentService.downloadAttachments(
+        Mockito.`when`(mockAttachmentService.download(
                 ArgumentMatchers.argThat { arg -> arg.contains(attachment) },
                 ArgumentMatchers.eq(mockAttachmentKey),
                 ArgumentMatchers.eq(USER_ID))
@@ -747,7 +748,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         val attachments = ArrayList<Attachment>()
         attachments.add(attachment)
         attachments.add(secondAttachment)
-        Mockito.`when`(mockAttachmentService.downloadAttachments(
+        Mockito.`when`(mockAttachmentService.download(
                 ArgumentMatchers.argThat { arg -> arg.containsAll(listOf(attachment, secondAttachment)) },
                 ArgumentMatchers.eq(mockAttachmentKey),
                 ArgumentMatchers.eq(USER_ID))

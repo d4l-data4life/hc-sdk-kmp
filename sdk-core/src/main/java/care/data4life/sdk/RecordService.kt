@@ -22,12 +22,15 @@ import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.fhir.stu3.model.FhirElementFactory
 import care.data4life.fhir.stu3.model.Identifier
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper
+import care.data4life.sdk.attachment.AttachmentContract
+import care.data4life.sdk.attachment.ThumbnailService
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.model.AppDataRecord
 import care.data4life.sdk.model.CreateResult
 import care.data4life.sdk.model.DeleteResult
 import care.data4life.sdk.model.DownloadResult
@@ -36,12 +39,11 @@ import care.data4life.sdk.model.FetchResult
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
-import care.data4life.sdk.model.AppDataRecord
 import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.DataRecord
-import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedAppDataRecord
+import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
@@ -71,7 +73,7 @@ class RecordService(
         private val tagEncryptionService: TagEncryptionService,
         private val taggingService: TaggingService,
         private val fhirService: FhirService,
-        private val attachmentService: AttachmentService,
+        private val attachmentService: AttachmentContract.Service,
         private val cryptoService: CryptoService,
         private val errorHandler: SdkContract.ErrorHandler
 ) {
@@ -411,15 +413,16 @@ class RecordService(
                     type
             )
 
-            return attachmentService.downloadAttachments(
+            return attachmentService.download(
                     validAttachments,
-                    decryptedRecord.attachmentsKey,
+                    // FIXME this is forced
+                    decryptedRecord.attachmentsKey!!,
                     userId
             )
                     .flattenAsObservable { items -> items }
                     .map { attachment ->
                         attachment.also {
-                            if (attachment.id!!.contains(SPLIT_CHAR)) updateAttachmentMeta(attachment)
+                            if (attachment.id!!.contains(ThumbnailService.SPLIT_CHAR)) updateAttachmentMeta(attachment)
                         }
                     }
                     .toList()
@@ -431,7 +434,7 @@ class RecordService(
     fun deleteAttachment(
             attachmentId: String,
             userId: String
-    ): Single<Boolean> = attachmentService.deleteAttachment(attachmentId, userId)
+    ): Single<Boolean> = attachmentService.delete(attachmentId, userId)
 
     fun <T : DomainResource> downloadRecord(
             recordId: String,
@@ -890,6 +893,7 @@ class RecordService(
         if (record.attachmentsKey == null) {
             record.attachmentsKey = cryptoService.generateGCKey().blockingGet()
         }
+
         val validAttachments: MutableList<Attachment> = arrayListOf()
         for (attachment in attachments) {
             if (attachment != null) {
@@ -912,9 +916,10 @@ class RecordService(
         if (validAttachments.isNotEmpty()) {
             updateDomainResourceIdentifier(
                     resource,
-                    attachmentService.uploadAttachments(
+                    attachmentService.upload(
                             validAttachments,
-                            record.attachmentsKey,
+                            // FIXME this is forced
+                            record.attachmentsKey!!,
                             userId
                     ).blockingGet()
             )
@@ -929,7 +934,7 @@ class RecordService(
     internal fun <T : DomainResource> updateData(
             record: DecryptedFhir3Record<T>,
             newResource: T?,
-            userId: String?
+            userId: String
     ): DecryptedFhir3Record<T> {
         newResource ?: throw CoreRuntimeException.UnsupportedOperation()
 
@@ -979,9 +984,10 @@ class RecordService(
         if (validAttachments.isNotEmpty()) {
             updateDomainResourceIdentifier(
                     resource,
-                    attachmentService.uploadAttachments(
+                    attachmentService.upload(
                             validAttachments,
-                            record.attachmentsKey,
+                            // FIXME this is forced
+                            record.attachmentsKey!!,
                             userId
                     ).blockingGet()
             )
@@ -992,7 +998,7 @@ class RecordService(
     @Throws(DataValidationException.IdUsageViolation::class, DataValidationException.InvalidAttachmentPayloadHash::class)
     internal fun <T : DomainResource> downloadData(
             record: DecryptedFhir3Record<T>,
-            userId: String?
+            userId: String
     ): DecryptedFhir3Record<T> {
         val resource = record.resource
         if (!FhirAttachmentHelper.hasAttachment(resource)) return record
@@ -1009,9 +1015,10 @@ class RecordService(
         }
 
         @Suppress("CheckResult")
-        attachmentService.downloadAttachments(
+        attachmentService.download(
                 attachments,
-                record.attachmentsKey,
+                // FIXME this is forced
+                record.attachmentsKey!!,
                 userId
         ).blockingGet()
         return record
@@ -1056,15 +1063,16 @@ class RecordService(
         for ((first, second) in result) {
             if (second != null) { //Attachment is a of image type
                 sb.setLength(0)
-                sb.append(DOWNSCALED_ATTACHMENT_IDS_FMT).append(SPLIT_CHAR).append(first.id)
+                sb.append(DOWNSCALED_ATTACHMENT_IDS_FMT).append(ThumbnailService.SPLIT_CHAR).append(first.id)
                 for (additionalId in second) {
-                    sb.append(SPLIT_CHAR).append(additionalId)
+                    sb.append(ThumbnailService.SPLIT_CHAR).append(additionalId)
                 }
                 FhirAttachmentHelper.appendIdentifier(d, sb.toString(), partnerId)
             }
         }
     }
 
+    // TODO move to AttachmentService -> Thumbnail handling
     @Throws(DataValidationException.IdUsageViolation::class)
     fun setAttachmentIdForDownloadType(
             attachments: List<Attachment>,
@@ -1077,8 +1085,8 @@ class RecordService(
                 when (type) {
                     DownloadType.Full -> {
                     }
-                    DownloadType.Medium -> attachment.id += SPLIT_CHAR + additionalIds[PREVIEW_ID_POS]
-                    DownloadType.Small -> attachment.id += SPLIT_CHAR + additionalIds[THUMBNAIL_ID_POS]
+                    DownloadType.Medium -> attachment.id += ThumbnailService.SPLIT_CHAR + additionalIds[PREVIEW_ID_POS]
+                    DownloadType.Small -> attachment.id += ThumbnailService.SPLIT_CHAR + additionalIds[THUMBNAIL_ID_POS]
                     else -> throw CoreRuntimeException.UnsupportedOperation()
                 }
             }
@@ -1103,13 +1111,14 @@ class RecordService(
         if (identifier.value == null || !identifier.value!!.startsWith(DOWNSCALED_ATTACHMENT_IDS_FMT)) {
             return null
         }
-        val parts = identifier.value!!.split(SPLIT_CHAR.toRegex()).toTypedArray()
+        val parts = identifier.value!!.split(ThumbnailService.SPLIT_CHAR.toRegex()).toTypedArray()
         if (parts.size != DOWNSCALED_ATTACHMENT_IDS_SIZE) {
             throw DataValidationException.IdUsageViolation(identifier.value)
         }
         return parts
     }
 
+    // TODO move to AttachmentService
     fun updateAttachmentMeta(attachment: Attachment): Attachment {
         val data = decode(attachment.data!!)
         attachment.size = data.size
@@ -1117,6 +1126,7 @@ class RecordService(
         return attachment
     }
 
+    // TODO move to AttachmentService
     fun getValidHash(attachment: Attachment): String {
         val data = decode(attachment.data!!)
         return encodeToString(sha1(data))
@@ -1183,7 +1193,6 @@ class RecordService(
         private const val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss[.SSS]"
         private const val EMPTY_RECORD_ID = ""
         const val DOWNSCALED_ATTACHMENT_IDS_FMT = "d4l_f_p_t" //d4l -> namespace, f-> full, p -> preview, t -> thumbnail
-        const val SPLIT_CHAR = "#"
         const val DOWNSCALED_ATTACHMENT_IDS_SIZE = 4
         const val FULL_ATTACHMENT_ID_POS = 1
         const val PREVIEW_ID_POS = 2

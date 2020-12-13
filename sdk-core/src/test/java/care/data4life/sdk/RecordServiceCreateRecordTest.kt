@@ -24,9 +24,6 @@ import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.util.Base64
 import care.data4life.sdk.util.MimeType
-
-import java.io.IOException
-
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockkObject
@@ -37,6 +34,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
+import java.io.IOException
 
 class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     @Before

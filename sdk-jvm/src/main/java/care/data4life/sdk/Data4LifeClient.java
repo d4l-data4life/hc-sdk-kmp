@@ -25,6 +25,7 @@ import care.data4life.auth.AuthorizationContract;
 import care.data4life.auth.AuthorizationException;
 import care.data4life.auth.AuthorizationService;
 import care.data4life.auth.storage.InMemoryAuthStorage;
+import care.data4life.sdk.attachment.AttachmentService;
 import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.fhir.FhirService;
 import care.data4life.sdk.log.Log;
@@ -120,7 +121,7 @@ public final class Data4LifeClient extends BaseClient {
         TaggingService taggingService = new TaggingService(clientId);
         FhirService fhirService = new FhirService(cryptoService);
         FileService fileService = new FileService(alias, apiService, cryptoService);
-        AttachmentService attachmentService = new AttachmentService(alias, fileService, new JvmImageResizer());
+        AttachmentService attachmentService = new AttachmentService(fileService, new JvmImageResizer());
         D4LErrorHandler errorHandler = new D4LErrorHandler();
         CallHandler callHandler = new CallHandler(errorHandler);
         String partnerId = clientId.split(CLIENT_ID_SPLIT_CHAR)[PARTNER_ID_INDEX];

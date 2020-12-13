@@ -23,6 +23,7 @@ import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.fhir.stu3.model.Identifier
 import care.data4life.fhir.stu3.model.Organization
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper
+import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.lang.D4LException
@@ -46,6 +47,7 @@ import org.threeten.bp.LocalDateTime
 import java.io.IOException
 
 class RecordServiceTest : RecordServiceTestBase() {
+    
     @Before
     fun setup() {
         init()
@@ -326,14 +328,14 @@ class RecordServiceTest : RecordServiceTestBase() {
         //when downloadType is Medium
         recordService.setAttachmentIdForDownloadType(attachments, identifiers, DownloadType.Medium)
         //then
-        Truth.assertThat(attachment.id).isEqualTo(ATTACHMENT_ID + RecordService.SPLIT_CHAR + PREVIEW_ID)
+        Truth.assertThat(attachment.id).isEqualTo(ATTACHMENT_ID + SPLIT_CHAR + PREVIEW_ID)
 
         //given
         attachment.id = ATTACHMENT_ID
         //when downloadType is Small
         recordService.setAttachmentIdForDownloadType(attachments, identifiers, DownloadType.Small)
         //then
-        Truth.assertThat(attachment.id).isEqualTo(ATTACHMENT_ID + RecordService.SPLIT_CHAR + THUMBNAIL_ID)
+        Truth.assertThat(attachment.id).isEqualTo(ATTACHMENT_ID + SPLIT_CHAR + THUMBNAIL_ID)
     }
 
     @Test
@@ -422,7 +424,7 @@ class RecordServiceTest : RecordServiceTestBase() {
     @Test
     fun splitAdditionalAttachmentId_shouldThrow_whenAdditionalAttachmentIdIsMalformed() {
         //given
-        val malformedAdditionalId = ADDITIONAL_ID + RecordService.SPLIT_CHAR + "unexpectedId"
+        val malformedAdditionalId = ADDITIONAL_ID + SPLIT_CHAR + "unexpectedId"
         val additionalIdentifier = FhirAttachmentHelper.buildIdentifier(malformedAdditionalId, ASSIGNER)
 
         //when
@@ -781,7 +783,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         val attachments = ArrayList<Attachment>()
         attachments.add(attachment)
         Mockito.`when`(
-                mockAttachmentService.downloadAttachments(
+                mockAttachmentService.download(
                         ArgumentMatchers.argThat { arg -> arg.contains(attachment) },
                         ArgumentMatchers.eq(mockAttachmentKey),
                         ArgumentMatchers.eq(USER_ID)
@@ -830,7 +832,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         attachments.add(attachment)
         attachments.add(secondAttachment)
         Mockito.`when`(
-                mockAttachmentService.downloadAttachments(
+                mockAttachmentService.download(
                         ArgumentMatchers.argThat { arg -> arg.containsAll(listOf(attachment, secondAttachment)) },
                         ArgumentMatchers.eq(mockAttachmentKey),
                         ArgumentMatchers.eq(USER_ID)

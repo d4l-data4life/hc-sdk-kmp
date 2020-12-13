@@ -29,6 +29,7 @@ import care.data4life.auth.AuthorizationService;
 import care.data4life.auth.AuthorizationService.AuthorizationListener;
 import care.data4life.auth.storage.SharedPrefsAuthStorage;
 import care.data4life.crypto.GCKeyPair;
+import care.data4life.sdk.attachment.AttachmentService;
 import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.fhir.FhirService;
 import care.data4life.sdk.lang.CoreRuntimeException;
@@ -163,7 +164,7 @@ public final class Data4LifeClient extends BaseClient {
         TaggingService taggingService = new TaggingService(clientId);
         FhirService fhirService = new FhirService(cryptoService);
         FileService fileService = new FileService(initConfig.getAlias(), apiService, cryptoService);
-        AttachmentService attachmentService = new AttachmentService(initConfig.getAlias(), fileService, new AndroidImageResizer());
+        AttachmentService attachmentService = new AttachmentService(fileService, new AndroidImageResizer());
         SdkContract.ErrorHandler errorHandler = new D4LErrorHandler();
         CallHandler callHandler = new CallHandler(errorHandler);
         String partnerId = clientId.split(CLIENT_ID_SPLIT_CHAR)[PARTNER_ID_INDEX];

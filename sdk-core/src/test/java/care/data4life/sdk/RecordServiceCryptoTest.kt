@@ -16,7 +16,6 @@
 
 package care.data4life.sdk
 
-import care.data4life.sdk.util.Base64
 import care.data4life.crypto.KeyType
 import care.data4life.fhir.stu3.model.CarePlan
 import care.data4life.fhir.stu3.model.DomainResource
@@ -24,6 +23,7 @@ import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.network.model.DecryptedRecord
+import care.data4life.sdk.util.Base64
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockkObject

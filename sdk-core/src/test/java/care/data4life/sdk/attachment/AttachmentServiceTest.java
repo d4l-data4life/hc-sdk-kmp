@@ -14,7 +14,7 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk;
+package care.data4life.sdk.attachment;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +27,8 @@ import care.data4life.crypto.GCKey;
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.FhirDateTime;
 import care.data4life.fhir.stu3.util.FhirDateTimeParser;
+import care.data4life.sdk.FileService;
+import care.data4life.sdk.ImageResizer;
 import care.data4life.sdk.config.DataRestrictionException;
 import care.data4life.sdk.helpers.stu3.AttachmentBuilder;
 import care.data4life.sdk.lang.D4LException;
@@ -44,7 +46,6 @@ import static org.mockito.Mockito.when;
 
 public class AttachmentServiceTest {
 
-    private static final String ALIAS = "alias";
     private static final String ATTACHMENT_ID = "attachmentId";
     private static final String THUMBNAIL_ID = "attachmentId#previewId";
     private static final String RECORD_ID = "recordId";
@@ -61,6 +62,7 @@ public class AttachmentServiceTest {
     private FileService mockFileService;
     private ImageResizer mockImageResizer;
     private Attachment attachment;
+
     private AttachmentService attachmentService; //SUT
 
     @Before
@@ -69,7 +71,7 @@ public class AttachmentServiceTest {
         mockFileService = mock(FileService.class);
         mockImageResizer = mock(ImageResizer.class);
 
-        attachmentService = new AttachmentService(ALIAS, mockFileService, mockImageResizer);
+        attachmentService = new AttachmentService(mockFileService, mockImageResizer);
     }
 
     @Test
@@ -84,7 +86,7 @@ public class AttachmentServiceTest {
 
         // when
         TestObserver<List<Pair<Attachment, List<String>>>> subscriber = attachmentService
-                .uploadAttachments(attachments, attachmentKey, USER_ID).test().await();
+                .upload(attachments, attachmentKey, USER_ID).test().await();
 
         // then
         List<Pair<Attachment, List<String>>> result = subscriber
@@ -138,7 +140,7 @@ public class AttachmentServiceTest {
 
         // when
         TestObserver<List<Attachment>> subscriber =
-                attachmentService.downloadAttachments(attachments, attachmentKey, USER_ID).test().await();
+                attachmentService.download(attachments, attachmentKey, USER_ID).test().await();
 
         // then
         List<Attachment> result = subscriber
@@ -168,7 +170,7 @@ public class AttachmentServiceTest {
 
         // When
         try {
-            attachmentService.downloadAttachments(attachments, attachmentKey, USER_ID);
+            attachmentService.download(attachments, attachmentKey, USER_ID);
             //fail("Exception expected!");
         } catch (D4LException e) {
 
@@ -184,11 +186,11 @@ public class AttachmentServiceTest {
         attachment.id = THUMBNAIL_ID;
         attachment.hash = DATA_HASH;
         List<Attachment> attachments = Arrays.asList(attachment);
-        when(mockFileService.downloadFile(attachmentKey, USER_ID, THUMBNAIL_ID.split(RecordService.SPLIT_CHAR)[1])).thenReturn(Single.just(pdf));
+        when(mockFileService.downloadFile(attachmentKey, USER_ID, THUMBNAIL_ID.split(ThumbnailService.SPLIT_CHAR)[1])).thenReturn(Single.just(pdf));
 
         // when
         TestObserver<List<Attachment>> subscriber =
-                attachmentService.downloadAttachments(attachments, attachmentKey, USER_ID).test().await();
+                attachmentService.download(attachments, attachmentKey, USER_ID).test().await();
 
         // then
         List<Attachment> result = subscriber
@@ -205,7 +207,7 @@ public class AttachmentServiceTest {
         assertThat(a.contentType).isEqualTo(CONTENT_TYPE);
         assertThat(a.data).isEqualTo(dataBase64);
 
-        verify(mockFileService).downloadFile(attachmentKey, USER_ID, THUMBNAIL_ID.split(RecordService.SPLIT_CHAR)[1]);
+        verify(mockFileService).downloadFile(attachmentKey, USER_ID, THUMBNAIL_ID.split(ThumbnailService.SPLIT_CHAR)[1]);
         verifyNoMoreInteractions(mockFileService);
 
     }
@@ -221,7 +223,7 @@ public class AttachmentServiceTest {
 
         // when
         TestObserver<List<Pair<Attachment, List<String>>>> subscriber =
-                attachmentService.uploadAttachments(attachments, attachmentKey, USER_ID).test().await();
+                attachmentService.upload(attachments, attachmentKey, USER_ID).test().await();
 
         // then
         List<Pair<Attachment, List<String>>> result = subscriber
@@ -241,7 +243,7 @@ public class AttachmentServiceTest {
         when(mockFileService.deleteFile(USER_ID, ATTACHMENT_ID)).thenReturn(Single.just(true));
 
         // when
-        TestObserver<Boolean> subscriber = attachmentService.deleteAttachment(ATTACHMENT_ID, USER_ID).test().await();
+        TestObserver<Boolean> subscriber = attachmentService.delete(ATTACHMENT_ID, USER_ID).test().await();
 
         // then
         subscriber.assertNoErrors()
@@ -252,10 +254,10 @@ public class AttachmentServiceTest {
     @Test
     public void deleteAttachment_shouldFail() throws InterruptedException {
         // given
-        when(mockFileService.deleteFile(ATTACHMENT_ID, USER_ID)).thenReturn(Single.error(new Throwable()));
+        when(mockFileService.deleteFile(USER_ID, ATTACHMENT_ID)).thenReturn(Single.error(new Throwable()));
 
         // when
-        TestObserver<Boolean> subscriber = attachmentService.deleteAttachment(ATTACHMENT_ID, USER_ID).test().await();
+        TestObserver<Boolean> subscriber = attachmentService.delete(ATTACHMENT_ID, USER_ID).test().await();
 
         // then
         subscriber.assertError(Objects::nonNull)

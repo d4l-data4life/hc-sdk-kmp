@@ -21,6 +21,8 @@ import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.fhir.stu3.model.CarePlan
 import care.data4life.fhir.stu3.model.DocumentReference
 import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.attachment.AttachmentContract
+import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.model.Meta
@@ -52,7 +54,7 @@ abstract class RecordServiceTestBase {
     internal lateinit var mockTagEncryptionService: TagEncryptionService
     internal lateinit var mockTaggingService: TaggingService
     internal lateinit var mockFhirService: FhirService
-    internal lateinit var mockAttachmentService: AttachmentService
+    internal lateinit var mockAttachmentService: AttachmentContract.Service
     internal lateinit var mockCryptoService: CryptoService
     private lateinit var mockErrorHandler: D4LErrorHandler
     internal lateinit var mockCarePlan: CarePlan
@@ -79,8 +81,7 @@ abstract class RecordServiceTestBase {
     internal lateinit var decryptedRecordIndicator: DecryptedRecord<DomainResource>
     internal lateinit var annotatedDecryptedRecordIndicator: DecryptedRecord<DomainResource>
 
-
-    private lateinit var mockitoSession : MockitoSession
+    private lateinit var mockitoSession: MockitoSession
 
     @Suppress("UNCHECKED_CAST")
     fun init() {
@@ -88,7 +89,7 @@ abstract class RecordServiceTestBase {
         mockTagEncryptionService = Mockito.mock(TagEncryptionService::class.java)
         mockTaggingService = Mockito.mock(TaggingService::class.java)
         mockFhirService = Mockito.mock(FhirService::class.java)
-        mockAttachmentService = Mockito.mock(AttachmentService::class.java)
+        mockAttachmentService = Mockito.mock(AttachmentContract.Service::class.java)
         mockCryptoService = Mockito.mock(CryptoService::class.java)
         mockErrorHandler = Mockito.mock(D4LErrorHandler::class.java)
         recordService = Mockito.spy(
@@ -223,11 +224,11 @@ abstract class RecordServiceTestBase {
         internal const val PREVIEW_ID = "previewId"
         internal const val ASSIGNER = "assigner"
         internal const val ADDITIONAL_ID = RecordService.DOWNSCALED_ATTACHMENT_IDS_FMT +
-                RecordService.SPLIT_CHAR +
+                SPLIT_CHAR +
                 ATTACHMENT_ID +
-                RecordService.SPLIT_CHAR +
+                SPLIT_CHAR +
                 PREVIEW_ID +
-                RecordService.SPLIT_CHAR +
+                SPLIT_CHAR +
                 THUMBNAIL_ID
         internal val LOCAL_DATE = LocalDate.of(2001, 1, 1)
         internal val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US)

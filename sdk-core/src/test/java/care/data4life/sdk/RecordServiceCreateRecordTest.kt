@@ -111,8 +111,10 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         @Suppress("UNCHECKED_CAST")
         every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
 
+        val annotations = listOf<String>()
+
         // When
-        val subscriber = recordService.createRecord(mockCarePlan, USER_ID).test().await()
+        val subscriber = recordService.createRecord(USER_ID, mockCarePlan, annotations).test().await()
 
         // Then
         val record = subscriber
@@ -229,8 +231,10 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         @Suppress("UNCHECKED_CAST")
         every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
 
+        val annotations = listOf<String>()
+
         // When
-        val subscriber = recordService.createRecord(mockCarePlan, USER_ID).test().await()
+        val subscriber = recordService.createRecord(USER_ID, mockCarePlan, annotations).test().await()
 
         // Then
         val record = subscriber
@@ -279,17 +283,18 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         // Given
         val invalidData = byteArrayOf(0x00)
         val doc = buildDocumentReference(invalidData)
+        val annotations = listOf<String>()
 
         // When
         try {
-            recordService.createRecord(doc, USER_ID).test().await()
+            recordService.createRecord(USER_ID, doc, annotations).test().await()
             Assert.fail("Exception expected!")
         } catch (ex: D4LException) {
 
             // Then
             Truth.assertThat(ex.javaClass).isEqualTo(DataRestrictionException.UnsupportedFileType::class.java)
         }
-        inOrder.verify(recordService).createRecord(doc, USER_ID)
+        inOrder.verify(recordService).createRecord(USER_ID, doc, annotations)
         inOrder.verify(recordService).checkDataRestrictions(doc)
         inOrder.verifyNoMoreInteractions()
     }
@@ -312,16 +317,18 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         )
         val doc = buildDocumentReference(unboxByteArray(invalidSizePdf))
 
+        val annotations = listOf<String>()
+
         // When
         try {
-            recordService.createRecord(doc, USER_ID).test().await()
+            recordService.createRecord(USER_ID, doc, annotations).test().await()
             Assert.fail("Exception expected!")
         } catch (ex: D4LException) {
 
             // Then
             Truth.assertThat(ex.javaClass).isEqualTo(DataRestrictionException.MaxDataSizeViolation::class.java)
         }
-        inOrder.verify(recordService).createRecord(doc, USER_ID)
+        inOrder.verify(recordService).createRecord(USER_ID, doc, annotations)
         inOrder.verify(recordService).checkDataRestrictions(doc)
         inOrder.verifyNoMoreInteractions()
     }
@@ -338,7 +345,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 mockCarePlan as DomainResource,
                 mockCarePlan as DomainResource
         )
-        Mockito.doReturn(Single.just(mockRecord)).`when`(recordService).createRecord(mockCarePlan, USER_ID)
+        val annotations = listOf<String>()
+        Mockito.doReturn(Single.just(mockRecord)).`when`(recordService).createRecord(USER_ID, mockCarePlan, annotations)
 
         // When
         val observer = recordService.createRecords(resources, USER_ID).test().await()
@@ -356,7 +364,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Truth.assertThat(result.successfulOperations[1].fhirResource).isEqualTo(mockCarePlan)
         Truth.assertThat(result.successfulOperations[1].meta).isEqualTo(mockMeta)
         inOrder.verify(recordService).createRecords(resources, USER_ID)
-        inOrder.verify(recordService, Mockito.times(2)).createRecord(mockCarePlan, USER_ID)
+        inOrder.verify(recordService, Mockito.times(2)).createRecord(USER_ID, mockCarePlan, annotations)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -421,7 +429,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         every { SdkRecordFactory.getInstance(mockAnnotatedDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
 
         // When
-        val subscriber = recordService.createRecord(mockCarePlan, USER_ID, ANNOTATIONS).test().await()
+        val subscriber = recordService.createRecord(USER_ID, mockCarePlan, ANNOTATIONS).test().await()
 
         // Then
         val record = subscriber
@@ -539,7 +547,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         every { SdkRecordFactory.getInstance(mockAnnotatedDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
 
         // When
-        val subscriber = recordService.createRecord(mockCarePlan, USER_ID, ANNOTATIONS).test().await()
+        val subscriber = recordService.createRecord(USER_ID, mockCarePlan, ANNOTATIONS).test().await()
 
         // Then
         val record = subscriber
@@ -597,14 +605,14 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
 
         // When
         try {
-            recordService.createRecord(doc, USER_ID, ANNOTATIONS).test().await()
+            recordService.createRecord(USER_ID, doc, ANNOTATIONS).test().await()
             Assert.fail("Exception expected!")
         } catch (ex: D4LException) {
 
             // Then
             Truth.assertThat(ex.javaClass).isEqualTo(DataRestrictionException.UnsupportedFileType::class.java)
         }
-        inOrder.verify(recordService).createRecord(doc, USER_ID, ANNOTATIONS)
+        inOrder.verify(recordService).createRecord(USER_ID, doc, ANNOTATIONS)
         inOrder.verify(recordService).checkDataRestrictions(doc)
         inOrder.verifyNoMoreInteractions()
     }
@@ -629,14 +637,14 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
 
         // When
         try {
-            recordService.createRecord(doc, USER_ID, ANNOTATIONS).test().await()
+            recordService.createRecord(USER_ID, doc, ANNOTATIONS).test().await()
             Assert.fail("Exception expected!")
         } catch (ex: D4LException) {
 
             // Then
             Truth.assertThat(ex.javaClass).isEqualTo(DataRestrictionException.MaxDataSizeViolation::class.java)
         }
-        inOrder.verify(recordService).createRecord(doc, USER_ID, ANNOTATIONS)
+        inOrder.verify(recordService).createRecord(USER_ID, doc, ANNOTATIONS)
         inOrder.verify(recordService).checkDataRestrictions(doc)
         inOrder.verifyNoMoreInteractions()
     }
@@ -688,8 +696,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
 
         // When
         val subscriber = recordService.createRecord(
-                mockDataResource.value,
                 USER_ID,
+                mockDataResource,
                 ANNOTATIONS
         ).test().await()
 

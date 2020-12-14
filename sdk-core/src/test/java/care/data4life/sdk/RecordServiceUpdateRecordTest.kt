@@ -37,6 +37,7 @@ import org.mockito.Mockito
 import java.io.IOException
 
 class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
+
     @Before
     fun setUp() {
         init()
@@ -83,9 +84,10 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
                 .assignResourceId(mockDecryptedDataRecord)
         @Suppress("UNCHECKED_CAST")
         every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
+        val annotations = listOf<String>()
 
         // When
-        val observer = recordService.updateRecord(mockCarePlan, USER_ID).test().await()
+        val observer = recordService.updateRecord(USER_ID, RECORD_ID, mockCarePlan, annotations).test().await()
 
         // Then
         val result = observer.assertNoErrors()
@@ -115,11 +117,8 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         ).resource = mockCarePlan
         Mockito.verify(
                 mockDecryptedFhir3Record,
-                Mockito.times(0)
-        ).annotations = listOf()
-
-        // Cleanup
-        mockCarePlan.id = null
+                Mockito.times(1)
+        ).annotations = annotations
     }
 
     @Test
@@ -128,16 +127,18 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         // Given
         val invalidData = byteArrayOf(0x00)
         val doc = buildDocumentReference(invalidData)
+        val annotations = listOf<String>()
 
         // When
         try {
-            recordService.updateRecord(doc, USER_ID).test().await()
+            recordService.updateRecord(USER_ID, RECORD_ID, doc, annotations).test().await()
             Assert.fail("Exception expected!")
         } catch (ex: Exception) {
             // Then
             Truth.assertThat(ex).isInstanceOf(DataRestrictionException.UnsupportedFileType::class.java)
         }
-        inOrder.verify(recordService).updateRecord(doc, USER_ID)
+
+        inOrder.verify(recordService).updateRecord(USER_ID, RECORD_ID, doc, annotations)
         inOrder.verify(recordService).checkDataRestrictions(doc)
         inOrder.verifyNoMoreInteractions()
     }
@@ -155,16 +156,17 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
                 MimeType.PDF.byteSignature()[0]!!.size
         )
         val doc = buildDocumentReference(unboxByteArray(invalidSizePdf))
+        val annotations = listOf<String>()
 
         // When
         try {
-            recordService.updateRecord(doc, USER_ID).test().await()
+            recordService.updateRecord(USER_ID, RECORD_ID, doc, annotations).test().await()
             Assert.fail("Exception expected!")
         } catch (ex: Exception) {
             // Then
             Truth.assertThat(ex).isInstanceOf(DataRestrictionException.MaxDataSizeViolation::class.java)
         }
-        inOrder.verify(recordService).updateRecord(doc, USER_ID)
+        inOrder.verify(recordService).updateRecord(USER_ID, RECORD_ID, doc, annotations)
         inOrder.verify(recordService).checkDataRestrictions(doc)
         inOrder.verifyNoMoreInteractions()
     }
@@ -204,7 +206,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
 
         // When
-        val observer = recordService.updateRecord(mockCarePlan, USER_ID, ANNOTATIONS).test().await()
+        val observer = recordService.updateRecord(USER_ID, RECORD_ID, mockCarePlan, ANNOTATIONS).test().await()
 
         // Then
         val result = observer.assertNoErrors()
@@ -236,9 +238,6 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
                 mockDecryptedFhir3Record,
                 Mockito.times(1)
         ).annotations = ANNOTATIONS
-
-        // Cleanup
-        mockCarePlan.id = null
     }
 
     @Test
@@ -257,18 +256,19 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
 
         // When
         try {
-            recordService.updateRecord(doc, USER_ID, ANNOTATIONS).test().await()
+            recordService.updateRecord(USER_ID, RECORD_ID, doc, ANNOTATIONS).test().await()
             Assert.fail("Exception expected!")
         } catch (ex: Exception) {
             // Then
             Truth.assertThat(ex).isInstanceOf(DataRestrictionException.MaxDataSizeViolation::class.java)
         }
-        inOrder.verify(recordService).updateRecord(doc, USER_ID, ANNOTATIONS)
+        inOrder.verify(recordService).updateRecord(USER_ID, RECORD_ID, doc, ANNOTATIONS)
         inOrder.verify(recordService).checkDataRestrictions(doc)
         inOrder.verifyNoMoreInteractions()
     }
 
     @Test
+    @Ignore
     @Throws(
             InterruptedException::class,
             DataRestrictionException.UnsupportedFileType::class,
@@ -277,9 +277,10 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
     fun `Given, updateRecords is called with multiple resources, Annotations and a UserId, returns multiple updated Records`() {
         // Given
         val resources = listOf(mockCarePlan, mockCarePlan)
+        val annotations = listOf<String>()
         Mockito.doReturn(Single.just(mockRecord))
                 .`when`(recordService)
-                .updateRecord(mockCarePlan, USER_ID)
+                .updateRecord(USER_ID, RECORD_ID, mockCarePlan, annotations)
 
         // When
         val observer = recordService.updateRecords(resources, USER_ID).test().await()
@@ -297,11 +298,8 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         inOrder.verify(
                 recordService,
                 Mockito.times(2)
-        ).updateRecord(mockCarePlan, USER_ID)
+        ).updateRecord(USER_ID, RECORD_ID, mockCarePlan, annotations)
         inOrder.verifyNoMoreInteractions()
-
-        // Cleanup
-        mockCarePlan.id = null
     }
 
     @Test
@@ -340,9 +338,9 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
 
         // When
         val observer = recordService.updateRecord(
-                RECORD_ID,
-                mockDataResource.value,
                 USER_ID,
+                RECORD_ID,
+                mockDataResource,
                 ANNOTATIONS
         ).test().await()
 
@@ -408,10 +406,10 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
 
         // When
         val observer = recordService.updateRecord(
-                RECORD_ID,
-                mockDataResource.value,
                 USER_ID,
-                null
+                RECORD_ID,
+                mockDataResource,
+                listOf()
         ).test().await()
 
         // Then

@@ -34,7 +34,6 @@ import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
-import care.data4life.sdk.model.AppDataRecord
 import care.data4life.sdk.model.CreateResult
 import care.data4life.sdk.model.DeleteResult
 import care.data4life.sdk.model.DownloadResult
@@ -111,8 +110,8 @@ class RecordService(
     }
 
     private fun <T : Any> createRecord(
-            resource: T,
             userId: String,
+            resource: T,
             annotations: List<String>
     ): Single<BaseRecord<T>> {
         checkDataRestrictions(resource)
@@ -140,42 +139,41 @@ class RecordService(
                 .map { recordFactory.getInstance(it) }
     }
 
-    // TODO add implementation
-    fun <T : Fhir4Resource> createFhir4Record(
-            userId: String,
-            resource: T,
-            annotations: List<String>
-    ): Single<Fhir4Record<T>> {
-        val createdDate = DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID))
-
-        // FIXME just a dummy response
-        return Single.just(Fhir4Record("", resource, Meta(LocalDate.now(UTC_ZONE_ID), LocalDateTime.now(UTC_ZONE_ID)), annotations))
-    }
-
     @Suppress("UNCHECKED_CAST")
     @Throws(DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class)
     @JvmOverloads
-    fun <T : Fhir3Resource> createRecord(
-            resource: T,
+    override fun <T : Fhir3Resource> createRecord(
             userId: String,
-            annotations: List<String> = listOf()
+            resource: T,
+            annotations: List<String>
     ): Single<Record<T>> = createRecord(
-            resource as Any,
             userId,
+            resource as Any,
             annotations
     ) as Single<Record<T>>
 
     @Suppress("UNCHECKED_CAST")
-    fun createRecord(
-            resource: ByteArray,
+    override fun createRecord(
             userId: String,
+            resource: DataResource,
             annotations: List<String>
     ): Single<DataRecord<DataResource>> = createRecord(
-            resource as Any,
             userId,
+            resource as Any,
             annotations
     ) as Single<DataRecord<DataResource>>
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : Fhir4Resource> createRecord(
+            userId: String,
+            resource: T,
+            annotations: List<String>
+    ): Single<Fhir4Record<T>> = createRecord(
+            userId,
+            resource as Any,
+            annotations
+    ) as Single<Fhir4Record<T>>
 
     fun <T : Fhir3Resource> createRecords(resources: List<T>, userId: String): Single<CreateResult<T>> {
         val failedOperations: MutableList<Pair<T, D4LException>> = mutableListOf()
@@ -183,7 +181,7 @@ class RecordService(
                 .fromCallable { resources }
                 .flatMapIterable { it }
                 .flatMapSingle { resource ->
-                    createRecord(resource, userId).onErrorReturn { error ->
+                    createRecord(userId, resource, listOf()).onErrorReturn { error ->
                         Record<T>(null, null, null).also {
                             failedOperations.add(Pair(resource, errorHandler.handleError(error)))
                             Unit
@@ -195,9 +193,9 @@ class RecordService(
                 .map { CreateResult(it, failedOperations) }
     }
 
-    fun deleteRecord(
-            recordId: String,
-            userId: String
+    override fun deleteRecord(
+            userId: String,
+            recordId: String
     ): Completable = apiService.deleteRecord(alias, recordId, userId)
 
     fun deleteRecords(recordIds: List<String>, userId: String): Single<DeleteResult> {
@@ -234,35 +232,31 @@ class RecordService(
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T : Fhir3Resource> fetchRecord(
+    override fun <T : Fhir3Resource> fetchFhir3Record(
             recordId: String,
             userId: String
     ): Single<Record<T>> = _fetchRecord<T>(recordId, userId) as Single<Record<T>>
 
     @Suppress("UNCHECKED_CAST")
-    @Deprecated("")
-    fun fetchAppDataRecord(
+    override fun <T : Fhir4Resource> fetchFhir4Record(
             recordId: String,
             userId: String
-    ): Single<DataRecord<DataResource>> {
-        return (_fetchRecord<ByteArray>(recordId, userId) as Single<AppDataRecord>)
-                .map { appData ->
-                    DataRecord(
-                            appData.identifier,
-                            DataResource(appData.resource),
-                            appData.meta,
-                            appData.annotations
-                    )
-                }
-    }
+    ): Single<Fhir4Record<T>> = _fetchRecord<T>(recordId, userId) as Single<Fhir4Record<T>>
 
-    fun <T : Fhir3Resource> fetchRecords(recordIds: List<String>, userId: String): Single<FetchResult<T>> {
+    @Suppress("UNCHECKED_CAST")
+    override fun fetchDataRecord(
+            userId: String,
+            recordId: String
+    ): Single<DataRecord<DataResource>> = _fetchRecord<DataResource>(recordId, userId) as Single<DataRecord<DataResource>>
+
+
+    fun <T : Fhir3Resource> fetchFhir3Records(recordIds: List<String>, userId: String): Single<FetchResult<T>> {
         val failedFetches: MutableList<Pair<String, D4LException>> = arrayListOf()
         return Observable
                 .fromCallable { recordIds }
                 .flatMapIterable { it }
                 .flatMapSingle { recordId ->
-                    fetchRecord<T>(recordId, userId)
+                    fetchFhir3Record<T>(recordId, userId)
                             .onErrorReturn { error ->
                                 Record<T>(null, null, null).also {
                                     failedFetches.add(Pair(recordId, errorHandler.handleError(error)))
@@ -337,16 +331,17 @@ class RecordService(
                 .toList() as Single<List<BaseRecord<T>>>
     }
 
-    fun <T : Fhir3Resource> fetchRecords(
+    fun <T : Fhir3Resource> fetchFhir3Records(
             userId: String,
             resourceType: Class<T>,
             startDate: LocalDate?,
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int
-    ): Single<List<Record<T>>> = fetchRecords(
+    ): Single<List<Record<T>>> = fetchFhir3Records(
             userId,
-            resourceType, emptyList(),
+            resourceType,
+            emptyList(),
             startDate,
             endDate,
             pageSize,
@@ -354,7 +349,7 @@ class RecordService(
     )
 
     @Suppress("UNCHECKED_CAST")
-    fun <T : Fhir3Resource> fetchRecords(
+    override fun <T : Fhir3Resource> fetchFhir3Records(
             userId: String,
             resourceType: Class<T>,
             annotations: List<String>,
@@ -373,7 +368,26 @@ class RecordService(
     ) as Single<List<Record<T>>>
 
     @Suppress("UNCHECKED_CAST")
-    fun fetchRecords(
+    override fun <T : Fhir4Resource> fetchFhir4Records(
+            userId: String,
+            resourceType: Class<T>,
+            annotations: List<String>,
+            startDate: LocalDate?,
+            endDate: LocalDate?,
+            pageSize: Int,
+            offset: Int
+    ): Single<List<Fhir4Record<T>>> = _fetchRecords(
+            userId,
+            resourceType,
+            annotations,
+            startDate,
+            endDate,
+            pageSize,
+            offset
+    ) as Single<List<Fhir4Record<T>>>
+
+    @Suppress("UNCHECKED_CAST")
+    override fun fetchDataRecords(
             userId: String,
             annotations: List<String>,
             startDate: LocalDate?,
@@ -433,12 +447,11 @@ class RecordService(
 
     @Throws(DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class)
-    @JvmOverloads
-    fun <T : Any> updateRecord(
-            resource: T,
+    private fun <T : Any> updateRecord(
             userId: String,
-            recordId: String?,
-            annotations: List<String>? = null
+            recordId: String,
+            resource: T,
+            annotations: List<String>
     ): Single<BaseRecord<T>> {
         checkDataRestrictions(resource)
         val data = extractUploadData(resource)
@@ -473,29 +486,41 @@ class RecordService(
     @Suppress("UNCHECKED_CAST")
     @Throws(DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class)
-    @JvmOverloads
-    fun <T : Fhir3Resource> updateRecord(
-            resource: T,
+    override fun <T : Fhir3Resource> updateRecord(
             userId: String,
-            annotations: List<String>? = null
+            recordId: String,
+            resource: T,
+            annotations: List<String>
     ): Single<Record<T>> = updateRecord(
-            resource as Any,
             userId,
-            resource.id,
+            recordId,
+            resource as Any,
             annotations
     ) as Single<Record<T>>
 
     @Suppress("UNCHECKED_CAST")
-    @JvmOverloads
-    fun updateRecord(
-            recordId: String,
-            resource: ByteArray,
+    override fun <T : Fhir4Resource> updateRecord(
             userId: String,
-            annotations: List<String>? = listOf()
-    ): Single<DataRecord<DataResource>> = updateRecord(
-            resource as Any,
+            recordId: String,
+            resource: T,
+            annotations: List<String>
+    ): Single<Fhir4Record<T>> = updateRecord(
             userId,
             recordId,
+            resource as Any,
+            annotations
+    ) as Single<Fhir4Record<T>>
+
+    @Suppress("UNCHECKED_CAST")
+    override fun updateRecord(
+            userId: String,
+            recordId: String,
+            resource: DataResource,
+            annotations: List<String>
+    ): Single<DataRecord<DataResource>> = updateRecord(
+            userId,
+            recordId,
+            resource as Any,
             annotations
     ) as Single<DataRecord<DataResource>>
 
@@ -505,7 +530,7 @@ class RecordService(
                 .fromCallable { resources }
                 .flatMapIterable { it }
                 .flatMapSingle { resource ->
-                    updateRecord(resource, userId)
+                    updateRecord(userId, resource.id!!, resource, listOf())
                             .onErrorReturn { error ->
                                 Record<T>(null, null, null).also {
                                     failedUpdates.add(Pair(resource, errorHandler.handleError(error)))
@@ -1196,4 +1221,5 @@ class RecordService(
                 .toFormatter(Locale.US)
         private val UTC_ZONE_ID = ZoneId.of("UTC")
     }
+
 }

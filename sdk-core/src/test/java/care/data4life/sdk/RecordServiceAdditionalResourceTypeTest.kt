@@ -745,16 +745,17 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         // Given
         val invalidData = byteArrayOf(0x00)
         val obs = ObservationBuilder.buildObservation(invalidData)
+        val annotations = listOf<String>()
 
         // When
         try {
-            recordService.updateRecord(obs, USER_ID).test().await()
+            recordService.updateRecord(USER_ID, RECORD_ID, obs, annotations).test().await()
             Assert.fail("Exception expected!")
         } catch (ex: Exception) {
             // Then
             Truth.assertThat(ex).isInstanceOf(DataRestrictionException.UnsupportedFileType::class.java)
         }
-        inOrder.verify(recordService).updateRecord(obs, USER_ID)
+        inOrder.verify(recordService).updateRecord(USER_ID, RECORD_ID, obs, annotations)
         inOrder.verify(recordService).checkDataRestrictions(obs)
         inOrder.verifyNoMoreInteractions()
     }
@@ -772,16 +773,17 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
                 MimeType.PDF.byteSignature()[0]?.size!!
         )
         val response = QuestionnaireResponseBuilder.buildQuestionnaireResponse(unboxByteArray(invalidSizePdf))
+        val annotations = listOf<String>()
 
         // When
         try {
-            recordService.updateRecord(response, USER_ID).test().await()
+            recordService.updateRecord(USER_ID, RECORD_ID, response, annotations).test().await()
             Assert.fail("Exception expected!")
         } catch (ex: Exception) {
             // Then
             Truth.assertThat(ex).isInstanceOf(DataRestrictionException.MaxDataSizeViolation::class.java)
         }
-        inOrder.verify(recordService).updateRecord(response, USER_ID)
+        inOrder.verify(recordService).updateRecord(USER_ID, RECORD_ID, response, annotations)
         inOrder.verify(recordService).checkDataRestrictions(response)
         inOrder.verifyNoMoreInteractions()
     }

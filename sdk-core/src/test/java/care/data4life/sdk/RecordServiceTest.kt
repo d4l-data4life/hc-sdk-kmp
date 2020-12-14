@@ -57,7 +57,7 @@ import org.threeten.bp.LocalDateTime
 import java.io.IOException
 
 class RecordServiceTest : RecordServiceTestBase() {
-    
+
     @Before
     fun setup() {
         init()
@@ -788,11 +788,11 @@ class RecordServiceTest : RecordServiceTestBase() {
         Mockito.`when`(mockApiService.deleteRecord(ALIAS, RECORD_ID, USER_ID)).thenReturn(Completable.complete())
 
         // When
-        val subscriber = recordService.deleteRecord(RECORD_ID, USER_ID).test().await()
+        val subscriber = recordService.deleteRecord(USER_ID, RECORD_ID).test().await()
 
         // Then
         subscriber.assertNoErrors().assertComplete()
-        inOrder.verify(recordService).deleteRecord(RECORD_ID, USER_ID)
+        inOrder.verify(recordService).deleteRecord(USER_ID, RECORD_ID)
         inOrder.verify(mockApiService).deleteRecord(ALIAS, RECORD_ID, USER_ID)
         inOrder.verifyNoMoreInteractions()
     }

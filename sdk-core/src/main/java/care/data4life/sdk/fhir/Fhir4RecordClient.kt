@@ -16,25 +16,24 @@
 
 package care.data4life.sdk.fhir
 
-import care.data4life.sdk.RecordService
 import care.data4life.sdk.SdkContract
 import care.data4life.sdk.auth.UserService
 import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.call.Callback
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.record.RecordContract
 
 internal class Fhir4RecordClient(
         private val userService: UserService,
-        private val recordService: RecordService,
+        private val recordService: RecordContract.Service,
         private val handler: CallHandler
 ) : SdkContract.Fhir4RecordClient {
 
     override fun <T : Fhir4Resource> create(resource: T, annotations: List<String>, callback: Callback<Fhir4Record<T>>) {
         val operation = userService.finishLogin(true)
                 .flatMap { userService.uID }
-                .flatMap { uid -> recordService.createFhir4Record(uid, resource, annotations) }
-
+                .flatMap { uid -> recordService.createRecord(uid, resource, annotations) }
         handler.executeSingle(operation, callback)
     }
 

@@ -31,7 +31,7 @@ import java.util.*
 
 // TODO add internal
 class AttachmentService internal constructor(
-        private val fileService: FileService,
+        private val fileService: FileContract.Service,
         // TODO move imageResizer to tumbnail service
         private val imageResizer: ImageResizer
 ) : AttachmentContract.Service {

@@ -16,8 +16,73 @@
 
 package care.data4life.sdk.attachment
 
+import care.data4life.crypto.GCKey
+import care.data4life.sdk.ImageResizer
+import care.data4life.sdk.lang.ImageResizeException
+import care.data4life.sdk.log.Log
+import care.data4life.sdk.wrappers.definitions.Attachment
+
 // TODO encapsulate thumbnail generation and handling
-class ThumbnailService {
+class ThumbnailService internal constructor(
+        private val imageResizer: ImageResizer,
+        private val fileService: FileContract.Service
+): ThumbnailContract.Service {
+
+    override fun uploadDownscaledImages(
+            attachmentsKey: GCKey,
+            userId: String,
+            attachment: Attachment,
+            originalData: ByteArray
+    ): List<String> {
+        return if(this.imageResizer.isResizable(originalData)) {
+            val ids = mutableListOf<String>()
+
+            this.resizeAndUpload(
+                    attachmentsKey,
+                    userId,
+                    attachment,
+                    originalData,
+                    ImageResizer.DEFAULT_PREVIEW_SIZE_PX
+            ).also {
+                if(it.isNotEmpty()) ids.add(it)
+            }
+
+            this.resizeAndUpload(
+                    attachmentsKey,
+                    userId,
+                    attachment,
+                    originalData,
+                    ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX
+            ).also {
+                if(it.isNotEmpty()) ids.add(it)
+            }
+
+            ids
+        } else {
+            listOf()
+        }
+    }
+
+    private fun resizeAndUpload(
+            attachmentsKey: GCKey,
+            userId: String,
+            attachment: Attachment,
+            originalData: ByteArray,
+            targetHeight: Int
+    ): String {
+        val downscaledImage = try {
+            imageResizer.resizeToHeight(originalData, targetHeight, ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT)
+        } catch (exception: ImageResizeException.JpegWriterMissing) {
+            Log.error(exception, exception.message)
+            return ""
+        }
+
+        return if(downscaledImage == null) {
+            attachment.id ?: ""  //Nothing to upload
+        } else {
+            fileService.uploadFile(attachmentsKey, userId, downscaledImage).blockingGet()
+        }
+    }
 
     companion object {
         const val SPLIT_CHAR = "#"

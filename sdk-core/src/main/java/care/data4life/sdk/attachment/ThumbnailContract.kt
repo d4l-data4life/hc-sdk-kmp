@@ -16,21 +16,16 @@
 
 package care.data4life.sdk.attachment
 
-import care.data4life.sdk.fhir.Fhir3Attachment
-import care.data4life.sdk.fhir.Fhir3DateTimeParser
+import care.data4life.crypto.GCKey
 import care.data4life.sdk.wrappers.definitions.Attachment
 
-internal object FhirDateValidator: AttachmentContract.FhirDateValidator {
-    private val validationFhir3Date = Fhir3DateTimeParser.parseDateTime(
-            "2019-09-15"
-    )
-
-    private fun validateFhir3Date(attachment: Fhir3Attachment): Boolean {
-        return attachment.creation?.date?.toDate()?.after(validationFhir3Date.date.toDate()) ?: false
+interface ThumbnailContract {
+    interface Service {
+        fun uploadDownscaledImages(
+                attachmentsKey: GCKey,
+                userId: String,
+                attachment: Attachment,
+                originalData: ByteArray
+        ): List<String>
     }
-
-    override fun validateDate(attachment: Attachment): Boolean {
-        return validateFhir3Date(attachment.unwrap() as Fhir3Attachment)
-    }
-
 }

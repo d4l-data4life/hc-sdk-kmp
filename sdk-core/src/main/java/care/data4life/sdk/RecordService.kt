@@ -233,14 +233,14 @@ class RecordService(
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Fhir3Resource> fetchFhir3Record(
-            recordId: String,
-            userId: String
+            userId: String,
+            recordId: String
     ): Single<Record<T>> = _fetchRecord<T>(recordId, userId) as Single<Record<T>>
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Fhir4Resource> fetchFhir4Record(
-            recordId: String,
-            userId: String
+            userId: String,
+            recordId: String
     ): Single<Fhir4Record<T>> = _fetchRecord<T>(recordId, userId) as Single<Fhir4Record<T>>
 
     @Suppress("UNCHECKED_CAST")

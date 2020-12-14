@@ -64,7 +64,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
         every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
 
         // When
-        val observer = recordService.fetchFhir3Record<CarePlan>(RECORD_ID, USER_ID).test().await()
+        val observer = recordService.fetchFhir3Record<CarePlan>(USER_ID, RECORD_ID).test().await()
 
         // Then
         val record = observer

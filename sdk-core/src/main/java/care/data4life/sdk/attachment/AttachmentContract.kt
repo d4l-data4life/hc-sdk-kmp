@@ -17,7 +17,6 @@
 package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.wrappers.definitions.Attachment
 import io.reactivex.Single
@@ -26,7 +25,6 @@ import io.reactivex.Single
 interface AttachmentContract {
 
     interface Service {
-
         fun upload(
                 attachments: List<Attachment>,
                 attachmentsKey: GCKey,
@@ -46,6 +44,6 @@ interface AttachmentContract {
     }
 
     interface FhirDateValidator {
-        fun validateFhirDate(attachment: Attachment): Boolean
+        fun validateDate(attachment: Attachment): Boolean
     }
 }

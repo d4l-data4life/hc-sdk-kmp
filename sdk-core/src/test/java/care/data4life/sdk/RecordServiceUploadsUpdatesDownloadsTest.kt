@@ -37,6 +37,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 
+/*
 class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
     @Before
     fun setup() {
@@ -1571,3 +1572,5 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         Truth.assertThat(response.identifier!!.assigner!!.reference).isEqualTo(PARTNER_ID)
     }
 }
+
+ */

@@ -42,11 +42,11 @@ class AttachmentService internal constructor(
             userId: String
     ): Single<List<Pair<Attachment, List<String>>>> {
         return Observable.fromIterable(attachments)
-                .filter { attachment -> attachment.data != null }
+                .filter { it.data != null }
                 .map { attachment ->
                     val originalData = decode(attachment.data!!)
                     attachment.id = fileService.uploadFile(attachmentsKey, userId, originalData).blockingGet()
-                    var additionalIds = uploadDownscaledImages(attachmentsKey, userId, attachment, originalData)
+                    val additionalIds = uploadDownscaledImages(attachmentsKey, userId, attachment, originalData)
                     Pair(attachment, additionalIds)
                 }
                 .filter { (first) -> first.id != null }
@@ -66,12 +66,15 @@ class AttachmentService internal constructor(
                     var attachmentId = attachment.id
                     var isPreview = false
                     if (attachment.id!!.contains(SPLIT_CHAR)) {
-                        attachmentId = attachment.id!!.split(SPLIT_CHAR).toTypedArray()[DOWNSCALED_ATTACHMENT_ID_POS]
+                        attachmentId = attachment.id!!.split(SPLIT_CHAR)[DOWNSCALED_ATTACHMENT_ID_POS]
                         isPreview = true
                     }
                     val data = fileService.downloadFile(attachmentsKey, userId, attachmentId!!).blockingGet()
 
-                    if (!isPreview && validateFhirDate(attachment) && attachment.hash != encodeToString(sha1(data))) {
+                    if (!isPreview &&
+                            FhirDateValidator.validateDate(attachment) &&
+                            attachment.hash != encodeToString(sha1(data))
+                    ) {
                         throw DataValidationException.InvalidAttachmentPayloadHash(
                                 "Attachment.hash is not valid")
                     } else {
@@ -105,7 +108,11 @@ class AttachmentService internal constructor(
                         userId,
                         attachment,
                         originalData,
-                        if (position == POSITION_PREVIEW) ImageResizer.DEFAULT_PREVIEW_SIZE_PX else ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX
+                        if (position == POSITION_PREVIEW) {
+                            ImageResizer.DEFAULT_PREVIEW_SIZE_PX
+                        } else {
+                            ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX
+                        }
                 )
                 if (downscaledId != null)
                     additionalIds.add(downscaledId)
@@ -136,6 +143,5 @@ class AttachmentService internal constructor(
     companion object {
         private const val DOWNSCALED_ATTACHMENT_ID_POS = 1
         private const val POSITION_PREVIEW = 0
-        private const val HASH_VALIDATION_DATE = "2019-09-15"
     }
 }

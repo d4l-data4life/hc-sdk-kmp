@@ -36,6 +36,7 @@ import org.mockito.Mockito
 import org.mockito.Mockito.times
 import java.io.IOException
 
+/*
 class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
     @Before
     fun setUp() {
@@ -346,3 +347,5 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
         inOrder.verifyNoMoreInteractions()
     }
 }
+
+ */

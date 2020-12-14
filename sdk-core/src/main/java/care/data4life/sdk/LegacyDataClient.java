@@ -218,14 +218,22 @@ public class LegacyDataClient implements SdkContract.LegacyDataClient {
     @Override
     public Task downloadAttachment(String recordId, String attachmentId, DownloadType type, ResultListener<Attachment> listener) {
         Single<Attachment> operation = userService.getUID()
-                .flatMap(uid -> recordService.downloadAttachment(recordId, attachmentId, uid, type));
+                .flatMap(uid -> recordService.downloadAttachment(recordId, attachmentId, uid, type))
+                .map(attachment -> (Attachment) attachment.unwrap());
         return handler.executeSingle(operation, listener);
     }
 
     @Override
     public Task downloadAttachments(String recordId, List<String> attachmentIds, DownloadType type, ResultListener<List<Attachment>> listener) {
         Single<List<Attachment>> operation = userService.getUID()
-                .flatMap(uid -> recordService.downloadAttachments(recordId, attachmentIds, uid, type));
+                .flatMap(uid -> recordService.downloadAttachments(recordId, attachmentIds, uid, type))
+                .map(attachments -> {
+                    List<Attachment> rawAttachments = new ArrayList<>(attachments.size());
+                    for(care.data4life.sdk.wrappers.definitions.Attachment attachment: attachments) {
+                        rawAttachments.add((Attachment) attachment.unwrap());
+                    }
+                    return rawAttachments;
+                });
         return handler.executeSingle(operation, listener);
     }
 

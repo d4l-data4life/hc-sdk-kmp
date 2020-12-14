@@ -41,7 +41,7 @@ class FhirDateValidationTest {
         fhirAttachment.creation = null
 
         // Then
-        assertFalse(FhirDateValidator.validateFhirDate(SdkFhir3Attachment(fhirAttachment)))
+        assertFalse(FhirDateValidator.validateDate(SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
@@ -55,7 +55,7 @@ class FhirDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertFalse(FhirDateValidator.validateFhirDate(SdkFhir3Attachment(fhirAttachment)))
+        assertFalse(FhirDateValidator.validateDate(SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
@@ -71,7 +71,7 @@ class FhirDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertFalse(FhirDateValidator.validateFhirDate(SdkFhir3Attachment(fhirAttachment)))
+        assertFalse(FhirDateValidator.validateDate(SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
@@ -85,7 +85,7 @@ class FhirDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertFalse(FhirDateValidator.validateFhirDate(SdkFhir3Attachment(fhirAttachment)))
+        assertFalse(FhirDateValidator.validateDate(SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
@@ -99,6 +99,6 @@ class FhirDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertTrue(FhirDateValidator.validateFhirDate(SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(FhirDateValidator.validateDate(SdkFhir3Attachment(fhirAttachment)))
     }
 }

@@ -15,47 +15,7 @@
  */
 package care.data4life.sdk
 
-import care.data4life.fhir.stu3.model.Attachment
-import care.data4life.fhir.stu3.model.CarePlan
-import care.data4life.fhir.stu3.model.DocumentReference
-import care.data4life.fhir.stu3.model.DocumentReference.DocumentReferenceContent
-import care.data4life.fhir.stu3.model.DomainResource
-import care.data4life.fhir.stu3.model.Identifier
-import care.data4life.fhir.stu3.model.Organization
-import care.data4life.fhir.stu3.util.FhirAttachmentHelper
-import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
-import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
-import care.data4life.sdk.config.DataRestrictionException
-import care.data4life.sdk.lang.D4LException
-import care.data4life.sdk.lang.DataValidationException
-import care.data4life.sdk.model.DownloadType
-import care.data4life.sdk.model.SdkRecordFactory
-import care.data4life.sdk.model.definitions.BaseRecord
-import care.data4life.sdk.network.model.DecryptedRecord
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
-import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
-import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import care.data4life.sdk.test.util.AttachmentBuilder
-import care.data4life.sdk.util.Base64.encodeToString
-import care.data4life.sdk.util.MimeType
-import com.google.common.truth.Truth
-import io.mockk.every
-import io.mockk.mockkClass
-import io.mockk.verify
-import io.reactivex.Completable
-import io.reactivex.Single
-import org.junit.After
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Ignore
-import org.junit.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito
-import org.mockito.Mockito.times
-import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalDateTime
-import java.io.IOException
-
+/*
 class RecordServiceTest : RecordServiceTestBase() {
 
     @Before
@@ -1103,3 +1063,5 @@ class RecordServiceTest : RecordServiceTestBase() {
         Truth.assertThat(errors[0]!!.message).isEqualTo("Please provide correct attachment ids!")
     }
 }
+
+ */

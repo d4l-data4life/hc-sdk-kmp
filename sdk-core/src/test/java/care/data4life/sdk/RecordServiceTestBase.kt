@@ -16,48 +16,7 @@
 
 package care.data4life.sdk
 
-import care.data4life.crypto.GCKey
-import care.data4life.fhir.stu3.model.Attachment
-import care.data4life.fhir.stu3.model.CarePlan
-import care.data4life.fhir.stu3.model.DocumentReference
-import care.data4life.fhir.stu3.model.DomainResource
-import care.data4life.fhir.stu3.util.FhirAttachmentHelper
-import care.data4life.sdk.attachment.AttachmentContract
-import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
-import care.data4life.sdk.data.DataResource
-import care.data4life.sdk.fhir.FhirService
-import care.data4life.sdk.lang.D4LException
-import care.data4life.sdk.model.Meta
-import care.data4life.sdk.model.ModelVersion
-import care.data4life.sdk.model.Record
-import care.data4life.sdk.model.SdkRecordFactory
-import care.data4life.sdk.model.definitions.DataRecord
-import care.data4life.sdk.model.definitions.RecordFactory
-import care.data4life.sdk.network.DecryptedRecordBuilderImpl
-import care.data4life.sdk.network.model.EncryptedKey
-import care.data4life.sdk.network.model.EncryptedRecord
-import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
-import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
-import care.data4life.sdk.tag.TagEncryptionService
-import care.data4life.sdk.tag.TaggingService
-import care.data4life.sdk.test.util.AttachmentBuilder
-import care.data4life.sdk.util.Base64
-import io.mockk.every
-import io.mockk.mockkConstructor
-import io.mockk.mockkObject
-import io.mockk.mockkStatic
-import io.mockk.unmockkAll
-import org.mockito.ArgumentMatchers
-import org.mockito.InOrder
-import org.mockito.Mockito
-import org.mockito.MockitoSession
-import org.threeten.bp.Clock
-import org.threeten.bp.LocalDate
-import org.threeten.bp.ZoneId
-import org.threeten.bp.format.DateTimeFormatter
-import java.util.*
-
+/*
 abstract class RecordServiceTestBase {
     //SUT
     internal lateinit var recordService: RecordService
@@ -268,3 +227,5 @@ abstract class RecordServiceTestBase {
         }
     }
 }
+
+ */

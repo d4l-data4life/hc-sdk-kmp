@@ -31,7 +31,6 @@ import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
-import care.data4life.sdk.model.AppDataRecord
 import care.data4life.sdk.model.CreateResult
 import care.data4life.sdk.model.DeleteResult
 import care.data4life.sdk.model.DownloadResult
@@ -101,7 +100,7 @@ class RecordService(
 
     @Deprecated("")
     internal enum class RemoveRestoreOperation {
-        REMOVE, RESTORE
+        RESTORE
     }
 
     private val recordFactory: RecordFactory = SdkRecordFactory
@@ -151,7 +150,6 @@ class RecordService(
     @Suppress("UNCHECKED_CAST")
     @Throws(DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class)
-    @JvmOverloads
     override fun <T : Fhir3Resource> createRecord(
             userId: String,
             resource: T,
@@ -477,9 +475,7 @@ class RecordService(
 
                     decryptedRecord.also {
                         (it as DecryptedBaseRecord<T>).resource = resource
-                        if (annotations != null) {
-                            it.annotations = annotations
-                        }
+                        it.annotations = annotations
                     }
 
                 }

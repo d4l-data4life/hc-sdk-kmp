@@ -25,7 +25,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import java.io.IOException
-
+/*
 class RecordServiceCountRecordsTest : RecordServiceTestBase() {
     @Before
     fun setup() {
@@ -132,3 +132,5 @@ class RecordServiceCountRecordsTest : RecordServiceTestBase() {
         inOrder.verifyNoMoreInteractions()
     }
 }
+
+ */

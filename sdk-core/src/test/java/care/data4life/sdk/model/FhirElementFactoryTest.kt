@@ -17,7 +17,7 @@
 package care.data4life.sdk.model
 
 import care.data4life.fhir.stu3.model.DocumentReference
-import care.data4life.sdk.RecordServiceTestBase
+import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.definitions.FhirElementFactory
 import care.data4life.sdk.test.util.AttachmentBuilder
@@ -27,8 +27,12 @@ import org.junit.Test
 import java.util.ArrayList
 
 class FhirElementFactoryTest {
+    private fun buildDocRefContent(attachment: Fhir3Attachment): DocumentReference.DocumentReferenceContent {
+        return DocumentReference.DocumentReferenceContent(attachment)
+    }
+
     private fun buildDocumentReference(): DocumentReference {
-        val content = RecordServiceTestBase.buildDocRefContent(AttachmentBuilder.buildAttachment(null))
+        val content = buildDocRefContent(AttachmentBuilder.buildAttachment(null))
         val contents: MutableList<DocumentReference.DocumentReferenceContent> = ArrayList()
         contents.add(content)
         return DocumentReference(

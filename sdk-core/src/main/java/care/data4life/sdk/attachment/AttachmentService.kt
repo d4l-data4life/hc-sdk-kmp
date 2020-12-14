@@ -16,17 +16,15 @@
 package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
-import care.data4life.fhir.stu3.model.Attachment
-import care.data4life.fhir.stu3.util.FhirDateTimeParser
 import care.data4life.sdk.ImageResizer
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
-import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.lang.ImageResizeException
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
+import care.data4life.sdk.wrappers.definitions.Attachment
 import io.reactivex.Observable
 import io.reactivex.Single
 import java.util.*
@@ -34,12 +32,12 @@ import java.util.*
 // TODO add internal
 class AttachmentService internal constructor(
         private val fileService: FileService,
-        // TODO move imageResizer to thumbnail service
+        // TODO move imageResizer to tumbnail service
         private val imageResizer: ImageResizer
 ) : AttachmentContract.Service {
 
     override fun upload(
-            attachments: List<Fhir3Attachment>,
+            attachments: List<Attachment>,
             attachmentsKey: GCKey,
             userId: String
     ): Single<List<Pair<Attachment, List<String>>>> {
@@ -72,8 +70,8 @@ class AttachmentService internal constructor(
                         isPreview = true
                     }
                     val data = fileService.downloadFile(attachmentsKey, userId, attachmentId!!).blockingGet()
-                    val validationDate = FhirDateTimeParser.parseDateTime(HASH_VALIDATION_DATE)
-                    if (!isPreview && attachment.creation!!.date.toDate().after(validationDate.date.toDate()) && attachment.hash != encodeToString(sha1(data))) {
+
+                    if (!isPreview && validateFhirDate(attachment) && attachment.hash != encodeToString(sha1(data))) {
                         throw DataValidationException.InvalidAttachmentPayloadHash(
                                 "Attachment.hash is not valid")
                     } else {

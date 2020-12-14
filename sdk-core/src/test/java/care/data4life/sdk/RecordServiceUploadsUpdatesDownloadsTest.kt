@@ -21,6 +21,7 @@ import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.DecryptedRecord
+import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.test.util.AttachmentBuilder
 import care.data4life.sdk.test.util.MedicationBuilder
 import care.data4life.sdk.test.util.ObservationBuilder
@@ -53,21 +54,21 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadOrDownloadData_calls__uploadData() {
         // Given
-        Mockito.doReturn(mockDecryptedFhirRecord).`when`(recordService)._uploadData(
-                mockDecryptedFhirRecord,
+        Mockito.doReturn(mockDecryptedFhir3Record).`when`(recordService)._uploadData(
+                mockDecryptedFhir3Record,
                 USER_ID
         )
 
         // When
         val record = recordService.uploadOrDownloadData(RecordService.UploadDownloadOperation.UPLOAD,
-                mockDecryptedFhirRecord,
+                mockDecryptedFhir3Record,
                 null,
                 USER_ID
         )
 
         // Then
-        Truth.assertThat(record).isEqualTo(mockDecryptedFhirRecord)
-        inOrder.verify(recordService)._uploadData(mockDecryptedFhirRecord, USER_ID)
+        Truth.assertThat(record).isEqualTo(mockDecryptedFhir3Record)
+        inOrder.verify(recordService)._uploadData(mockDecryptedFhir3Record, USER_ID)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -77,18 +78,48 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadData_calls__uploadData_when_no_new_resource_was_given() {
         // Given
-        Mockito.doReturn(mockDecryptedFhirRecord).`when`(recordService)._uploadData(
-                mockDecryptedFhirRecord,
+        Mockito.doReturn(mockDecryptedFhir3Record).`when`(recordService)._uploadData(
+                mockDecryptedFhir3Record,
                 USER_ID
         )
 
         // When
-        val record = recordService.uploadData(mockDecryptedFhirRecord, null, USER_ID)
+        val record = recordService.uploadData(mockDecryptedFhir3Record, null, USER_ID)
 
         // Then
-        Truth.assertThat(record).isEqualTo(mockDecryptedFhirRecord)
-        inOrder.verify(recordService).uploadData(mockDecryptedFhirRecord, null, USER_ID)
-        inOrder.verify(recordService)._uploadData(mockDecryptedFhirRecord, USER_ID)
+        Truth.assertThat(record).isEqualTo(mockDecryptedFhir3Record)
+        inOrder.verify(recordService).uploadData(mockDecryptedFhir3Record, null, USER_ID)
+        inOrder.verify(recordService)._uploadData(mockDecryptedFhir3Record, USER_ID)
+        inOrder.verifyNoMoreInteractions()
+    }
+
+    @Test
+    @Ignore
+    fun `Given, _uploadData is called with a non DecryptedFhirRecord and UserId, it reflects it`() {
+        // Given
+        val document = buildDocumentReference()
+
+        @Suppress("UNCHECKED_CAST")
+        val decryptedRecord = Mockito.mock(DecryptedBaseRecord::class.java) as DecryptedBaseRecord<Any>
+
+        val downscaledIds = listOf("downscaledId_1", "downscaledId_2")
+        val uploadResult = listOf(Pair(document.content[0].attachment, downscaledIds))
+        Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
+        Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
+        Mockito.`when`(recordService.getValidHash(document.content[0].attachment)).thenReturn(DATA_HASH)
+        Mockito.`when`(mockAttachmentService.upload(
+                ArgumentMatchers.any(),
+                ArgumentMatchers.eq(mockAttachmentKey),
+                ArgumentMatchers.eq(USER_ID))
+        ).thenReturn(Single.just(uploadResult))
+
+        // When
+        val record = recordService._uploadData(decryptedRecord, USER_ID)
+
+        // Then
+        Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
+
+        inOrder.verify(recordService)._uploadData(decryptedRecord, USER_ID)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -275,23 +306,23 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadOrDownloadData_calls_updateData() {
         // Given
-        Mockito.doReturn(mockDecryptedFhirRecord).`when`(recordService).updateData(
-                mockDecryptedFhirRecord,
+        Mockito.doReturn(mockDecryptedFhir3Record).`when`(recordService).updateData(
+                mockDecryptedFhir3Record,
                 mockDocumentReference,
                 USER_ID
         )
 
         // When
         val record = recordService.uploadOrDownloadData(RecordService.UploadDownloadOperation.UPDATE,
-                mockDecryptedFhirRecord,
+                mockDecryptedFhir3Record,
                 mockDocumentReference,
                 USER_ID
         )
 
         // Then
-        Truth.assertThat(record).isEqualTo(mockDecryptedFhirRecord)
+        Truth.assertThat(record).isEqualTo(mockDecryptedFhir3Record)
         inOrder.verify(recordService).updateData(
-                mockDecryptedFhirRecord,
+                mockDecryptedFhir3Record,
                 mockDocumentReference,
                 USER_ID
         )
@@ -304,33 +335,78 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadData_calls_updateData_when_a_new_resource_was_given() {
         // Given
-        Mockito.doReturn(mockDecryptedFhirRecord).`when`(recordService).updateData(
-                mockDecryptedFhirRecord,
+        Mockito.doReturn(mockDecryptedFhir3Record).`when`(recordService).updateData(
+                mockDecryptedFhir3Record,
                 mockDocumentReference,
                 USER_ID
         )
 
         // When
         val record = recordService.uploadData(
-                mockDecryptedFhirRecord,
+                mockDecryptedFhir3Record,
                 mockDocumentReference,
                 USER_ID
         )
 
         // Then
-        Truth.assertThat(record).isEqualTo(mockDecryptedFhirRecord)
+        Truth.assertThat(record).isEqualTo(mockDecryptedFhir3Record)
         inOrder.verify(recordService).uploadData(
-                mockDecryptedFhirRecord,
+                mockDecryptedFhir3Record,
                 mockDocumentReference,
                 USER_ID
         )
         inOrder.verify(recordService).updateData(
-                mockDecryptedFhirRecord,
+                mockDecryptedFhir3Record,
                 mockDocumentReference,
                 USER_ID
         )
         inOrder.verifyNoMoreInteractions()
     }
+
+    @Test
+    @Ignore
+    fun `Given, updateData is called with a non DecryptedFhirRecord, DomainResource and UserId, it reflects it`() {
+        // Given
+        @Suppress("UNCHECKED_CAST")
+        val decryptedRecord = Mockito.mock(DecryptedBaseRecord::class.java) as DecryptedBaseRecord<Any>
+
+        val oldDocument = buildDocumentReference()
+        val oldAttachment = oldDocument.content[0].attachment
+        oldAttachment.id = "id"
+        oldAttachment.size = 0
+        oldAttachment.hash = "hash"
+        val updatedHash = "hash2"
+        val updatedDocument = buildDocumentReference()
+        val updatedAttachment = updatedDocument.content[0].attachment
+        updatedAttachment.id = "id"
+        updatedAttachment.size = 0
+        updatedAttachment.hash = updatedHash
+
+        val downscaledIds = listOf("downscaledId_1", "downscaledId_2")
+        val uploadResult = listOf(
+                Pair(updatedDocument.content[0].attachment, downscaledIds)
+        )
+        Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
+        Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
+        Mockito.`when`(recordService.getValidHash(updatedDocument.content[0].attachment))
+                .thenReturn(DATA_HASH)
+        Mockito.`when`(mockAttachmentService.upload(
+                ArgumentMatchers.eq(listOf(updatedAttachment)),
+                ArgumentMatchers.eq(mockAttachmentKey),
+                ArgumentMatchers.eq(USER_ID))
+        ).thenReturn(Single.just(uploadResult))
+        Mockito.`when`(recordService.getValidHash(updatedDocument.content[0].attachment)).thenReturn(updatedHash)
+
+        // When
+        val record = recordService.updateData(decryptedRecord, updatedDocument, USER_ID)
+
+        // Then
+        Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
+
+        inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID)
+        inOrder.verifyNoMoreInteractions()
+    }
+
 
     @Test
     @Ignore
@@ -394,9 +470,11 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
     @Throws(DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
-    fun updateData_throws_CoreRuntimeExceptionUnsupportedOperation_whenNewResourceIsNull() {
+    fun `Given, updateData is called with a DecryptedFhirRecord, a non FhirResource and a UserId, it fails with a CoreRuntimeExceptionUnsupportedOperation`() {
         // Given
         val document = buildDocumentReference()
+
+        @Suppress("UNCHECKED_CAST")
         val decryptedRecord = DecryptedRecord(
                 RECORD_ID,
                 document,
@@ -407,10 +485,11 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 null,
                 null,
                 -1
-        )
+        ) as DecryptedBaseRecord<Any>
+
         try {
             // When
-            recordService.updateData(decryptedRecord, null, USER_ID)
+            recordService.updateData(decryptedRecord, "something", USER_ID)
         } catch (e: CoreRuntimeException) {
             // Then
             Truth.assertThat(e.javaClass).isEqualTo(CoreRuntimeException.UnsupportedOperation::class.java)
@@ -694,23 +773,48 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadOrDownloadData_calls_downloadData() {
         // Given
-        Mockito.doReturn(mockDecryptedFhirRecord).`when`(recordService).downloadData(mockDecryptedFhirRecord, USER_ID)
+        Mockito.doReturn(mockDecryptedFhir3Record).`when`(recordService).downloadData(mockDecryptedFhir3Record, USER_ID)
 
         // When
         val record = recordService.uploadOrDownloadData(RecordService.UploadDownloadOperation.DOWNLOAD,
-                mockDecryptedFhirRecord,
+                mockDecryptedFhir3Record,
                 null,
                 USER_ID
         )
 
         // Then
-        Truth.assertThat(record).isEqualTo(mockDecryptedFhirRecord)
+        Truth.assertThat(record).isEqualTo(mockDecryptedFhir3Record)
         inOrder.verify(recordService).uploadOrDownloadData(RecordService.UploadDownloadOperation.DOWNLOAD,
-                mockDecryptedFhirRecord,
+                mockDecryptedFhir3Record,
                 null,
                 USER_ID
         )
-        inOrder.verify(recordService).downloadData(mockDecryptedFhirRecord, USER_ID)
+        inOrder.verify(recordService).downloadData(mockDecryptedFhir3Record, USER_ID)
+        inOrder.verifyNoMoreInteractions()
+    }
+
+    @Test
+    @Ignore
+    @Throws(DataValidationException.IdUsageViolation::class, DataValidationException.InvalidAttachmentPayloadHash::class)
+    fun `Given, downloadData is called with a non DecryptedFhirRecord and a UserId, it reflects it`() {
+        // Given
+        val document = buildDocumentReference()
+        document.content[0].attachment.id = "id"
+        @Suppress("UNCHECKED_CAST")
+        val decryptedRecord = Mockito.mock(DecryptedBaseRecord::class.java) as DecryptedBaseRecord<Any>
+        Mockito.`when`(mockAttachmentService.download(
+                ArgumentMatchers.any(),
+                ArgumentMatchers.eq(mockAttachmentKey),
+                ArgumentMatchers.eq(USER_ID))
+        ).thenReturn(Single.just(arrayListOf()))
+
+        // When
+        val record = recordService.downloadData(decryptedRecord, USER_ID)
+
+        // Then
+        Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
+
+        inOrder.verify(recordService).downloadData(decryptedRecord, USER_ID)
         inOrder.verifyNoMoreInteractions()
     }
 

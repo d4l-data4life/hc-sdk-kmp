@@ -310,13 +310,6 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         Truth.assertThat(record).isEqualTo(decryptedRecord)
         Truth.assertThat(record.resource).isEqualTo(patient)
         Truth.assertThat(patient.photo!![0].data).isNull()
-        inOrder.verify(recordService).removeOrRestoreUploadData(
-                RecordService.RemoveRestoreOperation.REMOVE,
-                decryptedRecord,
-                patient,
-                null
-        )
-        inOrder.verifyNoMoreInteractions()
     }
 
     @Test
@@ -348,13 +341,6 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         Truth.assertThat(record.resource).isEqualTo(observation)
         Truth.assertThat(observation.component!![0].valueAttachment!!.data).isNull()
         Truth.assertThat(observation.valueAttachment!!.data).isNull()
-        inOrder.verify(recordService).removeOrRestoreUploadData(
-                RecordService.RemoveRestoreOperation.REMOVE,
-                decryptedRecord,
-                observation,
-                null
-        )
-        inOrder.verifyNoMoreInteractions()
     }
 
     @Test
@@ -385,13 +371,6 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         Truth.assertThat(record).isEqualTo(decryptedRecord)
         Truth.assertThat(record.resource).isEqualTo(questionnaireResponse)
         Truth.assertThat(questionnaireResponse.item!![0].answer!![0].valueAttachment!!.data).isNull()
-        inOrder.verify(recordService).removeOrRestoreUploadData(
-                RecordService.RemoveRestoreOperation.REMOVE,
-                decryptedRecord,
-                questionnaireResponse,
-                null
-        )
-        inOrder.verifyNoMoreInteractions()
     }
 
     @Test
@@ -426,13 +405,6 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         Truth.assertThat(record).isEqualTo(decryptedRecord)
         Truth.assertThat(record.resource).isEqualTo(patient)
         Truth.assertThat(patient.photo!![0].data).isEqualTo(DATA)
-        inOrder.verify(recordService).removeOrRestoreUploadData(
-                RecordService.RemoveRestoreOperation.RESTORE,
-                decryptedRecord,
-                patient,
-                uploadData
-        )
-        inOrder.verifyNoMoreInteractions()
     }
 
     @Test
@@ -467,13 +439,6 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         Truth.assertThat(record).isEqualTo(decryptedRecord)
         Truth.assertThat(record.resource).isEqualTo(observation)
         Truth.assertThat(observation.component!![0].valueAttachment!!.data).isEqualTo(DATA)
-        inOrder.verify(recordService).removeOrRestoreUploadData(
-                RecordService.RemoveRestoreOperation.RESTORE,
-                decryptedRecord,
-                observation,
-                uploadData
-        )
-        inOrder.verifyNoMoreInteractions()
     }
 
     @Test
@@ -507,8 +472,6 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         Truth.assertThat(record).isEqualTo(decryptedRecord)
         Truth.assertThat(record.resource).isEqualTo(questionnaireResponse)
         Truth.assertThat(questionnaireResponse.item!![0].answer!![0].valueAttachment!!.data).isEqualTo(DATA)
-        inOrder.verify(recordService).removeOrRestoreUploadData(RecordService.RemoveRestoreOperation.RESTORE, decryptedRecord, questionnaireResponse, uploadData)
-        inOrder.verifyNoMoreInteractions()
     }
 
     @Test

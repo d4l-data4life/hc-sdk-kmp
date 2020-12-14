@@ -21,6 +21,7 @@ import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.fhir.stu3.model.CarePlan
 import care.data4life.fhir.stu3.model.DocumentReference
 import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.fhir.stu3.util.FhirAttachmentHelper
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.data.DataResource
@@ -29,14 +30,20 @@ import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
-import care.data4life.sdk.network.model.DecryptedRecord
+import care.data4life.sdk.model.SdkRecordFactory
+import care.data4life.sdk.model.definitions.DataRecord
+import care.data4life.sdk.model.definitions.RecordFactory
+import care.data4life.sdk.network.DecryptedRecordBuilderImpl
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
+import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
 import care.data4life.sdk.test.util.AttachmentBuilder
 import care.data4life.sdk.util.Base64
 import io.mockk.every
+import io.mockk.mockkConstructor
+import io.mockk.mockkObject
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import org.mockito.ArgumentMatchers
@@ -45,6 +52,7 @@ import org.mockito.Mockito
 import org.mockito.MockitoSession
 import org.threeten.bp.Clock
 import org.threeten.bp.LocalDate
+import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import java.util.*
 
@@ -72,15 +80,16 @@ abstract class RecordServiceTestBase {
     internal lateinit var mockEncryptedAttachmentKey: EncryptedKey
     internal lateinit var mockEncryptedRecord: EncryptedRecord
     internal lateinit var mockAnnotatedEncryptedRecord: EncryptedRecord
-    internal lateinit var mockDecryptedFhirRecord: DecryptedFhir3Record<DomainResource>
+    internal lateinit var mockDecryptedFhir3Record: DecryptedFhir3Record<DomainResource>
     internal lateinit var mockAnnotatedDecryptedFhirRecord: DecryptedFhir3Record<DomainResource>
     internal lateinit var mockDecryptedDataRecord: DecryptedDataRecord
     internal lateinit var mockMeta: Meta
     private lateinit var mockD4LException: D4LException
     internal lateinit var mockRecord: Record<CarePlan>
+    internal lateinit var mockDataRecord: DataRecord
     internal lateinit var inOrder: InOrder
-    internal lateinit var decryptedRecordIndicator: DecryptedRecord<DomainResource>
-    internal lateinit var annotatedDecryptedRecordIndicator: DecryptedRecord<DomainResource>
+    internal lateinit var mockDecryptedRecordBuilder: DecryptedRecordBuilder
+    internal lateinit var mockRecordFactory: RecordFactory
 
     private lateinit var mockitoSession: MockitoSession
 
@@ -120,20 +129,23 @@ abstract class RecordServiceTestBase {
         mockEncryptedAttachmentKey = Mockito.mock(EncryptedKey::class.java)
         mockEncryptedRecord = Mockito.mock(EncryptedRecord::class.java)
         mockAnnotatedEncryptedRecord = Mockito.mock(EncryptedRecord::class.java)
-        mockDecryptedFhirRecord = Mockito.mock(DecryptedFhir3Record::class.java) as DecryptedFhir3Record<DomainResource>
+        mockDecryptedFhir3Record = Mockito.mock(DecryptedFhir3Record::class.java) as DecryptedFhir3Record<DomainResource>
         mockAnnotatedDecryptedFhirRecord = Mockito.mock(DecryptedFhir3Record::class.java) as DecryptedFhir3Record<DomainResource>
         mockDecryptedDataRecord = Mockito.mock(DecryptedDataRecord::class.java)
         mockMeta = Mockito.mock(Meta::class.java)
         mockD4LException = Mockito.mock(D4LException::class.java)
-        mockRecord = Mockito.mock<Record<*>>(Record::class.java) as Record<CarePlan>
+        mockRecord = Mockito.mock(Record::class.java) as Record<CarePlan>
+        mockDataRecord = Mockito.mock(DataRecord::class.java)
+        mockDecryptedRecordBuilder = Mockito.mock(DecryptedRecordBuilderImpl::class.java)
+        mockRecordFactory = Mockito.mock(RecordFactory::class.java)
 
         Mockito.`when`(mockRecord.fhirResource).thenReturn(mockCarePlan)
         Mockito.`when`(mockRecord.meta).thenReturn(mockMeta)
 
-        Mockito.`when`<HashMap<*, *>?>(mockDecryptedFhirRecord.tags).thenReturn(mockTags)
-        Mockito.`when`(mockDecryptedFhirRecord.dataKey).thenReturn(mockDataKey)
-        Mockito.`when`(mockDecryptedFhirRecord.resource).thenReturn(mockCarePlan)
-        Mockito.`when`(mockDecryptedFhirRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
+        Mockito.`when`(mockDecryptedFhir3Record.tags).thenReturn(mockTags)
+        Mockito.`when`(mockDecryptedFhir3Record.dataKey).thenReturn(mockDataKey)
+        Mockito.`when`(mockDecryptedFhir3Record.resource).thenReturn(mockCarePlan)
+        Mockito.`when`(mockDecryptedFhir3Record.modelVersion).thenReturn(ModelVersion.CURRENT)
 
         Mockito.`when`<HashMap<*, *>?>(mockAnnotatedDecryptedFhirRecord.tags).thenReturn(mockTags)
         Mockito.`when`(mockAnnotatedDecryptedFhirRecord.dataKey).thenReturn(mockDataKey)
@@ -148,7 +160,6 @@ abstract class RecordServiceTestBase {
         Mockito.`when`(mockDecryptedDataRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
         Mockito.`when`(mockDecryptedDataRecord.annotations).thenReturn(ANNOTATIONS)
 
-
         Mockito.`when`(mockTags[RESOURCE_TYPE]).thenReturn(CarePlan.resourceType)
 
         Mockito.`when`(mockEncryptedRecord.encryptedTags).thenReturn(mockEncryptedTags)
@@ -156,14 +167,20 @@ abstract class RecordServiceTestBase {
         Mockito.`when`(mockEncryptedRecord.encryptedBody).thenReturn(ENCRYPTED_RESOURCE)
         Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
         Mockito.`when`(mockEncryptedRecord.identifier).thenReturn(RECORD_ID)
+        Mockito.`when`(mockEncryptedRecord.customCreationDate).thenReturn(CREATION_DATE)
 
         Mockito.`when`(mockAnnotatedEncryptedRecord.encryptedTags).thenReturn(mockEncryptedTags)
         Mockito.`when`(mockAnnotatedEncryptedRecord.encryptedDataKey).thenReturn(mockEncryptedDataKey)
         Mockito.`when`(mockAnnotatedEncryptedRecord.encryptedBody).thenReturn(ENCRYPTED_RESOURCE)
         Mockito.`when`(mockAnnotatedEncryptedRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
         Mockito.`when`(mockAnnotatedEncryptedRecord.identifier).thenReturn(RECORD_ID)
+        Mockito.`when`(mockAnnotatedEncryptedRecord.customCreationDate).thenReturn(CREATION_DATE)
 
         Mockito.`when`(mockErrorHandler.handleError(ArgumentMatchers.any(Exception::class.java))).thenReturn(mockD4LException)
+
+        mockkConstructor(DecryptedRecordBuilderImpl::class)
+        mockkObject(SdkRecordFactory)
+
         inOrder = Mockito.inOrder(
                 mockApiService,
                 mockTagEncryptionService,
@@ -172,35 +189,17 @@ abstract class RecordServiceTestBase {
                 mockAttachmentService,
                 mockCryptoService,
                 mockErrorHandler,
+                mockDecryptedRecordBuilder,
                 recordService
-        )
-
-        decryptedRecordIndicator = DecryptedRecord(
-                null,
-                mockCarePlan as DomainResource,
-                mockTags,
-                listOf(),
-                DATE_FORMATTER.format(LOCAL_DATE),
-                null,
-                mockDataKey,
-                null,
-                ModelVersion.CURRENT
-        )
-
-        annotatedDecryptedRecordIndicator = DecryptedRecord(
-                null,
-                mockCarePlan as DomainResource,
-                mockTags,
-                ANNOTATIONS,
-                DATE_FORMATTER.format(LOCAL_DATE),
-                null,
-                mockDataKey,
-                null,
-                ModelVersion.CURRENT
         )
 
         mockkStatic(LocalDate::class)
         every { LocalDate.now(any() as Clock) } returns LOCAL_DATE
+
+        mockkStatic(DateTimeFormatter::class)
+        every { DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US) } returns DATE_FORMATTER
+
+        mockkStatic(FhirAttachmentHelper::class)
 
         mockitoSession = Mockito.mockitoSession().startMocking()
     }
@@ -233,7 +232,9 @@ abstract class RecordServiceTestBase {
                 THUMBNAIL_ID
         internal val LOCAL_DATE = LocalDate.of(2001, 1, 1)
         internal val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US)
+        internal val UTC_ZONE_ID = ZoneId.of("UTC")
         internal val ANNOTATIONS = listOf("potato", "tomato", "soup")
+        internal const val CREATION_DATE = "2020-05-03"
 
         fun buildDocumentReference(): DocumentReference {
             val content = buildDocRefContent(AttachmentBuilder.buildAttachment(null))

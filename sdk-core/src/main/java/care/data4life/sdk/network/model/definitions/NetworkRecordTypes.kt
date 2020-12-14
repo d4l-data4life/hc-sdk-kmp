@@ -26,22 +26,17 @@ internal interface DecryptedBaseRecord<T> {
     var tags: HashMap<String, String>?
     var annotations: List<String>
     var customCreationDate: String?
-    var updatedDate: String?
+    var updatedDate: String? //FIXME: This should never be null
     var dataKey: GCKey?
+    var attachmentsKey: GCKey?
     var modelVersion: Int
 }
 
-internal interface DecryptedFhirBaseRecord<T> : DecryptedBaseRecord<T> {
-    var attachmentsKey: GCKey?
-}
-
 // FIXME remove nullable type
-internal interface DecryptedFhir3Record<T : Fhir3Resource?> : DecryptedFhirBaseRecord<T>
-internal interface DecryptedFhir4Record<T : Fhir4Resource> : DecryptedFhirBaseRecord<T>
-
+internal interface DecryptedFhir3Record<T : Fhir3Resource?> : DecryptedBaseRecord<T>
+internal interface DecryptedFhir4Record<T : Fhir4Resource> : DecryptedBaseRecord<T>
 internal interface DecryptedDataRecord : DecryptedBaseRecord<ByteArray> {
-    fun copyWithResourceAnnotations(
-            data: ByteArray,
-            annotations: List<String>? = null
-    ): DecryptedDataRecord
+    override var attachmentsKey: GCKey?
+        get() = null
+        set(_) {}
 }

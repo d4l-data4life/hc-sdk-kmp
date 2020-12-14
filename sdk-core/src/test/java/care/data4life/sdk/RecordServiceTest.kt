@@ -29,11 +29,19 @@ import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.DownloadType
+import care.data4life.sdk.model.SdkRecordFactory
+import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.network.model.DecryptedRecord
+import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
+import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.test.util.AttachmentBuilder
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.MimeType
 import com.google.common.truth.Truth
+import io.mockk.every
+import io.mockk.mockkClass
+import io.mockk.verify
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.junit.After
@@ -43,6 +51,7 @@ import org.junit.Ignore
 import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
+import org.mockito.Mockito.times
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import java.io.IOException
@@ -60,6 +69,15 @@ class RecordServiceTest : RecordServiceTestBase() {
     }
 
     //region utility methods
+    @Test
+    fun `Given, extractUploadData is called with a non FhirResource, it returns null`() {
+        // When
+        val data = recordService.extractUploadData("something")
+        // Then
+        Truth.assertThat(data).isNull()
+    }
+
+
     @Test
     fun extractUploadData_shouldReturnExtractedData() {
         // Given
@@ -146,95 +164,132 @@ class RecordServiceTest : RecordServiceTestBase() {
     }
 
     @Test
-    fun removeUploadData_shouldCall_removeOrRestoreUploadData() {
+    fun `Given, removeOrRestoreUploadData is called with REMOVE, a DecryptedFhir3Record, a Resource and Attachment, it delegates it to removeUploadData`() {
         // Given
-        Mockito.doReturn(mockDecryptedFhirRecord)
+        val document = buildDocumentReference()
+
+        @Suppress("UNCHECKED_CAST")
+        val decryptedRecord = Mockito.mock(DecryptedFhir3Record::class.java) as DecryptedFhir3Record<DomainResource>
+
+        Mockito.doReturn(mockDecryptedFhir3Record)
                 .`when`(recordService)
-                .removeOrRestoreUploadData(
-                        RecordService.RemoveRestoreOperation.REMOVE,
-                        mockDecryptedFhirRecord,
-                        null,
-                        null
-                )
+                .removeUploadData(decryptedRecord)
 
         // When
-        val record = recordService.removeUploadData(mockDecryptedFhirRecord)
+        val record = recordService.removeOrRestoreUploadData(
+                RecordService.RemoveRestoreOperation.REMOVE,
+                decryptedRecord,
+                document,
+                mockUploadData
+        )
 
         // Then
-        Truth.assertThat(record).isEqualTo(mockDecryptedFhirRecord)
-        inOrder.verify(recordService).removeUploadData(mockDecryptedFhirRecord)
-        inOrder.verify(recordService).removeOrRestoreUploadData(
-                RecordService.RemoveRestoreOperation.REMOVE,
-                mockDecryptedFhirRecord,
-                null,
-                null
-        )
+        Truth.assertThat(record).isSameInstanceAs(mockDecryptedFhir3Record)
+
+        inOrder.verify(recordService).removeUploadData(decryptedRecord)
         inOrder.verifyNoMoreInteractions()
     }
 
     @Test
-    fun restoreUploadData_shouldCall_removeOrRestoreUploadData() {
+    @Ignore
+    fun `Given, removeUploadData is called with a non DecryptedFhir3Record, it reflects the given record`() {
         // Given
-        Mockito.doReturn(mockDecryptedFhirRecord)
+        @Suppress("UNCHECKED_CAST")
+        val decryptedRecord = Mockito.mock(DecryptedDataRecord::class.java) as DecryptedBaseRecord<Any>
+        val attachments = mutableListOf(
+                Mockito.mock(Attachment::class.java),
+                Mockito.mock(Attachment::class.java)
+        )
+
+        Mockito.`when`(decryptedRecord.resource).thenReturn(mockDataResource)
+
+        every { FhirAttachmentHelper.getAttachment(mockCarePlan) } returns attachments
+        every { FhirAttachmentHelper.updateAttachmentData(mockCarePlan, null) } returns Unit
+
+        // When
+        val record = recordService.removeUploadData(decryptedRecord)
+
+        // Then
+        Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
+
+        verify(exactly = 0) { FhirAttachmentHelper.getAttachment(mockCarePlan) }
+        verify(exactly = 0) { FhirAttachmentHelper.updateAttachmentData(mockCarePlan, null) }
+    }
+
+    @Test
+    fun `Given, removeUploadData is called with a DecryptedFhir3Record, it removes the existing Attachments`() {
+        // Given
+        @Suppress("UNCHECKED_CAST")
+        val decryptedRecord = Mockito.mock(DecryptedFhir3Record::class.java) as DecryptedFhir3Record<DomainResource>
+        val attachments = mutableListOf(
+                Mockito.mock(Attachment::class.java),
+                Mockito.mock(Attachment::class.java)
+        )
+
+        Mockito.`when`(decryptedRecord.resource).thenReturn(mockCarePlan)
+
+        every { FhirAttachmentHelper.getAttachment(mockCarePlan) } returns attachments
+        every { FhirAttachmentHelper.updateAttachmentData(mockCarePlan, null) } returns Unit
+
+        // When
+        val record = recordService.removeUploadData(decryptedRecord)
+
+        // Then
+        Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
+
+        verify(exactly = 1) { FhirAttachmentHelper.getAttachment(mockCarePlan) }
+        verify(exactly = 1) { FhirAttachmentHelper.updateAttachmentData(mockCarePlan, null) }
+    }
+
+    @Test
+    fun `Given, removeUploadData is called with a DecryptedFhir3Record, it does nothing, if no Attachments exists`() {
+        // Given
+        @Suppress("UNCHECKED_CAST")
+        val decryptedRecord = Mockito.mock(DecryptedFhir3Record::class.java) as DecryptedFhir3Record<DomainResource>
+
+        Mockito.`when`(decryptedRecord.resource).thenReturn(mockCarePlan)
+
+        every { FhirAttachmentHelper.getAttachment(mockCarePlan) } returns null
+        every { FhirAttachmentHelper.updateAttachmentData(mockCarePlan, null) } returns Unit
+
+        // When
+        val record = recordService.removeUploadData(decryptedRecord)
+
+        // Then
+        Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
+
+        verify(exactly = 1) { FhirAttachmentHelper.getAttachment(mockCarePlan) }
+        verify(exactly = 0) { FhirAttachmentHelper.updateAttachmentData(mockCarePlan, null) }
+    }
+
+    @Test
+    fun `Given, removeOrRestoreUploadData is called with RESTORE, a DecryptedFhir3Record, a Resource and Attachment, it delegates it to restoreUploadData`() {
+        // Given
+        val document = buildDocumentReference()
+
+        @Suppress("UNCHECKED_CAST")
+        val decryptedRecord = Mockito.mock(DecryptedFhir3Record::class.java) as DecryptedFhir3Record<DomainResource>
+
+        Mockito.doReturn(mockDecryptedFhir3Record)
                 .`when`(recordService)
-                .removeOrRestoreUploadData(RecordService.RemoveRestoreOperation.RESTORE,
-                        mockDecryptedFhirRecord,
-                        mockDocumentReference,
+                .restoreUploadData(
+                        decryptedRecord,
+                        document,
                         mockUploadData
                 )
 
         // When
-        val record = recordService.restoreUploadData(
-                mockDecryptedFhirRecord,
-                mockDocumentReference,
-                mockUploadData
-        )
-
-        // Then
-        Truth.assertThat(record).isEqualTo(mockDecryptedFhirRecord)
-        inOrder.verify(recordService).restoreUploadData(
-                mockDecryptedFhirRecord,
-                mockDocumentReference,
-                mockUploadData
-        )
-        inOrder.verify(recordService).removeOrRestoreUploadData(RecordService.RemoveRestoreOperation.RESTORE,
-                mockDecryptedFhirRecord,
-                mockDocumentReference,
-                mockUploadData
-        )
-        inOrder.verifyNoMoreInteractions()
-    }
-
-    @Test
-    fun removeOrRestoreUploadData_shouldRemoveUploadData() {
-        // Given
-        val document = buildDocumentReference()
-        val decryptedRecord = DecryptedRecord(
-                null,
-                document,
-                null,
-                arrayListOf(),
-                null,
-                null,
-                null,
-                null,
-                -1
-        )
-
-        // When
         val record = recordService.removeOrRestoreUploadData(
-                RecordService.RemoveRestoreOperation.REMOVE,
+                RecordService.RemoveRestoreOperation.RESTORE,
                 decryptedRecord,
                 document,
                 mockUploadData
         )
 
         // Then
-        Truth.assertThat(record).isEqualTo(decryptedRecord)
-        Truth.assertThat(record.resource).isEqualTo(document)
-        Truth.assertThat(document.content[0].attachment.data).isNull()
-        inOrder.verify(recordService).removeOrRestoreUploadData(
-                RecordService.RemoveRestoreOperation.REMOVE,
+        Truth.assertThat(record).isSameInstanceAs(mockDecryptedFhir3Record)
+
+        inOrder.verify(recordService).restoreUploadData(
                 decryptedRecord,
                 document,
                 mockUploadData
@@ -243,44 +298,198 @@ class RecordServiceTest : RecordServiceTestBase() {
     }
 
     @Test
-    fun removeOrRestoreUploadData_shouldRestoreUploadData() {
-        // Given
+    fun `Given, restoreUploadData is called with a non DecryptedFhir3Record, a Resource and Attachment, it reflects the given Record`() {
         val document = buildDocumentReference()
-        document.content[0].attachment.data = null
-        val decryptedRecord = DecryptedRecord(
-                null,
-                null,
-                null,
-                arrayListOf(),
-                null,
-                null,
-                null,
-                null,
-                -1
+        val decryptedRecord = mockkClass(DecryptedDataRecord::class)
+        val attachments = mutableListOf(
+                Mockito.mock(Attachment::class.java),
+                Mockito.mock(Attachment::class.java)
         )
-        val uploadData = HashMap<Attachment, String?>()
-        uploadData[document.content[0].attachment] = DATA
+
+        every { decryptedRecord.resource } returns mockDataResource.value
+        every { FhirAttachmentHelper.getAttachment(mockCarePlan) } returns attachments
+        every { FhirAttachmentHelper.updateAttachmentData(mockCarePlan, any()) } returns Unit
 
         // When
         @Suppress("UNCHECKED_CAST")
-        val record = recordService.removeOrRestoreUploadData(
-                RecordService.RemoveRestoreOperation.RESTORE,
-                decryptedRecord as DecryptedRecord<DocumentReference>,
+        val record = recordService.restoreUploadData(
+                decryptedRecord as DecryptedBaseRecord<Any>,
                 document,
-                uploadData
+                mockUploadData
         )
 
         // Then
-        Truth.assertThat(record).isEqualTo(decryptedRecord)
-        Truth.assertThat(record.resource).isEqualTo(document)
-        Truth.assertThat(document.content[0].attachment.data).isEqualTo(DATA)
-        inOrder.verify(recordService).removeOrRestoreUploadData(
-                RecordService.RemoveRestoreOperation.RESTORE,
+        Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
+
+        verify(exactly = 0) { decryptedRecord.resource = any() }
+    }
+
+    @Test
+    fun `Given, restoreUploadData is called with a DecryptedFhir3Record, a non FhirResource and Attachment, it reflects the given Record`() {
+        val document = "something"
+        val decryptedRecord = mockkClass(DecryptedFhir3Record::class)
+        val attachments = mutableListOf(
+                Mockito.mock(Attachment::class.java),
+                Mockito.mock(Attachment::class.java)
+        )
+
+        every { decryptedRecord.resource } returns mockCarePlan
+        every { FhirAttachmentHelper.getAttachment(mockCarePlan) } returns attachments
+        every { FhirAttachmentHelper.updateAttachmentData(mockCarePlan, any()) } returns Unit
+
+        // When
+        @Suppress("UNCHECKED_CAST")
+        val record = recordService.restoreUploadData(
+                decryptedRecord as DecryptedBaseRecord<Any>,
+                document,
+                mockUploadData
+        )
+
+        // Then
+        Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
+    }
+
+    @Test
+    fun `Given, restoreUploadData is called with a DecryptedFhir3Record, a Resource and Attachment, it sets the given Resource to the DecryptedFhir3Record`() {
+        val document = buildDocumentReference()
+
+        @Suppress("UNCHECKED_CAST")
+        val decryptedRecord = Mockito.mock(DecryptedFhir3Record::class.java) as DecryptedFhir3Record<DomainResource>
+        val attachments = mutableListOf(
+                Mockito.mock(Attachment::class.java),
+                Mockito.mock(Attachment::class.java)
+        )
+
+        Mockito.`when`(decryptedRecord.resource).thenReturn(mockCarePlan)
+
+        every { FhirAttachmentHelper.getAttachment(mockCarePlan) } returns attachments
+        every { FhirAttachmentHelper.updateAttachmentData(mockCarePlan, any()) } returns Unit
+
+        // When
+        val record = recordService.restoreUploadData(
                 decryptedRecord,
                 document,
-                uploadData
+                mockUploadData
         )
-        inOrder.verifyNoMoreInteractions()
+
+        // Then
+        Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
+
+        Mockito.verify(decryptedRecord, times(1)).resource = document
+    }
+
+    @Test
+    fun `Given, restoreUploadData is called with a DecryptedFhir3Record, null as a Resource and Attachment, it does not set a new Resource for the DecryptedFhir3Record`() {
+        @Suppress("UNCHECKED_CAST")
+        val decryptedRecord = mockkClass(DecryptedFhir3Record::class) as DecryptedFhir3Record<DomainResource>
+        val attachments = mutableListOf(
+                Mockito.mock(Attachment::class.java),
+                Mockito.mock(Attachment::class.java)
+        )
+
+        every { decryptedRecord.resource } returns mockCarePlan
+
+        every { FhirAttachmentHelper.getAttachment(mockCarePlan) } returns attachments
+        every { FhirAttachmentHelper.updateAttachmentData(mockCarePlan, any()) } returns Unit
+
+        // When
+        val record = recordService.restoreUploadData(
+                decryptedRecord,
+                null,
+                mockUploadData
+        )
+
+        // Then
+        Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
+
+        verify(exactly = 0) { decryptedRecord.resource = any() }
+    }
+
+    @Test
+    fun `Given, restoreUploadData is called with a DecryptedFhir3Record, a Resource and Attachment, it removes the existing Attachments`() {
+        val document = buildDocumentReference()
+
+        @Suppress("UNCHECKED_CAST")
+        val decryptedRecord = Mockito.mock(DecryptedFhir3Record::class.java) as DecryptedFhir3Record<DomainResource>
+        val attachments = mutableListOf(
+                Mockito.mock(Attachment::class.java),
+                Mockito.mock(Attachment::class.java)
+        )
+
+        Mockito.`when`(decryptedRecord.resource).thenReturn(mockCarePlan)
+
+        every { FhirAttachmentHelper.getAttachment(mockCarePlan) } returns attachments
+        every { FhirAttachmentHelper.updateAttachmentData(mockCarePlan, mockUploadData) } returns Unit
+
+        // When
+        val record = recordService.restoreUploadData(
+                decryptedRecord,
+                document,
+                mockUploadData
+        )
+
+        // Then
+        Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
+
+        verify(exactly = 1) { FhirAttachmentHelper.getAttachment(mockCarePlan) }
+        verify(exactly = 1) { FhirAttachmentHelper.updateAttachmentData(mockCarePlan, mockUploadData) }
+    }
+
+    @Test
+    fun `Given, restoreUploadData is called with a DecryptedFhir3Record, a Resource and Attachment, it does nothing, if no Attachments exists`() {
+        val document = buildDocumentReference()
+
+        @Suppress("UNCHECKED_CAST")
+        val decryptedRecord = Mockito.mock(DecryptedFhir3Record::class.java) as DecryptedFhir3Record<DomainResource>
+
+        Mockito.`when`(decryptedRecord.resource).thenReturn(mockCarePlan)
+
+        every { FhirAttachmentHelper.getAttachment(mockCarePlan) } returns null
+        every { FhirAttachmentHelper.updateAttachmentData(mockCarePlan, any()) } returns Unit
+
+        // When
+        val record = recordService.restoreUploadData(
+                decryptedRecord,
+                document,
+                mockUploadData
+        )
+
+        // Then
+        Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
+
+        verify(exactly = 1) { FhirAttachmentHelper.getAttachment(mockCarePlan) }
+        verify(exactly = 0) { FhirAttachmentHelper.updateAttachmentData(mockCarePlan, mockUploadData) }
+    }
+
+    @Test
+    @Ignore
+    fun `Given, restoreUploadData is called with a DecryptedFhir3Record, a Resource and null as Attachment, it returns the DecryptedFhir3Record without invoking more actions`() {
+        val document = buildDocumentReference()
+
+        @Suppress("UNCHECKED_CAST")
+        val decryptedRecord = Mockito.mock(DecryptedFhir3Record::class.java) as DecryptedFhir3Record<DomainResource>
+        val attachments = mutableListOf(
+                Mockito.mock(Attachment::class.java),
+                Mockito.mock(Attachment::class.java)
+        )
+
+        Mockito.`when`(decryptedRecord.resource).thenReturn(mockCarePlan)
+
+        every { FhirAttachmentHelper.getAttachment(mockCarePlan) } returns attachments
+        every { FhirAttachmentHelper.updateAttachmentData(mockCarePlan, mockUploadData) } returns Unit
+
+        // When
+        val record = recordService.restoreUploadData(
+                decryptedRecord,
+                document,
+                null
+        )
+
+        // Then
+        Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
+
+        verify(exactly = 0) { FhirAttachmentHelper.getAttachment(mockCarePlan) }
+        verify(exactly = 0) { FhirAttachmentHelper.updateAttachmentData(mockCarePlan, mockUploadData) }
     }
 
     @Test
@@ -537,16 +746,16 @@ class RecordServiceTest : RecordServiceTestBase() {
     fun buildMeta_shouldBuildMeta_whenUpdatedDateMillisecondsArePresent() {
         // Given
         val updatedDateWithMilliseconds = "2019-02-28T17:21:08.234123"
-        Mockito.`when`(mockDecryptedFhirRecord.customCreationDate).thenReturn("2019-02-28")
-        Mockito.`when`(mockDecryptedFhirRecord.updatedDate).thenReturn(updatedDateWithMilliseconds)
+        Mockito.`when`(mockDecryptedFhir3Record.customCreationDate).thenReturn("2019-02-28")
+        Mockito.`when`(mockDecryptedFhir3Record.updatedDate).thenReturn(updatedDateWithMilliseconds)
 
         // When
-        val meta = recordService.buildMeta(mockDecryptedFhirRecord)
+        val meta = recordService.buildMeta(mockDecryptedFhir3Record)
 
         // Then
         Truth.assertThat(meta.createdDate).isEqualTo(LocalDate.of(2019, 2, 28))
         Truth.assertThat(meta.updatedDate).isEqualTo(LocalDateTime.of(2019, 2, 28, 17, 21, 8, 234123000))
-        inOrder.verify(recordService).buildMeta(mockDecryptedFhirRecord)
+        inOrder.verify(recordService).buildMeta(mockDecryptedFhir3Record)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -554,11 +763,11 @@ class RecordServiceTest : RecordServiceTestBase() {
     fun buildMeta_shouldBuildMeta_whenUpdatedDateMillisecondsAreNotPresent() {
         // Given
         val updatedDateWithMilliseconds = "2019-02-28T17:21:08"
-        Mockito.`when`(mockDecryptedFhirRecord.customCreationDate).thenReturn("2019-02-28")
-        Mockito.`when`(mockDecryptedFhirRecord.updatedDate).thenReturn(updatedDateWithMilliseconds)
+        Mockito.`when`(mockDecryptedFhir3Record.customCreationDate).thenReturn("2019-02-28")
+        Mockito.`when`(mockDecryptedFhir3Record.updatedDate).thenReturn(updatedDateWithMilliseconds)
 
         // When
-        val meta = recordService.buildMeta(mockDecryptedFhirRecord)
+        val meta = recordService.buildMeta(mockDecryptedFhir3Record)
 
         // Then
         Truth.assertThat(meta.createdDate).isEqualTo(
@@ -567,7 +776,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         Truth.assertThat(meta.updatedDate).isEqualTo(
                 LocalDateTime.of(2019, 2, 28, 17, 21, 8)
         )
-        inOrder.verify(recordService).buildMeta(mockDecryptedFhirRecord)
+        inOrder.verify(recordService).buildMeta(mockDecryptedFhir3Record)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -623,13 +832,14 @@ class RecordServiceTest : RecordServiceTestBase() {
         Mockito.`when`(mockApiService.fetchRecord(ALIAS, USER_ID, RECORD_ID))
                 .thenReturn(Single.just(mockEncryptedRecord))
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
-        Mockito.doReturn(mockDecryptedFhirRecord)
+        Mockito.doReturn(mockDecryptedFhir3Record)
                 .`when`(recordService)
                 .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockDecryptedFhirRecord)
+        Mockito.doReturn(mockDecryptedFhir3Record)
                 .`when`(recordService)
-                .downloadData(mockDecryptedFhirRecord, USER_ID)
-        Mockito.doReturn(mockMeta).`when`(recordService).buildMeta(mockDecryptedFhirRecord)
+                .downloadData(mockDecryptedFhir3Record, USER_ID)
+        @Suppress("UNCHECKED_CAST")
+        every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
 
         // When
         val observer = recordService.downloadRecord<CarePlan>(RECORD_ID, USER_ID).test().await()
@@ -644,7 +854,9 @@ class RecordServiceTest : RecordServiceTestBase() {
         Truth.assertThat(result.fhirResource).isEqualTo(mockCarePlan)
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).buildMeta(mockDecryptedFhirRecord)
+        inOrder.verify(recordService).downloadData(mockDecryptedFhir3Record, USER_ID)
+        inOrder.verify(recordService).checkDataRestrictions(mockCarePlan)
+        inOrder.verify(recordService).assignResourceId(mockDecryptedFhir3Record)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -663,12 +875,12 @@ class RecordServiceTest : RecordServiceTestBase() {
         val doc = buildDocumentReference(invalidData)
         Mockito.`when`(mockApiService.fetchRecord(ALIAS, USER_ID, RECORD_ID))
                 .thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedFhirRecord)
+        Mockito.doReturn(mockDecryptedFhir3Record)
                 .`when`(recordService)
                 .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockDecryptedFhirRecord)
-                .`when`(recordService).downloadData(mockDecryptedFhirRecord, USER_ID)
-        Mockito.`when`(mockDecryptedFhirRecord.resource).thenReturn(doc)
+        Mockito.doReturn(mockDecryptedFhir3Record)
+                .`when`(recordService).downloadData(mockDecryptedFhir3Record, USER_ID)
+        Mockito.`when`(mockDecryptedFhir3Record.resource).thenReturn(doc)
 
         // When
         val observer = recordService.downloadRecord<DomainResource>(RECORD_ID, USER_ID).test().await()
@@ -679,7 +891,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         Truth.assertThat(errors[0]).isInstanceOf(DataRestrictionException.UnsupportedFileType::class.java)
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).downloadData(mockDecryptedFhirRecord, USER_ID)
+        inOrder.verify(recordService).downloadData(mockDecryptedFhir3Record, USER_ID)
         inOrder.verify(recordService).checkDataRestrictions(doc)
         inOrder.verifyNoMoreInteractions()
     }
@@ -707,13 +919,13 @@ class RecordServiceTest : RecordServiceTestBase() {
         Mockito.`when`(mockApiService
                 .fetchRecord(ALIAS, USER_ID, RECORD_ID))
                 .thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedFhirRecord)
+        Mockito.doReturn(mockDecryptedFhir3Record)
                 .`when`(recordService)
                 .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockDecryptedFhirRecord)
+        Mockito.doReturn(mockDecryptedFhir3Record)
                 .`when`(recordService)
-                .downloadData(mockDecryptedFhirRecord, USER_ID)
-        Mockito.`when`(mockDecryptedFhirRecord.resource).thenReturn(doc)
+                .downloadData(mockDecryptedFhir3Record, USER_ID)
+        Mockito.`when`(mockDecryptedFhir3Record.resource).thenReturn(doc)
 
         // When
         val observer = recordService.downloadRecord<DomainResource>(RECORD_ID, USER_ID).test().await()
@@ -724,7 +936,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         Truth.assertThat(errors[0]).isInstanceOf(DataRestrictionException.MaxDataSizeViolation::class.java)
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
         inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).downloadData(mockDecryptedFhirRecord, USER_ID)
+        inOrder.verify(recordService).downloadData(mockDecryptedFhir3Record, USER_ID)
         inOrder.verify(recordService).checkDataRestrictions(doc)
         inOrder.verifyNoMoreInteractions()
     }

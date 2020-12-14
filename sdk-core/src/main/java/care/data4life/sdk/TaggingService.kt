@@ -68,9 +68,7 @@ class TaggingService(
     fun appendDefaultAnnotatedTags(
             resourceType: String?,
             oldTags: HashMap<String, String>?
-    ): HashMap<String, String>? = appendAppDataTags(
-            appendCommonDefaultTags(resourceType, oldTags)
-    )
+    ): HashMap<String, String> = appendAppDataTags(appendCommonDefaultTags(resourceType, oldTags))!!
 
     fun getTagFromType(
             resourceType: String?

@@ -30,7 +30,7 @@ interface SdkContract {
 
         val data: DataRecordClient
 
-        val fhir4: Fhir4RecordClient
+//        val fhir4: Fhir4RecordClient
     }
 
     interface AuthClient {

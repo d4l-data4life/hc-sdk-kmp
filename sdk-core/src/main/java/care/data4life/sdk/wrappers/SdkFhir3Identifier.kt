@@ -13,21 +13,16 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
-package care.data4life.sdk.network.model
 
-import care.data4life.crypto.GCKey
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import java.io.Serializable
+package care.data4life.sdk.wrappers
 
-internal data class DecryptedRecord<T : Fhir3Resource?>(
-        override var identifier: String?,
-        override var resource: T,
-        override var tags: HashMap<String, String>?,
-        override var annotations: List<String>,
-        override var customCreationDate: String?,
-        override var updatedDate: String?,
-        override var dataKey: GCKey?,
-        override var attachmentsKey: GCKey?,
-        override var modelVersion: Int
-) : DecryptedFhir3Record<T>, Serializable
+import care.data4life.sdk.wrappers.definitions.Identifier
+import care.data4life.fhir.stu3.model.Identifier as Fhir3Identifier
+
+internal class SdkFhir3Identifier(
+        private val identifier: Fhir3Identifier
+): Identifier {
+    override var value: String?
+        get() = identifier.value
+        set(value) {identifier.value = value}
+}

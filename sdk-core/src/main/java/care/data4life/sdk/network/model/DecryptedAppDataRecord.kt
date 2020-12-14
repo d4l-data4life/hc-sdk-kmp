@@ -59,9 +59,4 @@ internal data class DecryptedAppDataRecord(
             dataKey,
             modelVersion
     )
-
-    override fun copyWithResourceAnnotations(
-            data: ByteArray,
-            annotations: List<String>?
-    ) = copy(resource = data, annotations = annotations ?: this.annotations)
 }

@@ -18,3 +18,6 @@ package care.data4life.sdk.fhir
 
 typealias Fhir3Resource = care.data4life.fhir.stu3.model.DomainResource
 typealias Fhir4Resource = care.data4life.fhir.r4.model.DomainResource
+
+typealias Fhir3Attachment = care.data4life.fhir.stu3.model.Attachment
+typealias Fhir4Attachment = care.data4life.fhir.r4.model.Attachment

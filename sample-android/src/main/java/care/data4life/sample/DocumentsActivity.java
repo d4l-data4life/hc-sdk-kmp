@@ -401,7 +401,7 @@ public class DocumentsActivity extends AppCompatActivity {
         client.getData().create(dataResource, annotations, new care.data4life.sdk.call.Callback<care.data4life.sdk.call.DataRecord<DataResource>>() {
 
             @Override
-            public void onSuccess(care.data4life.sdk.call.DataRecord<DataResource> result) {
+            public void onSuccess(DataRecord<DataResource> result) {
                 appdata = result;
                 mDocumentsSRL.setRefreshing(false);
             }

@@ -22,7 +22,6 @@ import care.data4life.sdk.lang.FileException
 import io.reactivex.Single
 
 // TODO internal
-// TODO move to attachment package
 class FileService(
         private val alias: String,
         private val apiService: ApiService,

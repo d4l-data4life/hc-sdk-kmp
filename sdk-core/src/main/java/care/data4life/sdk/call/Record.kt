@@ -42,12 +42,3 @@ data class DataRecord<T : DataContract.Resource>(
         override val meta: Meta,
         override val annotations: List<String>
 ) : CallContract.Record<T>, Record()
-
-
-
-
-
-
-
-
-

@@ -60,7 +60,7 @@ interface SdkContract {
         /**
          * Creates an {@link DataRecord} record.
          *
-         * @param data           the app data that will be created
+         * @param data           the data that will be created
          * @param annotations    custom annotations added as tags to the record
          * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          */
@@ -68,7 +68,7 @@ interface SdkContract {
 
         /**
          * @param recordId       the id of the {@link care.data4life.sdk.model.definitions.DataRecord} that shall be update
-         * @param data           the updated appData byte array thaat shall be uploaded
+         * @param data           the updated data byte array that shall be uploaded
          * @param annotations    custom annotations added as tags to the record
          * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          */
@@ -85,8 +85,8 @@ interface SdkContract {
         /**
          * Fetch an DataRecord with given recordId
          *
-         * @param recordId          the id of the app data record which shall be fetched
-         * @param resultListener    either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
+         * @param recordId          the id of the data record which shall be fetched
+         * @param callback          either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          * @return                  {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
         fun fetch(recordId: String, callback: Callback<DataRecord<DataResource>>): Task
@@ -99,8 +99,8 @@ interface SdkContract {
          * @param endDate     the filtered records have a creation date before the endDate
          * @param pageSize    define the size page result
          * @param offset      the offset of the records list
-         * @param listener    either [ResultListener.onSuccess] or [ResultListener.onError] will be called
-         * @return [Task] which can be used to cancel ongoing operation or to query operation status
+         * @param callback    either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
+         * @return            {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
         fun search(annotations: List<String>,
                    startDate: LocalDate?,

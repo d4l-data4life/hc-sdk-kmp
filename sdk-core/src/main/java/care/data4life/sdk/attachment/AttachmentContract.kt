@@ -40,7 +40,7 @@ interface AttachmentContract {
                 userId: String
         ): Single<List<Attachment>>
 
-        
+
         fun delete(attachmentId: String, userId: String): Single<Boolean>
     }
 }

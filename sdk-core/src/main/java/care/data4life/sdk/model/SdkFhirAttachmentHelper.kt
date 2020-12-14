@@ -22,7 +22,6 @@ import care.data4life.fhir.stu3.model.Identifier
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper as Fhir3AttachmentHelper
 import care.data4life.sdk.model.definitions.FhirAttachmentHelper
-import java.util.HashMap
 
 internal object SdkFhirAttachmentHelper: FhirAttachmentHelper {
     override fun hasAttachment(resource: Any): Boolean {
@@ -54,7 +53,7 @@ internal object SdkFhirAttachmentHelper: FhirAttachmentHelper {
     }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
-    override fun updateAttachmentData(resource: Any, attachmentData: HashMap<Any, String>?) {
+    override fun updateAttachmentData(resource: Any, attachmentData: HashMap<Any, String?>?) {
         if(resource !is DomainResource) {
             throw CoreRuntimeException.InternalFailure()
         } else {
@@ -70,7 +69,7 @@ internal object SdkFhirAttachmentHelper: FhirAttachmentHelper {
     }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
-    override fun getIdentifiers(resource: Any): List<Any> {
+    override fun getIdentifier(resource: Any): List<Any> {
         return if (resource !is DomainResource) {
             throw CoreRuntimeException.InternalFailure()
         } else {

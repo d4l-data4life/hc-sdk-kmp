@@ -22,6 +22,9 @@ typealias Fhir4Resource = care.data4life.fhir.r4.model.DomainResource
 typealias Fhir3Attachment = care.data4life.fhir.stu3.model.Attachment
 typealias Fhir4Attachment = care.data4life.fhir.r4.model.Attachment
 
+typealias Fhir3Identifier = care.data4life.fhir.stu3.model.Identifier
+typealias Fhir4Identifier = care.data4life.fhir.r4.model.Identifier
+
 interface FhirVersion {
     val version: String
 }

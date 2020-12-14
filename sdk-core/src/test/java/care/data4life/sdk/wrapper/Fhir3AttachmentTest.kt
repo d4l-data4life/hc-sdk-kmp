@@ -20,6 +20,7 @@ import care.data4life.fhir.stu3.model.Attachment as Fhir3Attachment
 import care.data4life.sdk.wrappers.SdkFhir3Attachment
 import care.data4life.sdk.wrappers.definitions.Attachment
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -159,6 +160,17 @@ class Fhir3AttachmentTest {
         assertEquals(
                 size,
                 fhir3Attachment.size
+        )
+    }
+
+    @Test
+    fun `Given, unwrap is called, it returns the wrapped Attachment`() {
+        val fhir3Attachment = Fhir3Attachment()
+
+        // Then
+        assertSame(
+                fhir3Attachment,
+                SdkFhir3Attachment(fhir3Attachment).unwrap()
         )
     }
 }

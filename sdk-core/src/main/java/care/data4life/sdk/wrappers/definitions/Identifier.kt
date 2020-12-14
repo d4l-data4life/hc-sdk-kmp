@@ -16,10 +16,10 @@
 
 package care.data4life.sdk.wrappers.definitions
 
-internal interface Identifier {
+interface Identifier {
     var value: String?
 }
 
 internal interface IdentifierFactory {
-    fun wrap(identifier: Any): Identifier
+    fun wrap(identifier: Any?): Identifier?
 }

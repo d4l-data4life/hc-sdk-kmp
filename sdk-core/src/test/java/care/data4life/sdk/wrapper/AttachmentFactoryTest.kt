@@ -21,6 +21,7 @@ import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.wrappers.SdkAttachmentFactory
 import care.data4life.sdk.wrappers.definitions.Attachment
 import care.data4life.sdk.wrappers.definitions.AttachmentFactory
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito
@@ -44,12 +45,17 @@ class AttachmentFactoryTest {
     }
 
     @Test
+    fun `Given, wrap is called with null, it returns a null`() {
+        assertNull(SdkAttachmentFactory.wrap(null))
+    }
+
+    @Test
     fun `Given, wrap is called with a Fhir3Attachment, it returns a Attachment`() {
         // Given
         val givenAttachment = Mockito.mock(Fhir3Attachment::class.java)
 
         // When
-        val wrapped: Any = SdkAttachmentFactory.wrap(givenAttachment)
+        val wrapped: Any = SdkAttachmentFactory.wrap(givenAttachment)!!
 
         // Then
         assertTrue(wrapped is Attachment)

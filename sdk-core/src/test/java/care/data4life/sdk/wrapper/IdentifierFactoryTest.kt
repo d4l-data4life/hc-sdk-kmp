@@ -21,6 +21,7 @@ import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.wrappers.SdkIdentifierFactory
 import care.data4life.sdk.wrappers.definitions.Identifier
 import care.data4life.sdk.wrappers.definitions.IdentifierFactory
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito
@@ -43,13 +44,20 @@ class IdentifierFactoryTest {
         }
     }
 
+
+
+    @Test
+    fun `Given, wrap is called with a null, it return null`() {
+        assertNull(SdkIdentifierFactory.wrap(null))
+    }
+
     @Test
     fun `Given, wrap is called with a Fhir3Identifier, it returns a Attachment`() {
         // Given
         val givenIdentifier = Mockito.mock(Fhir3Identifier::class.java)
 
         // When
-        val wrapped: Any = SdkIdentifierFactory.wrap(givenIdentifier)
+        val wrapped: Any = SdkIdentifierFactory.wrap(givenIdentifier)!!
 
         // Then
         assertTrue(wrapped is Identifier)

@@ -17,7 +17,7 @@
 package care.data4life.sdk.wrappers
 
 import care.data4life.sdk.wrappers.definitions.Identifier
-import care.data4life.fhir.stu3.model.Identifier as Fhir3Identifier
+import care.data4life.sdk.fhir.Fhir3Identifier
 
 internal class SdkFhir3Identifier(
         private val identifier: Fhir3Identifier

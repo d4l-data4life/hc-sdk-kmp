@@ -34,5 +34,7 @@ internal class SdkFhir3Attachment(
     override var size: Int?
         get() = attachment.size
         set(size) {attachment.size = size}
+    override fun unwrap(): Any = this.attachment
+
 
 }

@@ -16,21 +16,20 @@
 
 package care.data4life.sdk.wrappers
 
-import care.data4life.fhir.stu3.model.Attachment as Fhir3Attachment
+import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.wrappers.definitions.Attachment
 import care.data4life.sdk.wrappers.definitions.AttachmentFactory
 
 
-
 internal object SdkAttachmentFactory: AttachmentFactory {
     @Throws(DataValidationException.CustomDataLimitViolation::class)
-    override fun wrap(attachment: Any): Attachment {
-        return if(attachment !is Fhir3Attachment) {
-            throw CoreRuntimeException.InternalFailure()
-        } else {
-            SdkFhir3Attachment(attachment)
+    override fun wrap(attachment: Any?): Attachment? {
+        return when(attachment) {
+            null -> null
+            is Fhir3Attachment -> SdkFhir3Attachment(attachment)
+            else -> throw CoreRuntimeException.InternalFailure()
         }
     }
 }

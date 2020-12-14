@@ -127,7 +127,7 @@ class FhirAttachmentHelperTest {
         val attachments = hashMapOf(
                 Mockito.mock(Attachment::class.java) to "1",
                 Mockito.mock(Attachment::class.java) to "2"
-        ) as HashMap<Any, String>
+        ) as HashMap<Any, String?>
 
         try {
             // When
@@ -140,7 +140,7 @@ class FhirAttachmentHelperTest {
     }
 
     @Test
-    fun `Given, updateAttachmentData is called with a FhirResource and a HashMap, , which contains non Attachment to String, it fails with a CoreRuntimeExceptionInternalFailure`() {
+    fun `Given, updateAttachmentData is called with a FhirResource and a HashMap, which contains non Attachment to String, it fails with a CoreRuntimeExceptionInternalFailure`() {
         // Given
         val resource = Mockito.mock(DocumentReference::class.java)
 
@@ -148,7 +148,7 @@ class FhirAttachmentHelperTest {
         val attachments = hashMapOf(
                 Mockito.mock(Attachment::class.java) to "1",
                 "b" to "2"
-        ) as HashMap<Any, String>
+        ) as HashMap<Any, String?>
 
         try {
             // When
@@ -197,7 +197,7 @@ class FhirAttachmentHelperTest {
         val attachments = hashMapOf(
                 Mockito.mock(Attachment::class.java) to "1",
                 Mockito.mock(Attachment::class.java) to "2"
-        ) as HashMap<Any, String>
+        ) as HashMap<Any, String?>
 
         every {
             @Suppress("UNCHECKED_CAST")
@@ -219,7 +219,7 @@ class FhirAttachmentHelperTest {
         // Given
         try {
             // When
-            SdkFhirAttachmentHelper.getIdentifiers("something")
+            SdkFhirAttachmentHelper.getIdentifier("something")
             assertTrue(false)//Fixme
         } catch (e: Exception) {
             // Then
@@ -239,7 +239,7 @@ class FhirAttachmentHelperTest {
         // Then
         assertSame(
                 identifiers,
-                SdkFhirAttachmentHelper.getIdentifiers(resource)
+                SdkFhirAttachmentHelper.getIdentifier(resource)
         )
 
         verify(exactly = 1) { Fhir3AttachmentHelper.getIdentifier(resource) }
@@ -253,7 +253,7 @@ class FhirAttachmentHelperTest {
         every { Fhir3AttachmentHelper.getIdentifier(resource) } returns null
 
         // When
-        val result = SdkFhirAttachmentHelper.getIdentifiers(resource)
+        val result = SdkFhirAttachmentHelper.getIdentifier(resource)
 
         // Then
         assertTrue(result.isEmpty())

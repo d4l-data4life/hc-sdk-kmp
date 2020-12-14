@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.wrappers
 
-import care.data4life.fhir.stu3.model.Identifier as Fhir3Identifier
+import care.data4life.sdk.fhir.Fhir3Identifier
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.wrappers.definitions.Identifier
@@ -25,11 +25,11 @@ import care.data4life.sdk.wrappers.definitions.IdentifierFactory
 
 internal object SdkIdentifierFactory: IdentifierFactory {
     @Throws(DataValidationException.CustomDataLimitViolation::class)
-    override fun wrap(identifier: Any): Identifier {
-        return if(identifier !is Fhir3Identifier) {
-            throw CoreRuntimeException.InternalFailure()
-        } else {
-            SdkFhir3Identifier(identifier)
+    override fun wrap(identifier: Any?): Identifier? {
+        return when(identifier) {
+            null -> null
+            is Fhir3Identifier -> SdkFhir3Identifier(identifier)
+            else -> throw CoreRuntimeException.InternalFailure()
         }
     }
 }

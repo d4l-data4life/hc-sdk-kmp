@@ -30,6 +30,7 @@ import care.data4life.auth.AuthorizationService.AuthorizationListener;
 import care.data4life.auth.storage.SharedPrefsAuthStorage;
 import care.data4life.crypto.GCKeyPair;
 import care.data4life.sdk.attachment.AttachmentService;
+import care.data4life.sdk.attachment.FileService;
 import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.fhir.FhirService;
 import care.data4life.sdk.lang.CoreRuntimeException;

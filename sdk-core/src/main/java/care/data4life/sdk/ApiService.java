@@ -265,7 +265,8 @@ public final class ApiService {
         return service.updateRecord(alias, userId, recordId, encryptedRecord);
     }
 
-    Single<String> uploadDocument(String alias,
+    // TODO remove public
+    public Single<String> uploadDocument(String alias,
                                   String userId,
                                   byte[] encryptedAttachment) {
         return service.uploadDocument(
@@ -274,14 +275,16 @@ public final class ApiService {
         ).map(DocumentUploadResponse::getDocumentId);
     }
 
-    Single<byte[]> downloadDocument(String alias,
+    // TODO remove public
+    public Single<byte[]> downloadDocument(String alias,
                                     String userId,
                                     String documentId) {
         return service.downloadDocument(alias, userId, documentId)
                 .map(ResponseBody::bytes);
     }
 
-    Single<Boolean> deleteDocument(String alias,
+    // TODO remove public
+    public Single<Boolean> deleteDocument(String alias,
                                    String userId,
                                    String documentId) {
         // network request doesn't has a response except the HTTP 204

@@ -27,7 +27,6 @@ import care.data4life.crypto.GCKey;
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.FhirDateTime;
 import care.data4life.fhir.stu3.util.FhirDateTimeParser;
-import care.data4life.sdk.FileService;
 import care.data4life.sdk.ImageResizer;
 import care.data4life.sdk.config.DataRestrictionException;
 import care.data4life.sdk.helpers.stu3.AttachmentBuilder;

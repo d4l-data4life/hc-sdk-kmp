@@ -79,6 +79,9 @@ public final class Data4LifeClient extends BaseClient {
                 Data4LifeClient.Companion.createDataClient(
                         userService, recordService, callHandler
                 ),
+                Data4LifeClient.Companion.createFhir4Client(
+                        userService, recordService, callHandler
+                ),
                 Data4LifeClient.Companion.createLegacyDataClient(
                         alias, userService, recordService, callHandler
                 )

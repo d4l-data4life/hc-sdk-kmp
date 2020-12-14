@@ -30,6 +30,7 @@ interface SdkContract {
 
         val data: DataRecordClient
 
+        val fhir4: Fhir4RecordClient
     }
 
     interface AuthClient {
@@ -54,6 +55,9 @@ interface SdkContract {
          */
         fun logout(listener: LegacyCallback)
 
+    }
+
+    interface Fhir4RecordClient {
     }
 
     interface DataRecordClient {

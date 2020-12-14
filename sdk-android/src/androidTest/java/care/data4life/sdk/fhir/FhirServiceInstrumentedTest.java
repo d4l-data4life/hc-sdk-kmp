@@ -14,7 +14,7 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk;
+package care.data4life.sdk.fhir;
 
 import android.content.Context;
 
@@ -26,6 +26,8 @@ import androidx.test.InstrumentationRegistry;
 import care.data4life.crypto.GCKey;
 import care.data4life.fhir.stu3.model.DocumentReference;
 import care.data4life.fhir.stu3.model.DomainResource;
+import care.data4life.sdk.CryptoSecureStore;
+import care.data4life.sdk.CryptoService;
 import care.data4life.sdk.config.DataRestrictionException;
 import care.data4life.sdk.test.data.model.SymTestData;
 import care.data4life.sdk.test.util.AssetsHelper;

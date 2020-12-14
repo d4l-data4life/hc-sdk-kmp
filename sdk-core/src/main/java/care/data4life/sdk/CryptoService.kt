@@ -38,7 +38,6 @@ import care.data4life.sdk.util.Base64
 import com.squareup.moshi.Moshi
 import io.reactivex.Single
 import java.io.IOException
-import java.nio.charset.Charset
 import java.security.SecureRandom
 
 //TODO internal

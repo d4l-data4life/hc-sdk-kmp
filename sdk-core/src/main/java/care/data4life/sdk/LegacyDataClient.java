@@ -24,6 +24,7 @@ import javax.annotation.Nullable;
 
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.DomainResource;
+import care.data4life.sdk.auth.UserService;
 import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.call.Task;
 import care.data4life.sdk.listener.Callback;
@@ -35,7 +36,6 @@ import care.data4life.sdk.model.DownloadType;
 import care.data4life.sdk.model.FetchResult;
 import care.data4life.sdk.model.Record;
 import care.data4life.sdk.model.UpdateResult;
-import care.data4life.sdk.model.definitions.DataRecord;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 

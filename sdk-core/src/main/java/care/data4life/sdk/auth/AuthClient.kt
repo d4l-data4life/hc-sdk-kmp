@@ -16,7 +16,6 @@
 
 package care.data4life.sdk.auth
 
-import care.data4life.sdk.UserService
 import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.listener.Callback
 import care.data4life.sdk.listener.ResultListener

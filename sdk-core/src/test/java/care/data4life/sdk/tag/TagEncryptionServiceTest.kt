@@ -13,9 +13,10 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
-package care.data4life.sdk
+package care.data4life.sdk.tag
 
 import care.data4life.crypto.GCKey
+import care.data4life.sdk.CryptoService
 import care.data4life.sdk.test.util.TestSchedulerRule
 import care.data4life.sdk.util.Base64
 import com.google.common.truth.Truth
@@ -239,7 +240,7 @@ class TagEncryptionServiceTest {
     fun decryptAnnotations() {
         // given
         val expected = "value"
-        val tag = "${ANNOTATION_KEY}$expected"
+        val tag = "$ANNOTATION_KEY$expected"
         val gcKey = Mockito.mock(GCKey::class.java)
         val encryptedTag = "encryptedTag"
         val encryptedAnnotations: MutableList<String> = arrayListOf(encryptedTag)

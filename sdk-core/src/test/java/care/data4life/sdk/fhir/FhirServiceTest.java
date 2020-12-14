@@ -14,7 +14,7 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk;
+package care.data4life.sdk.fhir;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +27,7 @@ import care.data4life.fhir.FhirException;
 import care.data4life.fhir.FhirParser;
 import care.data4life.fhir.stu3.model.DocumentReference;
 import care.data4life.fhir.stu3.model.DomainResource;
-import care.data4life.sdk.fhir.FhirService;
+import care.data4life.sdk.CryptoService;
 import io.reactivex.Single;
 
 import static com.google.common.truth.Truth.assertThat;

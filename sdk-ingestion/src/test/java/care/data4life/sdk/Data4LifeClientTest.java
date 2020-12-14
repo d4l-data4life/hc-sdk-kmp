@@ -21,6 +21,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 
 import care.data4life.auth.AuthorizationService;
+import care.data4life.sdk.auth.UserService;
 import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.test.util.TestSchedulerRule;
 

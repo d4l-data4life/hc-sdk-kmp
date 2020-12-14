@@ -24,10 +24,12 @@ import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.ThumbnailService
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.call.DataRecord
+import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.D4LException
@@ -41,12 +43,10 @@ import care.data4life.sdk.model.FetchResult
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
-import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.SdkFhirElementFactory
 import care.data4life.sdk.model.SdkRecordFactory
+import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
-import care.data4life.sdk.network.model.DecryptedAppDataRecord
-import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.model.definitions.FhirElementFactory
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.DecryptedRecordBuilderImpl
@@ -54,8 +54,11 @@ import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
-import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
+import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
+import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.tag.TagEncryptionService
+import care.data4life.sdk.tag.TaggingService
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
@@ -85,7 +88,7 @@ class RecordService(
         private val attachmentService: AttachmentContract.Service,
         private val cryptoService: CryptoService,
         private val errorHandler: SdkContract.ErrorHandler
-) {
+) : RecordContract.Service {
     @Deprecated("")
     internal enum class UploadDownloadOperation {
         UPLOAD, DOWNLOAD, UPDATE
@@ -135,6 +138,18 @@ class RecordService(
                 .map { restoreUploadData(it, resource, data) }
                 .map { assignResourceId(it) }
                 .map { recordFactory.getInstance(it) }
+    }
+
+    // TODO add implementation
+    fun <T : Fhir4Resource> createFhir4Record(
+            userId: String,
+            resource: T,
+            annotations: List<String>
+    ): Single<Fhir4Record<T>> {
+        val createdDate = DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID))
+
+        // FIXME just a dummy response
+        return Single.just(Fhir4Record("", resource, Meta(LocalDate.now(UTC_ZONE_ID), LocalDateTime.now(UTC_ZONE_ID)), annotations))
     }
 
     @Suppress("UNCHECKED_CAST")

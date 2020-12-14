@@ -20,6 +20,7 @@ import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.fhir.stu3.util.FhirDateTimeParser
 import care.data4life.sdk.ImageResizer
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
+import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.lang.ImageResizeException
 import care.data4life.sdk.log.Log
@@ -38,7 +39,7 @@ class AttachmentService internal constructor(
 ) : AttachmentContract.Service {
 
     override fun upload(
-            attachments: List<Attachment>,
+            attachments: List<Fhir3Attachment>,
             attachmentsKey: GCKey,
             userId: String
     ): Single<List<Pair<Attachment, List<String>>>> {

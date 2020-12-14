@@ -298,7 +298,7 @@ public final class ApiService {
                 .map(response -> Integer.parseInt(response.headers().get(HEADER_TOTAL_COUNT)));
     }
 
-    Single<UserInfo> fetchUserInfo(String alias) {
+    public Single<UserInfo> fetchUserInfo(String alias) {
         return service
                 .fetchUserInfo(alias)
                 .subscribeOn(Schedulers.io());
@@ -313,7 +313,7 @@ public final class ApiService {
      * @param alias Alias
      * @return Completable
      */
-    Completable logout(String alias) {
+    public Completable logout(String alias) {
         if (this.staticAccessToken != null) {
             throw new D4LRuntimeException("Cannot log out when using a static access token!");
         }

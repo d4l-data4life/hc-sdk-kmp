@@ -98,8 +98,9 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
         }
     }
 
+    // TODO add FHIR 4
     @Throws(CoreRuntimeException.InternalFailure::class)
-    private fun <T : DomainResource?> buildFhirRecord(
+    private fun <T : DomainResource?> buildFhir3Record(
             resource: T?,
             tags: HashMap<String, String>,
             creationDate: String,
@@ -160,14 +161,14 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
         guard.checkTagsAndAnnotationsLimits(tags, annotations)
 
         return when (resource) {
-            null -> this.buildFhirRecord(
+            null -> this.buildFhir3Record(
                     resource,
                     tags,
                     creationDate,
                     dataKey,
                     modelVersion
             )
-            is DomainResource -> this.buildFhirRecord(
+            is DomainResource -> this.buildFhir3Record(
                     resource,
                     tags,
                     creationDate,

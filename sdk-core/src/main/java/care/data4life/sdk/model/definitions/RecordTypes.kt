@@ -16,7 +16,6 @@
 package care.data4life.sdk.model.definitions
 
 import care.data4life.fhir.stu3.model.DomainResource
-import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.model.Meta
 
 interface BaseRecord<T> {

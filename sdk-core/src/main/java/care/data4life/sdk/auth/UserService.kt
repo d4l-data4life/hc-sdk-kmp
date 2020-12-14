@@ -14,9 +14,12 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk
+package care.data4life.sdk.auth
 
 import care.data4life.auth.AuthorizationService
+import care.data4life.sdk.ApiService
+import care.data4life.sdk.CryptoSecureStore
+import care.data4life.sdk.CryptoService
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.network.model.UserInfo
 import io.reactivex.Completable

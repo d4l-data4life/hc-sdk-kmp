@@ -26,7 +26,7 @@ internal interface LimitGuard {
     fun checkDataLimit(data: ByteArray)
 
     companion object {
-        const val MAX_LENGTH_TAGS_AND_ANNOTATIONS = 100
+        const val MAX_LENGTH_TAGS_AND_ANNOTATIONS = 1000
         const val MAX_SIZE_CUSTOM_DATA = 10485760 // = 10 MiB in Bytes
     }
 }

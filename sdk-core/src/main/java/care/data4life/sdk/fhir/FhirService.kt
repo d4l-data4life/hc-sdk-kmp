@@ -20,7 +20,6 @@ import care.data4life.crypto.error.CryptoException.DecryptionFailed
 import care.data4life.crypto.error.CryptoException.EncryptionFailed
 import care.data4life.fhir.Fhir
 import care.data4life.fhir.FhirParser
-import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.fhir.stu3.model.FhirElementFactory
 import care.data4life.sdk.CryptoService
 import care.data4life.sdk.lang.D4LException

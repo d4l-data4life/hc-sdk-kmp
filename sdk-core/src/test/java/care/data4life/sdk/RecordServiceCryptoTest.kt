@@ -24,6 +24,7 @@ import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.DecryptedRecord
+import care.data4life.sdk.tag.TaggingService
 import care.data4life.sdk.util.Base64
 import com.google.common.truth.Truth
 import io.mockk.every

@@ -20,7 +20,6 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import io.mockk.mockk
 import io.mockk.mockkClass
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

@@ -16,8 +16,10 @@
 package care.data4life.sdk
 
 import care.data4life.sdk.auth.AuthClient
+import care.data4life.sdk.auth.UserService
 import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.data.DataRecordClient
+import care.data4life.sdk.fhir.Fhir4RecordClient
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.log.Logger
 
@@ -33,10 +35,13 @@ abstract class BaseClient(
         override val data: SdkContract.DataRecordClient =
                 createDataClient(userService, recordService, handler),
 
+        override val fhir4: SdkContract.Fhir4RecordClient =
+                 createFhir4Client(userService, recordService, handler),
+
         private val legacyDataClient: SdkContract.LegacyDataClient =
                 createLegacyDataClient(alias, userService, recordService, handler)
 
-) : SdkContract.Client, SdkContract.LegacyDataClient by legacyDataClient, SdkContract.AuthClient by authClient {
+ ) : SdkContract.Client, SdkContract.LegacyDataClient by legacyDataClient, SdkContract.AuthClient by authClient {
 
 
     companion object {
@@ -55,6 +60,14 @@ abstract class BaseClient(
                 handler: CallHandler
         ): SdkContract.DataRecordClient {
             return DataRecordClient(userService, recordService, handler)
+        }
+
+        fun createFhir4Client(
+                userService: UserService,
+                recordService: RecordService,
+                handler: CallHandler
+        ): SdkContract.Fhir4RecordClient {
+            return Fhir4RecordClient(userService, recordService, handler)
         }
 
 

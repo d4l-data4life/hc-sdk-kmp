@@ -14,9 +14,11 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk
+package care.data4life.sdk.fhir
 
-import org.junit.Ignore
+internal interface FhirContract {
 
-@Ignore
-class DataRecordClientTest
+    interface Service {
+
+    }
+}

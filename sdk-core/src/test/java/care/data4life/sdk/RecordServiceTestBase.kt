@@ -39,6 +39,8 @@ import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
+import care.data4life.sdk.tag.TagEncryptionService
+import care.data4life.sdk.tag.TaggingService
 import care.data4life.sdk.test.util.AttachmentBuilder
 import care.data4life.sdk.util.Base64
 import io.mockk.every

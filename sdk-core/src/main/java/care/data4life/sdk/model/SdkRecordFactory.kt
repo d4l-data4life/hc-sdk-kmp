@@ -47,12 +47,14 @@ internal object SdkRecordFactory : RecordFactory {
                     buildMeta(record),
                     record.annotations
             )
+            // TODO app data
             is DecryptedDataRecord -> AppDataRecord(
                     record.identifier!!,
                     record.resource,
                     buildMeta(record),
                     record.annotations
             )
+            // TODO FHIR 4
             else -> throw CoreRuntimeException.InternalFailure()
         } as BaseRecord<T>
     }

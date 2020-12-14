@@ -53,7 +53,7 @@ class LimitGuardTest {
 
     @Test
     fun `Given, checkTagsAndAnnotationsLimits is called with Tags, which exceeds the limit, and empty Annotations, it fails with a TagsAndAnnotationsLimitViolation`() {
-        val tags = buildMap(50)
+        val tags = buildMap(1000)
 
         // When
         try {
@@ -83,7 +83,7 @@ class LimitGuardTest {
 
     @Test
     fun `Given, checkTagsAndAnnotationsLimits is called with empty Tags, and empty Annotations, which exceeds the limit, it fails with a TagsAndAnnotationsLimitViolation`() {
-        val annotations = buildList(100)
+        val annotations = buildList(1000)
 
         // When
         try {
@@ -102,7 +102,7 @@ class LimitGuardTest {
     @Test
     fun `Given, checkTagsAndAnnotationsLimits is called with empty Tags and Annotations, which are in the boundaries, it accepts`() {
         // Given
-        val annotations = buildList(99)
+        val annotations = buildList(999)
 
         // When
         DecryptedRecordGuard.checkTagsAndAnnotationsLimits(hashMapOf(), annotations)
@@ -114,7 +114,7 @@ class LimitGuardTest {
     @Test
     fun `Given, checkTagsAndAnnotationsLimits is called with Tags and Annotations, which exceeding the limit together, it fails with a TagsAndAnnotationsLimitViolation`() {
         val tags = buildMap(25)
-        val annotations = buildList(50)
+        val annotations = buildList(1000)
 
         // When
         try {

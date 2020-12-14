@@ -17,8 +17,10 @@ package care.data4life.sdk
 
 import care.data4life.sdk.call.Callback
 import care.data4life.sdk.call.DataRecord
+import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.call.Task
 import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.D4LException
 import org.threeten.bp.LocalDate
 import care.data4life.sdk.listener.Callback as LegacyCallback
@@ -30,7 +32,7 @@ interface SdkContract {
 
         val data: DataRecordClient
 
-//        val fhir4: Fhir4RecordClient
+        val fhir4: Fhir4RecordClient
     }
 
     interface AuthClient {
@@ -58,28 +60,49 @@ interface SdkContract {
     }
 
     interface Fhir4RecordClient {
+        /**
+         * Creates a {@link Fhir4Record}
+         *
+         * @param resource       the resource that will be created
+         * @param annotations    custom annotations added as tags to the record
+         * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
+         */
+        fun <T : Fhir4Resource> create(resource: T, annotations: List<String>, callback: Callback<Fhir4Record<T>>)
+
+        /**
+         * Update an {@link Fhir4Record}
+         *
+         * @param recordId       the id of the {@link care.data4life.sdk.model.definitions.DataRecord} that shall be update
+         * @param resource       the updated resource that shall be uploaded
+         * @param annotations    custom annotations added as tags to the record
+         * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
+         */
+        fun <T : Fhir4Resource> update(recordId: String, resource: DataResource, annotations: List<String>, callback: Callback<Fhir4Record<T>>)
+
     }
 
     interface DataRecordClient {
         /**
-         * Creates an {@link DataRecord} record.
+         * Creates an {@link DataRecord}
          *
-         * @param data           the data that will be created
+         * @param resource       the resource that will be created
          * @param annotations    custom annotations added as tags to the record
          * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          */
         fun create(resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>)
 
         /**
+         * Update an {@link DataRecord}
+         *
          * @param recordId       the id of the {@link care.data4life.sdk.model.definitions.DataRecord} that shall be update
-         * @param data           the updated data byte array that shall be uploaded
+         * @param resource       the updated resource that shall be uploaded
          * @param annotations    custom annotations added as tags to the record
          * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          */
         fun update(recordId: String, resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>)
 
         /**
-         * Delete an DataRecord
+         * Delete an {@link DataRecord}
          *
          * @param recordId      the id of the record that shall be deleted
          * @param callback      either {@link Callback#onSuccess()} or {@link Callback#onError(D4LException)} will be called

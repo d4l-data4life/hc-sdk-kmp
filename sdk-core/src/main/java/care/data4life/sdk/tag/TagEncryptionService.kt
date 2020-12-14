@@ -13,12 +13,12 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
-package care.data4life.sdk
+package care.data4life.sdk.tag
 
 import care.data4life.crypto.GCKey
 import care.data4life.crypto.error.CryptoException
+import care.data4life.sdk.CryptoService
 import care.data4life.sdk.lang.D4LException
-import care.data4life.sdk.tags.TagHelper
 import care.data4life.sdk.util.Base64
 import io.reactivex.Observable
 import io.reactivex.Single

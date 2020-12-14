@@ -27,11 +27,14 @@ import care.data4life.auth.AuthorizationService;
 import care.data4life.auth.storage.InMemoryAuthStorage;
 import care.data4life.sdk.attachment.AttachmentService;
 import care.data4life.sdk.attachment.FileService;
+import care.data4life.sdk.auth.UserService;
 import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.fhir.FhirService;
 import care.data4life.sdk.log.Log;
 import care.data4life.sdk.log.Logger;
 import care.data4life.sdk.network.Environment;
+import care.data4life.sdk.tag.TagEncryptionService;
+import care.data4life.sdk.tag.TaggingService;
 import care.data4life.securestore.SecureStore;
 import care.data4life.securestore.SecureStoreContract;
 import care.data4life.securestore.SecureStoreCryptor;
@@ -64,9 +67,9 @@ public final class Data4LifeClient extends BaseClient {
                 Data4LifeClient.Companion.createDataClient(
                         userService, recordService, callHandler
                 ),
-//                Data4LifeClient.Companion.createFhir4Client(
-//                        userService, recordService, callHandler
-//                ),
+                Data4LifeClient.Companion.createFhir4Client(
+                        userService, recordService, callHandler
+                ),
                 Data4LifeClient.Companion.createLegacyDataClient(
                         alias, userService, recordService, callHandler
                 )

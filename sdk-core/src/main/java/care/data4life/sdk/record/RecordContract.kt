@@ -14,25 +14,11 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.fhir
+package care.data4life.sdk.record
 
-typealias Fhir3Resource = care.data4life.fhir.stu3.model.DomainResource
-typealias Fhir4Resource = care.data4life.fhir.r4.model.DomainResource
+interface RecordContract {
 
-typealias Fhir3Attachment = care.data4life.fhir.stu3.model.Attachment
-typealias Fhir4Attachment = care.data4life.fhir.r4.model.Attachment
+    interface Service {
 
-interface FhirVersion {
-    val version: String
-}
-
-fun Fhir3Resource.asVersionable() = object : FhirVersion {
-    override val version: String
-        get() = "3.0.1"
-}
-
-fun Fhir4Resource.asVersionable() = object : FhirVersion {
-    override val version: String
-        get() = "4.0.1"
-
+    }
 }

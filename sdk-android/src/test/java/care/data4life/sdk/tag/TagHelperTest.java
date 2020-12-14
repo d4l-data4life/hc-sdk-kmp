@@ -14,7 +14,7 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.tags;
+package care.data4life.sdk.tag;
 
 import org.junit.Test;
 

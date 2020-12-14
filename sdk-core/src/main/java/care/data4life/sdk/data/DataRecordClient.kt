@@ -17,7 +17,7 @@
 package care.data4life.sdk.data
 
 import care.data4life.sdk.RecordService
-import care.data4life.sdk.UserService
+import care.data4life.sdk.auth.UserService
 import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.call.Callback
 import care.data4life.sdk.call.DataRecord
@@ -28,35 +28,35 @@ import org.threeten.bp.LocalDate
 internal class DataRecordClient(
         private val userService: UserService,
         private val recordService: RecordService,
-        private val callHandler: CallHandler
+        private val handler: CallHandler
 ) : DataContract.Client {
 
     override fun create(resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>) {
         val operation = userService.finishLogin(true)
                 .flatMap { userService.uID }
                 .flatMap { uid -> recordService.createRecord(resource.value, uid, annotations) }
-        callHandler.executeSingle(operation, callback)
+        handler.executeSingle(operation, callback)
     }
 
     override fun update(recordId: String, resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>) {
         val operation = userService.finishLogin(true)
                 .flatMap { userService.uID }
                 .flatMap { uid -> recordService.updateRecord(recordId, resource.value, uid, annotations) }
-        callHandler.executeSingle(operation, callback)
+        handler.executeSingle(operation, callback)
     }
 
     override fun delete(recordId: String, callback: Callback<Boolean>) {
         val operation = userService.finishLogin(true)
                 .flatMap { userService.uID }
                 .flatMap { uid -> recordService.deleteRecord(recordId, uid).toSingle { true } }
-        callHandler.executeSingle(operation, callback)
+        handler.executeSingle(operation, callback)
     }
 
     override fun fetch(recordId: String, callback: Callback<DataRecord<DataResource>>): Task {
         val operation = userService.finishLogin(true)
                 .flatMap { userService.uID }
                 .flatMap { uid -> recordService.fetchAppDataRecord(recordId, uid) }
-        return callHandler.executeSingle(operation, callback)
+        return handler.executeSingle(operation, callback)
     }
 
     override fun search(annotations: List<String>, startDate: LocalDate?, endDate: LocalDate?, pageSize: Int, offset: Int, callback: Callback<List<DataRecord<DataResource>>>): Task {
@@ -72,7 +72,7 @@ internal class DataRecordClient(
                             offset
                     )
                 }
-        return callHandler.executeSingle(operation, callback)
+        return handler.executeSingle(operation, callback)
     }
 
 }

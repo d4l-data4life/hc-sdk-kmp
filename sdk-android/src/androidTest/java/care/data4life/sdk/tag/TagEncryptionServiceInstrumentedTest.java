@@ -14,7 +14,7 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk;
+package care.data4life.sdk.tag;
 
 import android.content.Context;
 
@@ -24,6 +24,9 @@ import org.junit.Test;
 import java.io.IOException;
 
 import androidx.test.InstrumentationRegistry;
+import care.data4life.sdk.CryptoSecureStore;
+import care.data4life.sdk.CryptoService;
+import care.data4life.sdk.tag.TagEncryptionService;
 import care.data4life.sdk.test.data.model.SymTestData;
 import care.data4life.sdk.test.util.AssetsHelper;
 import care.data4life.securestore.SecureStore;

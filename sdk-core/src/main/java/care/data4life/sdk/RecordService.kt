@@ -36,7 +36,6 @@ import care.data4life.sdk.model.DeleteResult
 import care.data4life.sdk.model.DownloadResult
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.FetchResult
-import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.wrapper.FhirAttachmentHelper
@@ -54,7 +53,6 @@ import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
-import care.data4life.sdk.util.HashUtil.sha1
 import care.data4life.sdk.util.MimeType
 import care.data4life.sdk.util.MimeType.Companion.recognizeMimeType
 import care.data4life.sdk.wrapper.AttachmentFactory
@@ -66,10 +64,8 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.DateTimeFormatterBuilder
 import java.io.IOException
 import java.util.*
 import kotlin.collections.HashMap
@@ -87,15 +83,6 @@ class RecordService(
         private val cryptoService: CryptoService,
         private val errorHandler: SdkContract.ErrorHandler
 ) : RecordContract.Service {
-    @Deprecated("")
-    internal enum class UploadDownloadOperation {
-        UPLOAD, DOWNLOAD, UPDATE
-    }
-
-    @Deprecated("")
-    internal enum class RemoveRestoreOperation {
-        RESTORE
-    }
 
     private val recordFactory: RecordFactory = SdkRecordFactory
     private val fhirElementFactory: WrapperFactoryContract.FhirElementFactory = FhirElementFactory
@@ -765,7 +752,7 @@ class RecordService(
                     .flattenAsObservable { items -> items }
                     .map { attachment ->
                         attachment.also {
-                            if (attachment.id!!.contains(SPLIT_CHAR)) updateAttachmentMeta(attachment)
+                            if (attachment.id!!.contains(SPLIT_CHAR)) attachmentService.updateAttachmentMeta(attachment)
                         }
                     }
                     .toList()
@@ -845,20 +832,6 @@ class RecordService(
         }
     }
 
-    @Deprecated("")
-    internal fun <T : Fhir3Resource> removeOrRestoreUploadData(
-            operation: RemoveRestoreOperation,
-            record: NetworkRecordContract.DecryptedFhir3Record<T>,
-            originalResource: T?,
-            attachmentData: HashMap<WrapperContract.Attachment, String?>?
-    ): NetworkRecordContract.DecryptedFhir3Record<T> {
-        return if (operation == RemoveRestoreOperation.RESTORE) {
-            restoreUploadData(record as NetworkRecordContract.DecryptedRecord<T>, originalResource, attachmentData) as NetworkRecordContract.DecryptedFhir3Record<T>
-        } else {
-            removeUploadData(record as NetworkRecordContract.DecryptedRecord<T>) as NetworkRecordContract.DecryptedFhir3Record<T>
-        }
-    }
-
     @Throws(DataValidationException.IdUsageViolation::class,
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
@@ -892,7 +865,7 @@ class RecordService(
                     throw DataValidationException.ExpectedFieldViolation(
                             "Attachment.hash and Attachment.size expected"
                     )
-                getValidHash(attachment) != attachment.hash ->
+                attachmentService.getValidHash(attachment) != attachment.hash ->
                     throw DataValidationException.InvalidAttachmentPayloadHash(
                             "Attachment.hash is not valid"
                     )
@@ -957,7 +930,7 @@ class RecordService(
                     throw DataValidationException.ExpectedFieldViolation(
                             "Attachment.hash and Attachment.size expected"
                     )
-                getValidHash(newAttachment) != newAttachment.hash ->
+                attachmentService.getValidHash(newAttachment) != newAttachment.hash ->
                     throw DataValidationException.InvalidAttachmentPayloadHash(
                             "Attachment.hash is not valid"
                     )
@@ -1023,43 +996,6 @@ class RecordService(
         return record
     }
 
-    // FIXME
-    // This method should not allowed to exist any longer in this shape. _uploadData should take over
-    // as soon as possible so we can get rid of uploadOrDownloadData. This also means uploadData should
-    // not be responsible for the actual upload and a update.
-    @Throws(DataValidationException.IdUsageViolation::class,
-            DataValidationException.ExpectedFieldViolation::class,
-            DataValidationException.InvalidAttachmentPayloadHash::class)
-    internal fun <T : Any> uploadData(
-            record: NetworkRecordContract.DecryptedRecord<T>,
-            newResource: T?,
-            userId: String
-    ): NetworkRecordContract.DecryptedRecord<T> {
-        return if (newResource == null) {
-            _uploadData(record, userId)
-        } else {
-            updateData(record, newResource, userId)
-        }
-    }
-
-    @Deprecated("")
-    @Throws(DataValidationException.IdUsageViolation::class,
-            DataValidationException.ExpectedFieldViolation::class,
-            DataValidationException.InvalidAttachmentPayloadHash::class,
-            CoreRuntimeException.UnsupportedOperation::class)
-    internal fun <T : Fhir3Resource> uploadOrDownloadData(
-            operation: UploadDownloadOperation,
-            record: NetworkRecordContract.DecryptedFhir3Record<T>,
-            newResource: T?,
-            userId: String
-    ): NetworkRecordContract.DecryptedFhir3Record<T> {
-        return when (operation) {
-            UploadDownloadOperation.UPDATE -> updateData(record, newResource!!, userId) as NetworkRecordContract.DecryptedFhir3Record
-            UploadDownloadOperation.UPLOAD -> _uploadData(record, userId) as NetworkRecordContract.DecryptedFhir3Record<T>
-            UploadDownloadOperation.DOWNLOAD -> downloadData(record, userId) as NetworkRecordContract.DecryptedFhir3Record<T>
-        }
-    }
-
     private fun updateResourceIdentifier(
             d: Any,
             result: List<Pair<WrapperContract.Attachment, List<String>?>>
@@ -1121,20 +1057,6 @@ class RecordService(
             throw DataValidationException.IdUsageViolation(identifier.value)
         }
         return parts
-    }
-
-    // TODO move to AttachmentService
-    fun updateAttachmentMeta(attachment: WrapperContract.Attachment): WrapperContract.Attachment {
-        val data = decode(attachment.data!!)
-        attachment.size = data.size
-        attachment.hash = encodeToString(sha1(data))
-        return attachment
-    }
-
-    // TODO move to AttachmentService
-    fun getValidHash(attachment: WrapperContract.Attachment): String {
-        val data = decode(attachment.data!!)
-        return encodeToString(sha1(data))
     }
 
     @Throws(DataValidationException.IdUsageViolation::class)
@@ -1204,14 +1126,6 @@ class RecordService(
             }
         }
     }
-
-    @Deprecated("")
-    internal fun buildMeta(
-            record: NetworkRecordContract.DecryptedRecord<*>
-    ): Meta = Meta(
-            LocalDate.parse(record.customCreationDate, DATE_FORMATTER),
-            LocalDateTime.parse(record.updatedDate, DATE_TIME_FORMATTER)
-    )
     //endregion
 
     companion object {
@@ -1225,10 +1139,6 @@ class RecordService(
         const val PREVIEW_ID_POS = 2
         const val THUMBNAIL_ID_POS = 3
         private val DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.US)
-        private val DATE_TIME_FORMATTER = DateTimeFormatterBuilder()
-                .parseLenient()
-                .appendPattern(DATE_TIME_FORMAT)
-                .toFormatter(Locale.US)
         private val UTC_ZONE_ID = ZoneId.of("UTC")
     }
 }

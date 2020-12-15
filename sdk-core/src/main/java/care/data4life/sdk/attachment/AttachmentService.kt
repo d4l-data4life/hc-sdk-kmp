@@ -95,6 +95,23 @@ class AttachmentService internal constructor(
             userId: String
     ): Single<Boolean> = fileService.deleteFile(userId, attachmentId)
 
+    override fun updateAttachmentMeta(
+            attachment: WrapperContract.Attachment
+    ): WrapperContract.Attachment {
+        if(attachment.data != null) {
+            val data = decode(attachment.data!!)
+            attachment.size = data.size
+            attachment.hash = encodeToString(sha1(data))
+        }
+
+        return attachment
+    }
+
+    override fun getValidHash(attachment: WrapperContract.Attachment): String {
+        val data = decode(attachment.data!!)
+        return encodeToString(sha1(data))
+    }
+
     companion object {
         private const val DOWNSCALED_ATTACHMENT_ID_POS = 1
     }

@@ -41,6 +41,10 @@ interface AttachmentContract {
 
 
         fun delete(attachmentId: String, userId: String): Single<Boolean>
+
+        fun updateAttachmentMeta(attachment: WrapperContract.Attachment): WrapperContract.Attachment
+
+        fun getValidHash(attachment: WrapperContract.Attachment): String?
     }
 
     interface FhirDateValidator {

@@ -422,6 +422,68 @@ class AttachmentServiceTest {
         verify(exactly = 1) { attachment.hash = newHash }
     }
 
+    @Test
+    fun `Given, updateAttachmentMeta is called with Attachment, it does not update the meta data, if the Attachment has no data`() {
+        // Given
+        val attachment = mockk<WrapperContract.Attachment>()
+
+        every { attachment.data } returns null
+
+        // When
+        attachmentService.updateAttachmentMeta(attachment)
+
+        // Then
+        verify(exactly = 0) { attachment.size = any() }
+        verify(exactly = 0) { attachment.hash = any() }
+        verify(exactly = 1) { attachment.data }
+    }
+
+    @Test
+    fun `Given, updateAttachmentMeta is called with Attachment, it updates the meta data of the Attachment, if the Attachment has data`() {
+        // Given
+        val attachment = mockk<WrapperContract.Attachment>(relaxed = true)
+        val dataSize = 23
+        val decodedData = ByteArray(dataSize)
+        val decodedShaData = ByteArray(42)
+        val encodedData = "abcd"
+        val data = "efg"
+
+        every { attachment.data } returns data
+        every { Base64.decode(data) } returns decodedData
+        every { HashUtil.sha1(decodedData) } returns decodedShaData
+        every { Base64.encodeToString(decodedShaData) } returns encodedData
+
+        // When
+        attachmentService.updateAttachmentMeta(attachment)
+
+        // Then
+        verify(exactly = 1) { attachment.size = dataSize }
+        verify(exactly = 1) { attachment.hash = encodedData }
+        verify(exactly = 2) { attachment.data }
+    }
+
+    @Test
+    fun `Given, updateAttachmentMeta is called with Attachment, it returns the updated Attachment,`() {
+        // Given
+        val attachment = mockk<WrapperContract.Attachment>(relaxed = true)
+        val dataSize = 23
+        val decodedData = ByteArray(dataSize)
+        val decodedShaData = ByteArray(42)
+        val encodedData = "abcd"
+        val data = "efg"
+        
+        every { attachment.data } returns data
+        every { Base64.decode(data) } returns decodedData
+        every { HashUtil.sha1(decodedData) } returns decodedShaData
+        every { Base64.encodeToString(decodedShaData) } returns encodedData
+
+        // Then
+        assertSame(
+                attachment,
+                attachmentService.updateAttachmentMeta(attachment)
+        )
+    }
+
     companion object {
         private const val USER_ID = "userId"
     }

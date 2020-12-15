@@ -28,6 +28,12 @@ typealias Fhir4Identifier = care.data4life.fhir.r4.model.Identifier
 typealias Fhir3DateTimeParser = care.data4life.fhir.stu3.util.FhirDateTimeParser
 typealias Fhir4DateTimeParser = care.data4life.fhir.r4.util.FhirDateTimeParser
 
+typealias Fhir3ElementFactory = care.data4life.fhir.stu3.model.FhirElementFactory
+typealias Fhir4ElementFactory = care.data4life.fhir.r4.model.FhirElementFactory
+
+typealias Fhir3AttachmentHelper = care.data4life.fhir.stu3.util.FhirAttachmentHelper
+typealias Fhir4AttachmentHelper = care.data4life.fhir.r4.util.FhirAttachmentHelper
+
 interface FhirVersion {
     val version: String
 }

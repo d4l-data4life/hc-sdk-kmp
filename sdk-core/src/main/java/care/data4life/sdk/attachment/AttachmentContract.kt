@@ -18,7 +18,7 @@ package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.lang.DataValidationException
-import care.data4life.sdk.wrappers.definitions.Attachment
+import care.data4life.sdk.wrappers.WrappersContract
 import io.reactivex.Single
 
 // TODO change to internal
@@ -26,24 +26,24 @@ interface AttachmentContract {
 
     interface Service {
         fun upload(
-                attachments: List<Attachment>,
+                attachments: List<WrappersContract.Attachment>,
                 attachmentsKey: GCKey,
                 userId: String
-        ): Single<List<Pair<Attachment, List<String>>>>
+        ): Single<List<Pair<WrappersContract.Attachment, List<String>>>>
 
 
         @Throws(DataValidationException.InvalidAttachmentPayloadHash::class)
         fun download(
-                attachments: List<Attachment>,
+                attachments: List<WrappersContract.Attachment>,
                 attachmentsKey: GCKey,
                 userId: String
-        ): Single<List<Attachment>>
+        ): Single<List<WrappersContract.Attachment>>
 
 
         fun delete(attachmentId: String, userId: String): Single<Boolean>
     }
 
     interface FhirDateValidator {
-        fun isInvalidateDate(attachment: Attachment): Boolean
+        fun isInvalidateDate(attachment: WrappersContract.Attachment): Boolean
     }
 }

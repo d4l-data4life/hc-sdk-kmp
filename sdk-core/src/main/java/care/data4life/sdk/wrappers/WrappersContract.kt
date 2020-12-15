@@ -14,11 +14,18 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.model.definitions
+package care.data4life.sdk.wrappers
 
-import care.data4life.sdk.lang.CoreRuntimeException
+interface WrappersContract {
+    interface Attachment {
+        var id: String?
+        var data: String?
+        var hash: String?
+        var size: Int?
+        fun unwrap(): Any
+    }
 
-internal interface FhirElementFactory {
-    @Throws(CoreRuntimeException.InternalFailure::class)
-    fun getFhirTypeForClass(resourceType: Class<out Any>): String
+    interface Identifier {
+        var value: String?
+    }
 }

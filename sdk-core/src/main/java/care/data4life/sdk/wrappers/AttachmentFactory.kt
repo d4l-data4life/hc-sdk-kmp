@@ -14,19 +14,19 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.model
+package care.data4life.sdk.wrappers
 
-import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.fhir.stu3.model.FhirElementFactory as Fhir3ElementFactory
-import care.data4life.sdk.model.definitions.FhirElementFactory
+import care.data4life.sdk.lang.DataValidationException
 
-internal object SdkFhirElementFactory: FhirElementFactory {
-    @Throws(CoreRuntimeException.InternalFailure::class)
-    override fun getFhirTypeForClass(resourceType: Class<out Any>): String {
-        @Suppress("UNCHECKED_CAST")
-        return Fhir3ElementFactory.getFhirTypeForClass(resourceType as Class<out DomainResource> )
-                ?: throw CoreRuntimeException.InternalFailure()
+internal object AttachmentFactory: WrapperFactoriesContract.AttachmentFactory {
+    @Throws(DataValidationException.CustomDataLimitViolation::class)
+    override fun wrap(attachment: Any?): WrappersContract.Attachment? {
+        return when(attachment) {
+            null -> null
+            is Fhir3Attachment -> SdkFhir3Attachment(attachment)
+            else -> throw CoreRuntimeException.InternalFailure()
+        }
     }
-
 }

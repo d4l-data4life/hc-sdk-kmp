@@ -20,7 +20,7 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.ImageResizer
 import care.data4life.sdk.lang.ImageResizeException
 import care.data4life.sdk.log.Log
-import care.data4life.sdk.wrappers.definitions.Attachment
+import care.data4life.sdk.wrappers.WrappersContract
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -52,7 +52,7 @@ class ThumbnailServiceTest {
         //Given
         val userId = "id"
         val orgData = ByteArray(42)
-        val attachment = mockk<Attachment>()
+        val attachment = mockk<WrappersContract.Attachment>()
         val attachmentKey = mockk<GCKey>()
 
         every { resizer.isResizable(orgData) }  returns false
@@ -72,7 +72,7 @@ class ThumbnailServiceTest {
         //Given
         val userId = "id"
         val orgData = ByteArray(42)
-        val attachment = mockk<Attachment>()
+        val attachment = mockk<WrappersContract.Attachment>()
         val attachmentKey = mockk<GCKey>()
         val exception = ImageResizeException.JpegWriterMissing()
 
@@ -103,7 +103,7 @@ class ThumbnailServiceTest {
         //Given
         val userId = "id"
         val orgData = ByteArray(42)
-        val attachment = mockk<Attachment>()
+        val attachment = mockk<WrappersContract.Attachment>()
         val attachmentKey = mockk<GCKey>()
         val attachmentId = "me"
 
@@ -140,7 +140,7 @@ class ThumbnailServiceTest {
         //Given
         val userId = "id"
         val orgData = ByteArray(42)
-        val attachment = mockk<Attachment>()
+        val attachment = mockk<WrappersContract.Attachment>()
         val attachmentKey = mockk<GCKey>()
         val downscaled = ByteArray(1)
         val upload = mockk<Single<String>>()
@@ -180,7 +180,7 @@ class ThumbnailServiceTest {
         //Given
         val userId = "id"
         val orgData = ByteArray(42)
-        val attachment = mockk<Attachment>()
+        val attachment = mockk<WrappersContract.Attachment>()
         val attachmentKey = mockk<GCKey>()
         val attachmentId = "me"
 
@@ -217,7 +217,7 @@ class ThumbnailServiceTest {
         //Given
         val userId = "id"
         val orgData = ByteArray(42)
-        val attachment = mockk<Attachment>()
+        val attachment = mockk<WrappersContract.Attachment>()
         val attachmentKey = mockk<GCKey>()
         val downscaled = ByteArray(1)
         val upload = mockk<Single<String>>()
@@ -258,7 +258,7 @@ class ThumbnailServiceTest {
         //Given
         val userId = "id"
         val orgData = ByteArray(42)
-        val attachment = mockk<Attachment>()
+        val attachment = mockk<WrappersContract.Attachment>()
         val attachmentKey = mockk<GCKey>()
         val downscaledPreview = ByteArray(1)
         val downscaledThumbnail = ByteArray(2)

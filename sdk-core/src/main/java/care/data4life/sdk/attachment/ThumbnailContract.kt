@@ -17,14 +17,14 @@
 package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.wrappers.definitions.Attachment
+import care.data4life.sdk.wrappers.WrappersContract
 
 interface ThumbnailContract {
     interface Service {
         fun uploadDownscaledImages(
                 attachmentsKey: GCKey,
                 userId: String,
-                attachment: Attachment,
+                attachment: WrappersContract.Attachment,
                 originalData: ByteArray
         ): List<String>
     }

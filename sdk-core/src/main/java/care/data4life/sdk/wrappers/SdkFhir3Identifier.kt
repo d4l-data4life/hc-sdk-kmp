@@ -16,12 +16,11 @@
 
 package care.data4life.sdk.wrappers
 
-import care.data4life.sdk.wrappers.definitions.Identifier
 import care.data4life.sdk.fhir.Fhir3Identifier
 
 internal class SdkFhir3Identifier(
         private val identifier: Fhir3Identifier
-): Identifier {
+): WrappersContract.Identifier {
     override var value: String?
         get() = identifier.value
         set(value) {identifier.value = value}

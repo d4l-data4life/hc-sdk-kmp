@@ -18,9 +18,9 @@ package care.data4life.sdk.wrapper
 
 import care.data4life.fhir.stu3.model.Attachment as Fhir3Attachment
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.wrappers.SdkAttachmentFactory
-import care.data4life.sdk.wrappers.definitions.Attachment
-import care.data4life.sdk.wrappers.definitions.AttachmentFactory
+import care.data4life.sdk.wrappers.AttachmentFactory
+import care.data4life.sdk.wrappers.WrapperFactoriesContract
+import care.data4life.sdk.wrappers.WrappersContract
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -29,14 +29,14 @@ import org.mockito.Mockito
 class AttachmentFactoryTest {
     @Test
     fun `it is a AttachmentFactory`() {
-        assertTrue((SdkAttachmentFactory as Any) is AttachmentFactory)
+        assertTrue((AttachmentFactory as Any) is WrapperFactoriesContract.AttachmentFactory)
     }
     
     @Test
     fun `Given, wrap is called with a non Fhir3Attachment, it fails with a CoreRuntimeExceptionInternalFailure`() {
         try {
             // When
-            SdkAttachmentFactory.wrap("fail me!")
+            AttachmentFactory.wrap("fail me!")
             assertTrue(false)//Fixme
         } catch (e: Exception) {
             // Then
@@ -46,7 +46,7 @@ class AttachmentFactoryTest {
 
     @Test
     fun `Given, wrap is called with null, it returns a null`() {
-        assertNull(SdkAttachmentFactory.wrap(null))
+        assertNull(AttachmentFactory.wrap(null))
     }
 
     @Test
@@ -55,9 +55,9 @@ class AttachmentFactoryTest {
         val givenAttachment = Mockito.mock(Fhir3Attachment::class.java)
 
         // When
-        val wrapped: Any = SdkAttachmentFactory.wrap(givenAttachment)!!
+        val wrapped: Any = AttachmentFactory.wrap(givenAttachment)!!
 
         // Then
-        assertTrue(wrapped is Attachment)
+        assertTrue(wrapped is WrappersContract.Attachment)
     }
 }

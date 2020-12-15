@@ -16,12 +16,11 @@
 
 package care.data4life.sdk.wrappers
 
-import care.data4life.fhir.stu3.model.Attachment as Fhir3Attachment
-import care.data4life.sdk.wrappers.definitions.Attachment
+import care.data4life.sdk.fhir.Fhir3Attachment
 
 internal class SdkFhir3Attachment(
         private val attachment: Fhir3Attachment
-): Attachment {
+): WrappersContract.Attachment {
     override var id: String?
         get() = attachment.id
         set(id) { attachment.id = id}

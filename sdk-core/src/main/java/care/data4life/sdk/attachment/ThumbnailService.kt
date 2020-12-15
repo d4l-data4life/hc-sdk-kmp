@@ -20,9 +20,9 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.ImageResizer
 import care.data4life.sdk.lang.ImageResizeException
 import care.data4life.sdk.log.Log
-import care.data4life.sdk.wrappers.definitions.Attachment
+import care.data4life.sdk.wrappers.WrappersContract
 
-// TODO encapsulate thumbnail generation and handling
+
 class ThumbnailService internal constructor(
         private val imageResizer: ImageResizer,
         private val fileService: FileContract.Service
@@ -31,7 +31,7 @@ class ThumbnailService internal constructor(
     override fun uploadDownscaledImages(
             attachmentsKey: GCKey,
             userId: String,
-            attachment: Attachment,
+            attachment: WrappersContract.Attachment,
             originalData: ByteArray
     ): List<String> {
         return if(this.imageResizer.isResizable(originalData)) {
@@ -66,7 +66,7 @@ class ThumbnailService internal constructor(
     private fun resizeAndUpload(
             attachmentsKey: GCKey,
             userId: String,
-            attachment: Attachment,
+            attachment: WrappersContract.Attachment,
             originalData: ByteArray,
             targetHeight: Int
     ): String {

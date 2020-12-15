@@ -39,13 +39,11 @@ import care.data4life.sdk.model.FetchResult
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
-import care.data4life.sdk.model.SdkFhirAttachmentHelper
-import care.data4life.sdk.model.SdkFhirElementFactory
+import care.data4life.sdk.wrappers.FhirAttachmentHelper
+import care.data4life.sdk.wrappers.FhirElementFactory
 import care.data4life.sdk.model.SdkRecordFactory
 import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
-import care.data4life.sdk.model.definitions.FhirAttachmentHelper
-import care.data4life.sdk.model.definitions.FhirElementFactory
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.DecryptedRecordBuilder
 import care.data4life.sdk.network.model.EncryptedKey
@@ -59,12 +57,11 @@ import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
 import care.data4life.sdk.util.MimeType
 import care.data4life.sdk.util.MimeType.Companion.recognizeMimeType
-import care.data4life.sdk.wrappers.SdkAttachmentFactory
+import care.data4life.sdk.wrappers.AttachmentFactory
+import care.data4life.sdk.wrappers.HelpersContract
 import care.data4life.sdk.wrappers.SdkIdentifierFactory
-import care.data4life.sdk.wrappers.definitions.AttachmentFactory
-import care.data4life.sdk.wrappers.definitions.IdentifierFactory
-import care.data4life.sdk.wrappers.definitions.Attachment
-import care.data4life.sdk.wrappers.definitions.Identifier
+import care.data4life.sdk.wrappers.WrapperFactoriesContract
+import care.data4life.sdk.wrappers.WrappersContract
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -101,10 +98,10 @@ class RecordService(
     }
 
     private val recordFactory: RecordFactory = SdkRecordFactory
-    private val fhirElementFactory: FhirElementFactory = SdkFhirElementFactory
-    private val fhirAttachmentHelper: FhirAttachmentHelper = SdkFhirAttachmentHelper
-    private val attachmentFactory: AttachmentFactory = SdkAttachmentFactory
-    private val identifierFactory: IdentifierFactory = SdkIdentifierFactory
+    private val fhirElementFactory: WrapperFactoriesContract.FhirElementFactory = FhirElementFactory
+    private val fhirAttachmentHelper: HelpersContract.FhirAttachmentHelper = FhirAttachmentHelper
+    private val attachmentFactory: WrapperFactoriesContract.AttachmentFactory = AttachmentFactory
+    private val identifierFactory: WrapperFactoriesContract.IdentifierFactory = SdkIdentifierFactory
 
     private fun getTagsOnCreate(resource: Any): HashMap<String, String> {
         return if (resource is ByteArray) {
@@ -707,7 +704,7 @@ class RecordService(
             attachmentId: String,
             userId: String,
             type: DownloadType
-    ): Single<Attachment> = downloadAttachments(
+    ): Single<WrappersContract.Attachment> = downloadAttachments(
             recordId,
             arrayListOf(attachmentId),
             userId,
@@ -719,7 +716,7 @@ class RecordService(
             attachmentIds: List<String>,
             userId: String,
             type: DownloadType
-    ): Single<List<Attachment>> = apiService
+    ): Single<List<WrappersContract.Attachment>> = apiService
             .fetchRecord(alias, userId, recordId)
             .map { decryptRecord<Fhir3Resource>(it, userId) }
             .flatMap {
@@ -738,11 +735,11 @@ class RecordService(
             userId: String,
             type: DownloadType,
             decryptedRecord: NetworkRecordsContract.DecryptedFhir3Record<Fhir3Resource>
-    ): Single<out List<Attachment>> {
+    ): Single<out List<WrappersContract.Attachment>> {
         if (fhirAttachmentHelper.hasAttachment(decryptedRecord.resource)) {
             val resource = decryptedRecord.resource
             val attachments = fhirAttachmentHelper.getAttachment(resource)
-            val validAttachments = mutableListOf<Attachment>()
+            val validAttachments = mutableListOf<WrappersContract.Attachment>()
 
             for (rawAttachment in attachments) {
                 val attachment = attachmentFactory.wrap(rawAttachment)
@@ -782,12 +779,12 @@ class RecordService(
             userId: String
     ): Single<Boolean> = attachmentService.delete(attachmentId, userId)
 
-    fun <T : Any> extractUploadData(resource: T): HashMap<Attachment, String?>? {
+    fun <T : Any> extractUploadData(resource: T): HashMap<WrappersContract.Attachment, String?>? {
         return if (resource !is ByteArray) {
             val attachments = fhirAttachmentHelper.getAttachment(resource)
             if (attachments.isEmpty()) return null
 
-            val data = HashMap<Attachment, String?>(attachments.size)
+            val data = HashMap<WrappersContract.Attachment, String?>(attachments.size)
             for (rawAttachment in attachments) {
                 val attachment = attachmentFactory.wrap(rawAttachment)
                 if (attachment?.data != null) {
@@ -820,7 +817,7 @@ class RecordService(
             setUploadData(
                     record,
                     null
-            ) as NetworkRecordsContract.DecryptedRecord<T>
+            )
         } else {
             record
         }
@@ -829,7 +826,7 @@ class RecordService(
     internal fun <T : Any> restoreUploadData(
             record: NetworkRecordsContract.DecryptedRecord<T>,
             originalResource: T?,
-            attachmentData: HashMap<Attachment, String?>?
+            attachmentData: HashMap<WrappersContract.Attachment, String?>?
     ): NetworkRecordsContract.DecryptedRecord<T> {
         if (record is NetworkRecordsContract.DecryptedDataRecord || originalResource == null || originalResource is ByteArray) {
             return record
@@ -853,7 +850,7 @@ class RecordService(
             operation: RemoveRestoreOperation,
             record: NetworkRecordsContract.DecryptedFhir3Record<T>,
             originalResource: T?,
-            attachmentData: HashMap<Attachment, String?>?
+            attachmentData: HashMap<WrappersContract.Attachment, String?>?
     ): NetworkRecordsContract.DecryptedFhir3Record<T> {
         return if (operation == RemoveRestoreOperation.RESTORE) {
             restoreUploadData(record as NetworkRecordsContract.DecryptedRecord<T>, originalResource, attachmentData) as NetworkRecordsContract.DecryptedFhir3Record<T>
@@ -882,7 +879,7 @@ class RecordService(
             record.attachmentsKey = cryptoService.generateGCKey().blockingGet()
         }
 
-        val validAttachments: MutableList<Attachment> = arrayListOf()
+        val validAttachments: MutableList<WrappersContract.Attachment> = arrayListOf()
         for (rawAttachment in attachments) {
             val attachment = attachmentFactory.wrap(rawAttachment)
 
@@ -938,8 +935,8 @@ class RecordService(
         if (!fhirAttachmentHelper.hasAttachment(resource)) return record
         val attachments = fhirAttachmentHelper.getAttachment(resource)
 
-        val validAttachments: MutableList<Attachment> = arrayListOf()
-        val oldAttachments: HashMap<String?, Attachment> = hashMapOf()
+        val validAttachments: MutableList<WrappersContract.Attachment> = arrayListOf()
+        val oldAttachments: HashMap<String?, WrappersContract.Attachment> = hashMapOf()
 
         for (rawAttachment in attachments) {
             val attachment = attachmentFactory.wrap(rawAttachment)
@@ -1005,7 +1002,7 @@ class RecordService(
         if (!fhirAttachmentHelper.hasAttachment(resource)) return record
 
         val attachments = fhirAttachmentHelper.getAttachment(resource)
-        val wrappedAttachments = mutableListOf<Attachment>()
+        val wrappedAttachments = mutableListOf<WrappersContract.Attachment>()
 
         for(rawAttachment in attachments) {
             val attachment = attachmentFactory.wrap(rawAttachment)
@@ -1065,7 +1062,7 @@ class RecordService(
 
     private fun updateResourceIdentifier(
             d: Any,
-            result: List<Pair<Attachment, List<String>?>>
+            result: List<Pair<WrappersContract.Attachment, List<String>?>>
     ) {
         val sb = StringBuilder()
         for ((first, second) in result) {
@@ -1083,7 +1080,7 @@ class RecordService(
     // TODO move to AttachmentService -> Thumbnail handling
     @Throws(DataValidationException.IdUsageViolation::class)
     fun setAttachmentIdForDownloadType(
-            attachments: List<Attachment>,
+            attachments: List<WrappersContract.Attachment>,
             identifiers: List<Any>?,
             type: DownloadType?
     ) {
@@ -1115,7 +1112,7 @@ class RecordService(
     }
 
     @Throws(DataValidationException.IdUsageViolation::class)
-    fun splitAdditionalAttachmentId(identifier: Identifier?): Array<String>? {
+    fun splitAdditionalAttachmentId(identifier: WrappersContract.Identifier?): Array<String>? {
         if (identifier?.value == null || !identifier.value!!.startsWith(DOWNSCALED_ATTACHMENT_IDS_FMT)) {
             return null
         }
@@ -1127,7 +1124,7 @@ class RecordService(
     }
 
     // TODO move to AttachmentService
-    fun updateAttachmentMeta(attachment: Attachment): Attachment {
+    fun updateAttachmentMeta(attachment: WrappersContract.Attachment): WrappersContract.Attachment {
         val data = decode(attachment.data!!)
         attachment.size = data.size
         attachment.hash = encodeToString(sha1(data))
@@ -1135,7 +1132,7 @@ class RecordService(
     }
 
     // TODO move to AttachmentService
-    fun getValidHash(attachment: Attachment): String {
+    fun getValidHash(attachment: WrappersContract.Attachment): String {
         val data = decode(attachment.data!!)
         return encodeToString(sha1(data))
     }

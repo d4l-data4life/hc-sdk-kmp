@@ -14,13 +14,13 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.model
+package care.data4life.sdk.wrapper
 
 import care.data4life.fhir.stu3.model.DocumentReference
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.model.definitions.FhirElementFactory
 import care.data4life.sdk.test.util.AttachmentBuilder
+import care.data4life.sdk.wrappers.FhirElementFactory
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -45,7 +45,7 @@ class FhirElementFactoryTest {
 
     @Test
     fun `it is a FhirElementFactory`() {
-        assertTrue((SdkFhirElementFactory as Any) is FhirElementFactory)
+        assertTrue((FhirElementFactory as Any) is FhirElementFactory)
     }
 
     @Test
@@ -54,7 +54,7 @@ class FhirElementFactoryTest {
         val resource = buildDocumentReference()
 
         // When
-        val name = SdkFhirElementFactory.getFhirTypeForClass(resource::class.java)
+        val name = FhirElementFactory.getFhirTypeForClass(resource::class.java)
 
         // Then
         assertEquals(
@@ -67,7 +67,7 @@ class FhirElementFactoryTest {
     fun `Given, getFhirTypeForClass is called with a non valid FhirResource Class, it returns fails with CoreRuntimeExceptionInternalFailure`() {
         try {
             // When
-            SdkFhirElementFactory.getFhirTypeForClass(String::class.java)
+            FhirElementFactory.getFhirTypeForClass(String::class.java)
             assertTrue(false)//Fixme
         } catch (e: Exception) {
             // Then

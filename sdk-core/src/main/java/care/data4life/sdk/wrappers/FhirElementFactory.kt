@@ -14,20 +14,18 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.model.definitions
+package care.data4life.sdk.wrappers
 
+import care.data4life.sdk.fhir.Fhir3ElementFactory
+import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 
-internal interface FhirAttachmentHelper {
-    fun hasAttachment(resource: Any): Boolean
+internal object FhirElementFactory: WrapperFactoriesContract.FhirElementFactory {
     @Throws(CoreRuntimeException.InternalFailure::class)
-    fun getAttachment(resource: Any): MutableList<Any>
-    @Throws(CoreRuntimeException.InternalFailure::class)
-    fun updateAttachmentData(resource: Any, attachmentData: HashMap<Any, String?>?)
-    @Throws(CoreRuntimeException.InternalFailure::class)
-    fun getIdentifier(resource: Any): List<Any>
-    @Throws(CoreRuntimeException.InternalFailure::class)
-    fun setIdentifier(resource: Any, updatedIdentifiers: List<Any>)
-    @Throws(CoreRuntimeException.InternalFailure::class)
-    fun appendIdentifier(resource: Any, identifier: String, assigner: String)
+    override fun getFhirTypeForClass(resourceType: Class<out Any>): String {
+        @Suppress("UNCHECKED_CAST")
+        return Fhir3ElementFactory.getFhirTypeForClass(resourceType as Class<out Fhir3Resource> )
+                ?: throw CoreRuntimeException.InternalFailure()
+    }
+
 }

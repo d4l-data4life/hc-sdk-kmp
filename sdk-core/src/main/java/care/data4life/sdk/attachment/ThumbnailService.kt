@@ -17,15 +17,23 @@
 package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
+import care.data4life.fhir.stu3.util.FhirAttachmentHelper
 import care.data4life.sdk.ImageResizer
+import care.data4life.sdk.RecordService
 import care.data4life.sdk.lang.ImageResizeException
 import care.data4life.sdk.log.Log
+import care.data4life.sdk.wrapper.HelperContract
 import care.data4life.sdk.wrapper.WrapperContract
+import org.threeten.bp.ZoneId
+import org.threeten.bp.format.DateTimeFormatter
+import java.util.*
 
 
 class ThumbnailService internal constructor(
+        private val partnerId: String,
         private val imageResizer: ImageResizer,
-        private val fileService: FileContract.Service
+        private val fileService: FileContract.Service,
+        private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper
 ): ThumbnailContract.Service {
 
     override fun uploadDownscaledImages(
@@ -84,14 +92,31 @@ class ThumbnailService internal constructor(
         }
     }
 
+    //FIXME: rename vars
+    //FIXME: Here could be a side effect WE HAVE TO discuss it in the review -> FhirAttachmentHelper.getAttachments()
     override fun updateResourceIdentifier(
             resource: WrapperContract.Resource,
             result: List<Pair<WrapperContract.Attachment, List<String>?>>
     ) {
-        TODO("Not yet implemented")
+        val sb = StringBuilder()
+        for ((first, second) in result) {
+            if (second != null) { //Attachment is a of image type
+                sb.setLength(0)
+                sb.append(DOWNSCALED_ATTACHMENT_IDS_FMT).append(SPLIT_CHAR).append(first.id)
+                for (additionalId in second) {
+                    sb.append(SPLIT_CHAR).append(additionalId)
+                }
+                fhirAttachmentHelper.appendIdentifier(
+                        resource.unwrap(),
+                        sb.toString(),
+                        partnerId
+                )
+            }
+        }
     }
 
     companion object {
         const val SPLIT_CHAR = "#"
+        const val DOWNSCALED_ATTACHMENT_IDS_FMT = "d4l_f_p_t" //d4l -> namespace, f-> full, p -> preview, t -> thumbnail
     }
 }

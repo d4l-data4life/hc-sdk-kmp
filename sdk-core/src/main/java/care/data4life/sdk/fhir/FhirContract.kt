@@ -16,9 +16,21 @@
 
 package care.data4life.sdk.fhir
 
+import care.data4life.crypto.GCKey
+import care.data4life.sdk.wrapper.WrapperContract
+import java.util.HashMap
+
+// TODO: Rename it in something like ResourceService
 internal interface FhirContract {
 
     interface Service {
+        fun encryptResource(dataKey: GCKey, resource: WrapperContract.Resource): String
+
+        fun decryptResource(
+                dataKey: GCKey,
+                tags: HashMap<String, String>,
+                encryptedResource: String
+        ): WrapperContract.Resource
 
     }
 }

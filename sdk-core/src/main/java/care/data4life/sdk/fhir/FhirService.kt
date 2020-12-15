@@ -23,7 +23,9 @@ import care.data4life.fhir.FhirParser
 import care.data4life.fhir.stu3.model.FhirElementFactory
 import care.data4life.sdk.CryptoService
 import care.data4life.sdk.lang.D4LException
+import care.data4life.sdk.wrapper.WrapperContract
 import io.reactivex.Single
+import java.util.HashMap
 
 // TODO remove @JvmOverloads when Data4LifeClient changed to Kotlin
 // TODO use of Single is not necessary as it's finalized with blockingGet()
@@ -32,7 +34,7 @@ class FhirService @JvmOverloads constructor(
         private val cryptoService: CryptoService,
         private val parserFhir3: FhirParser<Any> = Fhir().createStu3Parser(),
         private val parserFhir4: FhirParser<Any> = Fhir().createR4Parser()
-) {
+): FhirContract.Service {
 
     @Suppress("UNCHECKED_CAST")
     fun <T : Fhir3Resource> decryptResource(dataKey: GCKey, resourceType: String, encryptedResource: String): T {
@@ -63,6 +65,18 @@ class FhirService @JvmOverloads constructor(
                             EncryptionFailed("Failed to encrypt resource", error) as D4LException)
                 }
                 .blockingGet()
+    }
+
+    override fun encryptResource(dataKey: GCKey, resource: WrapperContract.Resource): String {
+        TODO("Not yet implemented")
+    }
+
+    override fun decryptResource(
+            dataKey: GCKey,
+            tags: HashMap<String, String>,
+            encryptedResource: String
+    ): WrapperContract.Resource {
+        TODO("Not yet implemented")
     }
 
 }

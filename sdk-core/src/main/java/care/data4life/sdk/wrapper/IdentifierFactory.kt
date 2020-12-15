@@ -20,7 +20,7 @@ import care.data4life.sdk.fhir.Fhir3Identifier
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 
-internal object SdkIdentifierFactory: WrapperFactoryContract.IdentifierFactory {
+internal object IdentifierFactory: WrapperFactoryContract.IdentifierFactory {
 
     @Throws(DataValidationException.CustomDataLimitViolation::class)
     override fun wrap(identifier: Any?): WrapperContract.Identifier? {

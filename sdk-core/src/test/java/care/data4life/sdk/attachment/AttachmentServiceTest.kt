@@ -471,7 +471,7 @@ class AttachmentServiceTest {
         val decodedShaData = ByteArray(42)
         val encodedData = "abcd"
         val data = "efg"
-        
+
         every { attachment.data } returns data
         every { Base64.decode(data) } returns decodedData
         every { HashUtil.sha1(decodedData) } returns decodedShaData

@@ -26,14 +26,14 @@ import org.mockito.Mockito
 class IdentifierFactoryTest {
     @Test
     fun `it is a AttachmentFactory`() {
-        assertTrue((SdkIdentifierFactory as Any) is WrapperFactoryContract.IdentifierFactory)
+        assertTrue((IdentifierFactory as Any) is WrapperFactoryContract.IdentifierFactory)
     }
     
     @Test
     fun `Given, wrap is called with a non Fhir3Identifier, it fails with a CoreRuntimeExceptionInternalFailure`() {
         try {
             // When
-            SdkIdentifierFactory.wrap("fail me!")
+            IdentifierFactory.wrap("fail me!")
             assertTrue(false)//Fixme
         } catch (e: Exception) {
             // Then
@@ -45,7 +45,7 @@ class IdentifierFactoryTest {
 
     @Test
     fun `Given, wrap is called with a null, it return null`() {
-        assertNull(SdkIdentifierFactory.wrap(null))
+        assertNull(IdentifierFactory.wrap(null))
     }
 
     @Test
@@ -54,7 +54,7 @@ class IdentifierFactoryTest {
         val givenIdentifier = Mockito.mock(Fhir3Identifier::class.java)
 
         // When
-        val wrapped: Any = SdkIdentifierFactory.wrap(givenIdentifier)!!
+        val wrapped: Any = IdentifierFactory.wrap(givenIdentifier)!!
 
         // Then
         assertTrue(wrapped is WrapperContract.Identifier)

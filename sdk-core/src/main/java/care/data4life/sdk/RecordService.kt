@@ -57,7 +57,7 @@ import care.data4life.sdk.util.MimeType
 import care.data4life.sdk.util.MimeType.Companion.recognizeMimeType
 import care.data4life.sdk.wrapper.AttachmentFactory
 import care.data4life.sdk.wrapper.HelperContract
-import care.data4life.sdk.wrapper.SdkIdentifierFactory
+import care.data4life.sdk.wrapper.IdentifierFactory
 import care.data4life.sdk.wrapper.WrapperFactoryContract
 import care.data4life.sdk.wrapper.WrapperContract
 import io.reactivex.Completable
@@ -88,7 +88,7 @@ class RecordService(
     private val fhirElementFactory: WrapperFactoryContract.FhirElementFactory = FhirElementFactory
     private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper = FhirAttachmentHelper
     private val attachmentFactory: WrapperFactoryContract.AttachmentFactory = AttachmentFactory
-    private val identifierFactory: WrapperFactoryContract.IdentifierFactory = SdkIdentifierFactory
+    private val identifierFactory: WrapperFactoryContract.IdentifierFactory = IdentifierFactory
 
     private fun getTagsOnCreate(resource: Any): HashMap<String, String> {
         return if (resource is ByteArray) {
@@ -1131,7 +1131,6 @@ class RecordService(
     companion object {
         private val EMPTY_RECORD = Record(null, null, null)
         private const val DATE_FORMAT = "yyyy-MM-dd"
-        private const val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss[.SSS]"
         private const val EMPTY_RECORD_ID = ""
         const val DOWNSCALED_ATTACHMENT_IDS_FMT = "d4l_f_p_t" //d4l -> namespace, f-> full, p -> preview, t -> thumbnail
         const val DOWNSCALED_ATTACHMENT_IDS_SIZE = 4

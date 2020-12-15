@@ -98,11 +98,11 @@ class RecordService(
         }
     }
 
-    private fun <T : Any> createRecord(
+    private fun createRecord(
             userId: String,
-            resource: T,
+            resource: WrapperContract.Resource,
             annotations: List<String>
-    ): Single<BaseRecord<T>> {
+    ): Single<BaseRecord<Any>> {
         checkDataRestrictions(resource)
         val data = extractUploadData(resource)
         val createdRecord = Single.just(
@@ -399,7 +399,7 @@ class RecordService(
             .fetchRecord(alias, userId, recordId)
             .map { encryptedRecord ->
                 @Suppress("UNCHECKED_CAST")
-                decryptRecord<Fhir3Resource>(encryptedRecord, userId) as NetworkRecordContract.DecryptedFhir3Record<T>
+                decryptRecord<Fhir3Resource>(encryptedRecord, userId) as NetworkRecordContract.DecryptedRecord<T>
             }
             .map { downloadData(it, userId) }
             .map { decryptedRecord ->
@@ -450,12 +450,12 @@ class RecordService(
                 .map { decryptRecord<Any>(it, userId) }
                 .map { updateData(it, resource, userId) }
                 .map { decryptedRecord ->
-                    if (decryptedRecord is NetworkRecordContract.DecryptedFhir3Record) {
+                    if (decryptedRecord is NetworkRecordContract.DecryptedRecord) {
                         cleanObsoleteAdditionalIdentifiers(resource as Fhir3Resource)
                     }
 
                     decryptedRecord.also {
-                        (it as NetworkRecordContract.DecryptedRecord<T>).resource = resource
+                        (it as NetworkRecordContract.DecryptedRecord).resource = resource
                         it.annotations = annotations
                     }
 
@@ -546,7 +546,7 @@ class RecordService(
 
     //region utility methods
     private fun <T> getEncryptedResourceAndAttachment(
-            record: NetworkRecordContract.DecryptedRecord<T>,
+            record: NetworkRecordContract.DecryptedRecord,
             commonKey: GCKey
     ): Pair<String, EncryptedKey?> {
         return if (record is NetworkRecordContract.DecryptedDataRecord) {
@@ -574,7 +574,7 @@ class RecordService(
 
     @Throws(IOException::class)
     internal fun <T> encryptRecord(
-            record: NetworkRecordContract.DecryptedRecord<T>
+            record: NetworkRecordContract.DecryptedRecord
     ): EncryptedRecord {
         val encryptedTags = tagEncryptionService.encryptTags(record.tags!!).also {
             (it as MutableList<String>).addAll(tagEncryptionService.encryptAnnotations(record.annotations))
@@ -628,7 +628,7 @@ class RecordService(
     private fun <T : Any> decryptRecord(
             record: EncryptedRecord,
             builder: NetworkRecordContract.Builder
-    ): NetworkRecordContract.DecryptedRecord<T> {
+    ): NetworkRecordContract.DecryptedRecord {
         @Suppress("UNCHECKED_CAST")
         return when {
             record.encryptedBody == null || record.encryptedBody.isEmpty() -> builder.build(null)
@@ -642,7 +642,7 @@ class RecordService(
             else -> builder.build(decode(record.encryptedBody).let {
                 cryptoService.decrypt(builder.dataKey!!, it).blockingGet()
             })
-        } as NetworkRecordContract.DecryptedRecord<T>
+        } as NetworkRecordContract.DecryptedRecord
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -650,7 +650,7 @@ class RecordService(
     internal fun <T : Any> decryptRecord(
             record: EncryptedRecord,
             userId: String
-    ): NetworkRecordContract.DecryptedRecord<T> {
+    ): NetworkRecordContract.DecryptedRecord {
         if (!ModelVersion.isModelVersionSupported(record.modelVersion)) {
             throw DataValidationException.ModelVersionNotSupported("Please update SDK to latest version!")
         }
@@ -711,7 +711,7 @@ class RecordService(
                         attachmentIds,
                         userId,
                         type,
-                        it as NetworkRecordContract.DecryptedFhir3Record<Fhir3Resource>
+                        it as NetworkRecordContract.DecryptedRecord<Fhir3Resource>
                 )
             }
 
@@ -721,7 +721,7 @@ class RecordService(
             attachmentIds: List<String>,
             userId: String,
             type: DownloadType,
-            decryptedRecord: NetworkRecordContract.DecryptedFhir3Record<Fhir3Resource>
+            decryptedRecord: NetworkRecordContract.DecryptedRecord<Fhir3Resource>
     ): Single<out List<WrapperContract.Attachment>> {
         if (fhirAttachmentHelper.hasAttachment(decryptedRecord.resource)) {
             val resource = decryptedRecord.resource
@@ -786,9 +786,9 @@ class RecordService(
     }
 
     private fun <T : Any> setUploadData(
-            record: NetworkRecordContract.DecryptedRecord<T>,
+            record: NetworkRecordContract.DecryptedRecord,
             attachmentData: HashMap<Any, String?>?
-    ): NetworkRecordContract.DecryptedRecord<T> = record.also {
+    ): NetworkRecordContract.DecryptedRecord = record.also {
         val attachments = fhirAttachmentHelper.getAttachment(record.resource)
         if (attachments.isNotEmpty()) {
             @Suppress("UNCHECKED_CAST")
@@ -797,8 +797,8 @@ class RecordService(
     }
 
     internal fun <T : Any> removeUploadData(
-            record: NetworkRecordContract.DecryptedRecord<T>
-    ): NetworkRecordContract.DecryptedRecord<T> {
+            record: NetworkRecordContract.DecryptedRecord
+    ): NetworkRecordContract.DecryptedRecord {
         @Suppress("UNCHECKED_CAST")
         return if (record !is NetworkRecordContract.DecryptedDataRecord) {
             setUploadData(
@@ -811,10 +811,10 @@ class RecordService(
     }
 
     internal fun <T : Any> restoreUploadData(
-            record: NetworkRecordContract.DecryptedRecord<T>,
+            record: NetworkRecordContract.DecryptedRecord,
             originalResource: T?,
             attachmentData: HashMap<WrapperContract.Attachment, String?>?
-    ): NetworkRecordContract.DecryptedRecord<T> {
+    ): NetworkRecordContract.DecryptedRecord {
         if (record is NetworkRecordContract.DecryptedDataRecord || originalResource == null || originalResource is ByteArray) {
             return record
         }
@@ -826,9 +826,9 @@ class RecordService(
             record
         } else {
             setUploadData(
-                    record as NetworkRecordContract.DecryptedFhir3Record<Fhir3Resource>,
+                    record as NetworkRecordContract.DecryptedRecord<Fhir3Resource>,
                     attachmentData as HashMap<Any, String?>
-            ) as NetworkRecordContract.DecryptedRecord<T>
+            ) as NetworkRecordContract.DecryptedRecord
         }
     }
 
@@ -836,10 +836,10 @@ class RecordService(
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
     internal fun <T : Any> _uploadData(
-            record: NetworkRecordContract.DecryptedRecord<T>,
+            record: NetworkRecordContract.DecryptedRecord,
             userId: String
-    ): NetworkRecordContract.DecryptedRecord<T> {
-        if (record !is NetworkRecordContract.DecryptedFhir3Record) {
+    ): NetworkRecordContract.DecryptedRecord {
+        if (record !is NetworkRecordContract.DecryptedRecord) {
             return record
         }
 
@@ -892,11 +892,11 @@ class RecordService(
             DataValidationException.InvalidAttachmentPayloadHash::class,
             CoreRuntimeException.UnsupportedOperation::class)
     internal fun <T : Any> updateData(
-            record: NetworkRecordContract.DecryptedRecord<T>,
+            record: NetworkRecordContract.DecryptedRecord,
             newResource: T?,
             userId: String?
-    ): NetworkRecordContract.DecryptedRecord<T> {
-        if (record !is NetworkRecordContract.DecryptedFhir3Record) {
+    ): NetworkRecordContract.DecryptedRecord {
+        if (record !is NetworkRecordContract.DecryptedRecord) {
             return record
         }
 
@@ -963,9 +963,9 @@ class RecordService(
 
     @Throws(DataValidationException.IdUsageViolation::class, DataValidationException.InvalidAttachmentPayloadHash::class)
     internal fun <T : Any> downloadData(
-            record: NetworkRecordContract.DecryptedRecord<T>,
+            record: NetworkRecordContract.DecryptedRecord,
             userId: String?
-    ): NetworkRecordContract.DecryptedRecord<T> {
+    ): NetworkRecordContract.DecryptedRecord {
         if (record is NetworkRecordContract.DecryptedDataRecord) {
             return record
         }
@@ -1117,12 +1117,12 @@ class RecordService(
     }
 
     internal fun <T : Any> assignResourceId(
-            record: NetworkRecordContract.DecryptedRecord<T>
-    ): NetworkRecordContract.DecryptedRecord<T> {
+            record: NetworkRecordContract.DecryptedRecord
+    ): NetworkRecordContract.DecryptedRecord {
         return record.also {
             if (record.resource is Fhir3Resource) {
                 @Suppress("UNCHECKED_CAST")
-                (record as NetworkRecordContract.DecryptedFhir3Record<Fhir3Resource>).resource.id = record.identifier
+                (record as NetworkRecordContract.DecryptedRecord<Fhir3Resource>).resource.id = record.identifier
             }
         }
     }

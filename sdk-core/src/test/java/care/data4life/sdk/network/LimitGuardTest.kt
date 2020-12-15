@@ -19,6 +19,9 @@ package care.data4life.sdk.network
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.NetworkRecordContract
+import care.data4life.sdk.wrapper.WrapperContract
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -144,9 +147,30 @@ class LimitGuardTest {
     }
 
     @Test
-    fun `Given, checkDataLimit is called with a payload, which exceeds the boundaries, it fails with CustomDataLimitViolation`() {
+    fun `Given, checkDataLimit is called with a payload, which is not of Type DATA, it ignores it`() {
         // Given
-        val data = ByteArray(10485760)
+        val data = mockk<WrapperContract.Resource>()
+        val rawData = ByteArray(10485760)
+
+        every { data.unwrap() } returns rawData
+        every { data.type } returns WrapperContract.Resource.TYPE.FHIR3
+
+        // When
+        DecryptedRecordGuard.checkDataLimit(data)
+
+
+        // Then
+        assertTrue(true)
+    }
+
+    @Test
+    fun `Given, checkDataLimit is called with a payload, which exceeds the boundaries and is  of Type DATA, it fails with CustomDataLimitViolation`() {
+        // Given
+        val data = mockk<WrapperContract.Resource>()
+        val rawData = ByteArray(10485760)
+
+        every { data.unwrap() } returns rawData
+        every { data.type } returns WrapperContract.Resource.TYPE.DATA
 
         // When
         try {
@@ -165,7 +189,11 @@ class LimitGuardTest {
     @Test
     fun `Given, checkDataLimit is called with a payload, which in the limit, it accepts`() {
         // Given
-        val data = ByteArray(10)
+        val data = mockk<WrapperContract.Resource>()
+        val rawData = ByteArray(10)
+
+        every { data.unwrap() } returns rawData
+        every { data.type } returns WrapperContract.Resource.TYPE.DATA
 
         // When
         DecryptedRecordGuard.checkDataLimit(data)

@@ -38,7 +38,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
     fun `Given, build is called with a DomainResource, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedFhirRecord`() {
         // When
         val record = DecryptedRecordBuilder().build(
-                fhirResource,
+                this.resource,
                 tags,
                 creationDate,
                 dataKey,
@@ -49,7 +49,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
                 record,
                 DecryptedRecord(
                         null,
-                        fhirResource,
+                        this.resource,
                         tags,
                         listOf(),
                         creationDate,
@@ -69,7 +69,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
 
         // Then
         val record = builder.build(
-                fhirResource,
+                this.resource,
                 tags,
                 creationDate,
                 dataKey,
@@ -80,7 +80,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
                 record,
                 DecryptedRecord(
                         identifier,
-                        fhirResource,
+                        this.resource,
                         tags,
                         listOf(),
                         creationDate,
@@ -101,7 +101,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
 
         // Then
         val record = builder.build(
-                fhirResource,
+                this.resource,
                 tags,
                 creationDate,
                 dataKey,
@@ -112,7 +112,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
                 record,
                 DecryptedRecord(
                         null,
-                        fhirResource,
+                        this.resource,
                         tags,
                         listOf(),
                         creationDate,
@@ -132,7 +132,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
 
         // Then
         val record1 = builder.build(
-                fhirResource,
+                this.resource,
                 tags,
                 creationDate,
                 dataKey,
@@ -143,7 +143,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
                 record1,
                 DecryptedRecord(
                         null,
-                        fhirResource,
+                        this.resource,
                         tags,
                         annotations,
                         creationDate,
@@ -165,7 +165,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
 
         // Then
         val record = builder.build(
-                fhirResource,
+                this.resource,
                 tags,
                 creationDate,
                 dataKey,
@@ -176,7 +176,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
                 record,
                 DecryptedRecord(
                         null,
-                        fhirResource,
+                        this.resource,
                         tags,
                         listOf(),
                         creationDate,
@@ -196,7 +196,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
 
         // Then
         val record = builder.build(
-                fhirResource,
+                this.resource,
                 tags,
                 creationDate,
                 dataKey,
@@ -207,7 +207,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
                 record,
                 DecryptedRecord(
                         null,
-                        fhirResource,
+                        this.resource,
                         tags,
                         listOf(),
                         creationDate,
@@ -228,7 +228,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
 
         // Then
         val record = builder.build(
-                fhirResource,
+                this.resource,
                 tags,
                 creationDate,
                 dataKey,
@@ -239,7 +239,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
                 record,
                 DecryptedRecord(
                         null,
-                        fhirResource,
+                        this.resource,
                         tags,
                         listOf(),
                         creationDate,
@@ -259,7 +259,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
 
         // Then
         val record = builder.build(
-                fhirResource,
+                this.resource,
                 tags,
                 creationDate,
                 dataKey,
@@ -270,7 +270,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
                 record,
                 DecryptedRecord(
                         null,
-                        fhirResource,
+                        this.resource,
                         tags,
                         listOf(),
                         creationDate,
@@ -291,7 +291,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
 
         // Then
         val record = builder.build(
-                fhirResource,
+                this.resource,
                 tags,
                 creationDate,
                 dataKey,
@@ -302,7 +302,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
                 record,
                 DecryptedRecord(
                         null,
-                        fhirResource,
+                        this.resource,
                         tags,
                         listOf(),
                         creationDate,
@@ -325,7 +325,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
 
         // Then
         val record = builder.build(
-                fhirResource,
+                this.resource,
                 tags,
                 creationDate,
                 dataKey,
@@ -336,7 +336,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
                 record,
                 DecryptedRecord(
                         identifier,
-                        fhirResource,
+                        this.resource,
                         tags,
                         annotations,
                         creationDate,
@@ -360,7 +360,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
 
         // Then
         val record = builder.build(
-                fhirResource,
+                this.resource,
                 tags,
                 creationDate,
                 dataKey,
@@ -371,7 +371,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
                 record,
                 DecryptedRecord(
                         null,
-                        fhirResource,
+                        this.resource,
                         tags,
                         listOf(),
                         creationDate,

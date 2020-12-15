@@ -17,17 +17,16 @@
 package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.wrapper.WrapperContract
 
 
 //ToDo Internal
 interface NetworkRecordContract {
      interface DecryptedRecord<T> {
         var identifier: String?
-        var resource: T
+        var resource: WrapperContract.Resource
         var tags: HashMap<String, String>?
         var annotations: List<String>
         var customCreationDate: String?
@@ -35,15 +34,6 @@ interface NetworkRecordContract {
         var dataKey: GCKey?
         var attachmentsKey: GCKey?
         var modelVersion: Int
-    }
-
-    // FIXME remove nullable type
-    interface DecryptedFhir3Record<T : Fhir3Resource?> : DecryptedRecord<T>
-    interface DecryptedFhir4Record<T : Fhir4Resource> : DecryptedRecord<T>
-    interface DecryptedDataRecord : DecryptedRecord<ByteArray> {
-        override var attachmentsKey: GCKey?
-            get() = null
-            set(_) {}
     }
 
     interface Builder {
@@ -63,13 +53,13 @@ interface NetworkRecordContract {
         fun setAttachmentKey(attachmentKey: GCKey?): Builder
 
         @Throws(CoreRuntimeException.InternalFailure::class)
-        fun <T : Any?> build(
-                resource: T,
+        fun build(
+                resource: WrapperContract.Resource,
                 tags: HashMap<String, String>? = null,
                 creationDate: String? = null,
                 dataKey: GCKey? = null,
                 modelVersion: Int? = null
-        ): DecryptedRecord<T>
+        ): DecryptedRecord
 
         fun clear(): Builder
     }
@@ -79,7 +69,7 @@ interface NetworkRecordContract {
         fun checkTagsAndAnnotationsLimits(tags: HashMap<String, String>, annotations: List<String>)
 
         @Throws(DataValidationException.CustomDataLimitViolation::class)
-        fun checkDataLimit(data: ByteArray)
+        fun checkDataLimit(data: WrapperContract.Resource)
 
         companion object {
             const val MAX_LENGTH_TAGS_AND_ANNOTATIONS = 1000

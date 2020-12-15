@@ -17,9 +17,10 @@
 package care.data4life.sdk.network
 
 import care.data4life.crypto.GCKey
-import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.sdk.network.model.DecryptedRecordGuard
+import care.data4life.sdk.wrapper.WrapperContract
 import io.mockk.every
+import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkAll
 import org.mockito.Mockito
@@ -33,8 +34,7 @@ abstract class DecryptedRecordBuilderTestBase {
     protected lateinit var dataKey: GCKey
     protected var attachmentKey: GCKey? = null
     protected var modelVersion: Int = 0
-    protected lateinit var fhirResource: DomainResource
-    protected lateinit var customResource: ByteArray
+    protected lateinit var resource: WrapperContract.Resource
 
     fun init() {
         identifier = "potato"
@@ -47,8 +47,7 @@ abstract class DecryptedRecordBuilderTestBase {
         dataKey = Mockito.mock(GCKey::class.java)
         attachmentKey = Mockito.mock(GCKey::class.java)
         modelVersion = 42
-        fhirResource = Mockito.mock(DomainResource::class.java)
-        customResource = ByteArray(42)
+        resource = mockk()
 
         mockkObject(DecryptedRecordGuard)
         every { DecryptedRecordGuard.checkTagsAndAnnotationsLimits(any(), any()) } returns Unit

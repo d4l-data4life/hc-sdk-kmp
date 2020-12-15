@@ -17,7 +17,7 @@
 package care.data4life.sdk.network
 
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.network.model.DecryptedAppDataRecord
+import care.data4life.sdk.network.model.DecryptedRecord
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -37,13 +37,13 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     }
 
     @Test
-    fun `Given, no mandatory setters are called, it fails if build is called with a CustomResource`() {
+    fun `Given, no mandatory setters are called, it fails if build is called with a DecryptedRecord`() {
         // Given
         val builder = DecryptedRecordBuilder()
 
         // When
         try {
-            builder.build(customResource)
+            builder.build(resource)
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -51,13 +51,13 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     }
 
     @Test
-    fun `Given, setTags is called with a HashMap String to String, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
+    fun `Given, setTags is called with a HashMap String to String, but the other mandatory setters are not called, it fails if build is called with a DecryptedRecord`() {
         // Given
         val builder = DecryptedRecordBuilder()
 
         // When
         try {
-            builder.setTags(tags).build(customResource)
+            builder.setTags(tags).build(resource)
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -65,13 +65,13 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     }
 
     @Test
-    fun `Given, setCreationDate is called with a String, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
+    fun `Given, setCreationDate is called with a String, but the other mandatory setters are not called, it fails if build is called with a DecryptedRecord`() {
         // Given
         val builder = DecryptedRecordBuilder()
 
         // When
         try {
-            builder.setCreationDate(creationDate).build(customResource)
+            builder.setCreationDate(creationDate).build(resource)
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -79,13 +79,13 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     }
 
     @Test
-    fun `Given, setDataKey is called with a GCKey, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
+    fun `Given, setDataKey is called with a GCKey, but the other mandatory setters are not called, it fails if build is called with a DecryptedRecord`() {
         // Given
         val builder = DecryptedRecordBuilder()
 
         // When
         try {
-            builder.setDataKey(dataKey).build(customResource)
+            builder.setDataKey(dataKey).build(resource)
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -93,13 +93,13 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     }
 
     @Test
-    fun `Given, setModelVersion is called with a Int, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
+    fun `Given, setModelVersion is called with a Int, but the other mandatory setters are not called, it fails if build is called with a DecryptedRecord`() {
         // Given
         val builder = DecryptedRecordBuilder()
 
         // When
         try {
-            builder.setModelVersion(modelVersion).build(customResource)
+            builder.setModelVersion(modelVersion).build(resource)
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -107,109 +107,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     }
 
     @Test
-    fun `Given, setTags and setCreationDate are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
-        // Given
-        val builder = DecryptedRecordBuilder()
-
-        // When
-        try {
-            builder
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .build(customResource)
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, setTags and setDataKey are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
-        // Given
-        val builder = DecryptedRecordBuilder()
-
-        // When
-        try {
-            builder
-                    .setTags(tags)
-                    .setDataKey(dataKey)
-                    .build(customResource)
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, setTags and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
-        // Given
-        val builder = DecryptedRecordBuilder()
-
-        // When
-        try {
-            builder
-                    .setTags(tags)
-                    .setModelVersion(modelVersion)
-                    .build(customResource)
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, setCreationDate and setDataKey are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
-        // Given
-        val builder = DecryptedRecordBuilder()
-
-        // When
-        try {
-            builder
-                    .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .build(customResource)
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, setCreationDate and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
-        // Given
-        val builder = DecryptedRecordBuilder()
-
-        // When
-        try {
-            builder
-                    .setCreationDate(creationDate)
-                    .setModelVersion(modelVersion)
-                    .build(customResource)
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, setDataKey and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
-        // Given
-        val builder = DecryptedRecordBuilder()
-
-        // When
-        try {
-            builder
-                    .setDataKey(dataKey)
-                    .setModelVersion(modelVersion)
-                    .build(customResource)
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, setTags, setCreationDate and setDataKey are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
+    fun `Given, setTags and setCreationDate are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a DecryptedRecord`() {
         // Given
         val builder = DecryptedRecordBuilder()
 
@@ -218,8 +116,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
             builder
                     .setTags(tags)
                     .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .build(customResource)
+                    .build(resource)
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -227,7 +124,110 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     }
 
     @Test
-    fun `Given, setTags, setCreationDate and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
+    fun `Given, setTags and setDataKey are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a DecryptedRecord`() {
+        // Given
+        val builder = DecryptedRecordBuilder()
+
+        // When
+        try {
+            builder
+                    .setTags(tags)
+                    .setDataKey(dataKey)
+                    .build(resource)
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, setTags and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a DecryptedRecord`() {
+        // Given
+        val builder = DecryptedRecordBuilder()
+
+        // When
+        try {
+            builder
+                    .setTags(tags)
+                    .setModelVersion(modelVersion)
+                    .build(resource)
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, setCreationDate and setDataKey are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a DecryptedRecord`() {
+        // Given
+        val builder = DecryptedRecordBuilder()
+
+        // When
+        try {
+            builder
+                    .setCreationDate(creationDate)
+                    .setDataKey(dataKey)
+                    .build(resource)
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, setCreationDate and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a DecryptedRecord`() {
+        // Given
+        val builder = DecryptedRecordBuilder()
+
+        // When
+        try {
+            builder
+                    .setCreationDate(creationDate)
+                    .setModelVersion(modelVersion)
+                    .build(resource)
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, setDataKey and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a DecryptedRecord`() {
+        // Given
+        val builder = DecryptedRecordBuilder()
+
+        // When
+        try {
+            builder
+                    .setDataKey(dataKey)
+                    .setModelVersion(modelVersion)
+                    .build(resource)
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, setTags, setCreationDate and setDataKey are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a DecryptedRecord`() {
+        // Given
+        val builder = DecryptedRecordBuilder()
+
+        // When
+        try {
+            builder
+                    .setTags(tags)
+                    .setCreationDate(creationDate)
+                    .setDataKey(dataKey)
+                    .build(resource)
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, setTags, setCreationDate and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a DecryptedRecord`() {
         // Given
         val builder = DecryptedRecordBuilder()
 
@@ -237,7 +237,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setTags(tags)
                     .setCreationDate(creationDate)
                     .setModelVersion(modelVersion)
-                    .build(customResource)
+                    .build(resource)
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -245,7 +245,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     }
 
     @Test
-    fun `Given, setTags, setDataKey and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
+    fun `Given, setTags, setDataKey and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a DecryptedRecord`() {
         // Given
         val builder = DecryptedRecordBuilder()
 
@@ -255,7 +255,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setTags(tags)
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
-                    .build(customResource)
+                    .build(resource)
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -263,7 +263,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     }
 
     @Test
-    fun `Given, setCreationDate, setDataKey and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
+    fun `Given, setCreationDate, setDataKey and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a DecryptedRecord`() {
         // Given
         val builder = DecryptedRecordBuilder()
 
@@ -273,7 +273,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setCreationDate(creationDate)
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
-                    .build(customResource)
+                    .build(resource)
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -281,7 +281,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     }
 
     @Test
-    fun `Given, setTags, setCreationDate, setDataKey and setModelVersion are called with their appropriate payload, it returns a DecryptedDataRecord a CustomResource`() {
+    fun `Given, setTags, setCreationDate, setDataKey and setModelVersion are called with their appropriate payload, it returns a DecryptedDataRecord a DecryptedRecord`() {
         // Given
         val builder = DecryptedRecordBuilder()
 
@@ -291,19 +291,20 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                 .setCreationDate(creationDate)
                 .setDataKey(dataKey)
                 .setModelVersion(modelVersion)
-                .build(customResource)
+                .build(resource)
 
         // Then
         assertEquals(
                 record,
-                DecryptedAppDataRecord(
+                DecryptedRecord(
                         null,
-                        customResource,
+                        resource,
                         tags,
                         listOf(),
                         creationDate,
                         null,
                         dataKey,
+                        null,
                         modelVersion
                 )
         )
@@ -322,7 +323,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
                     .setTags(null)
-                    .build(customResource)
+                    .build(resource)
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             // Then
@@ -343,7 +344,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
                     .setCreationDate(null)
-                    .build(customResource)
+                    .build(resource)
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             // Then
@@ -364,7 +365,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
                     .setDataKey(null)
-                    .build(customResource)
+                    .build(resource)
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             // Then
@@ -385,7 +386,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
                     .setModelVersion(null)
-                    .build(customResource)
+                    .build(resource)
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             // Then
@@ -405,7 +406,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
                     .clear()
-                    .build(customResource)
+                    .build(resource)
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -419,22 +420,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setModelVersion(modelVersion)
                     .clear()
                     .setTags(tags)
-                    .build(customResource)
-            assertTrue(false)// FIXME: This is stupid
-        } catch (e: Exception) {
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-
-        try {
-            builder
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .setModelVersion(modelVersion)
-                    .clear()
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .build(customResource)
+                    .build(resource)
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -449,8 +435,23 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .clear()
                     .setTags(tags)
                     .setCreationDate(creationDate)
+                    .build(resource)
+            assertTrue(false)// FIXME: This is stupid
+        } catch (e: Exception) {
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+
+        try {
+            builder
+                    .setTags(tags)
+                    .setCreationDate(creationDate)
                     .setDataKey(dataKey)
-                    .build(customResource)
+                    .setModelVersion(modelVersion)
+                    .clear()
+                    .setTags(tags)
+                    .setCreationDate(creationDate)
+                    .setDataKey(dataKey)
+                    .build(resource)
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -466,19 +467,20 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                 .setCreationDate(creationDate)
                 .setDataKey(dataKey)
                 .setModelVersion(modelVersion)
-                .build(customResource)
+                .build(resource)
 
         // Then
         assertEquals(
                 record,
-                DecryptedAppDataRecord(
+                DecryptedRecord(
                         null,
-                        customResource,
+                        resource,
                         tags,
                         listOf(),
                         creationDate,
                         null,
                         dataKey,
+                        null,
                         modelVersion
                 )
         )

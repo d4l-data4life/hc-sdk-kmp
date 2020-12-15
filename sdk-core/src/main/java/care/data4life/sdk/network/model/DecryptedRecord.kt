@@ -17,11 +17,12 @@ package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.wrapper.WrapperContract
 import java.io.Serializable
 
-internal data class DecryptedRecord<T : Fhir3Resource?>(
+internal data class DecryptedRecord(
         override var identifier: String?,
-        override var resource: T,
+        override var resource: WrapperContract.Resource,
         override var tags: HashMap<String, String>?,
         override var annotations: List<String>,
         override var customCreationDate: String?,
@@ -29,4 +30,4 @@ internal data class DecryptedRecord<T : Fhir3Resource?>(
         override var dataKey: GCKey?,
         override var attachmentsKey: GCKey?,
         override var modelVersion: Int
-) : NetworkRecordContract.DecryptedFhir3Record<T>, Serializable
+) : NetworkRecordContract.DecryptedRecord, Serializable

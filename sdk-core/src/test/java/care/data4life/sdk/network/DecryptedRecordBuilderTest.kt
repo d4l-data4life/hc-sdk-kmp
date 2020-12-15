@@ -18,7 +18,6 @@ package care.data4life.sdk.network
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.NetworkRecordContract
@@ -93,28 +92,10 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     }
 
     @Test
-    fun `Given, build is called with a unknown Resource, Tags, CreationDate, DataKey and ModelVersion, it fails with a InternalFailure`() {
-        try {
-            DecryptedRecordBuilder()
-                    .build(
-                            "something",
-                            tags,
-                            creationDate,
-                            dataKey,
-                            modelVersion
-                    )
-            assertTrue(false)// FIXME: This is stupid
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, build is called with a DomainResource, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedFhir3Record`() {
+    fun `Given, build is called with a DomainResource, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedRecord`() {
         // When
-        val record = DecryptedRecordBuilder().build(
-                fhirResource,
+        val record: Any = DecryptedRecordBuilder().build(
+                resource,
                 tags,
                 creationDate,
                 dataKey,
@@ -122,75 +103,18 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         )
 
         // Then
-        assertTrue(record is NetworkRecordContract.DecryptedFhir3Record<*>)
+        assertTrue(record is NetworkRecordContract.DecryptedRecord)
         assertEquals(
                 record,
                 DecryptedRecord(
                         null,
-                        fhirResource,
+                        resource,
                         tags,
                         listOf(),
                         creationDate,
                         null,
                         dataKey,
                         null,
-                        modelVersion
-                )
-        )
-    }
-
-    @Test
-    fun `Given, build is called with null, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedFhir3Record`() {
-        // When
-        val record = DecryptedRecordBuilder().build(
-                null,
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
-        )
-
-        // Then
-        assertTrue(record is NetworkRecordContract.DecryptedFhir3Record<*>)
-        assertEquals(
-                record,
-                DecryptedRecord(
-                        null,
-                        null,
-                        tags,
-                        listOf(),
-                        creationDate,
-                        null,
-                        dataKey,
-                        null,
-                        modelVersion
-                )
-        )
-    }
-
-    @Test
-    fun `Given, build is called with ByteArray, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedDataRecord`() {
-        // When
-        val record = DecryptedRecordBuilder().build(
-                customResource,
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
-        )
-
-        // Then
-        assertTrue(record is NetworkRecordContract.DecryptedDataRecord)
-        assertEquals(
-                record,
-                DecryptedAppDataRecord(
-                        null,
-                        customResource,
-                        tags,
-                        listOf(),
-                        creationDate,
-                        null,
-                        dataKey,
                         modelVersion
                 )
         )
@@ -202,7 +126,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         try {
             DecryptedRecordBuilder()
                     .build(
-                            customResource,
+                            resource,
                             creationDate = creationDate,
                             dataKey = dataKey,
                             modelVersion = modelVersion
@@ -220,7 +144,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         try {
             DecryptedRecordBuilder()
                     .build(
-                            customResource,
+                            resource,
                             tags = tags,
                             dataKey = dataKey,
                             modelVersion = modelVersion
@@ -238,7 +162,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         try {
             DecryptedRecordBuilder()
                     .build(
-                            customResource,
+                            resource,
                             tags = tags,
                             creationDate = creationDate,
                             modelVersion = modelVersion
@@ -256,7 +180,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         try {
             DecryptedRecordBuilder()
                     .build(
-                            customResource,
+                            resource,
                             tags = tags,
                             creationDate = creationDate,
                             dataKey = dataKey
@@ -274,7 +198,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         try {
             DecryptedRecordBuilder()
                     .build(
-                            customResource,
+                            resource,
                             null,
                             creationDate,
                             dataKey,
@@ -293,7 +217,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         try {
             DecryptedRecordBuilder()
                     .build(
-                            customResource,
+                            resource,
                             tags = tags,
                             creationDate = null,
                             dataKey = dataKey,
@@ -312,7 +236,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         try {
             DecryptedRecordBuilder()
                     .build(
-                            customResource,
+                            resource,
                             tags = tags,
                             creationDate = creationDate,
                             dataKey = null,
@@ -330,7 +254,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         try {
             DecryptedRecordBuilder()
                     .build(
-                            customResource,
+                            resource,
                             tags = tags,
                             creationDate = creationDate,
                             dataKey = dataKey,
@@ -355,7 +279,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
                 .setDataKey(dataKey)
                 .setModelVersion(modelVersion)
                 .build(
-                        customResource,
+                        resource,
                         tags = delegatedTags
                 )
 
@@ -377,7 +301,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
                 .setDataKey(dataKey)
                 .setModelVersion(modelVersion)
                 .build(
-                        customResource,
+                        resource,
                         creationDate = delegatedDate
                 )
 
@@ -399,7 +323,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
                 .setDataKey(dataKey)
                 .setModelVersion(modelVersion)
                 .build(
-                        customResource,
+                        resource,
                         dataKey = delegatedDataKey
                 )
 
@@ -421,7 +345,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
                 .setDataKey(dataKey)
                 .setModelVersion(modelVersion)
                 .build(
-                        customResource,
+                        resource,
                         modelVersion = delegatedModelVersion
                 )
 
@@ -433,7 +357,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     }
 
     @Test
-    fun `Given, mandatory and optional setters are called with their appropriate payload, it returns a DecryptedFhireRecord`() {
+    fun `Given, mandatory and optional setters are called with their appropriate payload, it returns a DecryptedRecord`() {
         // Given
         val builder = DecryptedRecordBuilder()
 
@@ -447,14 +371,14 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
                 .setDataKey(dataKey)
                 .setAttachmentKey(attachmentKey)
                 .setModelVersion(modelVersion)
-                .build(fhirResource)
+                .build(resource)
 
         // Then
         assertEquals(
                 record,
                 DecryptedRecord(
                         identifier,
-                        fhirResource,
+                        resource,
                         tags,
                         annotations,
                         creationDate,
@@ -467,45 +391,13 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     }
 
     @Test
-    fun `Given, mandatory and optional setters are called with their appropriate payload, it returns a DecryptedDataRecord`() {
-        // Given
-        val builder = DecryptedRecordBuilder()
-
-        // When
-        val record = builder
-                .setIdentifier(identifier)
-                .setTags(tags)
-                .setAnnotations(annotations)
-                .setCreationDate(creationDate)
-                .setUpdateDate(updateDate)
-                .setDataKey(dataKey)
-                .setAttachmentKey(attachmentKey)
-                .setModelVersion(modelVersion)
-                .build(customResource)
-
-        assertEquals(
-                record,
-                DecryptedAppDataRecord(
-                        identifier,
-                        customResource,
-                        tags,
-                        annotations,
-                        creationDate,
-                        updateDate,
-                        dataKey,
-                        modelVersion
-                )
-        )
-    }
-
-    @Test
     fun `Given, build is called with a valid Resource, Tags, CreationDate, DataKey and ModelVersion, it calls the Limit Guard, with the given Tags and empty Annotations`() {
         // Given
         every { DecryptedRecordGuard.checkTagsAndAnnotationsLimits(tags, listOf()) } returns Unit
 
         // When
         DecryptedRecordBuilder().build(
-                customResource,
+                resource,
                 tags,
                 creationDate,
                 dataKey,
@@ -528,7 +420,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         DecryptedRecordBuilder()
                 .setTags(tags)
                 .build(
-                    customResource,
+                    resource,
                     delegatedTags,
                     creationDate,
                     dataKey,
@@ -547,7 +439,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         DecryptedRecordBuilder()
                 .setAnnotations(annotations)
                 .build(
-                    customResource,
+                    resource,
                     tags,
                     creationDate,
                     dataKey,
@@ -561,12 +453,12 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     @Test
     fun `Given, build is called with a ByteArray, Tags, CreationDate, DataKey and ModelVersion, it calls the Limit Guard, with the given Resource`() {
         // When
-        every { DecryptedRecordGuard.checkDataLimit(customResource) } returns Unit
+        every { DecryptedRecordGuard.checkDataLimit(resource) } returns Unit
 
         DecryptedRecordBuilder()
                 .setAnnotations(annotations)
                 .build(
-                        customResource,
+                        resource,
                         tags,
                         creationDate,
                         dataKey,
@@ -574,44 +466,6 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
                 )
 
         // Then
-        verify { DecryptedRecordGuard.checkDataLimit(customResource) }
-    }
-
-    @Test
-    fun `Given, build is called with null as a Resource, Tags, CreationDate, DataKey and ModelVersion, it does not calls the Limit Guard, with the given Resource`() {
-        // When
-        every { DecryptedRecordGuard.checkDataLimit(any()) } returns Unit
-
-        DecryptedRecordBuilder()
-                .setAnnotations(annotations)
-                .build(
-                        null,
-                        tags,
-                        creationDate,
-                        dataKey,
-                        modelVersion
-                )
-
-        // Then
-        verify(exactly = 0) { DecryptedRecordGuard.checkDataLimit(any()) }
-    }
-
-    @Test
-    fun `Given, build is called with a FhirResource, Tags, CreationDate, DataKey and ModelVersion, it does not calls the Limit Guard, with the given Resource`() {
-        // When
-        every { DecryptedRecordGuard.checkDataLimit(any()) } returns Unit
-
-        DecryptedRecordBuilder()
-                .setAnnotations(annotations)
-                .build(
-                        null,
-                        tags,
-                        creationDate,
-                        dataKey,
-                        modelVersion
-                )
-
-        // Then
-        verify(exactly = 0) { DecryptedRecordGuard.checkDataLimit(any()) }
+        verify { DecryptedRecordGuard.checkDataLimit(resource) }
     }
 }

@@ -17,12 +17,11 @@
 package care.data4life.sdk.network
 
 import care.data4life.crypto.GCKey
-import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.NetworkRecordContract
+import care.data4life.sdk.wrapper.WrapperContract
 
 internal class DecryptedRecordBuilder : NetworkRecordContract.Builder {
     private var identifier: String? = null
@@ -94,54 +93,15 @@ internal class DecryptedRecordBuilder : NetworkRecordContract.Builder {
         }
     }
 
-    // TODO add FHIR 4
-    @Throws(CoreRuntimeException.InternalFailure::class)
-    private fun <T : DomainResource?> buildFhir3Record(
-            resource: T?,
-            tags: HashMap<String, String>,
-            creationDate: String,
-            dataKey: GCKey,
-            modelVersion: Int
-    ): NetworkRecordContract.DecryptedFhir3Record<T?> =
-            DecryptedRecord(
-                    this.identifier,
-                    resource,
-                    tags,
-                    this.annotations,
-                    creationDate,
-                    this.updatedDate,
-                    dataKey,
-                    this.attachmentKey,
-                    modelVersion
-            )
-
-    @Throws(CoreRuntimeException.InternalFailure::class)
-    private fun buildCustomRecord(
-            resource: ByteArray,
-            tags: HashMap<String, String>,
-            creationDate: String?,
-            dataKey: GCKey?,
-            modelVersion: Int?
-    ): NetworkRecordContract.DecryptedDataRecord = DecryptedAppDataRecord(
-            this.identifier,
-            resource,
-            tags,
-            this.annotations,
-            creationDate!!,
-            this.updatedDate,
-            dataKey!!,
-            modelVersion!!
-    )
-
     @Suppress("UNCHECKED_CAST", "NAME_SHADOWING")
     @Throws(CoreRuntimeException.InternalFailure::class)
-    override fun <T : Any?> build(
-            resource: T,
+    override fun build(
+            resource: WrapperContract.Resource,
             tags: HashMap<String, String>?,
             creationDate: String?,
             dataKey: GCKey?,
             modelVersion: Int?
-    ): NetworkRecordContract.DecryptedRecord<T> {
+    ): NetworkRecordContract.DecryptedRecord {
         this.validatePayload(
                 tags,
                 creationDate,
@@ -156,31 +116,17 @@ internal class DecryptedRecordBuilder : NetworkRecordContract.Builder {
 
         guard.checkTagsAndAnnotationsLimits(tags, annotations)
 
-        return when (resource) {
-            null -> this.buildFhir3Record(
-                    resource,
-                    tags,
-                    creationDate,
-                    dataKey,
-                    modelVersion
-            )
-            is DomainResource -> this.buildFhir3Record(
-                    resource,
-                    tags,
-                    creationDate,
-                    dataKey,
-                    modelVersion
-            )
-            is ByteArray -> this.buildCustomRecord(
-                    resource,
-                    tags,
-                    creationDate,
-                    dataKey,
-                    modelVersion
-            ).also { this.guard.checkDataLimit(resource) }
-            else -> throw CoreRuntimeException.InternalFailure()
-
-        } as NetworkRecordContract.DecryptedRecord<T>
+        return DecryptedRecord(
+                this.identifier,
+                resource,
+                tags,
+                this.annotations,
+                creationDate,
+                this.updatedDate,
+                dataKey,
+                this.attachmentKey,
+                modelVersion
+        )
     }
 
     override fun clear(): NetworkRecordContract.Builder = this.also {

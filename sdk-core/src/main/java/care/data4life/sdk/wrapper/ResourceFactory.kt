@@ -23,7 +23,7 @@ import care.data4life.sdk.lang.CoreRuntimeException
 internal object ResourceFactory: WrapperFactoryContract.ResourceFactory {
     override fun wrap(resource: Any?): WrapperContract.Resource? {
         return when(resource) {
-            null -> null
+            null -> null// ToDo -> do we need for that a type?
             is DataResource -> SdkDataResource(resource)
             is Fhir3Resource -> SdkFhir3Resource(resource)
             else -> throw CoreRuntimeException.InternalFailure()

@@ -19,6 +19,7 @@ package care.data4life.sdk.network.model
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.NetworkRecordContract.LimitGuard.Companion.MAX_LENGTH_TAGS_AND_ANNOTATIONS
 import care.data4life.sdk.network.model.NetworkRecordContract.LimitGuard.Companion.MAX_SIZE_CUSTOM_DATA
+import care.data4life.sdk.wrapper.WrapperContract
 
 internal object DecryptedRecordGuard : NetworkRecordContract.LimitGuard {
     override fun checkTagsAndAnnotationsLimits(tags: HashMap<String, String>, annotations: List<String>) {
@@ -41,9 +42,13 @@ internal object DecryptedRecordGuard : NetworkRecordContract.LimitGuard {
         }
     }
 
-    override fun checkDataLimit(data: ByteArray) {
-        if (data.size >= MAX_SIZE_CUSTOM_DATA) {
-            throw DataValidationException.CustomDataLimitViolation()
+    override fun checkDataLimit(data: WrapperContract.Resource) {
+
+        if(data.type == WrapperContract.Resource.TYPE.DATA) {
+            val rawData = data.unwrap() as ByteArray
+            if (rawData.size >= MAX_SIZE_CUSTOM_DATA) {
+                throw DataValidationException.CustomDataLimitViolation()
+            }
         }
     }
 }

@@ -21,6 +21,8 @@ buildscript {
         google()
         mavenCentral()
         jcenter()
+
+        maven("https://dl.bintray.com/data4life/maven")
     }
 
     dependencies {
@@ -47,12 +49,15 @@ buildscript {
 
         // https://github.com/jeremylong/dependency-check-gradle
         classpath("org.owasp:dependency-check-gradle:5.3.0")
+
+        // https://github.com/d4l-data4life/gradle-git-publish
+        classpath("care.data4life:gradle-git-publish:3.2.0")
     }
 }
 
 plugins {
     // https://github.com/ben-manes/gradle-versions-plugin
-    id("com.github.ben-manes.versions") version "0.27.0"
+    id("com.github.ben-manes.versions") version "0.36.0"
 }
 
 allprojects {

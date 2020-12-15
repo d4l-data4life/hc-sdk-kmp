@@ -62,5 +62,21 @@ interface AttachmentContract {
                 originalResource: WrapperContract.Resource?,
                 attachmentData: HashMap<WrapperContract.Attachment, String?>?
         ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+
+        fun downloadData(
+                record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>,
+                userId: String?
+        ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+
+        fun updateData(
+                record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>,
+                newResource: WrapperContract.Resource?,
+                userId: String?
+        ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+
+        fun uploadData(
+                record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>,
+                userId: String
+        ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
     }
 }

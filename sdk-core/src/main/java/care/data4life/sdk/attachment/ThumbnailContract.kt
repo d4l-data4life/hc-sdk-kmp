@@ -29,5 +29,10 @@ interface ThumbnailContract {
                 attachment: WrapperContract.Attachment,
                 originalData: ByteArray
         ): List<String>
+
+        fun updateResourceIdentifier(
+                resource: WrapperContract.Resource,
+                result: List<Pair<WrapperContract.Attachment, List<String>?>>
+        )
     }
 }

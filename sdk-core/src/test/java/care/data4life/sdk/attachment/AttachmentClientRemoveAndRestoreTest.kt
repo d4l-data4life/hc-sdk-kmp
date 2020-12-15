@@ -28,7 +28,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-class AttachmentClientTest {
+class AttachmentClientRemoveAndRestoreTest {
     private lateinit var fhirAttachmentHelper: FhirAttachmentHelper
 
     private lateinit var attachmentClient: AttachmentContract.Client
@@ -37,12 +37,26 @@ class AttachmentClientTest {
     fun setUp() {
         fhirAttachmentHelper = mockk()
 
-        attachmentClient = AttachmentClient(fhirAttachmentHelper)
+        attachmentClient = AttachmentClient(
+                fhirAttachmentHelper,
+                mockk(),
+                mockk(),
+                mockk(),
+                mockk()
+        )
     }
 
     @Test
     fun `it is a AttachmentClient`() {
-        assertTrue((AttachmentClient(fhirAttachmentHelper) as Any) is AttachmentContract.Client)
+        val client: Any = AttachmentClient(
+                fhirAttachmentHelper,
+                mockk(),
+                mockk(),
+                mockk(),
+                mockk()
+        )
+
+        assertTrue(client is AttachmentContract.Client)
     }
 
     @Test
@@ -364,11 +378,6 @@ class AttachmentClientTest {
         val rawKey1 = mockk<Any>()
         val key2 = mockk<WrapperContract.Attachment>()
         val rawKey2 = mockk<Any>()
-
-        val attachments = hashMapOf<WrapperContract.Attachment, String?>(
-                key1 to "21",
-                key2 to "42"
-        )
 
         val rawAttachment = hashMapOf<Any, String?>(
                 rawKey1 to "21",

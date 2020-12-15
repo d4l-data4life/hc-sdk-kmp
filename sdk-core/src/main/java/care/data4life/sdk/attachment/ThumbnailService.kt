@@ -84,6 +84,13 @@ class ThumbnailService internal constructor(
         }
     }
 
+    override fun updateResourceIdentifier(
+            resource: WrapperContract.Resource,
+            result: List<Pair<WrapperContract.Attachment, List<String>?>>
+    ) {
+        TODO("Not yet implemented")
+    }
+
     companion object {
         const val SPLIT_CHAR = "#"
     }

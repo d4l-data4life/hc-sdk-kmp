@@ -18,6 +18,7 @@ package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.network.model.NetworkRecordContract
 import care.data4life.sdk.wrapper.WrapperContract
 import io.reactivex.Single
@@ -46,6 +47,15 @@ interface AttachmentContract {
         fun updateAttachmentMeta(attachment: WrapperContract.Attachment): WrapperContract.Attachment
 
         fun getValidHash(attachment: WrapperContract.Attachment): String?
+
+        @Throws(DataValidationException.IdUsageViolation::class,
+                DataValidationException.InvalidAttachmentPayloadHash::class)
+        fun downloadAttachmentsFromStorage(
+                attachmentIds: List<String>,
+                userId: String,
+                type: DownloadType,
+                decryptedRecord: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+        ): Single<out List<WrapperContract.Attachment>>
     }
 
     interface FhirDateValidator {

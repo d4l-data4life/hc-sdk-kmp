@@ -17,6 +17,9 @@
 package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
+import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.model.DownloadType
+import care.data4life.sdk.network.model.NetworkRecordContract
 import care.data4life.sdk.wrapper.WrapperContract
 
 interface ThumbnailContract {
@@ -33,6 +36,13 @@ interface ThumbnailContract {
         fun updateResourceIdentifier(
                 resource: WrapperContract.Resource,
                 result: List<Pair<WrapperContract.Attachment, List<String>?>>
+        )
+
+        @Throws(DataValidationException.IdUsageViolation::class)
+        fun setAttachmentIdForDownloadType(
+                attachments: List<WrapperContract.Attachment>,
+                identifiers: List<Any>?,
+                type: DownloadType?
         )
     }
 }

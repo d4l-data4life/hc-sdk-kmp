@@ -257,10 +257,5 @@ internal class AttachmentClient(
         ).blockingGet()
 
         return record
-        TODO()
-    }
-
-    companion object {
-        const val DOWNSCALED_ATTACHMENT_IDS_FMT = "d4l_f_p_t" //d4l -> namespace, f-> full, p -> preview, t -> thumbnail
     }
 }

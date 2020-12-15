@@ -18,17 +18,25 @@ package care.data4life.sdk.attachment
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.lang.CoreRuntimeException
+import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.model.DownloadType
+import care.data4life.sdk.network.model.NetworkRecordContract
 import care.data4life.sdk.util.Base64
 import care.data4life.sdk.util.HashUtil
+import care.data4life.sdk.wrapper.AttachmentFactory
+import care.data4life.sdk.wrapper.FhirAttachmentHelper
 import care.data4life.sdk.wrapper.WrapperContract
+import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.spyk
 import io.mockk.unmockkObject
 import io.mockk.verify
 import io.reactivex.Single
 import org.junit.After
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -41,7 +49,9 @@ class AttachmentServiceTest {
     private lateinit var fileService: FileContract.Service
     private lateinit var thumbnailService: ThumbnailContract.Service
     private lateinit var attachment: WrapperContract.Attachment
-    private lateinit var attachmentService: AttachmentService  //SUT
+
+
+    private lateinit var attachmentService: AttachmentService
 
     @Before
     fun setUp() {
@@ -53,6 +63,8 @@ class AttachmentServiceTest {
         mockkObject(Base64)
         mockkObject(FhirDateValidator)
         mockkObject(HashUtil)
+        mockkObject(FhirAttachmentHelper)
+        mockkObject(AttachmentFactory)
     }
 
     @After
@@ -60,6 +72,8 @@ class AttachmentServiceTest {
         unmockkObject(Base64)
         unmockkObject(FhirDateValidator)
         unmockkObject(HashUtil)
+        unmockkObject(FhirAttachmentHelper)
+        unmockkObject(AttachmentFactory)
     }
 
     @Test
@@ -482,6 +496,261 @@ class AttachmentServiceTest {
                 attachment,
                 attachmentService.updateAttachmentMeta(attachment)
         )
+    }
+
+    @Test
+    fun `Given, downloadAttachmentsFromStorage is called with AttachmentIds, a UserId, a DownloadType and a DecryptedRecord, it fails, if the there are no Attachments for the provided Resource`() {
+        // Given
+        val attachments = mockk<List<String>>()
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val resource = mockk<WrapperContract.Resource>()
+        val rawResource = mockk<Any>()
+
+        every { decryptedRecord.resource } returns resource
+        every { resource.unwrap() } returns rawResource
+
+        every { FhirAttachmentHelper.hasAttachment(rawResource) } returns false
+
+        // When
+        try {
+            attachmentService.downloadAttachmentsFromStorage(
+                    attachments,
+                    USER_ID,
+                    DownloadType.Full,
+                    decryptedRecord
+
+            )
+            Assert.fail("Exception expected!")
+        } catch (e: IllegalArgumentException) {
+
+            // Then
+            Truth.assertThat(e.javaClass).isEqualTo(IllegalArgumentException::class.java)
+            Truth.assertThat(e.message).isEqualTo("Expected a record of a type that has attachment")
+        }
+    }
+
+    @Test
+    fun `Given, downloadAttachmentsFromStorage is called with AttachmentIds, a UserId, a DownloadType and a DecryptedRecord, it fails, if the amount of the given attachments does not match the amount of the validated Attachments`() {
+        // Given
+        val attachments = listOf(
+                "yes"
+        )
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val resource = mockk<WrapperContract.Resource>()
+        val rawResource = mockk<Any>()
+
+        val serviceAttachments = mutableListOf<Any>(
+                "attachment"
+        )
+
+        val wrappedServiceAttachment = mockk<WrapperContract.Attachment>()
+
+        every { decryptedRecord.resource } returns resource
+        every { resource.unwrap() } returns rawResource
+
+        every { wrappedServiceAttachment.id } returns "no"
+
+        every { FhirAttachmentHelper.hasAttachment(rawResource) } returns true
+        every { FhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
+
+        every { AttachmentFactory.wrap(serviceAttachments[0]) } returns wrappedServiceAttachment
+
+        // When
+        try {
+            attachmentService.downloadAttachmentsFromStorage(
+                    attachments,
+                    USER_ID,
+                    DownloadType.Full,
+                    decryptedRecord
+
+            )
+            Assert.fail("Exception expected!")
+        } catch (e: D4LException) {
+
+            // Then
+            Truth.assertThat(e.javaClass).isEqualTo(DataValidationException.IdUsageViolation::class.java)
+            Truth.assertThat(e.message).isEqualTo("Please provide correct attachment ids!")
+        }
+    }
+
+    @Test
+    fun `Given, downloadAttachmentsFromStorage is called with AttachmentIds, a UserId, a DownloadType and a DecryptedRecord, it downloads the requested Attachments`() {
+        // Given
+        val attachments = listOf(
+                "yes"
+        )
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val resource = mockk<WrapperContract.Resource>()
+        val rawResource = mockk<Any>()
+        val attachmentKey = mockk<GCKey>()
+        val type = DownloadType.Full
+
+
+        val serviceAttachments = mutableListOf<Any>(
+                "attachment"
+        )
+
+        val ids = listOf("id")
+
+        val wrappedServiceAttachment = mockk<WrapperContract.Attachment>()
+        val validatedAttachments = listOf(wrappedServiceAttachment)
+
+        val downloadedAttachment = mockk<WrapperContract.Attachment>()
+
+        val spyedService = spyk(attachmentService)
+
+        every { decryptedRecord.resource } returns resource
+        every { decryptedRecord.attachmentsKey } returns attachmentKey
+        every { resource.unwrap() } returns rawResource
+
+        every { wrappedServiceAttachment.id } returns "yes"
+
+        every { downloadedAttachment.id } returns "no split char"
+
+        every { FhirAttachmentHelper.hasAttachment(rawResource) } returns true
+        every { FhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
+        every { FhirAttachmentHelper.getIdentifier(rawResource) } returns ids
+
+        every { AttachmentFactory.wrap(serviceAttachments[0]) } returns wrappedServiceAttachment
+
+        every { thumbnailService.setAttachmentIdForDownloadType(
+                validatedAttachments,
+                ids,
+                type
+        ) } returns Unit
+
+        every { spyedService.download(
+                validatedAttachments,
+                attachmentKey,
+                USER_ID
+        ) } returns Single.just(listOf(downloadedAttachment))
+
+        every { spyedService.updateAttachmentMeta(any()) } returns mockk()
+
+        // When
+        val subscriber = spyedService.downloadAttachmentsFromStorage(
+                attachments,
+                USER_ID,
+                type,
+                decryptedRecord
+
+        ).test().await()
+        val result = subscriber
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
+
+        // Them
+
+        Truth.assertThat(result).isEqualTo(listOf(downloadedAttachment))
+
+
+        verify(exactly = 1) {
+            spyedService.download(
+                    any(),
+                    attachmentKey,
+                    USER_ID
+            )
+        }
+
+        verify(exactly = 1 ) { thumbnailService.setAttachmentIdForDownloadType(
+                validatedAttachments,
+                ids,
+                type
+        ) }
+
+        verify(exactly = 0) { spyedService.updateAttachmentMeta(any()) }
+    }
+
+    @Test
+    fun `Given, downloadAttachmentsFromStorage is called with AttachmentIds, a UserId, a DownloadType and a DecryptedRecord, it downloads the requested Attachments and updates their meta`() {
+        // Given
+        val attachments = listOf(
+                "yes"
+        )
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val resource = mockk<WrapperContract.Resource>()
+        val rawResource = mockk<Any>()
+        val attachmentKey = mockk<GCKey>()
+        val type = DownloadType.Full
+
+
+        val serviceAttachments = mutableListOf<Any>(
+                "attachment"
+        )
+
+        val ids = listOf("id")
+
+        val wrappedServiceAttachment = mockk<WrapperContract.Attachment>()
+        val validatedAttachments = listOf(wrappedServiceAttachment)
+
+        val downloadedAttachment = mockk<WrapperContract.Attachment>()
+
+        val spyedService = spyk(attachmentService)
+
+        every { decryptedRecord.resource } returns resource
+        every { decryptedRecord.attachmentsKey } returns attachmentKey
+        every { resource.unwrap() } returns rawResource
+
+        every { wrappedServiceAttachment.id } returns "yes"
+
+        every { downloadedAttachment.id } returns "with ${SPLIT_CHAR} char"
+
+        every { FhirAttachmentHelper.hasAttachment(rawResource) } returns true
+        every { FhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
+        every { FhirAttachmentHelper.getIdentifier(rawResource) } returns ids
+
+        every { AttachmentFactory.wrap(serviceAttachments[0]) } returns wrappedServiceAttachment
+
+        every { thumbnailService.setAttachmentIdForDownloadType(
+                validatedAttachments,
+                ids,
+                type
+        ) } returns Unit
+
+        every { spyedService.download(
+                validatedAttachments,
+                attachmentKey,
+                USER_ID
+        ) } returns Single.just(listOf(downloadedAttachment))
+
+        every { spyedService.updateAttachmentMeta(downloadedAttachment) } returns mockk()
+
+        // When
+        val subscriber = spyedService.downloadAttachmentsFromStorage(
+                attachments,
+                USER_ID,
+                type,
+                decryptedRecord
+
+        ).test().await()
+        val result = subscriber
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
+
+        // Them
+
+        Truth.assertThat(result).isEqualTo(listOf(downloadedAttachment))
+
+
+        verify(exactly = 1) {
+            spyedService.download(
+                    any(),
+                    attachmentKey,
+                    USER_ID
+            )
+        }
+
+        verify(exactly = 1 ) { thumbnailService.setAttachmentIdForDownloadType(
+                validatedAttachments,
+                ids,
+                type
+        ) }
+
+        verify(exactly = 1) { spyedService.updateAttachmentMeta(downloadedAttachment) }
     }
 
     companion object {

@@ -18,10 +18,16 @@ package care.data4life.sdk.attachment
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.model.DownloadType
+import care.data4life.sdk.network.model.NetworkRecordContract
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
+import care.data4life.sdk.wrapper.AttachmentFactory
+import care.data4life.sdk.wrapper.FhirAttachmentHelper
+import care.data4life.sdk.wrapper.HelperContract
 import care.data4life.sdk.wrapper.WrapperContract
+import care.data4life.sdk.wrapper.WrapperFactoryContract
 import io.reactivex.Observable
 import io.reactivex.Single
 
@@ -31,6 +37,8 @@ class AttachmentService internal constructor(
         private val thumbnailService: ThumbnailContract.Service
 ) : AttachmentContract.Service {
     private val fhirDateValidator: AttachmentContract.FhirDateValidator = FhirDateValidator
+    private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper = FhirAttachmentHelper
+    private val attachmentFactory: WrapperFactoryContract.AttachmentFactory = AttachmentFactory
 
     override fun upload(
             attachments: List<WrapperContract.Attachment>,
@@ -110,6 +118,53 @@ class AttachmentService internal constructor(
     override fun getValidHash(attachment: WrapperContract.Attachment): String {
         val data = decode(attachment.data!!)
         return encodeToString(sha1(data))
+    }
+
+    @Throws(DataValidationException.IdUsageViolation::class,
+            DataValidationException.InvalidAttachmentPayloadHash::class)
+    override fun downloadAttachmentsFromStorage(
+            attachmentIds: List<String>,
+            userId: String,
+            type: DownloadType,
+            decryptedRecord: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+    ): Single<out List<WrapperContract.Attachment>> {
+        val resource = decryptedRecord.resource.unwrap()
+
+        if (fhirAttachmentHelper.hasAttachment(resource)) {
+            val attachments = fhirAttachmentHelper.getAttachment(resource)
+            val validAttachments = mutableListOf<WrapperContract.Attachment>()
+
+            for (rawAttachment in attachments) {
+                val attachment = attachmentFactory.wrap(rawAttachment)
+                if (attachmentIds.contains(attachment?.id)) {
+                    validAttachments.add(attachment!!)
+                }
+            }
+            if (validAttachments.size != attachmentIds.size)
+                throw DataValidationException.IdUsageViolation("Please provide correct attachment ids!")
+
+            thumbnailService.setAttachmentIdForDownloadType(
+                    validAttachments,
+                    fhirAttachmentHelper.getIdentifier(resource),
+                    type
+            )
+
+            return download(
+                    validAttachments,
+                    // FIXME this is forced
+                    decryptedRecord.attachmentsKey!!,
+                    userId
+            )
+                    .flattenAsObservable { it }
+                    .map { attachment ->
+                        attachment.also {
+                            if (attachment.id!!.contains(ThumbnailService.SPLIT_CHAR)) updateAttachmentMeta(attachment)
+                        }
+                    }
+                    .toList()
+        }
+
+        throw IllegalArgumentException("Expected a record of a type that has attachment")
     }
 
     companion object {

@@ -20,6 +20,7 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.ImageResizer
 import care.data4life.sdk.lang.ImageResizeException
 import care.data4life.sdk.log.Log
+import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.wrapper.FhirAttachmentHelper
 import care.data4life.sdk.wrapper.HelperContract
 import care.data4life.sdk.wrapper.WrapperContract
@@ -110,6 +111,14 @@ class ThumbnailService internal constructor(
                 )
             }
         }
+    }
+
+    override fun setAttachmentIdForDownloadType(
+            attachments: List<WrapperContract.Attachment>,
+            identifiers: List<Any>?,
+            type: DownloadType?
+    ) {
+        TODO("Not yet implemented")
     }
 
     companion object {

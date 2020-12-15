@@ -30,6 +30,11 @@ internal interface WrapperFactoriesContract {
         fun wrap(identifier: Any?): WrappersContract.Identifier?
     }
 
+    interface ResourceFactory {
+        @Throws(DataValidationException.CustomDataLimitViolation::class)
+        fun wrap(resource: Any?): WrappersContract.Resource?
+    }
+
     interface FhirElementFactory {
         @Throws(CoreRuntimeException.InternalFailure::class)
         fun getFhirTypeForClass(resourceType: Class<out Any>): String

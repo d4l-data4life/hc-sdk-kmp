@@ -24,16 +24,20 @@ internal class SdkFhir3Attachment(
     override var id: String?
         get() = attachment.id
         set(id) { attachment.id = id}
+
     override var data: String?
         get() = attachment.data
         set(data) {attachment.data = data}
+
     override var hash: String?
         get() = attachment.hash
         set(hash) {attachment.hash = hash}
+
     override var size: Int?
         get() = attachment.size
         set(size) {attachment.size = size}
-    override fun unwrap(): Any = this.attachment
+
+    override fun unwrap(): Fhir3Attachment = this.attachment
 
 
 }

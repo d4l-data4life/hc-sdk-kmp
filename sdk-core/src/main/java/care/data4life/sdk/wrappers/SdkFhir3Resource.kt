@@ -16,28 +16,16 @@
 
 package care.data4life.sdk.wrappers
 
-interface WrappersContract {
-    interface Attachment {
-        var id: String?
-        var data: String?
-        var hash: String?
-        var size: Int?
-        fun unwrap(): Any
-    }
+import care.data4life.sdk.fhir.Fhir3Resource
 
-    interface Identifier {
-        var value: String?
-    }
+internal class SdkFhir3Resource(
+        private val resource: Fhir3Resource
+) : WrappersContract.Resource {
+    override var identifier: String?
+        get() = this.resource.id
+        set(id) {this.resource.id = id}
+    override val type: WrappersContract.Resource.TYPE
+        get() = WrappersContract.Resource.TYPE.FHIR3
 
-    interface Resource {
-        enum class TYPE {
-            DATA,
-            FHIR3
-        }
-
-        var identifier: String?
-        val type: TYPE
-
-        fun unwrap(): Any
-    }
+    override fun unwrap(): Fhir3Resource = this.resource
 }

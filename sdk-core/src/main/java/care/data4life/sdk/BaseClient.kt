@@ -39,7 +39,7 @@ abstract class BaseClient(
                  createFhir4Client(userService, recordService, handler),
 
         private val legacyDataClient: SdkContract.LegacyDataClient =
-                createLegacyDataClient(alias, userService, recordService, handler)
+                createLegacyDataClient(userService, recordService, handler)
 
  ) : SdkContract.Client, SdkContract.LegacyDataClient by legacyDataClient, SdkContract.AuthClient by authClient {
 
@@ -72,13 +72,13 @@ abstract class BaseClient(
 
 
         fun createLegacyDataClient(
-                alias: String,
                 userService: UserService,
                 recordService: RecordService,
                 handler: CallHandler
-        ): care.data4life.sdk.LegacyDataClient {
-            return LegacyDataClient(alias, userService, recordService, handler)
+        ): SdkContract.LegacyDataClient {
+            return LegacyDataClient(userService, recordService, handler)
         }
+
 
         // FIXME refactor into own tool
         const val CLIENT_ID_SPLIT_CHAR = "#"

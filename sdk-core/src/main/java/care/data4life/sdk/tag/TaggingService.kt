@@ -48,6 +48,7 @@ class TaggingService(
         return tags
     }
 
+    // FIXME add FHIR 4 support
     fun appendDefaultTags(
             resourceType: String?,
             oldTags: HashMap<String, String>?

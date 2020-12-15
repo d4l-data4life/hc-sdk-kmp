@@ -86,7 +86,7 @@ public final class Data4LifeClient extends BaseClient {
                         userService, recordService, callHandler
                 ),
                 Data4LifeClient.Companion.createLegacyDataClient(
-                        alias, userService, recordService, callHandler
+                        userService, recordService, callHandler
                 )
         );
         this.cryptoService = cryptoService;

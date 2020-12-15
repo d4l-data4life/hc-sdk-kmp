@@ -49,18 +49,15 @@ import io.reactivex.Single;
 public class LegacyDataClient implements SdkContract.LegacyDataClient {
 
     protected CallHandler handler;
-    protected String alias;
     public UserService userService;
     protected RecordService recordService;
 
 
     public LegacyDataClient(
-            String alias,
             UserService userService,
             RecordService recordService,
             CallHandler handler
     ) {
-        this.alias = alias;
         this.userService = userService;
         this.recordService = recordService;
         this.handler = handler;

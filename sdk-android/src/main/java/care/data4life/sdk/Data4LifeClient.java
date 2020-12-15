@@ -214,6 +214,12 @@ public final class Data4LifeClient extends BaseClient {
             @SuppressLint("CheckResult")
             @Override
             public void onSuccess() {
+                getUserService().getVersionInfo(BuildConfig.VERSION_NAME)
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(
+                                isSupported -> listener.onSuccess(),
+                                error -> listener.onError(getHandler().getErrorHandler().handleError(error))
+                        );
                 getUserService()
                         .finishLogin(true)
                         .subscribeOn(Schedulers.io())

@@ -72,7 +72,7 @@ internal class UserService(
         return Single.fromCallable { oAuthService.refreshAccessToken(alias) }
     }
 
-    fun getVersionInfo(currentVersion: Int): Single<Boolean>? {
+    fun getVersionInfo(currentVersion: String): Single<Boolean>? {
         return Single.just(currentVersion)
                 .flatMap { apiService.fetchVersionInfo(alias + "_user_id") }
                 .map { versionInfo: VersionInfo -> versionInfo.isSupported(currentVersion) }

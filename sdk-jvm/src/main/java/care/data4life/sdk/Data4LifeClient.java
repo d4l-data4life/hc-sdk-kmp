@@ -142,12 +142,7 @@ public final class Data4LifeClient extends BaseClient {
     @SuppressWarnings("ConstantConditions")
     public boolean finishLogin(String url) throws Throwable {
         boolean authorized = authorizationService.finishAuthorization(getAlias(), url);
-        boolean deprecated = getUserService().getVersionInfo(BuildConfig.VERSION_CODE);
-
-        if (deprecated) {
-            throw (Throwable) new AuthorizationException.FailedToLogin();
-        }
-        else if (!authorized) {
+        if (!authorized) {
             throw (Throwable) new AuthorizationException.FailedToLogin();
         }
 

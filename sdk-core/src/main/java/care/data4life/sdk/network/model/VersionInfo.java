@@ -30,10 +30,10 @@ public class VersionInfo {
         this.versionsList = versionsList;
     }
 
-    public Boolean isSupported(int currentVersion) {
+    public Boolean isSupported(String currentVersion) {
         boolean isSupported = true;
         for (Version version : versionsList) {
-            if (version.getVersionCode() == currentVersion && version.getStatus().equals(KEY_UNSUPPORTED)) {
+            if (version.getVersionName().equals(currentVersion) && version.getStatus().equals(KEY_UNSUPPORTED)) {
                 isSupported = false;
                 break;
             }

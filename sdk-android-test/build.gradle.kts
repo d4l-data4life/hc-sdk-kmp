@@ -40,25 +40,20 @@ android {
                 "clearPackageData" to "true"
         ))
 
-        adbOptions {
-            timeOutInMs(10 * 60 * 1000)
-            installOptions("-d")
-        }
-
-        manifestPlaceholders = mapOf<String, Any>(
+        manifestPlaceholders(mapOf<String, Any>(
                 "clientId" to d4lClientConfig[Environment.DEVELOPMENT].id,
                 "clientSecret" to d4lClientConfig[Environment.DEVELOPMENT].secret,
                 "redirectScheme" to d4lClientConfig[Environment.DEVELOPMENT].redirectScheme,
                 "environment" to "${Environment.DEVELOPMENT}",
                 "platform" to d4lClientConfig.platform,
                 "debug" to "true"
-        )
+        ))
     }
 
     buildTypes {
         buildTypes {
             getByName("debug") {
-                matchingFallbacks = listOf("debug", "release")
+                setMatchingFallbacks("debug", "release")
             }
         }
         getByName("release") {
@@ -68,7 +63,7 @@ android {
     }
 
     compileOptions {
-        coreLibraryDesugaringEnabled = false
+        isCoreLibraryDesugaringEnabled = false
 
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -86,16 +81,13 @@ android {
     testOptions {
         animationsDisabled = true
 
-        unitTests.all(KotlinClosure1<Any, Test>({
-            (this as Test).also { testTask ->
-                testTask.testLogging {
-                    events("passed", "skipped", "failed", "standardOut", "standardError")
-                }
+        unitTests.all {
+            it.testLogging {
+                events("passed", "skipped", "failed", "standardOut", "standardError")
             }
-        }, unitTests))
+        }
 
-        // FIXME
-        // execution = "ANDROID_TEST_ORCHESTRATOR"
+         execution = "ANDROID_TEST_ORCHESTRATOR"
     }
 }
 
@@ -125,20 +117,29 @@ dependencies {
 
     testImplementation(Dependency.Android.Test.junit)
 
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
+    androidTestUtil(Dependency.Android.AndroidTest.orchestrator)
 
+    androidTestImplementation(Dependency.Android.AndroidTest.core)
     androidTestImplementation(Dependency.Android.AndroidTest.runner)
     androidTestImplementation(Dependency.Android.AndroidTest.rules)
-    androidTestImplementation(Dependency.Android.AndroidTest.orchestrator)
+    androidTestImplementation(Dependency.Android.AndroidTest.extJUnit)
+
+    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
+    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
 
     androidTestImplementation(Dependency.Android.AndroidTest.espressoCore)
     androidTestImplementation(Dependency.Android.AndroidTest.espressoIntents)
     androidTestImplementation(Dependency.Android.AndroidTest.espressoWeb)
-    androidTestImplementation(Dependency.Android.moshi)
 
     androidTestImplementation(Dependency.Android.AndroidTest.uiAutomator)
     androidTestImplementation(Dependency.Android.AndroidTest.kakao)
+
+    androidTestImplementation(Dependency.Android.okHttp)
+    androidTestImplementation(Dependency.Android.okHttpLoggingInterceptor)
+    androidTestImplementation(Dependency.Android.retrofit)
+
+    androidTestImplementation(Dependency.Android.moshi)
+    androidTestImplementation(Dependency.Android.gson)
 
     androidTestImplementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")

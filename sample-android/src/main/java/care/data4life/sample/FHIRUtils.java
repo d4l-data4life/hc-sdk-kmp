@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Locale;
 
 import care.data4life.fhir.stu3.model.Attachment;
-import care.data4life.fhir.stu3.model.CodeSystems;
+import care.data4life.fhir.stu3.model.CodeSystemDocumentReferenceStatus;
 import care.data4life.fhir.stu3.model.CodeableConcept;
 import care.data4life.fhir.stu3.model.Coding;
 import care.data4life.fhir.stu3.model.DocumentReference;
@@ -36,9 +36,9 @@ import care.data4life.fhir.stu3.model.FhirInstant;
 import care.data4life.fhir.stu3.model.Practitioner;
 import care.data4life.fhir.stu3.util.FhirDateTimeParser;
 import care.data4life.sdk.config.DataRestrictionException;
-import care.data4life.sdk.helpers.AttachmentBuilder;
-import care.data4life.sdk.helpers.DocumentReferenceBuilder;
-import care.data4life.sdk.helpers.PractitionerBuilder;
+import care.data4life.sdk.helpers.stu3.AttachmentBuilder;
+import care.data4life.sdk.helpers.stu3.DocumentReferenceBuilder;
+import care.data4life.sdk.helpers.stu3.PractitionerBuilder;
 
 final class FHIRUtils {
     private static final String TAG = FHIRUtils.class.getSimpleName();
@@ -99,7 +99,7 @@ final class FHIRUtils {
         return DocumentReferenceBuilder.buildWith(
                 title,
                 indexed,
-                CodeSystems.DocumentReferenceStatus.CURRENT,
+                CodeSystemDocumentReferenceStatus.CURRENT,
                 attachments,
                 getFakeDocumentReferenceType(),
                 getFakePractitioner(),

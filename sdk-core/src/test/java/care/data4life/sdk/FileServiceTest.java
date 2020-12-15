@@ -59,12 +59,6 @@ public class FileServiceTest {
         // given
         when(apiService.downloadDocument(anyString(), anyString(), anyString())).thenReturn(Single.just(RESULT));
         when(cryptoService.decrypt(any(), any(byte[].class))).thenReturn(Single.just(RESULT));
-
-        fileService.downloadFile(any(GCKey.class), anyString(), anyString())
-                .test()
-                .assertValue(RESULT)
-                .assertComplete();
-
         when(apiService.downloadDocument(anyString(), anyString(), anyString())).thenReturn(Single.error(new IOException()));
 
 

@@ -25,7 +25,10 @@ import care.data4life.auth.AuthorizationContract;
 import care.data4life.auth.AuthorizationException;
 import care.data4life.auth.AuthorizationService;
 import care.data4life.auth.storage.InMemoryAuthStorage;
+import care.data4life.sdk.auth.OAuthService;
+import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.log.Log;
+import care.data4life.sdk.log.Logger;
 import care.data4life.sdk.network.Environment;
 import care.data4life.securestore.SecureStore;
 import care.data4life.securestore.SecureStoreContract;
@@ -47,8 +50,15 @@ public final class Data4LifeClient extends BaseClient {
                               CryptoService cryptoService,
                               UserService userService,
                               RecordService recordService,
-                              SdkContract.ErrorHandler errorHandler) {
-        super(alias, userService, recordService, errorHandler);
+                              CallHandler callHandler) {
+        super(
+                alias,
+                userService,
+                recordService,
+                callHandler,
+                Data4LifeClient.Companion.createLegacyDataClient(alias, userService, recordService, callHandler),
+                Data4LifeClient.Companion.createLegacyAuthClient(alias, userService, recordService, callHandler)
+        );
         this.authorizationService = authorizationService;
         this.cryptoService = cryptoService;
     }
@@ -113,10 +123,11 @@ public final class Data4LifeClient extends BaseClient {
         FileService fileService = new FileService(alias, apiService, cryptoService);
         AttachmentService attachmentService = new AttachmentService(alias, fileService, new JvmImageResizer());
         D4LErrorHandler errorHandler = new D4LErrorHandler();
+        CallHandler callHandler = new CallHandler(errorHandler);
         String partnerId = clientId.split(CLIENT_ID_SPLIT_CHAR)[PARTNER_ID_INDEX];
         RecordService recordService = new RecordService(partnerId, alias, apiService, tagEncryptionService, taggingService, fhirService, attachmentService, cryptoService, errorHandler);
 
-        return new Data4LifeClient(alias, authorizationService, cryptoService, userService, recordService, errorHandler);
+        return new Data4LifeClient(alias, authorizationService, cryptoService, userService, recordService, callHandler);
     }
 
 
@@ -124,22 +135,28 @@ public final class Data4LifeClient extends BaseClient {
         return cryptoService
                 .generateGCKeyPair()
                 .flatMap(gcKeyPair -> cryptoService.convertAsymmetricKeyToBase64ExchangeKey(gcKeyPair.getPublicKey()))
-                .map(pubKey -> authorizationService.createAuthorizationUrl(this.alias, pubKey))
+                .map(pubKey -> authorizationService.createAuthorizationUrl(getAlias(), pubKey))
                 .blockingGet();
     }
 
     @SuppressWarnings("ConstantConditions")
     public boolean finishLogin(String url) throws Throwable {
-        boolean authorized = authorizationService.finishAuthorization(this.alias, url);
-        boolean deprecated = userService.getVersionInfo(BuildConfig.VERSION_CODE);
+        boolean authorized = authorizationService.finishAuthorization(getAlias(), url);
+        boolean deprecated = getUserService().getVersionInfo(BuildConfig.VERSION_CODE);
 
-        if (!authorized) {
+        if (deprecated) {
             throw (Throwable) new AuthorizationException.FailedToLogin();
         }
-        else if (deprecated) {
+        else if (!authorized) {
             throw (Throwable) new AuthorizationException.FailedToLogin();
         }
-        return userService.finishLogin(authorized).blockingGet();
+
+        return getUserService().finishLogin(authorized).blockingGet();
+    }
+
+
+    public static void setLogger(Logger logger) {
+        Data4LifeClient.Companion.setLogger(logger);
     }
 
 }

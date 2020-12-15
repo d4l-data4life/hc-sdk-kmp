@@ -21,7 +21,7 @@ import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedRecordGuard
-import care.data4life.sdk.network.model.NetworkRecordsContract
+import care.data4life.sdk.network.model.NetworkRecordContract
 import io.mockk.every
 import io.mockk.verify
 import org.junit.After
@@ -47,7 +47,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     fun `it is a DecryptedRecordBuilder`() {
         val builder: Any = DecryptedRecordBuilder()
 
-        assertTrue(builder is NetworkRecordsContract.Builder)
+        assertTrue(builder is NetworkRecordContract.Builder)
     }
 
     @Test
@@ -122,7 +122,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         )
 
         // Then
-        assertTrue(record is NetworkRecordsContract.DecryptedFhir3Record<*>)
+        assertTrue(record is NetworkRecordContract.DecryptedFhir3Record<*>)
         assertEquals(
                 record,
                 DecryptedRecord(
@@ -151,7 +151,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         )
 
         // Then
-        assertTrue(record is NetworkRecordsContract.DecryptedFhir3Record<*>)
+        assertTrue(record is NetworkRecordContract.DecryptedFhir3Record<*>)
         assertEquals(
                 record,
                 DecryptedRecord(
@@ -180,7 +180,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         )
 
         // Then
-        assertTrue(record is NetworkRecordsContract.DecryptedDataRecord)
+        assertTrue(record is NetworkRecordContract.DecryptedDataRecord)
         assertEquals(
                 record,
                 DecryptedAppDataRecord(

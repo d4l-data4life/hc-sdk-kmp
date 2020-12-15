@@ -14,20 +14,20 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.attachment
+package care.data4life.sdk.wrapper
 
-import care.data4life.crypto.GCKey
-import care.data4life.sdk.wrapper.WrapperContract
+import care.data4life.sdk.data.DataResource
 
-interface ThumbnailContract {
+class SdkDataResource(
+        private val resource: DataResource
+): WrapperContract.Resource {
+    override var identifier: String?
+        get() = ""
+        set(value) {/* Do nothing */}
 
-    interface Service {
+    override val type: WrapperContract.Resource.TYPE
+        get() = WrapperContract.Resource.TYPE.DATA
 
-        fun uploadDownscaledImages(
-                attachmentsKey: GCKey,
-                userId: String,
-                attachment: WrapperContract.Attachment,
-                originalData: ByteArray
-        ): List<String>
-    }
+    override fun unwrap(): DataResource = this.resource
+
 }

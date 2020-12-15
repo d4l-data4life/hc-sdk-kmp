@@ -21,7 +21,7 @@ import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
-import care.data4life.sdk.wrappers.WrappersContract
+import care.data4life.sdk.wrapper.WrapperContract
 import io.reactivex.Observable
 import io.reactivex.Single
 
@@ -33,10 +33,10 @@ class AttachmentService internal constructor(
     private val fhirDateValidator: AttachmentContract.FhirDateValidator = FhirDateValidator
 
     override fun upload(
-            attachments: List<WrappersContract.Attachment>,
+            attachments: List<WrapperContract.Attachment>,
             attachmentsKey: GCKey,
             userId: String
-    ): Single<List<Pair<WrappersContract.Attachment, List<String>>>> {
+    ): Single<List<Pair<WrapperContract.Attachment, List<String>>>> {
         return Observable.fromIterable(attachments)
                 .filter { it.data != null }
                 .map { attachment ->
@@ -56,10 +56,10 @@ class AttachmentService internal constructor(
 
     @Throws(DataValidationException.InvalidAttachmentPayloadHash::class)
     override fun download(
-            attachments: List<WrappersContract.Attachment>,
+            attachments: List<WrapperContract.Attachment>,
             attachmentsKey: GCKey,
             userId: String
-    ): Single<List<WrappersContract.Attachment>> {
+    ): Single<List<WrapperContract.Attachment>> {
         return Observable
                 .fromCallable { attachments }
                 .flatMapIterable { it }

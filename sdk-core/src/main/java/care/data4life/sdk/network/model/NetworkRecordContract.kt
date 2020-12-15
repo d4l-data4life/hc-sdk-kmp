@@ -22,7 +22,7 @@ import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 
-internal interface NetworkRecordsContract {
+internal interface NetworkRecordContract {
      interface DecryptedRecord<T> {
         var identifier: String?
         var resource: T

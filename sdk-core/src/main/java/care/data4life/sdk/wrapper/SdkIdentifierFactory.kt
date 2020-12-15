@@ -14,14 +14,20 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.wrappers
+package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.fhir.Fhir3Identifier
+import care.data4life.sdk.lang.CoreRuntimeException
+import care.data4life.sdk.lang.DataValidationException
 
-internal class SdkFhir3Identifier(
-        private val identifier: Fhir3Identifier
-): WrappersContract.Identifier {
-    override var value: String?
-        get() = identifier.value
-        set(value) {identifier.value = value}
+internal object SdkIdentifierFactory: WrapperFactoryContract.IdentifierFactory {
+
+    @Throws(DataValidationException.CustomDataLimitViolation::class)
+    override fun wrap(identifier: Any?): WrapperContract.Identifier? {
+        return when(identifier) {
+            null -> null
+            is Fhir3Identifier -> SdkFhir3Identifier(identifier)
+            else -> throw CoreRuntimeException.InternalFailure()
+        }
+    }
 }

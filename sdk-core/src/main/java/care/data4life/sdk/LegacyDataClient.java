@@ -229,7 +229,7 @@ public class LegacyDataClient implements SdkContract.LegacyDataClient {
                 .flatMap(uid -> recordService.downloadAttachments(recordId, attachmentIds, uid, type))
                 .map(attachments -> {
                     List<Attachment> rawAttachments = new ArrayList<>(attachments.size());
-                    for(care.data4life.sdk.wrappers.WrappersContract.Attachment attachment: attachments) {
+                    for(care.data4life.sdk.wrapper.WrapperContract.Attachment attachment: attachments) {
                         rawAttachments.add((Attachment) attachment.unwrap());
                     }
                     return rawAttachments;

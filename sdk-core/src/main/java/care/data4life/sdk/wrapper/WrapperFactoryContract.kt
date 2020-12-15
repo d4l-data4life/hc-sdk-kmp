@@ -14,19 +14,34 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.wrappers
+package care.data4life.sdk.wrapper
 
-import care.data4life.sdk.fhir.Fhir3Identifier
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 
-internal object SdkIdentifierFactory: WrapperFactoriesContract.IdentifierFactory {
-    @Throws(DataValidationException.CustomDataLimitViolation::class)
-    override fun wrap(identifier: Any?): WrappersContract.Identifier? {
-        return when(identifier) {
-            null -> null
-            is Fhir3Identifier -> SdkFhir3Identifier(identifier)
-            else -> throw CoreRuntimeException.InternalFailure()
-        }
+internal interface WrapperFactoryContract {
+
+    interface AttachmentFactory {
+
+        @Throws(DataValidationException.CustomDataLimitViolation::class)
+        fun wrap(attachment: Any?): WrapperContract.Attachment?
+    }
+
+    interface IdentifierFactory {
+
+        @Throws(DataValidationException.CustomDataLimitViolation::class)
+        fun wrap(identifier: Any?): WrapperContract.Identifier?
+    }
+
+    interface ResourceFactory {
+
+        @Throws(DataValidationException.CustomDataLimitViolation::class)
+        fun wrap(resource: Any?): WrapperContract.Resource?
+    }
+
+    interface FhirElementFactory {
+
+        @Throws(CoreRuntimeException.InternalFailure::class)
+        fun getFhirTypeForClass(resourceType: Class<out Any>): String //TODO: Use Resource.TYPE
     }
 }

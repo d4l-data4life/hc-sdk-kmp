@@ -29,4 +29,4 @@ internal data class DecryptedRecord<T : Fhir3Resource?>(
         override var dataKey: GCKey?,
         override var attachmentsKey: GCKey?,
         override var modelVersion: Int
-) : NetworkRecordsContract.DecryptedFhir3Record<T>, Serializable
+) : NetworkRecordContract.DecryptedFhir3Record<T>, Serializable

@@ -17,10 +17,10 @@
 package care.data4life.sdk.network.model
 
 import care.data4life.sdk.lang.DataValidationException
-import care.data4life.sdk.network.model.NetworkRecordsContract.LimitGuard.Companion.MAX_LENGTH_TAGS_AND_ANNOTATIONS
-import care.data4life.sdk.network.model.NetworkRecordsContract.LimitGuard.Companion.MAX_SIZE_CUSTOM_DATA
+import care.data4life.sdk.network.model.NetworkRecordContract.LimitGuard.Companion.MAX_LENGTH_TAGS_AND_ANNOTATIONS
+import care.data4life.sdk.network.model.NetworkRecordContract.LimitGuard.Companion.MAX_SIZE_CUSTOM_DATA
 
-internal object DecryptedRecordGuard : NetworkRecordsContract.LimitGuard {
+internal object DecryptedRecordGuard : NetworkRecordContract.LimitGuard {
     override fun checkTagsAndAnnotationsLimits(tags: HashMap<String, String>, annotations: List<String>) {
         var acutal = 0
         tags.forEach { entry ->

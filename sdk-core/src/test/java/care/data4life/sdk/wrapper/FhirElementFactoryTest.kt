@@ -20,7 +20,6 @@ import care.data4life.fhir.stu3.model.DocumentReference
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.test.util.AttachmentBuilder
-import care.data4life.sdk.wrappers.FhirElementFactory
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

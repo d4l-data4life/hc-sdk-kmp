@@ -40,7 +40,7 @@ class FhirDateValidationTest {
         fhirAttachment.creation = null
 
         // Then
-        assertTrue(FhirDateValidator.isInvalidateDate(care.data4life.sdk.wrappers.SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(FhirDateValidator.isInvalidateDate(care.data4life.sdk.wrapper.SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
@@ -54,7 +54,7 @@ class FhirDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertTrue(FhirDateValidator.isInvalidateDate(care.data4life.sdk.wrappers.SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(FhirDateValidator.isInvalidateDate(care.data4life.sdk.wrapper.SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
@@ -70,7 +70,7 @@ class FhirDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertTrue(FhirDateValidator.isInvalidateDate(care.data4life.sdk.wrappers.SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(FhirDateValidator.isInvalidateDate(care.data4life.sdk.wrapper.SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
@@ -84,7 +84,7 @@ class FhirDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertFalse(FhirDateValidator.isInvalidateDate(care.data4life.sdk.wrappers.SdkFhir3Attachment(fhirAttachment)))
+        assertFalse(FhirDateValidator.isInvalidateDate(care.data4life.sdk.wrapper.SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
@@ -98,6 +98,6 @@ class FhirDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertTrue(FhirDateValidator.isInvalidateDate(care.data4life.sdk.wrappers.SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(FhirDateValidator.isInvalidateDate(care.data4life.sdk.wrapper.SdkFhir3Attachment(fhirAttachment)))
     }
 }

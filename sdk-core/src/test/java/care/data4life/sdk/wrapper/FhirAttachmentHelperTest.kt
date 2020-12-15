@@ -21,7 +21,6 @@ import care.data4life.sdk.fhir.Fhir3AttachmentHelper
 import care.data4life.sdk.fhir.Fhir3Identifier
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.wrappers.FhirAttachmentHelper
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll

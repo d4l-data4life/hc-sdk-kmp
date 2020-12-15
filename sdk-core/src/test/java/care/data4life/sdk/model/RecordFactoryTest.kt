@@ -24,7 +24,7 @@ import care.data4life.sdk.model.definitions.Fhir3Record
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.DecryptedRecord
-import care.data4life.sdk.network.model.NetworkRecordsContract
+import care.data4life.sdk.network.model.NetworkRecordContract
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
@@ -214,5 +214,5 @@ class RecordFactoryTest {
             override var dataKey: GCKey?,
             override var attachmentsKey: GCKey?,
             override var modelVersion: Int
-    ) : NetworkRecordsContract.DecryptedRecord<T>
+    ) : NetworkRecordContract.DecryptedRecord<T>
 }

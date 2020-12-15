@@ -32,7 +32,7 @@ internal data class DecryptedAppDataRecord(
         override var updatedDate: String?,
         override var dataKey: GCKey?,
         override var modelVersion: Int
-) : NetworkRecordsContract.DecryptedDataRecord {
+) : NetworkRecordContract.DecryptedDataRecord {
     override fun equals(other: Any?): Boolean {
         return when {
             other !is DecryptedAppDataRecord -> false

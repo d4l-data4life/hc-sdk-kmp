@@ -21,7 +21,7 @@ import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.util.Base64
 import care.data4life.sdk.util.HashUtil
-import care.data4life.sdk.wrappers.WrappersContract
+import care.data4life.sdk.wrapper.WrapperContract
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -40,7 +40,7 @@ class AttachmentServiceTest {
     private val attachmentKey = Mockito.mock(GCKey::class.java)
     private lateinit var fileService: FileContract.Service
     private lateinit var thumbnailService: ThumbnailContract.Service
-    private lateinit var attachment: WrappersContract.Attachment
+    private lateinit var attachment: WrapperContract.Attachment
     private lateinit var attachmentService: AttachmentService  //SUT
 
     @Before
@@ -200,7 +200,7 @@ class AttachmentServiceTest {
     @Test
     fun `Given, download is called with Attachments, a AttachmentKey and a UserID, it ignores Attachments, which have no valid ID`() {
         // Given
-        val attachment = mockk<WrappersContract.Attachment>()
+        val attachment = mockk<WrapperContract.Attachment>()
 
         every { attachment.id } returns null
 
@@ -220,7 +220,7 @@ class AttachmentServiceTest {
     @Test
     fun `Given, download is called with Attachments, a AttachmentKey and a UserID, it fails, if the attachmentId does not contain a $SPLIT_CHAR, the Date is invalid and the newHash does not match the oldHash`() {
         // Given
-        val attachment = mockk<WrappersContract.Attachment>()
+        val attachment = mockk<WrapperContract.Attachment>()
         val id = "tralla"
         val decodedData = ByteArray(23)
         val oldHash = "12345"
@@ -260,7 +260,7 @@ class AttachmentServiceTest {
     @Test
     fun `Given, download is called with Attachments, a AttachmentKey and a UserID, it fails, it returns a list with the downloaded Attachments, if the id contains a SPLIT_CHAR`() {
         // Given
-        val attachment = mockk<WrappersContract.Attachment>()
+        val attachment = mockk<WrapperContract.Attachment>()
         val id = "tral${SPLIT_CHAR}la"
         val decodedData = ByteArray(23)
         val decodedDataSha = ByteArray(42)
@@ -315,7 +315,7 @@ class AttachmentServiceTest {
     @Test
     fun `Given, download is called with Attachments, a AttachmentKey and a UserID, it fails, it returns a list with the downloaded Attachments, if the date is valid`() {
         // Given
-        val attachment = mockk<WrappersContract.Attachment>()
+        val attachment = mockk<WrapperContract.Attachment>()
         val id = "tralla"
         val decodedData = ByteArray(23)
         val decodedDataSha = ByteArray(42)
@@ -370,7 +370,7 @@ class AttachmentServiceTest {
     @Test
     fun `Given, download is called with Attachments, a AttachmentKey and a UserID, it fails, it returns a list with the downloaded Attachments, if the newHash matches the oldHash`() {
         // Given
-        val attachment = mockk<WrappersContract.Attachment>()
+        val attachment = mockk<WrapperContract.Attachment>()
         val id = "tralla"
         val decodedData = ByteArray(23)
         val decodedDataSha = ByteArray(42)

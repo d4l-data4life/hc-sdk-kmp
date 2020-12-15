@@ -14,7 +14,7 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.wrappers
+package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3Identifier
@@ -22,7 +22,8 @@ import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper as Fhir3AttachmentHelper
 
-internal object FhirAttachmentHelper: HelpersContract.FhirAttachmentHelper {
+internal object FhirAttachmentHelper: HelperContract.FhirAttachmentHelper {
+
     override fun hasAttachment(resource: Any): Boolean {
         return if(resource !is Fhir3Resource) {
              false

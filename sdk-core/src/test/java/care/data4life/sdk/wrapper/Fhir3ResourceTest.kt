@@ -17,8 +17,6 @@
 package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.wrappers.SdkFhir3Resource
-import care.data4life.sdk.wrappers.WrappersContract
 import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
@@ -28,14 +26,14 @@ import org.junit.Test
 class Fhir3ResourceTest {
     @Test
     fun `it is a Resource`() {
-        assertTrue((SdkFhir3Resource(mockk()) as Any) is WrappersContract.Resource)
+        assertTrue((SdkFhir3Resource(mockk()) as Any) is WrapperContract.Resource)
     }
 
     @Test
     fun `Given a wrapped Fhir3Resource, it has the type FHIR3`() {
         assertEquals(
                 SdkFhir3Resource(mockk()).type,
-                WrappersContract.Resource.TYPE.FHIR3
+                WrapperContract.Resource.TYPE.FHIR3
         )
     }
 

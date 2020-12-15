@@ -17,8 +17,6 @@
 package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.data.DataResource
-import care.data4life.sdk.wrappers.SdkDataResource
-import care.data4life.sdk.wrappers.WrappersContract
 import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
@@ -28,14 +26,14 @@ import org.junit.Test
 class DataResourceTest {
     @Test
     fun `it is a Resource`() {
-        assertTrue((SdkDataResource(mockk()) as Any) is WrappersContract.Resource)
+        assertTrue((SdkDataResource(mockk()) as Any) is WrapperContract.Resource)
     }
 
     @Test
     fun `Given a wrapped DataResource, it has the type Data`() {
         assertEquals(
                 SdkDataResource(mockk()).type,
-                WrappersContract.Resource.TYPE.DATA
+                WrapperContract.Resource.TYPE.DATA
         )
     }
 

@@ -37,7 +37,7 @@ class DecryptedDataRecordTest {
                         dataKey = mockkClass(GCKey::class),
                         modelVersion = 42
                 ) as Any
-                ) is NetworkRecordsContract.DecryptedRecord<*>)
+                ) is NetworkRecordContract.DecryptedRecord<*>)
     }
 
     @Test

@@ -14,13 +14,14 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.wrappers
+package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.fhir.Fhir3ElementFactory
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 
-internal object FhirElementFactory: WrapperFactoriesContract.FhirElementFactory {
+internal object FhirElementFactory: WrapperFactoryContract.FhirElementFactory {
+
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun getFhirTypeForClass(resourceType: Class<out Any>): String {
         @Suppress("UNCHECKED_CAST")

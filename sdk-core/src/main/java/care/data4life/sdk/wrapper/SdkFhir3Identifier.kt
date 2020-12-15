@@ -14,18 +14,14 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.wrappers
+package care.data4life.sdk.wrapper
 
-import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir3Identifier
 
-internal class SdkFhir3Resource(
-        private val resource: Fhir3Resource
-) : WrappersContract.Resource {
-    override var identifier: String?
-        get() = this.resource.id
-        set(id) {this.resource.id = id}
-    override val type: WrappersContract.Resource.TYPE
-        get() = WrappersContract.Resource.TYPE.FHIR3
-
-    override fun unwrap(): Fhir3Resource = this.resource
+internal class SdkFhir3Identifier(
+        private val identifier: Fhir3Identifier
+): WrapperContract.Identifier {
+    override var value: String?
+        get() = identifier.value
+        set(value) {identifier.value = value}
 }

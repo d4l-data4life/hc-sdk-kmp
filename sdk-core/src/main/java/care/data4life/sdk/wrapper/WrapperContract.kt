@@ -14,9 +14,10 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.wrappers
+package care.data4life.sdk.wrapper
 
-interface WrappersContract {
+interface WrapperContract {
+
     interface Attachment {
         var id: String?
         var data: String?

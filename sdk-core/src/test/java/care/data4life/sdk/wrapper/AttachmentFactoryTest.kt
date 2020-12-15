@@ -18,9 +18,6 @@ package care.data4life.sdk.wrapper
 
 import care.data4life.fhir.stu3.model.Attachment as Fhir3Attachment
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.wrappers.AttachmentFactory
-import care.data4life.sdk.wrappers.WrapperFactoriesContract
-import care.data4life.sdk.wrappers.WrappersContract
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -29,7 +26,7 @@ import org.mockito.Mockito
 class AttachmentFactoryTest {
     @Test
     fun `it is a AttachmentFactory`() {
-        assertTrue((AttachmentFactory as Any) is WrapperFactoriesContract.AttachmentFactory)
+        assertTrue((AttachmentFactory as Any) is WrapperFactoryContract.AttachmentFactory)
     }
     
     @Test
@@ -58,6 +55,6 @@ class AttachmentFactoryTest {
         val wrapped: Any = AttachmentFactory.wrap(givenAttachment)!!
 
         // Then
-        assertTrue(wrapped is WrappersContract.Attachment)
+        assertTrue(wrapped is WrapperContract.Attachment)
     }
 }

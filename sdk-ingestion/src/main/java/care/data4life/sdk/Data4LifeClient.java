@@ -142,16 +142,17 @@ public final class Data4LifeClient extends BaseClient {
         TaggingService taggingService = new TaggingService(clientId);
         FhirService fhirService = new FhirService(cryptoService);
         FileService fileService = new FileService(ALIAS, apiService, cryptoService);
+        String partnerId = clientId.split(CLIENT_ID_SPLIT_CHAR)[PARTNER_ID_INDEX];
         AttachmentService attachmentService = new AttachmentService(
                 fileService,
                 new ThumbnailService(
+                        partnerId,
                         new JvmImageResizer(),
                         fileService
                 )
         );
         D4LErrorHandler errorHandler = new D4LErrorHandler();
         CallHandler callHandler = new CallHandler(errorHandler);
-        String partnerId = clientId.split(CLIENT_ID_SPLIT_CHAR)[PARTNER_ID_INDEX];
         RecordService recordService = new RecordService(partnerId, ALIAS, apiService, tagEncryptionService, taggingService, fhirService, attachmentService, cryptoService, errorHandler);
 
         return new Data4LifeClient(ALIAS, userService, recordService, callHandler);

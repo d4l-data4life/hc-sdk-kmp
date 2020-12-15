@@ -14,24 +14,24 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.fhir
+package care.data4life.sdk.record
 
-import care.data4life.crypto.GCKey
+import care.data4life.sdk.network.model.EncryptedRecord
+import care.data4life.sdk.network.model.NetworkRecordContract
 import care.data4life.sdk.wrapper.WrapperContract
-import java.util.HashMap
 
-// TODO: Rename it in something like ResourceService
-internal interface FhirContract {
+internal interface RecordEncryptionContract {
 
     interface Service {
-        fun encryptResource(dataKey: GCKey, resource: WrapperContract.Resource): String
 
-        fun decryptResource(
-                dataKey: GCKey,
-                tags: HashMap<String, String>,
-                encryptedResource: String
-        ): WrapperContract.Resource
+        fun encryptRecord(
+                record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+        ): EncryptedRecord
+
+        fun decryptRecord(
+                record: EncryptedRecord,
+                userId: String
+        ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
 
     }
-
 }

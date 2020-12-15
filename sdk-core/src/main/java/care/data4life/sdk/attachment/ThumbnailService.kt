@@ -17,24 +17,21 @@
 package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
-import care.data4life.fhir.stu3.util.FhirAttachmentHelper
 import care.data4life.sdk.ImageResizer
-import care.data4life.sdk.RecordService
 import care.data4life.sdk.lang.ImageResizeException
 import care.data4life.sdk.log.Log
+import care.data4life.sdk.wrapper.FhirAttachmentHelper
 import care.data4life.sdk.wrapper.HelperContract
 import care.data4life.sdk.wrapper.WrapperContract
-import org.threeten.bp.ZoneId
-import org.threeten.bp.format.DateTimeFormatter
-import java.util.*
 
 
 class ThumbnailService internal constructor(
         private val partnerId: String,
         private val imageResizer: ImageResizer,
-        private val fileService: FileContract.Service,
-        private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper
+        private val fileService: FileContract.Service
 ): ThumbnailContract.Service {
+
+    private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper = FhirAttachmentHelper
 
     override fun uploadDownscaledImages(
             attachmentsKey: GCKey,

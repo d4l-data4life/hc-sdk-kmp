@@ -47,8 +47,8 @@ interface NetworkRecordContract {
     }
 
     interface Builder {
-        val tags: HashMap<String, String>?
-        val dataKey: GCKey?
+        val tags: HashMap<String, String>?//ToDo remove
+        val dataKey: GCKey?//ToDo remove
 
         //mandatory
         fun setTags(tags: HashMap<String, String>?): Builder

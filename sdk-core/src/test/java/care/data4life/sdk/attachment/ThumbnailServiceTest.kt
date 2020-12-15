@@ -18,11 +18,10 @@ package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.ImageResizer
-import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.lang.ImageResizeException
 import care.data4life.sdk.log.Log
-import care.data4life.sdk.wrapper.HelperContract
+import care.data4life.sdk.wrapper.FhirAttachmentHelper
 import care.data4life.sdk.wrapper.WrapperContract
 import io.mockk.every
 import io.mockk.mockk
@@ -30,6 +29,7 @@ import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
 import io.reactivex.Single
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -43,11 +43,17 @@ class ThumbnailServiceTest {
     fun setUp() {
         resizer = mockk(relaxed = true)
         fileService = mockk(relaxed = true)
+        mockkObject(FhirAttachmentHelper)
+    }
+    
+    @After
+    fun tearDown() {
+        unmockkObject(FhirAttachmentHelper)
     }
 
     @Test
     fun `it is a ThumbnailService`() {
-        assertTrue((ThumbnailService("", resizer,fileService, mockk())as Any) is ThumbnailContract.Service)
+        assertTrue((ThumbnailService("", resizer, fileService)as Any) is ThumbnailContract.Service)
     }
 
     @Test
@@ -61,7 +67,7 @@ class ThumbnailServiceTest {
         every { resizer.isResizable(orgData) }  returns false
 
         // When
-        val result = ThumbnailService("", resizer,fileService, mockk())
+        val result = ThumbnailService("", resizer, fileService)
                 .uploadDownscaledImages(attachmentKey, userId, attachment, orgData)
 
         // Then
@@ -89,7 +95,7 @@ class ThumbnailServiceTest {
         every { Log.Companion.error(exception, exception.message) } returns Unit
 
         // When
-        val result = ThumbnailService("", resizer,fileService, mockk())
+        val result = ThumbnailService("", resizer, fileService)
                 .uploadDownscaledImages(attachmentKey, userId, attachment, orgData)
 
         // Then
@@ -122,7 +128,7 @@ class ThumbnailServiceTest {
         every { fileService.uploadFile(attachmentKey, userId, any()) } returns mockk()
 
         // When
-        val result = ThumbnailService("", resizer,fileService, mockk())
+        val result = ThumbnailService("", resizer, fileService)
                 .uploadDownscaledImages(attachmentKey, userId, attachment, orgData)
 
         // Then
@@ -162,7 +168,7 @@ class ThumbnailServiceTest {
         every { upload.blockingGet() } returns newId
 
         // When
-        val result = ThumbnailService("", resizer,fileService, mockk())
+        val result = ThumbnailService("", resizer, fileService)
                 .uploadDownscaledImages(attachmentKey, userId, attachment, orgData)
 
         // Then
@@ -199,7 +205,7 @@ class ThumbnailServiceTest {
         every { fileService.uploadFile(attachmentKey, userId, any()) } returns mockk()
 
         // When
-        val result = ThumbnailService("", resizer,fileService, mockk())
+        val result = ThumbnailService("", resizer, fileService)
                 .uploadDownscaledImages(attachmentKey, userId, attachment, orgData)
 
         // Then
@@ -239,7 +245,7 @@ class ThumbnailServiceTest {
         every { upload.blockingGet() } returns newId
 
         // When
-        val result = ThumbnailService("", resizer,fileService, mockk())
+        val result = ThumbnailService("", resizer, fileService)
                 .uploadDownscaledImages(attachmentKey, userId, attachment, orgData)
 
         // Then
@@ -287,7 +293,7 @@ class ThumbnailServiceTest {
         every { uploadThumnail.blockingGet() } returns newIdThumbnail
 
         // When
-        val result = ThumbnailService("", resizer,fileService, mockk())
+        val result = ThumbnailService("", resizer, fileService)
                 .uploadDownscaledImages(attachmentKey, userId, attachment, orgData)
 
         // Then
@@ -312,15 +318,20 @@ class ThumbnailServiceTest {
         // Given
         val resource = mockk<WrapperContract.Resource>()
         val attachment = mockk<WrapperContract.Attachment>()
-        val fhirHelper = mockk<HelperContract.FhirAttachmentHelper>()
+
+        every {  FhirAttachmentHelper.appendIdentifier(
+                any(),
+                any(),
+                any()
+        ) } returns mockk()
 
         // When
-        ThumbnailService("", resizer,fileService, fhirHelper).updateResourceIdentifier(
+        ThumbnailService("", resizer, fileService).updateResourceIdentifier(
                 resource,
                 listOf<Pair<WrapperContract.Attachment, List<String>?>>(attachment to null)
         )
 
-        verify(exactly = 0) { fhirHelper.appendIdentifier(
+        verify(exactly = 0) { FhirAttachmentHelper.appendIdentifier(
                 any(),
                 any(),
                 any()
@@ -332,22 +343,27 @@ class ThumbnailServiceTest {
         // Given
         val resource = mockk<WrapperContract.Resource>()
         val attachment = mockk<WrapperContract.Attachment>()
-        val fhirHelper = mockk<HelperContract.FhirAttachmentHelper>(relaxed = true)
         val unwrappedResource = mockk<Fhir3Resource>()
         val partnerId = "di"
 
         every { resource.unwrap() } returns unwrappedResource
         every { attachment.id } returns "something"
 
+        every { FhirAttachmentHelper.appendIdentifier(
+                unwrappedResource,
+                "d4l_f_p_t#something#abc",
+                partnerId
+        ) } returns mockk()
+
         // When
-        ThumbnailService(partnerId, resizer,fileService, fhirHelper).updateResourceIdentifier(
+        ThumbnailService(partnerId, resizer, fileService).updateResourceIdentifier(
                 resource,
                 listOf<Pair<WrapperContract.Attachment, List<String>?>>(attachment to listOf("abc"))
         )
 
-        verify(exactly = 1) { fhirHelper.appendIdentifier(
+        verify(exactly = 1) { FhirAttachmentHelper.appendIdentifier(
                 unwrappedResource,
-                "d4l_f_p_t#something#abcg",
+                "d4l_f_p_t#something#abc",
                 partnerId
         ) }
     }

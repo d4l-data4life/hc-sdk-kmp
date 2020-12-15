@@ -17,7 +17,6 @@
 package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import java.util.Objects.hash
 
 /**
@@ -33,7 +32,7 @@ internal data class DecryptedAppDataRecord(
         override var updatedDate: String?,
         override var dataKey: GCKey?,
         override var modelVersion: Int
-) : DecryptedDataRecord {
+) : NetworkRecordsContract.DecryptedDataRecord {
     override fun equals(other: Any?): Boolean {
         return when {
             other !is DecryptedAppDataRecord -> false

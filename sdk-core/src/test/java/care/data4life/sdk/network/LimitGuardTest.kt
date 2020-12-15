@@ -18,7 +18,7 @@ package care.data4life.sdk.network
 
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.DecryptedRecordGuard
-import care.data4life.sdk.network.model.definitions.LimitGuard
+import care.data4life.sdk.network.model.NetworkRecordsContract
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -48,7 +48,7 @@ class LimitGuardTest {
 
     @Test
     fun `it is a LimitGuard`() {
-        assertTrue(DecryptedRecordGuard is LimitGuard)
+        assertTrue((DecryptedRecordGuard as Any) is NetworkRecordsContract.LimitGuard)
     }
 
     @Test

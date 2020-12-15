@@ -17,14 +17,13 @@
 package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import io.mockk.mockk
 import io.mockk.mockkClass
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class DecryptedAppDataRecordTest {
+class DecryptedDataRecordTest {
     @Test
     fun `it is a DecryptedBaseRecord`() {
         assertTrue((
@@ -38,7 +37,7 @@ class DecryptedAppDataRecordTest {
                         dataKey = mockkClass(GCKey::class),
                         modelVersion = 42
                 ) as Any
-                ) is DecryptedBaseRecord<*>)
+                ) is NetworkRecordsContract.DecryptedRecord<*>)
     }
 
     @Test

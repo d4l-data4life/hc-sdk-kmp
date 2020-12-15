@@ -22,13 +22,9 @@ import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedRecordGuard
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
-import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
-import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
-import care.data4life.sdk.network.model.definitions.LimitGuard
+import care.data4life.sdk.network.model.NetworkRecordsContract
 
-internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
+internal class DecryptedRecordBuilder : NetworkRecordsContract.Builder {
     private var identifier: String? = null
     private var _tags: HashMap<String, String>? = null
     private var annotations: List<String> = listOf()
@@ -38,7 +34,7 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
     private var _dataKey: GCKey? = null
     private var modelVersion: Int? = null
 
-    private val guard: LimitGuard = DecryptedRecordGuard
+    private val guard: NetworkRecordsContract.LimitGuard = DecryptedRecordGuard
 
     override val tags: HashMap<String, String>?
         get() = this._tags
@@ -49,36 +45,36 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
     //mandatory
     override fun setTags(
             tags: HashMap<String, String>?
-    ): DecryptedRecordBuilder = this.also { it._tags = tags }
+    ): NetworkRecordsContract.Builder = this.also { it._tags = tags }
 
     override fun setCreationDate(
             creationDate: String?
-    ): DecryptedRecordBuilder = this.also { it.creationDate = creationDate }
+    ): NetworkRecordsContract.Builder = this.also { it.creationDate = creationDate }
 
     override fun setDataKey(
             dataKey: GCKey?
-    ): DecryptedRecordBuilder = this.also { it._dataKey = dataKey }
+    ): NetworkRecordsContract.Builder = this.also { it._dataKey = dataKey }
 
     override fun setModelVersion(
             modelVersion: Int?
-    ): DecryptedRecordBuilder = this.also { it.modelVersion = modelVersion }
+    ): NetworkRecordsContract.Builder = this.also { it.modelVersion = modelVersion }
 
     //Optional
     override fun setIdentifier(
             identifier: String?
-    ): DecryptedRecordBuilder = this.also { it.identifier = identifier }
+    ): NetworkRecordsContract.Builder = this.also { it.identifier = identifier }
 
     override fun setAnnotations(
             annotations: List<String>?
-    ): DecryptedRecordBuilder = this.also { it.annotations = annotations ?: listOf() }
+    ): NetworkRecordsContract.Builder = this.also { it.annotations = annotations ?: listOf() }
 
     override fun setUpdateDate(
             updatedDate: String?
-    ): DecryptedRecordBuilder = this.also { it.updatedDate = updatedDate }
+    ): NetworkRecordsContract.Builder = this.also { it.updatedDate = updatedDate }
 
     override fun setAttachmentKey(
             attachmentKey: GCKey?
-    ): DecryptedRecordBuilder = this.also { it.attachmentKey = attachmentKey }
+    ): NetworkRecordsContract.Builder = this.also { it.attachmentKey = attachmentKey }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     private fun validatePayload(
@@ -106,7 +102,7 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
             creationDate: String,
             dataKey: GCKey,
             modelVersion: Int
-    ): DecryptedFhir3Record<T?> =
+    ): NetworkRecordsContract.DecryptedFhir3Record<T?> =
             DecryptedRecord(
                     this.identifier,
                     resource,
@@ -126,7 +122,7 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
             creationDate: String?,
             dataKey: GCKey?,
             modelVersion: Int?
-    ): DecryptedDataRecord = DecryptedAppDataRecord(
+    ): NetworkRecordsContract.DecryptedDataRecord = DecryptedAppDataRecord(
             this.identifier,
             resource,
             tags,
@@ -145,7 +141,7 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
             creationDate: String?,
             dataKey: GCKey?,
             modelVersion: Int?
-    ): DecryptedBaseRecord<T> {
+    ): NetworkRecordsContract.DecryptedRecord<T> {
         this.validatePayload(
                 tags,
                 creationDate,
@@ -184,10 +180,10 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
             ).also { this.guard.checkDataLimit(resource) }
             else -> throw CoreRuntimeException.InternalFailure()
 
-        } as DecryptedBaseRecord<T>
+        } as NetworkRecordsContract.DecryptedRecord<T>
     }
 
-    override fun clear(): DecryptedRecordBuilder = this.also {
+    override fun clear(): NetworkRecordsContract.Builder = this.also {
         it.identifier = null
         it._tags = null
         it.annotations = listOf()

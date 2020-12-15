@@ -39,7 +39,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, no mandatory setters are called, it fails if build is called with a CustomResource`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -53,7 +53,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setTags is called with a HashMap String to String, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -67,7 +67,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setCreationDate is called with a String, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -81,7 +81,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setDataKey is called with a GCKey, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -95,7 +95,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setModelVersion is called with a Int, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -109,7 +109,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setTags and setCreationDate are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -126,7 +126,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setTags and setDataKey are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -143,7 +143,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setTags and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -160,7 +160,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setCreationDate and setDataKey are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -177,7 +177,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setCreationDate and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -194,7 +194,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setDataKey and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -211,7 +211,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setTags, setCreationDate and setDataKey are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -229,7 +229,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setTags, setCreationDate and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -247,7 +247,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setTags, setDataKey and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -265,7 +265,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setCreationDate, setDataKey and setModelVersion are called with their appropriate payload, but the other mandatory setters are not called, it fails if build is called with a CustomResource`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -283,7 +283,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setTags, setCreationDate, setDataKey and setModelVersion are called with their appropriate payload, it returns a DecryptedDataRecord a CustomResource`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         val record = builder
@@ -312,7 +312,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setTags is called with null, it resets the Tags`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -333,7 +333,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setCreationDate is called with null, it resets the CreationDate`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -354,7 +354,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setDataKey is called with null, it resets the DataKey`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -375,7 +375,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setModelVersion is called with null, it resets the DataKey`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {
@@ -395,7 +395,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
 
     @Test
     fun `Given, clear is called, it resets all mandatory values`() {
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         try {

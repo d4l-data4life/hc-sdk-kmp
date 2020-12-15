@@ -15,31 +15,6 @@
  */
 package care.data4life.sdk
 
-import care.data4life.fhir.stu3.model.CarePlan
-import care.data4life.fhir.stu3.model.DomainResource
-import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
-import care.data4life.sdk.config.DataRestrictionException
-import care.data4life.sdk.lang.D4LException
-import care.data4life.sdk.lang.DataValidationException
-import care.data4life.sdk.model.ModelVersion
-import care.data4life.sdk.model.SdkRecordFactory
-import care.data4life.sdk.model.definitions.BaseRecord
-import care.data4life.sdk.network.DecryptedRecordBuilderImpl
-import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import care.data4life.sdk.util.MimeType
-import com.google.common.truth.Truth
-import io.mockk.every
-import io.reactivex.Single
-import org.junit.After
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Ignore
-import org.junit.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito
-import org.threeten.bp.LocalDate
-import java.io.IOException
-
 /*
 class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     @Before

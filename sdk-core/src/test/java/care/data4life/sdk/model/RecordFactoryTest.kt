@@ -24,7 +24,7 @@ import care.data4life.sdk.model.definitions.Fhir3Record
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.DecryptedRecord
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import care.data4life.sdk.network.model.NetworkRecordsContract
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
@@ -103,7 +103,7 @@ class RecordFactoryTest {
         val record = SdkRecordFactory.getInstance(decryptedRecord)
 
         // Then
-        assertTrue(record is Fhir3Record)
+        assertTrue(record is Fhir3Record<*>)
         // FIXME: Meta & Record should be a data class
         assertEquals(
                 record.resource,
@@ -214,5 +214,5 @@ class RecordFactoryTest {
             override var dataKey: GCKey?,
             override var attachmentsKey: GCKey?,
             override var modelVersion: Int
-    ) : DecryptedBaseRecord<T>
+    ) : NetworkRecordsContract.DecryptedRecord<T>
 }

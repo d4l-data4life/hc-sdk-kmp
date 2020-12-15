@@ -20,9 +20,7 @@ import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.RecordFactory
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
-import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
-import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
+import care.data4life.sdk.network.model.NetworkRecordsContract
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -39,16 +37,16 @@ internal object SdkRecordFactory : RecordFactory {
             .toFormatter(Locale.US)
 
     @Throws(CoreRuntimeException.InternalFailure::class)
-    override fun <T : Any> getInstance(record: DecryptedBaseRecord<T>): BaseRecord<T> {
+    override fun <T : Any> getInstance(record: NetworkRecordsContract.DecryptedRecord<T>): BaseRecord<T> {
         @Suppress("UNCHECKED_CAST")
         return when (record) {
-            is DecryptedFhir3Record -> Record(
+            is NetworkRecordsContract.DecryptedFhir3Record -> Record(
                     record.resource as Fhir3Resource,
                     buildMeta(record),
                     record.annotations
             )
             // TODO app data
-            is DecryptedDataRecord -> AppDataRecord(
+            is NetworkRecordsContract.DecryptedDataRecord -> AppDataRecord(
                     record.identifier!!,
                     record.resource,
                     buildMeta(record),
@@ -61,7 +59,7 @@ internal object SdkRecordFactory : RecordFactory {
 
     @JvmStatic
     private fun buildMeta(
-            record: DecryptedBaseRecord<*>
+            record: NetworkRecordsContract.DecryptedRecord<*>
     ): Meta = Meta(
             LocalDate.parse(record.customCreationDate, DATE_FORMATTER),
             LocalDateTime.parse(record.updatedDate, DATE_TIME_FORMATTER)

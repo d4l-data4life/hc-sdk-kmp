@@ -15,7 +15,7 @@
  */
 
 package care.data4life.sdk
-
+/*
 import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.D4LException
@@ -37,7 +37,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 
-/*
+
 class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
     @Before
     fun setup() {

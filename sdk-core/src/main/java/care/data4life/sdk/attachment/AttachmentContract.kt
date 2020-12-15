@@ -18,6 +18,7 @@ package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.network.model.NetworkRecordContract
 import care.data4life.sdk.wrapper.WrapperContract
 import io.reactivex.Single
 
@@ -49,5 +50,17 @@ interface AttachmentContract {
 
     interface FhirDateValidator {
         fun isInvalidateDate(attachment: WrapperContract.Attachment): Boolean
+    }
+
+    interface Client {
+        fun removeUploadData(
+                record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+        ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+
+        fun restoreUploadData(
+                record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>,
+                originalResource: WrapperContract.Resource?,
+                attachmentData: HashMap<WrapperContract.Attachment, String?>?
+        ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
     }
 }

@@ -44,6 +44,6 @@ interface AttachmentContract {
     }
 
     interface FhirDateValidator {
-        fun validateDate(attachment: Attachment): Boolean
+        fun isInvalidateDate(attachment: Attachment): Boolean
     }
 }

@@ -16,25 +16,21 @@
 package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.ImageResizer
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.lang.DataValidationException
-import care.data4life.sdk.lang.ImageResizeException
-import care.data4life.sdk.log.Log
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
 import care.data4life.sdk.wrappers.definitions.Attachment
 import io.reactivex.Observable
 import io.reactivex.Single
-import java.util.*
 
 // TODO add internal
 class AttachmentService internal constructor(
         private val fileService: FileContract.Service,
-        // TODO move imageResizer to tumbnail service
-        private val imageResizer: ImageResizer
+        private val thumbnailService: ThumbnailContract.Service
 ) : AttachmentContract.Service {
+    private val fhirDateValidator: AttachmentContract.FhirDateValidator = FhirDateValidator
 
     override fun upload(
             attachments: List<Attachment>,
@@ -46,10 +42,15 @@ class AttachmentService internal constructor(
                 .map { attachment ->
                     val originalData = decode(attachment.data!!)
                     attachment.id = fileService.uploadFile(attachmentsKey, userId, originalData).blockingGet()
-                    val additionalIds = uploadDownscaledImages(attachmentsKey, userId, attachment, originalData)
+                    val additionalIds = thumbnailService.uploadDownscaledImages(
+                            attachmentsKey,
+                            userId,
+                            attachment,
+                            originalData
+                    )
                     Pair(attachment, additionalIds)
                 }
-                .filter { (first) -> first.id != null }
+                .filter { (first) -> first.id != null } //FIXME: Should this be removed?
                 .toList()
     }
 
@@ -61,87 +62,40 @@ class AttachmentService internal constructor(
     ): Single<List<Attachment>> {
         return Observable
                 .fromCallable { attachments }
-                .flatMapIterable { attachmentList -> attachmentList }
+                .flatMapIterable { it }
+                .filter{ it.id != null }
                 .map { attachment ->
-                    var attachmentId = attachment.id
+                    var attachmentId = attachment.id!!
                     var isPreview = false
-                    if (attachment.id!!.contains(SPLIT_CHAR)) {
-                        attachmentId = attachment.id!!.split(SPLIT_CHAR)[DOWNSCALED_ATTACHMENT_ID_POS]
+                    if (attachmentId.contains(SPLIT_CHAR)) {
+                        attachmentId = attachmentId.split(SPLIT_CHAR)[DOWNSCALED_ATTACHMENT_ID_POS]
                         isPreview = true
                     }
-                    val data = fileService.downloadFile(attachmentsKey, userId, attachmentId!!).blockingGet()
+
+                    val data = fileService.downloadFile(attachmentsKey, userId, attachmentId).blockingGet()
+                    val newHash = encodeToString(sha1(data))
 
                     if (!isPreview &&
-                            FhirDateValidator.validateDate(attachment) &&
-                            attachment.hash != encodeToString(sha1(data))
+                            fhirDateValidator.isInvalidateDate(attachment) &&
+                            attachment.hash != newHash
                     ) {
-                        throw DataValidationException.InvalidAttachmentPayloadHash(
-                                "Attachment.hash is not valid")
+                        throw DataValidationException.InvalidAttachmentPayloadHash()
                     } else {
-                        attachment.hash = encodeToString(sha1(data))
+                        attachment.also {
+                            it.data = encodeToString(data)
+                            it.hash = newHash
+                        }
                     }
-                    attachment.data = encodeToString(data)
-                    attachment
                 }
                 .toList()
     }
 
-    override fun delete(attachmentId: String, userId: String): Single<Boolean> {
-        return fileService.deleteFile(userId, attachmentId)
-    }
-
-
-    // TODO -> thumbnail service
-    private fun uploadDownscaledImages(
-            attachmentsKey: GCKey,
-            userId: String,
-            attachment: Attachment,
-            originalData: ByteArray
-    ): List<String> {
-        var additionalIds = mutableListOf<String>()
-        if (imageResizer.isResizable(originalData)) {
-            additionalIds = ArrayList()
-            var downscaledId: String?
-            for (position in 0..1) {
-                downscaledId = resizeAndUpload(
-                        attachmentsKey,
-                        userId,
-                        attachment,
-                        originalData,
-                        if (position == POSITION_PREVIEW) {
-                            ImageResizer.DEFAULT_PREVIEW_SIZE_PX
-                        } else {
-                            ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX
-                        }
-                )
-                if (downscaledId != null)
-                    additionalIds.add(downscaledId)
-            }
-        }
-        return additionalIds
-    }
-
-    // TODO -> thumbnail service
-    private fun resizeAndUpload(
-            attachmentsKey: GCKey,
-            userId: String,
-            attachment: Attachment,
-            originalData: ByteArray,
-            targetHeight: Int
-    ): String? {
-        val downscaledImage = try {
-            imageResizer.resizeToHeight(originalData, targetHeight, ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT)
-        } catch (exception: ImageResizeException.JpegWriterMissing) {
-            Log.error(exception, exception.message)
-            return null
-        }
-        return if (downscaledImage == null) { //currentSizePx <= targetSizePx
-            attachment.id //nothing to upload
-        } else fileService.uploadFile(attachmentsKey, userId, downscaledImage).blockingGet()
-    }
+    override fun delete(
+            attachmentId: String,
+            userId: String
+    ): Single<Boolean> = fileService.deleteFile(userId, attachmentId)
 
     companion object {
         private const val DOWNSCALED_ATTACHMENT_ID_POS = 1
-        private const val POSITION_PREVIEW = 0
     }
 }

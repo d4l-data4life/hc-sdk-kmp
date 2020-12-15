@@ -31,18 +31,19 @@ class FileService(
     override fun downloadFile(key: GCKey, userId: String, fileId: String): Single<ByteArray> {
         return apiService
                 .downloadDocument(alias, userId, fileId)
-                .flatMap { downloadedFile -> cryptoService.decrypt(key, downloadedFile) }
-                .onErrorResumeNext { error -> Single.error(FileException.DownloadFailed(error)) }
+                .flatMap { cryptoService.decrypt(key, it) }
+                .onErrorResumeNext { Single.error(FileException.DownloadFailed(it)) }
     }
 
     override fun uploadFile(key: GCKey, userId: String, data: ByteArray): Single<String> {
         return cryptoService
                 .encrypt(key, data)
-                .flatMap { encryptedData -> apiService.uploadDocument(alias, userId, encryptedData) }
-                .onErrorResumeNext { error -> Single.error(FileException.UploadFailed(error)) }
+                .flatMap { apiService.uploadDocument(alias, userId, it) }
+                .onErrorResumeNext { Single.error(FileException.UploadFailed(it)) }
     }
 
-    override fun deleteFile(userId: String, fileId: String): Single<Boolean> {
-        return apiService.deleteDocument(alias, userId, fileId)
-    }
+    override fun deleteFile(
+            userId: String,
+            fileId: String
+    ): Single<Boolean> = apiService.deleteDocument(alias, userId, fileId)
 }

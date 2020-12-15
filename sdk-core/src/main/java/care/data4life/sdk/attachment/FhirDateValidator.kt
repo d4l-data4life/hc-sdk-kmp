@@ -26,10 +26,10 @@ internal object FhirDateValidator: AttachmentContract.FhirDateValidator {
     )
 
     private fun validateFhir3Date(attachment: Fhir3Attachment): Boolean {
-        return attachment.creation?.date?.toDate()?.after(validationFhir3Date.date.toDate()) ?: false
+        return attachment.creation?.date?.toDate()?.after(validationFhir3Date.date.toDate()) ?: true
     }
 
-    override fun validateDate(attachment: Attachment): Boolean {
+    override fun isInvalidateDate(attachment: Attachment): Boolean {
         return validateFhir3Date(attachment.unwrap() as Fhir3Attachment)
     }
 

@@ -34,18 +34,18 @@ class FhirDateValidationTest {
     }
 
     @Test
-    fun `Given, validateFhirDate is called with a Attachment, which contains a null as FhirDateTime, it returns false`() {
+    fun `Given, isInvalidDate is called with a Attachment, which contains a null as FhirDateTime, it returns true`() {
         // Given
         val fhirAttachment = Fhir3Attachment()
 
         fhirAttachment.creation = null
 
         // Then
-        assertFalse(FhirDateValidator.validateDate(SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(FhirDateValidator.isInvalidateDate(SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
-    fun `Given, validateFhirDate is called with a Attachment, which contains a null as FhirDate, it returns false`() {
+    fun `Given, isInvalidDate is called with a Attachment, which contains a null as FhirDate, it returns true`() {
         // Given
         val fhirAttachment = Fhir3Attachment()
         val fhirDateTime = mockkClass(Fhir3DateTime::class)
@@ -55,11 +55,11 @@ class FhirDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertFalse(FhirDateValidator.validateDate(SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(FhirDateValidator.isInvalidateDate(SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
-    fun `Given, validateFhirDate is called with a Attachment, which contains a null as Date, it returns false`() {
+    fun `Given, isInvalidDate is called with a Attachment, which contains a null as Date, it returns false`() {
         // Given
         val fhirAttachment = Fhir3Attachment()
         val fhirDateTime = mockkClass(Fhir3DateTime::class)
@@ -71,11 +71,11 @@ class FhirDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertFalse(FhirDateValidator.validateDate(SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(FhirDateValidator.isInvalidateDate(SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
-    fun `Given, validateFhirDate is called with a Attachment, which contains a FhirDate before 2019-09-15, it returns false`() {
+    fun `Given, isInvalidDate is called with a Attachment, which contains a FhirDate before 2019-09-15, it returns false`() {
         // Given
         val fhirAttachment = Fhir3Attachment()
         val fhirDateTime = FhirDateTimeParser.parseDateTime(
@@ -85,11 +85,11 @@ class FhirDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertFalse(FhirDateValidator.validateDate(SdkFhir3Attachment(fhirAttachment)))
+        assertFalse(FhirDateValidator.isInvalidateDate(SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
-    fun `Given, validateFhirDate is called with a Attachment, which contains a FhirDate after 2019-09-15, it returns true`() {
+    fun `Given, isInvalidDate is called with a Attachment, which contains a FhirDate after 2019-09-15, it returns true`() {
         // Given
         val fhirAttachment = Fhir3Attachment()
         val fhirDateTime = FhirDateTimeParser.parseDateTime(
@@ -99,6 +99,6 @@ class FhirDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertTrue(FhirDateValidator.validateDate(SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(FhirDateValidator.isInvalidateDate(SdkFhir3Attachment(fhirAttachment)))
     }
 }

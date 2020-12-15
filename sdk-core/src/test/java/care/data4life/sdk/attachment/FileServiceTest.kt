@@ -18,6 +18,9 @@ package care.data4life.sdk.attachment
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.ApiService
 import care.data4life.sdk.CryptoService
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkClass
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
@@ -34,7 +37,7 @@ class FileServiceTest {
     @Throws(Exception::class)
     fun setUp() {
         apiService = Mockito.mock(ApiService::class.java)
-        cryptoService = Mockito.mock(CryptoService::class.java)
+        cryptoService = mockkClass(CryptoService::class)
         fileService = Mockito.spy(FileService(ALIAS, apiService, cryptoService))
     }
 
@@ -47,11 +50,7 @@ class FileServiceTest {
                         ArgumentMatchers.anyString(),
                         ArgumentMatchers.anyString())
         ).thenReturn(Single.just(RESULT))
-        Mockito.`when`(
-                cryptoService.decrypt(
-                        ArgumentMatchers.any(),
-                        ArgumentMatchers.any(ByteArray::class.java))
-        ).thenReturn(Single.just(RESULT))
+        every { cryptoService.encrypt(any(), any()) } returns Single.just(RESULT)
         Mockito.`when`(
                 apiService.downloadDocument(
                         ArgumentMatchers.anyString(),
@@ -70,11 +69,7 @@ class FileServiceTest {
     @Test
     fun uploadFiles_shouldReturnTrueOrFalse() {
         // given
-        Mockito.`when`(
-                cryptoService.encrypt(
-                        ArgumentMatchers.any(),
-                        ArgumentMatchers.any(ByteArray::class.java))
-        ).thenReturn(Single.just(RESULT))
+        every { cryptoService.encrypt(any(), any()) } returns Single.just(RESULT)
         Mockito.`when`(apiService.uploadDocument(
                 ArgumentMatchers.anyString(),
                 ArgumentMatchers.anyString(),

@@ -23,6 +23,7 @@ import org.junit.Test;
 import care.data4life.crypto.GCKey;
 import care.data4life.crypto.GCKeyPair;
 import care.data4life.crypto.GCSymmetricKey;
+import care.data4life.sdk.auth.OAuthService;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.network.model.EncryptedKey;
 import care.data4life.sdk.network.model.UserInfo;
@@ -108,7 +109,7 @@ public class UserServiceTest {
     @Test
     public void getSessionToken_shouldReturnTrue() throws Exception {
         // given
-        when(oAuthService.getAccessToken(USER_ALIAS)).thenReturn(AUTH_TOKEN);
+        when(oAuthService.refreshAccessToken(USER_ALIAS)).thenReturn(AUTH_TOKEN);
 
         // when
         TestObserver<String> testSubscriber = userService.getSessionToken(USER_ALIAS)
@@ -123,7 +124,7 @@ public class UserServiceTest {
     @Test
     public void getSessionToken_shouldThrowError() throws Exception {
         // given
-        when(oAuthService.getAccessToken(USER_ALIAS)).thenReturn(null);
+        when(oAuthService.refreshAccessToken(USER_ALIAS)).thenReturn(null);
 
         // when
         TestObserver<String> testSubscriber = userService.getSessionToken(USER_ALIAS)
@@ -177,6 +178,7 @@ public class UserServiceTest {
         // given
         UserInfo userInfo = mock(UserInfo.class);
         when(userInfo.getCommonKey()).thenReturn(mock(EncryptedKey.class));
+        when(userInfo.getCommonKeyId()).thenReturn("mockedCommonKeyId");
         when(userInfo.getTagEncryptionKey()).thenReturn(mock(EncryptedKey.class));
         when(userInfo.getUid()).thenReturn("");
 

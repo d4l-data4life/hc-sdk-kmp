@@ -16,6 +16,8 @@
 
 package care.data4life.sdk;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.Field;
 
 import care.data4life.sdk.lang.D4LException;
@@ -31,8 +33,9 @@ class D4LErrorHandler implements SdkContract.ErrorHandler {
         //empty
     }
 
+    @NotNull
     @Override
-    public D4LException handleError(Throwable error) {
+    public D4LException handleError(@NotNull Throwable error) {
         removeAnySecret(error);
         if (error instanceof D4LException) {
             return (D4LException) error;
@@ -40,7 +43,7 @@ class D4LErrorHandler implements SdkContract.ErrorHandler {
         return new D4LException(error);
     }
 
-    private void removeAnySecret(Throwable error) {
+    private void removeAnySecret(@NotNull Throwable error) {
         do {
             if (error instanceof D4LRuntimeException || error instanceof D4LException)
                 continue;

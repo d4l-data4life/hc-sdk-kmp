@@ -33,5 +33,7 @@ jobs:
         run: ./gradlew clean
       - name: Configure project
         run: ./gradlew provideTestConfig
+      - name: Run sdk android tests
+        run: ./gradlew :sdk-android:test
       - name: Run tests with code coverage
         run: ./gradlew jacocoTestReport

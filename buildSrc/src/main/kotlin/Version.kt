@@ -21,12 +21,12 @@ object Version {
     /**
      * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)
      */
-    const val fhirSdk = "0.7.0"
+    const val fhirSdk = "1.0.0"
 
     /**
      * [hc-fhir-helper-sdk-kmp](https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp)
      */
-    const val fhirHelper = "1.3.1"
+    const val fhirHelper = "1.4.0"
 
     // kotlin
     const val kotlin = "1.3.72"
@@ -38,7 +38,7 @@ object Version {
 
     object GradlePlugin {
         const val kotlin = Version.kotlin
-        const val android = "4.0.1"
+        const val android = "4.1.1"
 
         /**
          * [Dexcount](https://github.com/KeepSafe/dexcount-gradle-plugin)
@@ -122,6 +122,13 @@ object Version {
      */
     const val moshi = "1.8.0"
 
+    /**
+     *
+     *[gson](https://github.com/square/retrofit/tree/master/retrofit-converters/gson)
+     */
+    const val gson = "2.9.0"
+
+
     // Date
 
     /**
@@ -192,10 +199,11 @@ object Version {
     const val robolectric = "4.3.1"
 
     // Android Test
-    const val androidTestCore = "1.0.0"
-    const val androidTest = "1.1.1"
-    const val androidTestEspresso = "3.1.1"
+    const val androidXTestCore = "1.3.0"
+    const val androidXTest = "1.3.0"
+    const val androidXEspresso = "3.1.1"
     const val androidXUiAutomator = "2.2.0"
+    const val androidXTestExtJUnit = "1.1.2"
 
     const val androidXKakao = "1.4.0-androidx"
 

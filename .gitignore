@@ -29,3 +29,10 @@ captures/
 .asciidoctor/
 
 .DS_Store
+
+# Editors
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

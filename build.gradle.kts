@@ -144,20 +144,21 @@ jgitver {
     nonQualifierBranches = "main"
 }
 
+afterEvaluate {
+    configure<care.data4life.gradle.git.publish.GitPublishExtension> {
+        repoUri.set("git@github.com:d4l-data4life/maven-repository.git")
 
-configure<care.data4life.gradle.git.publish.GitPublishExtension> {
-    repoUri.set("git@github.com:d4l-data4life/maven-repository.git")
+        branch.set("main")
 
-    branch.set("main")
+        contents {
+        }
 
-    contents {
+        preserve {
+            include("**/*")
+        }
+
+        commitMessage.set("Publish ${LibraryConfig.name} ${project.version}")
     }
-
-    preserve {
-        include("**/*")
-    }
-
-    commitMessage.set("Publish ${LibraryConfig.name} $version")
 }
 
 task<Exec>("publishFeature") {

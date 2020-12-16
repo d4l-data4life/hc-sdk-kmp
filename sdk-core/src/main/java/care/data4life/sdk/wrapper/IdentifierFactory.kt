@@ -17,6 +17,7 @@
 package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.fhir.Fhir3Identifier
+import care.data4life.sdk.fhir.Fhir4Identifier
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 
@@ -27,6 +28,7 @@ internal object IdentifierFactory: WrapperFactoryContract.IdentifierFactory {
         return when(identifier) {
             null -> null
             is Fhir3Identifier -> SdkFhir3Identifier(identifier)
+            is Fhir4Identifier -> SdkFhir4Identifier(identifier)
             else -> throw CoreRuntimeException.InternalFailure()
         }
     }

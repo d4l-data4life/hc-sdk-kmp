@@ -17,6 +17,7 @@
 package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.fhir.Fhir3Attachment
+import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 
@@ -27,6 +28,7 @@ internal object AttachmentFactory: WrapperFactoryContract.AttachmentFactory {
         return when(attachment) {
             null -> null
             is Fhir3Attachment -> SdkFhir3Attachment(attachment)
+            is Fhir4Attachment -> SdkFhir4Attachment(attachment)
             else -> throw CoreRuntimeException.InternalFailure()
         }
     }

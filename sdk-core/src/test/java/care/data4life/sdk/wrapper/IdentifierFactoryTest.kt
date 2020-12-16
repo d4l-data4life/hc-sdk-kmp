@@ -16,6 +16,7 @@
 
 package care.data4life.sdk.wrapper
 
+import care.data4life.sdk.fhir.Fhir4Identifier
 import care.data4life.fhir.stu3.model.Identifier as Fhir3Identifier
 import care.data4life.sdk.lang.CoreRuntimeException
 import org.junit.Assert.assertNull
@@ -52,6 +53,18 @@ class IdentifierFactoryTest {
     fun `Given, wrap is called with a Fhir3Identifier, it returns a Attachment`() {
         // Given
         val givenIdentifier = Mockito.mock(Fhir3Identifier::class.java)
+
+        // When
+        val wrapped: Any = IdentifierFactory.wrap(givenIdentifier)!!
+
+        // Then
+        assertTrue(wrapped is WrapperContract.Identifier)
+    }
+
+    @Test
+    fun `Given, wrap is called with a Fhir4Identifier, it returns a Attachment`() {
+        // Given
+        val givenIdentifier = Mockito.mock(Fhir4Identifier::class.java)
 
         // When
         val wrapped: Any = IdentifierFactory.wrap(givenIdentifier)!!

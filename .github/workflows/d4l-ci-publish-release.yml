@@ -1,4 +1,4 @@
-name: D4L Publish Artifact
+name: D4L CI - Publish Release
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  build:
+  publish-release:
 
     runs-on: ubuntu-latest
 
@@ -20,11 +20,20 @@ jobs:
       - name: Display runner context
         run: hostname -s
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - run: git branch -D ${{ github.head_ref }} || true
+      - name: Reattach head
+        run: git checkout -b ${{ github.head_ref }}
       - name: Cleanup
         run: ./gradlew clean
+      - name: Version
+        run: ./gradlew version
       - name: Configure project
         run: ./gradlew provideTestConfig
       - name: Build project
         run: ./gradlew build
-      - name: Publish artifacts
-        run: ./gradlew publish
+      - name: Publish to GitHub Packages
+        run: ./gradlew publishAllPublicationToGitHubPackagesRepository
+      - name: Publish Release to Maven Repo
+        run: ./gradlew publishRelease

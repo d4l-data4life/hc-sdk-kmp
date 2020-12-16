@@ -192,7 +192,7 @@ class RecordService(
                 .map { DeleteResult(it, failedDeletes) }
     }
 
-    private fun _fetchRecord(
+    fun _fetchRecord(
             recordId: String,
             userId: String
     ): Single<BaseRecord<Any>> {
@@ -228,7 +228,7 @@ class RecordService(
                 .fromCallable { recordIds }
                 .flatMapIterable { it }
                 .flatMapSingle { recordId ->
-                    fetchFhir3Record<T>(recordId, userId)
+                    fetchFhir3Record<T>(userId, recordId)
                             .onErrorReturn { error ->
                                 Record<T>(null, null, null).also {
                                     failedFetches.add(Pair(recordId, errorHandler.handleError(error)))
@@ -253,7 +253,7 @@ class RecordService(
         }
     }
 
-    private fun _fetchRecords(
+    fun _fetchRecords(
             userId: String,
             resourceType: Class<Any>,
             annotations: List<String>,

@@ -374,7 +374,6 @@ class RecordServiceCreateRecordTest: RecordTestBase() {
         val wrappedResource =  mockk<Fhir3Resource>()
         val resources = mutableListOf(wrappedResource)
         val userId = "id"
-        val resourceType = "type"
 
         val createdRecord = mockk<Record<Fhir3Resource>>()
         every { recordService.createRecord(userId, wrappedResource, listOf()) } returns Single.just(createdRecord)

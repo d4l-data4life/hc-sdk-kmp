@@ -59,6 +59,8 @@ plugins {
     gitVersioning()
 }
 
+apply(plugin = "care.data4life.git-publish")
+
 allprojects {
     repositories {
         google()
@@ -67,22 +69,28 @@ allprojects {
         maven {
             url = URI("https://maven.pkg.github.com/d4l-data4life/hc-util-sdk-kmp")
             credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+                username = project.findProperty("gpr.user") as String?
+                        ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
+                password = project.findProperty("gpr.key") as String?
+                        ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
             }
         }
         maven {
             url = URI("https://maven.pkg.github.com/d4l-data4life/hc-fhir-sdk-java")
             credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+                username = project.findProperty("gpr.user") as String?
+                        ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
+                password = project.findProperty("gpr.key") as String?
+                        ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
             }
         }
         maven {
             url = URI("https://maven.pkg.github.com/d4l-data4life/hc-fhir-helper-sdk-kmp")
             credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+                username = project.findProperty("gpr.user") as String?
+                        ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
+                password = project.findProperty("gpr.key") as String?
+                        ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
             }
         }
     }
@@ -136,3 +144,45 @@ jgitver {
     nonQualifierBranches = "main"
 }
 
+
+configure<care.data4life.gradle.git.publish.GitPublishExtension> {
+    repoUri.set("git@github.com:d4l-data4life/maven-repository.git")
+
+    branch.set("main")
+
+    contents {
+    }
+
+    preserve {
+        include("**/*")
+    }
+
+    commitMessage.set("Publish ${LibraryConfig.name} $version")
+}
+
+task<Exec>("publishFeature") {
+    commandLine("./gradlew",
+            "gitPublishReset",
+            "publishAllPublicationsToFeaturePackagesRepository",
+            "gitPublishCommit",
+            "gitPublishPush"
+    )
+}
+
+task<Exec>("publishSnapshot") {
+    commandLine("./gradlew",
+            "gitPublishReset",
+            "publishAllPublicationsToFeaturePackagesRepository",
+            "gitPublishCommit",
+            "gitPublishPush"
+    )
+}
+
+task<Exec>("publishRelease") {
+    commandLine("./gradlew",
+            "gitPublishReset",
+            "publishAllPublicationsToFeaturePackagesRepository",
+            "gitPublishCommit",
+            "gitPublishPush"
+    )
+}

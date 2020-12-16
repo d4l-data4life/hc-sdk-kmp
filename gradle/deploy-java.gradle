@@ -14,7 +14,6 @@
  * contact D4L by email to help@data4life.care.
  */
 
-apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
 group = LibraryConfig.group
@@ -48,17 +47,36 @@ publishing {
                 password = project.findProperty("gpr.key") ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
             }
         }
+
+        def target = "file://${project.rootProject.buildDir}/gitPublish"
+
+        maven {
+            name = "ReleasePackages"
+            url = uri("$target/releases")
+        }
+
+        maven {
+            name = "SnapshotPackages"
+            url = uri("$target/snapshots")
+        }
+
+        maven {
+            name = "FeaturePackages"
+            url = uri("$target/features")
+        }
     }
     publications {
-        gpr(MavenPublication) {
+        maven(MavenPublication) {
 
             from(components["java"])
             artifact(tasks["sourcesJar"])
             artifact(tasks["javadocJar"])
+
             pom {
                 name.set(LibraryConfig.name)
                 description.set(LibraryConfig.description)
                 url.set(LibraryConfig.url)
+                inceptionYear.set(LibraryConfig.year)
 
                 scm {
                     connection.set(LibraryConfig.scmConnection)

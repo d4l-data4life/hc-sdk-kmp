@@ -192,37 +192,34 @@ class RecordService(
                 .map { DeleteResult(it, failedDeletes) }
     }
 
-    private fun <T : Any> _fetchRecord(
+    private fun _fetchRecord(
             recordId: String,
             userId: String
-    ): Single<BaseRecord<T>> {
+    ): Single<BaseRecord<Any>> {
         return apiService
                 .fetchRecord(alias, userId, recordId)
                 .map { recordCryptoService.decryptRecord(it, userId) }
                 .map { resourceHelper.assignResourceId(it) }
-                .map { decryptedRecord ->
-                    @Suppress("UNCHECKED_CAST")
-                    recordFactory.getInstance(decryptedRecord) as BaseRecord<T>
-                }
+                .map { recordFactory.getInstance(it) }
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Fhir3Resource> fetchFhir3Record(
             userId: String,
             recordId: String
-    ): Single<Record<T>> = _fetchRecord<T>(recordId, userId) as Single<Record<T>>
+    ): Single<Record<T>> = _fetchRecord(recordId, userId) as Single<Record<T>>
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Fhir4Resource> fetchFhir4Record(
             userId: String,
             recordId: String
-    ): Single<Fhir4Record<T>> = _fetchRecord<T>(recordId, userId) as Single<Fhir4Record<T>>
+    ): Single<Fhir4Record<T>> = _fetchRecord(recordId, userId) as Single<Fhir4Record<T>>
 
     @Suppress("UNCHECKED_CAST")
     override fun fetchDataRecord(
             userId: String,
             recordId: String
-    ): Single<DataRecord<DataResource>> = _fetchRecord<DataResource>(recordId, userId) as Single<DataRecord<DataResource>>
+    ): Single<DataRecord<DataResource>> = _fetchRecord(recordId, userId) as Single<DataRecord<DataResource>>
 
 
     fun <T : Fhir3Resource> fetchFhir3Records(recordIds: List<String>, userId: String): Single<FetchResult<T>> {
@@ -244,6 +241,7 @@ class RecordService(
                 .map { FetchResult(it, failedFetches) }
     }
 
+    // ToDo: this should go somewhere else
     private fun getTagsOnFetch(resourceType: Class<Any>): HashMap<String, String> {
         return if (resourceType.simpleName == "byte[]") {
             taggingService.appendAppDataTags(hashMapOf())!!
@@ -268,10 +266,7 @@ class RecordService(
         val endTime = if (endDate != null) DATE_FORMATTER.format(endDate) else null
         @Suppress("UNCHECKED_CAST")
         return Observable
-                .fromCallable {
-                    @Suppress("UNCHECKED_CAST")
-                    getTagsOnFetch(resourceType as Class<Any>)
-                }
+                .fromCallable { getTagsOnFetch(resourceType) }
                 .map { tagEncryptionService.encryptTags(it) as MutableList<String> }
                 .map { tags ->
                     tags.also {
@@ -431,7 +426,6 @@ class RecordService(
         attachmentService.checkDataRestrictions(resource)
         val data = attachmentService.extractUploadData(resource)
 
-        @Suppress("UNCHECKED_CAST")
         return apiService
                 .fetchRecord(alias, userId, recordId)
                 .map { recordCryptoService.decryptRecord(it, userId) }

@@ -45,6 +45,7 @@ class RecordEncryptionService(
     //ToDo This dependency should be instead of here in the FhirService (aka ResourceService)
     private val resourceWrapperFactory: WrapperFactoryContract.ResourceFactory = ResourceFactory
 
+    // ToDo: this should go somewhere else
     private fun getEncryptedResourceAndAttachment(
             record: NetworkRecordContract.DecryptedRecord,
             commonKey: GCKey

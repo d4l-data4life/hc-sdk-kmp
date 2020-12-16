@@ -135,6 +135,7 @@ internal open class CryptoService : CryptoProtocol {
                 }
     }
 
+    @ExperimentalStdlibApi
     fun encryptSymmetricKey(key: GCKey, keyType: KeyType, gckey: GCKey): Single<EncryptedKey> {
         return Single.fromCallable { createKey(KEY_VERSION, keyType, gckey.getKeyBase64()) }
                 .map { exchangeKey -> moshi.adapter(ExchangeKey::class.java).toJson(exchangeKey) }

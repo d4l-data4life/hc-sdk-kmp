@@ -81,6 +81,7 @@ internal class RecordService(
         REMOVE, RESTORE
     }
 
+    @ExperimentalStdlibApi
     @Throws(DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class)
     @JvmOverloads
@@ -126,6 +127,7 @@ internal class RecordService(
                 }
     }
 
+    @ExperimentalStdlibApi
     fun createRecord(
             resource: ByteArray,
             userId: String,
@@ -162,6 +164,7 @@ internal class RecordService(
                 }
     }
 
+    @ExperimentalStdlibApi
     fun <T : DomainResource> createRecords(resources: List<T>, userId: String): Single<CreateResult<T>> {
         val failedOperations: MutableList<Pair<T, D4LException>> = mutableListOf()
         return Observable
@@ -474,6 +477,7 @@ internal class RecordService(
                 .map { successfulDownloads -> DownloadResult(successfulDownloads, failedDownloads) }
     }
 
+    @ExperimentalStdlibApi
     @Throws(DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class)
     @JvmOverloads
@@ -551,6 +555,7 @@ internal class RecordService(
                 )
             }
 
+    @ExperimentalStdlibApi
     fun <T : DomainResource> updateRecords(resources: List<T>, userId: String): Single<UpdateResult<T>> {
         val failedUpdates: MutableList<Pair<T, D4LException>> = arrayListOf()
         return Observable
@@ -619,6 +624,7 @@ internal class RecordService(
                 .flatMapIterable { encryptedRecords -> encryptedRecords }
     }
 
+    @ExperimentalStdlibApi
     @Throws(IOException::class)
     private fun <T> encrypt(
             record: DecryptedBaseRecord<T>,
@@ -693,6 +699,7 @@ internal class RecordService(
         )
     }
 
+    @ExperimentalStdlibApi
     @Throws(IOException::class)
     fun <T : DomainResource> encryptRecord(
             record: DecryptedFhirRecord<T>
@@ -712,6 +719,7 @@ internal class RecordService(
             }
     )
 
+    @ExperimentalStdlibApi
     @Throws(IOException::class)
     internal fun encryptDataRecord(
             record: DecryptedDataRecord? //FIXME: this a test concern, which should be removed soon as possible

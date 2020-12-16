@@ -60,6 +60,10 @@ interface AttachmentContract {
 
         @Throws(DataRestrictionException.MaxDataSizeViolation::class, DataRestrictionException.UnsupportedFileType::class)
         fun checkDataRestrictions(resource: WrapperContract.Resource?)
+
+        fun extractUploadData(
+                resource: WrapperContract.Resource
+        ): HashMap<WrapperContract.Attachment, String?>?
     }
 
     interface FhirDateValidator {

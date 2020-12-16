@@ -191,6 +191,27 @@ class AttachmentService internal constructor(
         }
     }
 
+    override fun extractUploadData(
+            resource: WrapperContract.Resource
+    ): HashMap<WrapperContract.Attachment, String?>? {
+        return if (resource.type != WrapperContract.Resource.TYPE.DATA) {
+            val attachments = fhirAttachmentHelper.getAttachment(resource.unwrap())
+            if (attachments.isEmpty()) return null
+
+            val data = HashMap<WrapperContract.Attachment, String?>(attachments.size)
+            for (rawAttachment in attachments) {
+                val attachment = attachmentFactory.wrap(rawAttachment)
+                if (attachment?.data != null) {
+                    data[attachment] = attachment.data
+                }
+            }
+
+            if (data.isEmpty()) null else data
+        } else {
+            null
+        }
+    }
+
     companion object {
         private const val DOWNSCALED_ATTACHMENT_ID_POS = 1
     }

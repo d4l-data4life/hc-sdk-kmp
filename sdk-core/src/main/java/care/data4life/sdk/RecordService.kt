@@ -168,30 +168,6 @@ class RecordService(
                 .map { CreateResult(it, failedOperations) }
     }
 
-    override fun deleteRecord(
-            userId: String,
-            recordId: String
-    ): Completable = apiService.deleteRecord(alias, recordId, userId)
-
-    fun deleteRecords(recordIds: List<String>, userId: String): Single<DeleteResult> {
-        val failedDeletes: MutableList<Pair<String, D4LException>> = mutableListOf()
-        return Observable
-                .fromCallable { recordIds }
-                .flatMapIterable { it }
-                .flatMapSingle { recordId ->
-                    deleteRecord(recordId, userId)
-                            .doOnError { error ->
-                                failedDeletes.add(
-                                        Pair(recordId, errorHandler.handleError(error)))
-                            }
-                            .toSingleDefault(recordId)
-                            .onErrorReturnItem(EMPTY_RECORD_ID)
-                }
-                .filter { it.isNotEmpty() }
-                .toList()
-                .map { DeleteResult(it, failedDeletes) }
-    }
-
     fun _fetchRecord(
             recordId: String,
             userId: String
@@ -374,44 +350,6 @@ class RecordService(
             offset
     ) as Single<List<DataRecord<DataResource>>>
 
-    fun <T : Fhir3Resource> downloadRecord(
-            recordId: String,
-            userId: String
-    ): Single<Record<T>> = apiService
-            .fetchRecord(alias, userId, recordId)
-            .map { recordCryptoService.decryptRecord(it, userId) }
-            .map { attachmentClient.downloadData(it, userId) }
-            .map { decryptedRecord ->
-                decryptedRecord.also {
-                    attachmentService.checkDataRestrictions(decryptedRecord.resource)
-                }
-            }
-            .map { resourceHelper.assignResourceId(it) }
-            .map { decryptedRecord ->
-                @Suppress("UNCHECKED_CAST")
-                recordFactory.getInstance(decryptedRecord) as Record<T>
-            }
-
-    fun <T : Fhir3Resource> downloadRecords(
-            recordIds: List<String>,
-            userId: String
-    ): Single<DownloadResult<T>> {
-        val failedDownloads: MutableList<Pair<String, D4LException>> = arrayListOf()
-        return Observable
-                .fromCallable { recordIds }
-                .flatMapIterable { it }
-                .flatMapSingle { recordId ->
-                    downloadRecord<T>(recordId, userId)
-                            .onErrorReturn { error ->
-                                failedDownloads.add(Pair(recordId, errorHandler.handleError(error)))
-                                Record(null, null, null)
-                            }
-                }
-                .filter { it != EMPTY_RECORD }
-                .toList()
-                .map { DownloadResult(it, failedDownloads) }
-    }
-
     @Throws(DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class)
     fun updateRecord(
@@ -508,21 +446,32 @@ class RecordService(
                 .map { UpdateResult(it, failedUpdates) }
     }
 
-    @JvmOverloads
-    fun countRecords(
-            type: Class<out Fhir3Resource>?,
+    override fun deleteRecord(
             userId: String,
-            annotations: List<String> = listOf()
-    ): Single<Int> = if (type == null) {
-        apiService.getCount(alias, userId, null)
-    } else {
-        Single
-                .fromCallable { taggingService.getTagFromType(fhirElementFactory.getFhirTypeForClass(type)) }
-                .map { tagEncryptionService.encryptTags(it) as MutableList<String> }
-                .map { tags -> tags.also { it.addAll(tagEncryptionService.encryptAnnotations(annotations)) } }
-                .flatMap { apiService.getCount(alias, userId, it) }
+            recordId: String
+    ): Completable = apiService.deleteRecord(alias, recordId, userId)
+
+
+    fun deleteRecords(recordIds: List<String>, userId: String): Single<DeleteResult> {
+        val failedDeletes: MutableList<Pair<String, D4LException>> = mutableListOf()
+        return Observable
+                .fromCallable { recordIds }
+                .flatMapIterable { it }
+                .flatMapSingle { recordId ->
+                    deleteRecord(userId, recordId)
+                            .doOnError { error ->
+                                failedDeletes.add(
+                                        Pair(recordId, errorHandler.handleError(error)))
+                            }
+                            .toSingleDefault(recordId)
+                            .onErrorReturnItem(EMPTY_RECORD_ID)
+                }
+                .filter { it.isNotEmpty() }
+                .toList()
+                .map { DeleteResult(it, failedDeletes) }
     }
 
+    // FIXME: This should go into a thing between the AttchmentService/Client and RecordService
     fun downloadAttachment(
             recordId: String,
             attachmentId: String,
@@ -535,6 +484,7 @@ class RecordService(
             type
     ).map { it[0] }
 
+    // FIXME: This should go into a thing between the AttchmentService/Client and RecordService
     fun downloadAttachments(
             recordId: String,
             attachmentIds: List<String>,
@@ -552,10 +502,65 @@ class RecordService(
                 )
             }
 
+    // FIXME: This should go into a thing between the AttchmentService/Client and RecordService
     fun deleteAttachment(
             attachmentId: String,
             userId: String
     ): Single<Boolean> = attachmentService.delete(attachmentId, userId)
+
+    //legacy
+    fun <T : Fhir3Resource> downloadRecord(
+            recordId: String,
+            userId: String
+    ): Single<Record<T>> = apiService
+            .fetchRecord(alias, userId, recordId)
+            .map { recordCryptoService.decryptRecord(it, userId) }
+            .map { attachmentClient.downloadData(it, userId) }
+            .map { decryptedRecord ->
+                decryptedRecord.also {
+                    attachmentService.checkDataRestrictions(decryptedRecord.resource)
+                }
+            }
+            .map { resourceHelper.assignResourceId(it) }
+            .map { decryptedRecord ->
+                @Suppress("UNCHECKED_CAST")
+                recordFactory.getInstance(decryptedRecord) as Record<T>
+            }
+
+    fun <T : Fhir3Resource> downloadRecords(
+            recordIds: List<String>,
+            userId: String
+    ): Single<DownloadResult<T>> {
+        val failedDownloads: MutableList<Pair<String, D4LException>> = arrayListOf()
+        return Observable
+                .fromCallable { recordIds }
+                .flatMapIterable { it }
+                .flatMapSingle { recordId ->
+                    downloadRecord<T>(recordId, userId)
+                            .onErrorReturn { error ->
+                                failedDownloads.add(Pair(recordId, errorHandler.handleError(error)))
+                                Record(null, null, null)
+                            }
+                }
+                .filter { it != EMPTY_RECORD }
+                .toList()
+                .map { DownloadResult(it, failedDownloads) }
+    }
+
+    @JvmOverloads
+    fun countRecords(
+            type: Class<out Fhir3Resource>?,
+            userId: String,
+            annotations: List<String> = listOf()
+    ): Single<Int> = if (type == null) {
+        apiService.getCount(alias, userId, null)
+    } else {
+        Single
+                .fromCallable { taggingService.getTagFromType(fhirElementFactory.getFhirTypeForClass(type)) }
+                .map { tagEncryptionService.encryptTags(it) as MutableList<String> }
+                .map { tags -> tags.also { it.addAll(tagEncryptionService.encryptAnnotations(annotations)) } }
+                .flatMap { apiService.getCount(alias, userId, it) }
+    }
 
     companion object {
         private val EMPTY_RECORD = Record(null, null, null)

@@ -25,16 +25,13 @@ import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.SdkRecordFactory
 import care.data4life.sdk.model.definitions.BaseRecord
-import care.data4life.sdk.network.DecryptedRecordBuilder
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkRecordContract
 import care.data4life.sdk.wrapper.ResourceFactory
 import care.data4life.sdk.wrapper.ResourceHelper
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkConstructor
 import io.mockk.mockkObject
-import io.mockk.unmockkConstructor
 import io.mockk.unmockkObject
 import io.mockk.verify
 import io.reactivex.Observable
@@ -54,7 +51,6 @@ class RecordServiceFetchRecordsTest: RecordTestBase() {
         mockkObject(ResourceFactory)
         mockkObject(ResourceHelper)
         mockkObject(SdkRecordFactory)
-        mockkConstructor(DecryptedRecordBuilder::class)
     }
 
     @After
@@ -62,7 +58,6 @@ class RecordServiceFetchRecordsTest: RecordTestBase() {
         unmockkObject(ResourceFactory)
         unmockkObject(ResourceHelper)
         unmockkObject(SdkRecordFactory)
-        unmockkConstructor(DecryptedRecordBuilder::class)
     }
 
     @Test
@@ -380,6 +375,7 @@ class RecordServiceFetchRecordsTest: RecordTestBase() {
         val offset = 2
 
         val tags = hashMapOf<String, String>()
+        val encryptedTags = mockk<MutableList<String>>(relaxed = true)
 
         val encryptedRecords = mutableListOf(mockk<EncryptedRecord>())
         val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>()
@@ -387,8 +383,8 @@ class RecordServiceFetchRecordsTest: RecordTestBase() {
 
 
         every { taggingService.appendAppDataTags(hashMapOf()) } returns tags
-        every { tagEncryptionService.encryptTags(tags) as MutableList<String> } returns mockk(relaxed = true) //FIXME: This should be a list
-        every { tagEncryptionService.encryptAnnotations(any()) } returns annotations
+        every { tagEncryptionService.encryptTags(tags) as MutableList<String> } returns encryptedTags
+        every { tagEncryptionService.encryptAnnotations(annotations) } returns annotations
         every { apiService.fetchRecords(
                 ALIAS,
                 userId,

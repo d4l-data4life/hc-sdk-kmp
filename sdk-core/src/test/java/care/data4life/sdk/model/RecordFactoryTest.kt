@@ -165,7 +165,7 @@ class RecordFactoryTest {
                 id
         )
         assertEquals(
-                record.resource,
+                (record.resource as DataResource).asByteArray(),
                 rawResource
         )
         assertEquals(

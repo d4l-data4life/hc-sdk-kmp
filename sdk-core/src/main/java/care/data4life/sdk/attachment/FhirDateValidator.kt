@@ -31,7 +31,12 @@ internal object FhirDateValidator: AttachmentContract.FhirDateValidator {
     }
 
     override fun isInvalidateDate(attachment: WrapperContract.Attachment): Boolean {
-        return validateFhir3Date(attachment.unwrap() as Fhir3Attachment)
+        val rawAttachment = attachment.unwrap()
+        return if(rawAttachment is Fhir3Attachment ) {
+            validateFhir3Date(rawAttachment)
+        } else {
+            true
+        }
     }
 
 }

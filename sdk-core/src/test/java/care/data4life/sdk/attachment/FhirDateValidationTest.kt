@@ -20,6 +20,10 @@ import care.data4life.fhir.stu3.model.FhirDateTime as Fhir3DateTime
 import care.data4life.fhir.stu3.model.FhirDate as Fhir3Date
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3DateTimeParser
+import care.data4life.sdk.fhir.Fhir4Attachment
+import care.data4life.sdk.fhir.Fhir4DateTimeParser
+import care.data4life.sdk.wrapper.SdkFhir3Attachment
+import care.data4life.sdk.wrapper.SdkFhir4Attachment
 import io.mockk.every
 import io.mockk.mockkClass
 import org.junit.Assert.assertFalse
@@ -40,7 +44,7 @@ class FhirDateValidationTest {
         fhirAttachment.creation = null
 
         // Then
-        assertTrue(FhirDateValidator.isInvalidateDate(care.data4life.sdk.wrapper.SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(FhirDateValidator.isInvalidateDate(SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
@@ -54,7 +58,7 @@ class FhirDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertTrue(FhirDateValidator.isInvalidateDate(care.data4life.sdk.wrapper.SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(FhirDateValidator.isInvalidateDate(SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
@@ -70,7 +74,7 @@ class FhirDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertTrue(FhirDateValidator.isInvalidateDate(care.data4life.sdk.wrapper.SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(FhirDateValidator.isInvalidateDate(SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
@@ -84,7 +88,7 @@ class FhirDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertFalse(FhirDateValidator.isInvalidateDate(care.data4life.sdk.wrapper.SdkFhir3Attachment(fhirAttachment)))
+        assertFalse(FhirDateValidator.isInvalidateDate(SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
@@ -98,6 +102,20 @@ class FhirDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertTrue(FhirDateValidator.isInvalidateDate(care.data4life.sdk.wrapper.SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(FhirDateValidator.isInvalidateDate(SdkFhir3Attachment(fhirAttachment)))
+    }
+
+    @Test
+    fun `Given, isInvalidDate is called with a Attachment, which contains a Fhir4Date, it returns always true`() {
+        // Given
+        val fhirAttachment = Fhir4Attachment()
+        val fhirDateTime = Fhir4DateTimeParser.parseDateTime(
+                "2011-11-11"
+        )
+
+        fhirAttachment.creation = fhirDateTime
+
+        // Then
+        assertTrue(FhirDateValidator.isInvalidateDate(SdkFhir4Attachment(fhirAttachment)))
     }
 }

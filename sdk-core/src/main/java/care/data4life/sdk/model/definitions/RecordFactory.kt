@@ -21,5 +21,5 @@ import care.data4life.sdk.network.model.NetworkRecordContract
 
 internal interface RecordFactory {
     @Throws(CoreRuntimeException.InternalFailure::class)
-    fun <T : Any> getInstance(record: NetworkRecordContract.DecryptedRecord<T>): BaseRecord<T>
+    fun getInstance(record: NetworkRecordContract.DecryptedRecord): BaseRecord<Any>
 }

@@ -43,7 +43,6 @@ internal object DecryptedRecordGuard : NetworkRecordContract.LimitGuard {
     }
 
     override fun checkDataLimit(data: WrapperContract.Resource) {
-
         if(data.type == WrapperContract.Resource.TYPE.DATA) {
             val rawData = data.unwrap() as ByteArray
             if (rawData.size >= MAX_SIZE_CUSTOM_DATA) {

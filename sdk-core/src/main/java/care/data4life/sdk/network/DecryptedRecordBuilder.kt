@@ -17,6 +17,7 @@
 package care.data4life.sdk.network
 
 import care.data4life.crypto.GCKey
+import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedRecordGuard
@@ -115,6 +116,7 @@ internal class DecryptedRecordBuilder : NetworkRecordContract.Builder {
         val modelVersion = modelVersion ?: this.modelVersion!!
 
         guard.checkTagsAndAnnotationsLimits(tags, annotations)
+        guard.checkDataLimit(resource)
 
         return DecryptedRecord(
                 this.identifier,

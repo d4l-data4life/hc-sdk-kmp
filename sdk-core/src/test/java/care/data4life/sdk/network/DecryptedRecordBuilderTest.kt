@@ -451,7 +451,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     }
 
     @Test
-    fun `Given, build is called with a ByteArray, Tags, CreationDate, DataKey and ModelVersion, it calls the Limit Guard, with the given Resource`() {
+    fun `Given, build is called with a Resource, Tags, CreationDate, DataKey and ModelVersion, it calls the Limit Guard, with the given Resource`() {
         // When
         every { DecryptedRecordGuard.checkDataLimit(resource) } returns Unit
 

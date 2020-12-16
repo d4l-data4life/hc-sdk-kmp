@@ -20,18 +20,19 @@ import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkRecordContract
 import care.data4life.sdk.wrapper.WrapperContract
 
-internal interface RecordEncryptionContract {
+//TODO Internal
+interface RecordEncryptionContract {
 
     interface Service {
 
         fun encryptRecord(
-                record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+                record: NetworkRecordContract.DecryptedRecord
         ): EncryptedRecord
 
         fun decryptRecord(
                 record: EncryptedRecord,
                 userId: String
-        ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+        ): NetworkRecordContract.DecryptedRecord
 
     }
 }

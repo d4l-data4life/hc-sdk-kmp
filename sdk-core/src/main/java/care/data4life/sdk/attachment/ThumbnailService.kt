@@ -148,7 +148,7 @@ class ThumbnailService internal constructor(
                         identifierFactory.wrap(next)
                 )
 
-                if (parts == null || currentAttachmentIds.contains(parts[RecordService.FULL_ATTACHMENT_ID_POS])) {
+                if (parts == null || currentAttachmentIds.contains(parts[FULL_ATTACHMENT_ID_POS])) {
                     updatedIdentifiers.add(next)
                 }
             }

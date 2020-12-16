@@ -18,7 +18,7 @@ package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.lang.CoreRuntimeException
 
-internal interface HelperContract {
+interface HelperContract {
 
     interface FhirAttachmentHelper {
         fun hasAttachment(resource: Any): Boolean

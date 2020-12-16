@@ -32,14 +32,15 @@ import care.data4life.sdk.network.model.NetworkRecordContract
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
 import care.data4life.sdk.util.Base64
+import care.data4life.sdk.wrapper.ResourceFactory
 import care.data4life.sdk.wrapper.WrapperContract
-import care.data4life.sdk.wrapper.WrapperFactoryContract
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkConstructor
 import io.mockk.mockkObject
 import io.mockk.unmockkAll
+import io.mockk.unmockkObject
 import io.mockk.verify
 import io.reactivex.Single
 import org.junit.After
@@ -54,7 +55,6 @@ class RecordEncryptionTest {
     private lateinit var cryptoService: CryptoService
     private lateinit var fhirService: FhirContract.Service
     private lateinit var apiService: ApiService
-    private lateinit var wrapperFactory: WrapperFactoryContract.ResourceFactory
     private val ALIAS = "alias"
     private val USER_ID = "user_id"
 
@@ -66,23 +66,23 @@ class RecordEncryptionTest {
         cryptoService = mockk()
         fhirService = mockk()
         apiService = mockk()
-        wrapperFactory = mockk()
 
         recordEncryptionService = RecordEncryptionService(
                 ALIAS,
                 tagEncryptionService,
                 cryptoService,
                 fhirService,
-                apiService,
-                wrapperFactory
+                apiService
         )
 
         mockkObject(Base64)
+        mockkObject(ResourceFactory)
     }
 
     @After
     fun tearDown() {
-        unmockkAll()
+        unmockkObject(Base64)
+        unmockkObject(ResourceFactory)
     }
 
     @Test
@@ -92,8 +92,7 @@ class RecordEncryptionTest {
                 tagEncryptionService,
                 cryptoService,
                 fhirService,
-                apiService,
-                wrapperFactory
+                apiService
         )
         assertTrue((service as Any) is RecordEncryptionContract.Service)
     }
@@ -107,7 +106,7 @@ class RecordEncryptionTest {
         val rawResource = mockk<DataResource>()
         val primitiveResult = ByteArray(23)
         val encryptedPrimitiveResult = ByteArray(1)
-        val record = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val record = mockk<NetworkRecordContract.DecryptedRecord>(relaxed = true)
         val annotations = mockk<List<String>>()
         val id = "abc"
         val creationDate = "heute"
@@ -177,7 +176,7 @@ class RecordEncryptionTest {
         val dataKey = mockk<GCKey>()
         val tags = mockk<HashMap<String, String>>()
         val resource = mockk<WrapperContract.Resource>()
-        val record = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val record = mockk<NetworkRecordContract.DecryptedRecord>(relaxed = true)
         val annotations = mockk<List<String>>()
         val id = "abc"
         val creationDate = "heute"
@@ -241,7 +240,7 @@ class RecordEncryptionTest {
         val dataKey = mockk<GCKey>()
         val tags = mockk<HashMap<String, String>>()
         val resource = mockk<WrapperContract.Resource>()
-        val record = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val record = mockk<NetworkRecordContract.DecryptedRecord>(relaxed = true)
         val annotations = mockk<List<String>>()
         val id = "abc"
         val creationDate = "heute"
@@ -351,7 +350,7 @@ class RecordEncryptionTest {
         val decodedResource = ByteArray(1)
         val decryptedResource = ByteArray(42)
         val wrappedResource = mockk<WrapperContract.Resource>()
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>()
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>()
 
 
         every { encryptedRecord.identifier } returns id
@@ -380,7 +379,7 @@ class RecordEncryptionTest {
         ) } returns Single.just(decryptedResource)
 
         // FIXME: This is a weakpoint
-        every { wrapperFactory.wrap(any()) } returns wrappedResource
+        every { ResourceFactory.wrap(any()) } returns wrappedResource
 
         mockkConstructor(DecryptedRecordBuilder::class)
         every { anyConstructed<DecryptedRecordBuilder>().build(wrappedResource) } returns decryptedRecord
@@ -429,7 +428,7 @@ class RecordEncryptionTest {
         val decryptedAnnotations = mockk<List<String>>()
         val decryptedDataKey = mockk<GCKey>()
         val wrappedResource = mockk<WrapperContract.Resource>()
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>()
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>()
 
 
         every { encryptedRecord.identifier } returns id
@@ -504,7 +503,7 @@ class RecordEncryptionTest {
         val decryptedDataKey = mockk<GCKey>()
         val decryptedAttachmentKey = mockk<GCKey>()
         val wrappedResource = mockk<WrapperContract.Resource>()
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>()
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>()
 
 
         every { encryptedRecord.identifier } returns id
@@ -584,7 +583,7 @@ class RecordEncryptionTest {
         val decryptedDataKey = mockk<GCKey>()
         val decryptedAttachmentKey = mockk<GCKey>()
         val wrappedResource = mockk<WrapperContract.Resource>()
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>()
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>()
 
         every { encryptedRecord.identifier } returns id
         every { encryptedRecord.encryptedTags } returns encryptedTags

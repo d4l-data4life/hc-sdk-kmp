@@ -31,19 +31,22 @@ import care.data4life.sdk.network.model.NetworkRecordContract
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
 import care.data4life.sdk.util.Base64
+import care.data4life.sdk.wrapper.ResourceFactory
 import care.data4life.sdk.wrapper.WrapperContract
 import care.data4life.sdk.wrapper.WrapperFactoryContract
 
-internal class RecordEncryptionService(
+class RecordEncryptionService(
         private val alias: String,
         private val tagEncryptionService: TagEncryptionService,
         private val cryptoService: CryptoService,
         private val fhirService: FhirContract.Service,
-        private val apiService: ApiService,
-        private val resourceWrapperFactory: WrapperFactoryContract.ResourceFactory
+        private val apiService: ApiService
 ): RecordEncryptionContract.Service {
+    //ToDo This dependency should be instead of here in the FhirService (aka ResourceService)
+    private val resourceWrapperFactory: WrapperFactoryContract.ResourceFactory = ResourceFactory
+
     private fun getEncryptedResourceAndAttachment(
-            record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>,
+            record: NetworkRecordContract.DecryptedRecord,
             commonKey: GCKey
     ): Pair<String, EncryptedKey?> {
         return if (record.resource.type == WrapperContract.Resource.TYPE.DATA) {
@@ -73,7 +76,7 @@ internal class RecordEncryptionService(
     }
 
     override fun encryptRecord(
-            record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+            record: NetworkRecordContract.DecryptedRecord
     ): EncryptedRecord {
         val encryptedTags = tagEncryptionService.encryptTags(record.tags!!).also {
             (it as MutableList<String>).addAll(tagEncryptionService.encryptAnnotations(record.annotations))
@@ -127,7 +130,7 @@ internal class RecordEncryptionService(
     override fun decryptRecord(
             record: EncryptedRecord,
             userId: String
-    ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource> {
+    ): NetworkRecordContract.DecryptedRecord {
         if (!ModelVersion.isModelVersionSupported(record.modelVersion)) {
             throw DataValidationException.ModelVersionNotSupported("Please update SDK to latest version!")
         }
@@ -162,7 +165,7 @@ internal class RecordEncryptionService(
         }
 
         val resource: Any? = when {
-            record.encryptedBody == null || record.encryptedBody.isEmpty() -> null
+            record.encryptedBody == null || record.encryptedBody.isEmpty() -> null//FIXME: CRITICAL!!!!!!!!!
             decryptedTags.containsKey(TaggingService.TAG_RESOURCE_TYPE) -> fhirService.decryptResource(
                     decryptedDataKey,
                     decryptedTags,
@@ -178,7 +181,7 @@ internal class RecordEncryptionService(
 
         // FIXME: Do we need a null Type
         @Suppress("UNCHECKED_CAST")
-        return builder.build(resource) as NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+        return builder.build(resource as WrapperContract.Resource)
     }
 
 }

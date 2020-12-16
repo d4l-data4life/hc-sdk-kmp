@@ -19,7 +19,7 @@ package care.data4life.sdk.wrapper
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 
-internal interface WrapperFactoryContract {
+interface WrapperFactoryContract {
 
     interface AttachmentFactory {
 

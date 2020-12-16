@@ -23,34 +23,35 @@ import care.data4life.sdk.wrapper.WrapperContract
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
 import io.mockk.verify
+import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
 class AttachmentClientRemoveAndRestoreTest {
-    private lateinit var fhirAttachmentHelper: FhirAttachmentHelper
 
     private lateinit var attachmentClient: AttachmentContract.Client
 
     @Before
     fun setUp() {
-        fhirAttachmentHelper = mockk()
-
         attachmentClient = AttachmentClient(
-                fhirAttachmentHelper,
-                mockk(),
                 mockk(),
                 mockk(),
                 mockk()
         )
+        mockkObject(FhirAttachmentHelper)
     }
 
+    @After
+    fun tearDown() {
+        unmockkObject(FhirAttachmentHelper)
+    }
     @Test
     fun `it is a AttachmentClient`() {
         val client: Any = AttachmentClient(
-                fhirAttachmentHelper,
-                mockk(),
                 mockk(),
                 mockk(),
                 mockk()
@@ -63,12 +64,12 @@ class AttachmentClientRemoveAndRestoreTest {
     fun `Given, removeUploadData is called with a DecryptedRecord, which does contains a DataResource, it reflects the given record`() {
         // Given
         val resource = mockk<WrapperContract.Resource>()
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>()
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>()
 
         every { resource.type } returns WrapperContract.Resource.TYPE.DATA
         every { decryptedRecord.resource } returns resource
-        every { fhirAttachmentHelper.getAttachment(any()) } returns mockk()
-        every { fhirAttachmentHelper.updateAttachmentData(any(), null) } returns Unit
+        every { FhirAttachmentHelper.getAttachment(any()) } returns mockk()
+        every { FhirAttachmentHelper.updateAttachmentData(any(), null) } returns Unit
 
         // When
         val record = attachmentClient.removeUploadData(decryptedRecord)
@@ -76,8 +77,8 @@ class AttachmentClientRemoveAndRestoreTest {
         // Then
         Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
 
-        verify(exactly = 0) { fhirAttachmentHelper.getAttachment(any()) }
-        verify(exactly = 0) { fhirAttachmentHelper.updateAttachmentData(any(), null) }
+        verify(exactly = 0) { FhirAttachmentHelper.getAttachment(any()) }
+        verify(exactly = 0) { FhirAttachmentHelper.updateAttachmentData(any(), null) }
     }
 
 
@@ -86,7 +87,7 @@ class AttachmentClientRemoveAndRestoreTest {
         // Given
         val resource = mockk<WrapperContract.Resource>()
         val wrappedResource = mockk<Fhir3Resource>()
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>()
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>()
         val attachments = mutableListOf<WrapperContract.Attachment>(
                 mockk(),
                 mockk()
@@ -96,8 +97,8 @@ class AttachmentClientRemoveAndRestoreTest {
         every { resource.type } returns WrapperContract.Resource.TYPE.FHIR3
         every { decryptedRecord.resource } returns resource
         @Suppress("UNCHECKED_CAST")
-        every { fhirAttachmentHelper.getAttachment(wrappedResource) } returns (attachments as MutableList<Any>)
-        every { fhirAttachmentHelper.updateAttachmentData(wrappedResource, null) } returns Unit
+        every { FhirAttachmentHelper.getAttachment(wrappedResource) } returns (attachments as MutableList<Any>)
+        every { FhirAttachmentHelper.updateAttachmentData(wrappedResource, null) } returns Unit
 
 
         // When
@@ -106,8 +107,8 @@ class AttachmentClientRemoveAndRestoreTest {
         // Then
         Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
 
-        verify(exactly = 1) { fhirAttachmentHelper.getAttachment(wrappedResource) }
-        verify(exactly = 1) { fhirAttachmentHelper.updateAttachmentData(wrappedResource, null) }
+        verify(exactly = 1) { FhirAttachmentHelper.getAttachment(wrappedResource) }
+        verify(exactly = 1) { FhirAttachmentHelper.updateAttachmentData(wrappedResource, null) }
     }
 
     @Test
@@ -115,14 +116,14 @@ class AttachmentClientRemoveAndRestoreTest {
         // Given
         val resource = mockk<WrapperContract.Resource>()
         val wrappedResource = mockk<Fhir3Resource>()
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>()
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>()
 
         every { resource.unwrap() } returns wrappedResource
         every { resource.type } returns WrapperContract.Resource.TYPE.FHIR3
         every { decryptedRecord.resource } returns resource
         @Suppress("UNCHECKED_CAST")
-        every { fhirAttachmentHelper.getAttachment(wrappedResource) } returns mutableListOf()
-        every { fhirAttachmentHelper.updateAttachmentData(wrappedResource, null) } returns Unit
+        every { FhirAttachmentHelper.getAttachment(wrappedResource) } returns mutableListOf()
+        every { FhirAttachmentHelper.updateAttachmentData(wrappedResource, null) } returns Unit
 
         // When
         val record = attachmentClient.removeUploadData(decryptedRecord)
@@ -130,17 +131,17 @@ class AttachmentClientRemoveAndRestoreTest {
         // Then
         Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
 
-        verify(exactly = 1) { fhirAttachmentHelper.getAttachment(wrappedResource) }
-        verify(exactly = 0) { fhirAttachmentHelper.updateAttachmentData(wrappedResource, null) }
+        verify(exactly = 1) { FhirAttachmentHelper.getAttachment(wrappedResource) }
+        verify(exactly = 0) { FhirAttachmentHelper.updateAttachmentData(wrappedResource, null) }
     }
 
     @Test
     fun `Given, restoreUploadData is called with DecryptedRecord, which contains a DataResource, a non DataResource and Attachment, it just reflects the given Record`() {
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>()
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>()
 
         every { decryptedRecord.resource.type } returns WrapperContract.Resource.TYPE.DATA
-        every { fhirAttachmentHelper.getAttachment(any()) } returns mockk()
-        every { fhirAttachmentHelper.updateAttachmentData(any(), any()) } returns Unit
+        every { FhirAttachmentHelper.getAttachment(any()) } returns mockk()
+        every { FhirAttachmentHelper.updateAttachmentData(any(), any()) } returns Unit
 
         // When
         @Suppress("UNCHECKED_CAST")
@@ -154,8 +155,8 @@ class AttachmentClientRemoveAndRestoreTest {
         Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
 
         verify(exactly = 0) { decryptedRecord.resource = any() }
-        verify(exactly = 0) { fhirAttachmentHelper.getAttachment(any()) }
-        verify(exactly = 0) { fhirAttachmentHelper.updateAttachmentData(any(), any()) }
+        verify(exactly = 0) { FhirAttachmentHelper.getAttachment(any()) }
+        verify(exactly = 0) { FhirAttachmentHelper.updateAttachmentData(any(), any()) }
     }
 
     @Test
@@ -163,14 +164,14 @@ class AttachmentClientRemoveAndRestoreTest {
         val resource = mockk<WrapperContract.Resource>()
         val orgResource = mockk<WrapperContract.Resource>()
 
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>()
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>()
 
         every { resource.type } returns WrapperContract.Resource.TYPE.FHIR3
         every { orgResource.type } returns WrapperContract.Resource.TYPE.DATA
 
         every { decryptedRecord.resource } returns resource
-        every { fhirAttachmentHelper.getAttachment(any()) } returns mockk()
-        every { fhirAttachmentHelper.updateAttachmentData(any(), any()) } returns Unit
+        every { FhirAttachmentHelper.getAttachment(any()) } returns mockk()
+        every { FhirAttachmentHelper.updateAttachmentData(any(), any()) } returns Unit
 
         // When
         @Suppress("UNCHECKED_CAST")
@@ -185,21 +186,21 @@ class AttachmentClientRemoveAndRestoreTest {
 
 
         verify(exactly = 0) { decryptedRecord.resource = any() }
-        verify(exactly = 0) { fhirAttachmentHelper.getAttachment(any()) }
-        verify(exactly = 0) { fhirAttachmentHelper.updateAttachmentData(any(), any()) }
+        verify(exactly = 0) { FhirAttachmentHelper.getAttachment(any()) }
+        verify(exactly = 0) { FhirAttachmentHelper.updateAttachmentData(any(), any()) }
     }
 
     @Test
     fun `Given, restoreUploadData is called with a DecryptedRecord, which contains a non DataResource, null as a Resource and Attachment, it just reflects the given Record`() {
         val resource = mockk<WrapperContract.Resource>()
 
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>()
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>()
 
         every { resource.type } returns WrapperContract.Resource.TYPE.FHIR3
 
         every { decryptedRecord.resource } returns resource
-        every { fhirAttachmentHelper.getAttachment(any()) } returns mockk()
-        every { fhirAttachmentHelper.updateAttachmentData(any(), any()) } returns Unit
+        every { FhirAttachmentHelper.getAttachment(any()) } returns mockk()
+        every { FhirAttachmentHelper.updateAttachmentData(any(), any()) } returns Unit
 
         // When
         @Suppress("UNCHECKED_CAST")
@@ -214,8 +215,8 @@ class AttachmentClientRemoveAndRestoreTest {
 
 
         verify(exactly = 0) { decryptedRecord.resource = any() }
-        verify(exactly = 0) { fhirAttachmentHelper.getAttachment(any()) }
-        verify(exactly = 0) { fhirAttachmentHelper.updateAttachmentData(any(), any()) }
+        verify(exactly = 0) { FhirAttachmentHelper.getAttachment(any()) }
+        verify(exactly = 0) { FhirAttachmentHelper.updateAttachmentData(any(), any()) }
     }
 
     @Test
@@ -233,7 +234,7 @@ class AttachmentClientRemoveAndRestoreTest {
                 key2 to "42"
         )
 
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>(relaxed = true)
 
         every { resource.type } returns WrapperContract.Resource.TYPE.FHIR3
         every { resource.unwrap() } returns mockk<Fhir3Resource>()
@@ -243,8 +244,8 @@ class AttachmentClientRemoveAndRestoreTest {
         every {  key2.unwrap() } returns rawKey2
 
         every { decryptedRecord.resource } returns resource
-        every { fhirAttachmentHelper.getAttachment(any()) } returns mutableListOf()
-        every { fhirAttachmentHelper.updateAttachmentData(any(), any()) } returns Unit
+        every { FhirAttachmentHelper.getAttachment(any()) } returns mutableListOf()
+        every { FhirAttachmentHelper.updateAttachmentData(any(), any()) } returns Unit
 
         // When
         @Suppress("UNCHECKED_CAST")
@@ -284,7 +285,7 @@ class AttachmentClientRemoveAndRestoreTest {
                 rawKey2 to "42"
         )
 
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>(relaxed = true)
 
         every { resource.type } returns WrapperContract.Resource.TYPE.FHIR3
         every { resource.unwrap() } returns wrappedResource
@@ -295,8 +296,8 @@ class AttachmentClientRemoveAndRestoreTest {
         every {  key2.unwrap() } returns rawKey2
 
         every { decryptedRecord.resource } returns resource
-        every { fhirAttachmentHelper.getAttachment(wrappedResource) } returns serviceAttachments
-        every { fhirAttachmentHelper.updateAttachmentData(wrappedResource, rawAttachment) } returns Unit
+        every { FhirAttachmentHelper.getAttachment(wrappedResource) } returns serviceAttachments
+        every { FhirAttachmentHelper.updateAttachmentData(wrappedResource, rawAttachment) } returns Unit
 
         // When
         @Suppress("UNCHECKED_CAST")
@@ -310,8 +311,8 @@ class AttachmentClientRemoveAndRestoreTest {
         Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
 
         verify(exactly = 1) { decryptedRecord.resource = orgResource }
-        verify(exactly = 1) { fhirAttachmentHelper.getAttachment(wrappedResource) }
-        verify(exactly = 1) { fhirAttachmentHelper.updateAttachmentData(wrappedResource, rawAttachment) }
+        verify(exactly = 1) { FhirAttachmentHelper.getAttachment(wrappedResource) }
+        verify(exactly = 1) { FhirAttachmentHelper.updateAttachmentData(wrappedResource, rawAttachment) }
     }
 
 
@@ -336,7 +337,7 @@ class AttachmentClientRemoveAndRestoreTest {
                 rawKey2 to "42"
         )
 
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>(relaxed = true)
 
         every { resource.type } returns WrapperContract.Resource.TYPE.FHIR3
         every { resource.unwrap() } returns wrappedResource
@@ -347,8 +348,8 @@ class AttachmentClientRemoveAndRestoreTest {
         every {  key2.unwrap() } returns rawKey2
 
         every { decryptedRecord.resource } returns resource
-        every { fhirAttachmentHelper.getAttachment(wrappedResource) } returns mutableListOf()
-        every { fhirAttachmentHelper.updateAttachmentData(wrappedResource, rawAttachment) } returns Unit
+        every { FhirAttachmentHelper.getAttachment(wrappedResource) } returns mutableListOf()
+        every { FhirAttachmentHelper.updateAttachmentData(wrappedResource, rawAttachment) } returns Unit
 
         // When
         @Suppress("UNCHECKED_CAST")
@@ -362,8 +363,8 @@ class AttachmentClientRemoveAndRestoreTest {
         Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
 
         verify(exactly = 1) { decryptedRecord.resource = orgResource }
-        verify(exactly = 1) { fhirAttachmentHelper.getAttachment(wrappedResource) }
-        verify(exactly = 0) { fhirAttachmentHelper.updateAttachmentData(wrappedResource, rawAttachment) }
+        verify(exactly = 1) { FhirAttachmentHelper.getAttachment(wrappedResource) }
+        verify(exactly = 0) { FhirAttachmentHelper.updateAttachmentData(wrappedResource, rawAttachment) }
     }
 
 
@@ -384,7 +385,7 @@ class AttachmentClientRemoveAndRestoreTest {
                 rawKey2 to "42"
         )
 
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>(relaxed = true)
 
         every { resource.type } returns WrapperContract.Resource.TYPE.FHIR3
         every { resource.unwrap() } returns wrappedResource
@@ -395,8 +396,8 @@ class AttachmentClientRemoveAndRestoreTest {
         every {  key2.unwrap() } returns rawKey2
 
         every { decryptedRecord.resource } returns resource
-        every { fhirAttachmentHelper.getAttachment(wrappedResource) } returns mutableListOf()
-        every { fhirAttachmentHelper.updateAttachmentData(wrappedResource, rawAttachment) } returns Unit
+        every { FhirAttachmentHelper.getAttachment(wrappedResource) } returns mutableListOf()
+        every { FhirAttachmentHelper.updateAttachmentData(wrappedResource, rawAttachment) } returns Unit
 
         // When
         @Suppress("UNCHECKED_CAST")
@@ -410,7 +411,7 @@ class AttachmentClientRemoveAndRestoreTest {
         Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
 
         verify(exactly = 1) { decryptedRecord.resource = orgResource }
-        verify(exactly = 0) { fhirAttachmentHelper.getAttachment(wrappedResource) }
-        verify(exactly = 0) { fhirAttachmentHelper.updateAttachmentData(wrappedResource, rawAttachment) }
+        verify(exactly = 0) { FhirAttachmentHelper.getAttachment(wrappedResource) }
+        verify(exactly = 0) { FhirAttachmentHelper.updateAttachmentData(wrappedResource, rawAttachment) }
     }
 }

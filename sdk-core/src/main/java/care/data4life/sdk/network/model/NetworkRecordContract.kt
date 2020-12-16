@@ -24,7 +24,7 @@ import care.data4life.sdk.wrapper.WrapperContract
 
 //ToDo Internal
 interface NetworkRecordContract {
-     interface DecryptedRecord<T> {
+     interface DecryptedRecord {
         var identifier: String?
         var resource: WrapperContract.Resource
         var tags: HashMap<String, String>?

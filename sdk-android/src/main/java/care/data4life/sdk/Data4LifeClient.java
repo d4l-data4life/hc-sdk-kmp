@@ -29,6 +29,7 @@ import care.data4life.auth.AuthorizationService;
 import care.data4life.auth.AuthorizationService.AuthorizationListener;
 import care.data4life.auth.storage.SharedPrefsAuthStorage;
 import care.data4life.crypto.GCKeyPair;
+import care.data4life.sdk.attachment.AttachmentClient;
 import care.data4life.sdk.attachment.AttachmentService;
 import care.data4life.sdk.attachment.FileService;
 import care.data4life.sdk.attachment.ThumbnailService;
@@ -39,6 +40,7 @@ import care.data4life.sdk.lang.CoreRuntimeException;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.Callback;
 import care.data4life.sdk.network.Environment;
+import care.data4life.sdk.record.RecordEncryptionService;
 import care.data4life.sdk.tag.TagEncryptionService;
 import care.data4life.sdk.tag.TaggingService;
 import care.data4life.securestore.SecureStore;
@@ -180,17 +182,41 @@ public final class Data4LifeClient extends BaseClient {
         FhirService fhirService = new FhirService(cryptoService);
         FileService fileService = new FileService(initConfig.getAlias(), apiService, cryptoService);
         String partnerId = clientId.split(CLIENT_ID_SPLIT_CHAR)[PARTNER_ID_INDEX];
+        ThumbnailService thumbnailService = new ThumbnailService(
+                partnerId,
+                new AndroidImageResizer(),
+                fileService
+        );
         AttachmentService attachmentService = new AttachmentService(
                 fileService,
-                new ThumbnailService(
-                        partnerId,
-                        new AndroidImageResizer(),
-                        fileService
-                )
+                thumbnailService
+        );
+        AttachmentClient attachmentClient = new AttachmentClient(
+                attachmentService,
+                cryptoService,
+                thumbnailService
+        );
+        RecordEncryptionService recordEncryptionService = new RecordEncryptionService(
+                initConfig.getAlias(),
+                tagEncryptionService,
+                cryptoService,
+                fhirService,
+                apiService
         );
         SdkContract.ErrorHandler errorHandler = new D4LErrorHandler();
         CallHandler callHandler = new CallHandler(errorHandler);
-        RecordService recordService = new RecordService(partnerId, initConfig.getAlias(), apiService, tagEncryptionService, taggingService, fhirService, attachmentService, cryptoService, errorHandler);
+        RecordService recordService = new RecordService(
+                initConfig.getAlias(),
+                apiService,
+                tagEncryptionService,
+                taggingService,
+                attachmentService,
+                attachmentClient,
+                thumbnailService,
+                cryptoService,
+                recordEncryptionService,
+                errorHandler
+        );
 
         return new Data4LifeClient(initConfig.getAlias(), cryptoService, authorizationService, userService, recordService, callHandler);
     }

@@ -129,7 +129,7 @@ class AttachmentService internal constructor(
             attachmentIds: List<String>,
             userId: String,
             type: DownloadType,
-            decryptedRecord: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+            decryptedRecord: NetworkRecordContract.DecryptedRecord
     ): Single<out List<WrapperContract.Attachment>> {
         val resource = decryptedRecord.resource.unwrap()
 

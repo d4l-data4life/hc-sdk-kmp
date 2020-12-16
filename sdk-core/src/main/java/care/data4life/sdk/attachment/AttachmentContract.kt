@@ -55,7 +55,7 @@ interface AttachmentContract {
                 attachmentIds: List<String>,
                 userId: String,
                 type: DownloadType,
-                decryptedRecord: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+                decryptedRecord: NetworkRecordContract.DecryptedRecord
         ): Single<out List<WrapperContract.Attachment>>
 
         @Throws(DataRestrictionException.MaxDataSizeViolation::class, DataRestrictionException.UnsupportedFileType::class)
@@ -72,29 +72,29 @@ interface AttachmentContract {
 
     interface Client {
         fun removeUploadData(
-                record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
-        ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+                record: NetworkRecordContract.DecryptedRecord
+        ): NetworkRecordContract.DecryptedRecord
 
         fun restoreUploadData(
-                record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>,
+                record: NetworkRecordContract.DecryptedRecord,
                 originalResource: WrapperContract.Resource?,
                 attachmentData: HashMap<WrapperContract.Attachment, String?>?
-        ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+        ): NetworkRecordContract.DecryptedRecord
 
         fun downloadData(
-                record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>,
+                record: NetworkRecordContract.DecryptedRecord,
                 userId: String?
-        ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+        ): NetworkRecordContract.DecryptedRecord
 
         fun updateData(
-                record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>,
+                record: NetworkRecordContract.DecryptedRecord,
                 newResource: WrapperContract.Resource?,
                 userId: String?
-        ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+        ): NetworkRecordContract.DecryptedRecord
 
         fun uploadData(
-                record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>,
+                record: NetworkRecordContract.DecryptedRecord,
                 userId: String
-        ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
+        ): NetworkRecordContract.DecryptedRecord
     }
 }

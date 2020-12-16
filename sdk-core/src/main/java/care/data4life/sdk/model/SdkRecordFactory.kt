@@ -16,11 +16,13 @@
 
 package care.data4life.sdk.model
 
+import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.model.NetworkRecordContract
+import care.data4life.sdk.wrapper.WrapperContract
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -37,29 +39,28 @@ internal object SdkRecordFactory : RecordFactory {
             .toFormatter(Locale.US)
 
     @Throws(CoreRuntimeException.InternalFailure::class)
-    override fun <T : Any> getInstance(record: NetworkRecordContract.DecryptedRecord<T>): BaseRecord<T> {
+    override fun getInstance(record: NetworkRecordContract.DecryptedRecord): BaseRecord<Any> {
         @Suppress("UNCHECKED_CAST")
-        return when (record) {
-            is NetworkRecordContract.DecryptedFhir3Record -> Record(
-                    record.resource as Fhir3Resource,
+        return when (record.resource.type) {
+            WrapperContract.Resource.TYPE.FHIR3 -> Record(
+                    record.resource.unwrap() as Fhir3Resource,
                     buildMeta(record),
                     record.annotations
             )
             // TODO app data
-            is NetworkRecordContract.DecryptedDataRecord -> AppDataRecord(
+            WrapperContract.Resource.TYPE.DATA -> AppDataRecord(
                     record.identifier!!,
-                    record.resource,
+                    ((record.resource.unwrap()) as DataResource).asByteArray(),
                     buildMeta(record),
                     record.annotations
             )
             // TODO FHIR 4
-            else -> throw CoreRuntimeException.InternalFailure()
-        } as BaseRecord<T>
+        } as BaseRecord<Any>
     }
 
     @JvmStatic
     private fun buildMeta(
-            record: NetworkRecordContract.DecryptedRecord<*>
+            record: NetworkRecordContract.DecryptedRecord
     ): Meta = Meta(
             LocalDate.parse(record.customCreationDate, DATE_FORMATTER),
             LocalDateTime.parse(record.updatedDate, DATE_TIME_FORMATTER)

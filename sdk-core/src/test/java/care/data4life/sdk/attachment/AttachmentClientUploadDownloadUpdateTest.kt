@@ -24,14 +24,17 @@ import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.NetworkRecordContract
+import care.data4life.sdk.wrapper.AttachmentFactory
 import care.data4life.sdk.wrapper.FhirAttachmentHelper
 import care.data4life.sdk.wrapper.WrapperContract
-import care.data4life.sdk.wrapper.WrapperFactoryContract
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
 import io.mockk.verify
 import io.reactivex.Single
+import org.junit.After
 import org.junit.Assert
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -39,9 +42,7 @@ import org.junit.Before
 import org.junit.Test
 
 class AttachmentClientUploadDownloadUpdateTest {
-    private lateinit var fhirAttachmentHelper: FhirAttachmentHelper
     private lateinit var cryptoService: CryptoService
-    private lateinit var attachmentFactory: WrapperFactoryContract.AttachmentFactory
     private lateinit var attachmentService: AttachmentContract.Service
     private lateinit var thumbnailService: ThumbnailContract.Service
     private val USER_ID = "ID"
@@ -50,26 +51,29 @@ class AttachmentClientUploadDownloadUpdateTest {
 
     @Before
     fun setUp() {
-        fhirAttachmentHelper = mockk()
         cryptoService = mockk()
-        attachmentFactory = mockk()
         attachmentService = mockk()
         thumbnailService = mockk()
 
         attachmentClient = AttachmentClient(
-                fhirAttachmentHelper,
                 attachmentService,
-                attachmentFactory,
                 cryptoService,
                 thumbnailService
         )
+        
+        mockkObject(FhirAttachmentHelper)
+        mockkObject(AttachmentFactory)
+    }
+    
+    @After
+    fun tearDown() {
+        unmockkObject(FhirAttachmentHelper)
+        unmockkObject(AttachmentFactory)
     }
 
     @Test
     fun `it is a AttachmentClient`() {
         val client: Any = AttachmentClient(
-                fhirAttachmentHelper,
-                mockk(),
                 mockk(),
                 mockk(),
                 mockk()
@@ -82,7 +86,7 @@ class AttachmentClientUploadDownloadUpdateTest {
     fun `Given, _uploadData is called with DecryptedRecord, which contains a DataResource, and UserId, it reflects it`() {
         // Given
         val resource = mockk<WrapperContract.Resource>()
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>()
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>()
 
         every { resource.type } returns WrapperContract.Resource.TYPE.DATA
         every { decryptedRecord.resource } returns resource
@@ -93,16 +97,16 @@ class AttachmentClientUploadDownloadUpdateTest {
         // Then
         Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
 
-        verify(exactly = 0) { fhirAttachmentHelper.hasAttachment(any()) }
+        verify(exactly = 0) { FhirAttachmentHelper.hasAttachment(any()) }
     }
 
-    // TODO Record fhirAttachmentHelper.hasAttachment == false
+    // TODO Record FhirAttachmentHelper.hasAttachment == false
     // TODO Attachment key at Record not null
 
     @Test
     fun `Given, uploadData is called with DecryptedRecord, which contains a non DataResource, and UserId, it fails, AttachmentId is set during uploadFlow`() {
         // Given
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>(relaxed = true)
         val resource = mockk<WrapperContract.Resource>()
         val rawResource = mockk<DocumentReference>()
         val attachmentKey = mockk<GCKey>()
@@ -116,11 +120,11 @@ class AttachmentClientUploadDownloadUpdateTest {
         every { decryptedRecord.resource } returns resource
         every { decryptedRecord.attachmentsKey } returns null
 
-        every { fhirAttachmentHelper.hasAttachment(rawResource) } returns true
-        every{ fhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
+        every { FhirAttachmentHelper.hasAttachment(rawResource) } returns true
+        every{ FhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
         every{ wrappedAttachment.id } returns "something"
 
-        every { attachmentFactory.wrap(serviceAttachment) } returns wrappedAttachment
+        every { AttachmentFactory.wrap(serviceAttachment) } returns wrappedAttachment
         every { cryptoService.generateGCKey() } returns Single.just(attachmentKey)
 
         // When
@@ -146,7 +150,7 @@ class AttachmentClientUploadDownloadUpdateTest {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun `Given, uploadData is called with DecryptedRecord, which contains a non DataResource, and UserId, it fails, on invalid hash`() {
         // Given
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>(relaxed = true)
         val resource = mockk<WrapperContract.Resource>()
         val rawResource = mockk<DocumentReference>()
         val attachmentKey = mockk<GCKey>()
@@ -162,12 +166,12 @@ class AttachmentClientUploadDownloadUpdateTest {
         every { decryptedRecord.resource } returns resource
         every { decryptedRecord.attachmentsKey } returns null
 
-        every { fhirAttachmentHelper.hasAttachment(rawResource) } returns true
-        every{ fhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
+        every { FhirAttachmentHelper.hasAttachment(rawResource) } returns true
+        every{ FhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
         every{ wrappedAttachment.id } returns null
         every { wrappedAttachment.size } returns 23
 
-        every { attachmentFactory.wrap(serviceAttachment) } returns wrappedAttachment
+        every { AttachmentFactory.wrap(serviceAttachment) } returns wrappedAttachment
         every { cryptoService.generateGCKey() } returns Single.just(attachmentKey)
 
         every { attachmentService.getValidHash(wrappedAttachment) } returns attachmentServiceHash
@@ -195,7 +199,7 @@ class AttachmentClientUploadDownloadUpdateTest {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun `Given, uploadData is called with DecryptedRecord, which contains a non DataResource, and UserId, it uploads the attachment and updates them`() {
         // Given
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>(relaxed = true)
         val resource = mockk<WrapperContract.Resource>()
         val rawResource = mockk<DocumentReference>()
         val attachmentKey = mockk<GCKey>()
@@ -217,12 +221,12 @@ class AttachmentClientUploadDownloadUpdateTest {
             null
         } }
 
-        every { fhirAttachmentHelper.hasAttachment(rawResource) } returns true
-        every{ fhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
+        every { FhirAttachmentHelper.hasAttachment(rawResource) } returns true
+        every{ FhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
         every{ wrappedAttachment.id } returns null
         every { wrappedAttachment.size } returns 23
 
-        every { attachmentFactory.wrap(serviceAttachment) } returns wrappedAttachment
+        every { AttachmentFactory.wrap(serviceAttachment) } returns wrappedAttachment
         every { cryptoService.generateGCKey() } returns Single.just(attachmentKey)
 
         every { attachmentService.getValidHash(wrappedAttachment) } returns resourceHash
@@ -259,7 +263,7 @@ class AttachmentClientUploadDownloadUpdateTest {
     fun `Given, updateData is called with a DecryptedRecord, which contains a DataResource, a Resource and UserId, it reflects it`() {
         // Given
         val resource = mockk<WrapperContract.Resource>()
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>()
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>()
 
         every { resource.type } returns WrapperContract.Resource.TYPE.DATA
         every { decryptedRecord.resource } returns resource
@@ -270,7 +274,7 @@ class AttachmentClientUploadDownloadUpdateTest {
         // Then
         Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
 
-        verify(exactly = 0) { fhirAttachmentHelper.hasAttachment(any()) }
+        verify(exactly = 0) { FhirAttachmentHelper.hasAttachment(any()) }
     }
 
     @Test
@@ -281,7 +285,7 @@ class AttachmentClientUploadDownloadUpdateTest {
         // Given
         val resource = mockk<WrapperContract.Resource>()
         val newResource = mockk<WrapperContract.Resource>()
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>()
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>()
 
         every { newResource.type } returns WrapperContract.Resource.TYPE.DATA
         every { resource.type } returns WrapperContract.Resource.TYPE.FHIR3
@@ -304,7 +308,7 @@ class AttachmentClientUploadDownloadUpdateTest {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun `Given, updateData is called with a DecryptedRecord, which contains a non DataResource, a non DataResource and a UserId, it fails, if has no size is present`() {
         // Given
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>(relaxed = true)
         val newResource = mockk<WrapperContract.Resource>()
         val newRawResource = mockk<DocumentReference>()
         val resource = mockk<WrapperContract.Resource>()
@@ -325,17 +329,17 @@ class AttachmentClientUploadDownloadUpdateTest {
         every { decryptedRecord.resource } returns resource
         every { decryptedRecord.attachmentsKey } returns null
 
-        every { fhirAttachmentHelper.hasAttachment(rawResource) } returns true
-        every{ fhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
+        every { FhirAttachmentHelper.hasAttachment(rawResource) } returns true
+        every{ FhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
 
-        every { fhirAttachmentHelper.hasAttachment(newRawResource) } returns true
-        every { fhirAttachmentHelper.getAttachment(newRawResource) } returns serviceAttachments
+        every { FhirAttachmentHelper.hasAttachment(newRawResource) } returns true
+        every { FhirAttachmentHelper.getAttachment(newRawResource) } returns serviceAttachments
 
         every{ wrappedAttachment.id } returns null
         every { wrappedAttachment.size } returns null
         every { wrappedAttachment.hash } returns resourceHash
 
-        every { attachmentFactory.wrap(serviceAttachment) } returns wrappedAttachment
+        every { AttachmentFactory.wrap(serviceAttachment) } returns wrappedAttachment
         every { cryptoService.generateGCKey() } returns Single.just(attachmentKey)
 
         every { attachmentService.getValidHash(wrappedAttachment) } returns resourceHash
@@ -362,7 +366,7 @@ class AttachmentClientUploadDownloadUpdateTest {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun `Given, updateData is called with a DecryptedRecord, which contains a non DataResource, a non DataResource and a UserId, it fails, if has no hash is present`() {
         // Given
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>(relaxed = true)
         val newResource = mockk<WrapperContract.Resource>()
         val newRawResource = mockk<DocumentReference>()
         val resource = mockk<WrapperContract.Resource>()
@@ -382,17 +386,17 @@ class AttachmentClientUploadDownloadUpdateTest {
         every { decryptedRecord.resource } returns resource
         every { decryptedRecord.attachmentsKey } returns null
 
-        every { fhirAttachmentHelper.hasAttachment(rawResource) } returns true
-        every { fhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
+        every { FhirAttachmentHelper.hasAttachment(rawResource) } returns true
+        every { FhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
 
-        every { fhirAttachmentHelper.hasAttachment(newRawResource) } returns true
-        every { fhirAttachmentHelper.getAttachment(newRawResource) } returns serviceAttachments
+        every { FhirAttachmentHelper.hasAttachment(newRawResource) } returns true
+        every { FhirAttachmentHelper.getAttachment(newRawResource) } returns serviceAttachments
 
         every { wrappedAttachment.id } returns null
         every { wrappedAttachment.size } returns 23
         every { wrappedAttachment.hash } returns null
 
-        every { attachmentFactory.wrap(serviceAttachment) } returns wrappedAttachment
+        every { AttachmentFactory.wrap(serviceAttachment) } returns wrappedAttachment
         every { cryptoService.generateGCKey() } returns Single.just(attachmentKey)
 
         every { attachmentService.getValidHash(wrappedAttachment) } returns attachmentServiceHash
@@ -420,7 +424,7 @@ class AttachmentClientUploadDownloadUpdateTest {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun `Given, updateData is called with a DecryptedRecord, which contains a non DataResource, a non DataResource and a UserId, it fails, if the hash is invalid`() {
         // Given
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>(relaxed = true)
         val newResource = mockk<WrapperContract.Resource>()
         val newRawResource = mockk<DocumentReference>()
         val resource = mockk<WrapperContract.Resource>()
@@ -441,17 +445,17 @@ class AttachmentClientUploadDownloadUpdateTest {
         every { decryptedRecord.resource } returns resource
         every { decryptedRecord.attachmentsKey } returns null
 
-        every { fhirAttachmentHelper.hasAttachment(rawResource) } returns true
-        every { fhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
+        every { FhirAttachmentHelper.hasAttachment(rawResource) } returns true
+        every { FhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
 
-        every { fhirAttachmentHelper.hasAttachment(newRawResource) } returns true
-        every { fhirAttachmentHelper.getAttachment(newRawResource) } returns serviceAttachments
+        every { FhirAttachmentHelper.hasAttachment(newRawResource) } returns true
+        every { FhirAttachmentHelper.getAttachment(newRawResource) } returns serviceAttachments
 
         every { wrappedAttachment.id } returns null
         every { wrappedAttachment.size } returns 23
         every { wrappedAttachment.hash } returns resourceHash
 
-        every { attachmentFactory.wrap(serviceAttachment) } returns wrappedAttachment
+        every { AttachmentFactory.wrap(serviceAttachment) } returns wrappedAttachment
         every { cryptoService.generateGCKey() } returns Single.just(attachmentKey)
 
         every { attachmentService.getValidHash(wrappedAttachment) } returns attachmentServiceHash
@@ -479,7 +483,7 @@ class AttachmentClientUploadDownloadUpdateTest {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun `Given, updateData is called with a DecryptedRecord, which contains a non DataResource, a non DataResource and a UserId, it fails, if has no fitting old resource was found`(){
         // Given
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>(relaxed = true)
         val newResource = mockk<WrapperContract.Resource>()
         val newRawResource = mockk<DocumentReference>()
         val oldResource = mockk<WrapperContract.Resource>()
@@ -500,14 +504,14 @@ class AttachmentClientUploadDownloadUpdateTest {
         every { decryptedRecord.resource } returns oldResource
         every { decryptedRecord.attachmentsKey } returns null
 
-        every { fhirAttachmentHelper.hasAttachment(oldRawResource) } returns true
-        every { fhirAttachmentHelper.getAttachment(oldRawResource) } returns  mutableListOf( oldServiceAttachment )
+        every { FhirAttachmentHelper.hasAttachment(oldRawResource) } returns true
+        every { FhirAttachmentHelper.getAttachment(oldRawResource) } returns  mutableListOf( oldServiceAttachment )
 
-        every { fhirAttachmentHelper.hasAttachment(newRawResource) } returns true
-        every { fhirAttachmentHelper.getAttachment(newRawResource) } returns  mutableListOf( newServiceAttachment )
+        every { FhirAttachmentHelper.hasAttachment(newRawResource) } returns true
+        every { FhirAttachmentHelper.getAttachment(newRawResource) } returns  mutableListOf( newServiceAttachment )
 
-        every { attachmentFactory.wrap(newServiceAttachment) } returns newWrappedAttachment
-        every { attachmentFactory.wrap(oldServiceAttachment) } returns oldWrappedAttachment
+        every { AttachmentFactory.wrap(newServiceAttachment) } returns newWrappedAttachment
+        every { AttachmentFactory.wrap(oldServiceAttachment) } returns oldWrappedAttachment
 
         every { newWrappedAttachment.id } returns "notqweqweqnull"
         every { newWrappedAttachment.size } returns 23
@@ -545,7 +549,7 @@ class AttachmentClientUploadDownloadUpdateTest {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun `Given, updateData is called with a DecryptedRecord, which contains a non DataResource, a non DataResource and a UserId, it updates Attachments`() {
         // Given
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>(relaxed = true)
         val newResource = mockk<WrapperContract.Resource>()
         val newRawResource = mockk<DocumentReference>()
         val oldResource = mockk<WrapperContract.Resource>()
@@ -568,14 +572,14 @@ class AttachmentClientUploadDownloadUpdateTest {
         every { decryptedRecord.resource } returns oldResource
         every { decryptedRecord.attachmentsKey } returns attachmentKey
 
-        every { fhirAttachmentHelper.hasAttachment(oldRawResource) } returns true
-        every { fhirAttachmentHelper.getAttachment(oldRawResource) } returns  mutableListOf( oldServiceAttachment )
+        every { FhirAttachmentHelper.hasAttachment(oldRawResource) } returns true
+        every { FhirAttachmentHelper.getAttachment(oldRawResource) } returns  mutableListOf( oldServiceAttachment )
 
-        every { fhirAttachmentHelper.hasAttachment(newRawResource) } returns true
-        every { fhirAttachmentHelper.getAttachment(newRawResource) } returns  mutableListOf( newServiceAttachment )
+        every { FhirAttachmentHelper.hasAttachment(newRawResource) } returns true
+        every { FhirAttachmentHelper.getAttachment(newRawResource) } returns  mutableListOf( newServiceAttachment )
 
-        every { attachmentFactory.wrap(newServiceAttachment) } returns newWrappedAttachment
-        every { attachmentFactory.wrap(oldServiceAttachment) } returns oldWrappedAttachment
+        every { AttachmentFactory.wrap(newServiceAttachment) } returns newWrappedAttachment
+        every { AttachmentFactory.wrap(oldServiceAttachment) } returns oldWrappedAttachment
 
         every { newWrappedAttachment.id } returns null
         every { newWrappedAttachment.size } returns 23
@@ -622,7 +626,7 @@ class AttachmentClientUploadDownloadUpdateTest {
     fun `Given, downloadData is called with a DecryptedRecord, which contains a DataResource, and a UserId, it reflects it`() {
         // Given
         val resource = mockk<WrapperContract.Resource>()
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>()
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>()
 
         every { resource.type } returns WrapperContract.Resource.TYPE.DATA
         every { decryptedRecord.resource } returns resource
@@ -633,7 +637,7 @@ class AttachmentClientUploadDownloadUpdateTest {
         // Then
         Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
 
-        verify(exactly = 0) { fhirAttachmentHelper.hasAttachment(any()) }
+        verify(exactly = 0) { FhirAttachmentHelper.hasAttachment(any()) }
     }
 
     // TODO: hasAttachment == false
@@ -644,7 +648,7 @@ class AttachmentClientUploadDownloadUpdateTest {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun `Given, downloadData is called with a DecryptedRecord, which contains a non DataResource, and a UserId, it fails, if the Attachment has no ID`() {
         // Given
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>(relaxed = true)
         val resource = mockk<WrapperContract.Resource>()
         val rawResource = mockk<DocumentReference>()
         val attachmentKey = mockk<GCKey>()
@@ -657,10 +661,10 @@ class AttachmentClientUploadDownloadUpdateTest {
         every { decryptedRecord.resource } returns resource
         every { decryptedRecord.attachmentsKey } returns null
 
-        every { fhirAttachmentHelper.hasAttachment(rawResource) } returns true
-        every{ fhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
+        every { FhirAttachmentHelper.hasAttachment(rawResource) } returns true
+        every{ FhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
 
-        every { attachmentFactory.wrap(serviceAttachment) } returns wrappedAttachment
+        every { AttachmentFactory.wrap(serviceAttachment) } returns wrappedAttachment
 
         every{ wrappedAttachment.id } returns null
 
@@ -680,7 +684,7 @@ class AttachmentClientUploadDownloadUpdateTest {
     @Throws(DataValidationException.IdUsageViolation::class, DataValidationException.InvalidAttachmentPayloadHash::class)
     fun `Given, downloadData is called with a DecryptedRecord, which contains a non DataResource, and a UserId, it downloads attachments`() {
         // Given
-        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>>(relaxed = true)
+        val decryptedRecord = mockk<NetworkRecordContract.DecryptedRecord>(relaxed = true)
         val resource = mockk<WrapperContract.Resource>()
         val rawResource = mockk<DocumentReference>()
         val attachmentKey = mockk<GCKey>()
@@ -693,10 +697,10 @@ class AttachmentClientUploadDownloadUpdateTest {
         every { decryptedRecord.resource } returns resource
         every { decryptedRecord.attachmentsKey } returns attachmentKey
 
-        every { fhirAttachmentHelper.hasAttachment(rawResource) } returns true
-        every{ fhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
+        every { FhirAttachmentHelper.hasAttachment(rawResource) } returns true
+        every{ FhirAttachmentHelper.getAttachment(rawResource) } returns serviceAttachments
 
-        every { attachmentFactory.wrap(serviceAttachment) } returns wrappedAttachment
+        every { AttachmentFactory.wrap(serviceAttachment) } returns wrappedAttachment
 
         every{ wrappedAttachment.id } returns "abs"
         every{ attachmentService.download(

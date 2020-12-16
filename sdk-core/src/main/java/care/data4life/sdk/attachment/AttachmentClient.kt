@@ -20,18 +20,21 @@ import care.data4life.sdk.CryptoService
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.NetworkRecordContract
+import care.data4life.sdk.wrapper.AttachmentFactory
+import care.data4life.sdk.wrapper.FhirAttachmentHelper
 import care.data4life.sdk.wrapper.HelperContract
 import care.data4life.sdk.wrapper.WrapperContract
 import care.data4life.sdk.wrapper.WrapperFactoryContract
 import kotlin.collections.HashMap
 
-internal class AttachmentClient(
-        private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper,
+class AttachmentClient(
         private val attachmentService: AttachmentContract.Service,
-        private val attachmentFactory: WrapperFactoryContract.AttachmentFactory,
         private val cryptoService: CryptoService,
         private val thumbnailService: ThumbnailContract.Service
 ): AttachmentContract.Client {
+    private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper = FhirAttachmentHelper
+    private val attachmentFactory: WrapperFactoryContract.AttachmentFactory = AttachmentFactory
+
     private fun unpackAttachments(
             attachments: HashMap<WrapperContract.Attachment, String?>
     ): HashMap<Any, String?> {
@@ -45,7 +48,7 @@ internal class AttachmentClient(
     }
 
     private fun setUploadData(
-            record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>,
+            record: NetworkRecordContract.DecryptedRecord,
             attachmentData: HashMap<Any, String?>?
     ) {
         val rawResource = record.resource.unwrap()
@@ -59,8 +62,8 @@ internal class AttachmentClient(
     }
 
     override fun removeUploadData(
-            record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
-    ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource> {
+            record: NetworkRecordContract.DecryptedRecord
+    ): NetworkRecordContract.DecryptedRecord {
         return record.also {
             if (record.resource.type != WrapperContract.Resource.TYPE.DATA) {
                 setUploadData(
@@ -72,10 +75,10 @@ internal class AttachmentClient(
     }
 
     override fun restoreUploadData(
-            record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>,
+            record: NetworkRecordContract.DecryptedRecord,
             originalResource: WrapperContract.Resource?,
             attachmentData: HashMap<WrapperContract.Attachment, String?>?
-    ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource> {
+    ): NetworkRecordContract.DecryptedRecord {
         if (
                 record.resource.type != WrapperContract.Resource.TYPE.DATA &&
                 originalResource != null &&
@@ -99,9 +102,9 @@ internal class AttachmentClient(
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
     override fun uploadData(
-            record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>,
+            record: NetworkRecordContract.DecryptedRecord,
             userId: String
-    ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource> {
+    ): NetworkRecordContract.DecryptedRecord {
         if (record.resource.type == WrapperContract.Resource.TYPE.DATA) {
             return record
         }
@@ -155,10 +158,10 @@ internal class AttachmentClient(
             DataValidationException.InvalidAttachmentPayloadHash::class,
             CoreRuntimeException.UnsupportedOperation::class)
     override fun updateData(
-            record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>,
+            record: NetworkRecordContract.DecryptedRecord,
             newResource: WrapperContract.Resource?,
             userId: String?
-    ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource> {
+    ): NetworkRecordContract.DecryptedRecord {
          if (record.resource.type == WrapperContract.Resource.TYPE.DATA) {
             return record
         }
@@ -226,9 +229,9 @@ internal class AttachmentClient(
 
     @Throws(DataValidationException.IdUsageViolation::class, DataValidationException.InvalidAttachmentPayloadHash::class)
     override fun downloadData(
-            record: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>,
+            record: NetworkRecordContract.DecryptedRecord,
             userId: String?
-    ): NetworkRecordContract.DecryptedRecord<WrapperContract.Resource> {
+    ): NetworkRecordContract.DecryptedRecord {
         if (record.resource.type == WrapperContract.Resource.TYPE.DATA) {
             return record
         }

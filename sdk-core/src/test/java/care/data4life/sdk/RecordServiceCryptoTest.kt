@@ -15,7 +15,7 @@
  */
 
 package care.data4life.sdk
-
+/*
 import care.data4life.crypto.KeyType
 import care.data4life.fhir.stu3.model.CarePlan
 import care.data4life.fhir.stu3.model.DomainResource
@@ -39,7 +39,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import java.io.IOException
 
-/*
+
 class RecordServiceCryptoTest : RecordServiceTestBase() {
     @Before
     fun setUp() {

@@ -17,6 +17,7 @@
 package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
+import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.network.model.NetworkRecordContract
@@ -56,6 +57,9 @@ interface AttachmentContract {
                 type: DownloadType,
                 decryptedRecord: NetworkRecordContract.DecryptedRecord<WrapperContract.Resource>
         ): Single<out List<WrapperContract.Attachment>>
+
+        @Throws(DataRestrictionException.MaxDataSizeViolation::class, DataRestrictionException.UnsupportedFileType::class)
+        fun checkDataRestrictions(resource: WrapperContract.Resource?)
     }
 
     interface FhirDateValidator {

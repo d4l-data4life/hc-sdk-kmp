@@ -17,12 +17,15 @@ package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
+import care.data4life.sdk.config.DataRestriction
+import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.network.model.NetworkRecordContract
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
+import care.data4life.sdk.util.MimeType
 import care.data4life.sdk.wrapper.AttachmentFactory
 import care.data4life.sdk.wrapper.FhirAttachmentHelper
 import care.data4life.sdk.wrapper.HelperContract
@@ -165,6 +168,27 @@ class AttachmentService internal constructor(
         }
 
         throw IllegalArgumentException("Expected a record of a type that has attachment")
+    }
+
+    @Throws(DataRestrictionException.MaxDataSizeViolation::class, DataRestrictionException.UnsupportedFileType::class)
+    override fun checkDataRestrictions(resource: WrapperContract.Resource?) {
+        if (resource == null || resource.type == WrapperContract.Resource.TYPE.DATA) {
+            return
+        }
+
+        val attachments = fhirAttachmentHelper.getAttachment(resource.unwrap())
+        for (rawAttachment in attachments) {
+            val attachment = attachmentFactory.wrap(rawAttachment)
+            attachment?.data ?: return
+
+            val data = decode(attachment.data!!)
+            if (MimeType.recognizeMimeType(data) == MimeType.UNKNOWN) {
+                throw DataRestrictionException.UnsupportedFileType()
+            }
+            if (data.size > DataRestriction.DATA_SIZE_MAX_BYTES) {
+                throw DataRestrictionException.MaxDataSizeViolation()
+            }
+        }
     }
 
     companion object {

@@ -17,6 +17,8 @@ package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
+import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
+import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
@@ -24,6 +26,7 @@ import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.network.model.NetworkRecordContract
 import care.data4life.sdk.util.Base64
 import care.data4life.sdk.util.HashUtil
+import care.data4life.sdk.util.MimeType
 import care.data4life.sdk.wrapper.AttachmentFactory
 import care.data4life.sdk.wrapper.FhirAttachmentHelper
 import care.data4life.sdk.wrapper.WrapperContract
@@ -31,6 +34,7 @@ import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.mockkStatic
 import io.mockk.spyk
 import io.mockk.unmockkObject
 import io.mockk.verify
@@ -50,7 +54,6 @@ class AttachmentServiceTest {
     private lateinit var thumbnailService: ThumbnailContract.Service
     private lateinit var attachment: WrapperContract.Attachment
 
-
     private lateinit var attachmentService: AttachmentService
 
     @Before
@@ -65,6 +68,7 @@ class AttachmentServiceTest {
         mockkObject(HashUtil)
         mockkObject(FhirAttachmentHelper)
         mockkObject(AttachmentFactory)
+        mockkObject(MimeType)
     }
 
     @After
@@ -74,6 +78,7 @@ class AttachmentServiceTest {
         unmockkObject(HashUtil)
         unmockkObject(FhirAttachmentHelper)
         unmockkObject(AttachmentFactory)
+        unmockkObject(MimeType)
     }
 
     @Test
@@ -753,7 +758,209 @@ class AttachmentServiceTest {
         verify(exactly = 1) { spyedService.updateAttachmentMeta(downloadedAttachment) }
     }
 
+    @Test
+    @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
+    fun `Given, checkForUnsupportedData is called with a FhirResource, it fails with a MaxDataSizeViolation, if a Attachment exceeds the maximum FileSizeLimit`() {
+        // Given
+        val resource = mockk<WrapperContract.Resource>()
+        val rawResource = mockk<Any>()
+
+        val attachments =  mutableListOf<Any>("attachment")
+        val wrappedAttachment = mockk<WrapperContract.Attachment>()
+
+        val data = "bla"
+        val decodedData = ByteArray(DATA_SIZE_MAX_BYTES+100000)
+
+        every { resource.type } returns WrapperContract.Resource.TYPE.FHIR3
+        every { resource.unwrap() } returns rawResource
+
+        every { wrappedAttachment.data } returns data
+
+        every { FhirAttachmentHelper.getAttachment(rawResource) } returns attachments
+        every { AttachmentFactory.wrap("attachment") } returns wrappedAttachment
+
+        every { Base64.decode(data) } returns decodedData
+        every { MimeType.recognizeMimeType(decodedData) } returns MimeType.DCM
+
+
+        // When
+        try {
+            attachmentService.checkDataRestrictions(resource)
+            Assert.fail("Exception expected!")
+        } catch (e: D4LException) {
+
+            // Then
+            Truth.assertThat(e.javaClass).isEqualTo(DataRestrictionException.MaxDataSizeViolation::class.java)
+        }
+    }
+
+    @Test
+    @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
+    fun `Given, checkForUnsupportedData is called with a FhirResource, it fails with a MaxDataSizeViolation, if the MimeType of a Attachment is unknown`() {
+        // Given
+        val resource = mockk<WrapperContract.Resource>()
+        val rawResource = mockk<Any>()
+
+        val attachments =  mutableListOf<Any>("attachment")
+        val wrappedAttachment = mockk<WrapperContract.Attachment>()
+
+        val data = "bla"
+        val decodedData = ByteArray(DATA_SIZE_MAX_BYTES)
+
+        every { resource.type } returns WrapperContract.Resource.TYPE.FHIR3
+        every { resource.unwrap() } returns rawResource
+
+        every { wrappedAttachment.data } returns data
+
+        every { FhirAttachmentHelper.getAttachment(rawResource) } returns attachments
+        every { AttachmentFactory.wrap("attachment") } returns wrappedAttachment
+
+        every { Base64.decode(data) } returns decodedData
+        every { MimeType.recognizeMimeType(decodedData) } returns MimeType.UNKNOWN
+
+
+        // When
+        try {
+            attachmentService.checkDataRestrictions(resource)
+            Assert.fail("Exception expected!")
+        } catch (e: D4LException) {
+
+            // Then
+            Truth.assertThat(e.javaClass).isEqualTo(DataRestrictionException.UnsupportedFileType::class.java)
+        }
+    }
+
+    @Test
+    @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
+    fun `Given, checkForUnsupportedData is called a DataResource, it accepts`() {
+        // Given
+        val resource = mockk<WrapperContract.Resource>()
+
+        every { resource.type } returns WrapperContract.Resource.TYPE.DATA
+
+        attachmentService.checkDataRestrictions(null)
+
+        assertTrue(true)
+    }
+
+    @Test
+    @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
+    fun `Given, checkForUnsupportedData is called with null, it accepts`() {
+
+        attachmentService.checkDataRestrictions(null)
+
+        assertTrue(true)
+    }
+
+    @Test
+    @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
+    fun `Given, checkForUnsupportedData is called with a FhirResource, it accepts, if all Attachments are in the boundaries`() {
+        // Given
+        val resource = mockk<WrapperContract.Resource>()
+        val rawResource = mockk<Any>()
+
+        val attachments =  mutableListOf<Any>("attachment")
+        val wrappedAttachment = mockk<WrapperContract.Attachment>()
+
+        val data = "bla"
+        val decodedData = ByteArray(DATA_SIZE_MAX_BYTES)
+
+        every { resource.type } returns WrapperContract.Resource.TYPE.FHIR3
+        every { resource.unwrap() } returns rawResource
+
+        every { wrappedAttachment.data } returns data
+
+        every { FhirAttachmentHelper.getAttachment(rawResource) } returns attachments
+        every { AttachmentFactory.wrap("attachment") } returns wrappedAttachment
+
+        every { Base64.decode(data) } returns decodedData
+        every { MimeType.recognizeMimeType(decodedData) } returns MimeType.DCM
+
+
+        // When
+        attachmentService.checkDataRestrictions(resource)
+        assertTrue(true)
+    }
+
     companion object {
         private const val USER_ID = "userId"
     }
+
+
+    /*
+
+
+    @Test
+    @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
+    fun checkForUnsupportedData_shouldReturnSuccessfully() {
+        // Given
+        val pdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES)
+        System.arraycopy(
+                MimeType.PDF.byteSignature()[0] as Any,
+                0,
+                pdf,
+                0,
+                MimeType.PDF.byteSignature()[0]?.size!!
+        )
+        val doc = buildDocumentReference(unboxByteArray(pdf))
+
+        // When
+        recordService.checkDataRestrictions(doc)
+
+        // Then
+        inOrder.verify(recordService).checkDataRestrictions(doc)
+        inOrder.verifyNoMoreInteractions()
+    }
+
+    @Test
+    @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
+    fun checkForUnsupportedData_shouldThrow_forUnsupportedData() {
+        // Given
+        val invalidData = byteArrayOf(0x00)
+        val doc = buildDocumentReference(invalidData)
+
+        // When
+        try {
+            recordService.checkDataRestrictions(doc)
+            Assert.fail("Exception expected!")
+        } catch (e: D4LException) {
+
+            // Then
+            Truth.assertThat(e.javaClass).isEqualTo(DataRestrictionException.UnsupportedFileType::class.java)
+        }
+
+        // Then
+        inOrder.verify(recordService).checkDataRestrictions(doc)
+        inOrder.verifyNoMoreInteractions()
+    }
+
+    @Test
+    @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
+    fun checkForUnsupportedData_shouldThrow_whenFileSizeLimitIsReached() {
+        // Given
+        val invalidSizePdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES + 1)
+        System.arraycopy(
+                MimeType.PDF.byteSignature()[0] as Any,
+                0,
+                invalidSizePdf,
+                0,
+                MimeType.PDF.byteSignature()[0]?.size!!
+        )
+        val doc = buildDocumentReference(unboxByteArray(invalidSizePdf))
+
+        // When
+        try {
+            recordService.checkDataRestrictions(doc)
+            Assert.fail("Exception expected!")
+        } catch (e: D4LException) {
+
+            // Then
+            Truth.assertThat(e.javaClass).isEqualTo(DataRestrictionException.MaxDataSizeViolation::class.java)
+        }
+
+        // Then
+        inOrder.verify(recordService).checkDataRestrictions(doc)
+        inOrder.verifyNoMoreInteractions()
+    }
+     */
 }

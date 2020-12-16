@@ -18,6 +18,7 @@ package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import io.mockk.mockk
 import org.junit.Assert.assertEquals
@@ -76,6 +77,22 @@ class ResourceFactoryTest {
         assertTrue(resource is WrapperContract.Resource)
         assertEquals(
                 WrapperContract.Resource.TYPE.FHIR3,
+                (resource as WrapperContract.Resource).type
+        )
+    }
+
+    @Test
+    fun `Given, wrap is called with a Fhir4, it returns a Resource, which has the TYPE FHIR4`() {
+        // Given
+        val dataResource = mockk<Fhir4Resource>()
+
+        // When
+        val resource: Any = ResourceFactory.wrap(dataResource)!!
+
+        // Then
+        assertTrue(resource is WrapperContract.Resource)
+        assertEquals(
+                WrapperContract.Resource.TYPE.FHIR4,
                 (resource as WrapperContract.Resource).type
         )
     }

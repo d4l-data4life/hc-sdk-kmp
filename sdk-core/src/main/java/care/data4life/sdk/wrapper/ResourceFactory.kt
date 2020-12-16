@@ -18,6 +18,7 @@ package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 
 internal object ResourceFactory: WrapperFactoryContract.ResourceFactory {
@@ -26,6 +27,7 @@ internal object ResourceFactory: WrapperFactoryContract.ResourceFactory {
             null -> null// ToDo -> do we need for that a type?
             is DataResource -> SdkDataResource(resource)
             is Fhir3Resource -> SdkFhir3Resource(resource)
+            is Fhir4Resource -> SdkFhir4Resource(resource)
             else -> throw CoreRuntimeException.InternalFailure()
         }
     }

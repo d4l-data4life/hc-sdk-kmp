@@ -1,8 +1,11 @@
 - name: bug
   description: Something isn't working
   color: d73a4a
+- name: ci
+  description: CI/CD
+  color: dce775
 - name: build
-  description: CI/CD or build tools
+  description: build tools
   color: dce775
 - name: dependencies
   description: Pull requests that update a dependency file

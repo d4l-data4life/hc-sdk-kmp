@@ -17,13 +17,14 @@
 package care.data4life.sdk.call
 
 import care.data4life.sdk.model.Meta
+import care.data4life.sdk.model.definitions.BaseRecord
 
 class CallContract {
 
-    interface Record<T> {
-        val identifier: String
-        val resource: T
-        val meta: Meta
-        val annotations: List<String>
+    interface Record<T>: BaseRecord<T> {
+        override val identifier: String
+        override val resource: T
+        override val meta: Meta
+        override val annotations: List<String>
     }
 }

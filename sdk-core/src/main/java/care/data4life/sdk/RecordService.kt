@@ -38,7 +38,6 @@ import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.DecryptedRecordBuilder
-import care.data4life.sdk.network.model.NetworkRecordContract
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.record.RecordEncryptionContract
 import care.data4life.sdk.tag.TagEncryptionService
@@ -77,15 +76,16 @@ class RecordService(
     private val resourceWrapperFactory: WrapperFactoryContract.ResourceFactory = ResourceFactory
     private val resourceHelper: HelperContract.ResourceHelper = ResourceHelper
 
-    private fun getTagsOnCreate(resource: Any): HashMap<String, String> {
-        return if (resource is ByteArray) {
+    //ToDo: This should not be here -> the taggingService should take of it
+    private fun getTagsOnCreate(resource: WrapperContract.Resource): HashMap<String, String> {
+        return if (resource.type == WrapperContract.Resource.TYPE.DATA) {
             taggingService.appendDefaultTags(null, null)
         } else {
-            taggingService.appendDefaultTags((resource as Fhir3Resource).resourceType, null)
+            taggingService.appendDefaultTags((resource.unwrap() as Fhir3Resource).resourceType, null)
         }
     }
 
-    private fun createRecord(
+    fun createRecord(
             userId: String,
             resource: WrapperContract.Resource,
             annotations: List<String>
@@ -264,7 +264,7 @@ class RecordService(
     ): Single<List<BaseRecord<Any>>> {
         val startTime = if (startDate != null) DATE_FORMATTER.format(startDate) else null
         val endTime = if (endDate != null) DATE_FORMATTER.format(endDate) else null
-        @Suppress("UNCHECKED_CAST")
+
         return Observable
                 .fromCallable { getTagsOnFetch(resourceType) }
                 .map { tagEncryptionService.encryptTags(it) as MutableList<String> }
@@ -379,10 +379,7 @@ class RecordService(
             userId: String
     ): Single<Record<T>> = apiService
             .fetchRecord(alias, userId, recordId)
-            .map { encryptedRecord ->
-                @Suppress("UNCHECKED_CAST")
-                recordCryptoService.decryptRecord(encryptedRecord, userId)
-            }
+            .map { recordCryptoService.decryptRecord(it, userId) }
             .map { attachmentClient.downloadData(it, userId) }
             .map { decryptedRecord ->
                 decryptedRecord.also {
@@ -431,7 +428,6 @@ class RecordService(
                 .map { recordCryptoService.decryptRecord(it, userId) }
                 .map { attachmentClient.updateData(it, resource, userId) }
                 .map { decryptedRecord ->
-                    //ToDo Type
                     if (decryptedRecord.resource.type != WrapperContract.Resource.TYPE.DATA) {
                         thumbnailService.cleanObsoleteAdditionalIdentifiers(resource)
                     }

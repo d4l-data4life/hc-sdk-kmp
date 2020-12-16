@@ -16,6 +16,7 @@
 
 package care.data4life.sdk.model
 
+import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.lang.CoreRuntimeException
@@ -48,9 +49,9 @@ internal object SdkRecordFactory : RecordFactory {
                     record.annotations
             )
             // TODO app data
-            WrapperContract.Resource.TYPE.DATA -> AppDataRecord(
+            WrapperContract.Resource.TYPE.DATA -> DataRecord(
                     record.identifier!!,
-                    ((record.resource.unwrap()) as DataResource).asByteArray(),
+                    (record.resource.unwrap()) as DataResource,
                     buildMeta(record),
                     record.annotations
             )

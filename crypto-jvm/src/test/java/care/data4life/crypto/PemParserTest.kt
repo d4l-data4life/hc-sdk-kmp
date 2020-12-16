@@ -32,6 +32,7 @@
 package care.data4life.crypto
 
 import care.data4life.sdk.util.Base64.decode
+import care.data4life.sdk.util.toBytes
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.util.io.pem.PemObject
 import org.bouncycastle.util.io.pem.PemWriter
@@ -97,12 +98,12 @@ class PemParserTest {
 
         // then
         val cipher = Cipher.getInstance(gcKeyPair!!.algorithm.transformation, BouncyCastleProvider.PROVIDER_NAME)
-        val x509EncodedKeySpec = X509EncodedKeySpec(decode(gcKeyPair.getPublicKeyBase64()))
+        val x509EncodedKeySpec = X509EncodedKeySpec(decode(gcKeyPair.getPublicKeyBase64().toBytes()))
         val keyFactory = KeyFactory.getInstance(algorithm.cipher)
         val pubKey = keyFactory.generatePublic(x509EncodedKeySpec)
         cipher.init(Cipher.ENCRYPT_MODE, pubKey)
         val encryptedText = cipher.doFinal(text.toByteArray())
-        val pkcs8EncodedKeySpec = PKCS8EncodedKeySpec(decode(gcKeyPair.getPrivateKeyBase64()))
+        val pkcs8EncodedKeySpec = PKCS8EncodedKeySpec(decode(gcKeyPair.getPrivateKeyBase64().toBytes()))
         val privKey = keyFactory.generatePrivate(pkcs8EncodedKeySpec)
         cipher.init(Cipher.DECRYPT_MODE, privKey)
         val decryptedText = cipher.doFinal(encryptedText)
@@ -130,12 +131,12 @@ class PemParserTest {
 
         // then
         val cipher = Cipher.getInstance(gcKeyPair!!.algorithm.transformation, BouncyCastleProvider.PROVIDER_NAME)
-        val x509EncodedKeySpec = X509EncodedKeySpec(decode(gcKeyPair.getPublicKeyBase64()))
+        val x509EncodedKeySpec = X509EncodedKeySpec(decode(gcKeyPair.getPublicKeyBase64().toBytes()))
         val keyFactory = KeyFactory.getInstance(algorithm.cipher)
         val pubKey = keyFactory.generatePublic(x509EncodedKeySpec)
         cipher.init(Cipher.ENCRYPT_MODE, pubKey)
         val encryptedText = cipher.doFinal(text.toByteArray())
-        val pkcs8EncodedKeySpec = PKCS8EncodedKeySpec(decode(gcKeyPair.getPrivateKeyBase64()))
+        val pkcs8EncodedKeySpec = PKCS8EncodedKeySpec(decode(gcKeyPair.getPrivateKeyBase64().toBytes()))
         val privKey = keyFactory.generatePrivate(pkcs8EncodedKeySpec)
         cipher.init(Cipher.DECRYPT_MODE, privKey)
         val decryptedText = cipher.doFinal(encryptedText)

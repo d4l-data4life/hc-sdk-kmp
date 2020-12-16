@@ -18,6 +18,7 @@ package care.data4life.sdk;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
+import com.sun.xml.internal.fastinfoset.util.CharArray;
 
 import org.junit.After;
 import org.junit.Before;
@@ -37,6 +38,7 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Objects;
 
 import javax.crypto.BadPaddingException;
@@ -62,6 +64,7 @@ import care.data4life.sdk.crypto.KeyFactory;
 import care.data4life.sdk.network.model.EncryptedKey;
 import care.data4life.sdk.test.util.TestSchedulerRule;
 import care.data4life.sdk.util.Base64;
+import care.data4life.sdk.util.*;
 import io.reactivex.observers.TestObserver;
 
 import static org.junit.Assert.assertEquals;
@@ -242,7 +245,7 @@ public class CryptoServiceTest {
     @Test
     public void setGCKeyPairFromPemPrivateKey_shouldStoreCorrectPrivateKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
         // given
-        String base64TestKey = "MIIEowIBAAKCAQEArosQh7LO8HhpJxeHBwQpi12uxOKQsYYBzMOUeoerijGOwtQG\n" +
+       String base64TestKeyWord = "MIIEowIBAAKCAQEArosQh7LO8HhpJxeHBwQpi12uxOKQsYYBzMOUeoerijGOwtQG\n" +
                 "sz656ZmQJNR62BIK2mHSSjIcpmu3ydE5fJkUxtF+dpTdmPtZ2URGEyt3/dXFe5RR\n" +
                 "i9hiIVwgWzjZAiVrWfIx4MtPEk9fMV2WKMLOa+o2ZEWqDLfiDjU8ixSaUc/Vtd5K\n" +
                 "msSun587+iBPTR33pGAG1u3If3GSkQPKkW3elRNLxL4twSL45+pmSIgkcTIrxo71\n" +
@@ -268,6 +271,8 @@ public class CryptoServiceTest {
                 "nnxSlrzV/rxA7uI40DFiPFGVrVoXW1w0C1ASeL3siqv1aoZ5QiuCUv6ULKrbNBp7\n" +
                 "QyhWfy6A4sU7XdwJfNhQUAoLvvRrECtqMR7Ayn7xoWgeuhqQCHeg\n";
 
+       char[] base64TestKey = base64TestKeyWord.toCharArray();
+
         String pemTestKeyString = "-----BEGIN RSA PRIVATE KEY-----\n" +
                 base64TestKey +
                 "-----END RSA PRIVATE KEY-----\n";
@@ -284,10 +289,10 @@ public class CryptoServiceTest {
         final GCRSAKeyAlgorithm algorithm = new GCRSAKeyAlgorithm();
         final java.security.KeyFactory keyFactory = java.security.KeyFactory.getInstance(algorithm.getCipher());
 
-        final String storedPrivateKeyBase64 = keyPairArg.getValue().getPrivateKeyBase64();
+        final char[] storedPrivateKeyBase64 = keyPairArg.getValue().getPrivateKeyBase64();
         final PrivateKey storedJavaKey = getPrivateJavaKey(keyFactory, storedPrivateKeyBase64);
 
-        final String testKeyNoLinebreaksBase64 = base64TestKey.replace("\n", "");
+        final char[] testKeyNoLinebreaksBase64 = Arrays.toString(base64TestKey).replace("\n", "").toCharArray();
         final PrivateKey testJavaKey = getPrivateJavaKey(keyFactory, testKeyNoLinebreaksBase64);
 
         assertEquals(testJavaKey, storedJavaKey);
@@ -301,9 +306,9 @@ public class CryptoServiceTest {
      * @return                  Key
      * @throws InvalidKeySpecException
      */
-    private PrivateKey getPrivateJavaKey(java.security.KeyFactory keyFactory, String privateKeyBase64) throws InvalidKeySpecException {
-        final String base64StoredPrivateKey = privateKeyBase64;
-        final byte[] storedPrivateKey = Base64.INSTANCE.decode(base64StoredPrivateKey);
+    private PrivateKey getPrivateJavaKey(java.security.KeyFactory keyFactory, char[] privateKeyBase64) throws InvalidKeySpecException {
+        final char[] base64StoredPrivateKey = privateKeyBase64;
+        final byte[] storedPrivateKey = Base64.INSTANCE.decode(base64StoredPrivateKey.toBytes());
         final PKCS8EncodedKeySpec encodedStoredKeySpec = new PKCS8EncodedKeySpec(storedPrivateKey);
         return keyFactory.generatePrivate(encodedStoredKeySpec);
     }
@@ -410,7 +415,7 @@ public class CryptoServiceTest {
         // given
         GCKey commonKey = mock(GCKey.class);
         EncryptedKey encryptedKey = new EncryptedKey("");
-        ExchangeKey ek = ExchangeKeyFactory.INSTANCE.createKey(KeyVersion.VERSION_1, KeyType.DATA_KEY, "");
+        ExchangeKey ek = ExchangeKeyFactory.INSTANCE.createKey(KeyVersion.VERSION_1, KeyType.DATA_KEY, new char[0]);
         when(adapter.fromJson(anyString())).thenReturn(ek);
         when(mockKeyFactory.createGCKey(ek)).thenReturn(gcKey);
 
@@ -430,7 +435,7 @@ public class CryptoServiceTest {
         // given
         GCKey commonKey = mock(GCKey.class);
         EncryptedKey encryptedKey = new EncryptedKey("");
-        ExchangeKey ek = ExchangeKeyFactory.INSTANCE.createKey(KeyVersion.VERSION_1, KeyType.TAG_KEY, "");
+        ExchangeKey ek = ExchangeKeyFactory.INSTANCE.createKey(KeyVersion.VERSION_1, KeyType.TAG_KEY, new char[0]);
         when(adapter.fromJson(anyString())).thenReturn(ek);
         when(mockKeyFactory.createGCKey(ek)).thenReturn(gcKey);
 
@@ -469,7 +474,7 @@ public class CryptoServiceTest {
     public void asymDecryptSymmetricKey() throws IOException {
         // given
         EncryptedKey encryptedKey = new EncryptedKey("");
-        ExchangeKey ek = ExchangeKeyFactory.INSTANCE.createKey(KeyVersion.VERSION_1, KeyType.DATA_KEY, "");
+        ExchangeKey ek = ExchangeKeyFactory.INSTANCE.createKey(KeyVersion.VERSION_1, KeyType.DATA_KEY, new char[0]);
         when(adapter.fromJson(anyString())).thenReturn(ek);
         when(mockKeyFactory.createGCKey(ek)).thenReturn(gcKey);
 

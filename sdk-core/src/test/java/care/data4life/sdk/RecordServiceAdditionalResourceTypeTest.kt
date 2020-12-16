@@ -772,6 +772,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         Truth.assertThat(result[1].id).isEqualTo(secondAttachmentId)
     }
 
+    @ExperimentalStdlibApi
     @Test
     @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
     fun updateRecord_shouldThrow_forUnsupportedData_Observation() {
@@ -792,6 +793,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         inOrder.verifyNoMoreInteractions()
     }
 
+    @ExperimentalStdlibApi
     @Test
     @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
     fun updateRecord_shouldThrow_forFileSizeLimitationBreach_QuestionnaireResponse() {

@@ -527,6 +527,7 @@ internal class RecordService(
                 }
     }
 
+    @ExperimentalStdlibApi
     fun updateRecord(
             resource: ByteArray,
             userId: String,

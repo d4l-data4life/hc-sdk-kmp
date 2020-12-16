@@ -29,6 +29,8 @@ import care.data4life.crypto.GCAsymmetricKey;
 import care.data4life.crypto.GCKeyPair;
 import care.data4life.crypto.GCRSAKeyAlgorithm;
 import care.data4life.sdk.util.Base64;
+import care.data4life.sdk.util.CharByteConversionKt;
+
 
 public class AsymTestData {
 
@@ -58,8 +60,8 @@ public class AsymTestData {
 
     public GCKeyPair getKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
         GCRSAKeyAlgorithm algorithm = new GCRSAKeyAlgorithm();
-        PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(Base64.INSTANCE.decode(privateKey.getPrivateKey()));
-        X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(Base64.INSTANCE.decode(publicKey.getPublicKey()));
+        PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(Base64.INSTANCE.decode((privateKey.getPrivateKey().toBytes())));
+        X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(Base64.INSTANCE.decode(publicKey.getPublicKey().toBytes));
         KeyFactory keyFactory = KeyFactory.getInstance(algorithm.getCipher());
         PrivateKey privateKey = keyFactory.generatePrivate(pkcs8EncodedKeySpec);
         PublicKey publicKey = keyFactory.generatePublic(x509EncodedKeySpec);

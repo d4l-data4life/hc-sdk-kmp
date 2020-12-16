@@ -17,8 +17,9 @@
 package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.lang.CoreRuntimeException
+import care.data4life.sdk.network.model.NetworkRecordContract
 
-interface HelperContract {
+internal interface HelperContract {
 
     interface FhirAttachmentHelper {
         fun hasAttachment(resource: Any): Boolean
@@ -37,5 +38,11 @@ interface HelperContract {
 
         @Throws(CoreRuntimeException.InternalFailure::class)
         fun appendIdentifier(resource: Any, identifier: String, assigner: String)
+    }
+
+    interface ResourceHelper {
+        fun assignResourceId(
+                record: NetworkRecordContract.DecryptedRecord
+        ): NetworkRecordContract.DecryptedRecord
     }
 }

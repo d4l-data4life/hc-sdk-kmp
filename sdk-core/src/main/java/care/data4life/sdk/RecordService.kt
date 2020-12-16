@@ -43,7 +43,9 @@ import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.record.RecordEncryptionContract
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
+import care.data4life.sdk.wrapper.HelperContract
 import care.data4life.sdk.wrapper.ResourceFactory
+import care.data4life.sdk.wrapper.ResourceHelper
 import care.data4life.sdk.wrapper.WrapperFactoryContract
 import care.data4life.sdk.wrapper.WrapperContract
 import io.reactivex.Completable
@@ -73,6 +75,7 @@ class RecordService(
     private val recordFactory: RecordFactory = SdkRecordFactory
     private val fhirElementFactory: WrapperFactoryContract.FhirElementFactory = FhirElementFactory
     private val resourceWrapperFactory: WrapperFactoryContract.ResourceFactory = ResourceFactory
+    private val resourceHelper: HelperContract.ResourceHelper = ResourceHelper
 
     private fun getTagsOnCreate(resource: Any): HashMap<String, String> {
         return if (resource is ByteArray) {
@@ -108,7 +111,7 @@ class RecordService(
                 .flatMap { apiService.createRecord(alias, userId, it) }
                 .map { recordCryptoService.decryptRecord(it, userId) }
                 .map { attachmentClient.restoreUploadData(it, resource, data) }
-                .map { assignResourceId(it) }
+                .map { resourceHelper.assignResourceId(it) }
                 .map { recordFactory.getInstance(it) }
     }
 
@@ -196,7 +199,7 @@ class RecordService(
         return apiService
                 .fetchRecord(alias, userId, recordId)
                 .map { recordCryptoService.decryptRecord(it, userId) }
-                .map { assignResourceId(it) }
+                .map { resourceHelper.assignResourceId(it) }
                 .map { decryptedRecord ->
                     @Suppress("UNCHECKED_CAST")
                     recordFactory.getInstance(decryptedRecord) as BaseRecord<T>
@@ -298,7 +301,7 @@ class RecordService(
 
                     }
                 }
-                .map { assignResourceId(it) }
+                .map { resourceHelper.assignResourceId(it) }
                 .map { recordFactory.getInstance(it) }
                 .toList()
     }
@@ -391,7 +394,7 @@ class RecordService(
                     attachmentService.checkDataRestrictions(decryptedRecord.resource)
                 }
             }
-            .map { assignResourceId(it) }
+            .map { resourceHelper.assignResourceId(it) }
             .map { decryptedRecord ->
                 @Suppress("UNCHECKED_CAST")
                 recordFactory.getInstance(decryptedRecord) as Record<T>
@@ -450,7 +453,7 @@ class RecordService(
                 .flatMap { apiService.updateRecord(alias, userId, recordId, it) }
                 .map { recordCryptoService.decryptRecord(it, userId) }
                 .map { attachmentClient.restoreUploadData(it, resource, data) }
-                .map { assignResourceId(it) }
+                .map { resourceHelper.assignResourceId(it) }
                 .map { recordFactory.getInstance(it) }
     }
 
@@ -562,19 +565,6 @@ class RecordService(
             attachmentId: String,
             userId: String
     ): Single<Boolean> = attachmentService.delete(attachmentId, userId)
-
-    private fun assignResourceId(
-            record: NetworkRecordContract.DecryptedRecord
-    ): NetworkRecordContract.DecryptedRecord {
-        return record.also {
-            if (record.resource.type != WrapperContract.Resource.TYPE.DATA) {
-                // TODO
-                //@Suppress("UNCHECKED_CAST")
-
-                //record.resource.unwrap().id = record.identifier
-            }
-        }
-    }
 
     companion object {
         private val EMPTY_RECORD = Record(null, null, null)

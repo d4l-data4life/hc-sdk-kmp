@@ -31,16 +31,16 @@ dependencies {
     expectedBy(project(":auth-common"))
 
     implementation(project(":securestore-jvm"))
-    implementation(Dependency.Multiplatform.D4L.utilJvm)
+    implementation(Dependencies.Multiplatform.D4L.utilJvm)
 
-    implementation(Dependency.Multiplatform.Kotlin.stdlibJdk8)
+    implementation(Dependencies.Multiplatform.Kotlin.stdlibJdk8)
 
-    implementation(Dependency.java.scribeCore)
-    implementation(Dependency.java.moshi)
+    implementation(Dependencies.java.scribeCore)
+    implementation(Dependencies.java.moshi)
 
 
-    testImplementation(Dependency.Java.Test.junit)
-    testImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
-    testImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
-    testImplementation(Dependency.Multiplatform.Test.MockK.jdk)
+    testImplementation(Dependencies.Java.Test.junit)
+    testImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvm)
+    testImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvmJunit)
+    testImplementation(Dependencies.Multiplatform.Test.MockK.jdk)
 }

@@ -15,7 +15,6 @@
  */
 
 object LibraryConfig {
-    const val version = "1.8.0"
     const val githubGroup = "care.data4life.hc-sdk-kmp"
     const val group = githubGroup
     const val artifactId = "hc-sdk-kmp"
@@ -33,7 +32,7 @@ object LibraryConfig {
     const val developerEmail = "mobile@data4life.care"
 
     // LICENSE
-    const val licenseName = ""
+    const val licenseName = "Private"
     const val licenseUrl = "$url/blob/main/LICENSE"
     const val licenseDistribution = "repo"
 

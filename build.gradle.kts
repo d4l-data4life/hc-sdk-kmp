@@ -26,8 +26,8 @@ buildscript {
     }
 
     dependencies {
-        classpath(Dependency.GradlePlugin.android)
-        classpath(Dependency.GradlePlugin.kotlin)
+        classpath(GradlePlugins.android)
+        classpath(GradlePlugins.kotlin)
 
         // https://github.com/vanniktech/gradle-android-junit-jacoco-plugin
         classpath("com.vanniktech:gradle-android-junit-jacoco-plugin:0.16.0")
@@ -37,27 +37,26 @@ buildscript {
         // https://github.com/dcendents/android-maven-gradle-plugin
         classpath("com.github.dcendents:android-maven-gradle-plugin:2.1")
 
-        classpath(Dependency.GradlePlugin.dexcount)
+        classpath(GradlePlugins.dexcount)
 
         // https://github.com/melix/japicmp-gradle-plugin
         classpath("me.champeau.gradle:japicmp-gradle-plugin:0.2.9")
 
-        classpath(Dependency.GradlePlugin.downloadTask)
+        classpath(GradlePlugins.downloadTask)
         classpath("org.apache.httpcomponents:httpclient:4.5.11")
 
-        classpath(Dependency.GradlePlugin.dokka)
+        classpath(GradlePlugins.dokka)
 
         // https://github.com/jeremylong/dependency-check-gradle
         classpath("org.owasp:dependency-check-gradle:5.3.0")
 
-        // https://github.com/d4l-data4life/gradle-git-publish
-        classpath("care.data4life:gradle-git-publish:3.2.0")
+        classpath(GradlePlugins.gitPublish)
     }
 }
 
 plugins {
-    // https://github.com/ben-manes/gradle-versions-plugin
-    id("com.github.ben-manes.versions") version "0.36.0"
+    dependencyUpdates()
+    gitVersioning()
 }
 
 allprojects {

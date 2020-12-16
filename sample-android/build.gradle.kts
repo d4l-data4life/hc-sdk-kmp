@@ -92,7 +92,7 @@ android {
 }
 
 dependencies {
-    coreLibraryDesugaring(Dependency.Android.androidDesugar)
+    coreLibraryDesugaring(Dependencies.Android.androidDesugar)
 
     implementation(project(":sdk-android")) {
         exclude(group = "org.threeten", module = "threetenbp")
@@ -103,29 +103,29 @@ dependencies {
         exclude(group = "care.data4life.hc-fhir-helper-sdk-kmp", module = "fhir-helper-jvm")
     }
 
-    implementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
+    implementation(Dependencies.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
     }
 
-    implementation(Dependency.Multiplatform.D4L.utilAndroid)
+    implementation(Dependencies.Multiplatform.D4L.utilAndroid)
 
-    implementation(Dependency.Android.threeTenABP)
+    implementation(Dependencies.Android.threeTenABP)
 
-    implementation(Dependency.Android.kotlinStdLib)
+    implementation(Dependencies.Android.kotlinStdLib)
 
-    implementation(Dependency.Android.AndroidX.appCompat)
-    implementation(Dependency.Android.AndroidX.constraintLayout)
-    implementation(Dependency.Android.material)
-    implementation(Dependency.Android.photoView)
-    implementation(Dependency.Android.pdfView)
+    implementation(Dependencies.Android.AndroidX.appCompat)
+    implementation(Dependencies.Android.AndroidX.constraintLayout)
+    implementation(Dependencies.Android.material)
+    implementation(Dependencies.Android.photoView)
+    implementation(Dependencies.Android.pdfView)
 
-    implementation(Dependency.Android.googlePlayServicesBase)
+    implementation(Dependencies.Android.googlePlayServicesBase)
 
-    implementation(Dependency.Android.moshi)
-
-
-    testImplementation(Dependency.Android.Test.junit)
+    implementation(Dependencies.Android.moshi)
 
 
-    androidTestImplementation(Dependency.Android.AndroidTest.runner)
+    testImplementation(Dependencies.Android.Test.junit)
+
+
+    androidTestImplementation(Dependencies.Android.AndroidTest.runner)
 }

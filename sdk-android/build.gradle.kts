@@ -87,7 +87,7 @@ val compatibilityBase by configurations.creating {
 }
 
 dependencies {
-    coreLibraryDesugaring(Dependency.Android.androidDesugar)
+    coreLibraryDesugaring(Dependencies.Android.androidDesugar)
 
     api(project(":sdk-core")) {
         exclude(group = "org.threeten", module = "threetenbp")
@@ -100,70 +100,70 @@ dependencies {
     implementation(project(":crypto-android"))
     implementation(project(":auth-android"))
 
-    api(Dependency.Multiplatform.D4L.utilAndroid)
+    api(Dependencies.Multiplatform.D4L.utilAndroid)
 
-    implementation(Dependency.Multiplatform.D4L.fhirSdk)
-    implementation(Dependency.Android.threeTenABP)
+    implementation(Dependencies.Multiplatform.D4L.fhirSdk)
+    implementation(Dependencies.Android.threeTenABP)
 
-    implementation(Dependency.Android.AndroidX.appCompat)
-    implementation(Dependency.Android.AndroidX.browser)
+    implementation(Dependencies.Android.AndroidX.appCompat)
+    implementation(Dependencies.Android.AndroidX.browser)
 
-    implementation(Dependency.Android.rxJava2)
+    implementation(Dependencies.Android.rxJava2)
 
-    implementation(Dependency.Android.okHttp)
-    implementation(Dependency.Android.okHttpLoggingInterceptor)
+    implementation(Dependencies.Android.okHttp)
+    implementation(Dependencies.Android.okHttpLoggingInterceptor)
 
-    implementation(Dependency.Android.retrofit)
-    implementation(Dependency.Android.retrofitConverterMoshi)
-    implementation(Dependency.Android.retrofitAdapterRxJava)
+    implementation(Dependencies.Android.retrofit)
+    implementation(Dependencies.Android.retrofitConverterMoshi)
+    implementation(Dependencies.Android.retrofitAdapterRxJava)
 
-    implementation(Dependency.Android.appAuthPatch)
+    implementation(Dependencies.Android.appAuthPatch)
 
-    implementation(Dependency.Android.bouncyCastleJdk15)
+    implementation(Dependencies.Android.bouncyCastleJdk15)
 
-    compileOnly(Dependency.java.javaXAnnotation)
+    compileOnly(Dependencies.java.javaXAnnotation)
 
-    testImplementation(Dependency.Android.Test.junit)
-    testImplementation(Dependency.Android.Test.truth)
+    testImplementation(Dependencies.Android.Test.junit)
+    testImplementation(Dependencies.Android.Test.truth)
 
     testImplementation("org.mockito:mockito-inline:2.9.0")
     testImplementation("org.powermock:powermock-core:1.7.3")
     testImplementation("org.powermock:powermock-module-junit4:1.7.3")
     testImplementation("org.powermock:powermock-api-mockito2:1.7.3")
 
-    testImplementation(Dependency.Android.Test.okHttpMockWebServer)
-    testImplementation(Dependency.Android.Test.jsonAssert)
+    testImplementation(Dependencies.Android.Test.okHttpMockWebServer)
+    testImplementation(Dependencies.Android.Test.jsonAssert)
 
-    testImplementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
+    testImplementation(Dependencies.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
     }
 
-    androidTestImplementation(Dependency.Android.AndroidX.constraintLayout)
-    androidTestImplementation(Dependency.Android.material)
+    androidTestImplementation(Dependencies.Android.AndroidX.constraintLayout)
+    androidTestImplementation(Dependencies.Android.material)
 
-    androidTestImplementation(Dependency.Multiplatform.Kotlin.stdlibAndroid)
-    androidTestImplementation(Dependency.Multiplatform.Coroutines.android)
+    androidTestImplementation(Dependencies.Multiplatform.Kotlin.stdlibAndroid)
+    androidTestImplementation(Dependencies.Multiplatform.Coroutines.android)
 
-    androidTestImplementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
+    androidTestImplementation(Dependencies.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
     }
 
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
+    androidTestImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvm)
+    androidTestImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvmJunit)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.runner)
-    androidTestImplementation(Dependency.Android.AndroidTest.rules)
-    androidTestImplementation(Dependency.Android.AndroidTest.orchestrator)
+    androidTestImplementation(Dependencies.Android.AndroidTest.runner)
+    androidTestImplementation(Dependencies.Android.AndroidTest.rules)
+    androidTestImplementation(Dependencies.Android.AndroidTest.orchestrator)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoCore)
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoIntents)
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoWeb)
+    androidTestImplementation(Dependencies.Android.AndroidTest.espressoCore)
+    androidTestImplementation(Dependencies.Android.AndroidTest.espressoIntents)
+    androidTestImplementation(Dependencies.Android.AndroidTest.espressoWeb)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.uiAutomator)
-    androidTestImplementation(Dependency.Android.AndroidTest.kakao)
+    androidTestImplementation(Dependencies.Android.AndroidTest.uiAutomator)
+    androidTestImplementation(Dependencies.Android.AndroidTest.kakao)
 
-    androidTestImplementation(Dependency.Android.googlePlayServicesBase)
-    androidTestImplementation(Dependency.Android.AndroidTest.truth)
+    androidTestImplementation(Dependencies.Android.googlePlayServicesBase)
+    androidTestImplementation(Dependencies.Android.AndroidTest.truth)
 
     compatibilityBase("care.data4life:hc-sdk-kmp:${LibraryConfig.referenceSdkVersion}") {
         isTransitive = false

@@ -58,22 +58,22 @@ dependencies {
     implementation(project(":crypto-jvm"))
     implementation(project(":auth-jvm"))
 
-    implementation(Dependency.Multiplatform.D4L.fhirHelperJvm) {
+    implementation(Dependencies.Multiplatform.D4L.fhirHelperJvm) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
     }
-    implementation(Dependency.Multiplatform.D4L.utilJvm)
-    implementation(Dependency.Multiplatform.D4L.fhirSdk)
+    implementation(Dependencies.Multiplatform.D4L.utilJvm)
+    implementation(Dependencies.Multiplatform.D4L.fhirSdk)
 
-    implementation(Dependency.Java.kotlinStdlibJdk8)
-    implementation(Dependency.Multiplatform.Coroutines.jdk)
+    implementation(Dependencies.Java.kotlinStdlibJdk8)
+    implementation(Dependencies.Multiplatform.Coroutines.jdk)
 
-    implementation(Dependency.Java.koinCore)
-    implementation(Dependency.Java.moshi)
-    implementation(Dependency.Java.cmdClickt)
-    implementation(Dependency.Java.threeTenBP)
+    implementation(Dependencies.Java.koinCore)
+    implementation(Dependencies.Java.moshi)
+    implementation(Dependencies.Java.cmdClickt)
+    implementation(Dependencies.Java.threeTenBP)
 
 
-    testImplementation(Dependency.Java.Test.koin)
+    testImplementation(Dependencies.Java.Test.koin)
 }
 
 val androidTestAssetsPath = "${projectDir}/src/androidTest/assets"

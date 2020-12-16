@@ -20,6 +20,7 @@ import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3DateTimeParser
 import care.data4life.sdk.wrapper.WrapperContract
 
+//TODO Fhir4
 internal object FhirDateValidator: AttachmentContract.FhirDateValidator {
     private val validationFhir3Date = Fhir3DateTimeParser.parseDateTime(
             "2019-09-15"

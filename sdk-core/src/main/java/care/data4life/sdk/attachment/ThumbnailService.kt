@@ -18,7 +18,6 @@ package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.ImageResizer
-import care.data4life.sdk.RecordService
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.lang.ImageResizeException
@@ -197,7 +196,7 @@ class ThumbnailService internal constructor(
             return null
         }
 
-        val parts = identifier.value!!.split(ThumbnailService.SPLIT_CHAR)
+        val parts = identifier.value!!.split(SPLIT_CHAR)
 
         if (parts.size != DOWNSCALED_ATTACHMENT_IDS_SIZE) {
             throw DataValidationException.IdUsageViolation(identifier.value)

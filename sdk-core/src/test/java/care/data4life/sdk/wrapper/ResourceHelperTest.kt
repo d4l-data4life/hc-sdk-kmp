@@ -77,4 +77,27 @@ class ResourceHelperTest {
 
         verify(exactly = 1) { wrappedResource.identifier = any() }
     }
+
+    @Test
+    fun `Given, assignResourceId is called with a DecryptedRecord, which contains a Fhir4Resource, it reassigns its ResourceId`() {
+        // Given
+        val record = mockk<NetworkRecordContract.DecryptedRecord>()
+        val recordId = "Id"
+        val wrappedResource = mockk<WrapperContract.Resource>(relaxed = true)
+
+        every { record.identifier } returns recordId
+        every { record.resource } returns wrappedResource
+        every { wrappedResource.type } returns WrapperContract.Resource.TYPE.FHIR4
+
+        // When
+        val result = ResourceHelper.assignResourceId(record)
+
+        // Then
+        assertSame(
+                record,
+                result
+        )
+
+        verify(exactly = 1) { wrappedResource.identifier = any() }
+    }
 }

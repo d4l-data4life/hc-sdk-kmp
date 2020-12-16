@@ -16,7 +16,6 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.network.model.NetworkRecordContract
 
 internal object ResourceHelper: HelperContract.ResourceHelper {
@@ -24,7 +23,7 @@ internal object ResourceHelper: HelperContract.ResourceHelper {
             record: NetworkRecordContract.DecryptedRecord
     ): NetworkRecordContract.DecryptedRecord {
         return record.also {
-            if (record.resource.type == WrapperContract.Resource.TYPE.FHIR3) {
+            if (record.resource.type != WrapperContract.Resource.TYPE.DATA) {
                 record.resource.identifier = record.identifier
             }
         }

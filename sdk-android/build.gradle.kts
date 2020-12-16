@@ -29,16 +29,16 @@ val d4lClientConfig = D4LConfigHelper.loadClientConfigAndroid("$rootDir")
 val d4LTestConfig = D4LConfigHelper.loadTestConfigAndroid("$rootDir")
 
 android {
-    compileSdkVersion(AndroidConfig.compileSdkVersion)
+    compileSdkVersion(LibraryConfig.android.compileSdkVersion)
 
     defaultConfig {
-        minSdkVersion(AndroidConfig.minSdkVersion)
-        targetSdkVersion(AndroidConfig.targetSdkVersion)
+        minSdkVersion(LibraryConfig.android.minSdkVersion)
+        targetSdkVersion(LibraryConfig.android.targetSdkVersion)
 
         // Workaround BuildConfig for Libraries not anymore containing VERSION_NAME
         // https://commonsware.com/blog/2020/10/14/android-studio-4p1-library-modules-version-code.html
         // FIXME LibraryConfig.versionName
-        buildConfigField("String", "VERSION_NAME", "\"${LibraryConfig.versionName}\"")
+        buildConfigField("String", "VERSION_NAME", "\"${project.version}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments(mapOf(

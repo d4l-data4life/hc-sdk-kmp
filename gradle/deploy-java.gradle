@@ -67,34 +67,35 @@ publishing {
     }
     publications {
         maven(MavenPublication) {
+            groupId = "${LibraryConfig.publish.groupId}.${LibraryConfig.publish.name}"
 
             from(components["java"])
             artifact(tasks["sourcesJar"])
             artifact(tasks["javadocJar"])
 
             pom {
-                name.set(LibraryConfig.name)
-                description.set(LibraryConfig.description)
-                url.set(LibraryConfig.url)
-                inceptionYear.set(LibraryConfig.year)
+                name.set(LibraryConfig.publish.name)
+                description.set(LibraryConfig.publish.description)
+                url.set(LibraryConfig.publish.url)
+                inceptionYear.set(LibraryConfig.publish.year)
 
                 scm {
-                    connection.set(LibraryConfig.scmConnection)
-                    developerConnection.set(LibraryConfig.scmDeveloperConnection)
-                    url.set(LibraryConfig.scmUrl)
+                    connection.set(LibraryConfig.publish.scmConnection)
+                    developerConnection.set(LibraryConfig.publish.scmDeveloperConnection)
+                    url.set(LibraryConfig.publish.scmUrl)
                 }
                 licenses {
                     license {
-                        name.set("${LibraryConfig.licenseName}")
-                        url.set("${LibraryConfig.licenseUrl}")
-                        distribution.set("${LibraryConfig.licenseDistribution}")
+                        name.set("${LibraryConfig.publish.licenseName}")
+                        url.set("${LibraryConfig.publish.licenseUrl}")
+                        distribution.set("${LibraryConfig.publish.licenseDistribution}")
                     }
                 }
                 developers {
                     developer {
-                        id.set("${LibraryConfig.developerId}")
-                        name.set("${LibraryConfig.developerName}")
-                        email.set("${LibraryConfig.developerEmail}")
+                        id.set("${LibraryConfig.publish.developerId}")
+                        name.set("${LibraryConfig.publish.developerName}")
+                        email.set("${LibraryConfig.publish.developerEmail}")
                     }
                 }
             }

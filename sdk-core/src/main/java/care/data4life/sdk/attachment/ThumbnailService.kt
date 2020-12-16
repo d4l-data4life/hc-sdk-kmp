@@ -18,12 +18,16 @@ package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.ImageResizer
+import care.data4life.sdk.lang.CoreRuntimeException
+import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.lang.ImageResizeException
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.wrapper.FhirAttachmentHelper
 import care.data4life.sdk.wrapper.HelperContract
+import care.data4life.sdk.wrapper.IdentifierFactory
 import care.data4life.sdk.wrapper.WrapperContract
+import care.data4life.sdk.wrapper.WrapperFactoryContract
 
 
 class ThumbnailService internal constructor(
@@ -33,6 +37,7 @@ class ThumbnailService internal constructor(
 ): ThumbnailContract.Service {
 
     private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper = FhirAttachmentHelper
+    private val identifierFactory: WrapperFactoryContract.IdentifierFactory = IdentifierFactory
 
     override fun uploadDownscaledImages(
             attachmentsKey: GCKey,
@@ -118,11 +123,56 @@ class ThumbnailService internal constructor(
             identifiers: List<Any>?,
             type: DownloadType?
     ) {
-        TODO("Not yet implemented")
+        for (attachment in attachments) {
+            val additionalIds = extractAdditionalAttachmentIds(identifiers, attachment.id)
+            if (additionalIds != null) {
+                when (type) {
+                    DownloadType.Full -> { /* do nothing */ }
+                    DownloadType.Medium -> attachment.id += SPLIT_CHAR + additionalIds[PREVIEW_ID_POS]
+                    DownloadType.Small -> attachment.id += SPLIT_CHAR + additionalIds[THUMBNAIL_ID_POS]
+                    else -> throw CoreRuntimeException.UnsupportedOperation()
+                }
+            }
+        }
+    }
+
+    //FIXME: This should be private
+    @Throws(DataValidationException.IdUsageViolation::class)
+    fun extractAdditionalAttachmentIds(
+            additionalIds: List<Any>?,
+            attachmentId: String?
+    ): List<String>? {
+        if (additionalIds == null) return null
+        for (identifier in additionalIds) {
+            val parts = splitAdditionalAttachmentId(identifierFactory.wrap(identifier))
+            if (parts != null && parts[FULL_ATTACHMENT_ID_POS] == attachmentId) return parts
+        }
+        return null //Attachment is not of image type
+    }
+
+    //TODO: This check this against FHIR4
+    //FIXME: This should be private
+    @Throws(DataValidationException.IdUsageViolation::class)
+    fun splitAdditionalAttachmentId(identifier: WrapperContract.Identifier?): List<String>? {
+        if (identifier?.value == null || !identifier.value!!.startsWith(DOWNSCALED_ATTACHMENT_IDS_FMT)) {
+            return null
+        }
+
+        val parts = identifier.value!!.split(ThumbnailService.SPLIT_CHAR)
+
+        if (parts.size != DOWNSCALED_ATTACHMENT_IDS_SIZE) {
+            throw DataValidationException.IdUsageViolation(identifier.value)
+        }
+
+        return parts
     }
 
     companion object {
         const val SPLIT_CHAR = "#"
         const val DOWNSCALED_ATTACHMENT_IDS_FMT = "d4l_f_p_t" //d4l -> namespace, f-> full, p -> preview, t -> thumbnail
+        const val DOWNSCALED_ATTACHMENT_IDS_SIZE = 4
+        const val FULL_ATTACHMENT_ID_POS = 1
+        const val PREVIEW_ID_POS = 2
+        const val THUMBNAIL_ID_POS = 3
     }
 }

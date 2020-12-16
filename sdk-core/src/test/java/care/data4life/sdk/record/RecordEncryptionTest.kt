@@ -103,9 +103,6 @@ class RecordEncryptionTest {
         val dataKey = mockk<GCKey>()
         val tags = mockk<HashMap<String, String>>()
         val resource = mockk<WrapperContract.Resource>()
-        val rawResource = mockk<DataResource>()
-        val primitiveResult = ByteArray(23)
-        val encryptedPrimitiveResult = ByteArray(1)
         val record = mockk<NetworkRecordContract.DecryptedRecord>(relaxed = true)
         val annotations = mockk<List<String>>()
         val id = "abc"
@@ -119,9 +116,7 @@ class RecordEncryptionTest {
         val encryptedDataKey = mockk<EncryptedKey>()
         val encryptedResource = "encrypted"
 
-        every { rawResource.asByteArray() } returns primitiveResult
         every { resource.type } returns WrapperContract.Resource.TYPE.DATA
-        every { resource.unwrap() } returns rawResource
         every { record.attachmentsKey } returns null
         every { record.resource } returns resource
         every { record.tags } returns tags
@@ -143,13 +138,8 @@ class RecordEncryptionTest {
                     dataKey
             )
         } returns Single.just(encryptedDataKey)
-        every {
-            cryptoService.encrypt(
-                    dataKey,
-                    primitiveResult
-            )
-        } returns Single.just(encryptedPrimitiveResult)
-        every { Base64.encodeToString(encryptedPrimitiveResult) } returns encryptedResource
+
+        every { fhirService.encryptResource(dataKey, resource) } returns encryptedResource
 
 
         // When
@@ -159,14 +149,6 @@ class RecordEncryptionTest {
         Truth.assertThat(encryptedRecord.encryptedBody).isEqualTo(encryptedResource)
         Truth.assertThat(encryptedRecord.commonKeyId).isEqualTo(currentCommonKeyId)
         Truth.assertThat(encryptedRecord.encryptedAttachmentsKey).isNull()
-
-        verify(exactly = 1) {
-            cryptoService.encrypt(
-                    dataKey,
-                    primitiveResult
-            )
-        }
-        verify(exactly = 1) { Base64.encodeToString(encryptedPrimitiveResult) }
     }
 
     @Test
@@ -189,7 +171,7 @@ class RecordEncryptionTest {
         val encryptedDataKey = mockk<EncryptedKey>()
         val encryptedResource = "encrypted"
 
-        every { resource.type } returns WrapperContract.Resource.TYPE.FHIR3
+        every { resource.type } returns WrapperContract.Resource.TYPE.DATA
         every { record.attachmentsKey } returns null
         every { record.resource } returns resource
         every { record.tags } returns tags

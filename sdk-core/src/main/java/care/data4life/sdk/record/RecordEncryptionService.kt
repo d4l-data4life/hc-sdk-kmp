@@ -46,33 +46,22 @@ class RecordEncryptionService(
     private val resourceWrapperFactory: WrapperFactoryContract.ResourceFactory = ResourceFactory
 
     // ToDo: this should go somewhere else
-    private fun getEncryptedResourceAndAttachment(
+    private fun getEncryptedAttachment(
             record: NetworkRecordContract.DecryptedRecord,
             commonKey: GCKey
-    ): Pair<String, EncryptedKey?> {
+    ): EncryptedKey? {
         return if (record.resource.type == WrapperContract.Resource.TYPE.DATA) {
-            Pair(
-                    Base64.encodeToString(
-                            cryptoService.encrypt(
-                                    record.dataKey!!,
-                                    (record.resource.unwrap() as DataResource).asByteArray()
-                            ).blockingGet()
-                    ),
-                    null
-            )
+            null
         } else {
-            Pair(
-                    fhirService.encryptResource(record.dataKey!!, record.resource),
-                    if (record.attachmentsKey == null) {
-                        null
-                    } else {
-                        cryptoService.encryptSymmetricKey(
-                                commonKey,
-                                KeyType.ATTACHMENT_KEY,
-                                record.attachmentsKey!!
-                        ).blockingGet()
-                    }
-            )
+            if (record.attachmentsKey == null) {
+                null
+            } else {
+                cryptoService.encryptSymmetricKey(
+                        commonKey,
+                        KeyType.ATTACHMENT_KEY,
+                        record.attachmentsKey!!
+                ).blockingGet()
+            }
         }
     }
 
@@ -91,10 +80,8 @@ class RecordEncryptionService(
                 record.dataKey!!
         ).blockingGet()
 
-        val (encryptedResource, encryptedAttachmentsKey) = getEncryptedResourceAndAttachment(
-                record,
-                commonKey
-        )
+        val encryptedResource = fhirService.encryptResource(record.dataKey!!, record.resource)
+        val encryptedAttachmentsKey = getEncryptedAttachment(record, commonKey)
 
         return EncryptedRecord(
                 currentCommonKeyId,

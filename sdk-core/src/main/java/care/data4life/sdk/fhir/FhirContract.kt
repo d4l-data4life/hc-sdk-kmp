@@ -20,7 +20,7 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.wrapper.WrapperContract
 import java.util.HashMap
 
-// TODO: Rename it in something like ResourceService
+// TODO: Rename & Move it in something like ResourceService
 interface FhirContract {
 
     interface Service {

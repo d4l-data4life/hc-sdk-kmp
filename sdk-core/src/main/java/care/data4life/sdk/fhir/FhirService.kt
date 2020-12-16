@@ -16,29 +16,29 @@
 package care.data4life.sdk.fhir
 
 import care.data4life.crypto.GCKey
-import care.data4life.crypto.error.CryptoException.DecryptionFailed
-import care.data4life.crypto.error.CryptoException.EncryptionFailed
-import care.data4life.fhir.Fhir
-import care.data4life.fhir.FhirParser
-import care.data4life.fhir.stu3.model.FhirElementFactory
+import care.data4life.crypto.error.CryptoException
 import care.data4life.sdk.CryptoService
+import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.lang.D4LException
+import care.data4life.sdk.util.Base64
+import care.data4life.sdk.wrapper.FhirParser
+import care.data4life.sdk.wrapper.ResourceFactory
 import care.data4life.sdk.wrapper.WrapperContract
 import io.reactivex.Single
 import java.util.HashMap
 
-// TODO remove @JvmOverloads when Data4LifeClient changed to Kotlin
 // TODO use of Single is not necessary as it's finalized with blockingGet()
 // TODO internal
-class FhirService @JvmOverloads constructor(
-        private val cryptoService: CryptoService,
-        private val parserFhir3: FhirParser<Any> = Fhir().createStu3Parser(),
-        private val parserFhir4: FhirParser<Any> = Fhir().createR4Parser()
+class FhirService constructor(
+        private val cryptoService: CryptoService
 ): FhirContract.Service {
+    private val parser = FhirParser
 
+    @Deprecated("Use the Contract method")
     @Suppress("UNCHECKED_CAST")
     fun <T : Fhir3Resource> decryptResource(dataKey: GCKey, resourceType: String, encryptedResource: String): T {
-        return Single
+        TODO()
+        /*return Single
                 .just(encryptedResource)
                 .filter { encResource: String -> !encResource.isBlank() }
                 .map { encResource: String -> cryptoService.decryptString(dataKey, encResource).blockingGet() }
@@ -50,25 +50,43 @@ class FhirService @JvmOverloads constructor(
                     Single.error(
                             DecryptionFailed("Failed to decrypt resource", error) as D4LException)
                 }
-                .blockingGet() as T
+                .blockingGet() as T*/
     }
 
 
+    @Deprecated("Use the Contract method")
+    fun <T : Fhir3Resource> encryptResource(
+            dataKey: GCKey,
+            resource: T
+    ): String = encryptResource(dataKey, ResourceFactory.wrap(resource)!!)
 
-    fun <T : Fhir3Resource> encryptResource(dataKey: GCKey, resource: T): String {
+    override fun encryptResource(dataKey: GCKey, resource: WrapperContract.Resource): String {
+        return if(resource.type == WrapperContract.Resource.TYPE.DATA) {
+            encryptDataResource(dataKey, resource)
+        } else {
+            encryptFhirResource(dataKey, resource)
+        }
+    }
+
+    private fun encryptFhirResource(dataKey: GCKey, resource: WrapperContract.Resource): String {
         return Single
                 .just(resource)
-                .map { fhirObject: T -> parserFhir3.fromFhir(fhirObject) }
+                .map {parser.fromResource(it) }
                 .flatMap { json: String -> cryptoService.encryptString(dataKey, json) }
                 .onErrorResumeNext { error ->
                     Single.error(
-                            EncryptionFailed("Failed to encrypt resource", error) as D4LException)
+                            CryptoException.EncryptionFailed("Failed to encrypt resource", error) as D4LException)
                 }
                 .blockingGet()
     }
 
-    override fun encryptResource(dataKey: GCKey, resource: WrapperContract.Resource): String {
-        TODO("Not yet implemented")
+    private fun encryptDataResource(dataKey: GCKey, resource: WrapperContract.Resource): String {
+        return Base64.encodeToString(
+                cryptoService.encrypt(
+                        dataKey,
+                        (resource.unwrap() as DataResource).asByteArray()
+                ).blockingGet()
+        )
     }
 
     override fun decryptResource(

@@ -105,7 +105,7 @@ class FhirParserTest {
         // Given
         val type = "DocumentReference"
         val source = "{\"resourceType\":\"DomainResource\"}"
-        
+
         // When
         val resource = FhirParser.toFhir4(type, source)
 

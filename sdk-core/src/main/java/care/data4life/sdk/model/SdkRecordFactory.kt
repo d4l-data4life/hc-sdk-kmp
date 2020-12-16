@@ -17,8 +17,10 @@
 package care.data4life.sdk.model
 
 import care.data4life.sdk.call.DataRecord
+import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.RecordFactory
@@ -48,15 +50,18 @@ internal object SdkRecordFactory : RecordFactory {
                     buildMeta(record),
                     record.annotations
             )
-            WrapperContract.Resource.TYPE.FHIR4 -> TODO()
-            // TODO app data
+            WrapperContract.Resource.TYPE.FHIR4 -> Fhir4Record(
+                    record.identifier!!,// FIXME
+                    record.resource.unwrap() as Fhir4Resource,
+                    buildMeta(record),
+                    record.annotations
+            )
             WrapperContract.Resource.TYPE.DATA -> DataRecord(
                     record.identifier!!,
                     (record.resource.unwrap()) as DataResource,
                     buildMeta(record),
                     record.annotations
             )
-            // TODO FHIR 4
         } as BaseRecord<Any>
     }
 

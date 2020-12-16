@@ -28,7 +28,6 @@ val d4lClientConfig = D4LConfigHelper.loadClientConfigAndroid("$rootDir")
 val d4LTestConfig = D4LConfigHelper.loadTestConfigAndroid("$rootDir")
 
 
-version = LibraryConfig.version
 group = LibraryConfig.group
 
 application {

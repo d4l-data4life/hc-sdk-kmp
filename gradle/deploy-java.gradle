@@ -17,7 +17,6 @@
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
-version = LibraryConfig.version
 group = LibraryConfig.group
 
 task sourcesJar(type: Jar, dependsOn: classes) {

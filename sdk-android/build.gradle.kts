@@ -23,7 +23,6 @@ plugins {
 
 apply(from = "${project.rootDir}/gradle/deploy-android-sdk.gradle")
 
-version = LibraryConfig.version
 group = LibraryConfig.group
 
 val d4lClientConfig = D4LConfigHelper.loadClientConfigAndroid("$rootDir")
@@ -38,6 +37,7 @@ android {
 
         // Workaround BuildConfig for Libraries not anymore containing VERSION_NAME
         // https://commonsware.com/blog/2020/10/14/android-studio-4p1-library-modules-version-code.html
+        // FIXME LibraryConfig.versionName
         buildConfigField("String", "VERSION_NAME", "\"${LibraryConfig.versionName}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

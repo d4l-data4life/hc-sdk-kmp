@@ -29,11 +29,11 @@ archivesBaseName = 'sdk-doc'
 asciidoctor {
     baseDirFollowsSourceDir()
 
-    outputDir = file("$rootProject.projectDir/docs/${LibraryConfig.version}")
+    outputDir = file("$rootProject.projectDir/docs/${project.version}")
 
 
     attributes 'icons': 'fonts',
-            'revnumber': "${LibraryConfig.version}",
+            'revnumber': "${project.version}",
             'source-highlighter': 'prettify'
 }
 
@@ -53,7 +53,7 @@ asciidoctorj {
 
 
 task removeCurrentDoc(type: Delete) {
-    delete "$rootProject.projectDir/docs/${LibraryConfig.version}"
+    delete "$rootProject.projectDir/docs/${project.version}"
 }
 
 asciidoctor.dependsOn('removeCurrentDoc')

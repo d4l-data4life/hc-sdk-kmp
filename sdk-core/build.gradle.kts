@@ -21,7 +21,6 @@ plugins {
 apply(from = "${project.rootDir}/gradle/jacoco-java.gradle")
 apply(from = "${project.rootDir}/gradle/deploy-java.gradle")
 
-version = LibraryConfig.version
 group = LibraryConfig.group
 
 

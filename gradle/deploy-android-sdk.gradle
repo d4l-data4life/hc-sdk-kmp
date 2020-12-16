@@ -16,8 +16,8 @@
 
 apply plugin: 'maven-publish'
 
-version = LibraryConfig.version
 group = LibraryConfig.group
+
 /*
 task androidSourcesJar(type: Jar) {
     classifier = 'sources'

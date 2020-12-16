@@ -17,9 +17,9 @@
 package care.data4life.sdk.model
 
 import care.data4life.crypto.GCKey
+import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.model.definitions.DataRecord
 import care.data4life.sdk.model.definitions.Fhir3Record
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.model.DecryptedRecord

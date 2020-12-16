@@ -414,7 +414,7 @@ class RecordService(
 
     @Throws(DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class)
-    private fun updateRecord(
+    fun updateRecord(
             userId: String,
             recordId: String,
             resource: WrapperContract.Resource,
@@ -494,6 +494,7 @@ class RecordService(
                 .fromCallable { resources }
                 .flatMapIterable { it }
                 .flatMapSingle { resource ->
+                    //Fixme: forced id
                     updateRecord(userId, resource.id!!, resource, listOf())
                             .onErrorReturn { error ->
                                 Record<T>(null, null, null).also {

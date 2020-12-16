@@ -16,7 +16,6 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 
 internal interface WrapperFactoryContract {
@@ -39,9 +38,4 @@ internal interface WrapperFactoryContract {
         fun wrap(resource: Any?): WrapperContract.Resource?
     }
 
-    interface FhirElementFactory {
-
-        @Throws(CoreRuntimeException.InternalFailure::class)
-        fun getFhirTypeForClass(resourceType: Class<out Any>): String //TODO: Use Resource.TYPE
-    }
 }

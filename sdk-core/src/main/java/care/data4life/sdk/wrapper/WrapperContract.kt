@@ -16,6 +16,11 @@
 
 package care.data4life.sdk.wrapper
 
+import care.data4life.fhir.FhirException
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.lang.CoreRuntimeException
+
 interface WrapperContract {
 
     interface Attachment {
@@ -33,12 +38,35 @@ interface WrapperContract {
     interface Resource {
         enum class TYPE {
             DATA,
-            FHIR3
+            FHIR3,
+            FHIR4
         }
 
         var identifier: String?
         val type: TYPE
 
         fun unwrap(): Any
+    }
+
+    interface ResourceParser {
+
+        @Throws(FhirException::class, CoreRuntimeException.InternalFailure::class)
+        fun toFhir3(resourceType: String, source: String): Resource
+
+        @Throws(FhirException::class, CoreRuntimeException.InternalFailure::class)
+        fun toFhir4(resourceType: String, source: String): Resource
+
+        @Throws(FhirException::class)
+        fun fromResource(resource: Resource): String
+    }
+
+    interface FhirElementFactory {
+
+        @Throws(CoreRuntimeException.InternalFailure::class)
+        fun getFhirTypeForClass(resourceType: Class<out Any>): String
+
+        fun getFhir3ClassForType(resourceType:String): Class<out Fhir3Resource>?
+
+        fun getFhir4ClassForType(resourceType:String): Class<out Fhir4Resource>?
     }
 }

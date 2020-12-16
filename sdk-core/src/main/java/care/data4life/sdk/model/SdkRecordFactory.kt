@@ -48,6 +48,7 @@ internal object SdkRecordFactory : RecordFactory {
                     buildMeta(record),
                     record.annotations
             )
+            WrapperContract.Resource.TYPE.FHIR4 -> TODO()
             // TODO app data
             WrapperContract.Resource.TYPE.DATA -> DataRecord(
                     record.identifier!!,

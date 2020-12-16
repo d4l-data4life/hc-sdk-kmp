@@ -72,7 +72,7 @@ class RecordService(
 ) : RecordContract.Service {
 
     private val recordFactory: RecordFactory = SdkRecordFactory
-    private val fhirElementFactory: WrapperFactoryContract.FhirElementFactory = FhirElementFactory
+    private val fhirElementFactory: WrapperContract.FhirElementFactory = FhirElementFactory
     private val resourceWrapperFactory: WrapperFactoryContract.ResourceFactory = ResourceFactory
     private val resourceHelper: HelperContract.ResourceHelper = ResourceHelper
 

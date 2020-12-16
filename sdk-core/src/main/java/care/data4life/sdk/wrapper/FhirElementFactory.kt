@@ -18,9 +18,11 @@ package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.fhir.Fhir3ElementFactory
 import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4ElementFactory
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 
-internal object FhirElementFactory: WrapperFactoryContract.FhirElementFactory {
+internal object FhirElementFactory: WrapperContract.FhirElementFactory {
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun getFhirTypeForClass(resourceType: Class<out Any>): String {
@@ -29,4 +31,19 @@ internal object FhirElementFactory: WrapperFactoryContract.FhirElementFactory {
                 ?: throw CoreRuntimeException.InternalFailure()
     }
 
+    override fun getFhir3ClassForType(resourceType:String): Class<out Fhir3Resource>? {
+        val clazz = Fhir3ElementFactory.getClassForFhirType(resourceType)
+
+        @Suppress("UNCHECKED_CAST")
+        return  if (clazz  == null)  null
+                else clazz  as Class<out Fhir3Resource>
+    }
+
+    override fun getFhir4ClassForType(resourceType: String): Class<out Fhir4Resource>? {
+        val clazz = Fhir4ElementFactory.getClassForFhirType(resourceType)
+
+        @Suppress("UNCHECKED_CAST")
+        return  if (clazz  == null)  null
+        else clazz  as Class<out Fhir4Resource>
+    }
 }

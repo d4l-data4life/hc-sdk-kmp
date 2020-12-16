@@ -21,6 +21,7 @@ import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.test.util.AttachmentBuilder
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.util.ArrayList
@@ -72,5 +73,20 @@ class FhirElementFactoryTest {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
         }
+    }
+
+    @Test
+    fun `Given, getFhir3ClassForType is called with a Fhir3Resource String, it returns a Fhir3 resource class`() {
+        val klass = FhirElementFactory.getFhir3ClassForType("DocumentReference")
+
+        assertEquals(
+                klass,
+                DocumentReference::class.java
+        )
+    }
+
+    @Test
+    fun `Given, getFhir3ClassForType is called with a unknown Fhir3Resource String, it returns a null`() {
+        assertNull(FhirElementFactory.getFhir3ClassForType("I will bug you"))
     }
 }

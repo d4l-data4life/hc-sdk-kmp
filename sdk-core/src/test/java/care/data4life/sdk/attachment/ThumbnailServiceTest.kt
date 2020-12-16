@@ -29,6 +29,7 @@ import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.lang.ImageResizeException
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.model.DownloadType
+import care.data4life.sdk.wrapper.AttachmentFactory
 import care.data4life.sdk.wrapper.FhirAttachmentHelper
 import care.data4life.sdk.wrapper.IdentifierFactory
 import care.data4life.sdk.wrapper.WrapperContract
@@ -62,12 +63,14 @@ class ThumbnailServiceTest {
 
         mockkObject(FhirAttachmentHelper)
         mockkObject(IdentifierFactory)
+        mockkObject(AttachmentFactory)
     }
     
     @After
     fun tearDown() {
         unmockkObject(FhirAttachmentHelper)
         unmockkObject(IdentifierFactory)
+        unmockkObject(AttachmentFactory)
     }
 
     @Test
@@ -387,6 +390,75 @@ class ThumbnailServiceTest {
         ) }
     }
 
+    @Test
+    @Throws(DataValidationException.IdUsageViolation::class)
+    fun `Given cleanObsoleteAdditionalIdentifiers is called with a DataResource, it does Nothing`() {
+        // Given
+        val resource = mockk<WrapperContract.Resource>()
+
+        every { resource.type } returns WrapperContract.Resource.TYPE.DATA
+        every { FhirAttachmentHelper.getAttachment(any()) } returns mockk()
+
+        // When
+        thumbnailService.cleanObsoleteAdditionalIdentifiers(resource)
+
+        // Then
+        verify(exactly = 0) { FhirAttachmentHelper.getAttachment(any()) }
+    }
+
+    @Test
+    @Throws(DataValidationException.IdUsageViolation::class)
+    fun `Given cleanObsoleteAdditionalIdentifiers is called with null, it does Nothing`() {
+        // Given
+        every { FhirAttachmentHelper.getAttachment(any()) } returns mockk()
+
+        // When
+        thumbnailService.cleanObsoleteAdditionalIdentifiers(null)
+
+        // Then
+        verify(exactly = 0) { FhirAttachmentHelper.getAttachment(any()) }
+    }
+
+    //TODO more test for this
+    @Test
+    @Throws(DataValidationException.IdUsageViolation::class)
+    fun `Given cleanObsoleteAdditionalIdentifiers is called with a FhirResource, it cleans the obsolete Ids`() {
+        // Given
+        val resource = mockk<WrapperContract.Resource>()
+        val rawResource = mockk<Fhir3Resource>()
+
+        val attachments = mutableListOf<Any>("attachment")
+        val wrappedAttachment = mockk<WrapperContract.Attachment>()
+        val attachmentId = "tomato"
+
+        val rawId = "id"
+        val identifiers = mutableListOf<Any>(rawId)
+        val wrappedId = mockk<WrapperContract.Identifier>()
+
+        val spyService = spyk((thumbnailService as ThumbnailService))
+
+        every { spyService.splitAdditionalAttachmentId(wrappedId) } returns null
+
+        every { resource.type } returns WrapperContract.Resource.TYPE.FHIR3
+        every { resource.unwrap() } returns rawResource
+
+        every { wrappedAttachment.id } returns attachmentId
+
+        every { FhirAttachmentHelper.getAttachment(rawResource) } returns attachments
+        every { FhirAttachmentHelper.getIdentifier(rawResource) } returns identifiers
+
+        every { AttachmentFactory.wrap("attachment") } returns wrappedAttachment
+        every { IdentifierFactory.wrap(rawId) } returns wrappedId
+
+        every { FhirAttachmentHelper.setIdentifier(rawResource, mutableListOf(rawId)) } returns Unit
+
+        // When
+        spyService.cleanObsoleteAdditionalIdentifiers(resource)
+
+        // Then
+        verify(exactly = 1) { FhirAttachmentHelper.getAttachment(rawResource) }
+    }
+
     //TODO: Unhappy path
     @Test
     @Throws(DataValidationException.IdUsageViolation::class)
@@ -597,31 +669,29 @@ class ThumbnailServiceTest {
     /*
 @Test
     @Throws(DataValidationException.IdUsageViolation::class)
-    fun setAttachmentIdForDownloadType_shouldSetAttachmentId() {
+    fun cleanObsoleteAdditionalIdentifiers_shouldCleanObsoleteIdentifiers() {
         //given
-        val attachment = AttachmentBuilder.buildAttachment(ATTACHMENT_ID)
-        val additionalId = FhirAttachmentHelper.buildIdentifier(ADDITIONAL_ID, ASSIGNER)
-        val attachments = listOf(attachment)
-        val identifiers = listOf(additionalId)
+        val currentId = ADDITIONAL_ID
+        val obsoleteId = ADDITIONAL_ID.replaceFirst(ATTACHMENT_ID.toRegex(), "obsoleteId")
+        val otherId = "otherId"
+        val currentIdentifier = FhirAttachmentHelper.buildIdentifier(currentId, ASSIGNER)
+        val obsoleteIdentifier = FhirAttachmentHelper.buildIdentifier(obsoleteId, ASSIGNER)
+        val otherIdentifier = FhirAttachmentHelper.buildIdentifier(otherId, ASSIGNER)
+        val identifiers: MutableList<Identifier> = arrayListOf()
+        identifiers.add(currentIdentifier)
+        identifiers.add(obsoleteIdentifier)
+        identifiers.add(otherIdentifier)
+        val doc = buildDocumentReference()
+        doc.content[0].attachment.id = ATTACHMENT_ID
+        doc.identifier = identifiers
 
-        //when downloadType is Full
-        recordService.setAttachmentIdForDownloadType(attachments, identifiers, DownloadType.Full)
-        //then
-        Truth.assertThat(attachment.id).isEqualTo(ATTACHMENT_ID)
+        //when
+        recordService.cleanObsoleteAdditionalIdentifiers(doc)
 
-        //given
-        attachment.id = ATTACHMENT_ID
-        //when downloadType is Medium
-        recordService.setAttachmentIdForDownloadType(attachments, identifiers, DownloadType.Medium)
         //then
-        Truth.assertThat(attachment.id).isEqualTo(ATTACHMENT_ID + SPLIT_CHAR + PREVIEW_ID)
-
-        //given
-        attachment.id = ATTACHMENT_ID
-        //when downloadType is Small
-        recordService.setAttachmentIdForDownloadType(attachments, identifiers, DownloadType.Small)
-        //then
-        Truth.assertThat(attachment.id).isEqualTo(ATTACHMENT_ID + SPLIT_CHAR + THUMBNAIL_ID)
+        Truth.assertThat(doc.identifier).hasSize(2)
+        Truth.assertThat(doc.identifier!![0]).isEqualTo(currentIdentifier)
+        Truth.assertThat(doc.identifier!![1]).isEqualTo(otherIdentifier)
     }
      */
 }

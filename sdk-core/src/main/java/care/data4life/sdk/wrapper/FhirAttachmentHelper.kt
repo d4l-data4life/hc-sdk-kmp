@@ -21,7 +21,7 @@ import care.data4life.sdk.fhir.Fhir3Identifier
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper as Fhir3AttachmentHelper
-
+//Todo: Do unpacking here and not sparse in the skd
 internal object FhirAttachmentHelper: HelperContract.FhirAttachmentHelper {
 
     override fun hasAttachment(resource: Any): Boolean {

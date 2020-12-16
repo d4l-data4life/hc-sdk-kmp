@@ -18,11 +18,13 @@ package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.ImageResizer
+import care.data4life.sdk.RecordService
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.lang.ImageResizeException
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.model.DownloadType
+import care.data4life.sdk.wrapper.AttachmentFactory
 import care.data4life.sdk.wrapper.FhirAttachmentHelper
 import care.data4life.sdk.wrapper.HelperContract
 import care.data4life.sdk.wrapper.IdentifierFactory
@@ -38,6 +40,7 @@ class ThumbnailService internal constructor(
 
     private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper = FhirAttachmentHelper
     private val identifierFactory: WrapperFactoryContract.IdentifierFactory = IdentifierFactory
+    private val attachmentFactory: WrapperFactoryContract.AttachmentFactory = AttachmentFactory
 
     override fun uploadDownscaledImages(
             attachmentsKey: GCKey,
@@ -115,6 +118,42 @@ class ThumbnailService internal constructor(
                         partnerId
                 )
             }
+        }
+    }
+
+    override fun cleanObsoleteAdditionalIdentifiers(resource: WrapperContract.Resource?) {
+        if(resource == null || resource.type == WrapperContract.Resource.TYPE.DATA) return
+
+        val rawResource = resource.unwrap()
+        val currentAttachments = fhirAttachmentHelper.getAttachment(rawResource)
+
+        if (currentAttachments.isNotEmpty()) {
+            val identifiers = fhirAttachmentHelper.getIdentifier(rawResource)
+            val currentAttachmentIds: MutableList<String?> = arrayListOf(currentAttachments.size.toString())
+
+            for (rawAttachment in currentAttachments) {
+                attachmentFactory.wrap(rawAttachment).also {
+                    if (it != null) {
+                        currentAttachmentIds.add(it.id)
+                    }
+                }
+            }
+
+            val updatedIdentifiers: MutableList<Any> = mutableListOf()
+            val identifierIterator = identifiers.iterator()
+
+            while (identifierIterator.hasNext()) {
+                val next = identifierIterator.next()
+                val parts = splitAdditionalAttachmentId(
+                        identifierFactory.wrap(next)
+                )
+
+                if (parts == null || currentAttachmentIds.contains(parts[RecordService.FULL_ATTACHMENT_ID_POS])) {
+                    updatedIdentifiers.add(next)
+                }
+            }
+
+            fhirAttachmentHelper.setIdentifier(rawResource, updatedIdentifiers)
         }
     }
 

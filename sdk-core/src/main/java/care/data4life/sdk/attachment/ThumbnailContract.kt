@@ -19,7 +19,6 @@ package care.data4life.sdk.attachment
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.DownloadType
-import care.data4life.sdk.network.model.NetworkRecordContract
 import care.data4life.sdk.wrapper.WrapperContract
 
 interface ThumbnailContract {
@@ -44,5 +43,8 @@ interface ThumbnailContract {
                 identifiers: List<Any>?,
                 type: DownloadType?
         )
+
+        @Throws(DataValidationException.IdUsageViolation::class)
+        fun cleanObsoleteAdditionalIdentifiers(resource: WrapperContract.Resource?)
     }
 }

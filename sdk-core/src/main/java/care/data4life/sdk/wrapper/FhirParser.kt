@@ -20,7 +20,7 @@ import care.data4life.fhir.Fhir
 import care.data4life.fhir.FhirParser
 import care.data4life.sdk.lang.CoreRuntimeException
 
-internal object ResourceParser: WrapperContract.ResourceParser {
+internal object FhirParser: WrapperContract.FhirParser {
     private val fhir3Parser: FhirParser<Any> = Fhir().createStu3Parser()
     private val fhir4Parser: FhirParser<Any> = Fhir().createR4Parser()
 
@@ -47,7 +47,7 @@ internal object ResourceParser: WrapperContract.ResourceParser {
     override fun fromResource(resource: WrapperContract.Resource): String {
         return when(resource.type) {
             WrapperContract.Resource.TYPE.FHIR3 -> fhir3Parser.fromFhir(resource.unwrap())
-            WrapperContract.Resource.TYPE.FHIR4 -> TODO()
+            WrapperContract.Resource.TYPE.FHIR4 -> fhir4Parser.fromFhir(resource.unwrap())
             WrapperContract.Resource.TYPE.DATA -> throw CoreRuntimeException.InternalFailure()
         }
     }

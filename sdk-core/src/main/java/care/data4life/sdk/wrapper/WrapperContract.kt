@@ -48,7 +48,7 @@ interface WrapperContract {
         fun unwrap(): Any
     }
 
-    interface ResourceParser {
+    interface FhirParser {
 
         @Throws(FhirException::class, CoreRuntimeException.InternalFailure::class)
         fun toFhir3(resourceType: String, source: String): Resource

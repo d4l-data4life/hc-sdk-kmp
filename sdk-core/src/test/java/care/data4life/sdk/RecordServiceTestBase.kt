@@ -33,11 +33,11 @@ import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.SdkRecordFactory
 import care.data4life.sdk.model.definitions.DataRecord
 import care.data4life.sdk.model.definitions.RecordFactory
+import care.data4life.sdk.network.DecryptedRecordBuilder
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import care.data4life.sdk.network.model.definitions.NetworkModelContract
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
 import care.data4life.sdk.test.util.AttachmentBuilder
@@ -89,7 +89,7 @@ abstract class RecordServiceTestBase {
     internal lateinit var mockRecord: Record<CarePlan>
     internal lateinit var mockDataRecord: DataRecord
     internal lateinit var inOrder: InOrder
-    internal lateinit var mockDecryptedRecordBuilder: NetworkModelContract.DecryptedRecordBuilder
+    internal lateinit var mockDecryptedRecordBuilder: DecryptedRecordBuilder
     internal lateinit var mockRecordFactory: RecordFactory
 
     private lateinit var mockitoSession: MockitoSession
@@ -137,7 +137,7 @@ abstract class RecordServiceTestBase {
         mockD4LException = Mockito.mock(D4LException::class.java)
         mockRecord = Mockito.mock(Record::class.java) as Record<CarePlan>
         mockDataRecord = Mockito.mock(DataRecord::class.java)
-        mockDecryptedRecordBuilder = Mockito.mock(NetworkModelContract.DecryptedRecordBuilder::class.java)
+        mockDecryptedRecordBuilder = Mockito.mock(DecryptedRecordBuilder::class.java)
         mockRecordFactory = Mockito.mock(RecordFactory::class.java)
 
         Mockito.`when`(mockRecord.fhirResource).thenReturn(mockCarePlan)
@@ -179,7 +179,7 @@ abstract class RecordServiceTestBase {
 
         Mockito.`when`(mockErrorHandler.handleError(ArgumentMatchers.any(Exception::class.java))).thenReturn(mockD4LException)
 
-        mockkConstructor(NetworkModelContract.DecryptedRecordBuilder::class)
+        mockkConstructor(DecryptedRecordBuilder::class)
         mockkObject(SdkRecordFactory)
 
         inOrder = Mockito.inOrder(

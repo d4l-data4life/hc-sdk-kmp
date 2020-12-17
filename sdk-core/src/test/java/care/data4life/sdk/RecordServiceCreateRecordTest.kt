@@ -382,8 +382,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun `Given, createRecord is called with a DomainResource, a UserId and Annotations, it returns a new Record`() {
         // Given
         every {
-            anyConstructed<DecryptedRecordBuilder>().setAnnotations(ANNOTATIONS)
-        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilder
+            anyConstructed<DecryptedRecordBuilder>().setAnnotations(any())
+        } returns mockDecryptedRecordBuilder
 
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
@@ -486,8 +486,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun `Given, createRecords is called a DomainResource and a UserId, Annotations and without attachment, it returns a new Record`() {
         // Given
         every {
-            anyConstructed<DecryptedRecordBuilder>().setAnnotations(ANNOTATIONS)
-        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilder
+            anyConstructed<DecryptedRecordBuilder>().setAnnotations(any())
+        } returns mockDecryptedRecordBuilder
 
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
@@ -664,7 +664,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun `Given createRecord is called with a Byte resource, a UserId and Annotations, it returns a new DataRecord`() {
         // Given
         every {
-            anyConstructed<DecryptedRecordBuilder>().setAnnotations(ANNOTATIONS)
+            anyConstructed<DecryptedRecordBuilder>().setAnnotations(listOf())
         } returns mockDecryptedRecordBuilder as DecryptedRecordBuilder
 
         Mockito.`when`(mockTaggingService.appendDefaultTags(null, null))

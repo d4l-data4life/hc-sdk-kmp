@@ -14,14 +14,12 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.model
+package care.data4life.sdk.wrapper
 
 import care.data4life.fhir.stu3.model.DocumentReference
-import care.data4life.fhir.stu3.model.FhirElementFactory
 import care.data4life.sdk.RecordServiceTestBase
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.test.util.AttachmentBuilder
-import care.data4life.sdk.wrapper.SdkFhirElementFactory
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -42,7 +40,7 @@ class FhirElementFactoryTest {
 
     @Test
     fun `it is a FhirElementFactory`() {
-        assertTrue((SdkFhirElementFactory as Any) is FhirElementFactory)
+        assertTrue((SdkFhirElementFactory as Any) is WrapperContract.FhirElementFactory)
     }
 
     @Test

@@ -14,15 +14,13 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.model
+package care.data4life.sdk.wrapper
 
 import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.fhir.stu3.model.DocumentReference
 import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.fhir.stu3.model.Identifier
-import care.data4life.sdk.wrapper.HelperContract
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper as Fhir3AttachmentHelper
-import care.data4life.sdk.wrapper.SdkFhirAttachmentHelper
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll

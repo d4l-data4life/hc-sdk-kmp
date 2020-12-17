@@ -35,7 +35,7 @@ import org.junit.Test
 import org.mockito.Mockito
 import java.util.*
 
-class AttachmentTmpTest {
+class AttachmentServiceTest {
     private val ATTACHMENT_ID = "attachmentId"
     private val THUMBNAIL_ID = "attachmentId#previewId"
     private val RECORD_ID = "recordId"
@@ -78,7 +78,7 @@ class AttachmentTmpTest {
 
         // when
         val subscriber = attachmentService
-                ._upload(attachments, attachmentKey, USER_ID).test().await()
+                .upload(attachments, attachmentKey, USER_ID).test().await()
 
         // then
         val result = subscriber
@@ -133,7 +133,7 @@ class AttachmentTmpTest {
         Mockito.`when`(mockFileService.downloadFile(attachmentKey, USER_ID, ATTACHMENT_ID)).thenReturn(Single.just(pdf))
 
         // when
-        val subscriber = attachmentService._download(attachments, attachmentKey, USER_ID).test().await()
+        val subscriber = attachmentService.download(attachments, attachmentKey, USER_ID).test().await()
 
         // then
         val result = subscriber
@@ -164,7 +164,7 @@ class AttachmentTmpTest {
 
         // When
         try {
-            attachmentService._download(attachments, attachmentKey, USER_ID)
+            attachmentService.download(attachments, attachmentKey, USER_ID)
             Assert.fail("Exception expected!");
         } catch (e: D4LException) {
 
@@ -189,7 +189,7 @@ class AttachmentTmpTest {
         ).thenReturn(Single.just(pdf))
 
         // when
-        val subscriber = attachmentService._download(attachments, attachmentKey, USER_ID).test().await()
+        val subscriber = attachmentService.download(attachments, attachmentKey, USER_ID).test().await()
 
         // then
         val result = subscriber
@@ -225,7 +225,7 @@ class AttachmentTmpTest {
         Mockito.`when`(mockFileService.uploadFile(attachmentKey, USER_ID, pdf)).thenReturn(Single.just(ATTACHMENT_ID))
 
         // when
-        val subscriber = attachmentService._upload(attachments, attachmentKey, USER_ID).test().await()
+        val subscriber = attachmentService.upload(attachments, attachmentKey, USER_ID).test().await()
 
         // then
         val result = subscriber

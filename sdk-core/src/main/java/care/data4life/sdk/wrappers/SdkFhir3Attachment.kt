@@ -37,4 +37,14 @@ internal class SdkFhir3Attachment(
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Any> unwrap(): T = attachment as T
+
+    override fun equals(other: Any?): Boolean {
+        return if(other !is SdkFhir3Attachment) {
+            false
+        } else {
+            return attachment === other.unwrap<Fhir3Attachment>()
+        }
+    }
+
+    override fun hashCode(): Int = attachment.hashCode()
 }

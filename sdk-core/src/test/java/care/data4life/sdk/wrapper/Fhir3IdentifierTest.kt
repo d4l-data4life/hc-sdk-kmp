@@ -20,6 +20,7 @@ import care.data4life.fhir.stu3.model.Identifier as Fhir3Identifier
 import care.data4life.sdk.wrappers.SdkFhir3Identifier
 import care.data4life.sdk.wrappers.definitions.Identifier
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -60,6 +61,18 @@ class Fhir3IdentifierTest {
         assertEquals(
                 value,
                 fhir3Identifier.value
+        )
+    }
+
+    @Test
+    fun `Given, unwrap is called, it returns its a wrapped Fhir3Identifier`() {
+        // Given
+        val value = "potato"
+        val fhir3Identifier = Fhir3Identifier()
+
+        assertSame(
+                fhir3Identifier,
+                SdkFhir3Identifier(fhir3Identifier).unwrap()
         )
     }
 }

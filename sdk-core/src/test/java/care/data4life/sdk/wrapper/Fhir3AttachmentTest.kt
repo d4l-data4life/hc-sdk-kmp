@@ -20,6 +20,7 @@ import care.data4life.fhir.stu3.model.Attachment as Fhir3Attachment
 import care.data4life.sdk.wrappers.SdkFhir3Attachment
 import care.data4life.sdk.wrappers.definitions.Attachment
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -159,6 +160,42 @@ class Fhir3AttachmentTest {
         assertEquals(
                 size,
                 fhir3Attachment.size
+        )
+    }
+
+    @Test
+    fun `Given, unwrap is called, it returns the wrapped Fhir3Attachment`() {
+        // Given
+        val fhir3Attachment = Fhir3Attachment()
+
+        // When
+        assertSame(
+                fhir3Attachment,
+                SdkFhir3Attachment(fhir3Attachment).unwrap()
+        )
+    }
+
+    @Test
+    fun `Given, on a compare, it return true, if both wrapped resources are identical`() {
+        // Given
+        val fhir3Attachment = Fhir3Attachment()
+
+        // When
+        assertEquals(
+                SdkFhir3Attachment(fhir3Attachment),
+                SdkFhir3Attachment(fhir3Attachment)
+        )
+    }
+
+    @Test
+    fun `Given, hashCode() is called it returns the hash of the wrapped resource`() {
+        // Given
+        val fhir3Attachment = Fhir3Attachment()
+
+        // When
+        assertEquals(
+                fhir3Attachment.hashCode(),
+                SdkFhir3Attachment(fhir3Attachment).hashCode()
         )
     }
 }

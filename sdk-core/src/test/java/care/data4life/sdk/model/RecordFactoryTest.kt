@@ -18,14 +18,18 @@ package care.data4life.sdk.model
 
 import care.data4life.crypto.GCKey
 import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.call.Fhir4Record
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.definitions.DataRecord
 import care.data4life.sdk.model.definitions.Fhir3Record
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.model.DecryptedAppDataRecord
+import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import io.mockk.every
+import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import org.junit.After
@@ -108,6 +112,52 @@ class RecordFactoryTest {
         assertEquals(
                 record.resource,
                 fhirResource
+        )
+        assertEquals(
+                record.meta!!.createdDate,
+                creationDate
+        )
+        assertEquals(
+                record.meta!!.updatedDate,
+                updateDate
+        )
+        assertEquals(
+                record.annotations,
+                annotations
+        )
+    }
+
+    @Test
+    fun `Given, getInstance is called with a DecryptedFhir43Record, it returns a Fhir4Record`() {
+        // Given
+        val givenCreationDate = "2020-05-03"
+        val givenUpdateDate = "2019-02-28T17:21:08.234123"
+        val resource = mockk<Fhir4Resource>()
+
+        every { LocalDate.parse(givenCreationDate, any()) } returns creationDate
+        every { LocalDateTime.parse(givenUpdateDate, any()) } returns updateDate
+
+        val decryptedRecord = DecryptedR4Record(
+                id,
+                resource,
+                tags,
+                annotations,
+                givenCreationDate,
+                givenUpdateDate,
+                dataKey,
+                attachmentKey,
+                modelVersion
+        )
+
+        // When
+        val record = SdkRecordFactory.getInstance(decryptedRecord)
+
+        // Then
+        assertTrue(record is Fhir4Record)
+        // FIXME: Meta & Record should be a data class
+        assertEquals(
+                record.resource,
+                resource
         )
         assertEquals(
                 record.meta!!.createdDate,

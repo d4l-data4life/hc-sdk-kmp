@@ -16,13 +16,16 @@
 
 package care.data4life.sdk.model
 
+import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
+import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -47,6 +50,12 @@ internal object SdkRecordFactory : RecordFactory {
                     buildMeta(record),
                     record.annotations
             )
+            is DecryptedFhir4Record -> Fhir4Record(
+                    record.identifier!!,//FIXME
+                    record.resource as Fhir4Resource,
+                    buildMeta(record),
+                    record.annotations
+            )
             // TODO app data
             is DecryptedDataRecord -> AppDataRecord(
                     record.identifier!!,
@@ -54,7 +63,6 @@ internal object SdkRecordFactory : RecordFactory {
                     buildMeta(record),
                     record.annotations
             )
-            // TODO FHIR 4
             else -> throw CoreRuntimeException.InternalFailure()
         } as BaseRecord<T>
     }

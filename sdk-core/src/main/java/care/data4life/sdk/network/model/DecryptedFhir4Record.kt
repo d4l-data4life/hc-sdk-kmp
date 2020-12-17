@@ -14,17 +14,20 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.call
+package care.data4life.sdk.network.model
 
-import care.data4life.sdk.model.Meta
-import care.data4life.sdk.model.definitions.BaseRecord
+import care.data4life.crypto.GCKey
+import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 
-class CallContract {
-
-    interface Record<T> : BaseRecord<T> {
-        override val identifier: String
-        override val resource: T
-        override val meta: Meta
-        override val annotations: List<String>
-    }
-}
+data class DecryptedR4Record<T: Fhir4Resource>(
+        override var identifier: String?,
+        override var resource: T,
+        override var tags: HashMap<String, String>?,
+        override var annotations: List<String>,
+        override var customCreationDate: String?,
+        override var updatedDate: String?,
+        override var dataKey: GCKey?,
+        override var attachmentsKey: GCKey?,
+        override var modelVersion: Int
+        ) : DecryptedFhir4Record<T>

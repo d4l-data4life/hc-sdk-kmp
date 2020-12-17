@@ -275,7 +275,7 @@ class RecordServiceTest : RecordServiceTestBase() {
                 .restoreUploadData(
                         decryptedRecord,
                         document,
-                        mockUploadData
+                mockUploadData as HashMap<Any, String?>
                 )
 
         // When
@@ -292,7 +292,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         inOrder.verify(recordService).restoreUploadData(
                 decryptedRecord,
                 document,
-                mockUploadData
+                mockUploadData as HashMap<Any, String?>
         )
         inOrder.verifyNoMoreInteractions()
     }
@@ -315,7 +315,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         val record = recordService.restoreUploadData(
                 decryptedRecord as DecryptedBaseRecord<Any>,
                 document,
-                mockUploadData
+                mockUploadData as HashMap<Any, String?>
         )
 
         // Then
@@ -342,7 +342,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         val record = recordService.restoreUploadData(
                 decryptedRecord as DecryptedBaseRecord<Any>,
                 document,
-                mockUploadData
+                mockUploadData as HashMap<Any, String?>
         )
 
         // Then
@@ -369,7 +369,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         val record = recordService.restoreUploadData(
                 decryptedRecord,
                 document,
-                mockUploadData
+                mockUploadData as HashMap<Any, String?>
         )
 
         // Then
@@ -396,7 +396,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         val record = recordService.restoreUploadData(
                 decryptedRecord,
                 null,
-                mockUploadData
+                mockUploadData as HashMap<Any, String?>
         )
 
         // Then
@@ -425,7 +425,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         val record = recordService.restoreUploadData(
                 decryptedRecord,
                 document,
-                mockUploadData
+                mockUploadData as HashMap<Any, String?>
         )
 
         // Then
@@ -451,7 +451,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         val record = recordService.restoreUploadData(
                 decryptedRecord,
                 document,
-                mockUploadData
+                mockUploadData as HashMap<Any, String?>
         )
 
         // Then

@@ -23,7 +23,6 @@ import care.data4life.sdk.wrappers.definitions.Attachment
 import care.data4life.sdk.wrappers.definitions.AttachmentFactory
 
 
-
 internal object SdkAttachmentFactory: AttachmentFactory {
     @Throws(DataValidationException.CustomDataLimitViolation::class)
     override fun wrap(attachment: Any): Attachment {

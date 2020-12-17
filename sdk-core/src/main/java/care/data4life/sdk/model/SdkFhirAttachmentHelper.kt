@@ -22,7 +22,6 @@ import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper as Fhir3AttachmentHelper
 import care.data4life.sdk.model.definitions.FhirAttachmentHelper
-import java.util.HashMap
 
 internal object SdkFhirAttachmentHelper: FhirAttachmentHelper {
     override fun hasAttachment(resource: Any): Boolean {
@@ -30,18 +29,18 @@ internal object SdkFhirAttachmentHelper: FhirAttachmentHelper {
     }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
-    override fun getAttachment(resource: Any): MutableList<Any>? {
+    override fun getAttachment(resource: Any): MutableList<Any?>? {
         @Suppress("UNCHECKED_CAST")
-        return Fhir3AttachmentHelper.getAttachment(resource as Fhir3Resource) as MutableList<Any>?
+        return Fhir3AttachmentHelper.getAttachment(resource as Fhir3Resource) as MutableList<Any?>?
     }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
-    override fun updateAttachmentData(resource: Any, attachmentData: HashMap<Any, String>?) {
+    override fun updateAttachmentData(resource: Any, attachmentData: HashMap<Any, String?>?) {
         @Suppress("UNCHECKED_CAST")
         val attachment = if( attachmentData == null) {
             null
         } else {
-            attachmentData as HashMap<Fhir3Attachment, String>
+            attachmentData as HashMap<Fhir3Attachment, String?>
         }
 
         @Suppress("UNCHECKED_CAST")
@@ -52,7 +51,7 @@ internal object SdkFhirAttachmentHelper: FhirAttachmentHelper {
     }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
-    override fun getIdentifiers(resource: Any): List<Any>? {
+    override fun getIdentifier(resource: Any): List<Any>? {
         return Fhir3AttachmentHelper.getIdentifier(resource as Fhir3Resource)
     }
 

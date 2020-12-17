@@ -141,7 +141,7 @@ class FhirAttachmentHelperTest {
         val attachments = hashMapOf(
                 Mockito.mock(Attachment::class.java) to "1",
                 Mockito.mock(Attachment::class.java) to "2"
-        ) as HashMap<Any, String>
+        ) as HashMap<Any, String?>?
 
         every {
             @Suppress("UNCHECKED_CAST")
@@ -170,7 +170,7 @@ class FhirAttachmentHelperTest {
         // Then
         assertSame(
                 identifiers,
-                SdkFhirAttachmentHelper.getIdentifiers(resource)
+                SdkFhirAttachmentHelper.getIdentifier(resource)
         )
 
         verify(exactly = 1) { Fhir3AttachmentHelper.getIdentifier(resource) }
@@ -184,7 +184,7 @@ class FhirAttachmentHelperTest {
         every { Fhir3AttachmentHelper.getIdentifier(resource) } returns null
 
         // When
-        val result = SdkFhirAttachmentHelper.getIdentifiers(resource)
+        val result = SdkFhirAttachmentHelper.getIdentifier(resource)
 
         // Then
         assertNull(result)

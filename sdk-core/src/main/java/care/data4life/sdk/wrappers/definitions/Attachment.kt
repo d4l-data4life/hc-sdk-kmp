@@ -23,6 +23,7 @@ internal interface Attachment {
     var data: String?
     var hash: String?
     var size: Int?
+    fun <T: Any> unwrap(): T
 }
 
 internal interface AttachmentFactory {

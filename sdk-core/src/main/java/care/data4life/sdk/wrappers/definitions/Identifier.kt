@@ -18,6 +18,7 @@ package care.data4life.sdk.wrappers.definitions
 
 internal interface Identifier {
     var value: String?
+    fun <T: Any>unwrap(): T
 }
 
 internal interface IdentifierFactory {

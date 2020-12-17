@@ -80,7 +80,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
 
         // Then
         Truth.assertThat(data).hasSize(2)
-        Truth.assertThat(data!![observation.component!![0].valueAttachment]).isEqualTo(DATA)
+        Truth.assertThat(data!![observation.component!![0].valueAttachment!!]).isEqualTo(DATA)
         inOrder.verify(recordService).extractUploadData(observation)
         inOrder.verifyNoMoreInteractions()
     }
@@ -95,7 +95,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
 
         // Then
         Truth.assertThat(data).hasSize(2)
-        Truth.assertThat(data!![observation.component!![0].valueAttachment]).isEqualTo(DATA)
+        Truth.assertThat(data!![observation.component!![0].valueAttachment!!]).isEqualTo(DATA)
         inOrder.verify(recordService).extractUploadData(observation)
         inOrder.verifyNoMoreInteractions()
     }
@@ -125,7 +125,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
 
         // Then
         Truth.assertThat(data).hasSize(1)
-        Truth.assertThat(data!![questionnaire.item!![0].initialAttachment]).isEqualTo(DATA)
+        Truth.assertThat(data!![questionnaire.item!![0].initialAttachment!!]).isEqualTo(DATA)
         inOrder.verify(recordService).extractUploadData(questionnaire)
         inOrder.verifyNoMoreInteractions()
     }
@@ -140,7 +140,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
 
         // Then
         Truth.assertThat(data).hasSize(1)
-        Truth.assertThat(data!![questionnaireResponse.item!![0].answer!![0].valueAttachment]).isEqualTo(DATA)
+        Truth.assertThat(data!![questionnaireResponse.item!![0].answer!![0].valueAttachment!!]).isEqualTo(DATA)
         inOrder.verify(recordService).extractUploadData(questionnaireResponse)
         inOrder.verifyNoMoreInteractions()
     }

@@ -17,9 +17,7 @@ package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
 import care.data4life.crypto.KeyType
-import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.fhir.stu3.model.Identifier
-import care.data4life.fhir.stu3.util.FhirAttachmentHelper
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.ThumbnailService
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
@@ -28,6 +26,8 @@ import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.fhir.Fhir3Attachment
+import care.data4life.sdk.fhir.Fhir3Identifier
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirService
@@ -42,10 +42,12 @@ import care.data4life.sdk.model.FetchResult
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
+import care.data4life.sdk.model.SdkFhirAttachmentHelper
 import care.data4life.sdk.model.SdkFhirElementFactory
 import care.data4life.sdk.model.SdkRecordFactory
 import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
+import care.data4life.sdk.model.definitions.FhirAttachmentHelper
 import care.data4life.sdk.model.definitions.FhirElementFactory
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.DecryptedRecordBuilderImpl
@@ -63,6 +65,8 @@ import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
 import care.data4life.sdk.util.MimeType
 import care.data4life.sdk.util.MimeType.Companion.recognizeMimeType
+import care.data4life.sdk.wrappers.SdkAttachmentFactory
+import care.data4life.sdk.wrappers.definitions.Attachment
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -100,6 +104,7 @@ class RecordService(
 
     private val recordFactory: RecordFactory = SdkRecordFactory
     private val fhirElementFactory: FhirElementFactory = SdkFhirElementFactory
+    private val fhirAttachmentHelper: FhirAttachmentHelper = SdkFhirAttachmentHelper
 
     private fun getTagsOnCreate(resource: Any): HashMap<String, String> {
         return if (resource is ByteArray) {
@@ -705,7 +710,7 @@ class RecordService(
             attachmentId: String,
             userId: String,
             type: DownloadType
-    ): Single<Attachment> = downloadAttachments(
+    ): Single<Fhir3Attachment> = downloadAttachments(
             recordId,
             arrayListOf(attachmentId),
             userId,
@@ -717,7 +722,7 @@ class RecordService(
             attachmentIds: List<String>,
             userId: String,
             type: DownloadType
-    ): Single<List<Attachment>> = apiService
+    ): Single<List<Fhir3Attachment>> = apiService
             .fetchRecord(alias, userId, recordId)
             .map { decryptRecord<Fhir3Resource>(it, userId) }
             .flatMap {
@@ -736,15 +741,15 @@ class RecordService(
             userId: String,
             type: DownloadType,
             decryptedRecord: DecryptedFhir3Record<Fhir3Resource>
-    ): Single<out List<Attachment>> {
-        if (FhirAttachmentHelper.hasAttachment(decryptedRecord.resource)) {
+    ): Single<out List<Fhir3Attachment>> {
+        if (fhirAttachmentHelper.hasAttachment(decryptedRecord.resource)) {
             val resource = decryptedRecord.resource
-            val attachments = FhirAttachmentHelper.getAttachment(resource)
-            val validAttachments = mutableListOf<Attachment>()
+            val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Fhir3Attachment?>
+            val validAttachments = mutableListOf<Fhir3Attachment>()
 
             for (attachment in attachments) {
-                if (attachmentIds.contains(attachment.id)) {
-                    validAttachments.add(attachment)
+                if (attachmentIds.contains(attachment?.id)) {
+                    validAttachments.add(attachment!!)
                 }
             }
             if (validAttachments.size != attachmentIds.size)
@@ -752,7 +757,7 @@ class RecordService(
 
             setAttachmentIdForDownloadType(
                     validAttachments,
-                    FhirAttachmentHelper.getIdentifier(resource),
+                    fhirAttachmentHelper.getIdentifier(resource) as List<Fhir3Identifier>?,
                     type
             )
 
@@ -779,12 +784,12 @@ class RecordService(
             userId: String
     ): Single<Boolean> = attachmentService.delete(attachmentId, userId)
 
-    fun <T : Any> extractUploadData(resource: T): HashMap<Attachment, String?>? {
+    fun <T : Any> extractUploadData(resource: T): HashMap<Any, String?>? {
         return if (resource is Fhir3Resource) {
-            val attachments = FhirAttachmentHelper.getAttachment(resource)
+            val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Fhir3Attachment?>?
             if (attachments == null || attachments.isEmpty()) return null
 
-            val data = HashMap<Attachment, String?>(attachments.size)
+            val data = HashMap<Any, String?>(attachments.size)
             for (attachment in attachments) {
                 if (attachment?.data != null) {
                     data[attachment] = attachment.data
@@ -799,11 +804,11 @@ class RecordService(
 
     private fun <T : Fhir3Resource> setUploadData(
             record: DecryptedFhir3Record<T>,
-            attachmentData: HashMap<Attachment, String?>?
+            attachmentData: HashMap<Any, String?>?
     ): DecryptedFhir3Record<T> = record.also {
-        val attachments = FhirAttachmentHelper.getAttachment(record.resource)
+        val attachments = fhirAttachmentHelper.getAttachment(record.resource)
         if (attachments != null && attachments.isNotEmpty()) {
-            FhirAttachmentHelper.updateAttachmentData(record.resource, attachmentData)
+            fhirAttachmentHelper.updateAttachmentData(record.resource, attachmentData)
         }
     }
 
@@ -824,7 +829,7 @@ class RecordService(
     internal fun <T : Any> restoreUploadData(
             record: DecryptedBaseRecord<T>,
             originalResource: T?,
-            attachmentData: HashMap<Attachment, String?>?
+            attachmentData: HashMap<Any, String?>?
     ): DecryptedBaseRecord<T> {
         if (record !is DecryptedFhir3Record || originalResource !is Fhir3Resource) {
             return record
@@ -848,10 +853,14 @@ class RecordService(
             operation: RemoveRestoreOperation,
             record: DecryptedFhir3Record<T>,
             originalResource: T?,
-            attachmentData: HashMap<Attachment, String?>?
+            attachmentData: HashMap<Fhir3Attachment, String?>?
     ): DecryptedFhir3Record<T> {
         return if (operation == RemoveRestoreOperation.RESTORE) {
-            restoreUploadData(record as DecryptedBaseRecord<T>, originalResource, attachmentData) as DecryptedFhir3Record<T>
+            restoreUploadData(
+                    record as DecryptedBaseRecord<T>,
+                    originalResource,
+                    attachmentData as HashMap<Any, String?>
+            ) as DecryptedFhir3Record<T>
         } else {
             removeUploadData(record as DecryptedBaseRecord<T>) as DecryptedFhir3Record<T>
         }
@@ -870,12 +879,8 @@ class RecordService(
 
         val resource: Fhir3Resource = record.resource as Fhir3Resource
 
-        if (!FhirAttachmentHelper.hasAttachment(resource)) return record
-        val attachments = if (FhirAttachmentHelper.getAttachment(resource) == null) {
-            arrayListOf()
-        } else {
-            FhirAttachmentHelper.getAttachment(resource)
-        }
+        if (!fhirAttachmentHelper.hasAttachment(resource)) return record
+        val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Fhir3Attachment?>?
 
         attachments ?: return record
 
@@ -883,9 +888,11 @@ class RecordService(
             record.attachmentsKey = cryptoService.generateGCKey().blockingGet()
         }
 
-        val validAttachments: MutableList<Attachment> = arrayListOf()
-        for (attachment in attachments) {
-            if (attachment != null) {
+        val validAttachments: MutableList<Fhir3Attachment> = arrayListOf()
+        for (rawAttachment in attachments) {
+            if (rawAttachment != null) {
+                val attachment = SdkAttachmentFactory.wrap(rawAttachment)
+
                 when {
                     attachment.id != null ->
                         throw DataValidationException.IdUsageViolation("Attachment.id should be null")
@@ -894,11 +901,11 @@ class RecordService(
                         throw DataValidationException.ExpectedFieldViolation(
                                 "Attachment.hash and Attachment.size expected"
                         )
-                    getValidHash(attachment) != attachment.hash ->
+                    getValidHash(rawAttachment) != attachment.hash ->
                         throw DataValidationException.InvalidAttachmentPayloadHash(
                                 "Attachment.hash is not valid"
                         )
-                    else -> validAttachments.add(attachment)
+                    else -> validAttachments.add(rawAttachment)
                 }
             }
         }
@@ -934,44 +941,46 @@ class RecordService(
         }
 
         var resource = record.resource as Fhir3Resource
-        if (!FhirAttachmentHelper.hasAttachment(resource)) return record
+        if (!fhirAttachmentHelper.hasAttachment(resource)) return record
         val attachments =
-                if (FhirAttachmentHelper.getAttachment(resource) == null) {
+                if (fhirAttachmentHelper.getAttachment(resource) == null) {
                     arrayListOf()
                 } else {
-                    FhirAttachmentHelper.getAttachment(resource)
+                    fhirAttachmentHelper.getAttachment(resource)!! as  List<Fhir3Attachment?>
                 }
 
-        val validAttachments: MutableList<Attachment> = arrayListOf()
+        val validAttachments: MutableList<Fhir3Attachment> = arrayListOf()
         val oldAttachments: HashMap<String?, Attachment> = hashMapOf()
 
         for (attachment in attachments) {
             if (attachment?.id != null) {
-                oldAttachments[attachment.id] = attachment
+                oldAttachments[attachment.id] = SdkAttachmentFactory.wrap(attachment)
             }
         }
 
         resource = newResource
-        val newAttachments = FhirAttachmentHelper.getAttachment(newResource)
-        for (newAttachment in newAttachments) {
-            if (newAttachment != null) {
+        val newAttachments = fhirAttachmentHelper.getAttachment(newResource) as List<Fhir3Attachment?>
+        for (rawNewAttachment in newAttachments) {
+            if (rawNewAttachment != null) {
+                val newAttachment = SdkAttachmentFactory.wrap(rawNewAttachment)
+
                 when {
                     newAttachment.hash == null || newAttachment.size == null ->
                         throw DataValidationException.ExpectedFieldViolation(
                                 "Attachment.hash and Attachment.size expected"
                         )
-                    getValidHash(newAttachment) != newAttachment.hash ->
+                    getValidHash(rawNewAttachment) != newAttachment.hash ->
                         throw DataValidationException.InvalidAttachmentPayloadHash(
                                 "Attachment.hash is not valid"
                         )
-                    newAttachment.id == null -> validAttachments.add(newAttachment)
+                    newAttachment.id == null -> validAttachments.add(rawNewAttachment)
                     else -> {
                         val oldAttachment = oldAttachments[newAttachment.id]
                                 ?: throw DataValidationException.IdUsageViolation(
                                         "Valid Attachment.id expected"
                                 )
                         if (oldAttachment.hash == null || newAttachment.hash != oldAttachment.hash) {
-                            validAttachments.add(newAttachment)
+                            validAttachments.add(rawNewAttachment)
                         }
                     }
                 }
@@ -1002,22 +1011,18 @@ class RecordService(
         }
 
         val resource = record.resource as Fhir3Resource
-        if (!FhirAttachmentHelper.hasAttachment(resource)) return record
-        val attachments = if (FhirAttachmentHelper.getAttachment(resource) == null) {
-            arrayListOf()
-        } else {
-            FhirAttachmentHelper.getAttachment(resource)
-        }
+        if (!fhirAttachmentHelper.hasAttachment(resource)) return record
+        val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Fhir3Attachment?>?
 
         attachments ?: return record
 
         attachments.forEach {
-            it.id ?: throw DataValidationException.IdUsageViolation("Attachment.id expected")
+            it?.id ?: throw DataValidationException.IdUsageViolation("Attachment.id expected")
         }
 
         @Suppress("CheckResult")
         attachmentService.download(
-                attachments,
+                attachments as List<Fhir3Attachment>,
                 // FIXME this is forced
                 record.attachmentsKey!!,
                 // FIXME this is forced
@@ -1064,18 +1069,19 @@ class RecordService(
     }
 
     private fun updateFhir3ResourceIdentifier(
-            d: Fhir3Resource,
-            result: List<Pair<Attachment, List<String>?>>
+            resource: Fhir3Resource,
+            result: List<Pair<Any, List<String>?>>
     ) {
         val sb = StringBuilder()
         for ((first, second) in result) {
             if (second != null) { //Attachment is a of image type
+                val attachment = SdkAttachmentFactory.wrap(second)
                 sb.setLength(0)
-                sb.append(DOWNSCALED_ATTACHMENT_IDS_FMT).append(ThumbnailService.SPLIT_CHAR).append(first.id)
+                sb.append(DOWNSCALED_ATTACHMENT_IDS_FMT).append(ThumbnailService.SPLIT_CHAR).append(attachment.id)
                 for (additionalId in second) {
                     sb.append(ThumbnailService.SPLIT_CHAR).append(additionalId)
                 }
-                FhirAttachmentHelper.appendIdentifier(d, sb.toString(), partnerId)
+                fhirAttachmentHelper.appendIdentifier(resource, sb.toString(), partnerId)
             }
         }
     }
@@ -1083,11 +1089,12 @@ class RecordService(
     // TODO move to AttachmentService -> Thumbnail handling
     @Throws(DataValidationException.IdUsageViolation::class)
     fun setAttachmentIdForDownloadType(
-            attachments: List<Attachment>,
+            attachments: List<Any>,
             identifiers: List<Identifier>?,
             type: DownloadType?
     ) {
-        for (attachment in attachments) {
+        for (rawAttachment in attachments) {
+            val attachment = SdkAttachmentFactory.wrap(rawAttachment)
             val additionalIds = extractAdditionalAttachmentIds(identifiers, attachment.id)
             if (additionalIds != null) {
                 when (type) {
@@ -1127,7 +1134,7 @@ class RecordService(
     }
 
     // TODO move to AttachmentService
-    fun updateAttachmentMeta(attachment: Attachment): Attachment {
+    fun updateAttachmentMeta(attachment: Fhir3Attachment): Fhir3Attachment {
         val data = decode(attachment.data!!)
         attachment.size = data.size
         attachment.hash = encodeToString(sha1(data))
@@ -1135,43 +1142,47 @@ class RecordService(
     }
 
     // TODO move to AttachmentService
-    fun getValidHash(attachment: Attachment): String {
+    internal fun getValidHash(attachment: Fhir3Attachment): String {
         val data = decode(attachment.data!!)
         return encodeToString(sha1(data))
     }
 
     @Throws(DataValidationException.IdUsageViolation::class)
     fun <T : Fhir3Resource?> cleanObsoleteAdditionalIdentifiers(resource: T) {
-        if (FhirAttachmentHelper.hasAttachment(resource) && FhirAttachmentHelper.getAttachment(resource).isNotEmpty()) {
-            val identifiers = FhirAttachmentHelper.getIdentifier(resource)
-            val currentAttachments = FhirAttachmentHelper.getAttachment(resource)
+        if (fhirAttachmentHelper.hasAttachment(resource as Any) &&
+                fhirAttachmentHelper.getAttachment(resource as Any)?.isNotEmpty() == true
+        ) {
+            val identifiers = fhirAttachmentHelper.getIdentifier(resource)
+            val currentAttachments = fhirAttachmentHelper.getAttachment(resource) as List<Fhir3Attachment?>
             val currentAttachmentIds: MutableList<String> = arrayListOf(currentAttachments.size.toString())
 
-            currentAttachments.forEach { currentAttachmentIds.add(it.id!!) }
+            currentAttachments.forEach {
+                if(it != null) currentAttachmentIds.add(it.id!!)
+            }
 
             if (identifiers == null) return
             val updatedIdentifiers: MutableList<Identifier> = mutableListOf()
-            val identifierIterator = identifiers.iterator()
+            val identifierIterator = identifiers.iterator() as Iterator<Fhir3Identifier>
 
             while (identifierIterator.hasNext()) {
                 val next = identifierIterator.next()
                 val parts = splitAdditionalAttachmentId(next)
                 if (parts == null || currentAttachmentIds.contains(parts[FULL_ATTACHMENT_ID_POS])) {
                     updatedIdentifiers.add(next)
-                } else {
-                    identifierIterator.remove()
                 }
             }
-            FhirAttachmentHelper.setIdentifier(resource, updatedIdentifiers)
+            fhirAttachmentHelper.setIdentifier(resource, updatedIdentifiers)
         }
     }
 
     @Throws(DataRestrictionException.MaxDataSizeViolation::class, DataRestrictionException.UnsupportedFileType::class)
     fun <T : Any> checkDataRestrictions(resource: T?) {
-        if (resource is Fhir3Resource && FhirAttachmentHelper.hasAttachment(resource)) {
-            val attachments = FhirAttachmentHelper.getAttachment(resource)
-            for (attachment in attachments) {
-                attachment?.data ?: return
+        if (resource is Fhir3Resource && fhirAttachmentHelper.hasAttachment(resource)) {
+            val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Fhir3Attachment?>
+            for (rawAttachment in attachments) {
+                rawAttachment?: return
+
+                val attachment = SdkAttachmentFactory.wrap(rawAttachment)
 
                 val data = decode(attachment.data!!)
                 if (recognizeMimeType(data) == MimeType.UNKNOWN) {

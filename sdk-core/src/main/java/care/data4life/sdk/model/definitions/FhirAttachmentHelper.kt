@@ -17,16 +17,15 @@
 package care.data4life.sdk.model.definitions
 
 import care.data4life.sdk.lang.CoreRuntimeException
-import java.util.HashMap
 
 internal interface FhirAttachmentHelper {
     fun hasAttachment(resource: Any): Boolean
     @Throws(CoreRuntimeException.InternalFailure::class)
-    fun getAttachment(resource: Any): MutableList<Any>?
+    fun getAttachment(resource: Any): MutableList<Any?>?
     @Throws(CoreRuntimeException.InternalFailure::class)
-    fun updateAttachmentData(resource: Any, attachmentData: HashMap<Any, String>?)
+    fun updateAttachmentData(resource: Any, attachmentData: HashMap<Any, String?>?)
     @Throws(CoreRuntimeException.InternalFailure::class)
-    fun getIdentifiers(resource: Any): List<Any>?
+    fun getIdentifier(resource: Any): List<Any>?
     @Throws(CoreRuntimeException.InternalFailure::class)
     fun setIdentifier(resource: Any, updatedIdentifiers: List<Any>)
     @Throws(CoreRuntimeException.InternalFailure::class)

@@ -35,4 +35,6 @@ internal class SdkFhir3Attachment(
         get() = attachment.size
         set(size) {attachment.size = size}
 
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : Any> unwrap(): T = attachment as T
 }

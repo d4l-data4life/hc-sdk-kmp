@@ -106,7 +106,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .`when`(recordService).restoreUploadData(
                         mockDecryptedFhir3Record,
                         mockCarePlan,
-                        mockUploadData
+                        mockUploadData as HashMap<Any, String?>
                 )
         @Suppress("UNCHECKED_CAST")
         every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
@@ -150,7 +150,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         inOrder.verify(recordService).restoreUploadData(
                 mockDecryptedFhir3Record,
                 mockCarePlan,
-                mockUploadData
+                mockUploadData as HashMap<Any, String?>
         )
         inOrder.verify(recordService).assignResourceId(mockDecryptedFhir3Record)
         inOrder.verifyNoMoreInteractions()
@@ -218,7 +218,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .restoreUploadData(
                         mockDecryptedFhir3Record,
                         mockCarePlan,
-                        mockUploadData
+                        mockUploadData as HashMap<Any, String?>
                 )
 
         Mockito.doReturn(mockDecryptedFhir3Record)
@@ -423,7 +423,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .`when`(recordService).restoreUploadData(
                         mockAnnotatedDecryptedFhirRecord,
                         mockCarePlan,
-                        mockUploadData
+                        mockUploadData as HashMap<Any, String?>
                 )
         @Suppress("UNCHECKED_CAST")
         every { SdkRecordFactory.getInstance(mockAnnotatedDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
@@ -466,7 +466,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         inOrder.verify(recordService).restoreUploadData(
                 mockAnnotatedDecryptedFhirRecord,
                 mockCarePlan,
-                mockUploadData
+                mockUploadData as HashMap<Any, String?>
         )
         inOrder.verify(recordService).assignResourceId(mockAnnotatedDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
@@ -534,7 +534,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .restoreUploadData(
                         mockAnnotatedDecryptedFhirRecord,
                         mockCarePlan,
-                        mockUploadData
+                        mockUploadData as HashMap<Any, String?>
                 )
 
         Mockito.doReturn(mockAnnotatedDecryptedFhirRecord)

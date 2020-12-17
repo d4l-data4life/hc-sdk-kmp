@@ -25,4 +25,7 @@ internal class SdkFhir3Identifier(
     override var value: String?
         get() = identifier.value
         set(value) {identifier.value = value}
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : Any> unwrap(): T = identifier as T
 }

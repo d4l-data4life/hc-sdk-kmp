@@ -26,10 +26,9 @@ import care.data4life.sdk.wrappers.definitions.IdentifierFactory
 internal object SdkIdentifierFactory: IdentifierFactory {
     @Throws(DataValidationException.CustomDataLimitViolation::class)
     override fun wrap(identifier: Any): Identifier {
-        return if(identifier !is Fhir3Identifier) {
-            throw CoreRuntimeException.InternalFailure()
-        } else {
-            SdkFhir3Identifier(identifier)
+        return when(identifier) {
+            is Fhir3Identifier -> SdkFhir3Identifier(identifier)
+            else -> throw CoreRuntimeException.InternalFailure()
         }
     }
 }

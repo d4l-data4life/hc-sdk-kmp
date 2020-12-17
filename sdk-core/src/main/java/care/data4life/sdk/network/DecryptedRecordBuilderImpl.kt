@@ -189,7 +189,7 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
                     creationDate,
                     dataKey,
                     modelVersion
-            )
+            )// ToDo: Explode
             is Fhir3Resource -> this.buildFhir3Record(
                     resource,
                     tags,

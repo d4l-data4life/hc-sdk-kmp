@@ -173,7 +173,7 @@ task<Exec>("publishFeature") {
 task<Exec>("publishSnapshot") {
     commandLine("./gradlew",
             "gitPublishReset",
-            "publishAllPublicationsToFeaturePackagesRepository",
+            "publishAllPublicationsToSnapshotPackagesRepository",
             "gitPublishCommit",
             "gitPublishPush"
     )
@@ -182,7 +182,7 @@ task<Exec>("publishSnapshot") {
 task<Exec>("publishRelease") {
     commandLine("./gradlew",
             "gitPublishReset",
-            "publishAllPublicationsToFeaturePackagesRepository",
+            "publishAllPublicationsToReleasePackagesRepository",
             "gitPublishCommit",
             "gitPublishPush"
     )

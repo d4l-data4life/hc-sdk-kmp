@@ -187,14 +187,11 @@ class RecordService(
                 .fromCallable { resources }
                 .flatMapIterable { it }
                 .flatMapSingle { resource ->
-                    createRecord(userId, resource, listOf()).onErrorReturn { error ->
-                        Record<T>(null, null, null).also {
-                            failedOperations.add(Pair(resource, errorHandler.handleError(error)))
-                            Unit
-                        }
-                    }
+                    createRecord(userId, resource, listOf())
+                            .ignoreErrors {
+                                failedOperations.add(Pair(resource, errorHandler.handleError(it)))
+                            }
                 }
-                .filter { it != EMPTY_RECORD }
                 .toList()
                 .map { CreateResult(it, failedOperations) }
     }
@@ -263,14 +260,10 @@ class RecordService(
                 .flatMapIterable { it }
                 .flatMapSingle { recordId ->
                     fetchFhir3Record<T>(recordId, userId)
-                            .onErrorReturn { error ->
-                                Record<T>(null, null, null).also {
-                                    failedFetches.add(Pair(recordId, errorHandler.handleError(error)))
-                                    Unit
-                                }
+                            .ignoreErrors {
+                                failedFetches.add(Pair(recordId, errorHandler.handleError(it)))
                             }
                 }
-                .filter { it != EMPTY_RECORD }
                 .toList()
                 .map { FetchResult(it, failedFetches) }
     }
@@ -441,12 +434,10 @@ class RecordService(
                 .flatMapIterable { it }
                 .flatMapSingle { recordId ->
                     downloadRecord<T>(recordId, userId)
-                            .onErrorReturn { error ->
-                                failedDownloads.add(Pair(recordId, errorHandler.handleError(error)))
-                                Record(null, null, null)
+                            .ignoreErrors {
+                                failedDownloads.add(Pair(recordId, errorHandler.handleError(it)))
                             }
                 }
-                .filter { it != EMPTY_RECORD }
                 .toList()
                 .map { DownloadResult(it, failedDownloads) }
     }
@@ -537,14 +528,10 @@ class RecordService(
                 .flatMapIterable { it }
                 .flatMapSingle { resource ->
                     updateRecord(userId, resource.id!!, resource, listOf())
-                            .onErrorReturn { error ->
-                                Record<T>(null, null, null).also {
-                                    failedUpdates.add(Pair(resource, errorHandler.handleError(error)))
-                                    Unit
-                                }
+                            .ignoreErrors {
+                                failedUpdates.add(Pair(resource, errorHandler.handleError(it)))
                             }
                 }
-                .filter { it != EMPTY_RECORD }
                 .toList()
                 .map { UpdateResult(it, failedUpdates) }
     }
@@ -947,7 +934,7 @@ class RecordService(
                 if (fhirAttachmentHelper.getAttachment(resource) == null) {
                     arrayListOf()
                 } else {
-                    fhirAttachmentHelper.getAttachment(resource)!! as  List<Fhir3Attachment?>
+                    fhirAttachmentHelper.getAttachment(resource)!! as List<Fhir3Attachment?>
                 }
 
         val validAttachments: MutableList<Attachment> = arrayListOf()
@@ -1164,7 +1151,7 @@ class RecordService(
             val currentAttachmentIds: MutableList<String> = arrayListOf(currentAttachments.size.toString())
 
             currentAttachments.forEach {
-                if(it != null) currentAttachmentIds.add(it.id!!)
+                if (it != null) currentAttachmentIds.add(it.id!!)
             }
 
             if (identifiers == null) return
@@ -1188,7 +1175,7 @@ class RecordService(
         if (resource is Fhir3Resource && fhirAttachmentHelper.hasAttachment(resource)) {
             val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Fhir3Attachment?>
             for (rawAttachment in attachments) {
-                rawAttachment?: return
+                rawAttachment ?: return
 
                 val attachment = SdkAttachmentFactory.wrap(rawAttachment)
 
@@ -1223,8 +1210,13 @@ class RecordService(
     )
     //endregion
 
+    private fun <T> Single<T>.ignoreErrors(exceptionHandler: (Throwable) -> Unit) = retryWhen { errors ->
+        errors
+                .doOnNext { exceptionHandler(it) }
+                .map { 0 }
+    }
+
     companion object {
-        private val EMPTY_RECORD = Record(null, null, null)
         private const val DATE_FORMAT = "yyyy-MM-dd"
         private const val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss[.SSS]"
         private const val EMPTY_RECORD_ID = ""

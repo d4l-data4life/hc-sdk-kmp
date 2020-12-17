@@ -16,36 +16,26 @@
 
 package care.data4life.sdk.attachment
 
-import care.data4life.crypto.GCKey
 import care.data4life.sdk.fhir.Fhir3Attachment
-import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.fhir.Fhir3DateTimeParser
 import care.data4life.sdk.wrappers.definitions.Attachment
-import io.reactivex.Single
 
-// TODO change to internal
-class AttachmentContract {
+internal object LegacyDateValidator: AttachmentContract.LegacyDateValidator {
+    private val validationFhir3Date = Fhir3DateTimeParser.parseDateTime(
+            "2019-09-15"
+    )
 
-    interface Service {
-
-        fun upload(
-                attachments: List<Fhir3Attachment>,
-                attachmentsKey: GCKey,
-                userId: String
-        ): Single<List<Pair<Fhir3Attachment, List<String>>>>
-
-
-        @Throws(DataValidationException.InvalidAttachmentPayloadHash::class)
-        fun download(
-                attachments: List<Fhir3Attachment>,
-                attachmentsKey: GCKey,
-                userId: String
-        ): Single<List<Fhir3Attachment>>
-
-        
-        fun delete(attachmentId: String, userId: String): Single<Boolean>
+    private fun validateFhir3Date(attachment: Fhir3Attachment): Boolean {
+        return attachment.creation?.date?.toDate()?.after(validationFhir3Date.date.toDate()) ?: true
     }
 
-    internal interface LegacyDateValidator {
-        fun isInvalidateDate(attachment: Attachment): Boolean
+    override fun isInvalidateDate(attachment: Attachment): Boolean {
+        val rawAttachment = attachment.unwrap() as Any
+        return if(rawAttachment is Fhir3Attachment ) {
+            validateFhir3Date(rawAttachment)
+        } else {
+            true
+        }
     }
+
 }

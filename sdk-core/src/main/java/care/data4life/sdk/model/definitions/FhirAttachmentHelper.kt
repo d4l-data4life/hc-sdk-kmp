@@ -22,11 +22,11 @@ import java.util.HashMap
 internal interface FhirAttachmentHelper {
     fun hasAttachment(resource: Any): Boolean
     @Throws(CoreRuntimeException.InternalFailure::class)
-    fun getAttachment(resource: Any): MutableList<Any>
+    fun getAttachment(resource: Any): MutableList<Any>?
     @Throws(CoreRuntimeException.InternalFailure::class)
     fun updateAttachmentData(resource: Any, attachmentData: HashMap<Any, String>?)
     @Throws(CoreRuntimeException.InternalFailure::class)
-    fun getIdentifiers(resource: Any): List<Any>
+    fun getIdentifiers(resource: Any): List<Any>?
     @Throws(CoreRuntimeException.InternalFailure::class)
     fun setIdentifier(resource: Any, updatedIdentifiers: List<Any>)
     @Throws(CoreRuntimeException.InternalFailure::class)

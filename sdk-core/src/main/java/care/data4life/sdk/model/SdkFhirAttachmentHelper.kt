@@ -16,9 +16,9 @@
 
 package care.data4life.sdk.model
 
-import care.data4life.fhir.stu3.model.Attachment
-import care.data4life.fhir.stu3.model.DomainResource
-import care.data4life.fhir.stu3.model.Identifier
+import care.data4life.sdk.fhir.Fhir3Attachment
+import care.data4life.sdk.fhir.Fhir3Identifier
+import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper as Fhir3AttachmentHelper
 import care.data4life.sdk.model.definitions.FhirAttachmentHelper
@@ -26,89 +26,52 @@ import java.util.HashMap
 
 internal object SdkFhirAttachmentHelper: FhirAttachmentHelper {
     override fun hasAttachment(resource: Any): Boolean {
-        return if(resource !is DomainResource) {
-             false
-        } else {
-            Fhir3AttachmentHelper.hasAttachment(resource)
-        }
+        return Fhir3AttachmentHelper.hasAttachment(resource as Fhir3Resource)
     }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
-    override fun getAttachment(resource: Any): MutableList<Any> {
+    override fun getAttachment(resource: Any): MutableList<Any>? {
         @Suppress("UNCHECKED_CAST")
-        return if(resource !is DomainResource) {
-            throw CoreRuntimeException.InternalFailure()
-        } else {
-            val result = Fhir3AttachmentHelper.getAttachment(resource)
-            (result ?: mutableListOf()) as MutableList<Any>
-        }
-    }
-
-    @Throws(CoreRuntimeException.InternalFailure::class)
-    private fun validateFhir3Attachments(attachments: Set<Any>) {
-        for(attachment in attachments) {
-            if(attachment !is Attachment) {
-                throw CoreRuntimeException.InternalFailure()
-            }
-        }
+        return Fhir3AttachmentHelper.getAttachment(resource as Fhir3Resource) as MutableList<Any>?
     }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun updateAttachmentData(resource: Any, attachmentData: HashMap<Any, String>?) {
-        if(resource !is DomainResource) {
-            throw CoreRuntimeException.InternalFailure()
+        @Suppress("UNCHECKED_CAST")
+        val attachment = if( attachmentData == null) {
+            null
         } else {
-            if(attachmentData == null || attachmentData.isEmpty() ) {
-                return
-            }
-
-            validateFhir3Attachments(attachmentData.keys)
-
-            @Suppress("UNCHECKED_CAST")
-            return Fhir3AttachmentHelper.updateAttachmentData(resource, attachmentData as HashMap<Attachment, String>)
+            attachmentData as HashMap<Fhir3Attachment, String>
         }
+
+        @Suppress("UNCHECKED_CAST")
+        return Fhir3AttachmentHelper.updateAttachmentData(
+                resource as Fhir3Resource,
+                attachment
+        )
     }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
-    override fun getIdentifiers(resource: Any): List<Any> {
-        return if (resource !is DomainResource) {
-            throw CoreRuntimeException.InternalFailure()
-        } else {
-            Fhir3AttachmentHelper.getIdentifier(resource) ?: mutableListOf()
-        }
-    }
-
-    @Throws(CoreRuntimeException.InternalFailure::class)
-    private fun validateFhir3Identifiers(identifiers: List<Any>) {
-        for( identifier in identifiers) {
-            if (identifier !is Identifier) {
-                throw CoreRuntimeException.InternalFailure()
-            }
-        }
+    override fun getIdentifiers(resource: Any): List<Any>? {
+        return Fhir3AttachmentHelper.getIdentifier(resource as Fhir3Resource)
     }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun setIdentifier(resource: Any, updatedIdentifiers: List<Any>) {
-        if (resource !is DomainResource) {
-            throw CoreRuntimeException.InternalFailure()
-        } else {
-            if(updatedIdentifiers.isEmpty()) {
-                return
-            }
-
-            validateFhir3Identifiers(updatedIdentifiers)
-            @Suppress("UNCHECKED_CAST")
-            Fhir3AttachmentHelper.setIdentifier(resource, updatedIdentifiers as List<Identifier>)
-        }
+        @Suppress("UNCHECKED_CAST")
+        return Fhir3AttachmentHelper.setIdentifier(
+                resource as Fhir3Resource,
+                updatedIdentifiers as List<Fhir3Identifier>
+        )
     }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun appendIdentifier(resource: Any, identifier: String, assigner: String) {
-        if( resource !is DomainResource ) {
-            throw CoreRuntimeException.InternalFailure()
-        } else {
-            Fhir3AttachmentHelper.appendIdentifier(resource, identifier, assigner)
-        }
+        return Fhir3AttachmentHelper.appendIdentifier(
+                resource as Fhir3Resource,
+                identifier,
+                assigner
+        )
     }
 
 }

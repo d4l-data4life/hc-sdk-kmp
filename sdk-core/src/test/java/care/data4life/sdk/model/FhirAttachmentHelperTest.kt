@@ -29,6 +29,7 @@ import io.mockk.unmockkAll
 import io.mockk.verify
 import org.junit.After
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -52,12 +53,7 @@ class FhirAttachmentHelperTest {
     }
 
     @Test
-    fun `Given, hasAttachment is called with non FhirResource, it returns false`() {
-        assertFalse(SdkFhirAttachmentHelper.hasAttachment("something"))
-    }
-
-    @Test
-    fun `Given, hasAttachment is called with a FhirResource, it delegates to and returns of the wrapped Fhir3AttachmentHelper`() {
+    fun `Given, hasAttachment is called with a Fhir3Resource, it delegates to and returns of the wrapped Fhir3AttachmentHelper`() {
         // Given
         val resource1 = Mockito.mock(DocumentReference::class.java)
         val resource2 = Mockito.mock(DocumentReference::class.java)
@@ -74,19 +70,7 @@ class FhirAttachmentHelperTest {
     }
 
     @Test
-    fun `Given, getAttachment is called with a non FhirResource, it fails with a CoreRuntimeExceptionInternalFailure`() {
-        try {
-            // When
-            SdkFhirAttachmentHelper.getAttachment("something")
-            assertTrue(false)//Fixme
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, getAttachment is called with FhirResource, it delegates to and returns of the wrapped Fhir3AttachmentHelper`() {
+    fun `Given, getAttachment is called with Fhir3Resource, it delegates to and returns of the wrapped Fhir3AttachmentHelper`() {
         // Given
         val resource = Mockito.mock(DocumentReference::class.java)
         @Suppress("UNCHECKED_CAST")
@@ -105,7 +89,7 @@ class FhirAttachmentHelperTest {
     }
 
     @Test
-    fun `Given, getAttachment is called with FhirResource and the response of the wrapped Fhir3AttachmentHelper is null, it returns a empty List`() {
+    fun `Given, getAttachment is called with Fhir3Resource and the response of the wrapped Fhir3AttachmentHelper is null, it returns null`() {
         // Given
         val resource = Mockito.mock(DocumentReference::class.java)
 
@@ -115,53 +99,13 @@ class FhirAttachmentHelperTest {
         val result = SdkFhirAttachmentHelper.getAttachment(resource)
 
         // Then
-        assertTrue(result.isEmpty())
+        assertNull(result)
 
         verify(exactly = 1) { Fhir3AttachmentHelper.getAttachment(resource) }
     }
 
     @Test
-    fun `Given, updateAttachmentData is called with a non FhirResource and a HashMap Attachment to String, it fails with a CoreRuntimeExceptionInternalFailure`() {
-        // Given
-        @Suppress("UNCHECKED_CAST")
-        val attachments = hashMapOf(
-                Mockito.mock(Attachment::class.java) to "1",
-                Mockito.mock(Attachment::class.java) to "2"
-        ) as HashMap<Any, String>
-
-        try {
-            // When
-            SdkFhirAttachmentHelper.updateAttachmentData("something", attachments)
-            assertTrue(false)//Fixme
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, updateAttachmentData is called with a FhirResource and a HashMap, , which contains non Attachment to String, it fails with a CoreRuntimeExceptionInternalFailure`() {
-        // Given
-        val resource = Mockito.mock(DocumentReference::class.java)
-
-        @Suppress("UNCHECKED_CAST")
-        val attachments = hashMapOf(
-                Mockito.mock(Attachment::class.java) to "1",
-                "b" to "2"
-        ) as HashMap<Any, String>
-
-        try {
-            // When
-            SdkFhirAttachmentHelper.updateAttachmentData(resource, attachments)
-            assertTrue(false)//Fixme
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, updateAttachmentData is called with a FhirResource and null as attachment, it does nothing`() {
+    fun `Given, updateAttachmentData is called with a Fhir3Resource and null as attachment, it delegates it to the Fhir3Helper`() {
         // Given
         val resource = Mockito.mock(DocumentReference::class.java)
 
@@ -171,11 +115,11 @@ class FhirAttachmentHelperTest {
         SdkFhirAttachmentHelper.updateAttachmentData(resource, null)
 
         // Then
-        verify(exactly = 0) { Fhir3AttachmentHelper.updateAttachmentData(any(), any()) }
+        verify(exactly = 1) { Fhir3AttachmentHelper.updateAttachmentData(any(), any()) }
     }
 
     @Test
-    fun `Given, updateAttachmentData is called with a FhirResource and a empty HashMap as attachement, it does nothing`() {
+    fun `Given, updateAttachmentData is called with a Fhir3Resource and a empty HashMap as attachement, it delegates it to the Fhir3Helper`() {
         // Given
         val resource = Mockito.mock(DocumentReference::class.java)
 
@@ -185,11 +129,11 @@ class FhirAttachmentHelperTest {
         SdkFhirAttachmentHelper.updateAttachmentData(resource, hashMapOf())
 
         // Then
-        verify(exactly = 0) { Fhir3AttachmentHelper.updateAttachmentData(any(), any()) }
+        verify(exactly = 1) { Fhir3AttachmentHelper.updateAttachmentData(any(), any()) }
     }
 
     @Test
-    fun `Given, updateAttachmentData is called with a FhirResource and a HashMap Attachment to String, it delegates to and returns of the wrapped Fhir3AttachmentHelper`() {
+    fun `Given, updateAttachmentData is called with a Fhir3Resource and a HashMap Attachment to String, it delegates to and returns of the wrapped Fhir3AttachmentHelper`() {
         // Given
         val resource = Mockito.mock(DocumentReference::class.java)
 
@@ -215,20 +159,7 @@ class FhirAttachmentHelperTest {
     }
 
     @Test
-    fun `Given, getIdentifiers is called with a non FhirResource, it fails with a CoreRuntimeExceptionInternalFailure`() {
-        // Given
-        try {
-            // When
-            SdkFhirAttachmentHelper.getIdentifiers("something")
-            assertTrue(false)//Fixme
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, getIdentifiers is called with a FhirResource, it delegates to and returns of the wrapped Fhir3AttachmentHelper`() {
+    fun `Given, getIdentifiers is called with a Fhir3Resource, it delegates to and returns of the wrapped Fhir3AttachmentHelper`() {
         // Given
         val resource = Mockito.mock(DomainResource::class.java)
         @Suppress("UNCHECKED_CAST")
@@ -246,7 +177,7 @@ class FhirAttachmentHelperTest {
     }
 
     @Test
-    fun `Given, getIdentifiers is called with a FhirResource and the response of the wrapped Fhir3AttachmentHelper is null, it returns a empty List`() {
+    fun `Given, getIdentifiers is called with a Fhir3Resource, it returns the result of the Fhir3AttachmentHelper`() {
         // Given
         val resource = Mockito.mock(DomainResource::class.java)
 
@@ -256,45 +187,13 @@ class FhirAttachmentHelperTest {
         val result = SdkFhirAttachmentHelper.getIdentifiers(resource)
 
         // Then
-        assertTrue(result.isEmpty())
+        assertNull(result)
 
         verify(exactly = 1) { Fhir3AttachmentHelper.getIdentifier(resource) }
     }
 
     @Test
-    fun `Given, setIdentifier is called with a non FhirResource and a List of Identifiers, it fails with a CoreRuntimeExceptionInternalFailure`() {
-        // Given
-        val identifier1 = Mockito.mock(Identifier::class.java)
-        val identifier2 = Mockito.mock(Identifier::class.java)
-
-        try {
-            // When
-            SdkFhirAttachmentHelper.setIdentifier("something", listOf(identifier1, identifier2))
-            assertTrue(false)//Fixme
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, setIdentifier is called with a FhirResource and a List, which contains Identifiers, it fails with a CoreRuntimeExceptionInternalFailure`() {
-        // Given
-        val resource = Mockito.mock(DomainResource::class.java)
-        val identifier = Mockito.mock(Identifier::class.java)
-
-        try {
-            // When
-            SdkFhirAttachmentHelper.setIdentifier(resource, listOf(identifier, "something"))
-            assertTrue(false)//Fixme
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, setIdentifier is called with a FhirResource and a empty List, it does nothing`() {
+    fun `Given, setIdentifier is called with a Fhir3Resource and a empty List, it returns the result of the Fhir3AttachmentHelper`() {
         // Given
         val resource = Mockito.mock(DomainResource::class.java)
         every { Fhir3AttachmentHelper.setIdentifier(any(), any()) } returns Unit
@@ -303,12 +202,12 @@ class FhirAttachmentHelperTest {
         SdkFhirAttachmentHelper.setIdentifier(resource, listOf())
 
         // Then
-        verify(exactly = 0) { Fhir3AttachmentHelper.setIdentifier(any(), any()) }
+        verify(exactly = 1) { Fhir3AttachmentHelper.setIdentifier(any(), any()) }
     }
 
 
     @Test
-    fun `Given, setIdentifier is called with a FhirResource and a List of Identifiers, it delegates to and returns of the wrapped Fhir3AttachmentHelper`() {
+    fun `Given, setIdentifier is called with a Fhir3Resource and a List of Identifiers, it delegates to and returns of the wrapped Fhir3AttachmentHelper`() {
         // Given
         val resource = Mockito.mock(DomainResource::class.java)
         val identifiers = listOf(
@@ -327,19 +226,7 @@ class FhirAttachmentHelperTest {
     }
 
     @Test
-    fun `Given, appendIdentifier is called with a non FhirResource, a Identifier and a Assigner, it fails with a CoreRuntimeExceptionInternalFailure`() {
-        try {
-            // When
-            SdkFhirAttachmentHelper.appendIdentifier("somthing", "id", "anything")
-            assertTrue(false)//Fixme
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-    }
-
-    @Test
-    fun `Given, appendIdentifier is called with a FhirResource, a Identifier and a Assigner, it delegates to and returns of the wrapped Fhir3AttachmentHelper`() {
+    fun `Given, appendIdentifier is called with a Fhir3Resource, a Identifier and a Assigner, it delegates to and returns of the wrapped Fhir3AttachmentHelper`() {
         // Given
         val resource = Mockito.mock(DomainResource::class.java)
         val identifier = "id"

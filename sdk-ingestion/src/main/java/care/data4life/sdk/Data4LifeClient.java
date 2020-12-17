@@ -26,6 +26,8 @@ import care.data4life.auth.AuthorizationConfiguration;
 import care.data4life.auth.AuthorizationContract;
 import care.data4life.auth.AuthorizationService;
 import care.data4life.auth.storage.InMemoryAuthStorage;
+import care.data4life.sdk.auth.OAuthService;
+import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.log.Log;
 import care.data4life.sdk.network.Environment;
 import care.data4life.securestore.SecureStore;
@@ -43,8 +45,9 @@ public final class Data4LifeClient extends BaseClient {
     private static final String DUMMY_CLIENT_SECRET = "secret";
     private static final String DUMMY_REDIRECT_URL = "dummy";
     /* Since this client get an OAuth access token directly and never makes
-    * any requests to the OAuth endpoint, we just add a single, dummy scope. */
+     * any requests to the OAuth endpoint, we just add a single, dummy scope. */
     private static final Set<String> DUMMY_SCOPES = new HashSet<String>(Arrays.asList("fakescope"));
+
 
     /**
      * Hidden constructor for the ingestion client.
@@ -52,18 +55,25 @@ public final class Data4LifeClient extends BaseClient {
      * @param alias         Alias
      * @param userService   User service
      * @param recordService Record service
-     * @param errorHandler  Error handler
+     * @param callHandler   Call handler
      */
     protected Data4LifeClient(String alias,
                               UserService userService,
                               RecordService recordService,
-                              SdkContract.ErrorHandler errorHandler) {
-        super(alias, userService, recordService, errorHandler);
+                              CallHandler callHandler) {
+        super(alias, userService, recordService, callHandler,
+                Data4LifeClient.Companion.createLegacyDataClient(
+                        alias, userService, recordService, callHandler
+                ),
+                Data4LifeClient.Companion.createLegacyAuthClient(
+                        alias, userService, recordService, callHandler
+                )
+        );
     }
 
     /**
      * Factory method for creating an ingestion SDK client instance.
-     *
+     * <p>
      * Unlike a normal SDK client, the ingestion SDK client does not handle OAuth authorization.
      * Instead, the OAuth flow must be handled by the system using the client and a valid OAuth
      * access token must be passed in. Likewise, the service must be passed the private key that
@@ -123,10 +133,11 @@ public final class Data4LifeClient extends BaseClient {
         FileService fileService = new FileService(ALIAS, apiService, cryptoService);
         AttachmentService attachmentService = new AttachmentService(ALIAS, fileService, new JvmImageResizer());
         D4LErrorHandler errorHandler = new D4LErrorHandler();
+        CallHandler callHandler = new CallHandler(errorHandler);
         String partnerId = clientId.split(CLIENT_ID_SPLIT_CHAR)[PARTNER_ID_INDEX];
         RecordService recordService = new RecordService(partnerId, ALIAS, apiService, tagEncryptionService, taggingService, fhirService, attachmentService, cryptoService, errorHandler);
 
-        return new Data4LifeClient(ALIAS, userService, recordService, errorHandler);
+        return new Data4LifeClient(ALIAS, userService, recordService, callHandler);
     }
 
     /**
@@ -139,7 +150,7 @@ public final class Data4LifeClient extends BaseClient {
      * @return True if fetching and storing succeeded
      */
     public boolean fetchKeys() {
-        return userService.finishLogin(true).blockingGet();
+        return getUserService().finishLogin(true).blockingGet();
     }
 
 }

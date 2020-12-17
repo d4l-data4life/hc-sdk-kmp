@@ -23,6 +23,7 @@ import org.junit.Test;
 import care.data4life.crypto.GCKey;
 import care.data4life.crypto.GCKeyPair;
 import care.data4life.crypto.GCSymmetricKey;
+import care.data4life.sdk.auth.OAuthService;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.network.model.EncryptedKey;
 import care.data4life.sdk.network.model.UserInfo;
@@ -177,6 +178,7 @@ public class UserServiceTest {
         // given
         UserInfo userInfo = mock(UserInfo.class);
         when(userInfo.getCommonKey()).thenReturn(mock(EncryptedKey.class));
+        when(userInfo.getCommonKeyId()).thenReturn("mockedCommonKeyId");
         when(userInfo.getTagEncryptionKey()).thenReturn(mock(EncryptedKey.class));
         when(userInfo.getUid()).thenReturn("");
 

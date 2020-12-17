@@ -185,15 +185,6 @@ public class CryptoServiceTest {
     }
 
     @Test
-    public void decrypt_shouldThrowErrors() {
-        // when
-        TestObserver<byte[]> testSubscriber = cryptoService.decrypt(gcKey, null).test();
-
-        // then
-        testSubscriber.assertError((Class<? extends Throwable>) CryptoException.DecryptionFailed.class);
-    }
-
-    @Test
     public void encryptString_shouldCompleteWithoutErrors() {
         // given
         String input = "data";
@@ -210,15 +201,6 @@ public class CryptoServiceTest {
     }
 
     @Test
-    public void encryptString_shouldThrowError() {
-        // when
-        TestObserver<String> observer = cryptoService.encryptString(null, "").test();
-
-        // then
-        observer.assertError((Class<? extends Throwable>) CryptoException.EncryptionFailed.class);
-    }
-
-    @Test
     public void decryptString_shouldCompleteWithoutErrors() {
         // given
         String input = "data";
@@ -232,15 +214,6 @@ public class CryptoServiceTest {
         testSubscriber
                 .assertNoErrors()
                 .assertComplete();
-    }
-
-    @Test
-    public void decryptSring_shouldThrowError() {
-        // when
-        TestObserver<String> observer = cryptoService.decryptString(gcKey, null).test();
-
-        // then
-        observer.assertError((Class<? extends Throwable>) CryptoException.DecryptionFailed.class);
     }
 
     @Test

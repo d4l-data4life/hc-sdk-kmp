@@ -24,7 +24,7 @@ import care.data4life.sdk.Data4LifeClient
 import care.data4life.sdk.e2e.page.HomePage
 import care.data4life.sdk.e2e.util.NetworkUtil
 import care.data4life.sdk.e2e.util.TestConfigLoader
-import care.data4life.sdk.helpers.FhirHelperConfig
+import care.data4life.sdk.helpers.stu3.FhirHelperConfig
 import com.jakewharton.threetenabp.AndroidThreeTen
 import org.junit.AfterClass
 import org.junit.Assume
@@ -62,7 +62,7 @@ open class BaseTestLogin {
             loginLogoutPage = HomePage()
                     .isVisible()
                     .openLoginPage()
-                    .doLogin(user.email, user.password)
+                    .doLogin(user)
                     .isVisible()
         }
 

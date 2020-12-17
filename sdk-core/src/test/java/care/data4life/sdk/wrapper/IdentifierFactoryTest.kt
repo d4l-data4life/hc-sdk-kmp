@@ -16,6 +16,8 @@
 
 package care.data4life.sdk.wrapper
 
+import care.data4life.fhir.stu3.util.FhirAttachmentHelper
+import care.data4life.sdk.RecordServiceTestBase
 import care.data4life.fhir.stu3.model.Identifier as Fhir3Identifier
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.wrappers.SdkIdentifierFactory
@@ -46,7 +48,7 @@ class IdentifierFactoryTest {
     @Test
     fun `Given, wrap is called with a Fhir3Identifier, it returns a Attachment`() {
         // Given
-        val givenIdentifier = Mockito.mock(Fhir3Identifier::class.java)
+        val givenIdentifier = FhirAttachmentHelper.buildIdentifier("id", "me")
 
         // When
         val wrapped: Any = SdkIdentifierFactory.wrap(givenIdentifier)

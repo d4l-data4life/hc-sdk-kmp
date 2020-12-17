@@ -17,7 +17,6 @@ package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
 import care.data4life.crypto.KeyType
-import care.data4life.fhir.stu3.model.Identifier
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.ThumbnailService
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
@@ -66,7 +65,9 @@ import care.data4life.sdk.util.HashUtil.sha1
 import care.data4life.sdk.util.MimeType
 import care.data4life.sdk.util.MimeType.Companion.recognizeMimeType
 import care.data4life.sdk.wrappers.SdkAttachmentFactory
+import care.data4life.sdk.wrappers.SdkIdentifierFactory
 import care.data4life.sdk.wrappers.definitions.Attachment
+import care.data4life.sdk.wrappers.definitions.Identifier
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -1090,12 +1091,15 @@ class RecordService(
     @Throws(DataValidationException.IdUsageViolation::class)
     fun setAttachmentIdForDownloadType(
             attachments: List<Any>,
-            identifiers: List<Identifier>?,
+            identifiers: List<Any>?,
             type: DownloadType?
     ) {
         for (rawAttachment in attachments) {
             val attachment = SdkAttachmentFactory.wrap(rawAttachment)
-            val additionalIds = extractAdditionalAttachmentIds(identifiers, attachment.id)
+            val additionalIds = extractAdditionalAttachmentIds(
+                    identifiers,
+                    attachment.id
+            )
             if (additionalIds != null) {
                 when (type) {
                     DownloadType.Full -> {
@@ -1109,20 +1113,20 @@ class RecordService(
     }
 
     @Throws(DataValidationException.IdUsageViolation::class)
-    fun extractAdditionalAttachmentIds(
-            additionalIds: List<Identifier>?,
+    internal fun extractAdditionalAttachmentIds(
+            additionalIds: List<Any>?,
             attachmentId: String?
     ): Array<String>? {
         if (additionalIds == null) return null
         for (i in additionalIds) {
-            val parts = splitAdditionalAttachmentId(i)
+            val parts = splitAdditionalAttachmentId(SdkIdentifierFactory.wrap(i))
             if (parts != null && parts[FULL_ATTACHMENT_ID_POS] == attachmentId) return parts
         }
         return null //Attachment is not of image type
     }
 
     @Throws(DataValidationException.IdUsageViolation::class)
-    fun splitAdditionalAttachmentId(identifier: Identifier): Array<String>? {
+    internal fun splitAdditionalAttachmentId(identifier: Identifier): Array<String>? {
         if (identifier.value == null || !identifier.value!!.startsWith(DOWNSCALED_ATTACHMENT_IDS_FMT)) {
             return null
         }
@@ -1165,10 +1169,11 @@ class RecordService(
             val identifierIterator = identifiers.iterator() as Iterator<Fhir3Identifier>
 
             while (identifierIterator.hasNext()) {
-                val next = identifierIterator.next()
+                val next = SdkIdentifierFactory.wrap(identifierIterator.next())
+
                 val parts = splitAdditionalAttachmentId(next)
                 if (parts == null || currentAttachmentIds.contains(parts[FULL_ATTACHMENT_ID_POS])) {
-                    updatedIdentifiers.add(next)
+                    updatedIdentifiers.add(next.unwrap())
                 }
             }
             fhirAttachmentHelper.setIdentifier(resource, updatedIdentifiers)

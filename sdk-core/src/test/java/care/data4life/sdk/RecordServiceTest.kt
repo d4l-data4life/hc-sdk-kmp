@@ -38,6 +38,7 @@ import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.test.util.AttachmentBuilder
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.MimeType
+import care.data4life.sdk.wrappers.SdkIdentifierFactory
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockkClass
@@ -596,7 +597,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         val additionalIdentifier = FhirAttachmentHelper.buildIdentifier(ADDITIONAL_ID, ASSIGNER)
 
         //when
-        val additionalIds = recordService.splitAdditionalAttachmentId(additionalIdentifier)
+        val additionalIds = recordService.splitAdditionalAttachmentId(SdkIdentifierFactory.wrap(additionalIdentifier))
 
         //then
         val d4lNamespacePos = 0
@@ -613,7 +614,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         //given
         val additionalIdentifier = FhirAttachmentHelper.buildIdentifier(null, ASSIGNER)
         //when
-        val additionalIds = recordService.splitAdditionalAttachmentId(additionalIdentifier)
+        val additionalIds = recordService.splitAdditionalAttachmentId(SdkIdentifierFactory.wrap(additionalIdentifier))
         //then
         Truth.assertThat(additionalIds).isNull()
     }
@@ -625,7 +626,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         val additionalIdentifier = FhirAttachmentHelper.buildIdentifier("otherId", ASSIGNER)
 
         //when
-        val additionalIds = recordService.splitAdditionalAttachmentId(additionalIdentifier)
+        val additionalIds = recordService.splitAdditionalAttachmentId(SdkIdentifierFactory.wrap(additionalIdentifier))
 
         //then
         Truth.assertThat(additionalIds).isNull()
@@ -639,7 +640,7 @@ class RecordServiceTest : RecordServiceTestBase() {
 
         //when
         try {
-            recordService.splitAdditionalAttachmentId(additionalIdentifier)
+            recordService.splitAdditionalAttachmentId(SdkIdentifierFactory.wrap(additionalIdentifier))
             Assert.fail("Exception expected!")
         } catch (ex: DataValidationException.IdUsageViolation) {
 

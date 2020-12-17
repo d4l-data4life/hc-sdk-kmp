@@ -17,14 +17,17 @@
 package care.data4life.sdk.network
 
 import care.data4life.crypto.GCKey
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.network.model.DecryptedAppDataRecord
+import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
 import io.mockk.every
+import io.mockk.mockk
 import io.mockk.verify
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -113,10 +116,11 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     }
 
     @Test
-    fun `Given, build is called with a DomainResource, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedFhir3Record`() {
+    fun `Given, build is called with a Fhir4Resource, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedFhir4Record`() {
         // When
+        val fhir4Resource = mockk<Fhir4Resource>()
         val record = DecryptedRecordBuilderImpl().build(
-                fhirResource,
+                fhir4Resource,
                 tags,
                 creationDate,
                 dataKey,
@@ -124,12 +128,12 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         )
 
         // Then
-        assertTrue(record is DecryptedFhir3Record<*>)
+        assertTrue(record is DecryptedR4Record<*>)
         assertEquals(
                 record,
-                DecryptedRecord(
+                DecryptedR4Record(
                         null,
-                        fhirResource,
+                        fhir4Resource,
                         tags,
                         listOf(),
                         creationDate,
@@ -159,6 +163,35 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
                 DecryptedRecord(
                         null,
                         null,
+                        tags,
+                        listOf(),
+                        creationDate,
+                        null,
+                        dataKey,
+                        null,
+                        modelVersion
+                )
+        )
+    }
+
+    @Test
+    fun `Given, build is called with a Fhir3Resource, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedFhir3Record`() {
+        // When
+        val record = DecryptedRecordBuilderImpl().build(
+                fhirResource,
+                tags,
+                creationDate,
+                dataKey,
+                modelVersion
+        )
+
+        // Then
+        assertTrue(record is DecryptedFhir3Record<*>)
+        assertEquals(
+                record,
+                DecryptedRecord(
+                        null,
+                        fhirResource,
                         tags,
                         listOf(),
                         creationDate,
@@ -435,7 +468,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     }
 
     @Test
-    fun `Given, mandatory and optional setters are called with their appropriate payload, it returns a DecryptedFhireRecord`() {
+    fun `Given, mandatory and optional setters are called with their appropriate payload, it returns a DecryptedFhir3Record`() {
         // Given
         val builder = DecryptedRecordBuilderImpl()
 
@@ -457,6 +490,41 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
                 DecryptedRecord(
                         identifier,
                         fhirResource,
+                        tags,
+                        annotations,
+                        creationDate,
+                        updateDate,
+                        dataKey,
+                        attachmentKey,
+                        modelVersion
+                )
+        )
+    }
+
+    @Test
+    fun `Given, mandatory and optional setters are called with their appropriate payload, it returns a DecryptedFhir4Record`() {
+        // Given
+        val builder = DecryptedRecordBuilderImpl()
+        val resource = mockk<Fhir4Resource>()
+
+        // When
+        val record = builder
+                .setIdentifier(identifier)
+                .setTags(tags)
+                .setAnnotations(annotations)
+                .setCreationDate(creationDate)
+                .setUpdateDate(updateDate)
+                .setDataKey(dataKey)
+                .setAttachmentKey(attachmentKey)
+                .setModelVersion(modelVersion)
+                .build(resource)
+
+        // Then
+        assertEquals(
+                record,
+                DecryptedR4Record(
+                        identifier,
+                        resource,
                         tags,
                         annotations,
                         creationDate,

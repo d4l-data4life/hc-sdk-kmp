@@ -17,14 +17,17 @@
 package care.data4life.sdk.network
 
 import care.data4life.crypto.GCKey
-import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.network.model.DecryptedAppDataRecord
+import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
+import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
 import care.data4life.sdk.network.model.definitions.LimitGuard
 
@@ -98,9 +101,8 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
         }
     }
 
-    // TODO add FHIR 4
     @Throws(CoreRuntimeException.InternalFailure::class)
-    private fun <T : DomainResource?> buildFhir3Record(
+    private fun <T : Fhir3Resource?> buildFhir3Record(
             resource: T?,
             tags: HashMap<String, String>,
             creationDate: String,
@@ -108,6 +110,26 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
             modelVersion: Int
     ): DecryptedFhir3Record<T?> =
             DecryptedRecord(
+                    this.identifier,
+                    resource,
+                    tags,
+                    this.annotations,
+                    creationDate,
+                    this.updatedDate,
+                    dataKey,
+                    this.attachmentKey,
+                    modelVersion
+            )
+
+    @Throws(CoreRuntimeException.InternalFailure::class)
+    private fun <T : Fhir4Resource> buildFhir4Record(
+            resource: T,
+            tags: HashMap<String, String>,
+            creationDate: String,
+            dataKey: GCKey,
+            modelVersion: Int
+    ): DecryptedFhir4Record<T> =
+            DecryptedR4Record(
                     this.identifier,
                     resource,
                     tags,
@@ -168,7 +190,14 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
                     dataKey,
                     modelVersion
             )
-            is DomainResource -> this.buildFhir3Record(
+            is Fhir3Resource -> this.buildFhir3Record(
+                    resource,
+                    tags,
+                    creationDate,
+                    dataKey,
+                    modelVersion
+            )
+            is Fhir4Resource -> this.buildFhir4Record(
                     resource,
                     tags,
                     creationDate,

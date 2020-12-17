@@ -23,11 +23,11 @@ val d4lClientConfig = D4LConfigHelper.loadClientConfigAndroid("$rootDir")
 val d4LTestConfig = D4LConfigHelper.loadTestConfigAndroid("$rootDir")
 
 android {
-    compileSdkVersion(AndroidConfig.compileSdkVersion)
+    compileSdkVersion(LibraryConfig.android.compileSdkVersion)
 
     defaultConfig {
-        minSdkVersion(AndroidConfig.minSdkVersion)
-        targetSdkVersion(AndroidConfig.targetSdkVersion)
+        minSdkVersion(LibraryConfig.android.minSdkVersion)
+        targetSdkVersion(LibraryConfig.android.targetSdkVersion)
 
         applicationId = "care.data4life.sdk.e2e"
         versionCode = 1
@@ -92,7 +92,7 @@ android {
 }
 
 dependencies {
-    coreLibraryDesugaring(Dependency.Android.androidDesugar)
+    coreLibraryDesugaring(Dependencies.Android.androidDesugar)
 
     implementation(project(":sdk-android")) {
         exclude(group = "org.threeten", module = "threetenbp")
@@ -103,45 +103,45 @@ dependencies {
         exclude(group = "care.data4life.hc-fhir-helper-sdk-kmp", module = "fhir-helper-jvm")
     }
 
-    implementation(Dependency.Android.threeTenABP)
+    implementation(Dependencies.Android.threeTenABP)
 
-    implementation(Dependency.Android.kotlinStdLib)
+    implementation(Dependencies.Android.kotlinStdLib)
 
-    implementation(Dependency.Android.AndroidX.appCompat)
-    implementation(Dependency.Android.AndroidX.constraintLayout)
-    implementation(Dependency.Android.AndroidX.browser)
-    implementation(Dependency.Android.material)
+    implementation(Dependencies.Android.AndroidX.appCompat)
+    implementation(Dependencies.Android.AndroidX.constraintLayout)
+    implementation(Dependencies.Android.AndroidX.browser)
+    implementation(Dependencies.Android.material)
 
-    implementation(Dependency.Android.googlePlayServicesBase)
+    implementation(Dependencies.Android.googlePlayServicesBase)
 
 
-    testImplementation(Dependency.Android.Test.junit)
+    testImplementation(Dependencies.Android.Test.junit)
 
-    androidTestUtil(Dependency.Android.AndroidTest.orchestrator)
+    androidTestUtil(Dependencies.Android.AndroidTest.orchestrator)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.core)
-    androidTestImplementation(Dependency.Android.AndroidTest.runner)
-    androidTestImplementation(Dependency.Android.AndroidTest.rules)
-    androidTestImplementation(Dependency.Android.AndroidTest.extJUnit)
+    androidTestImplementation(Dependencies.Android.AndroidTest.core)
+    androidTestImplementation(Dependencies.Android.AndroidTest.runner)
+    androidTestImplementation(Dependencies.Android.AndroidTest.rules)
+    androidTestImplementation(Dependencies.Android.AndroidTest.extJUnit)
 
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
+    androidTestImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvm)
+    androidTestImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvmJunit)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoCore)
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoIntents)
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoWeb)
+    androidTestImplementation(Dependencies.Android.AndroidTest.espressoCore)
+    androidTestImplementation(Dependencies.Android.AndroidTest.espressoIntents)
+    androidTestImplementation(Dependencies.Android.AndroidTest.espressoWeb)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.uiAutomator)
-    androidTestImplementation(Dependency.Android.AndroidTest.kakao)
+    androidTestImplementation(Dependencies.Android.AndroidTest.uiAutomator)
+    androidTestImplementation(Dependencies.Android.AndroidTest.kakao)
 
-    androidTestImplementation(Dependency.Android.okHttp)
-    androidTestImplementation(Dependency.Android.okHttpLoggingInterceptor)
-    androidTestImplementation(Dependency.Android.retrofit)
+    androidTestImplementation(Dependencies.Android.okHttp)
+    androidTestImplementation(Dependencies.Android.okHttpLoggingInterceptor)
+    androidTestImplementation(Dependencies.Android.retrofit)
 
-    androidTestImplementation(Dependency.Android.moshi)
-    androidTestImplementation(Dependency.Android.gson)
+    androidTestImplementation(Dependencies.Android.moshi)
+    androidTestImplementation(Dependencies.Android.gson)
 
-    androidTestImplementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
+    androidTestImplementation(Dependencies.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
     }
 }

@@ -23,7 +23,6 @@ apply(from = "${project.rootDir}/gradle/jacoco-java.gradle")
 apply(from = "${project.rootDir}/gradle/deploy-java.gradle")
 
 
-version = LibraryConfig.version
 group = LibraryConfig.group
 
 
@@ -35,15 +34,15 @@ java {
 dependencies {
     expectedBy(project(":securestore-common"))
 
-    implementation(Dependency.Multiplatform.D4L.utilJvm)
+    implementation(Dependencies.Multiplatform.D4L.utilJvm)
 
-    implementation(Dependency.Multiplatform.Kotlin.stdlibJdk8)
+    implementation(Dependencies.Multiplatform.Kotlin.stdlibJdk8)
 
 
-    testImplementation(Dependency.Multiplatform.Kotlin.stdlibJdk8)
-    testImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
-    testImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
-    testImplementation(Dependency.Multiplatform.Test.MockK.jdk)
+    testImplementation(Dependencies.Multiplatform.Kotlin.stdlibJdk8)
+    testImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvm)
+    testImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvmJunit)
+    testImplementation(Dependencies.Multiplatform.Test.MockK.jdk)
 }
 
 

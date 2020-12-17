@@ -14,30 +14,35 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network.model.definitions
+package care.data4life.sdk.wrapper
 
-import care.data4life.crypto.GCKey
+import care.data4life.fhir.FhirException
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.lang.CoreRuntimeException
 
-// ToDo -> to contract
-internal interface DecryptedBaseRecord<T> {
-    var identifier: String?
-    var resource: T
-    var tags: HashMap<String, String>?
-    var annotations: List<String>
-    var customCreationDate: String?
-    var updatedDate: String? //FIXME: This should never be null
-    var dataKey: GCKey?
-    var attachmentsKey: GCKey?
-    var modelVersion: Int
-}
+class WrapperContract {
 
-// FIXME remove nullable type
-internal interface DecryptedFhir3Record<T : Fhir3Resource?> : DecryptedBaseRecord<T>
-internal interface DecryptedFhir4Record<T : Fhir4Resource> : DecryptedBaseRecord<T>
-internal interface DecryptedDataRecord : DecryptedBaseRecord<ByteArray> {
-    override var attachmentsKey: GCKey?
-        get() = null
-        set(_) {}
+    interface Attachment {
+        var id: String?
+        var data: String?
+        var hash: String?
+        var size: Int?
+        fun <T: Any> unwrap(): T
+    }
+
+    internal interface Identifier {
+        var value: String?
+        fun <T: Any>unwrap(): T
+    }
+
+    interface FhirElementFactory {
+
+        @Throws(CoreRuntimeException.InternalFailure::class)
+        fun getFhirTypeForClass(resourceType: Class<out Any>): String
+
+        fun getFhir3ClassForType(resourceType:String): Class<out Fhir3Resource>?
+
+        fun getFhir4ClassForType(resourceType:String): Class<out Fhir4Resource>?
+    }
 }

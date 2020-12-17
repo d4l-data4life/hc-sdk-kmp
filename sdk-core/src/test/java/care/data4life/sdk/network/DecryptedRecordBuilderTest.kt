@@ -25,7 +25,7 @@ import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
+import care.data4life.sdk.network.model.definitions.NetworkModelContract
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -50,15 +50,15 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
 
     @Test
     fun `it is a DecryptedRecordBuilder`() {
-        val builder: Any = DecryptedRecordBuilderImpl()
+        val builder: Any = DecryptedRecordBuilder()
 
-        assertTrue(builder is DecryptedRecordBuilder)
+        assertTrue(builder is NetworkModelContract.DecryptedRecordBuilder)
     }
 
     @Test
     fun `Given tags are accessed, it returns null by default`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // Then
         assertNull(builder.tags)
@@ -67,7 +67,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     @Test
     fun `Given, setTags is called, with its proper payload and tags are accessed, it returns the payload of setTags`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl().setTags(tags)
+        val builder = DecryptedRecordBuilder().setTags(tags)
 
         // Then
         assertEquals(
@@ -79,7 +79,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     @Test
     fun `Given dataKey is accessed, it returns null by default`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // Then
         assertNull(builder.dataKey)
@@ -88,7 +88,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     @Test
     fun `Given, setDataKey is called, with its proper payload and dataKey is accessed, it returns the payload of setTags`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl().setDataKey(dataKey)
+        val builder = DecryptedRecordBuilder().setDataKey(dataKey)
 
         // Then
         assertEquals(
@@ -100,7 +100,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     @Test
     fun `Given, build is called with a unknown Resource, Tags, CreationDate, DataKey and ModelVersion, it fails with a InternalFailure`() {
         try {
-            DecryptedRecordBuilderImpl()
+            DecryptedRecordBuilder()
                     .build(
                             "something",
                             tags,
@@ -119,7 +119,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     fun `Given, build is called with a Fhir4Resource, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedFhir4Record`() {
         // When
         val fhir4Resource = mockk<Fhir4Resource>()
-        val record = DecryptedRecordBuilderImpl().build(
+        val record = DecryptedRecordBuilder().build(
                 fhir4Resource,
                 tags,
                 creationDate,
@@ -148,7 +148,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     @Test
     fun `Given, build is called with null, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedFhir3Record`() {
         // When
-        val record = DecryptedRecordBuilderImpl().build(
+        val record = DecryptedRecordBuilder().build(
                 null,
                 tags,
                 creationDate,
@@ -177,7 +177,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     @Test
     fun `Given, build is called with a Fhir3Resource, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedFhir3Record`() {
         // When
-        val record = DecryptedRecordBuilderImpl().build(
+        val record = DecryptedRecordBuilder().build(
                 fhirResource,
                 tags,
                 creationDate,
@@ -206,7 +206,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     @Test
     fun `Given, build is called with ByteArray, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedDataRecord`() {
         // When
-        val record = DecryptedRecordBuilderImpl().build(
+        val record = DecryptedRecordBuilder().build(
                 customResource,
                 tags,
                 creationDate,
@@ -235,7 +235,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     fun `Given, build is called with a valid Resource, CreationDate, DataKey and ModelVersion, but without using a setter or delegating Tags, it fails with a InternalFailure`() {
         // When
         try {
-            DecryptedRecordBuilderImpl()
+            DecryptedRecordBuilder()
                     .build(
                             customResource,
                             creationDate = creationDate,
@@ -253,7 +253,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     fun `Given, build is called with a valid Resource, Tags, DataKey and ModelVersion, but without using a setter or delegating a CreationDate, it fails with a InternalFailure`() {
         // When
         try {
-            DecryptedRecordBuilderImpl()
+            DecryptedRecordBuilder()
                     .build(
                             customResource,
                             tags = tags,
@@ -271,7 +271,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     fun `Given, build is called with a valid Resource, Tags, CreationDate and ModelVersion, but without using a setter or delegating a DataKey, it fails with a InternalFailure`() {
         // When
         try {
-            DecryptedRecordBuilderImpl()
+            DecryptedRecordBuilder()
                     .build(
                             customResource,
                             tags = tags,
@@ -289,7 +289,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     fun `Given, build is called with a valid Resource, Tags, and CreationDate, but without using a setter or delegating a ModelVersion, it fails with a InternalFailure`() {
         // When
         try {
-            DecryptedRecordBuilderImpl()
+            DecryptedRecordBuilder()
                     .build(
                             customResource,
                             tags = tags,
@@ -307,7 +307,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     fun `Given, build is called with a valid Resource, null for Tags, CreationDate, DataKey and ModelVersion, but without using a setter for Tags, it fails with a InternalFailure`() {
         // When
         try {
-            DecryptedRecordBuilderImpl()
+            DecryptedRecordBuilder()
                     .build(
                             customResource,
                             null,
@@ -326,7 +326,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     fun `Given, build is called with a valid Resource, Tags, null for a CreationDate, DataKey and ModelVersion, but without using a setter for a CreationDate, it fails with a InternalFailure`() {
         // When
         try {
-            DecryptedRecordBuilderImpl()
+            DecryptedRecordBuilder()
                     .build(
                             customResource,
                             tags = tags,
@@ -345,7 +345,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     fun `Given, build is called with a valid Resource, Tags, CreationDate, null for a DataKey and ModelVersion, but without using a setter for a DataKey, it fails with a InternalFailure`() {
         // When
         try {
-            DecryptedRecordBuilderImpl()
+            DecryptedRecordBuilder()
                     .build(
                             customResource,
                             tags = tags,
@@ -363,7 +363,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     @Test
     fun `Given, build is called with a valid Resource, Tags, CreationDate, DataKey and null for a ModelVersion, but without using a setter for a ModelVersion, it fails with a InternalFailure`() {
         try {
-            DecryptedRecordBuilderImpl()
+            DecryptedRecordBuilder()
                     .build(
                             customResource,
                             tags = tags,
@@ -384,7 +384,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         @Suppress("UNCHECKED_CAST")
         val delegatedTags = Mockito.mock(HashMap::class.java) as HashMap<String, String>
         // When
-        val record = DecryptedRecordBuilderImpl()
+        val record = DecryptedRecordBuilder()
                 .setTags(tags)
                 .setCreationDate(creationDate)
                 .setDataKey(dataKey)
@@ -406,7 +406,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         // Given
         val delegatedDate = "2011-10-12"
         // When
-        val record = DecryptedRecordBuilderImpl()
+        val record = DecryptedRecordBuilder()
                 .setTags(tags)
                 .setCreationDate(creationDate)
                 .setDataKey(dataKey)
@@ -428,7 +428,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         // Given
         val delegatedDataKey = Mockito.mock(GCKey::class.java)
         // When
-        val record = DecryptedRecordBuilderImpl()
+        val record = DecryptedRecordBuilder()
                 .setTags(tags)
                 .setCreationDate(creationDate)
                 .setDataKey(dataKey)
@@ -450,7 +450,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         // Given
         val delegatedModelVersion = 23
         // When
-        val record = DecryptedRecordBuilderImpl()
+        val record = DecryptedRecordBuilder()
                 .setTags(tags)
                 .setCreationDate(creationDate)
                 .setDataKey(dataKey)
@@ -470,7 +470,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     @Test
     fun `Given, mandatory and optional setters are called with their appropriate payload, it returns a DecryptedFhir3Record`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         val record = builder
@@ -504,7 +504,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     @Test
     fun `Given, mandatory and optional setters are called with their appropriate payload, it returns a DecryptedFhir4Record`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
         val resource = mockk<Fhir4Resource>()
 
         // When
@@ -539,7 +539,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     @Test
     fun `Given, mandatory and optional setters are called with their appropriate payload, it returns a DecryptedDataRecord`() {
         // Given
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = DecryptedRecordBuilder()
 
         // When
         val record = builder
@@ -574,7 +574,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         every { DecryptedRecordGuard.checkTagsAndAnnotationsLimits(tags, listOf()) } returns Unit
 
         // When
-        DecryptedRecordBuilderImpl().build(
+        DecryptedRecordBuilder().build(
                 customResource,
                 tags,
                 creationDate,
@@ -595,7 +595,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         every { DecryptedRecordGuard.checkTagsAndAnnotationsLimits(delegatedTags, listOf()) } returns Unit
 
         // When
-        DecryptedRecordBuilderImpl()
+        DecryptedRecordBuilder()
                 .setTags(tags)
                 .build(
                     customResource,
@@ -614,7 +614,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         // When
         every { DecryptedRecordGuard.checkTagsAndAnnotationsLimits(tags, annotations) } returns Unit
 
-        DecryptedRecordBuilderImpl()
+        DecryptedRecordBuilder()
                 .setAnnotations(annotations)
                 .build(
                     customResource,
@@ -633,7 +633,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         // When
         every { DecryptedRecordGuard.checkDataLimit(customResource) } returns Unit
 
-        DecryptedRecordBuilderImpl()
+        DecryptedRecordBuilder()
                 .setAnnotations(annotations)
                 .build(
                         customResource,
@@ -652,7 +652,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         // When
         every { DecryptedRecordGuard.checkDataLimit(any()) } returns Unit
 
-        DecryptedRecordBuilderImpl()
+        DecryptedRecordBuilder()
                 .setAnnotations(annotations)
                 .build(
                         null,
@@ -671,7 +671,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         // When
         every { DecryptedRecordGuard.checkDataLimit(any()) } returns Unit
 
-        DecryptedRecordBuilderImpl()
+        DecryptedRecordBuilder()
                 .setAnnotations(annotations)
                 .build(
                         null,

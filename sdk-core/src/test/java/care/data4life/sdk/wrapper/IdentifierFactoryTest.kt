@@ -17,20 +17,14 @@
 package care.data4life.sdk.wrapper
 
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper
-import care.data4life.sdk.RecordServiceTestBase
-import care.data4life.fhir.stu3.model.Identifier as Fhir3Identifier
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.wrappers.SdkIdentifierFactory
-import care.data4life.sdk.wrappers.definitions.Identifier
-import care.data4life.sdk.wrappers.definitions.IdentifierFactory
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.mockito.Mockito
 
 class IdentifierFactoryTest {
     @Test
     fun `it is a AttachmentFactory`() {
-        assertTrue((SdkIdentifierFactory as Any) is IdentifierFactory)
+        assertTrue((SdkIdentifierFactory as Any) is WrapperFactoryContract.IdentifierFactory)
     }
     
     @Test
@@ -54,6 +48,6 @@ class IdentifierFactoryTest {
         val wrapped: Any = SdkIdentifierFactory.wrap(givenIdentifier)
 
         // Then
-        assertTrue(wrapped is Identifier)
+        assertTrue(wrapped is WrapperContract.Identifier)
     }
 }

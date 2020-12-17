@@ -20,9 +20,9 @@ import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.fhir.stu3.model.DocumentReference
 import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.fhir.stu3.model.Identifier
-import care.data4life.sdk.lang.CoreRuntimeException
+import care.data4life.sdk.wrapper.HelperContract
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper as Fhir3AttachmentHelper
-import care.data4life.sdk.model.definitions.FhirAttachmentHelper
+import care.data4life.sdk.wrapper.SdkFhirAttachmentHelper
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
@@ -49,7 +49,7 @@ class FhirAttachmentHelperTest {
 
     @Test
     fun `it is a FhirAttachmentHelper`() {
-        assertTrue((SdkFhirAttachmentHelper as Any) is FhirAttachmentHelper)
+        assertTrue((SdkFhirAttachmentHelper as Any) is HelperContract.FhirAttachmentHelper)
     }
 
     @Test

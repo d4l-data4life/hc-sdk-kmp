@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
  *
@@ -14,11 +15,22 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.model.definitions
+package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.lang.CoreRuntimeException
 
-internal interface FhirElementFactory {
-    @Throws(CoreRuntimeException.InternalFailure::class)
-    fun getFhirTypeForClass(resourceType: Class<out Any>): String
+internal class HelperContract {
+
+    internal interface FhirAttachmentHelper {
+        fun hasAttachment(resource: Any): Boolean
+        fun getAttachment(resource: Any): MutableList<Any?>?
+
+        fun updateAttachmentData(resource: Any, attachmentData: HashMap<Any, String?>?)
+
+        fun getIdentifier(resource: Any): List<Any>?
+
+        fun setIdentifier(resource: Any, updatedIdentifiers: List<Any>)
+
+        fun appendIdentifier(resource: Any, identifier: String, assigner: String)
+    }
 }

@@ -17,8 +17,6 @@
 package care.data4life.sdk.wrapper
 
 import care.data4life.fhir.stu3.model.Attachment as Fhir3Attachment
-import care.data4life.sdk.wrappers.SdkFhir3Attachment
-import care.data4life.sdk.wrappers.definitions.Attachment
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -28,7 +26,7 @@ class Fhir3AttachmentTest {
     @Test
     fun `it is a Attachment`() {
         val wrapper: Any = SdkFhir3Attachment(Fhir3Attachment())
-        assertTrue(wrapper is Attachment)
+        assertTrue(wrapper is WrapperContract.Attachment)
     }
 
     @Test

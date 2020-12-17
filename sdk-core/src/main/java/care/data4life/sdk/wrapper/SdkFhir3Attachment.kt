@@ -14,14 +14,13 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.wrappers
+package care.data4life.sdk.wrapper
 
 import care.data4life.fhir.stu3.model.Attachment as Fhir3Attachment
-import care.data4life.sdk.wrappers.definitions.Attachment
 
 internal class SdkFhir3Attachment(
         private val attachment: Fhir3Attachment
-): Attachment {
+): WrapperContract.Attachment {
     override var id: String?
         get() = attachment.id
         set(id) { attachment.id = id}

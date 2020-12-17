@@ -24,7 +24,7 @@ import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.SdkRecordFactory
 import care.data4life.sdk.model.definitions.BaseRecord
-import care.data4life.sdk.network.DecryptedRecordBuilderImpl
+import care.data4life.sdk.network.DecryptedRecordBuilder
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.util.MimeType
 import com.google.common.truth.Truth
@@ -65,8 +65,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun `Given, createRecord is called with a DomainResource and a UserId, it returns a new Record`() {
         // Given
         every {
-            anyConstructed<DecryptedRecordBuilderImpl>().setAnnotations(listOf())
-        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilderImpl
+            anyConstructed<DecryptedRecordBuilder>().setAnnotations(listOf())
+        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilder
 
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
@@ -170,8 +170,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun `Given, createRecord is called a DomainResource, a UserId and no attachment, it returns a new Record`() {
         // Given
         every {
-            anyConstructed<DecryptedRecordBuilderImpl>().setAnnotations(listOf())
-        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilderImpl
+            anyConstructed<DecryptedRecordBuilder>().setAnnotations(listOf())
+        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilder
 
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
@@ -382,8 +382,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun `Given, createRecord is called with a DomainResource, a UserId and Annotations, it returns a new Record`() {
         // Given
         every {
-            anyConstructed<DecryptedRecordBuilderImpl>().setAnnotations(ANNOTATIONS)
-        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilderImpl
+            anyConstructed<DecryptedRecordBuilder>().setAnnotations(ANNOTATIONS)
+        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilder
 
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
@@ -486,8 +486,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun `Given, createRecords is called a DomainResource and a UserId, Annotations and without attachment, it returns a new Record`() {
         // Given
         every {
-            anyConstructed<DecryptedRecordBuilderImpl>().setAnnotations(ANNOTATIONS)
-        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilderImpl
+            anyConstructed<DecryptedRecordBuilder>().setAnnotations(ANNOTATIONS)
+        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilder
 
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
@@ -664,8 +664,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun `Given createRecord is called with a Byte resource, a UserId and Annotations, it returns a new DataRecord`() {
         // Given
         every {
-            anyConstructed<DecryptedRecordBuilderImpl>().setAnnotations(ANNOTATIONS)
-        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilderImpl
+            anyConstructed<DecryptedRecordBuilder>().setAnnotations(ANNOTATIONS)
+        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilder
 
         Mockito.`when`(mockTaggingService.appendDefaultTags(null, null))
                 .thenReturn(mockTags)

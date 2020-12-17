@@ -26,8 +26,8 @@ import care.data4life.sdk.test.util.MedicationBuilder
 import care.data4life.sdk.test.util.ObservationBuilder
 import care.data4life.sdk.test.util.PatientBuilder
 import care.data4life.sdk.test.util.QuestionnaireResponseBuilder
-import care.data4life.sdk.wrappers.SdkAttachmentFactory
-import care.data4life.sdk.wrappers.definitions.Attachment
+import care.data4life.sdk.wrapper.SdkAttachmentFactory
+import care.data4life.sdk.wrapper.WrapperContract
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.spyk
@@ -267,7 +267,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         firstAttachment.title = "image"
         val secondAttachment = docRef.content[1].attachment
         secondAttachment.title = "pdf"
-        val uploadResult: MutableList<Pair<Attachment, List<String>>> = arrayListOf()
+        val uploadResult: MutableList<Pair<WrapperContract.Attachment, List<String>>> = arrayListOf()
         uploadResult.add(Pair(SdkAttachmentFactory.wrap(firstAttachment), listOf(PREVIEW_ID, THUMBNAIL_ID)))
         uploadResult.add(Pair(SdkAttachmentFactory.wrap(secondAttachment), listOf()))
         val dummyDecryptedRecord = DecryptedRecord(
@@ -637,7 +637,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 mockAttachmentKey,
                 -1
         )
-        val uploadResult = arrayListOf<Pair<Attachment, List<String>>>()
+        val uploadResult = arrayListOf<Pair<WrapperContract.Attachment, List<String>>>()
         val downscaledIds = listOf("downscaledId_1", "downscaledId_2")
         uploadResult.add(Pair(SdkAttachmentFactory.wrap(updatedAttachment), downscaledIds))
         Mockito.`when`(mockAttachmentService.upload(
@@ -692,7 +692,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 mockAttachmentKey,
                 -1
         )
-        val uploadResult = arrayListOf<Pair<Attachment, List<String>>>()
+        val uploadResult = arrayListOf<Pair<WrapperContract.Attachment, List<String>>>()
         val downscaledIds = listOf("downscaledId_1", "downscaledId_2")
         uploadResult.add(Pair(SdkAttachmentFactory.wrap(updatedAttachment), downscaledIds))
         Mockito.`when`(mockAttachmentService.upload(
@@ -970,11 +970,11 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         )
         decryptedRecord.identifier = RECORD_ID
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        val uploadResult = arrayListOf<Pair<Attachment, List<String>>>()
+        val uploadResult = arrayListOf<Pair<WrapperContract.Attachment, List<String>>>()
         val downscaledIds: MutableList<String> = arrayListOf()
         downscaledIds.add("downscaledId_1")
         downscaledIds.add("downscaledId_2")
-        uploadResult.add(Pair<Attachment, List<String>>(SdkAttachmentFactory.wrap(patient.photo!![0]), downscaledIds))
+        uploadResult.add(Pair<WrapperContract.Attachment, List<String>>(SdkAttachmentFactory.wrap(patient.photo!![0]), downscaledIds))
         Mockito.`when`(
                 mockAttachmentService.upload(
                         ArgumentMatchers.any(),
@@ -1133,8 +1133,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         )
         decryptedRecord.identifier = RECORD_ID
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        val uploadResult: MutableList<Pair<Attachment, List<String>>> = arrayListOf()
-        uploadResult.add(Pair<Attachment, List<String>>(SdkAttachmentFactory.wrap(medication.image!![0]), listOf()))
+        val uploadResult: MutableList<Pair<WrapperContract.Attachment, List<String>>> = arrayListOf()
+        uploadResult.add(Pair<WrapperContract.Attachment, List<String>>(SdkAttachmentFactory.wrap(medication.image!![0]), listOf()))
         Mockito.`when`(mockAttachmentService.upload(
                 ArgumentMatchers.any(),
                 ArgumentMatchers.eq(mockAttachmentKey),
@@ -1196,7 +1196,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         Mockito.`when`(recordService.getValidHash(
                 eq(SdkAttachmentFactory.wrap(observation.valueAttachment!!))
         )).thenReturn(DATA_HASH)
-        val uploadResult: MutableList<Pair<Attachment, List<String>>> = arrayListOf()
+        val uploadResult: MutableList<Pair<WrapperContract.Attachment, List<String>>> = arrayListOf()
         val downscaledIds: MutableList<String> = arrayListOf()
         downscaledIds.add("downscaledId_1")
         downscaledIds.add("downscaledId_2")
@@ -1308,9 +1308,9 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 -1
         )
 
-        val uploadResult: MutableList<Pair<Attachment, List<String>>> = arrayListOf()
+        val uploadResult: MutableList<Pair<WrapperContract.Attachment, List<String>>> = arrayListOf()
         val downscaledIds: MutableList<String> = mutableListOf("downscaledId_1", "downscaledId_2")
-        uploadResult.add(Pair<Attachment, List<String>>(
+        uploadResult.add(Pair<WrapperContract.Attachment, List<String>>(
                 SdkAttachmentFactory.wrap(questionnaireResponse.item!![0].answer!![0].valueAttachment!!),
                 downscaledIds)
         )
@@ -1417,7 +1417,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         val secondAttachment = patient.photo!![1]
         secondAttachment.title = "pdf"
         secondAttachment.hash = DATA_HASH
-        val uploadResult: MutableList<Pair<Attachment, List<String>>> = arrayListOf()
+        val uploadResult: MutableList<Pair<WrapperContract.Attachment, List<String>>> = arrayListOf()
         uploadResult.add(Pair(SdkAttachmentFactory.wrap(firstAttachment), listOf(PREVIEW_ID, THUMBNAIL_ID)))
         uploadResult.add(Pair(SdkAttachmentFactory.wrap(secondAttachment), listOf()))
         val dummyDecryptedRecord = DecryptedRecord(
@@ -1479,7 +1479,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         firstAttachment.title = "image"
         val secondAttachment = medication.image!![1]
         secondAttachment.title = "pdf"
-        val uploadResult: MutableList<Pair<Attachment, List<String>>> = arrayListOf()
+        val uploadResult: MutableList<Pair<WrapperContract.Attachment, List<String>>> = arrayListOf()
         uploadResult.add(Pair(SdkAttachmentFactory.wrap(firstAttachment), listOf(PREVIEW_ID, THUMBNAIL_ID)))
         uploadResult.add(Pair(SdkAttachmentFactory.wrap(secondAttachment), listOf()))
         val dummyDecryptedRecord = DecryptedRecord(
@@ -1541,7 +1541,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         val attachment = observation.valueAttachment
         attachment!!.title = "doc"
         attachment.hash = DATA_HASH
-        val uploadResult: MutableList<Pair<Attachment, List<String>>> = arrayListOf()
+        val uploadResult: MutableList<Pair<WrapperContract.Attachment, List<String>>> = arrayListOf()
         uploadResult.add(Pair(SdkAttachmentFactory.wrap(firstAttachment), listOf(PREVIEW_ID, THUMBNAIL_ID)))
         uploadResult.add(Pair(SdkAttachmentFactory.wrap(secondAttachment), listOf()))
         uploadResult.add(Pair(SdkAttachmentFactory.wrap(attachment), listOf()))
@@ -1609,7 +1609,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         val secondAttachment = questionnaireResponse.item!![1].answer!![0].valueAttachment
         secondAttachment!!.title = "pdf"
         secondAttachment.hash = DATA_HASH
-        val uploadResult: MutableList<Pair<Attachment, List<String>>> = mutableListOf()
+        val uploadResult: MutableList<Pair<WrapperContract.Attachment, List<String>>> = mutableListOf()
         uploadResult.add(Pair(SdkAttachmentFactory.wrap(firstAttachment), listOf(PREVIEW_ID, THUMBNAIL_ID)))
         uploadResult.add(Pair(SdkAttachmentFactory.wrap(secondAttachment), listOf()))
         val dummyDecryptedRecord = DecryptedRecord(

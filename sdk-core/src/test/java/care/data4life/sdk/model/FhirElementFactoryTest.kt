@@ -17,10 +17,11 @@
 package care.data4life.sdk.model
 
 import care.data4life.fhir.stu3.model.DocumentReference
+import care.data4life.fhir.stu3.model.FhirElementFactory
 import care.data4life.sdk.RecordServiceTestBase
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.model.definitions.FhirElementFactory
 import care.data4life.sdk.test.util.AttachmentBuilder
+import care.data4life.sdk.wrapper.SdkFhirElementFactory
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

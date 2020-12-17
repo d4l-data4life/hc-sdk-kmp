@@ -28,10 +28,9 @@ import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
-import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
-import care.data4life.sdk.network.model.definitions.LimitGuard
+import care.data4life.sdk.network.model.definitions.NetworkModelContract
 
-internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
+internal class DecryptedRecordBuilder : NetworkModelContract.DecryptedRecordBuilder {
     private var identifier: String? = null
     private var _tags: HashMap<String, String>? = null
     private var annotations: List<String> = listOf()
@@ -41,7 +40,7 @@ internal class DecryptedRecordBuilderImpl : DecryptedRecordBuilder {
     private var _dataKey: GCKey? = null
     private var modelVersion: Int? = null
 
-    private val guard: LimitGuard = DecryptedRecordGuard
+    private val guard: NetworkModelContract.LimitGuard = DecryptedRecordGuard
 
     override val tags: HashMap<String, String>?
         get() = this._tags

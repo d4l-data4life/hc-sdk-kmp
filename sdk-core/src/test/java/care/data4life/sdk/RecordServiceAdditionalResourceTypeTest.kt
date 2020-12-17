@@ -32,8 +32,8 @@ import care.data4life.sdk.test.util.PatientBuilder
 import care.data4life.sdk.test.util.QuestionnaireBuilder
 import care.data4life.sdk.test.util.QuestionnaireResponseBuilder
 import care.data4life.sdk.util.MimeType
-import care.data4life.sdk.wrappers.SdkAttachmentFactory
-import care.data4life.sdk.wrappers.definitions.Attachment
+import care.data4life.sdk.wrapper.SdkAttachmentFactory
+import care.data4life.sdk.wrapper.WrapperContract
 import com.google.common.truth.Truth
 import io.reactivex.Single
 import org.junit.After
@@ -658,7 +658,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
                 -1
         )
 
-        val attachments = ArrayList<Attachment>()
+        val attachments = ArrayList<WrapperContract.Attachment>()
         attachments.add(SdkAttachmentFactory.wrap(attachment))
         attachments.add(SdkAttachmentFactory.wrap(secondAttachment))
 
@@ -715,7 +715,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
                 -1
         )
         Mockito.doReturn(decryptedRecord).`when`(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-        val attachments = ArrayList<Attachment>()
+        val attachments = ArrayList<WrapperContract.Attachment>()
         attachments.add(SdkAttachmentFactory.wrap(attachment))
         attachments.add(SdkAttachmentFactory.wrap(secondAttachment))
         Mockito.`when`(mockAttachmentService.download(

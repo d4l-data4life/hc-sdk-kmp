@@ -41,21 +41,18 @@ import care.data4life.sdk.model.FetchResult
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
-import care.data4life.sdk.model.SdkFhirAttachmentHelper
-import care.data4life.sdk.model.SdkFhirElementFactory
+import care.data4life.sdk.wrapper.SdkFhirAttachmentHelper
+import care.data4life.sdk.wrapper.SdkFhirElementFactory
 import care.data4life.sdk.model.SdkRecordFactory
 import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
-import care.data4life.sdk.model.definitions.FhirAttachmentHelper
-import care.data4life.sdk.model.definitions.FhirElementFactory
 import care.data4life.sdk.model.definitions.RecordFactory
-import care.data4life.sdk.network.DecryptedRecordBuilderImpl
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
+import care.data4life.sdk.network.model.definitions.NetworkModelContract
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
@@ -64,10 +61,11 @@ import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
 import care.data4life.sdk.util.MimeType
 import care.data4life.sdk.util.MimeType.Companion.recognizeMimeType
-import care.data4life.sdk.wrappers.SdkAttachmentFactory
-import care.data4life.sdk.wrappers.SdkIdentifierFactory
-import care.data4life.sdk.wrappers.definitions.Attachment
-import care.data4life.sdk.wrappers.definitions.Identifier
+import care.data4life.sdk.wrapper.HelperContract
+import care.data4life.sdk.wrapper.SdkAttachmentFactory
+import care.data4life.sdk.wrapper.SdkIdentifierFactory
+import care.data4life.sdk.wrapper.WrapperContract
+import care.data4life.sdk.wrapper.WrapperFactoryContract
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -104,8 +102,10 @@ class RecordService(
     }
 
     private val recordFactory: RecordFactory = SdkRecordFactory
-    private val fhirElementFactory: FhirElementFactory = SdkFhirElementFactory
-    private val fhirAttachmentHelper: FhirAttachmentHelper = SdkFhirAttachmentHelper
+    private val fhirElementFactory: WrapperContract.FhirElementFactory = SdkFhirElementFactory
+    private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper = SdkFhirAttachmentHelper
+    private val attchachmentFactory: WrapperFactoryContract.AttachmentFactory = SdkAttachmentFactory
+    private val identifierFactory: WrapperFactoryContract.IdentifierFactory = SdkIdentifierFactory
 
     private fun getTagsOnCreate(resource: Any): HashMap<String, String> {
         return if (resource is ByteArray) {
@@ -123,7 +123,7 @@ class RecordService(
         checkDataRestrictions(resource)
         val data = extractUploadData(resource)
         val createdRecord = Single.just(
-                DecryptedRecordBuilderImpl()
+                care.data4life.sdk.network.DecryptedRecordBuilder()
                         .setAnnotations(annotations)
                         .build(
                                 resource,
@@ -634,7 +634,7 @@ class RecordService(
 
     private fun <T : Any> decryptRecord(
             record: EncryptedRecord,
-            builder: DecryptedRecordBuilder
+            builder: NetworkModelContract.DecryptedRecordBuilder
     ): DecryptedBaseRecord<T> {
         @Suppress("UNCHECKED_CAST")
         return when {
@@ -662,7 +662,7 @@ class RecordService(
             throw DataValidationException.ModelVersionNotSupported("Please update SDK to latest version!")
         }
 
-        val builder = DecryptedRecordBuilderImpl()
+        val builder = care.data4life.sdk.network.DecryptedRecordBuilder()
                 .setIdentifier(record.identifier)
                 .setTags(
                         tagEncryptionService.decryptTags(record.encryptedTags)
@@ -733,11 +733,11 @@ class RecordService(
         if (fhirAttachmentHelper.hasAttachment(decryptedRecord.resource)) {
             val resource = decryptedRecord.resource
             val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Fhir3Attachment?>
-            val validAttachments = mutableListOf<Attachment>()
+            val validAttachments = mutableListOf<WrapperContract.Attachment>()
 
             for (attachment in attachments) {
                 if (attachmentIds.contains(attachment?.id)) {
-                    validAttachments.add(SdkAttachmentFactory.wrap(attachment!!))
+                    validAttachments.add(attchachmentFactory.wrap(attachment!!))
                 }
             }
             if (validAttachments.size != attachmentIds.size)
@@ -876,10 +876,10 @@ class RecordService(
             record.attachmentsKey = cryptoService.generateGCKey().blockingGet()
         }
 
-        val validAttachments: MutableList<Attachment> = arrayListOf()
+        val validAttachments: MutableList<WrapperContract.Attachment> = arrayListOf()
         for (rawAttachment in attachments) {
             if (rawAttachment != null) {
-                val attachment = SdkAttachmentFactory.wrap(rawAttachment)
+                val attachment = attchachmentFactory.wrap(rawAttachment)
 
                 when {
                     attachment.id != null ->
@@ -937,12 +937,12 @@ class RecordService(
                     fhirAttachmentHelper.getAttachment(resource)!! as List<Fhir3Attachment?>
                 }
 
-        val validAttachments: MutableList<Attachment> = arrayListOf()
-        val oldAttachments: HashMap<String?, Attachment> = hashMapOf()
+        val validAttachments: MutableList<WrapperContract.Attachment> = arrayListOf()
+        val oldAttachments: HashMap<String?, WrapperContract.Attachment> = hashMapOf()
 
         for (attachment in attachments) {
             if (attachment?.id != null) {
-                oldAttachments[attachment.id] = SdkAttachmentFactory.wrap(attachment)
+                oldAttachments[attachment.id] = attchachmentFactory.wrap(attachment)
             }
         }
 
@@ -950,7 +950,7 @@ class RecordService(
         val newAttachments = fhirAttachmentHelper.getAttachment(newResource) as List<Fhir3Attachment?>
         for (rawNewAttachment in newAttachments) {
             if (rawNewAttachment != null) {
-                val newAttachment = SdkAttachmentFactory.wrap(rawNewAttachment)
+                val newAttachment = attchachmentFactory.wrap(rawNewAttachment)
 
                 when {
                     newAttachment.hash == null || newAttachment.size == null ->
@@ -1001,14 +1001,14 @@ class RecordService(
         val resource = record.resource as Fhir3Resource
         if (!fhirAttachmentHelper.hasAttachment(resource)) return record
         val rawAttachments = fhirAttachmentHelper.getAttachment(resource) as List<Fhir3Attachment?>?
-        val attachments = mutableListOf<Attachment>()
+        val attachments = mutableListOf<WrapperContract.Attachment>()
 
         rawAttachments ?: return record
 
         rawAttachments.forEach {
             it?.id ?: throw DataValidationException.IdUsageViolation("Attachment.id expected")
 
-            attachments.add(SdkAttachmentFactory.wrap(it))
+            attachments.add(attchachmentFactory.wrap(it))
         }
 
         @Suppress("CheckResult")
@@ -1066,7 +1066,7 @@ class RecordService(
         val sb = StringBuilder()
         for ((first, second) in result) {
             if (second != null) { //Attachment is a of image type
-                val attachment = SdkAttachmentFactory.wrap(second)
+                val attachment = attchachmentFactory.wrap(second)
                 sb.setLength(0)
                 sb.append(DOWNSCALED_ATTACHMENT_IDS_FMT).append(ThumbnailService.SPLIT_CHAR).append(attachment.id)
                 for (additionalId in second) {
@@ -1085,7 +1085,7 @@ class RecordService(
             type: DownloadType?
     ) {
         for (rawAttachment in attachments) {
-            val attachment = SdkAttachmentFactory.wrap(rawAttachment)
+            val attachment = attchachmentFactory.wrap(rawAttachment)
             val additionalIds = extractAdditionalAttachmentIds(
                     identifiers,
                     attachment.id
@@ -1109,14 +1109,14 @@ class RecordService(
     ): Array<String>? {
         if (additionalIds == null) return null
         for (i in additionalIds) {
-            val parts = splitAdditionalAttachmentId(SdkIdentifierFactory.wrap(i))
+            val parts = splitAdditionalAttachmentId(identifierFactory.wrap(i))
             if (parts != null && parts[FULL_ATTACHMENT_ID_POS] == attachmentId) return parts
         }
         return null //Attachment is not of image type
     }
 
     @Throws(DataValidationException.IdUsageViolation::class)
-    internal fun splitAdditionalAttachmentId(identifier: Identifier): Array<String>? {
+    internal fun splitAdditionalAttachmentId(identifier: WrapperContract.Identifier): Array<String>? {
         if (identifier.value == null || !identifier.value!!.startsWith(DOWNSCALED_ATTACHMENT_IDS_FMT)) {
             return null
         }
@@ -1136,7 +1136,7 @@ class RecordService(
     }
 
     // TODO move to AttachmentService
-    internal fun getValidHash(attachment: Attachment): String {
+    internal fun getValidHash(attachment: WrapperContract.Attachment): String {
         val data = decode(attachment.data!!)
         return encodeToString(sha1(data))
     }
@@ -1155,11 +1155,11 @@ class RecordService(
             }
 
             if (identifiers == null) return
-            val updatedIdentifiers: MutableList<Identifier> = mutableListOf()
+            val updatedIdentifiers: MutableList<WrapperContract.Identifier> = mutableListOf()
             val identifierIterator = identifiers.iterator() as Iterator<Fhir3Identifier>
 
             while (identifierIterator.hasNext()) {
-                val next = SdkIdentifierFactory.wrap(identifierIterator.next())
+                val next = identifierFactory.wrap(identifierIterator.next())
 
                 val parts = splitAdditionalAttachmentId(next)
                 if (parts == null || currentAttachmentIds.contains(parts[FULL_ATTACHMENT_ID_POS])) {
@@ -1177,7 +1177,7 @@ class RecordService(
             for (rawAttachment in attachments) {
                 rawAttachment ?: return
 
-                val attachment = SdkAttachmentFactory.wrap(rawAttachment)
+                val attachment = attchachmentFactory.wrap(rawAttachment)
 
                 val data = decode(attachment.data!!)
                 if (recognizeMimeType(data) == MimeType.UNKNOWN) {

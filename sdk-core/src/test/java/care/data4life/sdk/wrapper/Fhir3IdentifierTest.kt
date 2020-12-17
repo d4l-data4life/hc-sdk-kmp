@@ -17,8 +17,6 @@
 package care.data4life.sdk.wrapper
 
 import care.data4life.fhir.stu3.model.Identifier as Fhir3Identifier
-import care.data4life.sdk.wrappers.SdkFhir3Identifier
-import care.data4life.sdk.wrappers.definitions.Identifier
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -28,7 +26,7 @@ class Fhir3IdentifierTest {
     @Test
     fun `it is a Identifier`() {
         val wrapper: Any = SdkFhir3Identifier(Fhir3Identifier())
-        assertTrue(wrapper is Identifier)
+        assertTrue(wrapper is WrapperContract.Identifier)
     }
 
     @Test

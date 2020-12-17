@@ -14,19 +14,28 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.model
+package care.data4life.sdk.wrapper
 
 import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.fhir.stu3.model.FhirElementFactory as Fhir3ElementFactory
-import care.data4life.sdk.model.definitions.FhirElementFactory
 
-internal object SdkFhirElementFactory: FhirElementFactory {
+internal object SdkFhirElementFactory: WrapperContract.FhirElementFactory {
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun getFhirTypeForClass(resourceType: Class<out Any>): String {
         @Suppress("UNCHECKED_CAST")
         return Fhir3ElementFactory.getFhirTypeForClass(resourceType as Class<out DomainResource> )
                 ?: throw CoreRuntimeException.InternalFailure()
+    }
+
+    override fun getFhir3ClassForType(resourceType: String): Class<out Fhir3Resource>? {
+        TODO("Not yet implemented")
+    }
+
+    override fun getFhir4ClassForType(resourceType: String): Class<out Fhir4Resource>? {
+        TODO("Not yet implemented")
     }
 
 }

@@ -38,9 +38,9 @@ import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.test.util.AttachmentBuilder
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.MimeType
-import care.data4life.sdk.wrappers.SdkAttachmentFactory
-import care.data4life.sdk.wrappers.SdkIdentifierFactory
-import care.data4life.sdk.wrappers.definitions.Attachment
+import care.data4life.sdk.wrapper.SdkAttachmentFactory
+import care.data4life.sdk.wrapper.SdkIdentifierFactory
+import care.data4life.sdk.wrapper.WrapperContract
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockkClass
@@ -997,7 +997,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         )
 
 
-        val attachments = ArrayList<Attachment>()
+        val attachments = ArrayList<WrapperContract.Attachment>()
         attachments.add(SdkAttachmentFactory.wrap(attachment))
         
         Mockito.doReturn(decryptedRecord)
@@ -1050,7 +1050,7 @@ class RecordServiceTest : RecordServiceTestBase() {
                 mockAttachmentKey,
                 -1
         )
-        val attachments = ArrayList<Attachment>()
+        val attachments = ArrayList<WrapperContract.Attachment>()
         attachments.add(SdkAttachmentFactory.wrap(attachment))
         attachments.add(SdkAttachmentFactory.wrap(secondAttachment))
 

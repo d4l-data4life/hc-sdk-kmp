@@ -18,7 +18,7 @@ package care.data4life.sdk.attachment
 
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3DateTimeParser
-import care.data4life.sdk.wrappers.definitions.Attachment
+import care.data4life.sdk.wrapper.WrapperContract
 
 internal object LegacyDateValidator: AttachmentContract.LegacyDateValidator {
     private val validationFhir3Date = Fhir3DateTimeParser.parseDateTime(
@@ -29,7 +29,7 @@ internal object LegacyDateValidator: AttachmentContract.LegacyDateValidator {
         return attachment.creation?.date?.toDate()?.after(validationFhir3Date.date.toDate()) ?: true
     }
 
-    override fun isInvalidateDate(attachment: Attachment): Boolean {
+    override fun isInvalidateDate(attachment: WrapperContract.Attachment): Boolean {
         val rawAttachment = attachment.unwrap() as Any
         return if(rawAttachment is Fhir3Attachment ) {
             validateFhir3Date(rawAttachment)

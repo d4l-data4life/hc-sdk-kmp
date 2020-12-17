@@ -20,8 +20,8 @@ import care.data4life.fhir.stu3.model.FhirDateTime as Fhir3DateTime
 import care.data4life.fhir.stu3.model.FhirDate as Fhir3Date
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3DateTimeParser
-import care.data4life.sdk.wrappers.SdkFhir3Attachment
-import care.data4life.sdk.wrappers.definitions.Attachment
+import care.data4life.sdk.wrapper.SdkFhir3Attachment
+import care.data4life.sdk.wrapper.WrapperContract
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkClass
@@ -106,7 +106,7 @@ class LegacyDateValidationTest {
 
     @Test
     fun `Given, isInvalidDate is called with a Attachment, which does contain a non Fhir3Attachment, it returns true`() {
-        val attachment = mockk<Attachment>()
+        val attachment = mockk<WrapperContract.Attachment>()
 
         every { attachment.unwrap<String>() } returns "not Fhir3"
 

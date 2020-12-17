@@ -14,19 +14,19 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.wrappers.definitions
+package care.data4life.sdk.wrapper
 
+import care.data4life.fhir.stu3.model.Identifier as Fhir3Identifier
+import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 
-interface Attachment {
-    var id: String?
-    var data: String?
-    var hash: String?
-    var size: Int?
-    fun <T: Any> unwrap(): T
-}
 
-internal interface AttachmentFactory {
+internal object SdkIdentifierFactory: WrapperFactoryContract.IdentifierFactory {
     @Throws(DataValidationException.CustomDataLimitViolation::class)
-    fun wrap(attachment: Any): Attachment
+    override fun wrap(identifier: Any): WrapperContract.Identifier {
+        return when(identifier) {
+            is Fhir3Identifier -> SdkFhir3Identifier(identifier)
+            else -> throw CoreRuntimeException.InternalFailure()
+        }
+    }
 }

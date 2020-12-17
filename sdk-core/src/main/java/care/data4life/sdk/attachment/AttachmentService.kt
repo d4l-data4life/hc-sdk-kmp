@@ -24,9 +24,9 @@ import care.data4life.sdk.log.Log
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
-import care.data4life.sdk.wrappers.SdkAttachmentFactory
-import care.data4life.sdk.wrappers.definitions.Attachment
-import care.data4life.sdk.wrappers.definitions.AttachmentFactory
+import care.data4life.sdk.wrapper.SdkAttachmentFactory
+import care.data4life.sdk.wrapper.WrapperContract
+import care.data4life.sdk.wrapper.WrapperFactoryContract
 import io.reactivex.Observable
 import io.reactivex.Single
 import java.util.*
@@ -37,13 +37,13 @@ class AttachmentService internal constructor(
         // TODO move imageResizer to thumbnail service
         private val imageResizer: ImageResizer
 ) : AttachmentContract.Service {
-    private val attachmentFactory: AttachmentFactory = SdkAttachmentFactory
+    private val attachmentFactory: WrapperFactoryContract.AttachmentFactory = SdkAttachmentFactory
 
     override fun upload(
-            attachments: List<Attachment>,
+            attachments: List<WrapperContract.Attachment>,
             attachmentsKey: GCKey,
             userId: String
-    ): Single<List<Pair<Attachment, List<String>>>> {
+    ): Single<List<Pair<WrapperContract.Attachment, List<String>>>> {
         return Observable.fromIterable(attachments)
                 .filter { it.data != null }
                 .map { attachment ->
@@ -63,10 +63,10 @@ class AttachmentService internal constructor(
 
     @Throws(DataValidationException.InvalidAttachmentPayloadHash::class)
     override fun download(
-            attachments: List<Attachment>,
+            attachments: List<WrapperContract.Attachment>,
             attachmentsKey: GCKey,
             userId: String
-    ): Single<List<Attachment>> {
+    ): Single<List<WrapperContract.Attachment>> {
         return Observable
                 .fromCallable { attachments }
                 .flatMapIterable { it }
@@ -108,7 +108,7 @@ class AttachmentService internal constructor(
             attachmentTmp: Any,
             originalData: ByteArray
     ): List<String> {
-        val attachment = if( attachmentTmp !is Attachment) {
+        val attachment = if( attachmentTmp !is WrapperContract.Attachment) {
             attachmentFactory.wrap(attachmentTmp)
         } else {
             attachmentTmp
@@ -141,7 +141,7 @@ class AttachmentService internal constructor(
             originalData: ByteArray,
             targetHeight: Int
     ): String? {
-        val attachment = if( attachmentTmp !is Attachment) {
+        val attachment = if( attachmentTmp !is WrapperContract.Attachment) {
             attachmentFactory.wrap(attachmentTmp)
         } else {
             attachmentTmp

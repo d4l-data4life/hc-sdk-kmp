@@ -24,8 +24,8 @@ import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.helpers.stu3.AttachmentBuilder.buildWith
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException.InvalidAttachmentPayloadHash
-import care.data4life.sdk.wrappers.SdkAttachmentFactory
-import care.data4life.sdk.wrappers.definitions.Attachment
+import care.data4life.sdk.wrapper.SdkAttachmentFactory
+import care.data4life.sdk.wrapper.WrapperContract
 import com.google.common.truth.Truth
 import io.reactivex.Single
 import org.junit.Assert
@@ -51,7 +51,7 @@ class AttachmentServiceTest {
 
     private lateinit var mockFileService: FileService
     private lateinit var mockImageResizer: ImageResizer
-    private lateinit var attachment: Attachment
+    private lateinit var attachment: WrapperContract.Attachment
 
     private lateinit var attachmentService: AttachmentService
 

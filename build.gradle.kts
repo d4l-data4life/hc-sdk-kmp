@@ -21,11 +21,13 @@ buildscript {
         google()
         mavenCentral()
         jcenter()
+
+        maven("https://dl.bintray.com/data4life/maven")
     }
 
     dependencies {
-        classpath(Dependency.GradlePlugin.android)
-        classpath(Dependency.GradlePlugin.kotlin)
+        classpath(GradlePlugins.android)
+        classpath(GradlePlugins.kotlin)
 
         // https://github.com/vanniktech/gradle-android-junit-jacoco-plugin
         classpath("com.vanniktech:gradle-android-junit-jacoco-plugin:0.16.0")
@@ -35,25 +37,29 @@ buildscript {
         // https://github.com/dcendents/android-maven-gradle-plugin
         classpath("com.github.dcendents:android-maven-gradle-plugin:2.1")
 
-        classpath(Dependency.GradlePlugin.dexcount)
+        classpath(GradlePlugins.dexcount)
 
         // https://github.com/melix/japicmp-gradle-plugin
         classpath("me.champeau.gradle:japicmp-gradle-plugin:0.2.9")
 
-        classpath(Dependency.GradlePlugin.downloadTask)
+        classpath(GradlePlugins.downloadTask)
         classpath("org.apache.httpcomponents:httpclient:4.5.11")
 
-        classpath(Dependency.GradlePlugin.dokka)
+        classpath(GradlePlugins.dokka)
 
         // https://github.com/jeremylong/dependency-check-gradle
         classpath("org.owasp:dependency-check-gradle:5.3.0")
+
+        classpath(GradlePlugins.gitPublish)
     }
 }
 
 plugins {
-    // https://github.com/ben-manes/gradle-versions-plugin
-    id("com.github.ben-manes.versions") version "0.27.0"
+    dependencyUpdates()
+    gitVersioning()
 }
+
+apply(plugin = "care.data4life.git-publish")
 
 allprojects {
     repositories {
@@ -63,22 +69,28 @@ allprojects {
         maven {
             url = URI("https://maven.pkg.github.com/d4l-data4life/hc-util-sdk-kmp")
             credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+                username = project.findProperty("gpr.user") as String?
+                        ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
+                password = project.findProperty("gpr.key") as String?
+                        ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
             }
         }
         maven {
             url = URI("https://maven.pkg.github.com/d4l-data4life/hc-fhir-sdk-java")
             credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+                username = project.findProperty("gpr.user") as String?
+                        ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
+                password = project.findProperty("gpr.key") as String?
+                        ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
             }
         }
         maven {
             url = URI("https://maven.pkg.github.com/d4l-data4life/hc-fhir-helper-sdk-kmp")
             credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+                username = project.findProperty("gpr.user") as String?
+                        ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
+                password = project.findProperty("gpr.key") as String?
+                        ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
             }
         }
     }
@@ -111,3 +123,67 @@ tasks.named<Wrapper>("wrapper") {
 }
 
 
+jgitver {
+    strategy(fr.brouillard.oss.jgitver.Strategies.MAVEN)
+
+    policy(closureOf<fr.brouillard.oss.gradle.plugins.JGitverPluginExtensionBranchPolicy> {
+        pattern = "release/(.*)"
+        transformations = listOf("IGNORE")
+    })
+
+    policy(closureOf<fr.brouillard.oss.gradle.plugins.JGitverPluginExtensionBranchPolicy> {
+        pattern = "feature/(.*)"
+        transformations = listOf("LOWERCASE_EN")
+    })
+
+    policy(closureOf<fr.brouillard.oss.gradle.plugins.JGitverPluginExtensionBranchPolicy> {
+        pattern = "(main)"
+        transformations = listOf("IGNORE")
+    })
+
+    nonQualifierBranches = "main"
+}
+
+afterEvaluate {
+    configure<care.data4life.gradle.git.publish.GitPublishExtension> {
+        repoUri.set("git@github.com:d4l-data4life/maven-repository.git")
+
+        branch.set("main")
+
+        contents {
+        }
+
+        preserve {
+            include("**/*")
+        }
+
+        commitMessage.set("Publish ${LibraryConfig.name} ${project.version}")
+    }
+}
+
+task<Exec>("publishFeature") {
+    commandLine("./gradlew",
+            "gitPublishReset",
+            "publishAllPublicationsToFeaturePackagesRepository",
+            "gitPublishCommit",
+            "gitPublishPush"
+    )
+}
+
+task<Exec>("publishSnapshot") {
+    commandLine("./gradlew",
+            "gitPublishReset",
+            "publishAllPublicationsToSnapshotPackagesRepository",
+            "gitPublishCommit",
+            "gitPublishPush"
+    )
+}
+
+task<Exec>("publishRelease") {
+    commandLine("./gradlew",
+            "gitPublishReset",
+            "publishAllPublicationsToReleasePackagesRepository",
+            "gitPublishCommit",
+            "gitPublishPush"
+    )
+}

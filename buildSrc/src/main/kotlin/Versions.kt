@@ -14,7 +14,7 @@
  * contact D4L by email to help@data4life.care.
  */
 
-object Version {
+object Versions {
     // D4L
     const val sdkUtil = "1.6.1"
 
@@ -36,8 +36,8 @@ object Version {
      */
     const val kotlinCoroutines = "1.3.3"
 
-    object GradlePlugin {
-        const val kotlin = Version.kotlin
+    object GradlePlugins {
+        const val kotlin = Versions.kotlin
         const val android = "4.1.1"
 
         /**
@@ -54,6 +54,21 @@ object Version {
          * [Dokka - Documentation Engine for Kotlin](https://github.com/Kotlin/dokka)
          */
         const val dokka = "0.10.1"
+
+        /**
+         * [DependencyUpdates](https://github.com/ben-manes/gradle-versions-plugin)
+         */
+        const val dependencyUpdates = "0.34.0"
+
+        /**
+         * [jGitVer](https://github.com/jgitver/gradle-jgitver-plugin)
+         */
+        const val gitVersioning = "0.6.1"
+
+        /**
+         * [Gradle Git Publish](https://github.com/d4l-data4life/gradle-git-publish)
+         */
+        const val gitPublish = "3.2.0"
     }
 
     // Java

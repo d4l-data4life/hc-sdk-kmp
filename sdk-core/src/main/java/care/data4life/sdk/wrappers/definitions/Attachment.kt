@@ -18,7 +18,7 @@ package care.data4life.sdk.wrappers.definitions
 
 import care.data4life.sdk.lang.DataValidationException
 
-internal interface Attachment {
+interface Attachment {
     var id: String?
     var data: String?
     var hash: String?

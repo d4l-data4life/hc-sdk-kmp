@@ -16,7 +16,6 @@
 package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
-import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.fhir.stu3.util.FhirDateTimeParser
 import care.data4life.sdk.ImageResizer
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
@@ -27,6 +26,9 @@ import care.data4life.sdk.log.Log
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
+import care.data4life.sdk.wrappers.SdkAttachmentFactory
+import care.data4life.sdk.wrappers.definitions.Attachment
+import care.data4life.sdk.wrappers.definitions.AttachmentFactory
 import io.reactivex.Observable
 import io.reactivex.Single
 import java.util.*
@@ -37,12 +39,14 @@ class AttachmentService internal constructor(
         // TODO move imageResizer to thumbnail service
         private val imageResizer: ImageResizer
 ) : AttachmentContract.Service {
+    private val attachmentFactory: AttachmentFactory = SdkAttachmentFactory
+
 
     override fun upload(
             attachments: List<Fhir3Attachment>,
             attachmentsKey: GCKey,
             userId: String
-    ): Single<List<Pair<Attachment, List<String>>>> {
+    ): Single<List<Pair<Fhir3Attachment, List<String>>>> {
         return Observable.fromIterable(attachments)
                 .filter { attachment -> attachment.data != null }
                 .map { attachment ->
@@ -57,10 +61,10 @@ class AttachmentService internal constructor(
 
     @Throws(DataValidationException.InvalidAttachmentPayloadHash::class)
     override fun download(
-            attachments: List<Attachment>,
+            attachments: List<Fhir3Attachment>,
             attachmentsKey: GCKey,
             userId: String
-    ): Single<List<Attachment>> {
+    ): Single<List<Fhir3Attachment>> {
         return Observable
                 .fromCallable { attachments }
                 .flatMapIterable { attachmentList -> attachmentList }
@@ -94,9 +98,15 @@ class AttachmentService internal constructor(
     private fun uploadDownscaledImages(
             attachmentsKey: GCKey,
             userId: String,
-            attachment: Attachment,
+            attachmentTmp: Any,
             originalData: ByteArray
     ): List<String> {
+        val attachment = if( attachmentTmp !is Attachment) {
+            attachmentFactory.wrap(attachmentTmp)
+        } else {
+            attachmentTmp
+        }
+
         var additionalIds = mutableListOf<String>()
         if (imageResizer.isResizable(originalData)) {
             additionalIds = ArrayList()
@@ -116,14 +126,78 @@ class AttachmentService internal constructor(
         return additionalIds
     }
 
+    fun _upload(
+            attachments: List<Attachment>,
+            attachmentsKey: GCKey,
+            userId: String
+    ): Single<List<Pair<Attachment, List<String>>>> {
+        return Observable.fromIterable(attachments)
+                .filter { it.data != null }
+                .map { attachment ->
+                    val originalData = decode(attachment.data!!)
+                    attachment.id = fileService.uploadFile(attachmentsKey, userId, originalData).blockingGet()
+                    val additionalIds = uploadDownscaledImages(
+                            attachmentsKey,
+                            userId,
+                            attachment,
+                            originalData
+                    )
+                    Pair(attachment, additionalIds)
+                }
+                .filter { (first) -> first.id != null } //FIXME: Should this be removed?
+                .toList()
+    }
+
+    @Throws(DataValidationException.InvalidAttachmentPayloadHash::class)
+    fun _download(
+            attachments: List<Attachment>,
+            attachmentsKey: GCKey,
+            userId: String
+    ): Single<List<Attachment>> {
+        return Observable
+                .fromCallable { attachments }
+                .flatMapIterable { it }
+                .filter{ it.id != null }
+                .map { attachment ->
+                    var attachmentId = attachment.id!!
+                    var isPreview = false
+                    if (attachmentId.contains(SPLIT_CHAR)) {
+                        attachmentId = attachmentId.split(SPLIT_CHAR)[DOWNSCALED_ATTACHMENT_ID_POS]
+                        isPreview = true
+                    }
+
+                    val data = fileService.downloadFile(attachmentsKey, userId, attachmentId).blockingGet()
+                    val newHash = encodeToString(sha1(data))
+
+                    if (!isPreview &&
+                            LegacyDateValidator.isInvalidateDate(attachment) &&
+                            attachment.hash != newHash
+                    ) {
+                        throw DataValidationException.InvalidAttachmentPayloadHash()
+                    } else {
+                        attachment.also {
+                            it.data = encodeToString(data)
+                            it.hash = newHash
+                        }
+                    }
+                }
+                .toList()
+    }
+
     // TODO -> thumbnail service
     private fun resizeAndUpload(
             attachmentsKey: GCKey,
             userId: String,
-            attachment: Attachment,
+            attachmentTmp: Any,
             originalData: ByteArray,
             targetHeight: Int
     ): String? {
+        val attachment = if( attachmentTmp !is Attachment) {
+            attachmentFactory.wrap(attachmentTmp)
+        } else {
+            attachmentTmp
+        }
+
         val downscaledImage = try {
             imageResizer.resizeToHeight(originalData, targetHeight, ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT)
         } catch (exception: ImageResizeException.JpegWriterMissing) {

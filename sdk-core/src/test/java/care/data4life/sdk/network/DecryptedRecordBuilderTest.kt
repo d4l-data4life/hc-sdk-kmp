@@ -30,7 +30,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -52,48 +51,6 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         val builder: Any = DecryptedRecordBuilder()
 
         assertTrue(builder is NetworkModelContract.DecryptedRecordBuilder)
-    }
-
-    @Test
-    fun `Given tags are accessed, it returns null by default`() {
-        // Given
-        val builder = DecryptedRecordBuilder()
-
-        // Then
-        assertNull(builder.tags)
-    }
-
-    @Test
-    fun `Given, setTags is called, with its proper payload and tags are accessed, it returns the payload of setTags`() {
-        // Given
-        val builder = DecryptedRecordBuilder().setTags(tags)
-
-        // Then
-        assertEquals(
-                tags,
-                builder.tags
-        )
-    }
-
-    @Test
-    fun `Given dataKey is accessed, it returns null by default`() {
-        // Given
-        val builder = DecryptedRecordBuilder()
-
-        // Then
-        assertNull(builder.dataKey)
-    }
-
-    @Test
-    fun `Given, setDataKey is called, with its proper payload and dataKey is accessed, it returns the payload of setTags`() {
-        // Given
-        val builder = DecryptedRecordBuilder().setDataKey(dataKey)
-
-        // Then
-        assertEquals(
-                dataKey,
-                builder.dataKey
-        )
     }
 
     @Test

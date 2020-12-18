@@ -31,26 +31,20 @@ import care.data4life.sdk.network.model.NetworkModelContract
 
 internal class DecryptedRecordBuilder : NetworkModelContract.DecryptedRecordBuilder {
     private var identifier: String? = null
-    private var _tags: HashMap<String, String>? = null
+    private var tags: HashMap<String, String>? = null
     private var annotations: List<String> = listOf()
     private var creationDate: String? = null
     private var updatedDate: String? = null
     private var attachmentKey: GCKey? = null
-    private var _dataKey: GCKey? = null
+    private var dataKey: GCKey? = null
     private var modelVersion: Int? = null
 
     private val guard: NetworkModelContract.LimitGuard = DecryptedRecordGuard
 
-    override val tags: HashMap<String, String>?
-        get() = this._tags
-
-    override val dataKey: GCKey?
-        get() = this._dataKey
-
     //mandatory
     override fun setTags(
             tags: HashMap<String, String>?
-    ): DecryptedRecordBuilder = this.also { it._tags = tags }
+    ): DecryptedRecordBuilder = this.also { it.tags = tags }
 
     override fun setCreationDate(
             creationDate: String?
@@ -58,7 +52,7 @@ internal class DecryptedRecordBuilder : NetworkModelContract.DecryptedRecordBuil
 
     override fun setDataKey(
             dataKey: GCKey?
-    ): DecryptedRecordBuilder = this.also { it._dataKey = dataKey }
+    ): DecryptedRecordBuilder = this.also { it.dataKey = dataKey }
 
     override fun setModelVersion(
             modelVersion: Int?
@@ -89,9 +83,9 @@ internal class DecryptedRecordBuilder : NetworkModelContract.DecryptedRecordBuil
             modelVersion: Int?
     ) {
         if (
-                this._tags == null && tags == null ||
+                this.tags == null && tags == null ||
                 this.creationDate == null && creationDate == null ||
-                this._dataKey == null && dataKey == null ||
+                this.dataKey == null && dataKey == null ||
                 this.modelVersion == null && modelVersion == null
 
         ) {
@@ -173,7 +167,7 @@ internal class DecryptedRecordBuilder : NetworkModelContract.DecryptedRecordBuil
                 modelVersion
         )
 
-        val tags = tags ?: this._tags!!
+        val tags = tags ?: this.tags!!
         val creationDate = creationDate ?: this.creationDate!!
         val dataKey = dataKey ?: this.dataKey!!
         val modelVersion = modelVersion ?: this.modelVersion!!
@@ -216,12 +210,12 @@ internal class DecryptedRecordBuilder : NetworkModelContract.DecryptedRecordBuil
 
     override fun clear(): DecryptedRecordBuilder = this.also {
         it.identifier = null
-        it._tags = null
+        it.tags = null
         it.annotations = listOf()
         it.creationDate = null
         it.updatedDate = null
         it.attachmentKey = null
-        it._dataKey = null
+        it.dataKey = null
         it.modelVersion = null
     }
 }

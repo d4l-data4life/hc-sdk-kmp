@@ -23,9 +23,6 @@ import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 
 class NetworkModelContract{
     internal interface DecryptedRecordBuilder {
-        val tags: HashMap<String, String>?// ToDo Remove me
-        val dataKey: GCKey?// ToDo Remove me
-
         //mandatory
         fun setTags(tags: HashMap<String, String>?): DecryptedRecordBuilder
         fun setCreationDate(creationDate: String?): DecryptedRecordBuilder

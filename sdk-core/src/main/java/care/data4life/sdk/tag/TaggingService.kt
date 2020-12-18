@@ -15,13 +15,18 @@
  */
 package care.data4life.sdk.tag
 
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir3Version
+import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.fhir.Fhir4Version
 import care.data4life.sdk.model.ModelVersion
 import java.util.*
+import kotlin.reflect.KClass
 
 // TODO internal
 class TaggingService(
         private val clientId: String
-) {
+): TaggingContract.Service {
     private val partnerId: String = clientId.substringBefore(SEPARATOR)
 
     private fun appendCommonDefaultTags(
@@ -49,12 +54,33 @@ class TaggingService(
     }
 
     // FIXME add FHIR 4 support
-    fun appendDefaultTags(
+    override fun appendDefaultTags(
             resourceType: String?,
             oldTags: HashMap<String, String>?
     ): HashMap<String, String> = appendCommonDefaultTags(resourceType, oldTags).also {
         if (!it.containsKey(TAG_FHIR_VERSION)) {
             it[TAG_FHIR_VERSION] = ModelVersion.FHIR_VERSION
+        }
+    }
+
+    override fun _appendDefaultTags(
+            resource: Any,
+            oldTags: HashMap<String, String>?
+    ): HashMap<String, String> {
+        return when(resource) {
+            is Fhir3Resource -> appendCommonDefaultTags(resource.resourceType, oldTags).also {
+                if (!it.containsKey(TAG_FHIR_VERSION)) {
+                    it[TAG_FHIR_VERSION] = Fhir3Version.version
+                }
+            }
+            is Fhir4Resource -> appendCommonDefaultTags(resource.resourceType, oldTags).also {
+                if (!it.containsKey(TAG_FHIR_VERSION)) {
+                    it[TAG_FHIR_VERSION] = Fhir4Version.version
+                }
+            }
+            else -> appendCommonDefaultTags(null, oldTags).also {
+                it[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE
+            }
         }
     }
 
@@ -71,12 +97,18 @@ class TaggingService(
             oldTags: HashMap<String, String>?
     ): HashMap<String, String> = appendAppDataTags(appendCommonDefaultTags(resourceType, oldTags))!!
 
-    fun getTagFromType(
+    override fun getTagFromType(
             resourceType: String?
     ): HashMap<String, String> = hashMapOf<String, String>().also {
         if (resourceType != null && resourceType.isNotEmpty()) {
             it[TAG_RESOURCE_TYPE] = resourceType.toLowerCase(US_LOCALE)
         }
+    }
+
+    override fun _getTagFromType(
+            resourceType: KClass<Any>?
+    ): HashMap<String, String> {
+        TODO("Not yet implemented")
     }
 
     companion object {

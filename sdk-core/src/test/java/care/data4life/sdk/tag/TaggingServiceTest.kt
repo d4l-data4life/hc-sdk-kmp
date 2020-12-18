@@ -15,6 +15,12 @@
  */
 package care.data4life.sdk.tag
 
+
+import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir3Version
+import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.fhir.Fhir4Version
 import care.data4life.sdk.model.ModelVersion
 import org.junit.Assert
 import org.junit.Before
@@ -250,6 +256,119 @@ class TaggingServiceTest {
 
         // Then
         Assert.assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `Given, appendDefaultTags is called with a Fhir3Resource and null, it returns the default tags`() { //tag_shouldReturnMapWithResourceAndClientTag
+        // Given
+        val resource = Fhir3Resource()
+
+        // When
+        val result = taggingService._appendDefaultTags(resource, null)
+
+        // Then
+        Assert.assertEquals(4, result.size.toLong())
+        Assert.assertTrue(result.containsKey(TAG_RESOURCE_TYPE))
+        Assert.assertEquals(resource.resourceType.toLowerCase(Locale.US), result[TAG_RESOURCE_TYPE])
+        Assert.assertTrue(result.containsKey(TAG_CLIENT))
+        Assert.assertEquals(CLIENT_ID, result[TAG_CLIENT])
+        Assert.assertTrue(result.containsKey(TAG_PARTNER))
+        Assert.assertEquals(PARTNER_ID, result[TAG_PARTNER])
+        Assert.assertFalse(result.containsKey(TAG_APPDATA_KEY))
+        Assert.assertTrue(result.containsKey(TAG_FHIR_VERSION))
+        Assert.assertEquals(Fhir3Version.version, result[TAG_FHIR_VERSION])
+        Assert.assertFalse(result.containsKey(TAG_APPDATA_KEY))
+    }
+
+    @Test
+    fun `Given, appendDefaultTags is called with a Fhir4Resource and null, it returns the default tags`() { //tag_shouldReturnMapWithResourceAndClientTag
+        // Given
+        val resource = Fhir4Resource()
+
+        // When
+        val result = taggingService._appendDefaultTags(resource, null)
+
+        // Then
+        Assert.assertEquals(4, result.size.toLong())
+        Assert.assertTrue(result.containsKey(TAG_RESOURCE_TYPE))
+        Assert.assertEquals(resource.resourceType.toLowerCase(Locale.US), result[TAG_RESOURCE_TYPE])
+        Assert.assertTrue(result.containsKey(TAG_CLIENT))
+        Assert.assertEquals(CLIENT_ID, result[TAG_CLIENT])
+        Assert.assertTrue(result.containsKey(TAG_PARTNER))
+        Assert.assertEquals(PARTNER_ID, result[TAG_PARTNER])
+        Assert.assertFalse(result.containsKey(TAG_APPDATA_KEY))
+        Assert.assertTrue(result.containsKey(TAG_FHIR_VERSION))
+        Assert.assertEquals(Fhir4Version.version, result[TAG_FHIR_VERSION])
+        Assert.assertFalse(result.containsKey(TAG_APPDATA_KEY))
+    }
+
+    @Test
+    fun `Given, appendDefaultTags is called with a DataResource and null, it returns the default tags`() {
+        // Given
+        val resource = DataResource(ByteArray(1))
+        // When
+        val result = taggingService._appendDefaultTags(resource, null)
+
+        // Then
+        Assert.assertEquals(3, result.size.toLong())
+        Assert.assertFalse(result.containsKey(TAG_RESOURCE_TYPE))
+        Assert.assertTrue(result.containsKey(TAG_CLIENT))
+        Assert.assertEquals(CLIENT_ID, result[TAG_CLIENT])
+        Assert.assertTrue(result.containsKey(TAG_PARTNER))
+        Assert.assertEquals(PARTNER_ID, result[TAG_PARTNER])
+        Assert.assertTrue(result.containsKey(TAG_APPDATA_KEY))
+        Assert.assertEquals(TAG_APPDATA_VALUE, result[TAG_APPDATA_KEY])
+        Assert.assertFalse(result.containsKey(TAG_FHIR_VERSION))
+    }
+
+    @Test
+    fun `Given, appendDefaultTags is called with a Resource and old Tags, it preserves the existing Tag and updates the Type`() { //annotatedTag_shouldPreserveExistingTagsAndUpdate
+        // Given
+        val type = Fhir3Resource()
+        val existingTags = HashMap<String, String>()
+        existingTags["tag_1_key"] = "tag_1_value"
+        existingTags["tag_2_key"] = "tag_2_value"
+        existingTags[TAG_RESOURCE_TYPE] = "old_typ"
+
+        // When
+        val result = taggingService._appendDefaultTags(type, existingTags)
+
+        // Then
+        Assert.assertEquals(6, result.size.toLong())
+        Assert.assertTrue(result.containsKey("tag_1_key"))
+        Assert.assertTrue(result.containsKey("tag_2_key"))
+        Assert.assertTrue(result.containsKey(TAG_RESOURCE_TYPE))
+        Assert.assertEquals(type.resourceType.toLowerCase(Locale.US), result[TAG_RESOURCE_TYPE])
+        Assert.assertTrue(result.containsKey(TAG_CLIENT))
+        Assert.assertEquals(CLIENT_ID, result[TAG_CLIENT])
+        Assert.assertTrue(result.containsKey(TAG_PARTNER))
+        Assert.assertEquals(PARTNER_ID, result[TAG_PARTNER])
+        Assert.assertTrue(result.containsKey(TAG_FHIR_VERSION))
+        Assert.assertEquals(Fhir3Version.version, result[TAG_FHIR_VERSION])
+        Assert.assertFalse(result.containsKey(TAG_APPDATA_KEY))
+    }
+
+    @Test
+    fun `Given, appendDefaultTags is called with a Resource and old Tags, sets UpdatedByClient Tag, if the TAG_CLIENT Tag is present`() { //annotatedTag_shouldSetUpdatedByClientTag_whenClientAlreadySet
+        // Given
+        val type = "type"
+        val existingTags = HashMap<String, String>()
+        existingTags[TAG_CLIENT] = OTHER_CLIENT_ID
+
+        // When
+        val result = taggingService.appendDefaultTags(type, existingTags)
+
+        // Then
+        Assert.assertEquals(5, result.size.toLong())
+        Assert.assertTrue(result.containsKey(TAG_CLIENT))
+        Assert.assertEquals(OTHER_CLIENT_ID, result[TAG_CLIENT])
+        Assert.assertTrue(result.containsKey(TAG_UPDATED_BY_CLIENT))
+        Assert.assertEquals(CLIENT_ID, result[TAG_UPDATED_BY_CLIENT])
+        Assert.assertTrue(result.containsKey(TAG_PARTNER))
+        Assert.assertEquals(PARTNER_ID, result[TAG_PARTNER])
+        Assert.assertTrue(result.containsKey(TAG_FHIR_VERSION))
+        Assert.assertEquals(Fhir3Version.version, result[TAG_FHIR_VERSION])
+        Assert.assertFalse(result.containsKey(TAG_APPDATA_KEY))
     }
 
     companion object {

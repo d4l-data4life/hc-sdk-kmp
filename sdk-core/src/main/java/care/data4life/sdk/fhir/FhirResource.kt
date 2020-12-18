@@ -31,12 +31,12 @@ interface FhirVersion {
     val version: String
 }
 
-fun Fhir3Resource.asVersionable() = object : FhirVersion {
+object Fhir3Version : FhirVersion {
     override val version: String
         get() = "3.0.1"
 }
 
-fun Fhir4Resource.asVersionable() = object : FhirVersion {
+object Fhir4Version : FhirVersion {
     override val version: String
         get() = "4.0.1"
 

@@ -16,10 +16,10 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.sdk.fhir.Fhir3Attachment
+import care.data4life.sdk.fhir.Fhir4Attachment
 
-internal class SdkFhir3Attachment(
-        private val attachment: Fhir3Attachment
+internal class SdkFhir4Attachment(
+        private val attachment: Fhir4Attachment
 ): WrapperContract.Attachment {
     override var id: String?
         get() = attachment.id
@@ -38,10 +38,10 @@ internal class SdkFhir3Attachment(
     override fun <T : Any> unwrap(): T = attachment as T
 
     override fun equals(other: Any?): Boolean {
-        return if(other !is SdkFhir3Attachment) {
+        return if(other !is SdkFhir4Attachment) {
             false
         } else {
-            return attachment === other.unwrap<Fhir3Attachment>()
+            return attachment === other.unwrap<Fhir4Attachment>()
         }
     }
 

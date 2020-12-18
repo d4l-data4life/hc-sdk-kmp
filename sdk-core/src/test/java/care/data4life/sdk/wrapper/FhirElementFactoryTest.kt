@@ -16,27 +16,20 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.fhir.stu3.model.DocumentReference
-import care.data4life.sdk.RecordServiceTestBase
+
+import care.data4life.sdk.fhir.Fhir3Attachment
+import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.test.util.AttachmentBuilder
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.util.ArrayList
+import java.util.*
+import care.data4life.fhir.r4.model.DocumentReference as DocumentReferenceFhir4
+import care.data4life.fhir.stu3.model.DocumentReference as DocumentReferenceFhir3
 
 class FhirElementFactoryTest {
-    private fun buildDocumentReference(): DocumentReference {
-        val content = RecordServiceTestBase.buildDocRefContent(AttachmentBuilder.buildAttachment(null))
-        val contents: MutableList<DocumentReference.DocumentReferenceContent> = ArrayList()
-        contents.add(content)
-        return DocumentReference(
-                null,
-                null,
-                null,
-                contents
-        )
-    }
 
     @Test
     fun `it is a FhirElementFactory`() {
@@ -44,9 +37,24 @@ class FhirElementFactoryTest {
     }
 
     @Test
-    fun `Given, getFhirTypeForClass is called with a valid FhirResource Class, it returns its name`() {
+    fun `Given, getFhirTypeForClass is called with a valid Fhir3Resource Class, it returns its name`() {
         // Given
-        val resource = buildDocumentReference()
+        val resource = buildDocumentReferenceFhir3()
+
+        // When
+        val name = SdkFhirElementFactory.getFhirTypeForClass(resource::class.java)
+
+        // Then
+        assertEquals(
+                "DocumentReference",
+                name
+        )
+    }
+
+    @Test
+    fun `Given, getFhirTypeForClass is called with a valid Fhir4Resource Class, it returns its name`() {
+        // Given
+        val resource = buildDocumentReferenceFhir4()
 
         // When
         val name = SdkFhirElementFactory.getFhirTypeForClass(resource::class.java)
@@ -67,6 +75,81 @@ class FhirElementFactoryTest {
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+    }
+
+    @Test
+    fun `Given, getFhir3ClassForType is called with a Fhir3Resource String, it returns a Fhir3 resource class`() {
+        val klass = SdkFhirElementFactory.getFhir3ClassForType("DocumentReference")
+
+        assertEquals(
+                klass,
+                DocumentReferenceFhir3::class.java
+        )
+    }
+
+    @Test
+    fun `Given, getFhir3ClassForType is called with a unknown Fhir3Resource String, it returns a null`() {
+        assertNull(SdkFhirElementFactory.getFhir3ClassForType("I will bug you"))
+    }
+
+    @Test
+    fun `Given, getFhir4ClassForType is called with a Fhir3Resource String, it returns a Fhir3 resource class`() {
+        val klass = SdkFhirElementFactory.getFhir4ClassForType("DocumentReference")
+
+        assertEquals(
+                klass,
+                DocumentReferenceFhir4::class.java
+        )
+    }
+
+    @Test
+    fun `Given, getFhir4ClassForType is called with a unknown Fhir3Resource String, it returns a null`() {
+        assertNull(SdkFhirElementFactory.getFhir4ClassForType("I will bug you"))
+    }
+
+    companion object {
+        private val DATA = "data"
+        private val DATA_SIZE = 42
+        private val DATA_HASH = "dataHash"
+
+        private fun buildDocRefContentFhir3(attachment: Fhir3Attachment): DocumentReferenceFhir3.DocumentReferenceContent {
+            return DocumentReferenceFhir3.DocumentReferenceContent(attachment)
+        }
+
+        private fun buildDocumentReferenceFhir3(): DocumentReferenceFhir3 {
+            val content = buildDocRefContentFhir3(AttachmentBuilder.buildAttachment(null))
+            val contents: MutableList<DocumentReferenceFhir3.DocumentReferenceContent> = ArrayList()
+            contents.add(content)
+            return DocumentReferenceFhir3(
+                    null,
+                    null,
+                    null,
+                    contents
+            )
+        }
+
+        private fun buildFhir4Attachment(): Fhir4Attachment {
+            val attachment = Fhir4Attachment()
+            attachment.id = null
+            attachment.data = DATA
+            attachment.size = DATA_SIZE
+            attachment.hash = DATA_HASH
+            return attachment
+        }
+
+        private fun buildDocRefContentFhir4(attachment: Fhir4Attachment): DocumentReferenceFhir4.DocumentReferenceContent {
+            return DocumentReferenceFhir4.DocumentReferenceContent(attachment)
+        }
+
+        private fun buildDocumentReferenceFhir4(): DocumentReferenceFhir4 {
+            val content = buildDocRefContentFhir4(buildFhir4Attachment())
+            val contents: MutableList<DocumentReferenceFhir4.DocumentReferenceContent> = ArrayList()
+            contents.add(content)
+            return DocumentReferenceFhir4(
+                    null,
+                    contents
+            )
         }
     }
 }

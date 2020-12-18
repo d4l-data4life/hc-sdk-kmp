@@ -16,26 +16,38 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.fhir.Fhir3ElementFactory
 import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4ElementFactory
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.fhir.stu3.model.FhirElementFactory as Fhir3ElementFactory
 
 internal object SdkFhirElementFactory: WrapperContract.FhirElementFactory {
+    private val fhir3Indicator = Fhir3Resource::class.java.`package`
+    private val fhir4Indicator = Fhir4Resource::class.java.`package`
+
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun getFhirTypeForClass(resourceType: Class<out Any>): String {
         @Suppress("UNCHECKED_CAST")
-        return Fhir3ElementFactory.getFhirTypeForClass(resourceType as Class<out DomainResource> )
-                ?: throw CoreRuntimeException.InternalFailure()
+        return when(resourceType.`package`) {
+            fhir3Indicator  -> Fhir3ElementFactory.getFhirTypeForClass(resourceType as Class<out Fhir3Resource>)
+            fhir4Indicator -> Fhir4ElementFactory.getFhirTypeForClass(resourceType as Class<out Fhir4Resource>)
+            else -> throw CoreRuntimeException.InternalFailure()
+        }
     }
 
-    override fun getFhir3ClassForType(resourceType: String): Class<out Fhir3Resource>? {
-        TODO("Not yet implemented")
+    override fun getFhir3ClassForType(resourceType:String): Class<out Fhir3Resource>? {
+        val clazz = Fhir3ElementFactory.getClassForFhirType(resourceType)
+
+        @Suppress("UNCHECKED_CAST")
+        return  if (clazz  == null) null else clazz as Class<out Fhir3Resource>
     }
 
     override fun getFhir4ClassForType(resourceType: String): Class<out Fhir4Resource>? {
-        TODO("Not yet implemented")
+        val clazz = Fhir4ElementFactory.getClassForFhirType(resourceType)
+
+        @Suppress("UNCHECKED_CAST")
+        return  if (clazz  == null) null else clazz as Class<out Fhir4Resource>
     }
 
 }

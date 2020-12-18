@@ -421,7 +421,7 @@ class RecordService(
 
     @Throws(DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class)
-    private fun <T : Any> updateRecord(
+    internal fun <T : Any> updateRecord(
             userId: String,
             recordId: String,
             resource: T,

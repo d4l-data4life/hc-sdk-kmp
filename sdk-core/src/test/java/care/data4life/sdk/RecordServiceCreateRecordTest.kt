@@ -134,8 +134,6 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     @Test
     fun `Given, createRecord is called with a Fhir4Resource, it wraps it and delegates it to the generic createRecord and return its Result`() {
         // Given
-        val recordService = spyk(recordService)
-
         val userId = "id"
         val rawResource = mockk<Fhir4Resource>()
 
@@ -143,11 +141,11 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
 
         @Suppress("UNCHECKED_CAST")
         every {
-            recordService.createRecord(userId, rawResource, any())
+            recordServiceK.createRecord(userId, rawResource, any())
         } returns Single.just(createdRecord)
 
         // When
-        val subscriber = recordService.createRecord(
+        val subscriber = recordServiceK.createRecord(
                 userId,
                 rawResource,
                 mockk(relaxed = true)
@@ -765,8 +763,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         inOrder.verifyNoMoreInteractions()
     }
 
+    @Ignore("This test is obsolete")
     @Test
-    @Ignore
     @Throws(
             InterruptedException::class,
             IOException::class,
@@ -777,7 +775,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class
     )
-    fun `Given createRecord is called with a Byte resource, a UserId and Annotations, it returns a new DataRecord`() {
+    fun `Given createRecord is called with a DataResource resource, a UserId and Annotations, it returns a new DataRecord`() {
         // Given
         every {
             anyConstructed<DecryptedRecordBuilder>().setAnnotations(listOf())

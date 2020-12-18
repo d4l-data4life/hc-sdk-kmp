@@ -129,13 +129,13 @@ class FhirService @JvmOverloads constructor(
                 .just(encryptedResource)
                 .filter { it.isNotBlank() }
                 .map { cryptoService.decryptString(dataKey, it).blockingGet() }
-                .map<Any> { parseFhir<T>(it, tags, resourceType) }
+                .map { parseFhir<T>(it, tags, resourceType) }
                 .toSingle()
                 .onErrorResumeNext { error ->
                     Single.error(
                             DecryptionFailed("Failed to decrypt resource", error) as D4LException)
                 }
-                .blockingGet() as T
+                .blockingGet()
     }
 
     private fun decryptData(

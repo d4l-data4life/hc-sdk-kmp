@@ -17,22 +17,24 @@
 package care.data4life.sdk
 
 import care.data4life.fhir.stu3.model.CarePlan
-import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.SdkRecordFactory
 import care.data4life.sdk.model.definitions.BaseRecord
+import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.util.MimeType
 import com.google.common.truth.Truth
 import io.mockk.every
-import io.mockk.spyk
+import io.mockk.mockk
 import io.reactivex.Single
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
@@ -58,7 +60,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given, updateRecord is called with a resource and a UserId, it returns a updated Record`() {
+    fun `Given, updateRecord is called with a Fhir3Resource and a UserId, it returns a updated Record`() {
         // Given
         mockCarePlan.id = RECORD_ID
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
@@ -71,7 +73,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         ).thenReturn(Single.just(mockEncryptedRecord))
         Mockito.doReturn(mockDecryptedFhir3Record)
                 .`when`(recordService)
-                .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
+                .decryptRecord<Fhir3Resource>(mockEncryptedRecord, USER_ID)
         Mockito.doReturn(mockEncryptedRecord).`when`(recordService).encryptRecord(mockDecryptedFhir3Record)
         Mockito.`when`(
                 mockApiService.updateRecord(
@@ -85,7 +87,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
                 .`when`(recordService)
                 .assignResourceId(mockDecryptedDataRecord)
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
+        every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<Fhir3Resource>
         val annotations = listOf<String>()
 
         // When
@@ -100,10 +102,10 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         Truth.assertThat(result).isSameInstanceAs(mockRecord)
 
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
-        inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).decryptRecord<Fhir3Resource>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).encryptRecord(mockDecryptedFhir3Record)
         inOrder.verify(mockApiService).updateRecord(ALIAS, USER_ID, RECORD_ID, mockEncryptedRecord)
-        inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).decryptRecord<Fhir3Resource>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).restoreUploadData(
                 mockDecryptedFhir3Record,
                 mockCarePlan,
@@ -181,7 +183,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given, updateRecord is called with a resource, Annotations and a UserId, it returns updated a Record`() {
+    fun `Given, updateRecord is called with a Fhir3Resource, Annotations and a UserId, it returns updated a Record`() {
         // Given
         mockCarePlan.id = RECORD_ID
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
@@ -194,7 +196,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         ).thenReturn(Single.just(mockEncryptedRecord))
         Mockito.doReturn(mockDecryptedFhir3Record)
                 .`when`(recordService)
-                .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
+                .decryptRecord<Fhir3Resource>(mockEncryptedRecord, USER_ID)
         Mockito.doReturn(mockEncryptedRecord).`when`(recordService).encryptRecord(mockDecryptedFhir3Record)
         Mockito.`when`(
                 mockApiService.updateRecord(
@@ -205,7 +207,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
                 )
         ).thenReturn(Single.just(mockEncryptedRecord))
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
+        every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<Fhir3Resource>
 
         // When
         val observer = recordService.updateRecord(USER_ID, RECORD_ID, mockCarePlan, ANNOTATIONS).test().await()
@@ -219,10 +221,10 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         Truth.assertThat(result).isSameInstanceAs(mockRecord)
 
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
-        inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).decryptRecord<Fhir3Resource>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).encryptRecord(mockDecryptedFhir3Record)
         inOrder.verify(mockApiService).updateRecord(ALIAS, USER_ID, RECORD_ID, mockEncryptedRecord)
-        inOrder.verify(recordService).decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).decryptRecord<Fhir3Resource>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).restoreUploadData(
                 mockDecryptedFhir3Record,
                 mockCarePlan,
@@ -311,7 +313,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given, updateRecord is called with a byte resource, Annotations and a UserId, it returns a updated AppDataRecord`() {
+    fun `Given, updateRecord is called with a byte resource, Annotations and a UserId, it returns a updated DataRecord`() {
         // Given
         Mockito.`when`(
                 mockApiService.fetchRecord(
@@ -378,7 +380,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given, updateRecord is called with a byte resource, empty list Annotations and a UserId, it returns a updated AppDataRecord`() {
+    fun `Given, updateRecord is called with a byte resource, empty list Annotations and a UserId, it returns a updated DataRecord`() {
         // Given
         Mockito.`when`(
                 mockApiService.fetchRecord(
@@ -437,5 +439,40 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
                 mockDecryptedDataRecord,
                 Mockito.times(1)
         ).annotations = ArgumentMatchers.anyList()
+    }
+
+    @Test
+    fun `Given, updateRecord is called with a UserId, recordId, a Fhir4Resource and Annotations, it wraps it and delegates it to the generic createRecord and return its Result`() {
+        // Given
+        val userId = "id"
+        val recordId = "absd"
+        val resource = Fhir4Resource()
+
+        val createdRecord = mockk<Fhir4Record<Fhir4Resource>>()
+
+        @Suppress("UNCHECKED_CAST")
+        every {
+            recordServiceK.updateRecord(userId, recordId, resource as Any, ANNOTATIONS)
+        } returns Single.just(createdRecord as BaseRecord<Any>)
+
+        // When
+        val subscriber = recordServiceK.updateRecord(
+                userId,
+                recordId,
+                resource,
+                ANNOTATIONS
+        ).test().await()
+
+        val record = subscriber
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
+
+        // Then
+        Assert.assertSame(
+                record,
+                createdRecord
+        )
     }
 }

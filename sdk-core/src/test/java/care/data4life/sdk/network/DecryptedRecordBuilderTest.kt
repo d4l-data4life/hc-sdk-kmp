@@ -24,7 +24,7 @@ import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import care.data4life.sdk.network.model.definitions.NetworkModelContract
+import care.data4life.sdk.network.model.NetworkModelContract
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

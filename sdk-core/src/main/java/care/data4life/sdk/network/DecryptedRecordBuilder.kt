@@ -27,7 +27,7 @@ import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
-import care.data4life.sdk.network.model.definitions.NetworkModelContract
+import care.data4life.sdk.network.model.NetworkModelContract
 
 internal class DecryptedRecordBuilder : NetworkModelContract.DecryptedRecordBuilder {
     private var identifier: String? = null

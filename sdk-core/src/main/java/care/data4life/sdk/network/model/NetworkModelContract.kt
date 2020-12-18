@@ -14,16 +14,17 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network.model.definitions
+package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 
 class NetworkModelContract{
     internal interface DecryptedRecordBuilder {
-        val tags: HashMap<String, String>?
-        val dataKey: GCKey?
+        val tags: HashMap<String, String>?// ToDo Remove me
+        val dataKey: GCKey?// ToDo Remove me
 
         //mandatory
         fun setTags(tags: HashMap<String, String>?): DecryptedRecordBuilder

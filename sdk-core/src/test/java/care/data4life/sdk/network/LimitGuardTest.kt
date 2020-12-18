@@ -18,7 +18,7 @@ package care.data4life.sdk.network
 
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.DecryptedRecordGuard
-import care.data4life.sdk.network.model.definitions.NetworkModelContract
+import care.data4life.sdk.network.model.NetworkModelContract
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

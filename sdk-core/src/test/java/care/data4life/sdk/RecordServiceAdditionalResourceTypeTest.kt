@@ -22,6 +22,7 @@ import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.fhir.Fhir3Attachment
+import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.network.model.DecryptedRecord
@@ -35,6 +36,7 @@ import care.data4life.sdk.util.MimeType
 import care.data4life.sdk.wrapper.SdkAttachmentFactory
 import care.data4life.sdk.wrapper.WrapperContract
 import com.google.common.truth.Truth
+import io.mockk.mockk
 import io.reactivex.Single
 import org.junit.After
 import org.junit.Assert
@@ -382,7 +384,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         patient.photo!![0].data = null
         val decryptedRecord = DecryptedRecord(
                 null,
-                null,
+                mockk<Fhir3Resource>(),
                 null,
                 arrayListOf(),
                 null,
@@ -416,7 +418,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         observation.component!![0].valueAttachment!!.data = null
         val decryptedRecord = DecryptedRecord(
                 null,
-                null,
+                mockk<Fhir3Resource>(),
                 null,
                 arrayListOf(),
                 null,
@@ -450,7 +452,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         questionnaireResponse.item!![0].answer!![0].valueAttachment!!.data = null
         val decryptedRecord = DecryptedRecord(
                 null,
-                null,
+                mockk<Fhir3Resource>(),
                 null,
                 arrayListOf(), null,
                 null,

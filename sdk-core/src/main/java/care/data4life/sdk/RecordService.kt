@@ -42,17 +42,15 @@ import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.wrapper.SdkFhirAttachmentHelper
-import care.data4life.sdk.wrapper.SdkFhirElementFactory
 import care.data4life.sdk.model.SdkRecordFactory
 import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.RecordFactory
-import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
-import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
+import care.data4life.sdk.network.model.definitions.DecryptedCustomDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import care.data4life.sdk.network.model.definitions.NetworkModelContract
+import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
@@ -102,11 +100,11 @@ class RecordService(
     }
 
     private val recordFactory: RecordFactory = SdkRecordFactory
-    private val fhirElementFactory: WrapperContract.FhirElementFactory = SdkFhirElementFactory
     private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper = SdkFhirAttachmentHelper
     private val attchachmentFactory: WrapperFactoryContract.AttachmentFactory = SdkAttachmentFactory
     private val identifierFactory: WrapperFactoryContract.IdentifierFactory = SdkIdentifierFactory
 
+    private fun isFhir(resource: Any): Boolean = resource is Fhir3Resource || resource is Fhir4Resource
 
     private fun <T : Any> createRecord(
             userId: String,
@@ -264,7 +262,7 @@ class RecordService(
 
     private fun <T : Any> _fetchRecords(
             userId: String,
-            resourceType: Class<T>,
+            resourceType: Class<T>?,
             annotations: List<String>,
             startDate: LocalDate?,
             endDate: LocalDate?,
@@ -296,7 +294,7 @@ class RecordService(
                 .flatMapIterable { it }
                 .map { decryptRecord<Any>(it, userId) }
                 .let {
-                    if (resourceType.simpleName == "byte[]") {
+                    if (resourceType ==null) {
                         it
                     } else {
                         it
@@ -373,9 +371,9 @@ class RecordService(
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int
-    ): Single<List<DataRecord<DataResource>>> = _fetchRecords(
+    ): Single<List<DataRecord<DataResource>>> = _fetchRecords<DataResource>(
             userId,
-            ByteArray::class.java,
+            null,
             annotations,
             startDate,
             endDate,
@@ -439,7 +437,7 @@ class RecordService(
                 .map { decryptRecord<Any>(it, userId) }
                 .map { updateData(it, resource, userId) }
                 .map { decryptedRecord ->
-                    if (decryptedRecord is DecryptedFhir3Record) {
+                    if (decryptedRecord !is DecryptedCustomDataRecord) {
                         cleanObsoleteAdditionalIdentifiers(resource as Fhir3Resource)
                     }
 
@@ -535,35 +533,8 @@ class RecordService(
     }
 
     //region utility methods
-    private fun <T> getEncryptedResourceAndAttachment(
-            record: DecryptedBaseRecord<T>,
-            commonKey: GCKey
-    ): Pair<String, EncryptedKey?> {
-        return if (record is DecryptedDataRecord) {
-            Pair(
-                    encodeToString(
-                            cryptoService.encrypt(record.dataKey!!, record.resource).blockingGet()
-                    ),
-                    null
-            )
-        } else {
-            Pair(
-                    fhirService.encryptResource(record.dataKey!!, record.resource as Fhir3Resource),
-                    if (record.attachmentsKey == null) {
-                        null
-                    } else {
-                        cryptoService.encryptSymmetricKey(
-                                commonKey,
-                                KeyType.ATTACHMENT_KEY,
-                                record.attachmentsKey!!
-                        ).blockingGet()
-                    }
-            )
-        }
-    }
-
     @Throws(IOException::class)
-    internal fun <T> encryptRecord(
+    internal fun <T: Any> encryptRecord(
             record: DecryptedBaseRecord<T>
     ): EncryptedRecord {
         val encryptedTags = tagEncryptionService.encryptTags(record.tags!!).also {
@@ -578,10 +549,17 @@ class RecordService(
                 record.dataKey!!
         ).blockingGet()
 
-        val (encryptedResource, encryptedAttachmentsKey) = getEncryptedResourceAndAttachment(
-                record,
-                commonKey
-        )
+        val encryptedResource = fhirService._encryptResource(record.dataKey!!, record.resource)
+
+        val encryptedAttachmentsKey = if (record.attachmentsKey == null) {
+            null
+        } else {
+            cryptoService.encryptSymmetricKey(
+                    commonKey,
+                    KeyType.ATTACHMENT_KEY,
+                    record.attachmentsKey!!
+            ).blockingGet()
+        }
 
         return EncryptedRecord(
                 currentCommonKeyId,
@@ -615,26 +593,6 @@ class RecordService(
         }
     }
 
-    private fun <T : Any> decryptRecord(
-            record: EncryptedRecord,
-            builder: NetworkModelContract.DecryptedRecordBuilder
-    ): DecryptedBaseRecord<T> {
-        @Suppress("UNCHECKED_CAST")
-        return when {
-            record.encryptedBody == null || record.encryptedBody.isEmpty() -> builder.build(null)
-            builder.tags!!.containsKey(TaggingService.TAG_RESOURCE_TYPE) -> builder.build(
-                    fhirService.decryptResource<Fhir3Resource>(
-                            builder.dataKey!!,
-                            builder.tags!![TaggingService.TAG_RESOURCE_TYPE]!!,
-                            record.encryptedBody
-                    )
-            )
-            else -> builder.build(decode(record.encryptedBody).let {
-                cryptoService.decrypt(builder.dataKey!!, it).blockingGet()
-            })
-        } as DecryptedBaseRecord<T>
-    }
-
     @Suppress("UNCHECKED_CAST")
     @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
     internal fun <T : Any> decryptRecord(
@@ -645,11 +603,11 @@ class RecordService(
             throw DataValidationException.ModelVersionNotSupported("Please update SDK to latest version!")
         }
 
+        val tags = tagEncryptionService.decryptTags(record.encryptedTags)
+
         val builder = care.data4life.sdk.network.DecryptedRecordBuilder()
                 .setIdentifier(record.identifier)
-                .setTags(
-                        tagEncryptionService.decryptTags(record.encryptedTags)
-                )
+                .setTags( tags )
                 .setAnnotations(
                         tagEncryptionService.decryptAnnotations(record.encryptedTags)
                 )
@@ -659,10 +617,9 @@ class RecordService(
 
         val commonKeyId = record.commonKeyId
         val commonKey: GCKey = getCommonKey(commonKeyId, userId)
+        val dataKey = cryptoService.symDecryptSymmetricKey(commonKey, record.encryptedDataKey).blockingGet()
 
-        builder.setDataKey(
-                cryptoService.symDecryptSymmetricKey(commonKey, record.encryptedDataKey).blockingGet()
-        )
+        builder.setDataKey( dataKey )
 
         if (record.encryptedAttachmentsKey != null) {
             builder.setAttachmentKey(
@@ -673,7 +630,17 @@ class RecordService(
             )
         }
 
-        return decryptRecord(record, builder)
+        return builder.build(
+                if(record.encryptedBody == null || record.encryptedBody.isEmpty()) {
+                    null
+                } else {
+                    fhirService.decryptResource<Fhir3Resource>(
+                        dataKey,
+                        tags,
+                        record.encryptedBody
+                    )
+                }
+        ) as DecryptedBaseRecord<T>
     }
 
     fun downloadAttachment(
@@ -756,14 +723,18 @@ class RecordService(
     ): Single<Boolean> = attachmentService.delete(attachmentId, userId)
 
     fun <T : Any> extractUploadData(resource: T): HashMap<Any, String?>? {
-        return if (resource is Fhir3Resource) {
-            val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Fhir3Attachment?>?
+        return if (isFhir(resource)) {
+            val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Any?>?
             if (attachments == null || attachments.isEmpty()) return null
 
             val data = HashMap<Any, String?>(attachments.size)
-            for (attachment in attachments) {
-                if (attachment?.data != null) {
-                    data[attachment] = attachment.data
+            for (rawAttachment in attachments) {
+                if(rawAttachment != null) {
+                    val attachment = attchachmentFactory.wrap(rawAttachment)
+
+                    if (attachment.data != null) {
+                        data[rawAttachment] = attachment.data
+                    }
                 }
             }
 
@@ -787,7 +758,7 @@ class RecordService(
             record: DecryptedBaseRecord<T>
     ): DecryptedBaseRecord<T> {
         @Suppress("UNCHECKED_CAST")
-        return if (record is DecryptedFhir3Record) {
+        return if (isFhir(record.resource)) {
             setUploadData(
                     record as DecryptedFhir3Record<Fhir3Resource>,
                     null
@@ -802,7 +773,7 @@ class RecordService(
             originalResource: T?,
             attachmentData: HashMap<Any, String?>?
     ): DecryptedBaseRecord<T> {
-        if (record !is DecryptedFhir3Record || originalResource !is Fhir3Resource) {
+        if (!isFhir(record.resource) || originalResource == null || originalResource is DataResource) {
             return record
         }
 
@@ -844,7 +815,7 @@ class RecordService(
             record: DecryptedBaseRecord<T>,
             userId: String
     ): DecryptedBaseRecord<T> {
-        if (record !is DecryptedFhir3Record) {
+        if (!isFhir(record.resource)) {
             return record
         }
 
@@ -881,7 +852,7 @@ class RecordService(
             }
         }
         if (validAttachments.isNotEmpty()) {
-            updateFhir3ResourceIdentifier(
+            updateFhirResourceIdentifier(
                     resource,
                     attachmentService.upload(
                             validAttachments,
@@ -903,16 +874,16 @@ class RecordService(
             newResource: T?,
             userId: String?
     ): DecryptedBaseRecord<T> {
-        if (record !is DecryptedFhir3Record) {
+        if (!isFhir(record.resource)) {
             return record
         }
 
-        if (newResource !is Fhir3Resource) {
+        if (newResource == null || !isFhir(newResource)) {
             throw CoreRuntimeException.UnsupportedOperation()
         }
 
-        var resource = record.resource as Fhir3Resource
-        if (!fhirAttachmentHelper.hasAttachment(resource)) return record
+        var resource: T? = record.resource
+        if (!fhirAttachmentHelper.hasAttachment(resource!!)) return record
         val attachments =
                 if (fhirAttachmentHelper.getAttachment(resource) == null) {
                     arrayListOf()
@@ -958,7 +929,7 @@ class RecordService(
             }
         }
         if (validAttachments.isNotEmpty()) {
-            updateFhir3ResourceIdentifier(
+            updateFhirResourceIdentifier(
                     resource,
                     attachmentService.upload(
                             validAttachments,
@@ -977,7 +948,7 @@ class RecordService(
             record: DecryptedBaseRecord<T>,
             userId: String?
     ): DecryptedBaseRecord<T> {
-        if (record !is DecryptedFhir3Record) {
+        if (!isFhir(record.resource)) {
             return record
         }
 
@@ -1042,14 +1013,13 @@ class RecordService(
         }
     }
 
-    private fun updateFhir3ResourceIdentifier(
-            resource: Fhir3Resource,
-            result: List<Pair<Any, List<String>?>>
+    private fun updateFhirResourceIdentifier(
+            resource: Any,
+            result: List<Pair<WrapperContract.Attachment, List<String>?>>
     ) {
         val sb = StringBuilder()
-        for ((first, second) in result) {
+        for ((attachment, second) in result) {
             if (second != null) { //Attachment is a of image type
-                val attachment = attchachmentFactory.wrap(second)
                 sb.setLength(0)
                 sb.append(DOWNSCALED_ATTACHMENT_IDS_FMT).append(ThumbnailService.SPLIT_CHAR).append(attachment.id)
                 for (additionalId in second) {
@@ -1177,9 +1147,10 @@ class RecordService(
             record: DecryptedBaseRecord<T>
     ): DecryptedBaseRecord<T> {
         return record.also {
-            if (record.resource is Fhir3Resource) {
-                @Suppress("UNCHECKED_CAST")
-                (record as DecryptedFhir3Record<Fhir3Resource>).resource.id = record.identifier
+            @Suppress("UNCHECKED_CAST")
+            when(record.resource) {
+                is Fhir3Resource -> (record as DecryptedFhir3Record<Fhir3Resource>).resource.id = record.identifier
+                is Fhir4Resource -> (record as DecryptedFhir4Record<Fhir4Resource>).resource.id = record.identifier
             }
         }
     }

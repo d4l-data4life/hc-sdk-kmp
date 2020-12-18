@@ -17,46 +17,20 @@
 package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
-import java.util.Objects.hash
+import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.network.model.definitions.DecryptedCustomDataRecord
 
 /**
  * DecryptedAppDataRecord is an internal decrypted form of AppDataRecord, analogous to DecryptedRecord
  * @see care.data4life.sdk.network.model.DecryptedRecord
  */
-internal data class DecryptedAppDataRecord(
+internal data class DecryptedDataRecord(
         override var identifier: String?,
-        override var resource: ByteArray,
+        override var resource: DataResource,
         override var tags: HashMap<String, String>?,
         override var annotations: List<String>,
         override var customCreationDate: String?,
         override var updatedDate: String?,
         override var dataKey: GCKey?,
         override var modelVersion: Int
-) : DecryptedDataRecord {
-    override fun equals(other: Any?): Boolean {
-        return when {
-            other !is DecryptedAppDataRecord -> false
-            identifier != other.identifier ||
-                    !resource.contentEquals(other.resource) ||
-                    tags != other.tags ||
-                    annotations != other.annotations ||
-                    customCreationDate != other.customCreationDate ||
-                    updatedDate != other.updatedDate ||
-                    dataKey != other.dataKey ||
-                    modelVersion != other.modelVersion -> false
-            else -> true
-        }
-    }
-
-    override fun hashCode(): Int = hash(
-            identifier,
-            resource.contentToString(),
-            tags,
-            annotations,
-            customCreationDate,
-            updatedDate,
-            dataKey,
-            modelVersion
-    )
-}
+) : DecryptedCustomDataRecord

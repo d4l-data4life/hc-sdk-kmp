@@ -20,12 +20,14 @@ import care.data4life.fhir.stu3.model.CarePlan
 import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
+import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.SdkRecordFactory
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.util.MimeType
 import com.google.common.truth.Truth
 import io.mockk.every
+import io.mockk.spyk
 import io.reactivex.Single
 import org.junit.After
 import org.junit.Assert
@@ -110,7 +112,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         inOrder.verify(recordService).assignResourceId(mockDecryptedFhir3Record)
         inOrder.verifyNoMoreInteractions()
 
-        Mockito.verify(mockDecryptedFhir3Record, Mockito.times(4)).resource
+        Mockito.verify(mockDecryptedFhir3Record, Mockito.times(7)).resource
         Mockito.verify(
                 mockDecryptedFhir3Record,
                 Mockito.times(2)
@@ -229,7 +231,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         inOrder.verify(recordService).assignResourceId(mockDecryptedFhir3Record)
         inOrder.verifyNoMoreInteractions()
 
-        Mockito.verify(mockDecryptedFhir3Record, Mockito.times(4)).resource
+        Mockito.verify(mockDecryptedFhir3Record, Mockito.times(7)).resource
         Mockito.verify(
                 mockDecryptedFhir3Record,
                 Mockito.times(2)
@@ -268,7 +270,6 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
     }
 
     @Test
-    @Ignore
     @Throws(
             InterruptedException::class,
             DataRestrictionException.UnsupportedFileType::class,
@@ -276,11 +277,13 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
     )
     fun `Given, updateRecords is called with multiple resources, Annotations and a UserId, returns multiple updated Records`() {
         // Given
+        mockCarePlan.id = RECORD_ID
         val resources = listOf(mockCarePlan, mockCarePlan)
         val annotations = listOf<String>()
+
         Mockito.doReturn(Single.just(mockRecord))
                 .`when`(recordService)
-                .updateRecord(USER_ID, RECORD_ID, mockCarePlan, annotations)
+                .updateRecord(USER_ID, RECORD_ID,  mockCarePlan, annotations)
 
         // When
         val observer = recordService.updateRecords(resources, USER_ID).test().await()
@@ -303,7 +306,6 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
     }
 
     @Test
-    @Ignore
     @Throws(
             InterruptedException::class,
             DataRestrictionException.UnsupportedFileType::class,
@@ -320,7 +322,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         ).thenReturn(Single.just(mockEncryptedRecord))
         Mockito.doReturn(mockDecryptedDataRecord)
                 .`when`(recordService)
-                .decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
+                .decryptRecord<DataResource>(mockEncryptedRecord, USER_ID)
         Mockito.doReturn(mockEncryptedRecord).`when`(recordService).encryptRecord(mockDecryptedDataRecord)
         Mockito.`when`(
                 mockApiService.updateRecord(
@@ -353,17 +355,17 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         Truth.assertThat(result).isSameInstanceAs(mockDataRecord)
 
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
-        inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).decryptRecord<DataResource>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).encryptRecord(mockDecryptedDataRecord)
         inOrder.verify(mockApiService).updateRecord(ALIAS, USER_ID, RECORD_ID, mockEncryptedRecord)
-        inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).decryptRecord<DataResource>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).assignResourceId(mockDecryptedDataRecord)
         inOrder.verifyNoMoreInteractions()
 
         Mockito.verify(
                 mockDecryptedDataRecord,
                 Mockito.times(1)
-        ).resource = mockDataResource.value
+        ).resource = mockDataResource
         Mockito.verify(
                 mockDecryptedDataRecord,
                 Mockito.times(1)
@@ -371,13 +373,12 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
     }
 
     @Test
-    @Ignore
     @Throws(
             InterruptedException::class,
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given, updateRecord is called with a byte resource, nulled Annotations and a UserId, it returns a updated AppDataRecord`() {
+    fun `Given, updateRecord is called with a byte resource, empty list Annotations and a UserId, it returns a updated AppDataRecord`() {
         // Given
         Mockito.`when`(
                 mockApiService.fetchRecord(
@@ -388,7 +389,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         ).thenReturn(Single.just(mockEncryptedRecord))
         Mockito.doReturn(mockDecryptedDataRecord)
                 .`when`(recordService)
-                .decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
+                .decryptRecord<DataResource>(mockEncryptedRecord, USER_ID)
         Mockito.doReturn(mockEncryptedRecord).`when`(recordService).encryptRecord(mockDecryptedDataRecord)
         Mockito.`when`(
                 mockApiService.updateRecord(
@@ -421,20 +422,20 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
         Truth.assertThat(result).isSameInstanceAs(mockDataRecord)
 
         inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
-        inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).decryptRecord<DataResource>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).encryptRecord(mockDecryptedDataRecord)
         inOrder.verify(mockApiService).updateRecord(ALIAS, USER_ID, RECORD_ID, mockEncryptedRecord)
-        inOrder.verify(recordService).decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
+        inOrder.verify(recordService).decryptRecord<DataResource>(mockEncryptedRecord, USER_ID)
         inOrder.verify(recordService).assignResourceId(mockDecryptedDataRecord)
         inOrder.verifyNoMoreInteractions()
 
         Mockito.verify(
                 mockDecryptedDataRecord,
                 Mockito.times(1)
-        ).resource = mockDataResource.value
+        ).resource = mockDataResource
         Mockito.verify(
                 mockDecryptedDataRecord,
-                Mockito.times(0)
+                Mockito.times(1)
         ).annotations = ArgumentMatchers.anyList()
     }
 }

@@ -16,6 +16,7 @@
 
 package care.data4life.sdk.model
 
+import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
@@ -23,7 +24,7 @@ import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
-import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
+import care.data4life.sdk.network.model.definitions.DecryptedCustomDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import org.threeten.bp.LocalDate
@@ -57,7 +58,7 @@ internal object SdkRecordFactory : RecordFactory {
                     record.annotations
             )
             // TODO app data
-            is DecryptedDataRecord -> AppDataRecord(
+            is DecryptedCustomDataRecord -> DataRecord(
                     record.identifier!!,
                     record.resource,
                     buildMeta(record),

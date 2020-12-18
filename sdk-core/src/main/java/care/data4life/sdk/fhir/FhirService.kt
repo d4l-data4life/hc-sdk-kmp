@@ -24,7 +24,6 @@ import care.data4life.fhir.stu3.model.FhirElementFactory
 import care.data4life.sdk.CryptoService
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.lang.D4LException
-import care.data4life.sdk.tag.TaggingService
 import care.data4life.sdk.util.Base64
 import care.data4life.sdk.wrapper.SdkFhirParser
 import care.data4life.sdk.wrapper.WrapperContract

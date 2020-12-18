@@ -18,13 +18,14 @@ package care.data4life.sdk.model
 
 import care.data4life.crypto.GCKey
 import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
+import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.model.definitions.DataRecord
 import care.data4life.sdk.model.definitions.Fhir3Record
 import care.data4life.sdk.model.definitions.RecordFactory
-import care.data4life.sdk.network.model.DecryptedAppDataRecord
+import care.data4life.sdk.network.model.DecryptedDataRecord
 import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
@@ -182,9 +183,9 @@ class RecordFactoryTest {
         every { LocalDate.parse(givenCreationDate, any()) } returns creationDate
         every { LocalDateTime.parse(givenUpdateDate, any()) } returns updateDate
 
-        val decryptedRecord = DecryptedAppDataRecord(
+        val decryptedRecord = DecryptedDataRecord(
                 id,
-                customResource,
+                DataResource(customResource),
                 tags,
                 annotations,
                 givenCreationDate,
@@ -204,7 +205,7 @@ class RecordFactoryTest {
                 id
         )
         assertEquals(
-                record.resource,
+                record.resource.value,
                 customResource
         )
         assertEquals(
@@ -245,7 +246,6 @@ class RecordFactoryTest {
 
         // When
         try {
-
             SdkRecordFactory.getInstance(decryptedRecord)
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {

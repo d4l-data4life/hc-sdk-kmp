@@ -17,11 +17,17 @@ package care.data4life.sdk
 
 import care.data4life.fhir.stu3.model.CarePlan
 import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.call.DataRecord
+import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
+import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.ModelVersion
+import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.SdkRecordFactory
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.network.DecryptedRecordBuilder
@@ -29,9 +35,13 @@ import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.util.MimeType
 import com.google.common.truth.Truth
 import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import io.reactivex.Single
 import org.junit.After
 import org.junit.Assert
+import org.junit.Assert.assertSame
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -50,6 +60,112 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun tearDown() {
         stop()
     }
+
+    @Test
+    fun `Given, createRecord is called with a DataResource, it wraps it and delegates it to the generic createRecord and return its Result`() {
+        // Given
+        val recordService = spyk(recordService)
+
+        val userId = "id"
+        val rawResource = mockk<DataResource>()
+
+        val createdRecord = mockk<DataRecord<DataResource>>()
+
+        @Suppress("UNCHECKED_CAST")
+        every {
+            recordService.createRecord(userId, rawResource, any())
+        } returns Single.just(createdRecord)
+
+        // When
+        val subscriber = recordService.createRecord(
+                userId,
+                rawResource,
+                mockk(relaxed = true)
+        ).test().await()
+
+        val record = subscriber
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
+
+        // Then
+        assertSame(
+                record,
+                createdRecord
+        )
+    }
+
+    @Test
+    fun `Given, createRecord is called with a Fhir3Resource, it wraps it and delegates it to the generic createRecord and return its Result`() {
+        // Given
+        val recordService = spyk(recordService)
+
+        val userId = "id"
+        val rawResource = mockk<Fhir3Resource>()
+
+        val createdRecord = mockk<Record<Fhir3Resource>>()
+
+        @Suppress("UNCHECKED_CAST")
+        every {
+            recordService.createRecord(userId, rawResource, any())
+        } returns Single.just(createdRecord)
+
+        // When
+        val subscriber = recordService.createRecord(
+                userId,
+                rawResource,
+                mockk(relaxed = true)
+        ).test().await()
+
+        val record = subscriber
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
+
+        // Then
+        assertSame(
+                record,
+                createdRecord
+        )
+    }
+
+    @Test
+    fun `Given, createRecord is called with a Fhir4Resource, it wraps it and delegates it to the generic createRecord and return its Result`() {
+        // Given
+        val recordService = spyk(recordService)
+
+        val userId = "id"
+        val rawResource = mockk<Fhir4Resource>()
+
+        val createdRecord = mockk<Fhir4Record<Fhir4Resource>>()
+
+        @Suppress("UNCHECKED_CAST")
+        every {
+            recordService.createRecord(userId, rawResource, any())
+        } returns Single.just(createdRecord)
+
+        // When
+        val subscriber = recordService.createRecord(
+                userId,
+                rawResource,
+                mockk(relaxed = true)
+        ).test().await()
+
+        val record = subscriber
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
+
+        // Then
+        assertSame(
+                record,
+                createdRecord
+        )
+    }
+
 
     @Test
     @Throws(
@@ -675,7 +791,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
                 mockDecryptedRecordBuilder.build(
-                        mockDataResource.value,
+                        mockDataResource,
                         mockTags,
                         DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
                         mockDataKey,
@@ -714,7 +830,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         inOrder.verify(mockTaggingService).appendDefaultTags(ArgumentMatchers.argThat { true }, null)
         inOrder.verify(mockCryptoService).generateGCKey()
         inOrder.verify(mockDecryptedRecordBuilder).build(
-                mockDataResource.value,
+                mockDataResource,
                 mockTags,
                 DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
                 mockDataKey,

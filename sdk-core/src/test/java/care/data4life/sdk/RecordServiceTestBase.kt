@@ -24,6 +24,7 @@ import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
+import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.lang.D4LException
@@ -31,12 +32,11 @@ import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.SdkRecordFactory
-import care.data4life.sdk.model.definitions.DataRecord
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.DecryptedRecordBuilder
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
-import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
+import care.data4life.sdk.network.model.definitions.DecryptedCustomDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
@@ -83,11 +83,11 @@ abstract class RecordServiceTestBase {
     internal lateinit var mockAnnotatedEncryptedRecord: EncryptedRecord
     internal lateinit var mockDecryptedFhir3Record: DecryptedFhir3Record<DomainResource>
     internal lateinit var mockAnnotatedDecryptedFhirRecord: DecryptedFhir3Record<DomainResource>
-    internal lateinit var mockDecryptedDataRecord: DecryptedDataRecord
+    internal lateinit var mockDecryptedDataRecord: DecryptedCustomDataRecord
     internal lateinit var mockMeta: Meta
     private lateinit var mockD4LException: D4LException
     internal lateinit var mockRecord: Record<CarePlan>
-    internal lateinit var mockDataRecord: DataRecord
+    internal lateinit var mockDataRecord: DataRecord<DataResource>
     internal lateinit var inOrder: InOrder
     internal lateinit var mockDecryptedRecordBuilder: DecryptedRecordBuilder
     internal lateinit var mockRecordFactory: RecordFactory
@@ -132,11 +132,11 @@ abstract class RecordServiceTestBase {
         mockAnnotatedEncryptedRecord = Mockito.mock(EncryptedRecord::class.java)
         mockDecryptedFhir3Record = Mockito.mock(DecryptedFhir3Record::class.java) as DecryptedFhir3Record<DomainResource>
         mockAnnotatedDecryptedFhirRecord = Mockito.mock(DecryptedFhir3Record::class.java) as DecryptedFhir3Record<DomainResource>
-        mockDecryptedDataRecord = Mockito.mock(DecryptedDataRecord::class.java)
+        mockDecryptedDataRecord = Mockito.mock(DecryptedCustomDataRecord::class.java)
         mockMeta = Mockito.mock(Meta::class.java)
         mockD4LException = Mockito.mock(D4LException::class.java)
         mockRecord = Mockito.mock(Record::class.java) as Record<CarePlan>
-        mockDataRecord = Mockito.mock(DataRecord::class.java)
+        mockDataRecord = Mockito.mock(DataRecord::class.java) as DataRecord<DataResource>
         mockDecryptedRecordBuilder = Mockito.mock(DecryptedRecordBuilder::class.java)
         mockRecordFactory = Mockito.mock(RecordFactory::class.java)
 
@@ -156,7 +156,7 @@ abstract class RecordServiceTestBase {
 
         Mockito.`when`<HashMap<*, *>?>(mockDecryptedDataRecord.tags).thenReturn(mockTags)
         Mockito.`when`(mockDecryptedDataRecord.dataKey).thenReturn(mockDataKey)
-        Mockito.`when`(mockDecryptedDataRecord.resource).thenReturn(mockDataResource.value)
+        Mockito.`when`(mockDecryptedDataRecord.resource).thenReturn(mockDataResource)
         Mockito.`when`(mockDecryptedDataRecord.identifier).thenReturn("id")
         Mockito.`when`(mockDecryptedDataRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
         Mockito.`when`(mockDecryptedDataRecord.annotations).thenReturn(ANNOTATIONS)

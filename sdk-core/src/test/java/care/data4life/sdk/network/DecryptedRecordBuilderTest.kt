@@ -17,13 +17,12 @@
 package care.data4life.sdk.network
 
 import care.data4life.crypto.GCKey
+import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedRecordGuard
-import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.NetworkModelContract
 import io.mockk.every
@@ -207,7 +206,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
     fun `Given, build is called with ByteArray, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedDataRecord`() {
         // When
         val record = DecryptedRecordBuilder().build(
-                customResource,
+                DataResource(customResource),
                 tags,
                 creationDate,
                 dataKey,
@@ -215,12 +214,12 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         )
 
         // Then
-        assertTrue(record is DecryptedDataRecord)
+        assertTrue(record is care.data4life.sdk.network.model.definitions.DecryptedCustomDataRecord)
         assertEquals(
                 record,
-                DecryptedAppDataRecord(
+                care.data4life.sdk.network.model.DecryptedDataRecord(
                         null,
-                        customResource,
+                        DataResource(customResource),
                         tags,
                         listOf(),
                         creationDate,
@@ -237,7 +236,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         try {
             DecryptedRecordBuilder()
                     .build(
-                            customResource,
+                            DataResource(customResource),
                             creationDate = creationDate,
                             dataKey = dataKey,
                             modelVersion = modelVersion
@@ -255,7 +254,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         try {
             DecryptedRecordBuilder()
                     .build(
-                            customResource,
+                            DataResource(customResource),
                             tags = tags,
                             dataKey = dataKey,
                             modelVersion = modelVersion
@@ -273,7 +272,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         try {
             DecryptedRecordBuilder()
                     .build(
-                            customResource,
+                            DataResource(customResource),
                             tags = tags,
                             creationDate = creationDate,
                             modelVersion = modelVersion
@@ -291,7 +290,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         try {
             DecryptedRecordBuilder()
                     .build(
-                            customResource,
+                            DataResource(customResource),
                             tags = tags,
                             creationDate = creationDate,
                             dataKey = dataKey
@@ -309,7 +308,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         try {
             DecryptedRecordBuilder()
                     .build(
-                            customResource,
+                            DataResource(customResource),
                             null,
                             creationDate,
                             dataKey,
@@ -328,7 +327,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         try {
             DecryptedRecordBuilder()
                     .build(
-                            customResource,
+                            DataResource(customResource),
                             tags = tags,
                             creationDate = null,
                             dataKey = dataKey,
@@ -347,7 +346,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         try {
             DecryptedRecordBuilder()
                     .build(
-                            customResource,
+                            DataResource(customResource),
                             tags = tags,
                             creationDate = creationDate,
                             dataKey = null,
@@ -365,7 +364,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         try {
             DecryptedRecordBuilder()
                     .build(
-                            customResource,
+                            DataResource(customResource),
                             tags = tags,
                             creationDate = creationDate,
                             dataKey = dataKey,
@@ -390,7 +389,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
                 .setDataKey(dataKey)
                 .setModelVersion(modelVersion)
                 .build(
-                        customResource,
+                        DataResource(customResource),
                         tags = delegatedTags
                 )
 
@@ -412,7 +411,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
                 .setDataKey(dataKey)
                 .setModelVersion(modelVersion)
                 .build(
-                        customResource,
+                        DataResource(customResource),
                         creationDate = delegatedDate
                 )
 
@@ -434,7 +433,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
                 .setDataKey(dataKey)
                 .setModelVersion(modelVersion)
                 .build(
-                        customResource,
+                        DataResource(customResource),
                         dataKey = delegatedDataKey
                 )
 
@@ -456,7 +455,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
                 .setDataKey(dataKey)
                 .setModelVersion(modelVersion)
                 .build(
-                        customResource,
+                        DataResource(customResource),
                         modelVersion = delegatedModelVersion
                 )
 
@@ -551,13 +550,13 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
                 .setDataKey(dataKey)
                 .setAttachmentKey(attachmentKey)
                 .setModelVersion(modelVersion)
-                .build(customResource)
+                .build(DataResource(customResource))
 
         assertEquals(
                 record,
-                DecryptedAppDataRecord(
+                care.data4life.sdk.network.model.DecryptedDataRecord(
                         identifier,
-                        customResource,
+                        DataResource(customResource),
                         tags,
                         annotations,
                         creationDate,
@@ -575,7 +574,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
 
         // When
         DecryptedRecordBuilder().build(
-                customResource,
+                DataResource(customResource),
                 tags,
                 creationDate,
                 dataKey,
@@ -598,7 +597,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         DecryptedRecordBuilder()
                 .setTags(tags)
                 .build(
-                    customResource,
+                    DataResource(customResource),
                     delegatedTags,
                     creationDate,
                     dataKey,
@@ -617,7 +616,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         DecryptedRecordBuilder()
                 .setAnnotations(annotations)
                 .build(
-                    customResource,
+                    DataResource(customResource),
                     tags,
                     creationDate,
                     dataKey,
@@ -636,7 +635,7 @@ class DecryptedRecordBuilderTest : DecryptedRecordBuilderTestBase() {
         DecryptedRecordBuilder()
                 .setAnnotations(annotations)
                 .build(
-                        customResource,
+                        DataResource(customResource),
                         tags,
                         creationDate,
                         dataKey,

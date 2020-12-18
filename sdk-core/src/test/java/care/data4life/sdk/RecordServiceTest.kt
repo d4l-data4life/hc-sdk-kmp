@@ -26,6 +26,7 @@ import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.fhir.Fhir3Attachment
+import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.DownloadType
@@ -33,7 +34,7 @@ import care.data4life.sdk.model.SdkRecordFactory
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
-import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
+import care.data4life.sdk.network.model.definitions.DecryptedCustomDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.test.util.AttachmentBuilder
 import care.data4life.sdk.util.Base64.encodeToString
@@ -43,6 +44,7 @@ import care.data4life.sdk.wrapper.SdkIdentifierFactory
 import care.data4life.sdk.wrapper.WrapperContract
 import com.google.common.truth.Truth
 import io.mockk.every
+import io.mockk.mockk
 import io.mockk.mockkClass
 import io.mockk.verify
 import io.reactivex.Completable
@@ -198,7 +200,7 @@ class RecordServiceTest : RecordServiceTestBase() {
     fun `Given, removeUploadData is called with a non DecryptedFhir3Record, it reflects the given record`() {
         // Given
         @Suppress("UNCHECKED_CAST")
-        val decryptedRecord = Mockito.mock(DecryptedDataRecord::class.java) as DecryptedBaseRecord<Any>
+        val decryptedRecord = Mockito.mock(DecryptedCustomDataRecord::class.java) as DecryptedBaseRecord<Any>
         val attachments = mutableListOf(
                 Mockito.mock(Fhir3Attachment::class.java),
                 Mockito.mock(Fhir3Attachment::class.java)
@@ -303,13 +305,13 @@ class RecordServiceTest : RecordServiceTestBase() {
     @Test
     fun `Given, restoreUploadData is called with a non DecryptedFhir3Record, a Resource and Attachment, it reflects the given Record`() {
         val document = buildDocumentReference()
-        val decryptedRecord = mockkClass(DecryptedDataRecord::class)
+        val decryptedRecord = mockkClass(DecryptedCustomDataRecord::class)
         val attachments = mutableListOf(
                 Mockito.mock(Fhir3Attachment::class.java),
                 Mockito.mock(Fhir3Attachment::class.java)
         )
 
-        every { decryptedRecord.resource } returns mockDataResource.value
+        every { decryptedRecord.resource } returns mockDataResource
         every { FhirAttachmentHelper.getAttachment(mockCarePlan) } returns attachments
         every { FhirAttachmentHelper.updateAttachmentData(mockCarePlan, any()) } returns Unit
 
@@ -329,8 +331,8 @@ class RecordServiceTest : RecordServiceTestBase() {
 
     @Test
     fun `Given, restoreUploadData is called with a DecryptedFhir3Record, a non FhirResource and Attachment, it reflects the given Record`() {
-        val document = "something"
-        val decryptedRecord = mockkClass(DecryptedFhir3Record::class)
+        val document = mockk<Fhir3Resource>()
+        val decryptedRecord = mockkClass(DecryptedFhir3Record::class, relaxed = true)
         val attachments = mutableListOf(
                 Mockito.mock(Fhir3Attachment::class.java),
                 Mockito.mock(Fhir3Attachment::class.java)

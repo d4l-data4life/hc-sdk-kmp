@@ -17,15 +17,14 @@
 package care.data4life.sdk.network
 
 import care.data4life.crypto.GCKey
+import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.network.model.DecryptedAppDataRecord
 import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
-import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.network.model.definitions.NetworkModelContract
@@ -142,18 +141,18 @@ internal class DecryptedRecordBuilder : NetworkModelContract.DecryptedRecordBuil
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     private fun buildCustomRecord(
-            resource: ByteArray,
+            resource: DataResource,
             tags: HashMap<String, String>,
             creationDate: String?,
             dataKey: GCKey?,
             modelVersion: Int?
-    ): DecryptedDataRecord = DecryptedAppDataRecord(
-            this.identifier,
+    ): care.data4life.sdk.network.model.definitions.DecryptedCustomDataRecord = care.data4life.sdk.network.model.DecryptedDataRecord(
+            identifier,
             resource,
             tags,
-            this.annotations,
+            annotations,
             creationDate!!,
-            this.updatedDate,
+            updatedDate,
             dataKey!!,
             modelVersion!!
     )
@@ -203,13 +202,13 @@ internal class DecryptedRecordBuilder : NetworkModelContract.DecryptedRecordBuil
                     dataKey,
                     modelVersion
             )
-            is ByteArray -> this.buildCustomRecord(
+            is DataResource -> this.buildCustomRecord(
                     resource,
                     tags,
                     creationDate,
                     dataKey,
                     modelVersion
-            ).also { this.guard.checkDataLimit(resource) }
+            ).also { this.guard.checkDataLimit(resource.asByteArray()) }
             else -> throw CoreRuntimeException.InternalFailure()
 
         } as DecryptedBaseRecord<T>

@@ -16,8 +16,9 @@
 
 package care.data4life.sdk.network
 
+import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.network.model.DecryptedAppDataRecord
+import care.data4life.sdk.network.model.DecryptedDataRecord
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -43,7 +44,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
 
         // When
         try {
-            builder.build(customResource)
+            builder.build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -57,7 +58,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
 
         // When
         try {
-            builder.setTags(tags).build(customResource)
+            builder.setTags(tags).build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -71,7 +72,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
 
         // When
         try {
-            builder.setCreationDate(creationDate).build(customResource)
+            builder.setCreationDate(creationDate).build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -85,7 +86,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
 
         // When
         try {
-            builder.setDataKey(dataKey).build(customResource)
+            builder.setDataKey(dataKey).build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -99,7 +100,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
 
         // When
         try {
-            builder.setModelVersion(modelVersion).build(customResource)
+            builder.setModelVersion(modelVersion).build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -116,7 +117,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
             builder
                     .setTags(tags)
                     .setCreationDate(creationDate)
-                    .build(customResource)
+                    .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -133,7 +134,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
             builder
                     .setTags(tags)
                     .setDataKey(dataKey)
-                    .build(customResource)
+                    .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -150,7 +151,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
             builder
                     .setTags(tags)
                     .setModelVersion(modelVersion)
-                    .build(customResource)
+                    .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -167,7 +168,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
             builder
                     .setCreationDate(creationDate)
                     .setDataKey(dataKey)
-                    .build(customResource)
+                    .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -184,7 +185,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
             builder
                     .setCreationDate(creationDate)
                     .setModelVersion(modelVersion)
-                    .build(customResource)
+                    .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -201,7 +202,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
             builder
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
-                    .build(customResource)
+                    .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -219,7 +220,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setTags(tags)
                     .setCreationDate(creationDate)
                     .setDataKey(dataKey)
-                    .build(customResource)
+                    .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -237,7 +238,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setTags(tags)
                     .setCreationDate(creationDate)
                     .setModelVersion(modelVersion)
-                    .build(customResource)
+                    .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -255,7 +256,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setTags(tags)
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
-                    .build(customResource)
+                    .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -273,7 +274,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setCreationDate(creationDate)
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
-                    .build(customResource)
+                    .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -291,14 +292,14 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                 .setCreationDate(creationDate)
                 .setDataKey(dataKey)
                 .setModelVersion(modelVersion)
-                .build(customResource)
+                .build(DataResource(customResource))
 
         // Then
         assertEquals(
                 record,
-                DecryptedAppDataRecord(
+                DecryptedDataRecord(
                         null,
-                        customResource,
+                        DataResource(customResource),
                         tags,
                         listOf(),
                         creationDate,
@@ -322,7 +323,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
                     .setTags(null)
-                    .build(customResource)
+                    .build(DataResource(customResource))
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             // Then
@@ -343,7 +344,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
                     .setCreationDate(null)
-                    .build(customResource)
+                    .build(DataResource(customResource))
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             // Then
@@ -364,7 +365,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
                     .setDataKey(null)
-                    .build(customResource)
+                    .build(DataResource(customResource))
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             // Then
@@ -385,7 +386,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
                     .setModelVersion(null)
-                    .build(customResource)
+                    .build(DataResource(customResource))
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             // Then
@@ -405,7 +406,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setDataKey(dataKey)
                     .setModelVersion(modelVersion)
                     .clear()
-                    .build(customResource)
+                    .build(DataResource(customResource))
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -419,22 +420,7 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .setModelVersion(modelVersion)
                     .clear()
                     .setTags(tags)
-                    .build(customResource)
-            assertTrue(false)// FIXME: This is stupid
-        } catch (e: Exception) {
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-
-        try {
-            builder
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .setModelVersion(modelVersion)
-                    .clear()
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .build(customResource)
+                    .build(DataResource(customResource))
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -449,8 +435,23 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                     .clear()
                     .setTags(tags)
                     .setCreationDate(creationDate)
+                    .build(DataResource(customResource))
+            assertTrue(false)// FIXME: This is stupid
+        } catch (e: Exception) {
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+
+        try {
+            builder
+                    .setTags(tags)
+                    .setCreationDate(creationDate)
                     .setDataKey(dataKey)
-                    .build(customResource)
+                    .setModelVersion(modelVersion)
+                    .clear()
+                    .setTags(tags)
+                    .setCreationDate(creationDate)
+                    .setDataKey(dataKey)
+                    .build(DataResource(customResource))
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -466,14 +467,14 @@ class DecryptedRecordBuilderMandatorySettersTest: DecryptedRecordBuilderTestBase
                 .setCreationDate(creationDate)
                 .setDataKey(dataKey)
                 .setModelVersion(modelVersion)
-                .build(customResource)
+                .build(DataResource(customResource))
 
         // Then
         assertEquals(
                 record,
-                DecryptedAppDataRecord(
+                DecryptedDataRecord(
                         null,
-                        customResource,
+                        DataResource(customResource),
                         tags,
                         listOf(),
                         creationDate,

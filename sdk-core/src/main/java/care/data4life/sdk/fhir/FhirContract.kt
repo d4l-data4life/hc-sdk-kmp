@@ -25,7 +25,6 @@ internal interface FhirContract {
 
         fun <T: Any> decryptResource(
                 dataKey: GCKey,
-                resourceType: String,
                 tags: HashMap<String, String>,
                 encryptedResource: String
         ): T

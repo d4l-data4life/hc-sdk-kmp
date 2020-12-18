@@ -24,6 +24,7 @@ import care.data4life.fhir.stu3.model.FhirElementFactory
 import care.data4life.sdk.CryptoService
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.lang.D4LException
+import care.data4life.sdk.tag.TaggingService
 import care.data4life.sdk.util.Base64
 import care.data4life.sdk.wrapper.SdkFhirParser
 import care.data4life.sdk.wrapper.WrapperContract
@@ -42,6 +43,7 @@ class FhirService @JvmOverloads constructor(
 ) : FhirContract.Service {
     private val parser: WrapperContract.FhirParser = SdkFhirParser
 
+    @Deprecated("Use the new Api")
     @Suppress("UNCHECKED_CAST")
     fun <T : Fhir3Resource> decryptResource(dataKey: GCKey, resourceType: String, encryptedResource: String): T {
         return Single
@@ -59,19 +61,11 @@ class FhirService @JvmOverloads constructor(
                 .blockingGet() as T
     }
 
-
-
-    fun <T : Fhir3Resource> encryptResource(dataKey: GCKey, resource: T): String {
-        return Single
-                .just(resource)
-                .map { fhirObject: T -> parserFhir3.fromFhir(fhirObject) }
-                .flatMap { json: String -> cryptoService.encryptString(dataKey, json) }
-                .onErrorResumeNext { error ->
-                    Single.error(
-                            EncryptionFailed("Failed to encrypt resource", error) as D4LException)
-                }
-                .blockingGet()
-    }
+    @Deprecated("Use the new Api")
+    fun <T : Fhir3Resource> encryptResource(
+            dataKey: GCKey,
+            resource: T
+    ): String = _encryptResource(dataKey, resource)
 
     override fun _encryptResource(dataKey: GCKey, resource: Any): String {
         return if(resource is DataResource) {
@@ -104,14 +98,13 @@ class FhirService @JvmOverloads constructor(
 
     override fun <T : Any> decryptResource(
             dataKey: GCKey,
-            resourceType: String,
             tags: HashMap<String, String>,
             encryptedResource: String
     ): T {
         return if(tags.containsKey(TAG_APPDATA_KEY)) {
             decryptData(dataKey, encryptedResource) as T
         } else  {
-            decryptFhir(dataKey, resourceType, tags, encryptedResource)
+            decryptFhir(dataKey, tags[TAG_RESOURCE_TYPE]!!, tags, encryptedResource)
         }
     }
 
@@ -156,6 +149,7 @@ class FhirService @JvmOverloads constructor(
     //ToDo share it between the TaggingService and this class
     companion object {
         private val US_LOCALE = Locale.US
+        private val TAG_RESOURCE_TYPE = "resourceType".toLowerCase(US_LOCALE)
         private val TAG_FHIR_VERSION = "fhirVersion".toLowerCase(US_LOCALE)
         private const val TAG_APPDATA_KEY = "flag"
     }

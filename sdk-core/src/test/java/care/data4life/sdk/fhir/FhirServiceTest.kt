@@ -29,13 +29,16 @@ import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.spyk
 import io.mockk.unmockkObject
+import io.mockk.verify
 import io.reactivex.Single
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
+import java.util.*
 
 class FhirServiceTest {
     private val parseException = FhirException(FhirException.ErrorType.DECODE, FhirException.ErrorCode.FAILED_TO_PARSE_JSON, "")
@@ -70,133 +73,6 @@ class FhirServiceTest {
     fun tearDown() {
         unmockkObject(SdkFhirParser)
         unmockkObject(Base64)
-    }
-
-    @Test
-    @Throws(FhirException::class)
-    fun decryptResource_shouldReturnResource() {
-        // Given
-        Mockito.`when`(mockCryptoService.decryptString(dataKey, ENCRYPTED_RESOURCE)).thenReturn(Single.just(JSON_RESOURCE))
-        Mockito.`when`<Any>(mockFhirParser.toFhir(fhirClass, JSON_RESOURCE)).thenReturn(mockDocumentReference)
-
-        // When
-        val resource = fhirService.decryptResource<Fhir3Resource>(dataKey, fhirType, ENCRYPTED_RESOURCE)
-
-        // Then
-        Truth.assertThat(resource).isEqualTo(mockDocumentReference)
-        val inOrder = Mockito.inOrder(mockCryptoService, mockFhirParser)
-        inOrder.verify(mockCryptoService)!!.decryptString(dataKey, ENCRYPTED_RESOURCE)
-        inOrder.verify(mockFhirParser)!!.toFhir(fhirClass, JSON_RESOURCE)
-        inOrder.verifyNoMoreInteractions()
-    }
-
-    @Test
-    @Throws(FhirException::class)
-    fun encryptResource_shouldReturnEncryptedResource() {
-        // given
-        Mockito.`when`(mockFhirParser.fromFhir(mockDocumentReference)).thenReturn(JSON_RESOURCE)
-        Mockito.`when`(mockCryptoService.encryptString(dataKey, JSON_RESOURCE)).thenReturn(Single.just(ENCRYPTED_RESOURCE))
-
-        // when
-        val result = fhirService.encryptResource(dataKey, mockDocumentReference)
-
-        // then
-        Truth.assertThat(result).isEqualTo(ENCRYPTED_RESOURCE)
-        val inOrder = Mockito.inOrder(mockCryptoService, mockFhirParser)
-        inOrder.verify(mockFhirParser)!!.fromFhir(mockDocumentReference)
-        inOrder.verify(mockCryptoService)!!.encryptString(dataKey, JSON_RESOURCE)
-        inOrder.verifyNoMoreInteractions()
-    }
-
-    @Test
-    fun decryptResource_shouldThrowException_whenDecryptErrorHappens() {
-        // given
-        Mockito.`when`(mockCryptoService.decryptString(dataKey, ENCRYPTED_RESOURCE)).thenThrow(unkwnownException)
-        try {
-            // when
-            fhirService.decryptResource<Fhir3Resource>(dataKey, DocumentReference.resourceType, ENCRYPTED_RESOURCE)
-            Assert.fail("Exception expected")
-        } catch (e: RuntimeException) {
-
-            //Then
-            val firstException = e.cause!!.cause as RuntimeException?
-            Truth.assertThat(firstException).isEqualTo(unkwnownException)
-            Truth.assertThat(e.cause).isInstanceOf(DecryptionFailed::class.java)
-            Truth.assertThat(e.cause!!.message).isEqualTo("Failed to decrypt resource")
-        }
-        val inOrder = Mockito.inOrder(mockCryptoService, mockFhirParser)
-        inOrder.verify(mockCryptoService)!!.decryptString(dataKey, ENCRYPTED_RESOURCE)
-        inOrder.verifyNoMoreInteractions()
-    }
-
-    @Test
-    @Throws(FhirException::class)
-    fun decryptResource_shouldThrowException_whenParseErrorHappens() {
-        // given
-        Mockito.`when`(mockCryptoService.decryptString(dataKey, ENCRYPTED_RESOURCE)).thenReturn(Single.just(JSON_RESOURCE))
-        Mockito.`when`<Any>(mockFhirParser.toFhir(DocumentReference::class.java, JSON_RESOURCE)).thenThrow(parseException)
-        try {
-            // when
-            fhirService.decryptResource<Fhir3Resource>(dataKey, DocumentReference.resourceType, ENCRYPTED_RESOURCE)
-            Assert.fail("Exception expected")
-        } catch (e: RuntimeException) {
-
-            //Then
-            val firstExc = e.cause!!.cause as FhirException?
-            Truth.assertThat(firstExc).isEqualTo(parseException)
-            Truth.assertThat(e.cause).isInstanceOf(DecryptionFailed::class.java)
-            Truth.assertThat(e.cause!!.message).isEqualTo("Failed to decrypt resource")
-        }
-        val inOrder = Mockito.inOrder(mockCryptoService, mockFhirParser)
-        inOrder.verify(mockCryptoService)!!.decryptString(dataKey, ENCRYPTED_RESOURCE)
-        inOrder.verify(mockFhirParser)!!.toFhir(fhirClass, JSON_RESOURCE)
-        inOrder.verifyNoMoreInteractions()
-    }
-
-    @Test
-    @Throws(FhirException::class)
-    fun encryptResource_shouldThrowException_whenParseErrorHappens() {
-        // given
-        Mockito.`when`(mockFhirParser.fromFhir(mockDocumentReference)).thenThrow(parseException)
-        try {
-            // when
-            fhirService.encryptResource(dataKey, mockDocumentReference)
-            Assert.fail("Exception expected!")
-        } catch (e: RuntimeException) {
-
-            // then
-            val firstException = e.cause!!.cause as FhirException?
-            Truth.assertThat(firstException).isEqualTo(parseException)
-            Truth.assertThat(e.cause).isInstanceOf(EncryptionFailed::class.java)
-            Truth.assertThat(e.cause!!.message).isEqualTo("Failed to encrypt resource")
-        }
-        val inOrder = Mockito.inOrder(mockCryptoService, mockFhirParser)
-        inOrder.verify(mockFhirParser)!!.fromFhir(mockDocumentReference)
-        inOrder.verifyNoMoreInteractions()
-    }
-
-    @Test
-    @Throws(FhirException::class)
-    fun encryptResource_shouldThrowException_whenEncryptErrorHappens() {
-        // given
-        Mockito.`when`(mockFhirParser.fromFhir(mockDocumentReference)).thenReturn(JSON_RESOURCE)
-        Mockito.`when`(mockCryptoService.encryptString(dataKey, JSON_RESOURCE)).thenThrow(unkwnownException)
-        try {
-            // when
-            fhirService.encryptResource(dataKey, mockDocumentReference)
-            Assert.fail("Exception expected!")
-        } catch (e: RuntimeException) {
-
-            // then
-            val firstException = e.cause!!.cause as RuntimeException?
-            Truth.assertThat(firstException).isEqualTo(unkwnownException)
-            Truth.assertThat(e.cause).isInstanceOf(EncryptionFailed::class.java)
-            Truth.assertThat(e.cause!!.message).isEqualTo("Failed to encrypt resource")
-        }
-        val inOrder = Mockito.inOrder(mockCryptoService, mockFhirParser)
-        inOrder.verify(mockFhirParser)!!.fromFhir(mockDocumentReference)
-        inOrder.verify(mockCryptoService)!!.encryptString(dataKey, JSON_RESOURCE)
-        inOrder.verifyNoMoreInteractions()
     }
 
     @Test
@@ -312,8 +188,10 @@ class FhirServiceTest {
         // When
         val resource = _fhirService.decryptResource<Fhir3Resource>(
                 dataKey,
-                fhirType,
-                hashMapOf(TAG_FHIR_VERSION to Fhir3Version.version),
+                hashMapOf(
+                        TAG_FHIR_VERSION to Fhir3Version.version,
+                        TAG_RESOURCE_TYPE to fhirType
+                ),
                 ENCRYPTED_RESOURCE
         )
 
@@ -333,8 +211,10 @@ class FhirServiceTest {
         // When
         val resource = _fhirService.decryptResource<Fhir4Resource>(
                 dataKey,
-                fhirType,
-                hashMapOf(TAG_FHIR_VERSION to Fhir4Version.version),
+                hashMapOf(
+                        TAG_FHIR_VERSION to Fhir4Version.version,
+                        TAG_RESOURCE_TYPE to fhirType
+                ),
                 ENCRYPTED_RESOURCE
         )
 
@@ -355,7 +235,6 @@ class FhirServiceTest {
         // When
         val resource = _fhirService.decryptResource<DataResource>(
                 dataKey,
-                fhirType,
                 hashMapOf(TAG_APPDATA_KEY to TAG_APPDATA_VALUE),
                 ENCRYPTED_RESOURCE
         )
@@ -373,8 +252,10 @@ class FhirServiceTest {
             // when
             _fhirService.decryptResource<DataResource>(
                     dataKey,
-                    fhirType,
-                    hashMapOf(TAG_FHIR_VERSION to Fhir4Version.version),
+                    hashMapOf(
+                            TAG_FHIR_VERSION to Fhir4Version.version,
+                            TAG_RESOURCE_TYPE to fhirType
+                    ),
                     ENCRYPTED_RESOURCE
             )
             Assert.fail("Exception expected")
@@ -399,8 +280,10 @@ class FhirServiceTest {
             // when
             _fhirService.decryptResource<DataResource>(
                     dataKey,
-                    fhirType,
-                    hashMapOf(TAG_FHIR_VERSION to Fhir4Version.version),
+                    hashMapOf(
+                            TAG_FHIR_VERSION to Fhir4Version.version,
+                            TAG_RESOURCE_TYPE to fhirType
+                    ),
                     ENCRYPTED_RESOURCE
             )
             Assert.fail("Exception expected")
@@ -414,10 +297,87 @@ class FhirServiceTest {
         }
     }
 
+    @Test
+    fun `Given, the legacy method encryptResource is called with a raw resource, it returns it encrypted`() {
+        val resource = mockk<Fhir3Resource>()
+        val service = spyk(fhirService)
+
+        every { service._encryptResource(dataKey, resource) } returns "something"
+
+        service.encryptResource(dataKey, resource)
+
+        verify(exactly = 1) { service._encryptResource(dataKey, resource) }
+    }
+
+    @Test
+    @Throws(FhirException::class)
+    fun legacy_decryptResource_shouldReturnResource() {
+        // Given
+        Mockito.`when`(mockCryptoService.decryptString(dataKey, ENCRYPTED_RESOURCE)).thenReturn(Single.just(JSON_RESOURCE))
+        Mockito.`when`<Any>(mockFhirParser.toFhir(fhirClass, JSON_RESOURCE)).thenReturn(mockDocumentReference)
+
+        // When
+        val resource = fhirService.decryptResource<Fhir3Resource>(dataKey, fhirType, ENCRYPTED_RESOURCE)
+
+        // Then
+        Truth.assertThat(resource).isEqualTo(mockDocumentReference)
+        val inOrder = Mockito.inOrder(mockCryptoService, mockFhirParser)
+        inOrder.verify(mockCryptoService)!!.decryptString(dataKey, ENCRYPTED_RESOURCE)
+        inOrder.verify(mockFhirParser)!!.toFhir(fhirClass, JSON_RESOURCE)
+        inOrder.verifyNoMoreInteractions()
+    }
+
+    @Test
+    fun legacy_decryptResource_shouldThrowException_whenDecryptErrorHappens() {
+        // given
+        Mockito.`when`(mockCryptoService.decryptString(dataKey, ENCRYPTED_RESOURCE)).thenThrow(unkwnownException)
+        try {
+            // when
+            fhirService.decryptResource<Fhir3Resource>(dataKey, DocumentReference.resourceType, ENCRYPTED_RESOURCE)
+            Assert.fail("Exception expected")
+        } catch (e: RuntimeException) {
+
+            //Then
+            val firstException = e.cause!!.cause as RuntimeException?
+            Truth.assertThat(firstException).isEqualTo(unkwnownException)
+            Truth.assertThat(e.cause).isInstanceOf(DecryptionFailed::class.java)
+            Truth.assertThat(e.cause!!.message).isEqualTo("Failed to decrypt resource")
+        }
+        val inOrder = Mockito.inOrder(mockCryptoService, mockFhirParser)
+        inOrder.verify(mockCryptoService)!!.decryptString(dataKey, ENCRYPTED_RESOURCE)
+        inOrder.verifyNoMoreInteractions()
+    }
+
+    @Test
+    @Throws(FhirException::class)
+    fun legacy_decryptResource_shouldThrowException_whenParseErrorHappens() {
+        // given
+        Mockito.`when`(mockCryptoService.decryptString(dataKey, ENCRYPTED_RESOURCE)).thenReturn(Single.just(JSON_RESOURCE))
+        Mockito.`when`<Any>(mockFhirParser.toFhir(DocumentReference::class.java, JSON_RESOURCE)).thenThrow(parseException)
+        try {
+            // when
+            fhirService.decryptResource<Fhir3Resource>(dataKey, DocumentReference.resourceType, ENCRYPTED_RESOURCE)
+            Assert.fail("Exception expected")
+        } catch (e: RuntimeException) {
+
+            //Then
+            val firstExc = e.cause!!.cause as FhirException?
+            Truth.assertThat(firstExc).isEqualTo(parseException)
+            Truth.assertThat(e.cause).isInstanceOf(DecryptionFailed::class.java)
+            Truth.assertThat(e.cause!!.message).isEqualTo("Failed to decrypt resource")
+        }
+        val inOrder = Mockito.inOrder(mockCryptoService, mockFhirParser)
+        inOrder.verify(mockCryptoService)!!.decryptString(dataKey, ENCRYPTED_RESOURCE)
+        inOrder.verify(mockFhirParser)!!.toFhir(fhirClass, JSON_RESOURCE)
+        inOrder.verifyNoMoreInteractions()
+    }
+
     companion object {
+        private val US_LOCALE = Locale.US
         private const val ENCRYPTED_RESOURCE = "encryptedResource"
         private const val JSON_RESOURCE = "jsonResource"
         private const val TAG_FHIR_VERSION = "fhirversion"
+        private val TAG_RESOURCE_TYPE = "resourceType".toLowerCase(US_LOCALE)
         private const val TAG_APPDATA_KEY = "flag"
         private const val TAG_APPDATA_VALUE = "appdata"
     }

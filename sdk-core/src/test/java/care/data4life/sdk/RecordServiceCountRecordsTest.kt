@@ -60,7 +60,8 @@ class RecordServiceCountRecordsTest : RecordServiceTestBase() {
     @Throws(InterruptedException::class, IOException::class)
     fun `Given, countRecords is called with a DomainResource, a UserId and a Tag, it returns amount of occurrences`() {
         // Given
-        Mockito.`when`(mockTaggingService.getTagFromType(CarePlan.resourceType)).thenReturn(mockTags)
+        @Suppress("UNCHECKED_CAST")
+        Mockito.`when`(mockTaggingService.getTagFromType(CarePlan::class.java as Class<Any>)).thenReturn(mockTags)
         Mockito.`when`(mockTagEncryptionService.encryptTags(mockTags)).thenReturn(mockEncryptedTags)
         Mockito.`when`(
                 mockTagEncryptionService.encryptAnnotations(ArgumentMatchers.anyList())
@@ -77,7 +78,7 @@ class RecordServiceCountRecordsTest : RecordServiceTestBase() {
                 .assertValueCount(1)
                 .values()[0]
         Truth.assertThat(result).isEqualTo(2)
-        inOrder.verify(mockTaggingService).getTagFromType(CarePlan.resourceType)
+        inOrder.verify(mockTaggingService).getTagFromType(CarePlan::class.java as Class<Any>)
         inOrder.verify(mockTagEncryptionService).encryptTags(mockTags)
         inOrder.verify(mockTagEncryptionService).encryptAnnotations(ArgumentMatchers.anyList())
         inOrder.verify(mockApiService).getCount(ALIAS, USER_ID, mockEncryptedTags)
@@ -108,7 +109,7 @@ class RecordServiceCountRecordsTest : RecordServiceTestBase() {
     @Throws(InterruptedException::class, IOException::class)
     fun `Given, countRecords is called with a DomainResource, a UserId, a Tag and Annotations, it returns amount of occurrences`() {
         // Given
-        Mockito.`when`(mockTaggingService.getTagFromType(CarePlan.resourceType)).thenReturn(mockTags)
+        Mockito.`when`(mockTaggingService.getTagFromType(CarePlan::class.java as Class<Any>)).thenReturn(mockTags)
         Mockito.`when`(mockTagEncryptionService.encryptTags(mockTags)).thenReturn(mockEncryptedTags)
         Mockito.`when`(
                 mockTagEncryptionService.encryptAnnotations(ANNOTATIONS)
@@ -125,7 +126,7 @@ class RecordServiceCountRecordsTest : RecordServiceTestBase() {
                 .assertValueCount(1)
                 .values()[0]
         Truth.assertThat(result).isEqualTo(2)
-        inOrder.verify(mockTaggingService).getTagFromType(CarePlan.resourceType)
+        inOrder.verify(mockTaggingService).getTagFromType(CarePlan::class.java as Class<Any>)
         inOrder.verify(mockTagEncryptionService).encryptTags(mockTags)
         inOrder.verify(mockTagEncryptionService).encryptAnnotations(ANNOTATIONS)
         inOrder.verify(mockApiService).getCount(ALIAS, USER_ID, mockEncryptedTags)

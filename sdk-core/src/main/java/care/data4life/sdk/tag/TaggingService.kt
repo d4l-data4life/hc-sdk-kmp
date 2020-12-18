@@ -55,17 +55,7 @@ class TaggingService(
         return tags
     }
 
-    // FIXME add FHIR 4 support
     override fun appendDefaultTags(
-            resourceType: String?,
-            oldTags: HashMap<String, String>?
-    ): HashMap<String, String> = appendCommonDefaultTags(resourceType, oldTags).also {
-        if (!it.containsKey(TAG_FHIR_VERSION)) {
-            it[TAG_FHIR_VERSION] = ModelVersion.FHIR_VERSION
-        }
-    }
-
-    override fun _appendDefaultTags(
             resource: Any,
             oldTags: HashMap<String, String>?
     ): HashMap<String, String> {
@@ -86,28 +76,7 @@ class TaggingService(
         }
     }
 
-    fun appendAppDataTags(
-            tags: HashMap<String, String>?
-    ): HashMap<String, String>? = tags.also {
-        if (it != null) {
-            it[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE
-        }
-    }
-
-    fun appendDefaultAnnotatedTags(
-            resourceType: String?,
-            oldTags: HashMap<String, String>?
-    ): HashMap<String, String> = appendAppDataTags(appendCommonDefaultTags(resourceType, oldTags))!!
-
     override fun getTagFromType(
-            resourceType: String?
-    ): HashMap<String, String> = hashMapOf<String, String>().also {
-        if (resourceType != null && resourceType.isNotEmpty()) {
-            it[TAG_RESOURCE_TYPE] = resourceType.toLowerCase(US_LOCALE)
-        }
-    }
-
-    override fun _getTagFromType(
             resourceType: Class<Any>?
     ): HashMap<String, String> {
         return hashMapOf<String, String>().also {

@@ -107,13 +107,6 @@ class RecordService(
     private val attchachmentFactory: WrapperFactoryContract.AttachmentFactory = SdkAttachmentFactory
     private val identifierFactory: WrapperFactoryContract.IdentifierFactory = SdkIdentifierFactory
 
-    private fun getTagsOnCreate(resource: Any): HashMap<String, String> {
-        return if (resource is ByteArray) {
-            taggingService.appendDefaultTags(null, null)
-        } else {
-            taggingService.appendDefaultTags((resource as Fhir3Resource).resourceType, null)
-        }
-    }
 
     private fun <T : Any> createRecord(
             userId: String,
@@ -121,13 +114,14 @@ class RecordService(
             annotations: List<String>
     ): Single<BaseRecord<T>> {
         checkDataRestrictions(resource)
+
         val data = extractUploadData(resource)
         val createdRecord = Single.just(
                 care.data4life.sdk.network.DecryptedRecordBuilder()
                         .setAnnotations(annotations)
                         .build(
                                 resource,
-                                this.getTagsOnCreate(resource),
+                                taggingService.appendDefaultTags(resource, null),
                                 DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
                                 cryptoService.generateGCKey().blockingGet(),
                                 ModelVersion.CURRENT
@@ -268,17 +262,6 @@ class RecordService(
                 .map { FetchResult(it, failedFetches) }
     }
 
-    private fun getTagsOnFetch(resourceType: Class<Any>): HashMap<String, String> {
-        return if (resourceType.simpleName == "byte[]") {
-            taggingService.appendAppDataTags(hashMapOf())!!
-        } else {
-            @Suppress("UNCHECKED_CAST")
-            taggingService.getTagFromType(
-                    fhirElementFactory.getFhirTypeForClass(resourceType as Class<out Fhir3Resource>)
-            )
-        }
-    }
-
     private fun <T : Any> _fetchRecords(
             userId: String,
             resourceType: Class<T>,
@@ -292,10 +275,7 @@ class RecordService(
         val endTime = if (endDate != null) DATE_FORMATTER.format(endDate) else null
         @Suppress("UNCHECKED_CAST")
         return Observable
-                .fromCallable {
-                    @Suppress("UNCHECKED_CAST")
-                    getTagsOnFetch(resourceType as Class<Any>)
-                }
+                .fromCallable { taggingService.getTagFromType(resourceType as Class<Any>) }
                 .map { tagEncryptionService.encryptTags(it) as MutableList<String> }
                 .map { tags ->
                     tags.also {
@@ -545,7 +525,10 @@ class RecordService(
         apiService.getCount(alias, userId, null)
     } else {
         Single
-                .fromCallable { taggingService.getTagFromType(fhirElementFactory.getFhirTypeForClass(type)) }
+                .fromCallable {
+                    @Suppress("UNCHECKED_CAST")
+                    taggingService.getTagFromType(type as Class<Any>)
+                }
                 .map { tagEncryptionService.encryptTags(it) as MutableList<String> }
                 .map { tags -> tags.also { it.addAll(tagEncryptionService.encryptAnnotations(annotations)) } }
                 .flatMap { apiService.getCount(alias, userId, it) }

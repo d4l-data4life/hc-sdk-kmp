@@ -17,26 +17,16 @@
 package care.data4life.sdk.tag
 
 import java.util.HashMap
-import kotlin.reflect.KClass
 
 class TaggingContract {
     
     interface Service {
         fun appendDefaultTags(
-                resourceType: String?,
-                oldTags: HashMap<String, String>?
-        ): HashMap<String, String>
-
-        fun _appendDefaultTags(
                 resource: Any,
                 oldTags: HashMap<String, String>?
         ): HashMap<String, String>
 
         fun getTagFromType(
-                resourceType: String?
-        ): HashMap<String, String>
-
-        fun _getTagFromType(
                 resourceType: Class<Any>?
         ): HashMap<String, String>
         

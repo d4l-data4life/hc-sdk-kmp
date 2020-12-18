@@ -81,9 +81,9 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Mockito.doReturn(mockUploadData).`when`(recordService).extractUploadData(mockCarePlan)
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
         Mockito.`when`(mockTaggingService.appendDefaultTags(
-                ArgumentMatchers.eq(CarePlan.resourceType),
-                ArgumentMatchers.any<HashMap<String, String>>())
-        ).thenReturn(mockTags)
+                mockCarePlan,
+                null
+        )).thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockDecryptedFhir3Record).`when`(recordService)
                 ._uploadData(
@@ -125,8 +125,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Truth.assertThat(record).isSameInstanceAs(mockRecord)
 
         inOrder.verify(mockTaggingService).appendDefaultTags(
-                ArgumentMatchers.anyString(),
-                ArgumentMatchers.any<HashMap<String, String>>()
+                mockCarePlan,
+                null
         )
         inOrder.verify(mockCryptoService).generateGCKey()
         inOrder.verify(mockDecryptedRecordBuilder).build(
@@ -171,7 +171,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         // Given
         every {
             anyConstructed<DecryptedRecordBuilder>().setAnnotations(listOf())
-        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilder
+        } returns mockDecryptedRecordBuilder
 
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
@@ -187,8 +187,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
         Mockito.`when`(
                 mockTaggingService.appendDefaultTags(
-                        ArgumentMatchers.eq(CarePlan.resourceType),
-                        ArgumentMatchers.any<HashMap<String, String>>()
+                        mockCarePlan,
+                        null
                 )
         ).thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey())
@@ -245,8 +245,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Truth.assertThat(record).isSameInstanceAs(mockRecord)
 
         inOrder.verify(mockTaggingService).appendDefaultTags(
-                ArgumentMatchers.anyString(),
-                ArgumentMatchers.any<HashMap<String, String>>()
+                mockCarePlan,
+                null
         )
         inOrder.verify(mockCryptoService).generateGCKey()
         inOrder.verify(mockDecryptedRecordBuilder).build(
@@ -398,9 +398,9 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Mockito.doReturn(mockUploadData).`when`(recordService).extractUploadData(mockCarePlan)
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
         Mockito.`when`(mockTaggingService.appendDefaultTags(
-                ArgumentMatchers.eq(CarePlan.resourceType),
-                ArgumentMatchers.any<HashMap<String, String>>())
-        ).thenReturn(mockTags)
+                mockCarePlan,
+                null
+        )).thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockAnnotatedDecryptedFhirRecord).`when`(recordService)
                 ._uploadData(
@@ -441,8 +441,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Truth.assertThat(record).isSameInstanceAs(mockRecord)
 
         inOrder.verify(mockTaggingService).appendDefaultTags(
-                ArgumentMatchers.anyString(),
-                ArgumentMatchers.any<HashMap<String, String>>()
+                mockCarePlan,
+                null
         )
         inOrder.verify(mockCryptoService).generateGCKey()
         inOrder.verify(mockDecryptedRecordBuilder).build(
@@ -503,8 +503,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
         Mockito.`when`(
                 mockTaggingService.appendDefaultTags(
-                        ArgumentMatchers.eq(CarePlan.resourceType),
-                        ArgumentMatchers.any<HashMap<String, String>>()
+                        mockCarePlan,
+                        null
                 )
         ).thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey())
@@ -559,8 +559,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Truth.assertThat(record).isSameInstanceAs(mockRecord)
 
         inOrder.verify(mockTaggingService).appendDefaultTags(
-                ArgumentMatchers.anyString(),
-                ArgumentMatchers.any<HashMap<String, String>>()
+                mockCarePlan,
+                null
         )
         inOrder.verify(mockCryptoService).generateGCKey()
         inOrder.verify(mockDecryptedRecordBuilder).build(
@@ -665,10 +665,12 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         // Given
         every {
             anyConstructed<DecryptedRecordBuilder>().setAnnotations(listOf())
-        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilder
+        } returns mockDecryptedRecordBuilder
 
-        Mockito.`when`(mockTaggingService.appendDefaultTags(null, null))
-                .thenReturn(mockTags)
+        Mockito.`when`(mockTaggingService.appendDefaultTags(
+                ArgumentMatchers.argThat { true },
+                null
+        )).thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
@@ -709,7 +711,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .values()[0]
         Truth.assertThat(record).isSameInstanceAs(mockDataRecord)
 
-        inOrder.verify(mockTaggingService).appendDefaultTags(null, null)
+        inOrder.verify(mockTaggingService).appendDefaultTags(ArgumentMatchers.argThat { true }, null)
         inOrder.verify(mockCryptoService).generateGCKey()
         inOrder.verify(mockDecryptedRecordBuilder).build(
                 mockDataResource.value,

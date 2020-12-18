@@ -111,7 +111,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
     fun `Given, fetchRecords called with a UserId, a ResourceType, a StartDate, a EndDate, the PageSize and Offset, it returns FetchedRecords`() {
         // Given
         val encryptedRecords = listOf(mockEncryptedRecord, mockEncryptedRecord)
-        Mockito.`when`(mockTaggingService.getTagFromType(CarePlan.resourceType)).thenReturn(mockTags)
+        Mockito.`when`(mockTaggingService.getTagFromType(CarePlan::class.java as Class<Any>)).thenReturn(mockTags)
         Mockito.`when`(mockTagEncryptionService.encryptTags(mockTags)).thenReturn(mockEncryptedTags)
         Mockito.`when`(
                 mockTagEncryptionService.encryptAnnotations(listOf())
@@ -154,7 +154,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
         Truth.assertThat(fetched[0].fhirResource).isEqualTo(mockCarePlan)
         Truth.assertThat(fetched[1].meta).isEqualTo(mockMeta)
         Truth.assertThat(fetched[1].fhirResource).isEqualTo(mockCarePlan)
-        inOrder.verify(mockTaggingService).getTagFromType(CarePlan.resourceType)
+        inOrder.verify(mockTaggingService).getTagFromType(CarePlan::class.java as Class<Any>)
         inOrder.verify(mockTagEncryptionService).encryptTags(mockTags)
         inOrder.verify(mockTagEncryptionService).encryptAnnotations(listOf())
         inOrder.verify(mockApiService).fetchRecords(
@@ -178,7 +178,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
     fun `Given, fetchRecords called with a UserId, a ResourceType, Annotations, a StartDate, a EndDate, the PageSize and Offset, it returns FetchedRecords`() {
         // Given
         val encryptedRecords = listOf(mockEncryptedRecord, mockEncryptedRecord)
-        Mockito.`when`(mockTaggingService.getTagFromType(CarePlan.resourceType)).thenReturn(mockTags)
+        Mockito.`when`(mockTaggingService.getTagFromType(CarePlan::class.java as Class<Any>)).thenReturn(mockTags)
         Mockito.`when`(mockTagEncryptionService.encryptTags(mockTags)).thenReturn(mockEncryptedTags)
         Mockito.`when`(
                 mockTagEncryptionService.encryptAnnotations(ANNOTATIONS)
@@ -222,7 +222,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
         Truth.assertThat(fetched[0].fhirResource).isEqualTo(mockCarePlan)
         Truth.assertThat(fetched[1].meta).isEqualTo(mockMeta)
         Truth.assertThat(fetched[1].fhirResource).isEqualTo(mockCarePlan)
-        inOrder.verify(mockTaggingService).getTagFromType(CarePlan.resourceType)
+        inOrder.verify(mockTaggingService).getTagFromType(CarePlan::class.java as Class<Any>)
         inOrder.verify(mockTagEncryptionService).encryptTags(mockTags)
         inOrder.verify(mockTagEncryptionService).encryptAnnotations(ANNOTATIONS)
         inOrder.verify(mockApiService).fetchRecords(
@@ -282,7 +282,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
         // Given
         val encryptedRecords = listOf(mockEncryptedRecord, mockEncryptedRecord)
         Mockito
-                .`when`(mockTaggingService.appendAppDataTags(ArgumentMatchers.eq(hashMapOf())))
+                .`when`(mockTaggingService.getTagFromType(null))
                 .thenReturn(mockTags)
         Mockito.`when`(mockTagEncryptionService.encryptTags(mockTags)).thenReturn(mockEncryptedTags)
         Mockito.`when`(
@@ -329,7 +329,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
         Truth.assertThat(fetched[0]).isSameInstanceAs(mockDataRecord)
         Truth.assertThat(fetched[1]).isSameInstanceAs(mockDataRecord)
 
-        inOrder.verify(mockTaggingService).appendAppDataTags(ArgumentMatchers.eq(hashMapOf()))
+        inOrder.verify(mockTaggingService).getTagFromType(null)
         inOrder.verify(mockTagEncryptionService).encryptTags(mockTags)
         inOrder.verify(mockTagEncryptionService).encryptAnnotations(ANNOTATIONS)
         inOrder.verify(mockApiService).fetchRecords(

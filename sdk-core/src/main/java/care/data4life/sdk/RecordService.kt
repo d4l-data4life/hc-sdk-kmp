@@ -673,7 +673,7 @@ class RecordService(
 
     @Throws(DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
-    private fun downloadAttachmentsFromStorage(
+    internal fun downloadAttachmentsFromStorage(
             attachmentIds: List<String>,
             userId: String,
             type: DownloadType,
@@ -689,6 +689,7 @@ class RecordService(
                     validAttachments.add(attchachmentFactory.wrap(attachment!!))
                 }
             }
+
             if (validAttachments.size != attachmentIds.size)
                 throw DataValidationException.IdUsageViolation("Please provide correct attachment ids!")
 
@@ -759,9 +760,9 @@ class RecordService(
         @Suppress("UNCHECKED_CAST")
         return if (isFhir(record.resource)) {
             setUploadData(
-                    record as DecryptedFhir3Record<Fhir3Resource>,
+                    record,
                     null
-            ) as DecryptedBaseRecord<T>
+            )
         } else {
             record
         }
@@ -783,7 +784,7 @@ class RecordService(
             record
         } else {
             setUploadData(
-                    record as DecryptedFhir3Record<Fhir3Resource>,
+                    record,
                     attachmentData
             ) as DecryptedBaseRecord<T>
         }

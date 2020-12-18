@@ -211,7 +211,7 @@ class RecordService(
                 .map { DeleteResult(it, failedDeletes) }
     }
 
-    private fun <T : Any> _fetchRecord(
+    internal fun <T : Any> _fetchRecord(
             recordId: String,
             userId: String
     ): Single<BaseRecord<T>> {
@@ -259,7 +259,7 @@ class RecordService(
                 .map { FetchResult(it, failedFetches) }
     }
 
-    private fun <T : Any> _fetchRecords(
+    internal fun <T : Any> _fetchRecords(
             userId: String,
             resourceType: Class<T>?,
             annotations: List<String>,

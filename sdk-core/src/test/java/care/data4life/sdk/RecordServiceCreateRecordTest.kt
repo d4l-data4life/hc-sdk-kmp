@@ -37,7 +37,6 @@ import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
-import io.mockk.verify
 import io.reactivex.Single
 import org.junit.After
 import org.junit.Assert

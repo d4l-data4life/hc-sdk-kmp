@@ -17,59 +17,110 @@
 package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.fhir.Fhir3Attachment
+import care.data4life.sdk.fhir.Fhir3AttachmentHelper
 import care.data4life.sdk.fhir.Fhir3Identifier
 import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Attachment
+import care.data4life.sdk.fhir.Fhir4AttachmentHelper
+import care.data4life.sdk.fhir.Fhir4Identifier
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.fhir.stu3.util.FhirAttachmentHelper as Fhir3AttachmentHelper
 
 internal object SdkFhirAttachmentHelper: HelperContract.FhirAttachmentHelper {
+
+    @Throws(CoreRuntimeException.InternalFailure::class)
     override fun hasAttachment(resource: Any): Boolean {
-        return Fhir3AttachmentHelper.hasAttachment(resource as Fhir3Resource)
+        return when(resource) {
+            is Fhir4Resource -> Fhir4AttachmentHelper.hasAttachment(resource)
+            is Fhir3Resource -> Fhir3AttachmentHelper.hasAttachment(resource)
+            else -> throw CoreRuntimeException.InternalFailure()
+        }
     }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun getAttachment(resource: Any): MutableList<Any?>? {
         @Suppress("UNCHECKED_CAST")
-        return Fhir3AttachmentHelper.getAttachment(resource as Fhir3Resource) as MutableList<Any?>?
+        return when(resource) {
+            is Fhir4Resource -> Fhir4AttachmentHelper.getAttachment(resource) as MutableList<Any?>?
+            is Fhir3Resource -> Fhir3AttachmentHelper.getAttachment(resource) as MutableList<Any?>?
+            else -> throw CoreRuntimeException.InternalFailure()
+        }
     }
 
-    @Throws(CoreRuntimeException.InternalFailure::class)
-    override fun updateAttachmentData(resource: Any, attachmentData: HashMap<Any, String?>?) {
-        @Suppress("UNCHECKED_CAST")
+    private fun updateFhir3AttachmentData(resource: Fhir3Resource, attachmentData: HashMap<Any, String?>?) {
         val attachment = if( attachmentData == null) {
             null
         } else {
             attachmentData as HashMap<Fhir3Attachment, String?>
         }
 
-        @Suppress("UNCHECKED_CAST")
-        return Fhir3AttachmentHelper.updateAttachmentData(
-                resource as Fhir3Resource,
+        Fhir3AttachmentHelper.updateAttachmentData(
+                resource,
+                attachment
+        )
+    }
+
+    private fun updateFhir4AttachmentData(resource: Fhir4Resource, attachmentData: HashMap<Any, String?>?) {
+        val attachment = if( attachmentData == null) {
+            null
+        } else {
+            attachmentData as HashMap<Fhir4Attachment, String?>
+        }
+
+        Fhir4AttachmentHelper.updateAttachmentData(
+                resource,
                 attachment
         )
     }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
+    override fun updateAttachmentData(resource: Any, attachmentData: HashMap<Any, String?>?) {
+        return when(resource) {
+            is Fhir4Resource -> updateFhir4AttachmentData(resource, attachmentData)
+            is Fhir3Resource -> updateFhir3AttachmentData(resource, attachmentData)
+            else -> throw CoreRuntimeException.InternalFailure()
+        }
+    }
+
+    @Throws(CoreRuntimeException.InternalFailure::class)
     override fun getIdentifier(resource: Any): List<Any>? {
-        return Fhir3AttachmentHelper.getIdentifier(resource as Fhir3Resource)
+        return when(resource) {
+            is Fhir4Resource -> Fhir4AttachmentHelper.getIdentifier(resource)
+            is Fhir3Resource -> Fhir3AttachmentHelper.getIdentifier(resource)
+            else -> throw CoreRuntimeException.InternalFailure()
+        }
     }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun setIdentifier(resource: Any, updatedIdentifiers: List<Any>) {
-        @Suppress("UNCHECKED_CAST")
-        return Fhir3AttachmentHelper.setIdentifier(
-                resource as Fhir3Resource,
-                updatedIdentifiers as List<Fhir3Identifier>
-        )
+        return when(resource) {
+            is Fhir4Resource -> Fhir4AttachmentHelper.setIdentifier(
+                    resource,
+                    updatedIdentifiers as List<Fhir4Identifier>
+            )
+            is Fhir3Resource -> Fhir3AttachmentHelper.setIdentifier(
+                    resource,
+                    updatedIdentifiers as List<Fhir3Identifier>
+            )
+            else -> throw CoreRuntimeException.InternalFailure()
+        }
     }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun appendIdentifier(resource: Any, identifier: String, assigner: String) {
-        return Fhir3AttachmentHelper.appendIdentifier(
-                resource as Fhir3Resource,
-                identifier,
-                assigner
-        )
+        return when(resource) {
+            is Fhir4Resource -> Fhir4AttachmentHelper.appendIdentifier(
+                    resource,
+                    identifier,
+                    assigner
+            )
+            is Fhir3Resource -> Fhir3AttachmentHelper.appendIdentifier(
+                    resource,
+                    identifier,
+                    assigner
+            )
+            else -> throw CoreRuntimeException.InternalFailure()
+        }
     }
 
 }

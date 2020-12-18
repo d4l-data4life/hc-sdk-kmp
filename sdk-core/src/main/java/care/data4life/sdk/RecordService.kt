@@ -1016,7 +1016,7 @@ class RecordService(
         }
     }
 
-    private fun updateFhirResourceIdentifier(
+    internal fun updateFhirResourceIdentifier(
             resource: Any,
             result: List<Pair<WrapperContract.Attachment, List<String>?>>
     ) {

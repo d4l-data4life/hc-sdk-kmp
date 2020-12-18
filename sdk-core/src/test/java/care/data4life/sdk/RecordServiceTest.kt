@@ -1368,4 +1368,56 @@ class RecordServiceTest : RecordServiceTestBase() {
 
         verify(exactly = 1) { recordServiceK.updateAttachmentMeta(any()) }
     }
+
+    @Test
+    fun `Given, updateResourceIdentifier is called, with a Resource and a Map of Attachments to a null for a Lists of String, it does noting`() {
+        // Given
+        val resource = mockk<Fhir4Resource>()
+        val attachment = mockk<WrapperContract.Attachment>()
+
+        every {  Fhir4AttachmentHelper.appendIdentifier(
+                resource,
+                any(),
+                PARTNER_ID
+        ) } returns mockk()
+
+        // When
+        recordServiceK.updateFhirResourceIdentifier(
+                resource,
+                listOf<Pair<WrapperContract.Attachment, List<String>?>>(attachment to null)
+        )
+
+        verify(exactly = 0) { Fhir4AttachmentHelper.appendIdentifier(
+                resource,
+                any(),
+                PARTNER_ID
+        ) }
+    }
+
+    @Test
+    fun `Given, updateResourceIdentifier is called, with a Resource and a Map of Attachments to a Lists of String, it appends the Identifier`() {
+        // Given
+        val attachment = mockk<WrapperContract.Attachment>()
+        val resource = mockk<Fhir4Resource>(relaxed = true)
+
+        every { attachment.id } returns "something"
+
+        every { Fhir4AttachmentHelper.appendIdentifier(
+                resource,
+                "d4l_f_p_t#something#abc",
+                PARTNER_ID
+        ) } returns mockk()
+
+        // When
+        recordServiceK.updateFhirResourceIdentifier(
+                resource,
+                listOf<Pair<WrapperContract.Attachment, List<String>?>>(attachment to listOf("abc"))
+        )
+
+        verify(exactly = 1) { Fhir4AttachmentHelper.appendIdentifier(
+                resource,
+                "d4l_f_p_t#something#abc",
+                PARTNER_ID
+        ) }
+    }
 }

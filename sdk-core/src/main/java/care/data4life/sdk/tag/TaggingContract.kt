@@ -37,7 +37,7 @@ class TaggingContract {
         ): HashMap<String, String>
 
         fun _getTagFromType(
-                resourceType: KClass<Any>?
+                resourceType: Class<Any>?
         ): HashMap<String, String>
         
     }

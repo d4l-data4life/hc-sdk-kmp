@@ -39,7 +39,7 @@ class WrapperContract {
     interface FhirElementFactory {
 
         @Throws(CoreRuntimeException.InternalFailure::class)
-        fun getFhirTypeForClass(resourceType: Class<out Any>): String
+        fun getFhirTypeForClass(resourceType: Class<out Any>): String?
 
         fun getFhir3ClassForType(resourceType:String): Class<out Fhir3Resource>?
 

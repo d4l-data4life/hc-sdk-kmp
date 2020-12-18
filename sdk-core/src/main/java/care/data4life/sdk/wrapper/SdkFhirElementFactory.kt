@@ -27,11 +27,11 @@ internal object SdkFhirElementFactory: WrapperContract.FhirElementFactory {
     private val fhir4Indicator = Fhir4Resource::class.java.`package`
 
     @Throws(CoreRuntimeException.InternalFailure::class)
-    override fun getFhirTypeForClass(resourceType: Class<out Any>): String {
+    override fun getFhirTypeForClass(resourceType: Class<out Any>): String? {
         @Suppress("UNCHECKED_CAST")
         return when(resourceType.`package`) {
-            fhir3Indicator  -> Fhir3ElementFactory.getFhirTypeForClass(resourceType as Class<out Fhir3Resource>)
-            fhir4Indicator -> Fhir4ElementFactory.getFhirTypeForClass(resourceType as Class<out Fhir4Resource>)
+            fhir3Indicator  -> Fhir3ElementFactory.getFhirTypeForClass(resourceType as Class<Fhir3Resource>)
+            fhir4Indicator -> Fhir4ElementFactory.getFhirTypeForClass(resourceType as Class<Fhir4Resource>)
             else -> throw CoreRuntimeException.InternalFailure()
         }
     }

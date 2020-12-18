@@ -20,14 +20,16 @@ import care.data4life.sdk.fhir.Fhir3Version
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.Fhir4Version
 import care.data4life.sdk.model.ModelVersion
+import care.data4life.sdk.wrapper.SdkFhirElementFactory
+import care.data4life.sdk.wrapper.WrapperContract
 import java.util.*
-import kotlin.reflect.KClass
 
 // TODO internal
 class TaggingService(
         private val clientId: String
 ): TaggingContract.Service {
     private val partnerId: String = clientId.substringBefore(SEPARATOR)
+    private val fhirElementFactory: WrapperContract.FhirElementFactory = SdkFhirElementFactory
 
     private fun appendCommonDefaultTags(
             resourceType: String?,
@@ -106,9 +108,15 @@ class TaggingService(
     }
 
     override fun _getTagFromType(
-            resourceType: KClass<Any>?
+            resourceType: Class<Any>?
     ): HashMap<String, String> {
-        TODO("Not yet implemented")
+        return hashMapOf<String, String>().also {
+            if (resourceType == null) {
+                it[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE
+            } else {
+                it[TAG_RESOURCE_TYPE] = fhirElementFactory.getFhirTypeForClass(resourceType)!!.toLowerCase(US_LOCALE)
+            }
+        }
     }
 
     companion object {

@@ -313,7 +313,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given, updateRecord is called with a byte resource, Annotations and a UserId, it returns a updated DataRecord`() {
+    fun `Given, updateRecord is called with a DataResource, Annotations and a UserId, it returns a updated DataRecord`() {
         // Given
         Mockito.`when`(
                 mockApiService.fetchRecord(
@@ -380,7 +380,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    fun `Given, updateRecord is called with a byte resource, empty list Annotations and a UserId, it returns a updated DataRecord`() {
+    fun `Given, updateRecord is called with a DataResource, empty list Annotations and a UserId, it returns a updated DataRecord`() {
         // Given
         Mockito.`when`(
                 mockApiService.fetchRecord(

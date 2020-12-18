@@ -683,10 +683,12 @@ class RecordService(
             val resource = decryptedRecord.resource
             val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Fhir3Attachment?>
             val validAttachments = mutableListOf<WrapperContract.Attachment>()
+            val validRawAttachments = mutableListOf<Fhir3Attachment>()
 
             for (attachment in attachments) {
                 if (attachmentIds.contains(attachment?.id)) {
-                    validAttachments.add(attchachmentFactory.wrap(attachment!!))
+                    validRawAttachments.add(attachment!!)
+                    validAttachments.add(SdkAttachmentFactory.wrap(attachment))
                 }
             }
 
@@ -694,7 +696,7 @@ class RecordService(
                 throw DataValidationException.IdUsageViolation("Please provide correct attachment ids!")
 
             setAttachmentIdForDownloadType(
-                    validAttachments,
+                    validRawAttachments,
                     fhirAttachmentHelper.getIdentifier(resource) as List<Fhir3Identifier>?,
                     type
             )

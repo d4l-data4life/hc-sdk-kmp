@@ -17,12 +17,12 @@ package care.data4life.sdk.tag
 
 
 import care.data4life.fhir.stu3.model.Patient
+import care.data4life.fhir.r4.model.Patient as R4Patient
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir3Version
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.Fhir4Version
-import care.data4life.sdk.model.ModelVersion
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -154,6 +154,20 @@ class TaggingServiceTest {
     fun `Given, getTagFromType is called with a type, it returns a Map, which contains TAG_RESOURCE_TYPE to the given type`() {//getTagFromType_shouldReturnListWithResourceTypeTag
         // Given
         val type = Patient() // Fixme: Mock elementFactory
+        // When
+        @Suppress("UNCHECKED_CAST")
+        val result = taggingService.getTagFromType(type::class.java as Class<Any>)
+
+        // Then
+        Assert.assertEquals(1, result.size.toLong())
+        Assert.assertTrue(result.containsKey(TAG_RESOURCE_TYPE))
+        Assert.assertEquals(type.resourceType.toLowerCase(Locale.US), result[TAG_RESOURCE_TYPE])
+    }
+
+    @Test
+    fun `Given, getTagFromType (Fhir4) is called with a type, it returns a Map, which contains TAG_RESOURCE_TYPE to the given type`() {//getTagFromType_shouldReturnListWithResourceTypeTag
+        // Given
+        val type = R4Patient() // Fixme: Mock elementFactory
         // When
         @Suppress("UNCHECKED_CAST")
         val result = taggingService.getTagFromType(type::class.java as Class<Any>)

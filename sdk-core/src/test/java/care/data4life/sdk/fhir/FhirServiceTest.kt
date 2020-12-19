@@ -79,7 +79,7 @@ class FhirServiceTest {
     @Throws(FhirException::class)
     fun `Given encryptResource is called with a Fhir3Resource, it encrypts it`() {//encryptResource_shouldReturnEncryptedResource
         // given
-        val resource = mockk<Fhir3Resource>()
+        val resource = Fhir3Resource()
 
         every { SdkFhirParser.fromResource(resource) } returns JSON_RESOURCE
         every { cryptoService.encryptString(dataKey, JSON_RESOURCE) } returns Single.just(ENCRYPTED_RESOURCE)
@@ -95,7 +95,7 @@ class FhirServiceTest {
     @Throws(FhirException::class)
     fun `Given encryptResource is called with a Fhir4Resource, it encrypts it`() {//encryptResource_shouldReturnEncryptedResource
         // given
-        val resource = mockk<Fhir4Resource>()
+        val resource = Fhir4Resource()
 
         every { SdkFhirParser.fromResource(resource) } returns JSON_RESOURCE
         every { cryptoService.encryptString(dataKey, JSON_RESOURCE) } returns Single.just(ENCRYPTED_RESOURCE)
@@ -111,13 +111,12 @@ class FhirServiceTest {
     @Throws(FhirException::class)
     fun `Given encryptResource is called with a DataResource, it encrypts it`() {//encryptResource_shouldReturnEncryptedResource
         // Given
-        val resource = mockk<DataResource>()
         val raw = ByteArray(1)
+        val resource = DataResource(raw)
 
         val encrypted = ByteArray(23)
         val encoded = "encryptedResource"
 
-        every { resource.asByteArray() } returns raw
         every {
             cryptoService.encrypt(
                     dataKey,
@@ -137,7 +136,7 @@ class FhirServiceTest {
     @Throws(FhirException::class)
     fun `Given, encryptResource is called with a FhirResource, it fails on a Parser Error`() {//encryptResource_shouldThrowException_whenParseErrorHappens() {
         // given
-        val resource = mockk<Fhir3Resource>()
+        val resource = Fhir3Resource()
 
         every { SdkFhirParser.fromResource(resource) } throws parseException
 
@@ -159,7 +158,7 @@ class FhirServiceTest {
     @Throws(FhirException::class)
     fun `Given, encryptResource is called with a FhirResource, it fails on a Encryption Error`() {//encryptResource_shouldThrowException_whenEncryptErrorHappens() {
         // given
-        val resource = mockk<Fhir3Resource>()
+        val resource = Fhir3Resource()
 
         every { SdkFhirParser.fromResource(resource) } returns JSON_RESOURCE
         every { cryptoService.encryptString(dataKey, JSON_RESOURCE) } throws unkwnownException

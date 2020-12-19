@@ -45,6 +45,7 @@ import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
 import care.data4life.sdk.test.util.AttachmentBuilder
 import care.data4life.sdk.util.Base64
+import care.data4life.sdk.util.HashUtil
 import care.data4life.sdk.wrapper.FhirElementFactoryTest
 import io.mockk.every
 import io.mockk.mockk
@@ -72,7 +73,7 @@ abstract class RecordServiceTestBase {
     internal lateinit var mockFhirService: FhirService
     internal lateinit var mockAttachmentService: AttachmentContract.Service
     internal lateinit var mockCryptoService: CryptoService
-    private lateinit var mockErrorHandler: D4LErrorHandler
+    internal lateinit var mockErrorHandler: D4LErrorHandler
     internal lateinit var mockCarePlan: CarePlan
     internal lateinit var mockDataResource: DataResource
     internal lateinit var mockDocumentReference: DocumentReference
@@ -100,6 +101,7 @@ abstract class RecordServiceTestBase {
     internal lateinit var recordServiceK: RecordService
     internal lateinit var attachmentService: AttachmentContract.Service
     internal lateinit var apiService: ApiService
+    internal lateinit var cryptoService: CryptoService
 
     private lateinit var mockitoSession: MockitoSession
 
@@ -116,6 +118,7 @@ abstract class RecordServiceTestBase {
         // mockk compatibitlity
         attachmentService = mockk()
         apiService = mockk()
+        cryptoService = mockk()
 
         recordService = Mockito.spy(
                 RecordService(
@@ -140,7 +143,7 @@ abstract class RecordServiceTestBase {
                         mockTaggingService,
                         mockFhirService,
                         attachmentService,
-                        mockCryptoService,
+                        cryptoService,
                         mockErrorHandler
                 )
         )
@@ -231,6 +234,9 @@ abstract class RecordServiceTestBase {
 
         mockkStatic(Fhir3AttachmentHelper::class)
         mockkStatic(Fhir4AttachmentHelper::class)
+
+        mockkObject(HashUtil)
+        mockkObject(Base64)
 
         mockitoSession = Mockito.mockitoSession().startMocking()
     }

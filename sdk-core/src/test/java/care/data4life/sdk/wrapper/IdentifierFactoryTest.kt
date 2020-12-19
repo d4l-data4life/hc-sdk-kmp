@@ -56,7 +56,7 @@ class IdentifierFactoryTest {
     @Test
     fun `Given, wrap is called with a Fhir4Identifier, it returns a Attachment`() {
         // When
-        val wrapped: Any = SdkIdentifierFactory.wrap(mockk<Fhir4Identifier>())
+        val wrapped: Any = SdkIdentifierFactory.wrap(Fhir4Identifier())
 
         // Then
         assertTrue(wrapped is WrapperContract.Identifier)

@@ -46,6 +46,7 @@ import care.data4life.sdk.model.SdkRecordFactory
 import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.RecordFactory
+import care.data4life.sdk.network.DecryptedRecordBuilder
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
@@ -114,7 +115,7 @@ class RecordService(
 
         val data = extractUploadData(resource)
         val createdRecord = Single.just(
-                care.data4life.sdk.network.DecryptedRecordBuilder()
+                DecryptedRecordBuilder()
                         .setAnnotations(annotations)
                         .build(
                                 resource,
@@ -270,9 +271,9 @@ class RecordService(
     ): Single<List<BaseRecord<T>>> {
         val startTime = if (startDate != null) DATE_FORMATTER.format(startDate) else null
         val endTime = if (endDate != null) DATE_FORMATTER.format(endDate) else null
-        @Suppress("UNCHECKED_CAST")
+
         return Observable
-                .fromCallable { taggingService.getTagFromType(resourceType as Class<Any>) }
+                .fromCallable { taggingService.getTagFromType(resourceType as Class<Any>?) }
                 .map { tagEncryptionService.encryptTags(it) as MutableList<String> }
                 .map { tags ->
                     tags.also {
@@ -522,10 +523,7 @@ class RecordService(
         apiService.getCount(alias, userId, null)
     } else {
         Single
-                .fromCallable {
-                    @Suppress("UNCHECKED_CAST")
-                    taggingService.getTagFromType(type as Class<Any>)
-                }
+                .fromCallable { taggingService.getTagFromType(type as Class<Any>?) }
                 .map { tagEncryptionService.encryptTags(it) as MutableList<String> }
                 .map { tags -> tags.also { it.addAll(tagEncryptionService.encryptAnnotations(annotations)) } }
                 .flatMap { apiService.getCount(alias, userId, it) }
@@ -604,7 +602,7 @@ class RecordService(
 
         val tags = tagEncryptionService.decryptTags(record.encryptedTags)
 
-        val builder = care.data4life.sdk.network.DecryptedRecordBuilder()
+        val builder = DecryptedRecordBuilder()
                 .setIdentifier(record.identifier)
                 .setTags( tags )
                 .setAnnotations(
@@ -788,7 +786,7 @@ class RecordService(
             setUploadData(
                     record,
                     attachmentData
-            ) as DecryptedBaseRecord<T>
+            )
         }
     }
 
@@ -835,6 +833,7 @@ class RecordService(
         val validAttachments: MutableList<WrapperContract.Attachment> = arrayListOf()
         for (rawAttachment in attachments) {
             if (rawAttachment != null) {
+
                 val attachment = attchachmentFactory.wrap(rawAttachment)
 
                 when {
@@ -853,6 +852,7 @@ class RecordService(
                 }
             }
         }
+
         if (validAttachments.isNotEmpty()) {
             updateFhirResourceIdentifier(
                     resource,
@@ -954,7 +954,7 @@ class RecordService(
             return record
         }
 
-        val resource = record.resource as Fhir3Resource
+        val resource = record.resource
         if (!fhirAttachmentHelper.hasAttachment(resource)) return record
         val rawAttachments = fhirAttachmentHelper.getAttachment(resource) as List<Fhir3Attachment?>?
         val attachments = mutableListOf<WrapperContract.Attachment>()
@@ -1016,9 +1016,16 @@ class RecordService(
         }
     }
 
+    /*
+     *   TODO: This function makes a false assumption. It claims, that the output of the attachmentService.upload
+     *    matches List<String?>?, but it is actually List<String?>. This means the claim of the former author that second (the list)
+     *    is a indicator for a type is wrong.
+     */
+
+
     internal fun updateFhirResourceIdentifier(
             resource: Any,
-            result: List<Pair<WrapperContract.Attachment, List<String>?>>
+            result: List<Pair<WrapperContract.Attachment, List<String?>?>>
     ) {
         val sb = StringBuilder()
         for ((attachment, second) in result) {
@@ -1150,7 +1157,6 @@ class RecordService(
             record: DecryptedBaseRecord<T>
     ): DecryptedBaseRecord<T> {
         return record.also {
-            @Suppress("UNCHECKED_CAST")
             when(record.resource) {
                 is Fhir3Resource -> (record as DecryptedFhir3Record<Fhir3Resource>).resource.id = record.identifier
                 is Fhir4Resource -> (record as DecryptedFhir4Record<Fhir4Resource>).resource.id = record.identifier

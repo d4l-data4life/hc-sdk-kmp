@@ -37,8 +37,7 @@ import kotlin.collections.HashMap
 // TODO internal
 class FhirService @JvmOverloads constructor(
         private val cryptoService: CryptoService,
-        private val parserFhir3: FhirParser<Any> = Fhir().createStu3Parser(),
-        private val parserFhir4: FhirParser<Any> = Fhir().createR4Parser()
+        private val parserFhir3: FhirParser<Any> = Fhir().createStu3Parser()
 ) : FhirContract.Service {
     private val parser: WrapperContract.FhirParser = SdkFhirParser
 

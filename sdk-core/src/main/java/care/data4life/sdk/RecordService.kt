@@ -220,10 +220,7 @@ class RecordService(
                 .fetchRecord(alias, userId, recordId)
                 .map { decryptRecord<T>(it, userId) }
                 .map { assignResourceId(it) }
-                .map { decryptedRecord ->
-                    @Suppress("UNCHECKED_CAST")
-                    recordFactory.getInstance(decryptedRecord)
-                }
+                .map { recordFactory.getInstance(it) }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -384,7 +381,6 @@ class RecordService(
     ): Single<Record<T>> = apiService
             .fetchRecord(alias, userId, recordId)
             .map { encryptedRecord ->
-                @Suppress("UNCHECKED_CAST")
                 decryptRecord<T>(encryptedRecord, userId) as DecryptedFhir3Record<T>
             }
             .map { downloadData(it, userId) }
@@ -395,7 +391,6 @@ class RecordService(
             }
             .map { assignResourceId(it) }
             .map { decryptedRecord ->
-                @Suppress("UNCHECKED_CAST")
                 recordFactory.getInstance(decryptedRecord) as Record<T>
             }
 
@@ -428,15 +423,12 @@ class RecordService(
         checkDataRestrictions(resource)
         val data = extractUploadData(resource)
 
-        @Suppress("UNCHECKED_CAST")
         return apiService
                 .fetchRecord(alias, userId, recordId)
                 .map { decryptRecord<T>(it, userId) } //Fixme: Resource clash
                 .map { updateData(it, resource, userId) }
                 .map { decryptedRecord ->
-                    if (isFhir(resource)) {
-                        cleanObsoleteAdditionalIdentifiers(resource)
-                    }
+                    cleanObsoleteAdditionalIdentifiers(resource)
 
                     decryptedRecord.also {
                         it.resource = resource
@@ -452,7 +444,7 @@ class RecordService(
                 .map { decryptRecord<T>(it, userId) }
                 .map { restoreUploadData(it, resource, data) }
                 .map { assignResourceId(it) }
-                .map { recordFactory.getInstance(it)  }
+                .map { recordFactory.getInstance(it) }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -471,6 +463,8 @@ class RecordService(
     ) as Single<Record<T>>
 
     @Suppress("UNCHECKED_CAST")
+    @Throws(DataRestrictionException.UnsupportedFileType::class,
+            DataRestrictionException.MaxDataSizeViolation::class)
     override fun <T : Fhir4Resource> updateRecord(
             userId: String,
             recordId: String,
@@ -587,7 +581,6 @@ class RecordService(
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
     @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
     internal fun <T : Any> decryptRecord(
             record: EncryptedRecord,
@@ -626,7 +619,7 @@ class RecordService(
 
         return builder.build(
                 if(record.encryptedBody == null || record.encryptedBody.isEmpty()) {
-                    null
+                    null// Fixme: This is a potential bug
                 } else {
                     fhirService.decryptResource<T>(
                         dataKey,
@@ -754,7 +747,6 @@ class RecordService(
     internal fun <T : Any> removeUploadData(
             record: DecryptedBaseRecord<T>
     ): DecryptedBaseRecord<T> {
-        @Suppress("UNCHECKED_CAST")
         return if (isFhir(record.resource)) {
             setUploadData(
                     record,
@@ -776,7 +768,6 @@ class RecordService(
 
         record.resource = originalResource
 
-        @Suppress("UNCHECKED_CAST")
         return if (attachmentData == null) {
             record
         } else {
@@ -1104,8 +1095,8 @@ class RecordService(
     @Throws(DataValidationException.IdUsageViolation::class)
     fun <T : Any> cleanObsoleteAdditionalIdentifiers(resource: T?) {
         if (
-                resource != null &&
-                fhirAttachmentHelper.hasAttachment(resource) &&
+                isFhir(resource) &&
+                fhirAttachmentHelper.hasAttachment(resource!!) &&
                 fhirAttachmentHelper.getAttachment(resource)?.isNotEmpty() == true
         ) {
             val identifiers = fhirAttachmentHelper.getIdentifier(resource)

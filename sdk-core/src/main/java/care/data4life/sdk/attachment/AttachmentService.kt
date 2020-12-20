@@ -24,9 +24,7 @@ import care.data4life.sdk.log.Log
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
-import care.data4life.sdk.wrapper.SdkAttachmentFactory
 import care.data4life.sdk.wrapper.WrapperContract
-import care.data4life.sdk.wrapper.WrapperFactoryContract
 import io.reactivex.Observable
 import io.reactivex.Single
 import java.util.*

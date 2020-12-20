@@ -297,11 +297,8 @@ class RecordService(
                     if (resourceType == null) {
                         it
                     } else {
-                        it
-                                .filter { decryptedRecord -> resourceType.isAssignableFrom(decryptedRecord.resource::class.java) }
-                                .filter { decryptedRecord -> decryptedRecord.annotations.containsAll(annotations) }
-
-                    }
+                        it.filter { decryptedRecord -> resourceType.isAssignableFrom(decryptedRecord.resource::class.java) }
+                    }.filter { decryptedRecord -> decryptedRecord.annotations.containsAll(annotations) }
                 }
                 .map { assignResourceId(it) }
                 .map { recordFactory.getInstance(it) }

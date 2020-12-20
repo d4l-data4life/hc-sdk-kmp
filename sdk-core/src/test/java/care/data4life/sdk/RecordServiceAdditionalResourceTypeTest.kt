@@ -690,7 +690,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         val result = test
                 .assertNoErrors()
                 .assertComplete()
-                //.assertValue(attachments)
+                .assertValue(listOf(attachments[0].unwrap(), attachments[1].unwrap()))
                 .values()[0]
         Truth.assertThat(result[0].id).isEqualTo(ATTACHMENT_ID)
         Truth.assertThat(result[1].id).isEqualTo(secondAttachmentId)
@@ -758,7 +758,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         val result = test
                 .assertNoErrors()
                 .assertComplete()
-                //.assertValue(attachments)
+                .assertValue(listOf(attachments[0].unwrap(), attachments[1].unwrap()))
                 .values()[0]
         Truth.assertThat(result[0].id).isEqualTo(ATTACHMENT_ID)
         Truth.assertThat(result[1].id).isEqualTo(secondAttachmentId)

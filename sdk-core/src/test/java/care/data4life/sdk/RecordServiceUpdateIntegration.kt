@@ -910,6 +910,7 @@ class RecordServiceUpdateIntegration: RecordServiceIntegrationBase() {
                 null,
                 ModelVersion.CURRENT
         ).also { it.updatedDate = UPDATE_DATE }
+
         updatedEncryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,

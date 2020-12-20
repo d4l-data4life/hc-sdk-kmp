@@ -222,7 +222,7 @@ class RecordService(
                 .map { assignResourceId(it) }
                 .map { decryptedRecord ->
                     @Suppress("UNCHECKED_CAST")
-                    recordFactory.getInstance(decryptedRecord) as BaseRecord<T>
+                    recordFactory.getInstance(decryptedRecord)
                 }
     }
 
@@ -294,7 +294,7 @@ class RecordService(
                 .flatMapIterable { it }
                 .map { decryptRecord<T>(it, userId) }
                 .let {
-                    if (resourceType ==null) {
+                    if (resourceType == null) {
                         it
                     } else {
                         it

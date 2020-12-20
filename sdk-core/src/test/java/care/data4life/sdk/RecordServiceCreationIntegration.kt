@@ -185,8 +185,8 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
         // decrypt record
         every { cryptoService.hasCommonKey(commonKeyId) } returns true
         every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
+        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
         every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
 
         // When
@@ -360,8 +360,8 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
         // decrypt record
         every { cryptoService.hasCommonKey(commonKeyId) } returns true
         every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
+        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
         every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
 
         // When
@@ -488,8 +488,8 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
         // decrypt record
         every { cryptoService.hasCommonKey(commonKeyId) } returns true
         every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
+        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
         every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
 
         // When
@@ -663,8 +663,8 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
         // decrypt record
         every { cryptoService.hasCommonKey(commonKeyId) } returns true
         every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
+        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
         every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
 
         // When

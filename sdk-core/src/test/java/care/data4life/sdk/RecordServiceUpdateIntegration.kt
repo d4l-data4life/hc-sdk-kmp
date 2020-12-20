@@ -578,8 +578,8 @@ class RecordServiceUpdateIntegration: RecordServiceIntegrationBase() {
         every { cryptoService.storeCommonKey(commonKeyId, commonKey) } returns Unit
 
         // decrypt Resource
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
+        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
         every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
 
         // upload
@@ -1136,8 +1136,8 @@ class RecordServiceUpdateIntegration: RecordServiceIntegrationBase() {
         every { cryptoService.storeCommonKey(commonKeyId, commonKey) } returns Unit
 
         // decrypt Resource
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
+        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
         every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
 
         // upload

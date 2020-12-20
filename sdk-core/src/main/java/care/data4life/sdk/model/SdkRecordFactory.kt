@@ -52,14 +52,14 @@ internal object SdkRecordFactory : RecordFactory {
                     record.annotations
             )
             is DecryptedFhir4Record -> Fhir4Record(
-                    record.identifier!!,//FIXME
+                    record.identifier ?: "",//FIXME
                     record.resource as Fhir4Resource,
                     buildMeta(record),
                     record.annotations
             )
             // TODO app data
             is DecryptedCustomDataRecord -> DataRecord(
-                    record.identifier!!,
+                    record.identifier ?: "",//FIXME
                     record.resource,
                     buildMeta(record),
                     record.annotations

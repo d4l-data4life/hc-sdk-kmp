@@ -104,7 +104,7 @@ class RecordService(
     private val attchachmentFactory: WrapperFactoryContract.AttachmentFactory = SdkAttachmentFactory
     private val identifierFactory: WrapperFactoryContract.IdentifierFactory = SdkIdentifierFactory
 
-    private fun isFhir(resource: Any): Boolean = resource is Fhir3Resource || resource is Fhir4Resource
+    private fun isFhir(resource: Any?): Boolean = resource is Fhir3Resource || resource is Fhir4Resource
 
     private fun <T : Any> createRecord(
             userId: String,
@@ -604,7 +604,7 @@ class RecordService(
 
         val builder = DecryptedRecordBuilder()
                 .setIdentifier(record.identifier)
-                .setTags( tags )
+                .setTags(tags)
                 .setAnnotations(
                         tagEncryptionService.decryptAnnotations(record.encryptedTags)
                 )
@@ -819,10 +819,10 @@ class RecordService(
             return record
         }
 
-        val resource: Fhir3Resource = record.resource as Fhir3Resource
+        val resource = record.resource
 
         if (!fhirAttachmentHelper.hasAttachment(resource)) return record
-        val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Fhir3Attachment?>?
+        val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Any?>?
 
         attachments ?: return record
 
@@ -1135,8 +1135,8 @@ class RecordService(
 
     @Throws(DataRestrictionException.MaxDataSizeViolation::class, DataRestrictionException.UnsupportedFileType::class)
     fun <T : Any> checkDataRestrictions(resource: T?) {
-        if (resource is Fhir3Resource && fhirAttachmentHelper.hasAttachment(resource)) {
-            val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Fhir3Attachment?>
+        if (isFhir(resource) && fhirAttachmentHelper.hasAttachment(resource!!)) {
+            val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Any?>
             for (rawAttachment in attachments) {
                 rawAttachment ?: return
 

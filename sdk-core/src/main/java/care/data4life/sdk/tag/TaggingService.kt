@@ -19,7 +19,6 @@ import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir3Version
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.Fhir4Version
-import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.wrapper.SdkFhirElementFactory
 import care.data4life.sdk.wrapper.WrapperContract
 import java.util.*

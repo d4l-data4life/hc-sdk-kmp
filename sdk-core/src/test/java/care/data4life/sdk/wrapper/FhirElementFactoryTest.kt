@@ -22,6 +22,7 @@ import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.test.util.AttachmentBuilder
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -89,12 +90,55 @@ class FhirElementFactoryTest {
     }
 
     @Test
+    fun `Given, getFhir3ClassForType is called with a Fhir3Resource in a non canonical form, it returns a Fhir3 resource class`() {
+        val klass = SdkFhirElementFactory.getFhir3ClassForType("documentreference")
+
+        assertEquals(
+                klass,
+                DocumentReferenceFhir3::class.java
+        )
+    }
+
+    @Test
     fun `Given, getFhir3ClassForType is called with a unknown Fhir3Resource String, it returns a null`() {
         assertNull(SdkFhirElementFactory.getFhir3ClassForType("I will bug you"))
     }
 
     @Test
-    fun `Given, getFhir4ClassForType is called with a Fhir3Resource String, it returns a Fhir3 resource class`() {
+    fun `Given, getFhir3ClassForType is called, with any valid Fhir3Resource in string representation, it returns its resource class`() {
+        val resources = listOf(
+                "specimen",
+                "substance",
+                "valueSet",
+                "referralRequest",
+                "documentReference",
+                "diagnosticReport",
+                "medication",
+                "questionnaire",
+                "goal",
+                "carePlan",
+                "careTeam",
+                "questionnaireResponse",
+                "procedureRequest",
+                "practitioner",
+                "patient",
+                "procedure",
+                "condition",
+                "familyMemberHistory",
+                "organization",
+                "medicationRequest",
+                "observation",
+                "provenance"
+        )
+
+        for(type in resources) {
+            assertNotNull(SdkFhirElementFactory.getFhir3ClassForType(type))
+        }
+    }
+
+
+    @Test
+    fun `Given, getFhir4ClassForType is called with a Fhir4Resource String, it returns a Fhir4 resource class`() {
         val klass = SdkFhirElementFactory.getFhir4ClassForType("DocumentReference")
 
         assertEquals(
@@ -104,8 +148,52 @@ class FhirElementFactoryTest {
     }
 
     @Test
-    fun `Given, getFhir4ClassForType is called with a unknown Fhir3Resource String, it returns a null`() {
+    fun `Given, getFhir4ClassForType is called with a Fhir4Resource in a non canonical form, it returns a Fhir4 resource class`() {
+        val klass = SdkFhirElementFactory.getFhir4ClassForType("documentreference")
+
+        assertEquals(
+                klass,
+                DocumentReferenceFhir4::class.java
+        )
+    }
+
+    @Test
+    fun `Given, getFhir4ClassForType is called with a unknown Fhir4Resource String, it returns a null`() {
         assertNull(SdkFhirElementFactory.getFhir4ClassForType("I will bug you"))
+    }
+
+    @Test
+    fun `Given, getFhir4ClassForType is called, with any valid Fhir4Resource in string representation, it returns its resource class`() {
+        val resources = listOf(
+                "Specimen",
+                "ServiceRequest",
+                "Substance",
+                "ValueSet",
+                "DocumentReference",
+                "DiagnosticReport",
+                "Encounter",
+                "Medication",
+                "Questionnaire",
+                "Goal",
+                "CarePlan",
+                "CareTeam",
+                "QuestionnaireResponse",
+                "Practitioner",
+                "Patient",
+                "Procedure",
+                "Condition",
+                "FamilyMemberHistory",
+                "Organization",
+                "MedicationRequest",
+                "Observation",
+                "Location",
+                "Provenance"
+        )
+
+        for(type in resources) {
+            assertNotNull(SdkFhirElementFactory.getFhir4ClassForType(type))
+        }
+
     }
 
     companion object {

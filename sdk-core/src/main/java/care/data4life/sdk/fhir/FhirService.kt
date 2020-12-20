@@ -77,7 +77,7 @@ class FhirService @JvmOverloads constructor(
     private fun encryptFhirResource(dataKey: GCKey, resource: Any): String {
         return Single
                 .just(resource)
-                .map {parser.fromResource(it) }
+                .map { parser.fromResource(it) }
                 .flatMap { cryptoService.encryptString(dataKey, it) }
                 .onErrorResumeNext { error ->
                     Single.error(

@@ -16,6 +16,7 @@
 
 package care.data4life.sdk
 
+import care.data4life.crypto.GCKey
 import care.data4life.crypto.KeyType
 import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.call.DataRecord
@@ -76,39 +77,11 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
         encryptedAttachmentKey = mockk()
     }
 
-    @Test
-    fun `Given, createFhir3Record is called with the appropriate payload without Annotations, it creates a Record for Fhir3`() {
-        // Given
-        val resource = buildDocumentReferenceFhir3()
-
-        val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
-                "fhirversion" to "fhirversion=3.0.1",
-                "resourcetype" to "resourcetype=documentreference"
-        )
-
-        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
-        encryptedBody = "ZW5jcnlwdGVk"
-
-        encryptedRecord = EncryptedRecord(
-                commonKeyId,
-                RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249My4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
-                encryptedBody,
-                CREATION_DATE,
-                encryptedDataKey,
-                encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
-
-        val gcKeys = mutableListOf(
-                dataKey,
-                attachmentKey,
-                dataKey,
-                attachmentKey
-        )
-
+    private fun runFhirFlow(
+            tags: Map<String, String>,
+            annotations: Map<String, String> = mapOf(),
+            gcKeys: MutableList<GCKey>
+    ) {
         // constrain check
         every { MimeType.recognizeMimeType(Base64.decode(ATTACHMENT_PAYLOAD)) } returns MimeType.PDF
         // get tags
@@ -143,6 +116,25 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
                     tags["resourcetype"]!!.toByteArray()
             ), IV)
         } returns tags["resourcetype"]!!.toByteArray()
+
+        // encrypt annotations
+        if(annotations.isNotEmpty()) {
+            every {
+                cryptoService.symEncrypt(tagEncryptionKey, eq(
+                        annotations["wow"]!!.toByteArray()
+                ), IV)
+            } returns annotations["wow"]!!.toByteArray()
+            every {
+                cryptoService.symEncrypt(tagEncryptionKey, eq(
+                        annotations["it"]!!.toByteArray()
+                ), IV)
+            } returns annotations["it"]!!.toByteArray()
+            every {
+                cryptoService.symEncrypt(tagEncryptionKey, eq(
+                        annotations["works"]!!.toByteArray()
+                ), IV)
+            } returns annotations["works"]!!.toByteArray()
+        }
 
         // encrypt Resource
         every { cryptoService.fetchCurrentCommonKey() } returns commonKey
@@ -182,12 +174,168 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
             ), IV)
         } returns tags["resourcetype"]!!.toByteArray()
 
+        //decrypt annotations
+        if(annotations.isNotEmpty()) {
+            every {
+                cryptoService.symDecrypt(tagEncryptionKey, eq(
+                        annotations["wow"]!!.toByteArray()
+                ), IV)
+            } returns annotations["wow"]!!.toByteArray()
+            every {
+                cryptoService.symDecrypt(tagEncryptionKey, eq(
+                        annotations["it"]!!.toByteArray()
+                ), IV)
+            } returns annotations["it"]!!.toByteArray()
+            every {
+                cryptoService.symDecrypt(tagEncryptionKey, eq(
+                        annotations["works"]!!.toByteArray()
+                ), IV)
+            } returns annotations["works"]!!.toByteArray()
+        }
+
         // decrypt record
         every { cryptoService.hasCommonKey(commonKeyId) } returns true
         every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
         every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
+    }
+
+    private fun runDatalow(
+            resource: DataResource,
+            encryptedResource: ByteArray,
+            tags: Map<String, String>,
+            annotations: Map<String, String> = mapOf(),
+            gcKeys: MutableList<GCKey>
+    ) {
+        // encrypt Record
+        // get tags
+        every { cryptoService.generateGCKey() } answers {
+            Single.just(gcKeys.removeAt(0))
+        }
+
+        // encrypt tags
+        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
+        every {
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["partner"]!!.toByteArray()
+            ), IV)
+        } returns tags["partner"]!!.toByteArray()
+        every {
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["client"]!!.toByteArray()
+            ), IV)
+        } returns tags["client"]!!.toByteArray()
+        every {
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["flag"]!!.toByteArray()
+            ), IV)
+        } returns tags["flag"]!!.toByteArray()
+
+        // encrypt annotations
+        if(annotations.isNotEmpty()) {
+            every {
+                cryptoService.symEncrypt(tagEncryptionKey, eq(
+                        annotations["wow"]!!.toByteArray()
+                ), IV)
+            } returns annotations["wow"]!!.toByteArray()
+            every {
+                cryptoService.symEncrypt(tagEncryptionKey, eq(
+                        annotations["it"]!!.toByteArray()
+                ), IV)
+            } returns annotations["it"]!!.toByteArray()
+            every {
+                cryptoService.symEncrypt(tagEncryptionKey, eq(
+                        annotations["works"]!!.toByteArray()
+                ), IV)
+            } returns annotations["works"]!!.toByteArray()
+        }
+
+        // encrypt Resource
+        every { cryptoService.fetchCurrentCommonKey() } returns commonKey
+        every { cryptoService.currentCommonKeyId } returns commonKeyId
+        every { cryptoService.encryptSymmetricKey(commonKey, KeyType.DATA_KEY, dataKey) } returns Single.just(encryptedDataKey)
+        every { cryptoService.encrypt(dataKey, resource.value) } returns Single.just(encryptedResource)
+
+        every { apiService.createRecord(ALIAS, USER_ID, any()) } returns Single.just(encryptedRecord)
+
+        // decrypt tags
+        every {
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["partner"]!!.toByteArray()
+            ), IV)
+        } returns tags["partner"]!!.toByteArray()
+        every {
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["client"]!!.toByteArray()
+            ), IV)
+        } returns tags["client"]!!.toByteArray()
+        every {
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["flag"]!!.toByteArray()
+            ), IV)
+        } returns tags["flag"]!!.toByteArray()
+
+        //decrypt annotations
+        if(annotations.isNotEmpty()) {
+            every {
+                cryptoService.symDecrypt(tagEncryptionKey, eq(
+                        annotations["wow"]!!.toByteArray()
+                ), IV)
+            } returns annotations["wow"]!!.toByteArray()
+            every {
+                cryptoService.symDecrypt(tagEncryptionKey, eq(
+                        annotations["it"]!!.toByteArray()
+                ), IV)
+            } returns annotations["it"]!!.toByteArray()
+            every {
+                cryptoService.symDecrypt(tagEncryptionKey, eq(
+                        annotations["works"]!!.toByteArray()
+                ), IV)
+            } returns annotations["works"]!!.toByteArray()
+        }
+
+        // decrypt record
+        every { cryptoService.hasCommonKey(commonKeyId) } returns true
+        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
+        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
+        every { cryptoService.decrypt(dataKey, encryptedResource) } returns Single.just(resource.value)
+    }
+
+    @Test
+    fun `Given, createFhir3Record is called with the appropriate payload without Annotations, it creates a Record for Fhir3`() {
+        // Given
+        val resource = buildDocumentReferenceFhir3()
+
+        val tags = mapOf(
+                "partner" to "partner=TEST",
+                "client" to "client=TEST",
+                "fhirversion" to "fhirversion=3.0.1",
+                "resourcetype" to "resourcetype=documentreference"
+        )
+
+        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        encryptedBody = "ZW5jcnlwdGVk"
+
+        encryptedRecord = EncryptedRecord(
+                commonKeyId,
+                RECORD_ID,
+                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249My4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                encryptedBody,
+                CREATION_DATE,
+                encryptedDataKey,
+                encryptedAttachmentKey,
+                ModelVersion.CURRENT
+        ).also { it.updatedDate = UPDATE_DATE }
+
+        val gcKeys = mutableListOf(
+                dataKey,
+                attachmentKey,
+                dataKey,
+                attachmentKey
+        )
+
+        runFhirFlow(tags, gcKeys = gcKeys)
 
         // When
         val result = recordService.createRecord(
@@ -250,119 +398,7 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
                 attachmentKey
         )
 
-        // constrain check
-        every { MimeType.recognizeMimeType(Base64.decode(ATTACHMENT_PAYLOAD)) } returns MimeType.PDF
-        // get tags
-        every { cryptoService.generateGCKey() } answers {
-            Single.just(gcKeys.removeAt(0))
-        }
-        every {
-            fileService.uploadFile(attachmentKey, USER_ID, Base64.decode(ATTACHMENT_PAYLOAD))
-        } returns Single.just(ATTACHMENT_ID)
-        every { imageResizer.isResizable(byteArrayOf(117, -85, 90)) } returns false
-
-        // Encrypt Record
-        // encrypt tags
-        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["partner"]!!.toByteArray()
-            ), IV)
-        } returns tags["partner"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["client"]!!.toByteArray()
-            ), IV)
-        } returns tags["client"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["fhirversion"]!!.toByteArray()
-            ), IV)
-        } returns tags["fhirversion"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["resourcetype"]!!.toByteArray()
-            ), IV)
-        } returns tags["resourcetype"]!!.toByteArray()
-
-        // encrypt annotations
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    annotations["wow"]!!.toByteArray()
-            ), IV)
-        } returns annotations["wow"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    annotations["it"]!!.toByteArray()
-            ), IV)
-        } returns annotations["it"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    annotations["works"]!!.toByteArray()
-            ), IV)
-        } returns annotations["works"]!!.toByteArray()
-
-        // encrypt Resource
-        every { cryptoService.fetchCurrentCommonKey() } returns commonKey
-        every { cryptoService.currentCommonKeyId } returns commonKeyId
-        every { cryptoService.encryptSymmetricKey(commonKey, KeyType.DATA_KEY, dataKey) } returns Single.just(encryptedDataKey)
-        every { cryptoService.encryptString(dataKey, stringifiedResource) } returns Single.just(encryptedBody)
-
-        //encrypt Attachment
-        every {
-            cryptoService.encryptSymmetricKey(commonKey, KeyType.ATTACHMENT_KEY, attachmentKey)
-        } returns Single.just(encryptedAttachmentKey)
-        every {
-            fileService.uploadFile(attachmentKey, USER_ID, Base64.decode(ATTACHMENT_PAYLOAD))
-        } returns Single.just(RECORD_ID)
-
-        every { apiService.createRecord(ALIAS, USER_ID, any()) } returns Single.just(encryptedRecord)
-
-        // decrypt tags
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["partner"]!!.toByteArray()
-            ), IV)
-        } returns tags["partner"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["client"]!!.toByteArray()
-            ), IV)
-        } returns tags["client"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["fhirversion"]!!.toByteArray()
-            ), IV)
-        } returns tags["fhirversion"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["resourcetype"]!!.toByteArray()
-            ), IV)
-        } returns tags["resourcetype"]!!.toByteArray()
-
-        //decrypt annotations
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    annotations["wow"]!!.toByteArray()
-            ), IV)
-        } returns annotations["wow"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    annotations["it"]!!.toByteArray()
-            ), IV)
-        } returns annotations["it"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    annotations["works"]!!.toByteArray()
-            ), IV)
-        } returns annotations["works"]!!.toByteArray()
-
-        // decrypt record
-        every { cryptoService.hasCommonKey(commonKeyId) } returns true
-        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
-        every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
+        runFhirFlow(tags, annotations, gcKeys)
 
         // When
         val result = recordService.createRecord(
@@ -412,85 +448,7 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
                 attachmentKey
         )
 
-        // constrain check
-        every { MimeType.recognizeMimeType(Base64.decode(ATTACHMENT_PAYLOAD)) } returns MimeType.PDF
-        // get tags
-        every { cryptoService.generateGCKey() } answers {
-            Single.just(gcKeys.removeAt(0))
-        }
-        every {
-            fileService.uploadFile(attachmentKey, USER_ID, Base64.decode(ATTACHMENT_PAYLOAD))
-        } returns Single.just(ATTACHMENT_ID)
-        every { imageResizer.isResizable(byteArrayOf(117, -85, 90)) } returns false
-
-        // encrypt Record
-        // encrypt tags
-        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["partner"]!!.toByteArray()
-            ), IV)
-        } returns tags["partner"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["client"]!!.toByteArray()
-            ), IV)
-        } returns tags["client"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["fhirversion"]!!.toByteArray()
-            ), IV)
-        } returns tags["fhirversion"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["resourcetype"]!!.toByteArray()
-            ), IV)
-        } returns tags["resourcetype"]!!.toByteArray()
-
-        // encrypt Resource
-        every { cryptoService.fetchCurrentCommonKey() } returns commonKey
-        every { cryptoService.currentCommonKeyId } returns commonKeyId
-        every { cryptoService.encryptSymmetricKey(commonKey, KeyType.DATA_KEY, dataKey) } returns Single.just(encryptedDataKey)
-        every { cryptoService.encryptString(dataKey, stringifiedResource) } returns Single.just(encryptedBody)
-
-        //encrypt Attachment
-        every {
-            cryptoService.encryptSymmetricKey(commonKey, KeyType.ATTACHMENT_KEY, attachmentKey)
-        } returns Single.just(encryptedAttachmentKey)
-        every {
-            fileService.uploadFile(attachmentKey, USER_ID, Base64.decode(ATTACHMENT_PAYLOAD))
-        } returns Single.just(RECORD_ID)
-
-        every { apiService.createRecord(ALIAS, USER_ID, any()) } returns Single.just(encryptedRecord)
-
-        // decrypt tags
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["partner"]!!.toByteArray()
-            ), IV)
-        } returns tags["partner"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["client"]!!.toByteArray()
-            ), IV)
-        } returns tags["client"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["fhirversion"]!!.toByteArray()
-            ), IV)
-        } returns tags["fhirversion"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["resourcetype"]!!.toByteArray()
-            ), IV)
-        } returns tags["resourcetype"]!!.toByteArray()
-
-        // decrypt record
-        every { cryptoService.hasCommonKey(commonKeyId) } returns true
-        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
-        every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
+        runFhirFlow(tags, gcKeys = gcKeys)
 
         // When
         val result = recordService.createRecord(
@@ -553,119 +511,7 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
                 attachmentKey
         )
 
-        // constrain check
-        every { MimeType.recognizeMimeType(Base64.decode(ATTACHMENT_PAYLOAD)) } returns MimeType.PDF
-        // get tags
-        every { cryptoService.generateGCKey() } answers {
-            Single.just(gcKeys.removeAt(0))
-        }
-        every {
-            fileService.uploadFile(attachmentKey, USER_ID, Base64.decode(ATTACHMENT_PAYLOAD))
-        } returns Single.just(ATTACHMENT_ID)
-        every { imageResizer.isResizable(byteArrayOf(117, -85, 90)) } returns false
-
-        // encrypt Record
-        // encrypt tags
-        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["partner"]!!.toByteArray()
-            ), IV)
-        } returns tags["partner"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["client"]!!.toByteArray()
-            ), IV)
-        } returns tags["client"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["fhirversion"]!!.toByteArray()
-            ), IV)
-        } returns tags["fhirversion"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["resourcetype"]!!.toByteArray()
-            ), IV)
-        } returns tags["resourcetype"]!!.toByteArray()
-
-        // encrypt annotations
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    annotations["wow"]!!.toByteArray()
-            ), IV)
-        } returns annotations["wow"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    annotations["it"]!!.toByteArray()
-            ), IV)
-        } returns annotations["it"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    annotations["works"]!!.toByteArray()
-            ), IV)
-        } returns annotations["works"]!!.toByteArray()
-
-        // encrypt Resource
-        every { cryptoService.fetchCurrentCommonKey() } returns commonKey
-        every { cryptoService.currentCommonKeyId } returns commonKeyId
-        every { cryptoService.encryptSymmetricKey(commonKey, KeyType.DATA_KEY, dataKey) } returns Single.just(encryptedDataKey)
-        every { cryptoService.encryptString(dataKey, stringifiedResource) } returns Single.just(encryptedBody)
-
-        //encrypt Attachment
-        every {
-            cryptoService.encryptSymmetricKey(commonKey, KeyType.ATTACHMENT_KEY, attachmentKey)
-        } returns Single.just(encryptedAttachmentKey)
-        every {
-            fileService.uploadFile(attachmentKey, USER_ID, Base64.decode(ATTACHMENT_PAYLOAD))
-        } returns Single.just(RECORD_ID)
-
-        every { apiService.createRecord(ALIAS, USER_ID, any()) } returns Single.just(encryptedRecord)
-
-        // decrypt tags
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["partner"]!!.toByteArray()
-            ), IV)
-        } returns tags["partner"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["client"]!!.toByteArray()
-            ), IV)
-        } returns tags["client"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["fhirversion"]!!.toByteArray()
-            ), IV)
-        } returns tags["fhirversion"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["resourcetype"]!!.toByteArray()
-            ), IV)
-        } returns tags["resourcetype"]!!.toByteArray()
-
-        //decrypt annotations
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    annotations["wow"]!!.toByteArray()
-            ), IV)
-        } returns annotations["wow"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    annotations["it"]!!.toByteArray()
-            ), IV)
-        } returns annotations["it"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    annotations["works"]!!.toByteArray()
-            ), IV)
-        } returns annotations["works"]!!.toByteArray()
-
-        // decrypt record
-        every { cryptoService.hasCommonKey(commonKeyId) } returns true
-        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
-        every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
+        runFhirFlow(tags, annotations, gcKeys)
 
         // When
         val result = recordService.createRecord(
@@ -712,60 +558,12 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
                 dataKey
         )
 
-        // encrypt Record
-        // get tags
-        every { cryptoService.generateGCKey() } answers {
-            Single.just(gcKeys.removeAt(0))
-        }
-
-        // encrypt tags
-        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["partner"]!!.toByteArray()
-            ), IV)
-        } returns tags["partner"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["client"]!!.toByteArray()
-            ), IV)
-        } returns tags["client"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["flag"]!!.toByteArray()
-            ), IV)
-        } returns tags["flag"]!!.toByteArray()
-
-        // encrypt Resource
-        every { cryptoService.fetchCurrentCommonKey() } returns commonKey
-        every { cryptoService.currentCommonKeyId } returns commonKeyId
-        every { cryptoService.encryptSymmetricKey(commonKey, KeyType.DATA_KEY, dataKey) } returns Single.just(encryptedDataKey)
-        every { cryptoService.encrypt(dataKey, resource.value) } returns Single.just(encryptedResource)
-
-        every { apiService.createRecord(ALIAS, USER_ID, any()) } returns Single.just(encryptedRecord)
-
-        // decrypt tags
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["partner"]!!.toByteArray()
-            ), IV)
-        } returns tags["partner"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["client"]!!.toByteArray()
-            ), IV)
-        } returns tags["client"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["flag"]!!.toByteArray()
-            ), IV)
-        } returns tags["flag"]!!.toByteArray()
-
-        // decrypt record
-        every { cryptoService.hasCommonKey(commonKeyId) } returns true
-        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
-        every { cryptoService.decrypt(dataKey, encryptedResource) } returns Single.just(resource.value)
+        runDatalow(
+                resource,
+                encryptedResource,
+                tags,
+                gcKeys = gcKeys
+        )
 
         // When
         val result = recordService.createRecord(
@@ -824,94 +622,13 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
                 dataKey
         )
 
-        // encrypt Record
-        // get tags
-        every { cryptoService.generateGCKey() } answers {
-            Single.just(gcKeys.removeAt(0))
-        }
-
-        // encrypt tags
-        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["partner"]!!.toByteArray()
-            ), IV)
-        } returns tags["partner"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["client"]!!.toByteArray()
-            ), IV)
-        } returns tags["client"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["flag"]!!.toByteArray()
-            ), IV)
-        } returns tags["flag"]!!.toByteArray()
-
-        // encrypt annotations
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    annotations["wow"]!!.toByteArray()
-            ), IV)
-        } returns annotations["wow"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    annotations["it"]!!.toByteArray()
-            ), IV)
-        } returns annotations["it"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    annotations["works"]!!.toByteArray()
-            ), IV)
-        } returns annotations["works"]!!.toByteArray()
-
-        // encrypt Resource
-        every { cryptoService.fetchCurrentCommonKey() } returns commonKey
-        every { cryptoService.currentCommonKeyId } returns commonKeyId
-        every { cryptoService.encryptSymmetricKey(commonKey, KeyType.DATA_KEY, dataKey) } returns Single.just(encryptedDataKey)
-        every { cryptoService.encrypt(dataKey, resource.value) } returns Single.just(encryptedResource)
-
-        every { apiService.createRecord(ALIAS, USER_ID, any()) } returns Single.just(encryptedRecord)
-
-        // decrypt tags
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["partner"]!!.toByteArray()
-            ), IV)
-        } returns tags["partner"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["client"]!!.toByteArray()
-            ), IV)
-        } returns tags["client"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["flag"]!!.toByteArray()
-            ), IV)
-        } returns tags["flag"]!!.toByteArray()
-
-        //decrypt annotations
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    annotations["wow"]!!.toByteArray()
-            ), IV)
-        } returns annotations["wow"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    annotations["it"]!!.toByteArray()
-            ), IV)
-        } returns annotations["it"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    annotations["works"]!!.toByteArray()
-            ), IV)
-        } returns annotations["works"]!!.toByteArray()
-
-        // decrypt record
-        every { cryptoService.hasCommonKey(commonKeyId) } returns true
-        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
-        every { cryptoService.decrypt(dataKey, encryptedResource) } returns Single.just(resource.value)
+        runDatalow(
+                resource,
+                encryptedResource,
+                tags,
+                annotations,
+                gcKeys
+        )
 
         // When
         val result = recordService.createRecord(

@@ -434,11 +434,11 @@ class RecordService(
         @Suppress("UNCHECKED_CAST")
         return apiService
                 .fetchRecord(alias, userId, recordId)
-                .map { decryptRecord<T>(it, userId) }
+                .map { decryptRecord<T>(it, userId) } //Fixme: Resource clash
                 .map { updateData(it, resource, userId) }
                 .map { decryptedRecord ->
                     if (isFhir(resource)) {
-                        cleanObsoleteAdditionalIdentifiers(resource as Any)
+                        cleanObsoleteAdditionalIdentifiers(resource)
                     }
 
                     decryptedRecord.also {
@@ -455,7 +455,7 @@ class RecordService(
                 .map { decryptRecord<T>(it, userId) }
                 .map { restoreUploadData(it, resource, data) }
                 .map { assignResourceId(it) }
-                .map { recordFactory.getInstance(it) }
+                .map { recordFactory.getInstance(it)  }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -886,24 +886,23 @@ class RecordService(
 
         var resource: T? = record.resource
         if (!fhirAttachmentHelper.hasAttachment(resource!!)) return record
-        val attachments =
-                if (fhirAttachmentHelper.getAttachment(resource) == null) {
-                    arrayListOf()
-                } else {
-                    fhirAttachmentHelper.getAttachment(resource)!! as List<Fhir3Attachment?>
-                }
+        val attachments = fhirAttachmentHelper.getAttachment(resource) ?: listOf<Any>()
 
         val validAttachments: MutableList<WrapperContract.Attachment> = arrayListOf()
         val oldAttachments: HashMap<String?, WrapperContract.Attachment> = hashMapOf()
 
-        for (attachment in attachments) {
-            if (attachment?.id != null) {
-                oldAttachments[attachment.id] = attchachmentFactory.wrap(attachment)
+        for (rawAttachment in attachments) {
+            if(rawAttachment != null) {
+                val attachment = attchachmentFactory.wrap(rawAttachment)
+
+                if (attachment.id != null) {
+                    oldAttachments[attachment.id] = attachment
+                }
             }
         }
 
         resource = newResource
-        val newAttachments = fhirAttachmentHelper.getAttachment(newResource) as List<Fhir3Attachment?>
+        val newAttachments = fhirAttachmentHelper.getAttachment(newResource) ?: listOf<Any>()
         for (rawNewAttachment in newAttachments) {
             if (rawNewAttachment != null) {
                 val newAttachment = attchachmentFactory.wrap(rawNewAttachment)
@@ -1084,6 +1083,7 @@ class RecordService(
             return null
         }
         val parts = identifier.value!!.split(ThumbnailService.SPLIT_CHAR.toRegex()).toTypedArray()
+
         if (parts.size != DOWNSCALED_ATTACHMENT_IDS_SIZE) {
             throw DataValidationException.IdUsageViolation(identifier.value)
         }
@@ -1105,21 +1105,28 @@ class RecordService(
     }
 
     @Throws(DataValidationException.IdUsageViolation::class)
-    fun <T : Any?> cleanObsoleteAdditionalIdentifiers(resource: T) {
-        if (fhirAttachmentHelper.hasAttachment(resource as Any) &&
-                fhirAttachmentHelper.getAttachment(resource as Any)?.isNotEmpty() == true
+    fun <T : Any> cleanObsoleteAdditionalIdentifiers(resource: T?) {
+        if (
+                resource != null &&
+                fhirAttachmentHelper.hasAttachment(resource) &&
+                fhirAttachmentHelper.getAttachment(resource)?.isNotEmpty() == true
         ) {
             val identifiers = fhirAttachmentHelper.getIdentifier(resource)
-            val currentAttachments = fhirAttachmentHelper.getAttachment(resource) as List<Fhir3Attachment?>
+            val currentAttachments = fhirAttachmentHelper.getAttachment(resource)!!
             val currentAttachmentIds: MutableList<String> = arrayListOf(currentAttachments.size.toString())
 
             currentAttachments.forEach {
-                if (it != null) currentAttachmentIds.add(it.id!!)
+                if (it != null) {
+                    val attachment = attchachmentFactory.wrap(it)
+                    if(attachment.id != null) {
+                        currentAttachmentIds.add(attachment.id!!)
+                    }
+                }
             }
 
             if (identifiers == null) return
             val updatedIdentifiers: MutableList<WrapperContract.Identifier> = mutableListOf()
-            val identifierIterator = identifiers.iterator() as Iterator<Fhir3Identifier>
+            val identifierIterator = identifiers.iterator()
 
             while (identifierIterator.hasNext()) {
                 val next = identifierFactory.wrap(identifierIterator.next())
@@ -1195,5 +1202,4 @@ class RecordService(
                 .toFormatter(Locale.US)
         private val UTC_ZONE_ID = ZoneId.of("UTC")
     }
-
 }

@@ -37,8 +37,6 @@ class AttachmentService internal constructor(
         // TODO move imageResizer to thumbnail service
         private val imageResizer: ImageResizer
 ) : AttachmentContract.Service {
-    private val attachmentFactory: WrapperFactoryContract.AttachmentFactory = SdkAttachmentFactory
-
     override fun upload(
             attachments: List<WrapperContract.Attachment>,
             attachmentsKey: GCKey,
@@ -105,15 +103,9 @@ class AttachmentService internal constructor(
     private fun uploadDownscaledImages(
             attachmentsKey: GCKey,
             userId: String,
-            attachmentTmp: Any,
+            attachment: WrapperContract.Attachment,
             originalData: ByteArray
     ): List<String> {
-        val attachment = if( attachmentTmp !is WrapperContract.Attachment) {
-            attachmentFactory.wrap(attachmentTmp)
-        } else {
-            attachmentTmp
-        }
-
         var additionalIds = mutableListOf<String>()
         if (imageResizer.isResizable(originalData)) {
             additionalIds = ArrayList()
@@ -137,16 +129,10 @@ class AttachmentService internal constructor(
     private fun resizeAndUpload(
             attachmentsKey: GCKey,
             userId: String,
-            attachmentTmp: Any,
+            attachment: WrapperContract.Attachment,
             originalData: ByteArray,
             targetHeight: Int
     ): String? {
-        val attachment = if( attachmentTmp !is WrapperContract.Attachment) {
-            attachmentFactory.wrap(attachmentTmp)
-        } else {
-            attachmentTmp
-        }
-
         val downscaledImage = try {
             imageResizer.resizeToHeight(originalData, targetHeight, ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT)
         } catch (exception: ImageResizeException.JpegWriterMissing) {

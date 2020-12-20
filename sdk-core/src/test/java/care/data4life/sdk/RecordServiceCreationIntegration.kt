@@ -16,29 +16,19 @@
 
 package care.data4life.sdk
 
-import care.data4life.crypto.GCKey
 import care.data4life.crypto.KeyType
-import care.data4life.fhir.stu3.model.Attachment
-import care.data4life.fhir.stu3.model.DocumentReference
 import care.data4life.sdk.attachment.AttachmentService
-import care.data4life.sdk.attachment.FileService
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.data.DataResource
-import care.data4life.sdk.fhir.Fhir3Attachment
-import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirService
-import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
-import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
-import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
 import care.data4life.sdk.util.Base64
-import care.data4life.sdk.util.HashUtil.sha1
 import care.data4life.sdk.util.MimeType
 import com.google.common.truth.Truth
 import io.mockk.every
@@ -47,34 +37,8 @@ import io.mockk.mockkObject
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
-import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.DateTimeFormatterBuilder
-import java.util.*
 
-class RecordServiceCreationIntegration {
-    private val commonKeyId = "commonKeyId"
-
-    private lateinit var dataKey: GCKey
-    private lateinit var attachmentKey: GCKey
-    private lateinit var encryptionKey: GCKey
-    private lateinit var commonKey: GCKey
-    private lateinit var commonKey2: GCKey
-    private lateinit var encryptedDataKey: EncryptedKey
-    private lateinit var encryptedAttachmentKey: EncryptedKey
-
-    private lateinit var recordService: RecordContract.Service
-    private lateinit var apiService: ApiService
-    private lateinit var cryptoService: CryptoService
-    private lateinit var fileService: FileService
-    private lateinit var imageResizer: ImageResizer
-    private lateinit var errorHandler: D4LErrorHandler
-    private lateinit var encryptedRecord: EncryptedRecord
-
-    private lateinit var encryptedBody: String
-    private lateinit var stringifiedResource: String
-
+class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
     @Before
     fun setUp() {
         apiService = mockk()
@@ -106,16 +70,17 @@ class RecordServiceCreationIntegration {
 
         dataKey = mockk()
         attachmentKey = mockk()
-        encryptionKey = mockk()
+        tagEncryptionKey = mockk()
         commonKey = mockk()
-        commonKey2 = mockk()
         encryptedDataKey = mockk()
         encryptedAttachmentKey = mockk()
     }
 
     @Test
-    fun `Given, createFhir3Record is called with the appropriate payload without Attachments, it creates a Record for Fhir3`() {
+    fun `Given, createFhir3Record is called with the appropriate payload without Annotations, it creates a Record for Fhir3`() {
+        // Given
         val resource = buildDocumentReferenceFhir3()
+
         val tags = mapOf(
                 "partner" to "partner=TEST",
                 "client" to "client=TEST",
@@ -151,31 +116,31 @@ class RecordServiceCreationIntegration {
             Single.just(gcKeys.removeAt(0))
         }
         every {
-            fileService.uploadFile(dataKey, USER_ID, Base64.decode(ATTACHMENT_PAYLOAD))
-        } returns Single.just("23")
+            fileService.uploadFile(attachmentKey, USER_ID, Base64.decode(ATTACHMENT_PAYLOAD))
+        } returns Single.just(ATTACHMENT_ID)
         every { imageResizer.isResizable(byteArrayOf(117, -85, 90)) } returns false
 
         // Encrypt Record
         // encrypt tags
-        every { cryptoService.fetchTagEncryptionKey() } returns encryptionKey
+        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["partner"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["partner"]!!.toByteArray()
             ), IV)
         } returns tags["partner"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["client"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["client"]!!.toByteArray()
             ), IV)
         } returns tags["client"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["fhirversion"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["fhirversion"]!!.toByteArray()
             ), IV)
         } returns tags["fhirversion"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["resourcetype"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["resourcetype"]!!.toByteArray()
             ), IV)
         } returns tags["resourcetype"]!!.toByteArray()
 
@@ -191,29 +156,29 @@ class RecordServiceCreationIntegration {
         } returns Single.just(encryptedAttachmentKey)
         every {
             fileService.uploadFile(attachmentKey, USER_ID, Base64.decode(ATTACHMENT_PAYLOAD))
-        } returns Single.just("42")
+        } returns Single.just(RECORD_ID)
 
         every { apiService.createRecord(ALIAS, USER_ID, any()) } returns Single.just(encryptedRecord)
 
         // decrypt tags
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["partner"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["partner"]!!.toByteArray()
             ), IV)
         } returns tags["partner"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["client"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["client"]!!.toByteArray()
             ), IV)
         } returns tags["client"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["fhirversion"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["fhirversion"]!!.toByteArray()
             ), IV)
         } returns tags["fhirversion"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["resourcetype"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["resourcetype"]!!.toByteArray()
             ), IV)
         } returns tags["resourcetype"]!!.toByteArray()
 
@@ -224,12 +189,14 @@ class RecordServiceCreationIntegration {
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
         every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
 
+        // When
         val result = recordService.createRecord(
                 USER_ID,
                 resource,
                 listOf()
         ).blockingGet()
 
+        // Then
         Truth.assertThat(result).isInstanceOf(Record::class.java)
         Truth.assertThat(result.resource.identifier).isNotEmpty()
         Truth.assertThat(result.meta).isEqualTo(buildMeta(CREATION_DATE, UPDATE_DATE))
@@ -238,8 +205,10 @@ class RecordServiceCreationIntegration {
     }
 
     @Test
-    fun `Given, createFhir3Record is called with the appropriate payload with Attachments, it creates a Record for Fhir3`() {
+    fun `Given, createFhir3Record is called with the appropriate payload with Annotations, it creates a Record for Fhir3`() {
+        // Given
         val resource = buildDocumentReferenceFhir3()
+
         val tags = mapOf(
                 "partner" to "partner=TEST",
                 "client" to "client=TEST",
@@ -288,48 +257,48 @@ class RecordServiceCreationIntegration {
             Single.just(gcKeys.removeAt(0))
         }
         every {
-            fileService.uploadFile(dataKey, USER_ID, Base64.decode(ATTACHMENT_PAYLOAD))
-        } returns Single.just("23")
+            fileService.uploadFile(attachmentKey, USER_ID, Base64.decode(ATTACHMENT_PAYLOAD))
+        } returns Single.just(ATTACHMENT_ID)
         every { imageResizer.isResizable(byteArrayOf(117, -85, 90)) } returns false
 
         // Encrypt Record
         // encrypt tags
-        every { cryptoService.fetchTagEncryptionKey() } returns encryptionKey
+        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["partner"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["partner"]!!.toByteArray()
             ), IV)
         } returns tags["partner"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["client"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["client"]!!.toByteArray()
             ), IV)
         } returns tags["client"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["fhirversion"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["fhirversion"]!!.toByteArray()
             ), IV)
         } returns tags["fhirversion"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["resourcetype"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["resourcetype"]!!.toByteArray()
             ), IV)
         } returns tags["resourcetype"]!!.toByteArray()
 
         // encrypt annotations
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(annotations["wow"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    annotations["wow"]!!.toByteArray()
             ), IV)
         } returns annotations["wow"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(annotations["it"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    annotations["it"]!!.toByteArray()
             ), IV)
         } returns annotations["it"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(annotations["works"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    annotations["works"]!!.toByteArray()
             ), IV)
         } returns annotations["works"]!!.toByteArray()
 
@@ -345,46 +314,46 @@ class RecordServiceCreationIntegration {
         } returns Single.just(encryptedAttachmentKey)
         every {
             fileService.uploadFile(attachmentKey, USER_ID, Base64.decode(ATTACHMENT_PAYLOAD))
-        } returns Single.just("42")
+        } returns Single.just(RECORD_ID)
 
         every { apiService.createRecord(ALIAS, USER_ID, any()) } returns Single.just(encryptedRecord)
 
         // decrypt tags
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["partner"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["partner"]!!.toByteArray()
             ), IV)
         } returns tags["partner"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["client"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["client"]!!.toByteArray()
             ), IV)
         } returns tags["client"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["fhirversion"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["fhirversion"]!!.toByteArray()
             ), IV)
         } returns tags["fhirversion"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["resourcetype"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["resourcetype"]!!.toByteArray()
             ), IV)
         } returns tags["resourcetype"]!!.toByteArray()
 
         //decrypt annotations
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(annotations["wow"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    annotations["wow"]!!.toByteArray()
             ), IV)
         } returns annotations["wow"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(annotations["it"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    annotations["it"]!!.toByteArray()
             ), IV)
         } returns annotations["it"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(annotations["works"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    annotations["works"]!!.toByteArray()
             ), IV)
         } returns annotations["works"]!!.toByteArray()
 
@@ -395,12 +364,14 @@ class RecordServiceCreationIntegration {
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
         every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
 
+        // When
         val result = recordService.createRecord(
                 USER_ID,
                 resource,
                 listOf("wow", "it", "works")
         ).blockingGet()
 
+        // Then
         Truth.assertThat(result).isInstanceOf(Record::class.java)
         Truth.assertThat(result.resource.identifier).isNotEmpty()
         Truth.assertThat(result.meta).isEqualTo(buildMeta(CREATION_DATE, UPDATE_DATE))
@@ -410,7 +381,9 @@ class RecordServiceCreationIntegration {
 
     @Test
     fun `Given, createFhir4Record is called with the appropriate payload without annotations, it creates a Record for Fhir4`() {
+        // Given
         val resource: Fhir4Resource = buildDocumentReferenceFhir4()
+
         val tags = mapOf(
                 "partner" to "partner=TEST",
                 "client" to "client=TEST",
@@ -446,31 +419,31 @@ class RecordServiceCreationIntegration {
             Single.just(gcKeys.removeAt(0))
         }
         every {
-            fileService.uploadFile(dataKey, USER_ID, Base64.decode(ATTACHMENT_PAYLOAD))
-        } returns Single.just("23")
+            fileService.uploadFile(attachmentKey, USER_ID, Base64.decode(ATTACHMENT_PAYLOAD))
+        } returns Single.just(ATTACHMENT_ID)
         every { imageResizer.isResizable(byteArrayOf(117, -85, 90)) } returns false
 
         // encrypt Record
         // encrypt tags
-        every { cryptoService.fetchTagEncryptionKey() } returns encryptionKey
+        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["partner"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["partner"]!!.toByteArray()
             ), IV)
         } returns tags["partner"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["client"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["client"]!!.toByteArray()
             ), IV)
         } returns tags["client"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["fhirversion"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["fhirversion"]!!.toByteArray()
             ), IV)
         } returns tags["fhirversion"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["resourcetype"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["resourcetype"]!!.toByteArray()
             ), IV)
         } returns tags["resourcetype"]!!.toByteArray()
 
@@ -486,29 +459,29 @@ class RecordServiceCreationIntegration {
         } returns Single.just(encryptedAttachmentKey)
         every {
             fileService.uploadFile(attachmentKey, USER_ID, Base64.decode(ATTACHMENT_PAYLOAD))
-        } returns Single.just("42")
+        } returns Single.just(RECORD_ID)
 
         every { apiService.createRecord(ALIAS, USER_ID, any()) } returns Single.just(encryptedRecord)
 
         // decrypt tags
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["partner"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["partner"]!!.toByteArray()
             ), IV)
         } returns tags["partner"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["client"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["client"]!!.toByteArray()
             ), IV)
         } returns tags["client"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["fhirversion"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["fhirversion"]!!.toByteArray()
             ), IV)
         } returns tags["fhirversion"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["resourcetype"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["resourcetype"]!!.toByteArray()
             ), IV)
         } returns tags["resourcetype"]!!.toByteArray()
 
@@ -519,12 +492,14 @@ class RecordServiceCreationIntegration {
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
         every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
 
+        // When
         val result = recordService.createRecord(
                 USER_ID,
                 resource,
                 listOf()
         ).blockingGet()
 
+        // Then
         Truth.assertThat(result).isInstanceOf(Fhir4Record::class.java)
         Truth.assertThat(result.identifier).isEqualTo(RECORD_ID)
         Truth.assertThat(result.meta).isEqualTo(buildMeta(CREATION_DATE, UPDATE_DATE))
@@ -534,7 +509,9 @@ class RecordServiceCreationIntegration {
 
     @Test
     fun `Given, createFhir4Record is called with the appropriate payload with annotations, it creates a Record for Fhir4`() {
+        // Given
         val resource: Fhir4Resource = buildDocumentReferenceFhir4()
+
         val tags = mapOf(
                 "partner" to "partner=TEST",
                 "client" to "client=TEST",
@@ -583,48 +560,48 @@ class RecordServiceCreationIntegration {
             Single.just(gcKeys.removeAt(0))
         }
         every {
-            fileService.uploadFile(dataKey, USER_ID, Base64.decode(ATTACHMENT_PAYLOAD))
-        } returns Single.just("23")
+            fileService.uploadFile(attachmentKey, USER_ID, Base64.decode(ATTACHMENT_PAYLOAD))
+        } returns Single.just(ATTACHMENT_ID)
         every { imageResizer.isResizable(byteArrayOf(117, -85, 90)) } returns false
 
         // encrypt Record
         // encrypt tags
-        every { cryptoService.fetchTagEncryptionKey() } returns encryptionKey
+        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["partner"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["partner"]!!.toByteArray()
             ), IV)
         } returns tags["partner"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["client"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["client"]!!.toByteArray()
             ), IV)
         } returns tags["client"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["fhirversion"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["fhirversion"]!!.toByteArray()
             ), IV)
         } returns tags["fhirversion"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["resourcetype"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["resourcetype"]!!.toByteArray()
             ), IV)
         } returns tags["resourcetype"]!!.toByteArray()
 
         // encrypt annotations
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(annotations["wow"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    annotations["wow"]!!.toByteArray()
             ), IV)
         } returns annotations["wow"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(annotations["it"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    annotations["it"]!!.toByteArray()
             ), IV)
         } returns annotations["it"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(annotations["works"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    annotations["works"]!!.toByteArray()
             ), IV)
         } returns annotations["works"]!!.toByteArray()
 
@@ -640,46 +617,46 @@ class RecordServiceCreationIntegration {
         } returns Single.just(encryptedAttachmentKey)
         every {
             fileService.uploadFile(attachmentKey, USER_ID, Base64.decode(ATTACHMENT_PAYLOAD))
-        } returns Single.just("42")
+        } returns Single.just(RECORD_ID)
 
         every { apiService.createRecord(ALIAS, USER_ID, any()) } returns Single.just(encryptedRecord)
 
         // decrypt tags
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["partner"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["partner"]!!.toByteArray()
             ), IV)
         } returns tags["partner"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["client"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["client"]!!.toByteArray()
             ), IV)
         } returns tags["client"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["fhirversion"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["fhirversion"]!!.toByteArray()
             ), IV)
         } returns tags["fhirversion"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["resourcetype"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["resourcetype"]!!.toByteArray()
             ), IV)
         } returns tags["resourcetype"]!!.toByteArray()
 
         //decrypt annotations
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(annotations["wow"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    annotations["wow"]!!.toByteArray()
             ), IV)
         } returns annotations["wow"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(annotations["it"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    annotations["it"]!!.toByteArray()
             ), IV)
         } returns annotations["it"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(annotations["works"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    annotations["works"]!!.toByteArray()
             ), IV)
         } returns annotations["works"]!!.toByteArray()
 
@@ -690,12 +667,14 @@ class RecordServiceCreationIntegration {
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
         every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
 
+        // When
         val result = recordService.createRecord(
                 USER_ID,
                 resource,
                 listOf("wow", "it", "works")
         ).blockingGet()
 
+        // Then
         Truth.assertThat(result).isInstanceOf(Fhir4Record::class.java)
         Truth.assertThat(result.identifier).isEqualTo(RECORD_ID)
         Truth.assertThat(result.meta).isEqualTo(buildMeta(CREATION_DATE, UPDATE_DATE))
@@ -704,8 +683,10 @@ class RecordServiceCreationIntegration {
     }
 
     @Test
-    fun `Given, createDataRecord is called with the appropriate payload without Attachments, it creates a Record for DataResource`() {
+    fun `Given, createDataRecord is called with the appropriate payload without Annotations, it creates a Record for DataResource`() {
+        // Given
         val resource = DataResource("I am test".toByteArray())
+
         val tags = mapOf(
                 "partner" to "partner=TEST",
                 "client" to "client=TEST",
@@ -738,20 +719,20 @@ class RecordServiceCreationIntegration {
         }
 
         // encrypt tags
-        every { cryptoService.fetchTagEncryptionKey() } returns encryptionKey
+        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["partner"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["partner"]!!.toByteArray()
             ), IV)
         } returns tags["partner"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["client"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["client"]!!.toByteArray()
             ), IV)
         } returns tags["client"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["flag"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["flag"]!!.toByteArray()
             ), IV)
         } returns tags["flag"]!!.toByteArray()
 
@@ -765,18 +746,18 @@ class RecordServiceCreationIntegration {
 
         // decrypt tags
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["partner"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["partner"]!!.toByteArray()
             ), IV)
         } returns tags["partner"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["client"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["client"]!!.toByteArray()
             ), IV)
         } returns tags["client"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["flag"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["flag"]!!.toByteArray()
             ), IV)
         } returns tags["flag"]!!.toByteArray()
 
@@ -786,12 +767,14 @@ class RecordServiceCreationIntegration {
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
         every { cryptoService.decrypt(dataKey, encryptedResource) } returns Single.just(resource.value)
 
+        // When
         val result = recordService.createRecord(
                 USER_ID,
                 resource,
                 listOf()
         ).blockingGet()
 
+        // Then
         Truth.assertThat(result).isInstanceOf(DataRecord::class.java)
         Truth.assertThat(result.identifier).isEqualTo(RECORD_ID)
         Truth.assertThat(result.meta).isEqualTo(buildMeta(CREATION_DATE, UPDATE_DATE))
@@ -801,7 +784,9 @@ class RecordServiceCreationIntegration {
 
     @Test
     fun `Given, createDataRecord is called with the appropriate payload with Attachments, it creates a Record for DataResource`() {
+        // Given
         val resource = DataResource("I am test".toByteArray())
+
         val tags = mapOf(
                 "partner" to "partner=TEST",
                 "client" to "client=TEST",
@@ -846,37 +831,37 @@ class RecordServiceCreationIntegration {
         }
 
         // encrypt tags
-        every { cryptoService.fetchTagEncryptionKey() } returns encryptionKey
+        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["partner"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["partner"]!!.toByteArray()
             ), IV)
         } returns tags["partner"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["client"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["client"]!!.toByteArray()
             ), IV)
         } returns tags["client"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["flag"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["flag"]!!.toByteArray()
             ), IV)
         } returns tags["flag"]!!.toByteArray()
 
         // encrypt annotations
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(annotations["wow"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    annotations["wow"]!!.toByteArray()
             ), IV)
         } returns annotations["wow"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(annotations["it"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    annotations["it"]!!.toByteArray()
             ), IV)
         } returns annotations["it"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(annotations["works"]!!.toByteArray()))
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    annotations["works"]!!.toByteArray()
             ), IV)
         } returns annotations["works"]!!.toByteArray()
 
@@ -890,35 +875,35 @@ class RecordServiceCreationIntegration {
 
         // decrypt tags
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["partner"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["partner"]!!.toByteArray()
             ), IV)
         } returns tags["partner"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["client"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["client"]!!.toByteArray()
             ), IV)
         } returns tags["client"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(tags["flag"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    tags["flag"]!!.toByteArray()
             ), IV)
         } returns tags["flag"]!!.toByteArray()
 
         //decrypt annotations
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(annotations["wow"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    annotations["wow"]!!.toByteArray()
             ), IV)
         } returns annotations["wow"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(annotations["it"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    annotations["it"]!!.toByteArray()
             ), IV)
         } returns annotations["it"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(encryptionKey, eq(
-                    Base64.decode(Base64.encode(annotations["works"]!!.toByteArray()))
+            cryptoService.symDecrypt(tagEncryptionKey, eq(
+                    annotations["works"]!!.toByteArray()
             ), IV)
         } returns annotations["works"]!!.toByteArray()
 
@@ -928,97 +913,18 @@ class RecordServiceCreationIntegration {
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
         every { cryptoService.decrypt(dataKey, encryptedResource) } returns Single.just(resource.value)
 
+        // When
         val result = recordService.createRecord(
                 USER_ID,
                 resource,
                 listOf("wow", "it", "works")
         ).blockingGet()
 
+        // Then
         Truth.assertThat(result).isInstanceOf(DataRecord::class.java)
         Truth.assertThat(result.identifier).isEqualTo(RECORD_ID)
         Truth.assertThat(result.meta).isEqualTo(buildMeta(CREATION_DATE, UPDATE_DATE))
         Truth.assertThat(result.annotations).isEqualTo(listOf("wow", "it", "works"))
         Truth.assertThat(result.resource).isEqualTo(resource)
-    }
-
-    companion object {
-        private const val CLIENT_ID = "TEST"
-        private const val USER_ID = "ME"
-        private const val ALIAS = "alias"
-        private const val RECORD_ID = "chaos"
-        private const val CREATION_DATE = "2020-12-12"
-        private const val UPDATE_DATE = "2020-12-13T17:21:08.234123"
-        private const val ATTACHMENT_PAYLOAD = "data"
-        private val IV = ByteArray(16)
-        private const val DATE_FORMAT = "yyyy-MM-dd"
-        private const val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss[.SSS]"
-        private val DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.US)
-        private val DATE_TIME_FORMATTER = DateTimeFormatterBuilder()
-                .parseLenient()
-                .appendPattern(DATE_TIME_FORMAT)
-                .toFormatter(Locale.US)
-
-        private fun buildFhir3Attachment(): Fhir3Attachment {
-            val attachment = Fhir3Attachment()
-            attachment.id = null
-            attachment.data = ATTACHMENT_PAYLOAD
-            attachment.size = 42
-            attachment.hash = Base64.encodeToString(sha1(Base64.decode(ATTACHMENT_PAYLOAD)))
-            return attachment
-        }
-
-       private fun buildDocumentReferenceFhir3(): DocumentReference {
-            val content = buildDocRefContentFhir3(buildFhir3Attachment())
-            val contents: MutableList<DocumentReference.DocumentReferenceContent> = ArrayList()
-            contents.add(content)
-            return DocumentReference(
-                    null,
-                    null,
-                    null,
-                    contents
-            )
-        }
-
-        private fun buildDocRefContentFhir3(attachment: Attachment): DocumentReference.DocumentReferenceContent {
-            return DocumentReference.DocumentReferenceContent(attachment)
-        }
-
-        private fun buildDocumentReferenceFhir3(data: ByteArray?): DocumentReference {
-            val doc = buildDocumentReferenceFhir3()
-            doc.content[0].attachment.data = Base64.encodeToString(data!!)
-            return doc
-        }
-
-        private fun buildFhir4Attachment(): Fhir4Attachment {
-            val attachment = Fhir4Attachment()
-            attachment.id = null
-            attachment.data = ATTACHMENT_PAYLOAD
-            attachment.size = 42
-            attachment.hash = Base64.encodeToString(sha1(Base64.decode(ATTACHMENT_PAYLOAD)))
-            return attachment
-        }
-
-        private fun buildDocRefContentFhir4(attachment: Fhir4Attachment): care.data4life.fhir.r4.model.DocumentReference.DocumentReferenceContent {
-            return care.data4life.fhir.r4.model.DocumentReference.DocumentReferenceContent(attachment)
-        }
-
-        private fun buildDocumentReferenceFhir4(): care.data4life.fhir.r4.model.DocumentReference {
-            val content = buildDocRefContentFhir4(buildFhir4Attachment())
-            val contents: MutableList<care.data4life.fhir.r4.model.DocumentReference.DocumentReferenceContent> = ArrayList()
-            contents.add(content)
-
-            return care.data4life.fhir.r4.model.DocumentReference(
-                    null,
-                    contents
-            )
-        }
-
-        private fun buildMeta(
-                customCreationDate: String,
-                updatedDate: String
-        ): Meta = Meta(
-                LocalDate.parse(customCreationDate, DATE_FORMATTER),
-                LocalDateTime.parse(updatedDate, DATE_TIME_FORMATTER)
-        )
     }
 }

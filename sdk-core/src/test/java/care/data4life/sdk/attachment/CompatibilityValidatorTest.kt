@@ -29,14 +29,14 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class LegacyDateValidationTest {
+class CompatibilityValidatorTest {
     @Test
     fun `it is a FhirDateValidator`() {
         assertTrue( (CompatibilityValidator as Any) is AttachmentContract.CompatibilityValidator)
     }
 
     @Test
-    fun `Given, isInvalidDate is called with a Attachment, which contains a null as Fhir3DateTime, it returns true`() {
+    fun `Given, isHashable is called with a Attachment, which contains a null as Fhir3DateTime, it returns true`() {
         // Given
         val fhirAttachment = Fhir3Attachment()
 
@@ -47,7 +47,7 @@ class LegacyDateValidationTest {
     }
 
     @Test
-    fun `Given, isInvalidDate is called with a Attachment, which contains a null as Fhir3Date, it returns true`() {
+    fun `Given, isHashable is called with a Attachment, which contains a null as Fhir3Date, it returns true`() {
         // Given
         val fhirAttachment = Fhir3Attachment()
         val fhirDateTime = mockkClass(Fhir3DateTime::class)
@@ -61,7 +61,7 @@ class LegacyDateValidationTest {
     }
 
     @Test
-    fun `Given, isInvalidDate is called with a Attachment, which contains a null as Date, it returns false`() {
+    fun `Given, isHashable is called with a Attachment, which contains a null as Date, it returns true`() {
         // Given
         val fhirAttachment = Fhir3Attachment()
         val fhirDateTime = mockkClass(Fhir3DateTime::class)
@@ -77,7 +77,7 @@ class LegacyDateValidationTest {
     }
 
     @Test
-    fun `Given, isInvalidDate is called with a Attachment, which contains a Fhir3Date before 2019-09-15, it returns false`() {
+    fun `Given, isHashable is called with a Attachment, which contains a Fhir3Date before 2019-09-15, it returns false`() {
         // Given
         val fhirAttachment = Fhir3Attachment()
         val fhirDateTime = Fhir3DateTimeParser.parseDateTime(
@@ -91,7 +91,7 @@ class LegacyDateValidationTest {
     }
 
     @Test
-    fun `Given, isInvalidDate is called with a Attachment, which contains a Fhir3Date after 2019-09-15, it returns true`() {
+    fun `Given, isHashable is called with a Attachment, which contains a Fhir3Date after 2019-09-15, it returns true`() {
         // Given
         val fhirAttachment = Fhir3Attachment()
         val fhirDateTime = Fhir3DateTimeParser.parseDateTime(
@@ -105,7 +105,7 @@ class LegacyDateValidationTest {
     }
 
     @Test
-    fun `Given, isInvalidDate is called with a Attachment, which does contain a non Fhir3Attachment, it returns true`() {
+    fun `Given, isHashable is called with a Attachment, which does contain a non Fhir3Attachment, it returns true`() {
         val attachment = mockk<WrapperContract.Attachment>()
 
         every { attachment.unwrap<String>() } returns "not Fhir3"

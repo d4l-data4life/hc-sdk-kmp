@@ -79,7 +79,7 @@ class AttachmentService internal constructor(
                     val newHash = encodeToString(sha1(data))
 
                     if (!isPreview &&
-                            LegacyDateValidator.isInvalidateDate(attachment) &&
+                            CompatibilityValidator.isHashable(attachment) &&
                             attachment.hash != newHash
                     ) {
                         throw DataValidationException.InvalidAttachmentPayloadHash()

@@ -47,6 +47,15 @@ internal object SdkFhirAttachmentHelper: HelperContract.FhirAttachmentHelper {
         }
     }
 
+    @Throws(CoreRuntimeException.InternalFailure::class)
+    override fun updateAttachmentData(resource: Any, attachmentData: HashMap<Any, String?>?) {
+        return when(resource) {
+            is Fhir4Resource -> updateFhir4AttachmentData(resource, attachmentData)
+            is Fhir3Resource -> updateFhir3AttachmentData(resource, attachmentData)
+            else -> throw CoreRuntimeException.InternalFailure()
+        }
+    }
+
     private fun updateFhir3AttachmentData(resource: Fhir3Resource, attachmentData: HashMap<Any, String?>?) {
         val attachment = if( attachmentData == null) {
             null
@@ -71,15 +80,6 @@ internal object SdkFhirAttachmentHelper: HelperContract.FhirAttachmentHelper {
                 resource,
                 attachment
         )
-    }
-
-    @Throws(CoreRuntimeException.InternalFailure::class)
-    override fun updateAttachmentData(resource: Any, attachmentData: HashMap<Any, String?>?) {
-        return when(resource) {
-            is Fhir4Resource -> updateFhir4AttachmentData(resource, attachmentData)
-            is Fhir3Resource -> updateFhir3AttachmentData(resource, attachmentData)
-            else -> throw CoreRuntimeException.InternalFailure()
-        }
     }
 
     @Throws(CoreRuntimeException.InternalFailure::class)

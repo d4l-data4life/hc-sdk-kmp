@@ -20,19 +20,19 @@ import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3DateTimeParser
 import care.data4life.sdk.wrapper.WrapperContract
 
-internal object LegacyDateValidator: AttachmentContract.LegacyDateValidator {
-    private val validationFhir3Date = Fhir3DateTimeParser.parseDateTime(
+internal object CompatibilityValidator: AttachmentContract.CompatibilityValidator {
+    private val fhir3SeparationDate = Fhir3DateTimeParser.parseDateTime(
             "2019-09-15"
     )
 
-    private fun validateFhir3Date(attachment: Fhir3Attachment): Boolean {
-        return attachment.creation?.date?.toDate()?.after(validationFhir3Date.date.toDate()) ?: true
+    private fun isHahableFhir3Date(attachment: Fhir3Attachment): Boolean {
+        return attachment.creation?.date?.toDate()?.after(fhir3SeparationDate.date.toDate()) ?: true
     }
 
-    override fun isInvalidateDate(attachment: WrapperContract.Attachment): Boolean {
+    override fun isHashable(attachment: WrapperContract.Attachment): Boolean {
         val rawAttachment = attachment.unwrap() as Any
         return if(rawAttachment is Fhir3Attachment ) {
-            validateFhir3Date(rawAttachment)
+            isHahableFhir3Date(rawAttachment)
         } else {
             true
         }

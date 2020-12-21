@@ -33,11 +33,11 @@ class Fhir4AttachmentTest {
     fun `Given a wrapped Fhir4Attachment, it allows read access to id`() {
         // Given
         val id = "potato"
-        val fhir3Attachment = Fhir4Attachment()
-        fhir3Attachment.id  = id
+        val fhir4Attachment = Fhir4Attachment()
+        fhir4Attachment.id  = id
 
         // When
-        val result = SdkFhir4Attachment(fhir3Attachment).id
+        val result = SdkFhir4Attachment(fhir4Attachment).id
 
         // Then
         assertEquals(
@@ -50,15 +50,15 @@ class Fhir4AttachmentTest {
     fun `Given a wrapped Fhir4Attachment, it allows write access to id`() {
         // Given
         val id = "potato"
-        val fhir3Attachment = Fhir4Attachment()
+        val fhir4Attachment = Fhir4Attachment()
 
         // When
-        SdkFhir4Attachment(fhir3Attachment).id = id
+        SdkFhir4Attachment(fhir4Attachment).id = id
 
         // Then
         assertEquals(
                 id,
-                fhir3Attachment.id
+                fhir4Attachment.id
         )
     }
 
@@ -66,11 +66,11 @@ class Fhir4AttachmentTest {
     fun `Given a wrapped Fhir4Attachment, it allows read access to data`() {
         // Given
         val data = "soup"
-        val fhir3Attachment = Fhir4Attachment()
-        fhir3Attachment.data  = data
+        val fhir4Attachment = Fhir4Attachment()
+        fhir4Attachment.data  = data
 
         // When
-        val result = SdkFhir4Attachment(fhir3Attachment).data
+        val result = SdkFhir4Attachment(fhir4Attachment).data
 
         // Then
         assertEquals(
@@ -83,15 +83,15 @@ class Fhir4AttachmentTest {
     fun `Given a wrapped Fhir4Attachment, it allows write access to data`() {
         // Given
         val data = "soup"
-        val fhir3Attachment = Fhir4Attachment()
+        val fhir4Attachment = Fhir4Attachment()
 
         // When
-        SdkFhir4Attachment(fhir3Attachment).data = data
+        SdkFhir4Attachment(fhir4Attachment).data = data
 
         // Then
         assertEquals(
                 data,
-                fhir3Attachment.data
+                fhir4Attachment.data
         )
     }
 
@@ -99,11 +99,11 @@ class Fhir4AttachmentTest {
     fun `Given a wrapped Fhir4Attachment, it allows read access to hash`() {
         // Given
         val hash = "1234"
-        val fhir3Attachment = Fhir4Attachment()
-        fhir3Attachment.hash  = hash
+        val fhir4Attachment = Fhir4Attachment()
+        fhir4Attachment.hash  = hash
 
         // When
-        val result = SdkFhir4Attachment(fhir3Attachment).hash
+        val result = SdkFhir4Attachment(fhir4Attachment).hash
 
         // Then
         assertEquals(
@@ -116,15 +116,15 @@ class Fhir4AttachmentTest {
     fun `Given a wrapped Fhir4Attachment, it allows write access to hash`() {
         // Given
         val hash = "1234"
-        val fhir3Attachment = Fhir4Attachment()
+        val fhir4Attachment = Fhir4Attachment()
 
         // When
-        SdkFhir4Attachment(fhir3Attachment).hash = hash
+        SdkFhir4Attachment(fhir4Attachment).hash = hash
 
         // Then
         assertEquals(
                 hash,
-                fhir3Attachment.hash
+                fhir4Attachment.hash
         )
     }
 
@@ -132,11 +132,11 @@ class Fhir4AttachmentTest {
     fun `Given a wrapped Fhir4Attachment, it allows read access to size`() {
         // Given
         val size = 42
-        val fhir3Attachment = Fhir4Attachment()
-        fhir3Attachment.size  = size
+        val fhir4Attachment = Fhir4Attachment()
+        fhir4Attachment.size  = size
 
         // When
-        val result = SdkFhir4Attachment(fhir3Attachment).size
+        val result = SdkFhir4Attachment(fhir4Attachment).size
 
         // Then
         assertEquals(
@@ -149,51 +149,51 @@ class Fhir4AttachmentTest {
     fun `Given a wrapped Fhir4Attachment, it allows write access to size`() {
         // Given
         val size = 23
-        val fhir3Attachment = Fhir4Attachment()
+        val fhir4Attachment = Fhir4Attachment()
 
         // When
-        SdkFhir4Attachment(fhir3Attachment).size = size
+        SdkFhir4Attachment(fhir4Attachment).size = size
 
         // Then
         assertEquals(
                 size,
-                fhir3Attachment.size
+                fhir4Attachment.size
         )
     }
 
     @Test
     fun `Given, unwrap is called, it returns the wrapped Fhir4Attachment`() {
         // Given
-        val fhir3Attachment = Fhir4Attachment()
+        val fhir4Attachment = Fhir4Attachment()
 
         // When
         assertSame(
-                fhir3Attachment,
-                SdkFhir4Attachment(fhir3Attachment).unwrap()
+                fhir4Attachment,
+                SdkFhir4Attachment(fhir4Attachment).unwrap()
         )
     }
 
     @Test
     fun `Given, on a compare, it return true, if both wrapped resources are identical`() {
         // Given
-        val fhir3Attachment = Fhir4Attachment()
+        val fhir4Attachment = Fhir4Attachment()
 
         // When
         assertEquals(
-                SdkFhir4Attachment(fhir3Attachment),
-                SdkFhir4Attachment(fhir3Attachment)
+                SdkFhir4Attachment(fhir4Attachment),
+                SdkFhir4Attachment(fhir4Attachment)
         )
     }
 
     @Test
     fun `Given, hashCode() is called it returns the hash of the wrapped resource`() {
         // Given
-        val fhir3Attachment = Fhir4Attachment()
+        val fhir4Attachment = Fhir4Attachment()
 
         // When
         assertEquals(
-                fhir3Attachment.hashCode(),
-                SdkFhir4Attachment(fhir3Attachment).hashCode()
+                fhir4Attachment.hashCode(),
+                SdkFhir4Attachment(fhir4Attachment).hashCode()
         )
     }
 }

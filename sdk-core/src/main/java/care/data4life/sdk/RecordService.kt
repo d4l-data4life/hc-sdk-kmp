@@ -212,6 +212,7 @@ class RecordService(
                 .map { DeleteResult(it, failedDeletes) }
     }
 
+    // ToDo throw error on false error
     internal fun <T : Any> _fetchRecord(
             recordId: String,
             userId: String
@@ -436,7 +437,6 @@ class RecordService(
                             it.annotations = annotations
                         }
                     }
-
                 }
                 .map { removeUploadData(it) }
                 .map { encryptRecord(it) }

@@ -34,11 +34,11 @@ class Fhir4IdentifierTest {
     fun `Given a wrapped Fhir4Identifier, it allows read access to value`() {
         // Given
         val value = "potato"
-        val fhir3Identifier = Fhir4Identifier()
-        fhir3Identifier.value  = value
+        val fhir4Identifier = Fhir4Identifier()
+        fhir4Identifier.value  = value
 
         // When
-        val result = SdkFhir4Identifier(fhir3Identifier).value
+        val result = SdkFhir4Identifier(fhir4Identifier).value
 
         // Then
         assertEquals(
@@ -51,15 +51,15 @@ class Fhir4IdentifierTest {
     fun `Given a wrapped Fhir4Identifier, it allows write access to value`() {
         // Given
         val value = "potato"
-        val fhir3Identifier = Fhir4Identifier()
+        val fhir4Identifier = Fhir4Identifier()
 
         // When
-        SdkFhir4Identifier(fhir3Identifier).value = value
+        SdkFhir4Identifier(fhir4Identifier).value = value
 
         // Then
         assertEquals(
                 value,
-                fhir3Identifier.value
+                fhir4Identifier.value
         )
     }
 
@@ -67,11 +67,11 @@ class Fhir4IdentifierTest {
     fun `Given, unwrap is called, it returns its a wrapped Fhir4Identifier`() {
         // Given
         val value = "potato"
-        val fhir3Identifier = Fhir4Identifier()
+        val fhir4Identifier = Fhir4Identifier()
 
         assertSame(
-                fhir3Identifier,
-                SdkFhir4Identifier(fhir3Identifier).unwrap()
+                fhir4Identifier,
+                SdkFhir4Identifier(fhir4Identifier).unwrap()
         )
     }
 }

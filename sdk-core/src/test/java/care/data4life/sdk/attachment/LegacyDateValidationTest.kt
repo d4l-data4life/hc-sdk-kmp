@@ -32,7 +32,7 @@ import org.junit.Test
 class LegacyDateValidationTest {
     @Test
     fun `it is a FhirDateValidator`() {
-        assertTrue( (LegacyDateValidator as Any) is AttachmentContract.LegacyDateValidator)
+        assertTrue( (CompatibilityValidator as Any) is AttachmentContract.CompatibilityValidator)
     }
 
     @Test
@@ -43,7 +43,7 @@ class LegacyDateValidationTest {
         fhirAttachment.creation = null
 
         // Then
-        assertTrue(LegacyDateValidator.isInvalidateDate(SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(CompatibilityValidator.isHashable(SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
@@ -57,7 +57,7 @@ class LegacyDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertTrue(LegacyDateValidator.isInvalidateDate(SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(CompatibilityValidator.isHashable(SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
@@ -73,7 +73,7 @@ class LegacyDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertTrue(LegacyDateValidator.isInvalidateDate(SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(CompatibilityValidator.isHashable(SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
@@ -87,7 +87,7 @@ class LegacyDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertFalse(LegacyDateValidator.isInvalidateDate(SdkFhir3Attachment(fhirAttachment)))
+        assertFalse(CompatibilityValidator.isHashable(SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
@@ -101,7 +101,7 @@ class LegacyDateValidationTest {
         fhirAttachment.creation = fhirDateTime
 
         // Then
-        assertTrue(LegacyDateValidator.isInvalidateDate(SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(CompatibilityValidator.isHashable(SdkFhir3Attachment(fhirAttachment)))
     }
 
     @Test
@@ -110,6 +110,6 @@ class LegacyDateValidationTest {
 
         every { attachment.unwrap<String>() } returns "not Fhir3"
 
-        assertTrue(LegacyDateValidator.isInvalidateDate(attachment))
+        assertTrue(CompatibilityValidator.isHashable(attachment))
     }
 }

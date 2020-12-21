@@ -44,7 +44,7 @@ class AttachmentContract {
         fun delete(attachmentId: String, userId: String): Single<Boolean>
     }
 
-    internal interface LegacyDateValidator {
-        fun isInvalidateDate(attachment: WrapperContract.Attachment): Boolean
+    internal interface CompatibilityValidator {
+        fun isHashable(attachment: WrapperContract.Attachment): Boolean
     }
 }

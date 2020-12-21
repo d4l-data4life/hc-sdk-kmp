@@ -21,32 +21,37 @@ import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.fhir.stu3.model.CarePlan
 import care.data4life.fhir.stu3.model.DocumentReference
 import care.data4life.fhir.stu3.model.DomainResource
-import care.data4life.fhir.stu3.util.FhirAttachmentHelper
+import care.data4life.fhir.r4.model.DocumentReference as Fhir4Reference
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
+import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.fhir.Fhir3AttachmentHelper
+import care.data4life.sdk.fhir.Fhir4Attachment
+import care.data4life.sdk.fhir.Fhir4AttachmentHelper
 import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
-import care.data4life.sdk.model.SdkRecordFactory
-import care.data4life.sdk.model.definitions.DataRecord
+import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.model.definitions.RecordFactory
-import care.data4life.sdk.network.DecryptedRecordBuilderImpl
+import care.data4life.sdk.network.DecryptedRecordMapper
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
-import care.data4life.sdk.network.model.definitions.DecryptedDataRecord
+import care.data4life.sdk.network.model.definitions.DecryptedCustomDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import care.data4life.sdk.network.model.definitions.DecryptedRecordBuilder
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
 import care.data4life.sdk.test.util.AttachmentBuilder
 import care.data4life.sdk.util.Base64
+import care.data4life.sdk.util.HashUtil
 import io.mockk.every
+import io.mockk.mockk
 import io.mockk.mockkConstructor
 import io.mockk.mockkObject
 import io.mockk.mockkStatic
+import io.mockk.spyk
 import io.mockk.unmockkAll
 import org.mockito.ArgumentMatchers
 import org.mockito.InOrder
@@ -67,7 +72,7 @@ abstract class RecordServiceTestBase {
     internal lateinit var mockFhirService: FhirService
     internal lateinit var mockAttachmentService: AttachmentContract.Service
     internal lateinit var mockCryptoService: CryptoService
-    private lateinit var mockErrorHandler: D4LErrorHandler
+    internal lateinit var mockErrorHandler: D4LErrorHandler
     internal lateinit var mockCarePlan: CarePlan
     internal lateinit var mockDataResource: DataResource
     internal lateinit var mockDocumentReference: DocumentReference
@@ -84,14 +89,18 @@ abstract class RecordServiceTestBase {
     internal lateinit var mockAnnotatedEncryptedRecord: EncryptedRecord
     internal lateinit var mockDecryptedFhir3Record: DecryptedFhir3Record<DomainResource>
     internal lateinit var mockAnnotatedDecryptedFhirRecord: DecryptedFhir3Record<DomainResource>
-    internal lateinit var mockDecryptedDataRecord: DecryptedDataRecord
+    internal lateinit var mockDecryptedDataRecord: DecryptedCustomDataRecord
     internal lateinit var mockMeta: Meta
     private lateinit var mockD4LException: D4LException
     internal lateinit var mockRecord: Record<CarePlan>
-    internal lateinit var mockDataRecord: DataRecord
+    internal lateinit var mockDataRecord: DataRecord<DataResource>
     internal lateinit var inOrder: InOrder
-    internal lateinit var mockDecryptedRecordBuilder: DecryptedRecordBuilder
+    internal lateinit var mockDecryptedRecordMapper: DecryptedRecordMapper
     internal lateinit var mockRecordFactory: RecordFactory
+    internal lateinit var recordServiceK: RecordService
+    internal lateinit var attachmentService: AttachmentContract.Service
+    internal lateinit var apiService: ApiService
+    internal lateinit var cryptoService: CryptoService
 
     private lateinit var mockitoSession: MockitoSession
 
@@ -104,6 +113,12 @@ abstract class RecordServiceTestBase {
         mockAttachmentService = Mockito.mock(AttachmentContract.Service::class.java)
         mockCryptoService = Mockito.mock(CryptoService::class.java)
         mockErrorHandler = Mockito.mock(D4LErrorHandler::class.java)
+
+        // mockk compatibitlity
+        attachmentService = mockk()
+        apiService = mockk()
+        cryptoService = mockk()
+
         recordService = Mockito.spy(
                 RecordService(
                         PARTNER_ID,
@@ -117,6 +132,21 @@ abstract class RecordServiceTestBase {
                         mockErrorHandler
                 )
         )
+
+        recordServiceK = spyk(
+                RecordService(
+                        PARTNER_ID,
+                        ALIAS,
+                        apiService,
+                        mockTagEncryptionService,
+                        mockTaggingService,
+                        mockFhirService,
+                        attachmentService,
+                        cryptoService,
+                        mockErrorHandler
+                )
+        )
+
         mockCarePlan = Mockito.mock(CarePlan::class.java)
         mockDataResource = DataResource(ByteArray(23))
         mockDocumentReference = Mockito.mock(DocumentReference::class.java)
@@ -133,12 +163,12 @@ abstract class RecordServiceTestBase {
         mockAnnotatedEncryptedRecord = Mockito.mock(EncryptedRecord::class.java)
         mockDecryptedFhir3Record = Mockito.mock(DecryptedFhir3Record::class.java) as DecryptedFhir3Record<DomainResource>
         mockAnnotatedDecryptedFhirRecord = Mockito.mock(DecryptedFhir3Record::class.java) as DecryptedFhir3Record<DomainResource>
-        mockDecryptedDataRecord = Mockito.mock(DecryptedDataRecord::class.java)
+        mockDecryptedDataRecord = Mockito.mock(DecryptedCustomDataRecord::class.java)
         mockMeta = Mockito.mock(Meta::class.java)
         mockD4LException = Mockito.mock(D4LException::class.java)
         mockRecord = Mockito.mock(Record::class.java) as Record<CarePlan>
-        mockDataRecord = Mockito.mock(DataRecord::class.java)
-        mockDecryptedRecordBuilder = Mockito.mock(DecryptedRecordBuilderImpl::class.java)
+        mockDataRecord = Mockito.mock(DataRecord::class.java) as DataRecord<DataResource>
+        mockDecryptedRecordMapper = Mockito.mock(DecryptedRecordMapper::class.java)
         mockRecordFactory = Mockito.mock(RecordFactory::class.java)
 
         Mockito.`when`(mockRecord.fhirResource).thenReturn(mockCarePlan)
@@ -157,7 +187,7 @@ abstract class RecordServiceTestBase {
 
         Mockito.`when`<HashMap<*, *>?>(mockDecryptedDataRecord.tags).thenReturn(mockTags)
         Mockito.`when`(mockDecryptedDataRecord.dataKey).thenReturn(mockDataKey)
-        Mockito.`when`(mockDecryptedDataRecord.resource).thenReturn(mockDataResource.value)
+        Mockito.`when`(mockDecryptedDataRecord.resource).thenReturn(mockDataResource)
         Mockito.`when`(mockDecryptedDataRecord.identifier).thenReturn("id")
         Mockito.`when`(mockDecryptedDataRecord.modelVersion).thenReturn(ModelVersion.CURRENT)
         Mockito.`when`(mockDecryptedDataRecord.annotations).thenReturn(ANNOTATIONS)
@@ -180,8 +210,8 @@ abstract class RecordServiceTestBase {
 
         Mockito.`when`(mockErrorHandler.handleError(ArgumentMatchers.any(Exception::class.java))).thenReturn(mockD4LException)
 
-        mockkConstructor(DecryptedRecordBuilderImpl::class)
-        mockkObject(SdkRecordFactory)
+        mockkConstructor(DecryptedRecordMapper::class)
+        mockkObject(RecordMapper)
 
         inOrder = Mockito.inOrder(
                 mockApiService,
@@ -191,7 +221,7 @@ abstract class RecordServiceTestBase {
                 mockAttachmentService,
                 mockCryptoService,
                 mockErrorHandler,
-                mockDecryptedRecordBuilder,
+                mockDecryptedRecordMapper,
                 recordService
         )
 
@@ -201,7 +231,11 @@ abstract class RecordServiceTestBase {
         mockkStatic(DateTimeFormatter::class)
         every { DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US) } returns DATE_FORMATTER
 
-        mockkStatic(FhirAttachmentHelper::class)
+        mockkStatic(Fhir3AttachmentHelper::class)
+        mockkStatic(Fhir4AttachmentHelper::class)
+
+        mockkObject(HashUtil)
+        mockkObject(Base64)
 
         mockitoSession = Mockito.mockitoSession().startMocking()
     }
@@ -238,6 +272,8 @@ abstract class RecordServiceTestBase {
         internal val ANNOTATIONS = listOf("potato", "tomato", "soup")
         internal const val CREATION_DATE = "2020-05-03"
 
+        // ToDo remove that
+
         fun buildDocumentReference(): DocumentReference {
             val content = buildDocRefContent(AttachmentBuilder.buildAttachment(null))
             val contents: MutableList<DocumentReference.DocumentReferenceContent> = ArrayList()
@@ -265,6 +301,30 @@ abstract class RecordServiceTestBase {
             var i = 0
             for (b in array) result[i++] = b ?: 0
             return result
+        }
+
+        protected fun buildFhir4Attachment(): Fhir4Attachment {
+            val attachment = Fhir4Attachment()
+            attachment.id = null
+            attachment.data = DATA
+            attachment.size = 42
+            attachment.hash = DATA_HASH
+            return attachment
+        }
+
+        private fun buildDocRefContentFhir4(attachment: Fhir4Attachment): care.data4life.fhir.r4.model.DocumentReference.DocumentReferenceContent {
+            return Fhir4Reference.DocumentReferenceContent(attachment)
+        }
+
+        fun buildDocumentReferenceFhir4(): care.data4life.fhir.r4.model.DocumentReference {
+            val content = buildDocRefContentFhir4(buildFhir4Attachment())
+            val contents: MutableList<Fhir4Reference.DocumentReferenceContent> = ArrayList()
+            contents.add(content)
+
+            return Fhir4Reference(
+                    null,
+                    contents
+            )
         }
     }
 }

@@ -22,16 +22,28 @@ typealias Fhir4Resource = care.data4life.fhir.r4.model.DomainResource
 typealias Fhir3Attachment = care.data4life.fhir.stu3.model.Attachment
 typealias Fhir4Attachment = care.data4life.fhir.r4.model.Attachment
 
+typealias Fhir3AttachmentHelper = care.data4life.fhir.stu3.util.FhirAttachmentHelper
+typealias Fhir4AttachmentHelper = care.data4life.fhir.r4.util.FhirAttachmentHelper
+
+typealias Fhir3Identifier = care.data4life.fhir.stu3.model.Identifier
+typealias Fhir4Identifier = care.data4life.fhir.r4.model.Identifier
+
+typealias Fhir3ElementFactory = care.data4life.fhir.stu3.model.FhirElementFactory
+typealias Fhir4ElementFactory = care.data4life.fhir.r4.model.FhirElementFactory
+
+typealias Fhir3DateTimeParser = care.data4life.fhir.stu3.util.FhirDateTimeParser
+
+
 interface FhirVersion {
     val version: String
 }
 
-fun Fhir3Resource.asVersionable() = object : FhirVersion {
+object Fhir3Version : FhirVersion {
     override val version: String
         get() = "3.0.1"
 }
 
-fun Fhir4Resource.asVersionable() = object : FhirVersion {
+object Fhir4Version : FhirVersion {
     override val version: String
         get() = "4.0.1"
 

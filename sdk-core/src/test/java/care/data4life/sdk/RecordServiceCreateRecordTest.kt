@@ -17,21 +17,30 @@ package care.data4life.sdk
 
 import care.data4life.fhir.stu3.model.CarePlan
 import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.call.DataRecord
+import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
+import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.ModelVersion
-import care.data4life.sdk.model.SdkRecordFactory
+import care.data4life.sdk.model.Record
+import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.model.definitions.BaseRecord
-import care.data4life.sdk.network.DecryptedRecordBuilderImpl
+import care.data4life.sdk.network.DecryptedRecordMapper
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.util.MimeType
 import com.google.common.truth.Truth
 import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
 import io.reactivex.Single
 import org.junit.After
 import org.junit.Assert
+import org.junit.Assert.assertSame
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -52,6 +61,110 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     }
 
     @Test
+    fun `Given, createRecord is called with a DataResource, it wraps it and delegates it to the generic createRecord and return its Result`() {
+        // Given
+        val recordService = spyk(recordService)
+
+        val userId = "id"
+        val rawResource = mockk<DataResource>()
+
+        val createdRecord = mockk<DataRecord<DataResource>>()
+
+        @Suppress("UNCHECKED_CAST")
+        every {
+            recordService.createRecord(userId, rawResource, any())
+        } returns Single.just(createdRecord)
+
+        // When
+        val subscriber = recordService.createRecord(
+                userId,
+                rawResource,
+                mockk(relaxed = true)
+        ).test().await()
+
+        val record = subscriber
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
+
+        // Then
+        assertSame(
+                record,
+                createdRecord
+        )
+    }
+
+    @Test
+    fun `Given, createRecord is called with a Fhir3Resource, it wraps it and delegates it to the generic createRecord and return its Result`() {
+        // Given
+        val recordService = spyk(recordService)
+
+        val userId = "id"
+        val rawResource = mockk<Fhir3Resource>()
+
+        val createdRecord = mockk<Record<Fhir3Resource>>()
+
+        @Suppress("UNCHECKED_CAST")
+        every {
+            recordService.createRecord(userId, rawResource, any())
+        } returns Single.just(createdRecord)
+
+        // When
+        val subscriber = recordService.createRecord(
+                userId,
+                rawResource,
+                mockk(relaxed = true)
+        ).test().await()
+
+        val record = subscriber
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
+
+        // Then
+        assertSame(
+                record,
+                createdRecord
+        )
+    }
+
+    @Test
+    fun `Given, createRecord is called with a Fhir4Resource, it wraps it and delegates it to the generic createRecord and return its Result`() {
+        // Given
+        val userId = "id"
+        val rawResource = mockk<Fhir4Resource>()
+
+        val createdRecord = mockk<Fhir4Record<Fhir4Resource>>()
+
+        @Suppress("UNCHECKED_CAST")
+        every {
+            recordServiceK.createRecord(userId, rawResource, any())
+        } returns Single.just(createdRecord)
+
+        // When
+        val subscriber = recordServiceK.createRecord(
+                userId,
+                rawResource,
+                mockk(relaxed = true)
+        ).test().await()
+
+        val record = subscriber
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
+
+        // Then
+        assertSame(
+                record,
+                createdRecord
+        )
+    }
+
+
+    @Test
     @Throws(
             InterruptedException::class,
             IOException::class,
@@ -65,12 +178,12 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun `Given, createRecord is called with a DomainResource and a UserId, it returns a new Record`() {
         // Given
         every {
-            anyConstructed<DecryptedRecordBuilderImpl>().setAnnotations(listOf())
-        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilderImpl
+            anyConstructed<DecryptedRecordMapper>().setAnnotations(listOf())
+        } returns mockDecryptedRecordMapper as DecryptedRecordMapper
 
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
-                mockDecryptedRecordBuilder.build(
+                mockDecryptedRecordMapper.build(
                         mockCarePlan,
                         mockTags,
                         DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
@@ -81,9 +194,9 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Mockito.doReturn(mockUploadData).`when`(recordService).extractUploadData(mockCarePlan)
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
         Mockito.`when`(mockTaggingService.appendDefaultTags(
-                ArgumentMatchers.eq(CarePlan.resourceType),
-                ArgumentMatchers.any<HashMap<String, String>>())
-        ).thenReturn(mockTags)
+                mockCarePlan,
+                null
+        )).thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockDecryptedFhir3Record).`when`(recordService)
                 ._uploadData(
@@ -106,10 +219,10 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .`when`(recordService).restoreUploadData(
                         mockDecryptedFhir3Record,
                         mockCarePlan,
-                        mockUploadData
+                        mockUploadData as HashMap<Any, String?>
                 )
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
+        every { RecordMapper.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
 
         val annotations = listOf<String>()
 
@@ -125,11 +238,11 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Truth.assertThat(record).isSameInstanceAs(mockRecord)
 
         inOrder.verify(mockTaggingService).appendDefaultTags(
-                ArgumentMatchers.anyString(),
-                ArgumentMatchers.any<HashMap<String, String>>()
+                mockCarePlan,
+                null
         )
         inOrder.verify(mockCryptoService).generateGCKey()
-        inOrder.verify(mockDecryptedRecordBuilder).build(
+        inOrder.verify(mockDecryptedRecordMapper).build(
                 mockCarePlan,
                 mockTags,
                 DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
@@ -150,7 +263,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         inOrder.verify(recordService).restoreUploadData(
                 mockDecryptedFhir3Record,
                 mockCarePlan,
-                mockUploadData
+                mockUploadData as HashMap<Any, String?>
         )
         inOrder.verify(recordService).assignResourceId(mockDecryptedFhir3Record)
         inOrder.verifyNoMoreInteractions()
@@ -170,12 +283,12 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun `Given, createRecord is called a DomainResource, a UserId and no attachment, it returns a new Record`() {
         // Given
         every {
-            anyConstructed<DecryptedRecordBuilderImpl>().setAnnotations(listOf())
-        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilderImpl
+            anyConstructed<DecryptedRecordMapper>().setAnnotations(listOf())
+        } returns mockDecryptedRecordMapper
 
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
-                mockDecryptedRecordBuilder.build(
+                mockDecryptedRecordMapper.build(
                         mockCarePlan,
                         mockTags,
                         DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
@@ -187,8 +300,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
         Mockito.`when`(
                 mockTaggingService.appendDefaultTags(
-                        ArgumentMatchers.eq(CarePlan.resourceType),
-                        ArgumentMatchers.any<HashMap<String, String>>()
+                        mockCarePlan,
+                        null
                 )
         ).thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey())
@@ -218,7 +331,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .restoreUploadData(
                         mockDecryptedFhir3Record,
                         mockCarePlan,
-                        mockUploadData
+                        mockUploadData as HashMap<Any, String?>
                 )
 
         Mockito.doReturn(mockDecryptedFhir3Record)
@@ -229,7 +342,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                         USER_ID
                 )
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
+        every { RecordMapper.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
 
         val annotations = listOf<String>()
 
@@ -245,11 +358,11 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Truth.assertThat(record).isSameInstanceAs(mockRecord)
 
         inOrder.verify(mockTaggingService).appendDefaultTags(
-                ArgumentMatchers.anyString(),
-                ArgumentMatchers.any<HashMap<String, String>>()
+                mockCarePlan,
+                null
         )
         inOrder.verify(mockCryptoService).generateGCKey()
-        inOrder.verify(mockDecryptedRecordBuilder).build(
+        inOrder.verify(mockDecryptedRecordMapper).build(
                 mockCarePlan,
                 mockTags,
                 DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
@@ -382,12 +495,12 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun `Given, createRecord is called with a DomainResource, a UserId and Annotations, it returns a new Record`() {
         // Given
         every {
-            anyConstructed<DecryptedRecordBuilderImpl>().setAnnotations(ANNOTATIONS)
-        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilderImpl
+            anyConstructed<DecryptedRecordMapper>().setAnnotations(any())
+        } returns mockDecryptedRecordMapper
 
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
-                mockDecryptedRecordBuilder.build(
+                mockDecryptedRecordMapper.build(
                         mockCarePlan,
                         mockTags,
                         DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
@@ -398,9 +511,9 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Mockito.doReturn(mockUploadData).`when`(recordService).extractUploadData(mockCarePlan)
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
         Mockito.`when`(mockTaggingService.appendDefaultTags(
-                ArgumentMatchers.eq(CarePlan.resourceType),
-                ArgumentMatchers.any<HashMap<String, String>>())
-        ).thenReturn(mockTags)
+                mockCarePlan,
+                null
+        )).thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockAnnotatedDecryptedFhirRecord).`when`(recordService)
                 ._uploadData(
@@ -423,10 +536,10 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .`when`(recordService).restoreUploadData(
                         mockAnnotatedDecryptedFhirRecord,
                         mockCarePlan,
-                        mockUploadData
+                        mockUploadData as HashMap<Any, String?>
                 )
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockAnnotatedDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
+        every { RecordMapper.getInstance(mockAnnotatedDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
 
         // When
         val subscriber = recordService.createRecord(USER_ID, mockCarePlan, ANNOTATIONS).test().await()
@@ -441,11 +554,11 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Truth.assertThat(record).isSameInstanceAs(mockRecord)
 
         inOrder.verify(mockTaggingService).appendDefaultTags(
-                ArgumentMatchers.anyString(),
-                ArgumentMatchers.any<HashMap<String, String>>()
+                mockCarePlan,
+                null
         )
         inOrder.verify(mockCryptoService).generateGCKey()
-        inOrder.verify(mockDecryptedRecordBuilder).build(
+        inOrder.verify(mockDecryptedRecordMapper).build(
                 mockCarePlan,
                 mockTags,
                 DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
@@ -466,7 +579,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         inOrder.verify(recordService).restoreUploadData(
                 mockAnnotatedDecryptedFhirRecord,
                 mockCarePlan,
-                mockUploadData
+                mockUploadData as HashMap<Any, String?>
         )
         inOrder.verify(recordService).assignResourceId(mockAnnotatedDecryptedFhirRecord)
         inOrder.verifyNoMoreInteractions()
@@ -486,12 +599,12 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun `Given, createRecords is called a DomainResource and a UserId, Annotations and without attachment, it returns a new Record`() {
         // Given
         every {
-            anyConstructed<DecryptedRecordBuilderImpl>().setAnnotations(ANNOTATIONS)
-        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilderImpl
+            anyConstructed<DecryptedRecordMapper>().setAnnotations(any())
+        } returns mockDecryptedRecordMapper
 
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
-                mockDecryptedRecordBuilder.build(
+                mockDecryptedRecordMapper.build(
                         mockCarePlan,
                         mockTags,
                         DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
@@ -503,8 +616,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
         Mockito.`when`(
                 mockTaggingService.appendDefaultTags(
-                        ArgumentMatchers.eq(CarePlan.resourceType),
-                        ArgumentMatchers.any<HashMap<String, String>>()
+                        mockCarePlan,
+                        null
                 )
         ).thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey())
@@ -534,7 +647,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .restoreUploadData(
                         mockAnnotatedDecryptedFhirRecord,
                         mockCarePlan,
-                        mockUploadData
+                        mockUploadData as HashMap<Any, String?>
                 )
 
         Mockito.doReturn(mockAnnotatedDecryptedFhirRecord)
@@ -544,7 +657,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                         USER_ID
                 )
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockAnnotatedDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
+        every { RecordMapper.getInstance(mockAnnotatedDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
 
         // When
         val subscriber = recordService.createRecord(USER_ID, mockCarePlan, ANNOTATIONS).test().await()
@@ -559,11 +672,11 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Truth.assertThat(record).isSameInstanceAs(mockRecord)
 
         inOrder.verify(mockTaggingService).appendDefaultTags(
-                ArgumentMatchers.anyString(),
-                ArgumentMatchers.any<HashMap<String, String>>()
+                mockCarePlan,
+                null
         )
         inOrder.verify(mockCryptoService).generateGCKey()
-        inOrder.verify(mockDecryptedRecordBuilder).build(
+        inOrder.verify(mockDecryptedRecordMapper).build(
                 mockCarePlan,
                 mockTags,
                 DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
@@ -649,8 +762,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         inOrder.verifyNoMoreInteractions()
     }
 
+    @Ignore("This test is obsolete")
     @Test
-    @Ignore
     @Throws(
             InterruptedException::class,
             IOException::class,
@@ -661,19 +774,21 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class
     )
-    fun `Given createRecord is called with a Byte resource, a UserId and Annotations, it returns a new DataRecord`() {
+    fun `Given createRecord is called with a DataResource resource, a UserId and Annotations, it returns a new DataRecord`() {
         // Given
         every {
-            anyConstructed<DecryptedRecordBuilderImpl>().setAnnotations(ANNOTATIONS)
-        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilderImpl
+            anyConstructed<DecryptedRecordMapper>().setAnnotations(listOf())
+        } returns mockDecryptedRecordMapper
 
-        Mockito.`when`(mockTaggingService.appendDefaultTags(null, null))
-                .thenReturn(mockTags)
+        Mockito.`when`(mockTaggingService.appendDefaultTags(
+                ArgumentMatchers.argThat { true },
+                null
+        )).thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
-                mockDecryptedRecordBuilder.build(
-                        mockDataResource.value,
+                mockDecryptedRecordMapper.build(
+                        mockDataResource,
                         mockTags,
                         DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
                         mockDataKey,
@@ -692,7 +807,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .`when`(recordService)
                 .assignResourceId(mockDecryptedDataRecord)
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockDecryptedDataRecord) } returns mockDataRecord
+        every { RecordMapper.getInstance(mockDecryptedDataRecord) } returns mockDataRecord
 
         // When
         val subscriber = recordService.createRecord(
@@ -709,10 +824,10 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .values()[0]
         Truth.assertThat(record).isSameInstanceAs(mockDataRecord)
 
-        inOrder.verify(mockTaggingService).appendDefaultTags(null, null)
+        inOrder.verify(mockTaggingService).appendDefaultTags(ArgumentMatchers.argThat { true }, null)
         inOrder.verify(mockCryptoService).generateGCKey()
-        inOrder.verify(mockDecryptedRecordBuilder).build(
-                mockDataResource.value,
+        inOrder.verify(mockDecryptedRecordMapper).build(
+                mockDataResource,
                 mockTags,
                 DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
                 mockDataKey,

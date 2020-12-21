@@ -15,14 +15,20 @@
  */
 package care.data4life.sdk.tag
 
-import care.data4life.sdk.model.ModelVersion
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir3Version
+import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.fhir.Fhir4Version
+import care.data4life.sdk.wrapper.SdkFhirElementFactory
+import care.data4life.sdk.wrapper.WrapperContract
 import java.util.*
 
 // TODO internal
 class TaggingService(
         private val clientId: String
-) {
+): TaggingContract.Service {
     private val partnerId: String = clientId.substringBefore(SEPARATOR)
+    private val fhirElementFactory: WrapperContract.FhirElementFactory = SdkFhirElementFactory
 
     private fun appendCommonDefaultTags(
             resourceType: String?,
@@ -48,34 +54,36 @@ class TaggingService(
         return tags
     }
 
-    // FIXME add FHIR 4 support
-    fun appendDefaultTags(
-            resourceType: String?,
+    override fun appendDefaultTags(
+            resource: Any,
             oldTags: HashMap<String, String>?
-    ): HashMap<String, String> = appendCommonDefaultTags(resourceType, oldTags).also {
-        if (!it.containsKey(TAG_FHIR_VERSION)) {
-            it[TAG_FHIR_VERSION] = ModelVersion.FHIR_VERSION
+    ): HashMap<String, String> {
+        return when(resource) {
+            is Fhir3Resource -> appendCommonDefaultTags(resource.resourceType, oldTags).also {
+                if (!it.containsKey(TAG_FHIR_VERSION)) {
+                    it[TAG_FHIR_VERSION] = Fhir3Version.version
+                }
+            }
+            is Fhir4Resource -> appendCommonDefaultTags(resource.resourceType, oldTags).also {
+                if (!it.containsKey(TAG_FHIR_VERSION)) {
+                    it[TAG_FHIR_VERSION] = Fhir4Version.version
+                }
+            }
+            else -> appendCommonDefaultTags(null, oldTags).also {
+                it[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE
+            }
         }
     }
 
-    fun appendAppDataTags(
-            tags: HashMap<String, String>?
-    ): HashMap<String, String>? = tags.also {
-        if (it != null) {
-            it[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE
-        }
-    }
-
-    fun appendDefaultAnnotatedTags(
-            resourceType: String?,
-            oldTags: HashMap<String, String>?
-    ): HashMap<String, String> = appendAppDataTags(appendCommonDefaultTags(resourceType, oldTags))!!
-
-    fun getTagFromType(
-            resourceType: String?
-    ): HashMap<String, String> = hashMapOf<String, String>().also {
-        if (resourceType != null && resourceType.isNotEmpty()) {
-            it[TAG_RESOURCE_TYPE] = resourceType.toLowerCase(US_LOCALE)
+    override fun getTagFromType(
+            resourceType: Class<Any>?
+    ): HashMap<String, String> {
+        return hashMapOf<String, String>().also {
+            if (resourceType == null) {
+                it[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE
+            } else {
+                it[TAG_RESOURCE_TYPE] = fhirElementFactory.getFhirTypeForClass(resourceType)!!.toLowerCase(US_LOCALE)
+            }
         }
     }
 

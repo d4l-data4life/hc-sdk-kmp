@@ -20,11 +20,11 @@ import care.data4life.sdk.model.definitions.Fhir3Record
 import java.util.Objects.hash
 
 open class Record<T : DomainResource>(
-        fhirResource: T?,
+        fhirResource: T,
         meta: Meta?,
         annotations: List<String>? = null
-) : Fhir3Record<T?> {
-    constructor(fhirResource: T?, meta: Meta?) : this(
+) : Fhir3Record<T> {
+    constructor(fhirResource: T, meta: Meta?) : this(
             fhirResource,
             meta,
             null
@@ -33,8 +33,8 @@ open class Record<T : DomainResource>(
     override val identifier: String
         get() = ""
 
-    private val _resource: T? = fhirResource
-    override val resource: T?
+    private val _resource: T = fhirResource
+    override val resource: T
         get() = _resource
 
     private val _meta: Meta? = meta

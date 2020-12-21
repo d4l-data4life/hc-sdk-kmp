@@ -17,7 +17,7 @@ package care.data4life.sdk.tag
 
 import java.util.*
 
-object TagHelper {
+object TagHelper : TaggingContract.Helper {
 
     private const val TAG_DELIMITER = "="
 

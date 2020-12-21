@@ -17,9 +17,11 @@
 package care.data4life.sdk.network.model.definitions
 
 import care.data4life.crypto.GCKey
+import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 
+// ToDo -> to contract
 internal interface DecryptedBaseRecord<T> {
     var identifier: String?
     var resource: T
@@ -35,7 +37,7 @@ internal interface DecryptedBaseRecord<T> {
 // FIXME remove nullable type
 internal interface DecryptedFhir3Record<T : Fhir3Resource?> : DecryptedBaseRecord<T>
 internal interface DecryptedFhir4Record<T : Fhir4Resource> : DecryptedBaseRecord<T>
-internal interface DecryptedDataRecord : DecryptedBaseRecord<ByteArray> {
+internal interface DecryptedCustomDataRecord : DecryptedBaseRecord<DataResource> {
     override var attachmentsKey: GCKey?
         get() = null
         set(_) {}

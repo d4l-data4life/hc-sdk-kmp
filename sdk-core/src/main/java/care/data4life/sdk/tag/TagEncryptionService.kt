@@ -29,7 +29,7 @@ import java.nio.charset.StandardCharsets
 class TagEncryptionService @JvmOverloads constructor(
         private val cryptoService: CryptoService,
         private val base64: Base64 = Base64
-) {
+) : TaggingContract.EncryptionService {
     @Throws(IOException::class)
     private fun encryptList(list: List<String>, prefix: String = ""): List<String> {
         val tek = cryptoService.fetchTagEncryptionKey()

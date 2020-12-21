@@ -17,30 +17,34 @@
 package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
-import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.wrapper.WrapperContract
 import io.reactivex.Single
 
 // TODO change to internal
-interface AttachmentContract {
+class AttachmentContract {
 
     interface Service {
 
         fun upload(
-                attachments: List<Attachment>,
+                attachments: List<WrapperContract.Attachment>,
                 attachmentsKey: GCKey,
                 userId: String
-        ): Single<List<Pair<Attachment, List<String>>>>
+        ): Single<List<Pair<WrapperContract.Attachment, List<String>>>>
 
 
         @Throws(DataValidationException.InvalidAttachmentPayloadHash::class)
         fun download(
-                attachments: List<Attachment>,
+                attachments: List<WrapperContract.Attachment>,
                 attachmentsKey: GCKey,
                 userId: String
-        ): Single<List<Attachment>>
+        ): Single<List<WrapperContract.Attachment>>
 
         
         fun delete(attachmentId: String, userId: String): Single<Boolean>
+    }
+
+    internal interface CompatibilityValidator {
+        fun isHashable(attachment: WrapperContract.Attachment): Boolean
     }
 }

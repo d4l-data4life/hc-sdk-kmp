@@ -25,7 +25,7 @@ interface BaseRecord<T> {
     val annotations: List<String>?
 }
 
-interface Fhir3Record<T : DomainResource?> : BaseRecord<T> {
+interface Fhir3Record<T : DomainResource> : BaseRecord<T> {
     val fhirResource: T
         get() = resource
 }

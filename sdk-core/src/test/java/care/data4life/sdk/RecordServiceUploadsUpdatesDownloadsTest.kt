@@ -16,7 +16,6 @@
 
 package care.data4life.sdk
 
-import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
@@ -27,7 +26,14 @@ import care.data4life.sdk.test.util.MedicationBuilder
 import care.data4life.sdk.test.util.ObservationBuilder
 import care.data4life.sdk.test.util.PatientBuilder
 import care.data4life.sdk.test.util.QuestionnaireResponseBuilder
+import care.data4life.sdk.util.Base64
+import care.data4life.sdk.util.HashUtil
+import care.data4life.sdk.wrapper.SdkAttachmentFactory
+import care.data4life.sdk.wrapper.WrapperContract
 import com.google.common.truth.Truth
+import io.mockk.every
+import io.mockk.spyk
+import io.mockk.verify
 import io.reactivex.Single
 import org.junit.After
 import org.junit.Assert
@@ -35,6 +41,7 @@ import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito
 
 class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
@@ -94,7 +101,6 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
     }
 
     @Test
-    @Ignore
     fun `Given, _uploadData is called with a non DecryptedFhirRecord and UserId, it reflects it`() {
         // Given
         val document = buildDocumentReference()
@@ -103,28 +109,26 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         val decryptedRecord = Mockito.mock(DecryptedBaseRecord::class.java) as DecryptedBaseRecord<Any>
 
         val downscaledIds = listOf("downscaledId_1", "downscaledId_2")
-        val uploadResult = listOf(Pair(document.content[0].attachment, downscaledIds))
-        Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        Mockito.`when`(recordService.getValidHash(document.content[0].attachment)).thenReturn(DATA_HASH)
-        Mockito.`when`(mockAttachmentService.upload(
-                ArgumentMatchers.any(),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.just(uploadResult))
+        val uploadResult = listOf(Pair(SdkAttachmentFactory.wrap(document.content[0].attachment), downscaledIds))
 
+        every { cryptoService.generateGCKey() } returns Single.just(mockAttachmentKey)
+        every { recordServiceK.getValidHash(
+                eq(SdkAttachmentFactory.wrap(document.content[0].attachment))
+        ) } returns DATA_HASH
+
+        every { attachmentService.upload(
+                listOf(SdkAttachmentFactory.wrap(document.content[0].attachment)),
+                mockAttachmentKey,
+                USER_ID
+        ) } returns Single.just(uploadResult)
         // When
-        val record = recordService._uploadData(decryptedRecord, USER_ID)
+        val record = recordServiceK._uploadData(decryptedRecord, USER_ID)
 
         // Then
         Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
-
-        inOrder.verify(recordService)._uploadData(decryptedRecord, USER_ID)
-        inOrder.verifyNoMoreInteractions()
     }
 
     @Test
-    @Ignore
     @Throws(DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
@@ -143,31 +147,45 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 -1
         )
         val downscaledIds = listOf("downscaledId_1", "downscaledId_2")
-        val uploadResult = listOf(Pair(document.content[0].attachment, downscaledIds))
-        Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        Mockito.`when`(recordService.getValidHash(document.content[0].attachment)).thenReturn(DATA_HASH)
-        Mockito.`when`(mockAttachmentService.upload(
-                ArgumentMatchers.any(),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.just(uploadResult))
+        val uploadResult = listOf(Pair(SdkAttachmentFactory.wrap(document.content[0].attachment), downscaledIds))
+
+        every { cryptoService.generateGCKey() } returns Single.just(mockAttachmentKey)
+        every { recordServiceK.getValidHash(
+                eq(SdkAttachmentFactory.wrap(document.content[0].attachment))
+        ) } returns DATA_HASH
+
+        every { attachmentService.upload(
+                listOf(SdkAttachmentFactory.wrap(document.content[0].attachment)),
+                mockAttachmentKey,
+                USER_ID
+        ) } returns Single.just(uploadResult)
+
+        every { recordServiceK.getValidHash(
+                SdkAttachmentFactory.wrap(document.content[0].attachment)
+        ) } returns DATA_HASH
+
+        every { attachmentService.upload(
+                listOf(SdkAttachmentFactory.wrap(document.content[0].attachment)),
+                mockAttachmentKey,
+                USER_ID
+        ) } returns Single.just(uploadResult)
 
         // When
-        val record = recordService._uploadData(decryptedRecord, USER_ID)
+        val record = recordServiceK._uploadData(decryptedRecord, USER_ID)
 
         // Then
         Truth.assertThat(record).isEqualTo(decryptedRecord)
         Truth.assertThat(record.attachmentsKey).isEqualTo(mockAttachmentKey)
-        inOrder.verify(recordService)._uploadData(decryptedRecord, USER_ID)
+
+        /*inOrder.verify(recordService)._uploadData(decryptedRecord, USER_ID)
         inOrder.verify(mockCryptoService).generateGCKey()
-        inOrder.verify(recordService).getValidHash(document.content[0].attachment)
+        inOrder.verify(recordService).getValidHash(eq(SdkAttachmentFactory.wrap(document.content[0].attachment)))
         inOrder.verify(mockAttachmentService).upload(
                 ArgumentMatchers.any(),
                 ArgumentMatchers.eq(mockAttachmentKey),
                 ArgumentMatchers.eq(USER_ID)
         )
-        inOrder.verifyNoMoreInteractions()
+        inOrder.verifyNoMoreInteractions()*/
     }
 
     @Test
@@ -238,14 +256,13 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
             Truth.assertThat(e.javaClass).isEqualTo(DataValidationException.InvalidAttachmentPayloadHash::class.java)
             Truth.assertThat(e.message).isEqualTo("Attachment.hash is not valid")
         }
-        inOrder.verify(recordService)._uploadData(decryptedRecord, USER_ID)
+        /*inOrder.verify(recordService)._uploadData(decryptedRecord, USER_ID)
         inOrder.verify(mockCryptoService).generateGCKey()
-        inOrder.verify(recordService).getValidHash(document.content[0].attachment)
-        inOrder.verifyNoMoreInteractions()
+        inOrder.verify(recordService).getValidHash(eq(SdkAttachmentFactory.wrap(document.content[0].attachment)))
+        inOrder.verifyNoMoreInteractions()*/
     }
 
     @Test
-    @Ignore
     @Throws(DataValidationException.IdUsageViolation::class,
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
@@ -257,9 +274,9 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         firstAttachment.title = "image"
         val secondAttachment = docRef.content[1].attachment
         secondAttachment.title = "pdf"
-        val uploadResult: MutableList<Pair<Attachment, List<String>>> = arrayListOf()
-        uploadResult.add(Pair(firstAttachment, listOf(PREVIEW_ID, THUMBNAIL_ID)))
-        uploadResult.add(Pair(secondAttachment, listOf()))
+        val uploadResult: MutableList<Pair<WrapperContract.Attachment, List<String>?>> = arrayListOf()
+        uploadResult.add(Pair(SdkAttachmentFactory.wrap(firstAttachment), listOf(PREVIEW_ID, THUMBNAIL_ID)))
+        uploadResult.add(Pair(SdkAttachmentFactory.wrap(secondAttachment), null))
         val dummyDecryptedRecord = DecryptedRecord(
                 RECORD_ID,
                 docRef,
@@ -271,21 +288,29 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 null,
                 -1
         )
-        Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        Mockito.`when`(recordService.getValidHash(secondAttachment)).thenReturn(DATA_HASH)
-        Mockito.`when`(recordService.getValidHash(firstAttachment)).thenReturn(DATA_HASH)
-        Mockito.`when`(mockAttachmentService.upload(
-                ArgumentMatchers.any(),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.fromCallable {
+
+        every { cryptoService.generateGCKey() } returns Single.just(mockAttachmentKey)
+
+        every { recordServiceK.getValidHash(
+                SdkAttachmentFactory.wrap(firstAttachment)
+        ) } returns DATA_HASH
+
+        every { recordServiceK.getValidHash(
+                SdkAttachmentFactory.wrap(secondAttachment)
+        ) } returns DATA_HASH
+
+        every { attachmentService.upload(
+                any(),
+                mockAttachmentKey,
+                USER_ID
+        ) } returns Single.fromCallable {
             firstAttachment.id = ATTACHMENT_ID
             secondAttachment.id = ATTACHMENT_ID
-            uploadResult
-        })
+            uploadResult as List<Pair<WrapperContract.Attachment, List<String>>>
+        }
 
         //when
-        val doc = recordService._uploadData(
+        val doc = recordServiceK._uploadData(
                 dummyDecryptedRecord,
                 USER_ID
         ).resource
@@ -321,6 +346,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
 
         // Then
         Truth.assertThat(record).isEqualTo(mockDecryptedFhir3Record)
+
         inOrder.verify(recordService).updateData(
                 mockDecryptedFhir3Record,
                 mockDocumentReference,
@@ -363,10 +389,13 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         inOrder.verifyNoMoreInteractions()
     }
 
+
     @Test
-    @Ignore
     fun `Given, updateData is called with a non DecryptedFhirRecord, DomainResource and UserId, it reflects it`() {
         // Given
+        val recordService = spyk(recordService)
+        val attachmentService = spyk(mockAttachmentService)
+
         @Suppress("UNCHECKED_CAST")
         val decryptedRecord = Mockito.mock(DecryptedBaseRecord::class.java) as DecryptedBaseRecord<Any>
 
@@ -384,18 +413,20 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
 
         val downscaledIds = listOf("downscaledId_1", "downscaledId_2")
         val uploadResult = listOf(
-                Pair(updatedDocument.content[0].attachment, downscaledIds)
-        )
-        Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        Mockito.`when`(recordService.getValidHash(updatedDocument.content[0].attachment))
-                .thenReturn(DATA_HASH)
-        Mockito.`when`(mockAttachmentService.upload(
-                ArgumentMatchers.eq(listOf(updatedAttachment)),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.just(uploadResult))
-        Mockito.`when`(recordService.getValidHash(updatedDocument.content[0].attachment)).thenReturn(updatedHash)
+                Pair(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment), downscaledIds))
+
+        every { cryptoService.generateGCKey() } returns Single.just(mockAttachmentKey)
+
+        every { recordServiceK.getValidHash(
+                SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment)
+        ) } returns DATA_HASH
+
+        every { attachmentService.upload(
+                listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
+                mockAttachmentKey,
+                USER_ID
+        ) } returns Single.just(uploadResult)
+
 
         // When
         val record = recordService.updateData(decryptedRecord, updatedDocument, USER_ID)
@@ -403,13 +434,21 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         // Then
         Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
 
+        verify(exactly = 0 ) { cryptoService.generateGCKey() }
+        verify(exactly = 0) {
+            attachmentService.upload(
+                    listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
+                    mockAttachmentKey,
+                    USER_ID
+            )
+        }
+        /*
         inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID)
         inOrder.verifyNoMoreInteractions()
+         */
     }
 
-
     @Test
-    @Ignore
     @Throws(DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
@@ -439,31 +478,41 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         )
         val downscaledIds = listOf("downscaledId_1", "downscaledId_2")
         val uploadResult = listOf(
-                Pair(updatedDocument.content[0].attachment, downscaledIds)
+                Pair(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment), downscaledIds)
         )
-        Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        Mockito.`when`(recordService.getValidHash(updatedDocument.content[0].attachment))
-                .thenReturn(DATA_HASH)
-        Mockito.`when`(mockAttachmentService.upload(
-                ArgumentMatchers.eq(listOf(updatedAttachment)),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.just(uploadResult))
-        Mockito.`when`(recordService.getValidHash(updatedDocument.content[0].attachment)).thenReturn(updatedHash)
+
+        every { recordServiceK.getValidHash(
+                SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment)
+        ) } returns updatedHash
+
+        every { attachmentService.upload(
+                listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
+                mockAttachmentKey,
+                USER_ID
+        ) } returns Single.just(uploadResult)
 
         // When
-        recordService.updateData(decryptedRecord, updatedDocument, USER_ID)
+        recordServiceK.updateData(decryptedRecord, updatedDocument, USER_ID)
 
         // Then
-        inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID)
-        inOrder.verify(recordService).getValidHash(updatedDocument.content[0].attachment)
+
+        verify (exactly = 1) { recordServiceK.getValidHash(
+                SdkAttachmentFactory.wrap(updatedAttachment)
+        ) }
+        verify (exactly = 1) { attachmentService.upload(
+                listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
+                mockAttachmentKey,
+                USER_ID
+        ) }
+
+        /*inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID)
+        inOrder.verify(recordService).getValidHash(eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment)))
         inOrder.verify(mockAttachmentService).upload(
-                ArgumentMatchers.eq(listOf(updatedAttachment)),
+                ArgumentMatchers.eq(listOf(SdkAttachmentFactory.wrap(updatedAttachment))),
                 ArgumentMatchers.eq(mockAttachmentKey),
                 ArgumentMatchers.eq(USER_ID)
         )
-        inOrder.verifyNoMoreInteractions()
+        inOrder.verifyNoMoreInteractions()*/
     }
 
     @Test
@@ -559,10 +608,14 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 -1
         )
 
+        every { recordServiceK.getValidHash(
+                eq(SdkAttachmentFactory.wrap(document.content[0].attachment))
+        ) } returns "i cannot never ever be valid"
+
         // When
         try {
             document.content[0].attachment.hash = "hash"
-            recordService.updateData(decryptedRecord, document, USER_ID)
+            recordServiceK.updateData(decryptedRecord, document, USER_ID)
             Assert.fail("Exception expected!")
         } catch (e: D4LException) {
 
@@ -570,13 +623,17 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
             Truth.assertThat(e.javaClass).isEqualTo(DataValidationException.InvalidAttachmentPayloadHash::class.java)
             Truth.assertThat(e.message).isEqualTo("Attachment.hash is not valid")
         }
-        inOrder.verify(recordService).updateData(decryptedRecord, document, USER_ID)
-        inOrder.verify(recordService).getValidHash(document.content[0].attachment)
-        inOrder.verifyNoMoreInteractions()
+
+        verify(exactly = 1) { recordServiceK.getValidHash(
+                eq(SdkAttachmentFactory.wrap(document.content[0].attachment))
+        ) }
+
+        /*inOrder.verify(recordService).updateData(decryptedRecord, document, USER_ID)
+        inOrder.verify(recordService).getValidHash(eq(SdkAttachmentFactory.wrap(document.content[0].attachment)))
+        inOrder.verifyNoMoreInteractions()*/
     }
 
     @Test
-    @Ignore
     @Throws(DataValidationException.IdUsageViolation::class,
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
@@ -584,14 +641,14 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         // Given
         val oldDocument = buildDocumentReference()
         val oldAttachment = oldDocument.content[0].attachment
-        oldAttachment.id = "id"
+        oldAttachment.id = "no id"
         oldAttachment.size = null
         oldAttachment.hash = null
         val updatedDocument = buildDocumentReference()
         val updatedAttachment = updatedDocument.content[0].attachment
         updatedAttachment.id = "id"
         updatedAttachment.size = 0
-        updatedAttachment.hash = "hash"
+        updatedAttachment.hash = DATA_HASH
         val decryptedRecord = DecryptedRecord(
                 RECORD_ID,
                 oldDocument,
@@ -603,86 +660,38 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 mockAttachmentKey,
                 -1
         )
-        val uploadResult = arrayListOf<Pair<Attachment, List<String>>>()
+        val uploadResult = arrayListOf<Pair<WrapperContract.Attachment, List<String>>>()
         val downscaledIds = listOf("downscaledId_1", "downscaledId_2")
-        uploadResult.add(Pair(updatedAttachment, downscaledIds))
-        Mockito.`when`(mockAttachmentService.upload(
-                ArgumentMatchers.eq(listOf(updatedAttachment)),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.just(uploadResult))
+        uploadResult.add(Pair(SdkAttachmentFactory.wrap(updatedAttachment), downscaledIds))
 
-        // When
-        try {
-            recordService.updateData(decryptedRecord, updatedDocument, USER_ID)
-            Assert.fail("Exception expected!")
-        } catch (e: D4LException) {
-
-            // Then
-            Truth.assertThat(e.javaClass).isEqualTo(DataValidationException.InvalidAttachmentPayloadHash::class.java)
-            Truth.assertThat(e.message).isEqualTo("Attachment.hash is not valid")
-        }
-
-
-        // Then
-        inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID)
-        inOrder.verify(recordService).getValidHash(updatedDocument.content[0].attachment)
-        inOrder.verifyNoMoreInteractions()
-    }
-
-    @Test
-    @Ignore
-    @Throws(DataValidationException.IdUsageViolation::class,
-            DataValidationException.ExpectedFieldViolation::class,
-            DataValidationException.InvalidAttachmentPayloadHash::class)
-    fun updateData_throws_Attachment_whenHashesDontMatch() {
-        // Given
-        val oldDocument = buildDocumentReference()
-        val oldAttachment = oldDocument.content[0].attachment
-        oldAttachment.id = "id"
-        oldAttachment.size = 0
-        oldAttachment.hash = "oldHash"
-        val updatedDocument = buildDocumentReference()
-        val updatedAttachment = updatedDocument.content[0].attachment
-        updatedAttachment.id = "id"
-        updatedAttachment.size = 0
-        updatedAttachment.hash = "newHash"
-        val decryptedRecord = DecryptedRecord(
-                RECORD_ID,
-                oldDocument,
-                null,
-                arrayListOf(),
-                null,
-                null,
-                null,
+        every { recordServiceK.getValidHash(SdkAttachmentFactory.wrap(updatedAttachment)) } returns DATA_HASH
+        every { attachmentService.upload(
+                listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
                 mockAttachmentKey,
-                -1
-        )
-        val uploadResult = arrayListOf<Pair<Attachment, List<String>>>()
-        val downscaledIds = listOf("downscaledId_1", "downscaledId_2")
-        uploadResult.add(Pair(updatedAttachment, downscaledIds))
-        Mockito.`when`(mockAttachmentService.upload(
-                ArgumentMatchers.eq(listOf(updatedAttachment)),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.just(uploadResult))
-
+                USER_ID
+        ) } returns Single.just(uploadResult)
 
         // When
         try {
-            recordService.updateData(decryptedRecord, updatedDocument, USER_ID)
+            recordServiceK.updateData(decryptedRecord, updatedDocument, USER_ID)
             Assert.fail("Exception expected!")
         } catch (e: D4LException) {
 
             // Then
-            Truth.assertThat(e.javaClass).isEqualTo(DataValidationException.InvalidAttachmentPayloadHash::class.java)
-            Truth.assertThat(e.message).isEqualTo("Attachment.hash is not valid")
+            Truth.assertThat(e.javaClass).isEqualTo(DataValidationException.IdUsageViolation::class.java)
+            Truth.assertThat(e.message).isEqualTo("Valid Attachment.id expected")
         }
 
         // Then
-        inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID)
-        inOrder.verify(recordService).getValidHash(updatedDocument.content[0].attachment)
-        inOrder.verifyNoMoreInteractions()
+        verify (exactly = 0) { attachmentService.upload(
+                listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
+                mockAttachmentKey,
+                USER_ID
+        ) }
+        verify (exactly = 1) { recordServiceK.getValidHash(SdkAttachmentFactory.wrap(updatedAttachment)) }
+        /*inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID)
+        inOrder.verify(recordService).getValidHash(eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment)))
+        inOrder.verifyNoMoreInteractions()*/
     }
 
     @Test
@@ -691,6 +700,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun updateData_throws_whenValidAttachmentIdNotPresent() {
         // Given
+        val recordService = spyk(recordService)
+
         val oldDocument = buildDocumentReference()
         val oldAttachment = oldDocument.content[0].attachment
         oldAttachment.id = "id1"
@@ -712,8 +723,14 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 null,
                 -1
         )
-        Mockito.`when`(recordService.getValidHash(updatedDocument.content[0].attachment))
-                .thenReturn("hash")
+
+        every {recordService.getValidHash(
+                eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment))
+        ) } returns "hash"
+        /*
+        Mockito.`when`(recordService.getValidHash(
+                eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment))
+        )).thenReturn("hash")*/
         // When
         try {
             recordService.updateData(decryptedRecord, updatedDocument, USER_ID)
@@ -724,9 +741,15 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
             Truth.assertThat(e.javaClass).isEqualTo(DataValidationException.IdUsageViolation::class.java)
             Truth.assertThat(e.message).isEqualTo("Valid Attachment.id expected")
         }
-        inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID)
-        inOrder.verify(recordService).getValidHash(updatedDocument.content[0].attachment)
-        inOrder.verifyNoMoreInteractions()
+
+        verify(exactly = 1) {
+            recordService.getValidHash(
+                eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment))
+            )
+        }
+        /*inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID)
+        inOrder.verify(recordService).getValidHash(eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment)))
+        inOrder.verifyNoMoreInteractions()*/
     }
 
     @Test
@@ -735,6 +758,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
             DataValidationException.IdUsageViolation::class)
     fun updateData_notUploadsAttachment_whenHashesMatch() {
         // Given
+        val recordService = spyk(recordService)
+
         val oldDocument = buildDocumentReference()
         val oldAttachment = oldDocument.content[0].attachment
         oldAttachment.id = "id"
@@ -756,15 +781,77 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 mockAttachmentKey,
                 -1
         )
-        Mockito.`when`(recordService.getValidHash(updatedDocument.content[0].attachment))
-                .thenReturn("hash")
+
+        every { recordService.getValidHash(
+                eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment))
+        ) } returns "hash"
+
         // When
         recordService.updateData(decryptedRecord, updatedDocument, USER_ID)
 
+        verify(exactly = 1) {
+            recordService.getValidHash(
+                    eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment))
+            )
+        }
         // Then
-        inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID)
-        inOrder.verify(recordService).getValidHash(updatedDocument.content[0].attachment)
-        inOrder.verifyNoMoreInteractions()
+        /*inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID)
+        inOrder.verify(recordService).getValidHash(eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment)))
+        inOrder.verifyNoMoreInteractions()*/
+    }
+
+    @Test
+    @Throws(DataValidationException.IdUsageViolation::class,
+            DataValidationException.ExpectedFieldViolation::class,
+            DataValidationException.InvalidAttachmentPayloadHash::class)
+    fun updateData_doesAppendWhenOldHashIsNUll() {
+        // Given
+        val oldDocument = buildDocumentReference()
+        val oldAttachment = oldDocument.content[0].attachment
+        oldAttachment.id = "id"
+        oldAttachment.size = 0
+        oldAttachment.hash = null
+        val updatedDocument = buildDocumentReference()
+        val updatedAttachment = updatedDocument.content[0].attachment
+        updatedAttachment.id = "id"
+        updatedAttachment.size = 0
+        updatedAttachment.hash = DATA_HASH
+        val decryptedRecord = DecryptedRecord(
+                RECORD_ID,
+                oldDocument,
+                null,
+                arrayListOf(),
+                null,
+                null,
+                null,
+                mockAttachmentKey,
+                -1
+        )
+        val uploadResult = arrayListOf<Pair<WrapperContract.Attachment, List<String>>>()
+        val downscaledIds = listOf("downscaledId_1", "downscaledId_2")
+        uploadResult.add(Pair(SdkAttachmentFactory.wrap(updatedAttachment), downscaledIds))
+
+        every { attachmentService.upload(
+                listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
+                mockAttachmentKey,
+                USER_ID
+        ) } returns Single.just(uploadResult)
+        every { recordServiceK.getValidHash(SdkAttachmentFactory.wrap(updatedAttachment)) } returns DATA_HASH
+
+        // When
+        recordServiceK.updateData(decryptedRecord, updatedDocument, USER_ID)
+
+        // Then
+        verify (exactly = 1) { attachmentService.upload(
+                listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
+                mockAttachmentKey,
+                USER_ID
+        ) }
+        verify (exactly = 1) { recordServiceK.getValidHash(SdkAttachmentFactory.wrap(updatedAttachment)) }
+        // Then
+        /*inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID)
+        inOrder.verify(recordService).getValidHash(eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment)))
+        inOrder.verifyNoMoreInteractions()*/
     }
 
     @Test
@@ -794,7 +881,6 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
     }
 
     @Test
-    @Ignore
     @Throws(DataValidationException.IdUsageViolation::class, DataValidationException.InvalidAttachmentPayloadHash::class)
     fun `Given, downloadData is called with a non DecryptedFhirRecord and a UserId, it reflects it`() {
         // Given
@@ -802,24 +888,31 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         document.content[0].attachment.id = "id"
         @Suppress("UNCHECKED_CAST")
         val decryptedRecord = Mockito.mock(DecryptedBaseRecord::class.java) as DecryptedBaseRecord<Any>
-        Mockito.`when`(mockAttachmentService.download(
-                ArgumentMatchers.any(),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.just(arrayListOf()))
+
+        every {
+            attachmentService.download(
+                    listOf(SdkAttachmentFactory.wrap(document.content[0].attachment)),
+                    mockAttachmentKey,
+                    USER_ID
+        ) } returns Single.just(arrayListOf())
 
         // When
-        val record = recordService.downloadData(decryptedRecord, USER_ID)
+        val record = recordServiceK.downloadData(decryptedRecord, USER_ID)
 
         // Then
         Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
 
-        inOrder.verify(recordService).downloadData(decryptedRecord, USER_ID)
-        inOrder.verifyNoMoreInteractions()
+        verify (exactly = 0) {
+            attachmentService.download(
+                    listOf(SdkAttachmentFactory.wrap(document.content[0].attachment)),
+                    mockAttachmentKey,
+                    USER_ID
+        ) }
+        /*inOrder.verify(recordService).downloadData(decryptedRecord, USER_ID)
+        inOrder.verifyNoMoreInteractions()*/
     }
 
     @Test
-    @Ignore
     @Throws(DataValidationException.IdUsageViolation::class, DataValidationException.InvalidAttachmentPayloadHash::class)
     fun downloadData_shouldDownloadData() {
         // Given
@@ -836,24 +929,33 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 mockAttachmentKey,
                 -1
         )
-        Mockito.`when`(mockAttachmentService.download(
-                ArgumentMatchers.any(),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.just(arrayListOf()))
+
+        every {
+            attachmentService.download(
+                    listOf(SdkAttachmentFactory.wrap(document.content[0].attachment)),
+                    mockAttachmentKey,
+                    USER_ID
+        ) } returns Single.just(arrayListOf())
 
         // When
-        val record = recordService.downloadData(decryptedRecord, USER_ID)
+        val record = recordServiceK.downloadData(decryptedRecord, USER_ID)
 
         // Then
         Truth.assertThat(record).isEqualTo(decryptedRecord)
-        inOrder.verify(recordService).downloadData(decryptedRecord, USER_ID)
+
+        verify (exactly = 1) {
+            attachmentService.download(
+                    listOf(SdkAttachmentFactory.wrap(document.content[0].attachment)),
+                    mockAttachmentKey,
+                    USER_ID
+        ) }
+        /*inOrder.verify(recordService).downloadData(decryptedRecord, USER_ID)
         inOrder.verify(mockAttachmentService).download(
                 ArgumentMatchers.any(),
                 ArgumentMatchers.eq(mockAttachmentKey),
                 ArgumentMatchers.eq(USER_ID)
         )
-        inOrder.verifyNoMoreInteractions()
+        inOrder.verifyNoMoreInteractions()*/
     }
 
     @Test
@@ -891,12 +993,25 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
     }
 
     @Test
-    @Ignore
     @Throws(DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadOrDownloadData_shouldUploadData_Patient() {
         // Given
+        val recordService = Mockito.spy(
+                RecordService(
+                        PARTNER_ID,
+                        ALIAS,
+                        mockApiService,
+                        mockTagEncryptionService,
+                        mockTaggingService,
+                        mockFhirService,
+                        attachmentService,
+                        mockCryptoService,
+                        mockErrorHandler
+                )
+        )
+
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
         val patient = PatientBuilder.buildPatient()
         val decryptedRecord = DecryptedRecord(
@@ -912,18 +1027,22 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         )
         decryptedRecord.identifier = RECORD_ID
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        val uploadResult = arrayListOf<Pair<Attachment, List<String>>>()
+        val uploadResult = arrayListOf<Pair<WrapperContract.Attachment, List<String>>>()
         val downscaledIds: MutableList<String> = arrayListOf()
         downscaledIds.add("downscaledId_1")
         downscaledIds.add("downscaledId_2")
-        uploadResult.add(Pair<Attachment, List<String>>(patient.photo!![0], downscaledIds))
-        Mockito.`when`(
-                mockAttachmentService.upload(
-                        ArgumentMatchers.any(),
-                        ArgumentMatchers.eq(mockAttachmentKey),
-                        ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.just(uploadResult))
-        Mockito.`when`(recordService.getValidHash(patient.photo!![0])).thenReturn(DATA_HASH)
+        uploadResult.add(Pair<WrapperContract.Attachment, List<String>>(SdkAttachmentFactory.wrap(patient.photo!![0]), downscaledIds))
+
+        every {
+            attachmentService.upload(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+        ) } returns Single.just(uploadResult)
+
+        val encrypted = ByteArray(1)
+        every { HashUtil.sha1(any()) } returns encrypted
+        every { Base64.encodeToString(encrypted) } returns DATA_HASH
 
         // When
         val record = recordService.uploadOrDownloadData(
@@ -936,28 +1055,49 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         // Then
         Truth.assertThat(record).isEqualTo(decryptedRecord)
         Truth.assertThat(record.attachmentsKey).isEqualTo(mockAttachmentKey)
-        inOrder.verify(recordService).uploadOrDownloadData(
+
+        verify (exactly = 1) { Base64.decode(SdkAttachmentFactory.wrap(patient.photo!![0]).data!!) }
+        verify (exactly = 1) {
+            attachmentService.upload(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+        ) }
+        /*inOrder.verify(recordService).uploadOrDownloadData(
                 RecordService.UploadDownloadOperation.UPLOAD,
                 decryptedRecord,
                 null,
                 USER_ID
         )
         inOrder.verify(mockCryptoService).generateGCKey()
-        inOrder.verify(mockAttachmentService).upload(
+        /*inOrder.verify(mockAttachmentService).upload(
                 ArgumentMatchers.any(),
                 ArgumentMatchers.eq(mockAttachmentKey),
                 ArgumentMatchers.eq(USER_ID)
-        )
-        inOrder.verifyNoMoreInteractions()
+        )*/
+        inOrder.verifyNoMoreInteractions()*/
     }
 
     @Test
-    @Ignore
     @Throws(DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadOrDownloadData_shouldDownloadData_Patient() {
         // Given
+        val recordService = Mockito.spy(
+                RecordService(
+                        PARTNER_ID,
+                        ALIAS,
+                        mockApiService,
+                        mockTagEncryptionService,
+                        mockTaggingService,
+                        mockFhirService,
+                        attachmentService,
+                        mockCryptoService,
+                        mockErrorHandler
+                )
+        )
+
         val patient = PatientBuilder.buildPatient()
         patient.photo!![0].id = "id"
         val decryptedRecord = DecryptedRecord(
@@ -971,11 +1111,13 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 mockAttachmentKey,
                 -1
         )
-        Mockito.`when`(mockAttachmentService.download(
-                ArgumentMatchers.any(),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.just(arrayListOf()))
+
+        every {
+            attachmentService.download(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+        ) } returns Single.just(listOf())
 
         // When
         val record = recordService.uploadOrDownloadData(
@@ -987,7 +1129,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
 
         // Then
         Truth.assertThat(record).isEqualTo(decryptedRecord)
-        inOrder.verify(recordService).uploadOrDownloadData(
+        /*inOrder.verify(recordService).uploadOrDownloadData(
                 RecordService.UploadDownloadOperation.DOWNLOAD,
                 decryptedRecord,
                 null,
@@ -998,16 +1140,35 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 ArgumentMatchers.eq(mockAttachmentKey),
                 ArgumentMatchers.eq(USER_ID)
         )
-        inOrder.verifyNoMoreInteractions()
+        inOrder.verifyNoMoreInteractions()*/
+        verify (exactly = 1) {
+            attachmentService.download(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+        ) }
     }
 
     @Test
-    @Ignore
     @Throws(DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadOrDownloadData_shouldDownloadData_Medication() {
         // Given
+        val recordService = Mockito.spy(
+                RecordService(
+                        PARTNER_ID,
+                        ALIAS,
+                        mockApiService,
+                        mockTagEncryptionService,
+                        mockTaggingService,
+                        mockFhirService,
+                        attachmentService,
+                        mockCryptoService,
+                        mockErrorHandler
+                )
+        )
+
         val medication = MedicationBuilder.buildMedication()
         medication.image!![0].id = "id"
         val decryptedRecord = DecryptedRecord(
@@ -1021,11 +1182,13 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 mockAttachmentKey,
                 -1
         )
-        Mockito.`when`(mockAttachmentService.download(
-                ArgumentMatchers.any(),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.just(arrayListOf()))
+
+        every {
+            attachmentService.download(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+        ) } returns Single.just(listOf())
 
         // When
         val record = recordService.uploadOrDownloadData(
@@ -1037,7 +1200,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
 
         // Then
         Truth.assertThat(record).isEqualTo(decryptedRecord)
-        inOrder.verify(recordService).uploadOrDownloadData(
+        /*inOrder.verify(recordService).uploadOrDownloadData(
                 RecordService.UploadDownloadOperation.DOWNLOAD,
                 decryptedRecord,
                 null,
@@ -1048,16 +1211,35 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 ArgumentMatchers.eq(mockAttachmentKey),
                 ArgumentMatchers.eq(USER_ID)
         )
-        inOrder.verifyNoMoreInteractions()
+        inOrder.verifyNoMoreInteractions()*/
+        verify (exactly = 1) {
+            attachmentService.download(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+        ) }
     }
 
     @Test
-    @Ignore
     @Throws(DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadOrDownloadData_shouldUploadData_Medication() {
         // Given
+        val recordService = Mockito.spy(
+                RecordService(
+                        PARTNER_ID,
+                        ALIAS,
+                        mockApiService,
+                        mockTagEncryptionService,
+                        mockTaggingService,
+                        mockFhirService,
+                        attachmentService,
+                        mockCryptoService,
+                        mockErrorHandler
+                )
+        )
+
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
         val medication = MedicationBuilder.buildMedication()
         val decryptedRecord = DecryptedRecord(
@@ -1073,14 +1255,20 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         )
         decryptedRecord.identifier = RECORD_ID
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        val uploadResult: MutableList<Pair<Attachment, List<String>>> = arrayListOf()
-        uploadResult.add(Pair<Attachment, List<String>>(medication.image!![0], listOf()))
-        Mockito.`when`(mockAttachmentService.upload(
-                ArgumentMatchers.any(),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.just(uploadResult))
-        Mockito.`when`(recordService.getValidHash(medication.image!![0])).thenReturn(DATA_HASH)
+
+        val uploadResult: MutableList<Pair<WrapperContract.Attachment, List<String>>> = arrayListOf()
+        uploadResult.add(Pair<WrapperContract.Attachment, List<String>>(SdkAttachmentFactory.wrap(medication.image!![0]), listOf()))
+
+        every {
+            attachmentService.upload(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+        ) } returns Single.just(listOf())
+
+        val encrypted = ByteArray(1)
+        every { HashUtil.sha1(any()) } returns encrypted
+        every { Base64.encodeToString(encrypted) } returns DATA_HASH
 
         // When
         val record = recordService.uploadOrDownloadData(
@@ -1093,7 +1281,15 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         // Then
         Truth.assertThat(record).isEqualTo(decryptedRecord)
         Truth.assertThat(record.attachmentsKey).isEqualTo(mockAttachmentKey)
-        inOrder.verify(recordService).uploadOrDownloadData(
+        verify (exactly = 1) {
+            attachmentService.upload(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+        ) }
+        verify (exactly = 1) { Base64.decode(SdkAttachmentFactory.wrap(medication.image!![0]).data!!) }
+
+        /*inOrder.verify(recordService).uploadOrDownloadData(
                 RecordService.UploadDownloadOperation.UPLOAD,
                 decryptedRecord,
                 null,
@@ -1105,16 +1301,29 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 ArgumentMatchers.eq(mockAttachmentKey),
                 ArgumentMatchers.eq(USER_ID)
         )
-        inOrder.verifyNoMoreInteractions()
+        inOrder.verifyNoMoreInteractions()*/
     }
 
     @Test
-    @Ignore
     @Throws(DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadOrDownloadData_shouldUploadData_Observation() {
         // Given
+        val recordService = Mockito.spy(
+                RecordService(
+                        PARTNER_ID,
+                        ALIAS,
+                        mockApiService,
+                        mockTagEncryptionService,
+                        mockTaggingService,
+                        mockFhirService,
+                        attachmentService,
+                        mockCryptoService,
+                        mockErrorHandler
+                )
+        )
+
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
         val observation = ObservationBuilder.buildObservationWithComponent()
         observation.component!![0].valueAttachment!!.id = null
@@ -1131,19 +1340,24 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         )
         decryptedRecord.identifier = RECORD_ID
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        Mockito.`when`(recordService.getValidHash(observation.valueAttachment!!)).thenReturn(DATA_HASH)
-        val uploadResult: MutableList<Pair<Attachment, List<String>>> = arrayListOf()
+
+        val uploadResult: MutableList<Pair<WrapperContract.Attachment, List<String>>> = arrayListOf()
         val downscaledIds: MutableList<String> = arrayListOf()
         downscaledIds.add("downscaledId_1")
         downscaledIds.add("downscaledId_2")
-        uploadResult.add(Pair(observation.component!![0].valueAttachment!!, downscaledIds))
-        uploadResult.add(Pair(observation.valueAttachment!!, downscaledIds))
-        Mockito.`when`(mockAttachmentService.upload(
-                ArgumentMatchers.any(),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.just(uploadResult))
-        Mockito.`when`(recordService.getValidHash(observation.component!![0].valueAttachment!!)).thenReturn(DATA_HASH)
+        uploadResult.add(Pair(SdkAttachmentFactory.wrap(observation.component!![0].valueAttachment!!), downscaledIds))
+        uploadResult.add(Pair(SdkAttachmentFactory.wrap(observation.valueAttachment!!), downscaledIds))
+
+        every {
+            attachmentService.upload(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+        ) } returns Single.just(listOf())
+
+        val encrypted = ByteArray(1)
+        every { HashUtil.sha1(any()) } returns encrypted
+        every { Base64.encodeToString(encrypted) } returns DATA_HASH
 
         // When
         val record = recordService.uploadOrDownloadData(
@@ -1156,7 +1370,15 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         // Then
         Truth.assertThat(record).isEqualTo(decryptedRecord)
         Truth.assertThat(record.attachmentsKey).isEqualTo(mockAttachmentKey)
-        inOrder.verify(recordService).uploadOrDownloadData(
+
+        verify (exactly = 1) {
+            attachmentService.upload(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+        ) }
+        verify (exactly = 2) { Base64.decode(SdkAttachmentFactory.wrap(observation.component!![0].valueAttachment!!).data!!) }
+        /*inOrder.verify(recordService).uploadOrDownloadData(
                 RecordService.UploadDownloadOperation.UPLOAD,
                 decryptedRecord,
                 null,
@@ -1168,16 +1390,29 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 ArgumentMatchers.eq(mockAttachmentKey),
                 ArgumentMatchers.eq(USER_ID)
         )
-        inOrder.verifyNoMoreInteractions()
+        inOrder.verifyNoMoreInteractions()*/
     }
 
     @Test
-    @Ignore
     @Throws(DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadOrDownloadData_shouldDownloadData_Observation() {
         // Given
+        val recordService = Mockito.spy(
+                RecordService(
+                        PARTNER_ID,
+                        ALIAS,
+                        mockApiService,
+                        mockTagEncryptionService,
+                        mockTaggingService,
+                        mockFhirService,
+                        attachmentService,
+                        mockCryptoService,
+                        mockErrorHandler
+                )
+        )
+
         val observation = ObservationBuilder.buildObservationWithComponent()
         observation.component!![0].valueAttachment!!.id = "id1"
         observation.valueAttachment!!.id = "id0"
@@ -1192,11 +1427,13 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 mockAttachmentKey,
                 -1
         )
-        Mockito.`when`(mockAttachmentService.download(
-                ArgumentMatchers.any(),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.just(arrayListOf()))
+
+        every {
+            attachmentService.download(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+        ) } returns Single.just(listOf())
 
         // When
         val record = recordService.uploadOrDownloadData(
@@ -1208,7 +1445,13 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
 
         // Then
         Truth.assertThat(record).isEqualTo(decryptedRecord)
-        inOrder.verify(recordService).uploadOrDownloadData(
+        verify (exactly = 1) {
+            attachmentService.download(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+        ) }
+        /*inOrder.verify(recordService).uploadOrDownloadData(
                 RecordService.UploadDownloadOperation.DOWNLOAD,
                 decryptedRecord,
                 null,
@@ -1219,16 +1462,29 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 ArgumentMatchers.eq(mockAttachmentKey),
                 ArgumentMatchers.eq(USER_ID)
         )
-        inOrder.verifyNoMoreInteractions()
+        inOrder.verifyNoMoreInteractions()*/
     }
 
     @Test
-    @Ignore
     @Throws(DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadOrDownloadData_shouldUploadData_QuestionnaireResponse() {
         // Given
+        val recordService = Mockito.spy(
+                RecordService(
+                        PARTNER_ID,
+                        ALIAS,
+                        mockApiService,
+                        mockTagEncryptionService,
+                        mockTaggingService,
+                        mockFhirService,
+                        attachmentService,
+                        mockCryptoService,
+                        mockErrorHandler
+                )
+        )
+
         val questionnaireResponse = QuestionnaireResponseBuilder.buildQuestionnaireResponse()
         val decryptedRecord = DecryptedRecord(
                 RECORD_ID,
@@ -1242,21 +1498,25 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 -1
         )
 
-        val uploadResult: MutableList<Pair<Attachment, List<String>>> = arrayListOf()
+        val uploadResult: MutableList<Pair<WrapperContract.Attachment, List<String>>> = arrayListOf()
         val downscaledIds: MutableList<String> = mutableListOf("downscaledId_1", "downscaledId_2")
-        uploadResult.add(Pair<Attachment, List<String>>(
-                questionnaireResponse.item!![0].answer!![0].valueAttachment!!,
+        uploadResult.add(Pair<WrapperContract.Attachment, List<String>>(
+                SdkAttachmentFactory.wrap(questionnaireResponse.item!![0].answer!![0].valueAttachment!!),
                 downscaledIds)
         )
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        Mockito.`when`(mockAttachmentService.upload(
-                ArgumentMatchers.any(),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID)
-        )).thenReturn(Single.just(uploadResult))
-        Mockito.`when`(recordService.getValidHash(questionnaireResponse.item!![0].answer!![0].valueAttachment!!))
-                .thenReturn(DATA_HASH)
+
+        every {
+            attachmentService.upload(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+            ) } returns Single.just(listOf())
+
+        val encrypted = ByteArray(1)
+        every { HashUtil.sha1(any()) } returns encrypted
+        every { Base64.encodeToString(encrypted) } returns DATA_HASH
 
         // When
         val record = recordService.uploadOrDownloadData(
@@ -1269,7 +1529,16 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         // Then
         Truth.assertThat(record).isEqualTo(decryptedRecord)
         Truth.assertThat(record.attachmentsKey).isEqualTo(mockAttachmentKey)
-        inOrder.verify(recordService).uploadOrDownloadData(
+        verify (exactly = 1) {
+            attachmentService.upload(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+        ) }
+        verify (exactly = 1) { Base64.decode(
+                SdkAttachmentFactory.wrap(questionnaireResponse.item!![0].answer!![0].valueAttachment!!).data!!)
+        }
+        /*inOrder.verify(recordService).uploadOrDownloadData(
                 RecordService.UploadDownloadOperation.UPLOAD,
                 decryptedRecord,
                 null,
@@ -1281,16 +1550,29 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 ArgumentMatchers.eq(mockAttachmentKey),
                 ArgumentMatchers.eq(USER_ID)
         )
-        inOrder.verifyNoMoreInteractions()
+        inOrder.verifyNoMoreInteractions()*/
     }
 
     @Test
-    @Ignore
     @Throws(DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.IdUsageViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadOrDownloadData_shouldDownloadData_QuestionnaireResponse() {
         // Given
+        val recordService = Mockito.spy(
+                RecordService(
+                        PARTNER_ID,
+                        ALIAS,
+                        mockApiService,
+                        mockTagEncryptionService,
+                        mockTaggingService,
+                        mockFhirService,
+                        attachmentService,
+                        mockCryptoService,
+                        mockErrorHandler
+                )
+        )
+
         val questionnaireResponse = QuestionnaireResponseBuilder.buildQuestionnaireResponse()
         questionnaireResponse.item!![0].answer!![0].valueAttachment!!.id = "id"
         val decryptedRecord = DecryptedRecord(
@@ -1304,11 +1586,13 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 mockAttachmentKey,
                 -1
         )
-        Mockito.`when`(mockAttachmentService.download(
-                ArgumentMatchers.any(),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.just(arrayListOf()))
+
+        every {
+            attachmentService.download(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+        ) } returns Single.just(listOf())
 
         // When
         val record = recordService.uploadOrDownloadData(
@@ -1320,7 +1604,14 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
 
         // Then
         Truth.assertThat(record).isEqualTo(decryptedRecord)
-        inOrder.verify(recordService).uploadOrDownloadData(
+
+        verify (exactly = 1) {
+            attachmentService.download(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+        ) }
+        /*inOrder.verify(recordService).uploadOrDownloadData(
                 RecordService.UploadDownloadOperation.DOWNLOAD,
                 decryptedRecord,
                 null,
@@ -1331,16 +1622,29 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 ArgumentMatchers.eq(mockAttachmentKey),
                 ArgumentMatchers.eq(USER_ID)
         )
-        inOrder.verifyNoMoreInteractions()
+        inOrder.verifyNoMoreInteractions()*/
     }
 
     @Test
-    @Ignore
     @Throws(DataValidationException.IdUsageViolation::class,
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadOrDownloadData_shouldAppendAdditionalIdentifiers_Patient() {
         //given
+        val recordService = Mockito.spy(
+                RecordService(
+                        PARTNER_ID,
+                        ALIAS,
+                        mockApiService,
+                        mockTagEncryptionService,
+                        mockTaggingService,
+                        mockFhirService,
+                        attachmentService,
+                        mockCryptoService,
+                        mockErrorHandler
+                )
+        )
+
         val patient = PatientBuilder.buildPatient()
         patient.photo!!.add(AttachmentBuilder.buildAttachment(null))
         val firstAttachment = patient.photo!![0]
@@ -1349,9 +1653,9 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         val secondAttachment = patient.photo!![1]
         secondAttachment.title = "pdf"
         secondAttachment.hash = DATA_HASH
-        val uploadResult: MutableList<Pair<Attachment, List<String>>> = arrayListOf()
-        uploadResult.add(Pair(firstAttachment, listOf(PREVIEW_ID, THUMBNAIL_ID)))
-        uploadResult.add(Pair(secondAttachment, listOf()))
+        val uploadResult: MutableList<Pair<WrapperContract.Attachment, List<String>?>> = arrayListOf()
+        uploadResult.add(Pair(SdkAttachmentFactory.wrap(firstAttachment), listOf(PREVIEW_ID, THUMBNAIL_ID)))
+        uploadResult.add(Pair(SdkAttachmentFactory.wrap(secondAttachment), null))
         val dummyDecryptedRecord = DecryptedRecord(
                 RECORD_ID,
                 patient,
@@ -1364,17 +1668,22 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 -1
         )
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        Mockito.`when`(recordService.getValidHash(patient.photo!![0])).thenReturn(DATA_HASH)
-        Mockito.`when`(recordService.getValidHash(secondAttachment)).thenReturn(DATA_HASH)
-        Mockito.`when`(mockAttachmentService.upload(
-                ArgumentMatchers.any(),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.fromCallable {
-            firstAttachment.id = ATTACHMENT_ID
-            secondAttachment.id = ATTACHMENT_ID
-            uploadResult
-        })
+
+        val encrypted = ByteArray(1)
+        every { HashUtil.sha1(any()) } returns encrypted
+        every { Base64.encodeToString(encrypted) } returns DATA_HASH
+
+        every {
+            attachmentService.upload(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+        ) } returns Single.fromCallable {
+            uploadResult.also {
+                firstAttachment.id = ATTACHMENT_ID
+                secondAttachment.id = ATTACHMENT_ID
+            } as List<Pair<WrapperContract.Attachment, List<String>>> //This cast is technically wrong, how ever this is the assumption of updateFhirResourceIdentifier
+        }
 
         //when
         val pat = recordService.uploadOrDownloadData(
@@ -1392,24 +1701,44 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                         + PREVIEW_ID + "#" + THUMBNAIL_ID
         )
         Truth.assertThat(pat.identifier!![0].assigner!!.reference).isEqualTo(PARTNER_ID)
+
+        verify { Base64.decode(
+                SdkAttachmentFactory.wrap(patient.photo!![0]).data!!)
+        }
+        verify { Base64.decode(
+                SdkAttachmentFactory.wrap(secondAttachment).data!!)
+        }
     }
 
     @Test
-    @Ignore
     @Throws(DataValidationException.IdUsageViolation::class,
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadOrDownloadData_shouldNotAppendAdditionalIdentifiers_Medication() {
         //given
+        val recordService = Mockito.spy(
+                RecordService(
+                        PARTNER_ID,
+                        ALIAS,
+                        mockApiService,
+                        mockTagEncryptionService,
+                        mockTaggingService,
+                        mockFhirService,
+                        attachmentService,
+                        mockCryptoService,
+                        mockErrorHandler
+                )
+        )
+
         val medication = MedicationBuilder.buildMedication()
         medication.image!!.add(AttachmentBuilder.buildAttachment(null))
         val firstAttachment = medication.image!![0]
         firstAttachment.title = "image"
         val secondAttachment = medication.image!![1]
         secondAttachment.title = "pdf"
-        val uploadResult: MutableList<Pair<Attachment, List<String>>> = arrayListOf()
-        uploadResult.add(Pair(firstAttachment, listOf(PREVIEW_ID, THUMBNAIL_ID)))
-        uploadResult.add(Pair(secondAttachment, listOf()))
+        val uploadResult: MutableList<Pair<WrapperContract.Attachment, List<String>>> = arrayListOf()
+        uploadResult.add(Pair(SdkAttachmentFactory.wrap(firstAttachment), listOf(PREVIEW_ID, THUMBNAIL_ID)))
+        uploadResult.add(Pair(SdkAttachmentFactory.wrap(secondAttachment), listOf()))
         val dummyDecryptedRecord = DecryptedRecord(
                 RECORD_ID,
                 medication,
@@ -1422,17 +1751,22 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 -1
         )
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        Mockito.`when`(recordService.getValidHash(firstAttachment)).thenReturn(DATA_HASH)
-        Mockito.`when`(recordService.getValidHash(secondAttachment)).thenReturn(DATA_HASH)
-        Mockito.`when`(mockAttachmentService.upload(
-                ArgumentMatchers.any(),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.fromCallable {
-            firstAttachment.id = ATTACHMENT_ID
-            secondAttachment.id = ATTACHMENT_ID
-            uploadResult
-        })
+
+        val encrypted = ByteArray(1)
+        every { HashUtil.sha1(any()) } returns encrypted
+        every { Base64.encodeToString(encrypted) } returns DATA_HASH
+
+        every {
+            attachmentService.upload(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+        ) } returns Single.fromCallable {
+            uploadResult.also {
+                firstAttachment.id = ATTACHMENT_ID
+                secondAttachment.id = ATTACHMENT_ID
+            } as List<Pair<WrapperContract.Attachment, List<String>>> //This cast is technically wrong, how ever this is the assumption of updateFhirResourceIdentifier
+        }
 
         //when
         val med = recordService.uploadOrDownloadData(
@@ -1444,15 +1778,35 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
 
         //then
         Truth.assertThat(med).isEqualTo(medication)
+
+        verify { Base64.decode(
+                SdkAttachmentFactory.wrap(firstAttachment).data!!)
+        }
+        verify { Base64.decode(
+                SdkAttachmentFactory.wrap(secondAttachment).data!!)
+        }
     }
 
     @Test
-    @Ignore
     @Throws(DataValidationException.IdUsageViolation::class,
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadOrDownloadData_shouldAppendAdditionalIdentifiers_Observation() {
         //given
+        val recordService = Mockito.spy(
+                RecordService(
+                        PARTNER_ID,
+                        ALIAS,
+                        mockApiService,
+                        mockTagEncryptionService,
+                        mockTaggingService,
+                        mockFhirService,
+                        attachmentService,
+                        mockCryptoService,
+                        mockErrorHandler
+                )
+        )
+
         val observation = ObservationBuilder.buildObservationWithComponent()
         observation.component!![0].valueAttachment!!.id = null
         observation.component!!.add(ObservationBuilder.buildComponent(null, AttachmentBuilder.buildAttachment(null)))
@@ -1465,10 +1819,10 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         val attachment = observation.valueAttachment
         attachment!!.title = "doc"
         attachment.hash = DATA_HASH
-        val uploadResult: MutableList<Pair<Attachment, List<String>>> = arrayListOf()
-        uploadResult.add(Pair(firstAttachment, listOf(PREVIEW_ID, THUMBNAIL_ID)))
-        uploadResult.add(Pair(secondAttachment, listOf()))
-        uploadResult.add(Pair(attachment, listOf()))
+        val uploadResult: MutableList<Pair<WrapperContract.Attachment, List<String>?>> = arrayListOf()
+        uploadResult.add(Pair(SdkAttachmentFactory.wrap(firstAttachment), listOf(PREVIEW_ID, THUMBNAIL_ID)))
+        uploadResult.add(Pair(SdkAttachmentFactory.wrap(secondAttachment), null))
+        uploadResult.add(Pair(SdkAttachmentFactory.wrap(attachment), null))
         val dummyDecryptedRecord = DecryptedRecord(
                 RECORD_ID,
                 observation,
@@ -1481,18 +1835,22 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 -1
         )
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        Mockito.`when`(recordService.getValidHash(firstAttachment)).thenReturn(DATA_HASH)
-        Mockito.`when`(recordService.getValidHash(secondAttachment)).thenReturn(DATA_HASH)
-        Mockito.`when`(recordService.getValidHash(attachment)).thenReturn(DATA_HASH)
-        Mockito.`when`(mockAttachmentService.upload(
-                ArgumentMatchers.any(), ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.fromCallable {
-            firstAttachment.id = ATTACHMENT_ID
-            secondAttachment.id = ATTACHMENT_ID
-            attachment.id = ATTACHMENT_ID
-            uploadResult
-        })
+        val encrypted = ByteArray(1)
+        every { HashUtil.sha1(any()) } returns encrypted
+        every { Base64.encodeToString(encrypted) } returns DATA_HASH
+
+        every {
+            attachmentService.upload(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+        ) } returns Single.fromCallable {
+            uploadResult.also {
+                firstAttachment.id = ATTACHMENT_ID
+                secondAttachment.id = ATTACHMENT_ID
+                attachment.id = ATTACHMENT_ID
+            } as List<Pair<WrapperContract.Attachment, List<String>>> //This cast is technically wrong, how ever this is the assumption of updateFhirResourceIdentifier
+        }
 
         //when
         val obs = recordService.uploadOrDownloadData(
@@ -1510,15 +1868,37 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                         PREVIEW_ID + "#" + THUMBNAIL_ID
         )
         Truth.assertThat(obs.identifier!![0].assigner!!.reference).isEqualTo(PARTNER_ID)
+
+        verify { Base64.decode(
+                SdkAttachmentFactory.wrap(attachment).data!!)
+        }
+        verify { Base64.decode(
+                SdkAttachmentFactory.wrap(firstAttachment).data!!)
+        }
+        verify { Base64.decode(
+                SdkAttachmentFactory.wrap(secondAttachment).data!!)
+        }
     }
 
     @Test
-    @Ignore
     @Throws(DataValidationException.IdUsageViolation::class,
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
     fun uploadOrDownloadData_shouldAppendAdditionalIdentifiers_QuestionnaireResponse() {
         //given
+        val recordService = Mockito.spy(
+                RecordService(
+                        PARTNER_ID,
+                        ALIAS,
+                        mockApiService,
+                        mockTagEncryptionService,
+                        mockTaggingService,
+                        mockFhirService,
+                        attachmentService,
+                        mockCryptoService,
+                        mockErrorHandler
+                )
+        )
         val questionnaireResponse = QuestionnaireResponseBuilder.buildQuestionnaireResponse()
         questionnaireResponse.item!!.add(QuestionnaireResponseBuilder.buildItem("", AttachmentBuilder.buildAttachment(null)))
         val firstAttachment = questionnaireResponse.item!![0].answer!![0].valueAttachment
@@ -1527,9 +1907,9 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         val secondAttachment = questionnaireResponse.item!![1].answer!![0].valueAttachment
         secondAttachment!!.title = "pdf"
         secondAttachment.hash = DATA_HASH
-        val uploadResult: MutableList<Pair<Attachment, List<String>>> = mutableListOf()
-        uploadResult.add(Pair(firstAttachment, listOf(PREVIEW_ID, THUMBNAIL_ID)))
-        uploadResult.add(Pair(secondAttachment, listOf()))
+        val uploadResult: MutableList<Pair<WrapperContract.Attachment, List<String>?>> = mutableListOf()
+        uploadResult.add(Pair(SdkAttachmentFactory.wrap(firstAttachment), listOf(PREVIEW_ID, THUMBNAIL_ID)))
+        uploadResult.add(Pair(SdkAttachmentFactory.wrap(secondAttachment), null))
         val dummyDecryptedRecord = DecryptedRecord(
                 RECORD_ID,
                 questionnaireResponse,
@@ -1542,17 +1922,22 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 -1
         )
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockAttachmentKey))
-        Mockito.`when`(recordService.getValidHash(firstAttachment)).thenReturn(DATA_HASH)
-        Mockito.`when`(recordService.getValidHash(secondAttachment)).thenReturn(DATA_HASH)
-        Mockito.`when`(mockAttachmentService.upload(
-                ArgumentMatchers.any(),
-                ArgumentMatchers.eq(mockAttachmentKey),
-                ArgumentMatchers.eq(USER_ID))
-        ).thenReturn(Single.fromCallable {
-            firstAttachment.id = ATTACHMENT_ID
-            secondAttachment.id = ATTACHMENT_ID
-            uploadResult
-        })
+
+        val encrypted = ByteArray(1)
+        every { HashUtil.sha1(any()) } returns encrypted
+        every { Base64.encodeToString(encrypted) } returns DATA_HASH
+
+        every {
+            attachmentService.upload(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+            ) } returns Single.fromCallable {
+            uploadResult.also {
+                firstAttachment.id = ATTACHMENT_ID
+                secondAttachment.id = ATTACHMENT_ID
+            } as List<Pair<WrapperContract.Attachment, List<String>>> //This cast is technically wrong, how ever this is the assumption of updateFhirResourceIdentifier
+        }
 
         //when
         val response = recordService.uploadOrDownloadData(
@@ -1569,5 +1954,12 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                         PREVIEW_ID + "#" + THUMBNAIL_ID
         )
         Truth.assertThat(response.identifier!!.assigner!!.reference).isEqualTo(PARTNER_ID)
+
+        verify { Base64.decode(
+                SdkAttachmentFactory.wrap(firstAttachment).data!!)
+        }
+        verify { Base64.decode(
+                SdkAttachmentFactory.wrap(secondAttachment).data!!)
+        }
     }
 }

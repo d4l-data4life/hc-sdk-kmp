@@ -16,23 +16,21 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.fhir.stu3.model.Identifier as Fhir3Identifier
+import care.data4life.sdk.fhir.Fhir3AttachmentHelper
+import care.data4life.sdk.fhir.Fhir4Identifier
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.wrappers.SdkIdentifierFactory
-import care.data4life.sdk.wrappers.definitions.Identifier
-import care.data4life.sdk.wrappers.definitions.IdentifierFactory
+import io.mockk.mockk
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.mockito.Mockito
 
 class IdentifierFactoryTest {
     @Test
     fun `it is a AttachmentFactory`() {
-        assertTrue((SdkIdentifierFactory as Any) is IdentifierFactory)
+        assertTrue((SdkIdentifierFactory as Any) is WrapperFactoryContract.IdentifierFactory)
     }
     
     @Test
-    fun `Given, wrap is called with a non Fhir3Identifier, it fails with a CoreRuntimeExceptionInternalFailure`() {
+    fun `Given, wrap is called with a non FhirIdentifier, it fails with a CoreRuntimeExceptionInternalFailure`() {
         try {
             // When
             SdkIdentifierFactory.wrap("fail me!")
@@ -46,12 +44,21 @@ class IdentifierFactoryTest {
     @Test
     fun `Given, wrap is called with a Fhir3Identifier, it returns a Attachment`() {
         // Given
-        val givenIdentifier = Mockito.mock(Fhir3Identifier::class.java)
+        val givenIdentifier = Fhir3AttachmentHelper.buildIdentifier("id", "me")
 
         // When
         val wrapped: Any = SdkIdentifierFactory.wrap(givenIdentifier)
 
         // Then
-        assertTrue(wrapped is Identifier)
+        assertTrue(wrapped is WrapperContract.Identifier)
+    }
+
+    @Test
+    fun `Given, wrap is called with a Fhir4Identifier, it returns a Attachment`() {
+        // When
+        val wrapped: Any = SdkIdentifierFactory.wrap(Fhir4Identifier())
+
+        // Then
+        assertTrue(wrapped is WrapperContract.Identifier)
     }
 }

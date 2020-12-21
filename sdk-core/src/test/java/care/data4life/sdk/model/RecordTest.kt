@@ -29,19 +29,12 @@ import org.junit.Test
 class RecordTest {
     @Test
     fun `Given a Record it has an empty string identifier by default`() {
-        val record = Record<DomainResource>(null, null)
+        val record = Record(DomainResource(), null)
 
         assertEquals(
                 "",
                 record.identifier
         )
-    }
-
-    @Test
-    fun `Given a Record it has no Resource by default`() {
-        val record = Record<DomainResource>(null, null)
-
-        assertNull(record.resource)
     }
 
     @Test
@@ -58,32 +51,29 @@ class RecordTest {
     @Test
     fun `Given a Record, which is initialized with a Resource, its FhireResource is a alias of Resource`() {
         val resource = mockkClass(DomainResource::class)
-        val record1 = Record<DomainResource>(null, null)
-        val record2 = Record(resource, null)
+        val record1 = Record(resource, null)
 
-        assertNull(record1.resource)
-        assertNull(record1.fhirResource)
         assertSame(
-                record2.resource,
+                record1.resource,
                 resource
         )
         assertSame(
-                record2.fhirResource,
+                record1.fhirResource,
                 resource
         )
     }
 
     @Test
     fun `Given a Record it has no Meta by default`() {
-        val record = Record<DomainResource>(null, null)
+        val record = Record(DomainResource(), null)
 
-        assertNull(record.fhirResource)
+        assertNull(record.meta)
     }
 
     @Test
     fun `Given a Record, which is initialized with a Meta, it returns a given Meta`() {
         val meta = mockkClass(Meta::class)
-        val record = Record<DomainResource>(null, meta)
+        val record = Record(DomainResource(), meta)
 
         assertSame(
                 record.meta,
@@ -93,15 +83,15 @@ class RecordTest {
 
     @Test
     fun `Given a Record it has no Annotations by default`() {
-        val record = Record<DomainResource>(null, null)
+        val record = Record(DomainResource(), null)
 
-        assertNull(record.fhirResource)
+        assertNull(record.annotations)
     }
 
     @Test
     fun `Given a Record, which is initialized with a Annotations, it returns a given Annotations`() {
         val annotations = listOf<String>()
-        val record = Record<DomainResource>(null, null, annotations)
+        val record = Record(DomainResource(), null, annotations)
 
         assertSame(
                 record.annotations,

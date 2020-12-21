@@ -46,7 +46,7 @@ import care.data4life.sdk.model.SdkRecordFactory
 import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.RecordFactory
-import care.data4life.sdk.network.DecryptedRecordBuilder
+import care.data4life.sdk.network.DecryptedRecordMapper
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
@@ -115,7 +115,7 @@ class RecordService(
 
         val data = extractUploadData(resource)
         val createdRecord = Single.just(
-                DecryptedRecordBuilder()
+                DecryptedRecordMapper()
                         .setAnnotations(annotations)
                         .build(
                                 resource,
@@ -592,7 +592,7 @@ class RecordService(
 
         val tags = tagEncryptionService.decryptTags(record.encryptedTags)
 
-        val builder = DecryptedRecordBuilder()
+        val builder = DecryptedRecordMapper()
                 .setIdentifier(record.identifier)
                 .setTags(tags)
                 .setAnnotations(

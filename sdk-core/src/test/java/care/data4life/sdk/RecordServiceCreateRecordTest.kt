@@ -30,7 +30,7 @@ import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.SdkRecordFactory
 import care.data4life.sdk.model.definitions.BaseRecord
-import care.data4life.sdk.network.DecryptedRecordBuilder
+import care.data4life.sdk.network.DecryptedRecordMapper
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.util.MimeType
 import com.google.common.truth.Truth
@@ -178,12 +178,12 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun `Given, createRecord is called with a DomainResource and a UserId, it returns a new Record`() {
         // Given
         every {
-            anyConstructed<DecryptedRecordBuilder>().setAnnotations(listOf())
-        } returns mockDecryptedRecordBuilder as DecryptedRecordBuilder
+            anyConstructed<DecryptedRecordMapper>().setAnnotations(listOf())
+        } returns mockDecryptedRecordMapper as DecryptedRecordMapper
 
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
-                mockDecryptedRecordBuilder.build(
+                mockDecryptedRecordMapper.build(
                         mockCarePlan,
                         mockTags,
                         DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
@@ -242,7 +242,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 null
         )
         inOrder.verify(mockCryptoService).generateGCKey()
-        inOrder.verify(mockDecryptedRecordBuilder).build(
+        inOrder.verify(mockDecryptedRecordMapper).build(
                 mockCarePlan,
                 mockTags,
                 DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
@@ -283,12 +283,12 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun `Given, createRecord is called a DomainResource, a UserId and no attachment, it returns a new Record`() {
         // Given
         every {
-            anyConstructed<DecryptedRecordBuilder>().setAnnotations(listOf())
-        } returns mockDecryptedRecordBuilder
+            anyConstructed<DecryptedRecordMapper>().setAnnotations(listOf())
+        } returns mockDecryptedRecordMapper
 
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
-                mockDecryptedRecordBuilder.build(
+                mockDecryptedRecordMapper.build(
                         mockCarePlan,
                         mockTags,
                         DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
@@ -362,7 +362,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 null
         )
         inOrder.verify(mockCryptoService).generateGCKey()
-        inOrder.verify(mockDecryptedRecordBuilder).build(
+        inOrder.verify(mockDecryptedRecordMapper).build(
                 mockCarePlan,
                 mockTags,
                 DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
@@ -495,12 +495,12 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun `Given, createRecord is called with a DomainResource, a UserId and Annotations, it returns a new Record`() {
         // Given
         every {
-            anyConstructed<DecryptedRecordBuilder>().setAnnotations(any())
-        } returns mockDecryptedRecordBuilder
+            anyConstructed<DecryptedRecordMapper>().setAnnotations(any())
+        } returns mockDecryptedRecordMapper
 
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
-                mockDecryptedRecordBuilder.build(
+                mockDecryptedRecordMapper.build(
                         mockCarePlan,
                         mockTags,
                         DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
@@ -558,7 +558,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 null
         )
         inOrder.verify(mockCryptoService).generateGCKey()
-        inOrder.verify(mockDecryptedRecordBuilder).build(
+        inOrder.verify(mockDecryptedRecordMapper).build(
                 mockCarePlan,
                 mockTags,
                 DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
@@ -599,12 +599,12 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun `Given, createRecords is called a DomainResource and a UserId, Annotations and without attachment, it returns a new Record`() {
         // Given
         every {
-            anyConstructed<DecryptedRecordBuilder>().setAnnotations(any())
-        } returns mockDecryptedRecordBuilder
+            anyConstructed<DecryptedRecordMapper>().setAnnotations(any())
+        } returns mockDecryptedRecordMapper
 
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
-                mockDecryptedRecordBuilder.build(
+                mockDecryptedRecordMapper.build(
                         mockCarePlan,
                         mockTags,
                         DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
@@ -676,7 +676,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 null
         )
         inOrder.verify(mockCryptoService).generateGCKey()
-        inOrder.verify(mockDecryptedRecordBuilder).build(
+        inOrder.verify(mockDecryptedRecordMapper).build(
                 mockCarePlan,
                 mockTags,
                 DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
@@ -777,8 +777,8 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
     fun `Given createRecord is called with a DataResource resource, a UserId and Annotations, it returns a new DataRecord`() {
         // Given
         every {
-            anyConstructed<DecryptedRecordBuilder>().setAnnotations(listOf())
-        } returns mockDecryptedRecordBuilder
+            anyConstructed<DecryptedRecordMapper>().setAnnotations(listOf())
+        } returns mockDecryptedRecordMapper
 
         Mockito.`when`(mockTaggingService.appendDefaultTags(
                 ArgumentMatchers.argThat { true },
@@ -787,7 +787,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
         @Suppress("UNCHECKED_CAST")
         Mockito.`when`(
-                mockDecryptedRecordBuilder.build(
+                mockDecryptedRecordMapper.build(
                         mockDataResource,
                         mockTags,
                         DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
@@ -826,7 +826,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
 
         inOrder.verify(mockTaggingService).appendDefaultTags(ArgumentMatchers.argThat { true }, null)
         inOrder.verify(mockCryptoService).generateGCKey()
-        inOrder.verify(mockDecryptedRecordBuilder).build(
+        inOrder.verify(mockDecryptedRecordMapper).build(
                 mockDataResource,
                 mockTags,
                 DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),

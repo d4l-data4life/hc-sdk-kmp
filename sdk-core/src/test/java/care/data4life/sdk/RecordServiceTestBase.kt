@@ -36,7 +36,7 @@ import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.SdkRecordFactory
 import care.data4life.sdk.model.definitions.RecordFactory
-import care.data4life.sdk.network.DecryptedRecordBuilder
+import care.data4life.sdk.network.DecryptedRecordMapper
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedCustomDataRecord
@@ -95,7 +95,7 @@ abstract class RecordServiceTestBase {
     internal lateinit var mockRecord: Record<CarePlan>
     internal lateinit var mockDataRecord: DataRecord<DataResource>
     internal lateinit var inOrder: InOrder
-    internal lateinit var mockDecryptedRecordBuilder: DecryptedRecordBuilder
+    internal lateinit var mockDecryptedRecordMapper: DecryptedRecordMapper
     internal lateinit var mockRecordFactory: RecordFactory
     internal lateinit var recordServiceK: RecordService
     internal lateinit var attachmentService: AttachmentContract.Service
@@ -168,7 +168,7 @@ abstract class RecordServiceTestBase {
         mockD4LException = Mockito.mock(D4LException::class.java)
         mockRecord = Mockito.mock(Record::class.java) as Record<CarePlan>
         mockDataRecord = Mockito.mock(DataRecord::class.java) as DataRecord<DataResource>
-        mockDecryptedRecordBuilder = Mockito.mock(DecryptedRecordBuilder::class.java)
+        mockDecryptedRecordMapper = Mockito.mock(DecryptedRecordMapper::class.java)
         mockRecordFactory = Mockito.mock(RecordFactory::class.java)
 
         Mockito.`when`(mockRecord.fhirResource).thenReturn(mockCarePlan)
@@ -210,7 +210,7 @@ abstract class RecordServiceTestBase {
 
         Mockito.`when`(mockErrorHandler.handleError(ArgumentMatchers.any(Exception::class.java))).thenReturn(mockD4LException)
 
-        mockkConstructor(DecryptedRecordBuilder::class)
+        mockkConstructor(DecryptedRecordMapper::class)
         mockkObject(SdkRecordFactory)
 
         inOrder = Mockito.inOrder(
@@ -221,7 +221,7 @@ abstract class RecordServiceTestBase {
                 mockAttachmentService,
                 mockCryptoService,
                 mockErrorHandler,
-                mockDecryptedRecordBuilder,
+                mockDecryptedRecordMapper,
                 recordService
         )
 

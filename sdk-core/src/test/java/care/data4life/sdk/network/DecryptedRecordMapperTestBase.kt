@@ -24,7 +24,7 @@ import io.mockk.mockkObject
 import io.mockk.unmockkAll
 import org.mockito.Mockito
 
-abstract class DecryptedRecordBuilderTestBase {
+abstract class DecryptedRecordMapperTestBase {
     protected lateinit var identifier: String
     protected lateinit var tags: HashMap<String, String>
     protected lateinit var annotations: List<String>

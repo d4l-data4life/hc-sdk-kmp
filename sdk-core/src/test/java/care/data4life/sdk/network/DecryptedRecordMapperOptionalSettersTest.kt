@@ -22,7 +22,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase() {
+class DecryptedRecordMapperOptionalSettersTest : DecryptedRecordMapperTestBase() {
 
     @Before
     fun setUp() {
@@ -37,7 +37,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
     @Test
     fun `Given, build is called with a DomainResource, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedFhirRecord`() {
         // When
-        val record = DecryptedRecordBuilder().build(
+        val record = DecryptedRecordMapper().build(
                 fhirResource,
                 tags,
                 creationDate,
@@ -64,7 +64,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setIdentifier is called with a String, it sets the Identifier on build for a FhirResource`() {
         // When
-        val builder = DecryptedRecordBuilder()
+        val builder = DecryptedRecordMapper()
                 .setIdentifier(identifier)
 
         // Then
@@ -95,7 +95,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setIdentifier is called with null, it resets the Identifier on build for a FhirResource`() {
         // When
-        val builder = DecryptedRecordBuilder()
+        val builder = DecryptedRecordMapper()
                 .setIdentifier(identifier)
                 .setIdentifier(null)
 
@@ -127,7 +127,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setAnnotations is called with a List of Strings, it sets the Annotations on build for a FhirResource`() {
         // When
-        val builder = DecryptedRecordBuilder()
+        val builder = DecryptedRecordMapper()
                 .setAnnotations(annotations)
 
         // Then
@@ -159,7 +159,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setAnnotations is called with null, it resets the Annotations on build for a FhirResource`() {
         // When
-        val builder = DecryptedRecordBuilder()
+        val builder = DecryptedRecordMapper()
                 .setAnnotations(annotations)
                 .setAnnotations(null)
 
@@ -191,7 +191,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setUpdateDate is called with a Strings, it sets the UpdateDate on build for a FhirResource`() {
         // When
-        val builder = DecryptedRecordBuilder()
+        val builder = DecryptedRecordMapper()
                 .setUpdateDate(updateDate)
 
         // Then
@@ -222,7 +222,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setUpdateDate is called with null, it resets the UpdateDate on build for a FhirResource`() {
         // When
-        val builder = DecryptedRecordBuilder()
+        val builder = DecryptedRecordMapper()
                 .setUpdateDate(updateDate)
                 .setUpdateDate(null)
 
@@ -254,7 +254,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setAttachmentKey is called with a GCKey, it sets the AttachmentKey on build for a FhirResource`() {
         // When
-        val builder = DecryptedRecordBuilder()
+        val builder = DecryptedRecordMapper()
                 .setAttachmentKey(attachmentKey)
 
         // Then
@@ -285,7 +285,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
     @Test
     fun `Given, setAttachmentKey is called with null, it resets the AttachmentKey on build for a FhirResource`() {
         // When
-        val builder = DecryptedRecordBuilder()
+        val builder = DecryptedRecordMapper()
                 .setAttachmentKey(attachmentKey)
                 .setAttachmentKey(null)
 
@@ -317,7 +317,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
     @Test
     fun `Given, arbitrary are called, it uses the combination on build for a FhirResource`() {
         // When
-        val builder = DecryptedRecordBuilder()
+        val builder = DecryptedRecordMapper()
                 .setIdentifier(identifier)
                 .setAnnotations(annotations)
                 .setUpdateDate(updateDate)
@@ -351,7 +351,7 @@ class DecryptedRecordBuilderOptionalSettersTest : DecryptedRecordBuilderTestBase
     @Test
     fun `Given, clear is called, it resets all optional setters for a FhirResource`() {
         // When
-        val builder = DecryptedRecordBuilder()
+        val builder = DecryptedRecordMapper()
                 .setIdentifier(identifier)
                 .setAnnotations(annotations)
                 .setUpdateDate(updateDate)

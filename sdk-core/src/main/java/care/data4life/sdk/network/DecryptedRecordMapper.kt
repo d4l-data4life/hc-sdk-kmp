@@ -29,7 +29,7 @@ import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.network.model.NetworkModelContract
 
-internal class DecryptedRecordBuilder : NetworkModelContract.DecryptedRecordBuilder {
+internal class DecryptedRecordMapper : NetworkModelContract.DecryptedRecordBuilder {
     private var identifier: String? = null
     private var tags: HashMap<String, String>? = null
     private var annotations: List<String> = listOf()
@@ -44,36 +44,36 @@ internal class DecryptedRecordBuilder : NetworkModelContract.DecryptedRecordBuil
     //mandatory
     override fun setTags(
             tags: HashMap<String, String>?
-    ): DecryptedRecordBuilder = this.also { it.tags = tags }
+    ): DecryptedRecordMapper = this.also { it.tags = tags }
 
     override fun setCreationDate(
             creationDate: String?
-    ): DecryptedRecordBuilder = this.also { it.creationDate = creationDate }
+    ): DecryptedRecordMapper = this.also { it.creationDate = creationDate }
 
     override fun setDataKey(
             dataKey: GCKey?
-    ): DecryptedRecordBuilder = this.also { it.dataKey = dataKey }
+    ): DecryptedRecordMapper = this.also { it.dataKey = dataKey }
 
     override fun setModelVersion(
             modelVersion: Int?
-    ): DecryptedRecordBuilder = this.also { it.modelVersion = modelVersion }
+    ): DecryptedRecordMapper = this.also { it.modelVersion = modelVersion }
 
     //Optional
     override fun setIdentifier(
             identifier: String?
-    ): DecryptedRecordBuilder = this.also { it.identifier = identifier }
+    ): DecryptedRecordMapper = this.also { it.identifier = identifier }
 
     override fun setAnnotations(
             annotations: List<String>?
-    ): DecryptedRecordBuilder = this.also { it.annotations = annotations ?: listOf() }
+    ): DecryptedRecordMapper = this.also { it.annotations = annotations ?: listOf() }
 
     override fun setUpdateDate(
             updatedDate: String?
-    ): DecryptedRecordBuilder = this.also { it.updatedDate = updatedDate }
+    ): DecryptedRecordMapper = this.also { it.updatedDate = updatedDate }
 
     override fun setAttachmentKey(
             attachmentKey: GCKey?
-    ): DecryptedRecordBuilder = this.also { it.attachmentKey = attachmentKey }
+    ): DecryptedRecordMapper = this.also { it.attachmentKey = attachmentKey }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     private fun validatePayload(
@@ -208,7 +208,7 @@ internal class DecryptedRecordBuilder : NetworkModelContract.DecryptedRecordBuil
         } as DecryptedBaseRecord<T>
     }
 
-    override fun clear(): DecryptedRecordBuilder = this.also {
+    override fun clear(): DecryptedRecordMapper = this.also {
         it.identifier = null
         it.tags = null
         it.annotations = listOf()

@@ -112,11 +112,11 @@ class SingleMainView(private val alias: String) : BaseView(), KoinComponent {
         runBlocking {
             client.isUserLoggedIn(object : ResultListener<Boolean> {
                 override fun onSuccess(t: Boolean) {
-                    isLoggedIn = t ?: false
+                    isLoggedIn = t
                 }
 
                 override fun onError(exception: D4LException) {
-                    exception?.printStackTrace()
+                    exception.printStackTrace()
                     isLoggedIn = false
                 }
             })

@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import care.data4life.sdk.auth.OAuthService;
+import care.data4life.auth.AuthorizationService;
 import care.data4life.sdk.network.Environment;
 import care.data4life.sdk.network.IHCService;
 import care.data4life.sdk.network.model.EncryptedRecord;
@@ -66,18 +66,18 @@ public class ApiServiceTest {
     private OkHttpClient client;
     private IHCService service;
     private MockWebServer server = new MockWebServer();
-    private OAuthService oAuthService;
+    private AuthorizationService authService;
     private NetworkConnectivityService connectivityService;
     private Moshi moshi;
 
     @Before
     public void setUp() throws Throwable {
-        oAuthService = mock(OAuthService.class);
-        when(oAuthService.refreshAccessToken(ALIAS)).thenReturn("access_token");
+        authService = mock(AuthorizationService.class);
+        when(authService.refreshAccessToken(ALIAS)).thenReturn("access_token");
         moshi = new Moshi.Builder().build();
         connectivityService = mock(NetworkConnectivityService.class);
         when(connectivityService.isConnected()).thenReturn(true);
-        apiService = spy(new ApiService(oAuthService, Environment.DEVELOPMENT, "", "", PLATFORM, connectivityService, "", true));
+        apiService = spy(new ApiService(authService, Environment.DEVELOPMENT, "", "", PLATFORM, connectivityService, "", true));
         client = apiService.getClient();
     }
 
@@ -171,7 +171,7 @@ public class ApiServiceTest {
                 .test();
 
         // then
-        verify(oAuthService, atLeastOnce()).refreshAccessToken(ALIAS);
+        verify(authService, atLeastOnce()).refreshAccessToken(ALIAS);
     }
 
     @Test

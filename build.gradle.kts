@@ -62,6 +62,8 @@ plugins {
 apply(plugin = "care.data4life.git-publish")
 
 allprojects {
+    version = LibraryConfig.version
+
     repositories {
         google()
         jcenter()
@@ -123,26 +125,28 @@ tasks.named<Wrapper>("wrapper") {
 }
 
 
-jgitver {
-    strategy(fr.brouillard.oss.jgitver.Strategies.MAVEN)
-
-    policy(closureOf<fr.brouillard.oss.gradle.plugins.JGitverPluginExtensionBranchPolicy> {
-        pattern = "release/(.*)"
-        transformations = listOf("IGNORE")
-    })
-
-    policy(closureOf<fr.brouillard.oss.gradle.plugins.JGitverPluginExtensionBranchPolicy> {
-        pattern = "feature/(.*)"
-        transformations = listOf("LOWERCASE_EN")
-    })
-
-    policy(closureOf<fr.brouillard.oss.gradle.plugins.JGitverPluginExtensionBranchPolicy> {
-        pattern = "(main)"
-        transformations = listOf("IGNORE")
-    })
-
-    nonQualifierBranches = "main"
-}
+//jgitver {
+//    strategy(fr.brouillard.oss.jgitver.Strategies.MAVEN)
+//
+//    policy(closureOf<fr.brouillard.oss.gradle.plugins.JGitverPluginExtensionBranchPolicy> {
+//        pattern = "release/(.*)"
+//        transformations = listOf("IGNORE")
+//    })
+//
+//    policy(closureOf<fr.brouillard.oss.gradle.plugins.JGitverPluginExtensionBranchPolicy> {
+//        pattern = "feature/(.*)"
+//        transformations = listOf("LOWERCASE_EN")
+//    })
+//
+//    policy(closureOf<fr.brouillard.oss.gradle.plugins.JGitverPluginExtensionBranchPolicy> {
+//        pattern = "(main)"
+//        transformations = listOf("IGNORE")
+//    })
+//
+//    nonQualifierBranches = "main"
+//
+//    regexVersionTag("v([0-9]+(?:.[0-9]+){0,2}(?:-[a-zA-Z0-9-_]+)?)")
+//}
 
 afterEvaluate {
     configure<care.data4life.gradle.git.publish.GitPublishExtension> {

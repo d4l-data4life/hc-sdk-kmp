@@ -34,7 +34,7 @@ import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
-import care.data4life.sdk.model.SdkRecordFactory
+import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.DecryptedRecordMapper
 import care.data4life.sdk.network.model.EncryptedKey
@@ -211,7 +211,7 @@ abstract class RecordServiceTestBase {
         Mockito.`when`(mockErrorHandler.handleError(ArgumentMatchers.any(Exception::class.java))).thenReturn(mockD4LException)
 
         mockkConstructor(DecryptedRecordMapper::class)
-        mockkObject(SdkRecordFactory)
+        mockkObject(RecordMapper)
 
         inOrder = Mockito.inOrder(
                 mockApiService,

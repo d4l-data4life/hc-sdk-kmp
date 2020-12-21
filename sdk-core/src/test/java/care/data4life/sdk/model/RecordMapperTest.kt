@@ -42,7 +42,7 @@ import org.mockito.Mockito
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 
-class RecordFactoryTest {
+class RecordMapperTest {
     private lateinit var id: String
     private lateinit var fhirResource: DomainResource
     private lateinit var customResource: ByteArray
@@ -80,7 +80,7 @@ class RecordFactoryTest {
 
     @Test
     fun `it is a RecordFactory`() {
-        assertTrue((SdkRecordFactory as Any) is RecordFactory)
+        assertTrue((RecordMapper as Any) is RecordFactory)
     }
 
     @Test
@@ -105,7 +105,7 @@ class RecordFactoryTest {
         )
 
         // When
-        val record = SdkRecordFactory.getInstance(decryptedRecord)
+        val record = RecordMapper.getInstance(decryptedRecord)
 
         // Then
         assertTrue(record is Fhir3Record)
@@ -151,7 +151,7 @@ class RecordFactoryTest {
         )
 
         // When
-        val record = SdkRecordFactory.getInstance(decryptedRecord)
+        val record = RecordMapper.getInstance(decryptedRecord)
 
         // Then
         assertTrue(record is Fhir4Record)
@@ -195,7 +195,7 @@ class RecordFactoryTest {
         )
 
         // When
-        val record = SdkRecordFactory.getInstance(decryptedRecord)
+        val record = RecordMapper.getInstance(decryptedRecord)
 
         // Then
         assertTrue(record is DataRecord)
@@ -246,7 +246,7 @@ class RecordFactoryTest {
 
         // When
         try {
-            SdkRecordFactory.getInstance(decryptedRecord)
+            RecordMapper.getInstance(decryptedRecord)
             assertTrue(false)// FIXME: This is stupid
         } catch (e: Exception) {
             // Then

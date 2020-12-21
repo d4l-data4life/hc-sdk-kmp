@@ -25,7 +25,7 @@ import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.Record
-import care.data4life.sdk.model.SdkRecordFactory
+import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.model.definitions.BaseRecord
 import com.google.common.truth.Truth
 import io.mockk.every
@@ -66,7 +66,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
                 .`when`(recordService)
                 .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
+        every { RecordMapper.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
 
         // When
         val observer = recordService.fetchFhir3Record<CarePlan>(USER_ID, RECORD_ID).test().await()
@@ -136,7 +136,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
                 .`when`(recordService)
                 .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
+        every { RecordMapper.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
 
         // When
         val observer = recordService.fetchFhir3Records(
@@ -203,7 +203,7 @@ class RecordServiceFetchRecordsTest : RecordServiceTestBase() {
                 .`when`(recordService)
                 .decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockAnnotatedDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
+        every { RecordMapper.getInstance(mockAnnotatedDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
 
         // When
         val observer = recordService.fetchFhir3Records(

@@ -24,7 +24,7 @@ import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.DataValidationException
-import care.data4life.sdk.model.SdkRecordFactory
+import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.util.MimeType
 import com.google.common.truth.Truth
@@ -86,7 +86,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
                 .`when`(recordService)
                 .assignResourceId(mockDecryptedDataRecord)
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<Fhir3Resource>
+        every { RecordMapper.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<Fhir3Resource>
         val annotations = listOf<String>()
 
         // When
@@ -206,7 +206,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
                 )
         ).thenReturn(Single.just(mockEncryptedRecord))
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<Fhir3Resource>
+        every { RecordMapper.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<Fhir3Resource>
 
         // When
         val observer = recordService.updateRecord(USER_ID, RECORD_ID, mockCarePlan, ANNOTATIONS).test().await()
@@ -337,7 +337,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
                 .`when`(recordService)
                 .assignResourceId(mockDecryptedDataRecord)
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockDecryptedDataRecord) } returns mockDataRecord
+        every { RecordMapper.getInstance(mockDecryptedDataRecord) } returns mockDataRecord
 
         // When
         val observer = recordService.updateRecord(
@@ -404,7 +404,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
                 .`when`(recordService)
                 .assignResourceId(mockDecryptedDataRecord)
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockDecryptedDataRecord) } returns mockDataRecord
+        every { RecordMapper.getInstance(mockDecryptedDataRecord) } returns mockDataRecord
 
         // When
         val observer = recordService.updateRecord(

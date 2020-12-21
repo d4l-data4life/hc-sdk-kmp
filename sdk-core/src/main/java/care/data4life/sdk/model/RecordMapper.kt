@@ -33,7 +33,7 @@ import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.DateTimeFormatterBuilder
 import java.util.*
 
-internal object SdkRecordFactory : RecordFactory {
+internal object RecordMapper : RecordFactory {
     private const val DATE_FORMAT = "yyyy-MM-dd"
     private const val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss[.SSS]"
     private val DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.US)
@@ -57,7 +57,6 @@ internal object SdkRecordFactory : RecordFactory {
                     buildMeta(record),
                     record.annotations
             )
-            // TODO app data
             is DecryptedCustomDataRecord -> DataRecord(
                     record.identifier ?: "",//FIXME
                     record.resource,

@@ -35,7 +35,7 @@ import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.DownloadType
-import care.data4life.sdk.model.SdkRecordFactory
+import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.EncryptedRecord
@@ -920,7 +920,7 @@ class RecordServiceTest : RecordServiceTestBase() {
                 .`when`(recordService)
                 .downloadData(mockDecryptedFhir3Record, USER_ID)
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<Fhir3Resource>
+        every { RecordMapper.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<Fhir3Resource>
 
         // When
         val observer = recordService.downloadRecord<CarePlan>(RECORD_ID, USER_ID).test().await()

@@ -42,7 +42,7 @@ import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.wrapper.SdkFhirAttachmentHelper
-import care.data4life.sdk.model.SdkRecordFactory
+import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.RecordFactory
@@ -99,7 +99,7 @@ class RecordService(
         REMOVE, RESTORE
     }
 
-    private val recordFactory: RecordFactory = SdkRecordFactory
+    private val recordFactory: RecordFactory = RecordMapper
     private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper = SdkFhirAttachmentHelper
     private val attchachmentFactory: WrapperFactoryContract.AttachmentFactory = SdkAttachmentFactory
     private val identifierFactory: WrapperFactoryContract.IdentifierFactory = SdkIdentifierFactory

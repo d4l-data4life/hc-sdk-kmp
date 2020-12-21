@@ -28,7 +28,7 @@ import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
-import care.data4life.sdk.model.SdkRecordFactory
+import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.network.DecryptedRecordMapper
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
@@ -222,7 +222,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                         mockUploadData as HashMap<Any, String?>
                 )
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
+        every { RecordMapper.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
 
         val annotations = listOf<String>()
 
@@ -342,7 +342,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                         USER_ID
                 )
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
+        every { RecordMapper.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
 
         val annotations = listOf<String>()
 
@@ -539,7 +539,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                         mockUploadData as HashMap<Any, String?>
                 )
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockAnnotatedDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
+        every { RecordMapper.getInstance(mockAnnotatedDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
 
         // When
         val subscriber = recordService.createRecord(USER_ID, mockCarePlan, ANNOTATIONS).test().await()
@@ -657,7 +657,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                         USER_ID
                 )
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockAnnotatedDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
+        every { RecordMapper.getInstance(mockAnnotatedDecryptedFhirRecord) } returns mockRecord as BaseRecord<DomainResource>
 
         // When
         val subscriber = recordService.createRecord(USER_ID, mockCarePlan, ANNOTATIONS).test().await()
@@ -807,7 +807,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .`when`(recordService)
                 .assignResourceId(mockDecryptedDataRecord)
         @Suppress("UNCHECKED_CAST")
-        every { SdkRecordFactory.getInstance(mockDecryptedDataRecord) } returns mockDataRecord
+        every { RecordMapper.getInstance(mockDecryptedDataRecord) } returns mockDataRecord
 
         // When
         val subscriber = recordService.createRecord(

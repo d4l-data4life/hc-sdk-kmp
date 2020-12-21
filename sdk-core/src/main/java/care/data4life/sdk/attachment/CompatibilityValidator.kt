@@ -25,14 +25,14 @@ internal object CompatibilityValidator: AttachmentContract.CompatibilityValidato
             "2019-09-15"
     )
 
-    private fun isHahableFhir3Date(attachment: Fhir3Attachment): Boolean {
+    private fun isHashableFhir3Date(attachment: Fhir3Attachment): Boolean {
         return attachment.creation?.date?.toDate()?.after(fhir3SeparationDate.date.toDate()) ?: true
     }
 
     override fun isHashable(attachment: WrapperContract.Attachment): Boolean {
         val rawAttachment = attachment.unwrap() as Any
         return if(rawAttachment is Fhir3Attachment ) {
-            isHahableFhir3Date(rawAttachment)
+            isHashableFhir3Date(rawAttachment)
         } else {
             true
         }

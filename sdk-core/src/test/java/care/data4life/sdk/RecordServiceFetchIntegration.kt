@@ -30,11 +30,9 @@ import care.data4life.sdk.model.Record
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
-import care.data4life.sdk.util.MimeType
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkObject
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.junit.Before
@@ -56,8 +54,6 @@ class RecordServiceFetchIntegration: RecordServiceIntegrationBase() {
         fileService = mockk()
         imageResizer = mockk()
         errorHandler = mockk()
-
-        mockkObject(MimeType)
 
         recordService = RecordService(
                 RecordServiceTestBase.PARTNER_ID,

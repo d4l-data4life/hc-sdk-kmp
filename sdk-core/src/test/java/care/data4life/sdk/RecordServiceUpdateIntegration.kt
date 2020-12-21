@@ -38,7 +38,9 @@ import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.unmockkObject
 import io.reactivex.Single
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import java.lang.ClassCastException
@@ -89,6 +91,11 @@ class RecordServiceUpdateIntegration: RecordServiceIntegrationBase() {
         commonKeyResponse = mockk()
         keyPair = mockk()
         encryptedCommonKey = mockk()
+    }
+
+    @After
+    fun tearDown() {
+        unmockkObject(MimeType)
     }
 
     private fun runFhirFlow(
@@ -168,7 +175,9 @@ class RecordServiceUpdateIntegration: RecordServiceIntegrationBase() {
             Single.just(dataKeys.removeAt(0))
         }
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
-        every { cryptoService.decryptString(dataKeyRound1, eq(encryptedBody)) } returns Single.just(stringifiedResource)
+        every { cryptoService.decryptString(dataKeyRound1, eq(encryptedBody)) } returns Single.just(
+                stringifiedResource
+        )
 
         // upload
         every {
@@ -510,7 +519,7 @@ class RecordServiceUpdateIntegration: RecordServiceIntegrationBase() {
     }
 
     @Test
-    fun `Given, updateFhir3Record is called with the appropriate payload without Annotations and Attachments without an Identifier, it returns a updated Record`() {
+    fun `Given, updateFhir3Record is called with the appropriate payload without Annotations and Attachments with exiting Identifier, it returns a updated Record`() {
         // Given
         val resource = buildDocumentReferenceFhir3("42")
 
@@ -576,6 +585,8 @@ class RecordServiceUpdateIntegration: RecordServiceIntegrationBase() {
         Truth.assertThat(result.annotations).isEmpty()
         Truth.assertThat(result.resource).isEqualTo(resource)
     }
+
+    // ToDo with clean obsolete Id
 
     @Test
     fun `Given, updateFhir4Record is called with the appropriate payload without Annotations, it return a updated Fhir4Record`() {
@@ -737,7 +748,7 @@ class RecordServiceUpdateIntegration: RecordServiceIntegrationBase() {
     }
 
     @Test
-    fun `Given, updateFhir4Record is called with the appropriate payload without Annotations and Attachments without an Identifier, it returns a updated Fhir4Record`() {
+    fun `Given, updateFhir4Record is called with the appropriate payload without Annotations and Attachments with exiting Identifier, it returns a updated Fhir4Record`() {
         // Given
         val resource = buildDocumentReferenceFhir4("42")
 
@@ -803,6 +814,8 @@ class RecordServiceUpdateIntegration: RecordServiceIntegrationBase() {
         Truth.assertThat(result.annotations).isEmpty()
         Truth.assertThat(result.resource).isEqualTo(resource)
     }
+
+    // ToDo with clean obsolete Id
 
     @Test
     fun `Given, updateDataRecord is called with the appropriate payload without Annotations, it returns a updated DataRecord`() {

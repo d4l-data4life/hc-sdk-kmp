@@ -35,7 +35,9 @@ import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.unmockkObject
 import io.reactivex.Single
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
@@ -75,6 +77,11 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
         commonKey = mockk()
         encryptedDataKey = mockk()
         encryptedAttachmentKey = mockk()
+    }
+
+    @After
+    fun tearDown() {
+        unmockkObject(MimeType)
     }
 
     private fun runFhirFlow(
@@ -198,7 +205,9 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
         every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
-        every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
+        every {
+            cryptoService.decryptString(dataKey, encryptedBody)
+        } returns Single.just( stringifiedResource )
     }
 
     private fun runDatalow(
@@ -416,6 +425,70 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
     }
 
     @Test
+    fun `Given, createFhir3Record is called with the appropriate payload without Attachments, it creates a Record for Fhir3`() {
+        // Given
+        val resource = buildDocumentReferenceFhir3()
+        resource.content = null
+
+        val tags = mapOf(
+                "partner" to "partner=TEST",
+                "client" to "client=TEST",
+                "fhirversion" to "fhirversion=3.0.1",
+                "resourcetype" to "resourcetype=documentreference"
+        )
+        val annotations = mapOf(
+                "wow" to "custom=wow",
+                "it" to "custom=it",
+                "works" to "custom=works"
+        )
+
+        stringifiedResource = "{\"resourceType\":\"DocumentReference\"}"
+        encryptedBody = "ZW5jcnlwdGVk"
+
+        encryptedRecord = EncryptedRecord(
+                commonKeyId,
+                RECORD_ID,
+                listOf(
+                        "cGFydG5lcj1URVNU",
+                        "Y2xpZW50PVRFU1Q=",
+                        "ZmhpcnZlcnNpb249My4wLjE=",
+                        "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl",
+                        "Y3VzdG9tPXdvdw==",
+                        "Y3VzdG9tPWl0",
+                        "Y3VzdG9tPXdvcmtz"
+                ),
+                encryptedBody,
+                CREATION_DATE,
+                encryptedDataKey,
+                encryptedAttachmentKey,
+                ModelVersion.CURRENT
+        ).also { it.updatedDate = UPDATE_DATE }
+
+        val gcKeys = mutableListOf(
+                dataKey,
+                attachmentKey,
+                dataKey,
+                attachmentKey
+        )
+
+        runFhirFlow(tags, annotations, gcKeys)
+
+        // When
+        val result = recordService.createRecord(
+                USER_ID,
+                resource,
+                listOf("wow", "it", "works")
+        ).blockingGet()
+
+        // Then
+        Truth.assertThat(result).isInstanceOf(Record::class.java)
+        Truth.assertThat(result.resource).isNotNull()
+        Truth.assertThat(result.meta).isEqualTo(buildMeta(CREATION_DATE, UPDATE_DATE))
+        Truth.assertThat(result.annotations).isEqualTo(listOf("wow", "it", "works"))
+        Truth.assertThat(result.resource).isEqualTo(resource)
+    }
+
+    @Test
     fun `Given, createFhir4Record is called with the appropriate payload without annotations, it creates a Record for Fhir4`() {
         // Given
         val resource: Fhir4Resource = buildDocumentReferenceFhir4()
@@ -523,6 +596,70 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
         // Then
         Truth.assertThat(result).isInstanceOf(Fhir4Record::class.java)
         Truth.assertThat(result.identifier).isEqualTo(RECORD_ID)
+        Truth.assertThat(result.meta).isEqualTo(buildMeta(CREATION_DATE, UPDATE_DATE))
+        Truth.assertThat(result.annotations).isEqualTo(listOf("wow", "it", "works"))
+        Truth.assertThat(result.resource).isEqualTo(resource)
+    }
+
+    @Test
+    fun `Given, createFhir4Record is called with the appropriate payload without Attachments, it creates a Fhir4Record`() {
+        // Given
+        val resource = buildDocumentReferenceFhir4()
+        resource.content = null
+
+        val tags = mapOf(
+                "partner" to "partner=TEST",
+                "client" to "client=TEST",
+                "fhirversion" to "fhirversion=4.0.1",
+                "resourcetype" to "resourcetype=documentreference"
+        )
+        val annotations = mapOf(
+                "wow" to "custom=wow",
+                "it" to "custom=it",
+                "works" to "custom=works"
+        )
+
+        stringifiedResource = "{\"resourceType\":\"DocumentReference\"}"
+        encryptedBody = "ZW5jcnlwdGVk"
+
+        encryptedRecord = EncryptedRecord(
+                commonKeyId,
+                RECORD_ID,
+                listOf(
+                        "cGFydG5lcj1URVNU",
+                        "Y2xpZW50PVRFU1Q=",
+                        "ZmhpcnZlcnNpb249NC4wLjE=",
+                        "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl",
+                        "Y3VzdG9tPXdvdw==",
+                        "Y3VzdG9tPWl0",
+                        "Y3VzdG9tPXdvcmtz"
+                ),
+                encryptedBody,
+                CREATION_DATE,
+                encryptedDataKey,
+                encryptedAttachmentKey,
+                ModelVersion.CURRENT
+        ).also { it.updatedDate = UPDATE_DATE }
+
+        val gcKeys = mutableListOf(
+                dataKey,
+                attachmentKey,
+                dataKey,
+                attachmentKey
+        )
+
+        runFhirFlow(tags, annotations, gcKeys)
+
+        // When
+        val result = recordService.createRecord(
+                USER_ID,
+                resource,
+                listOf("wow", "it", "works")
+        ).blockingGet()
+
+        // Then
+        Truth.assertThat(result).isInstanceOf(Fhir4Record::class.java)
+        Truth.assertThat(result.resource).isNotNull()
         Truth.assertThat(result.meta).isEqualTo(buildMeta(CREATION_DATE, UPDATE_DATE))
         Truth.assertThat(result.annotations).isEqualTo(listOf("wow", "it", "works"))
         Truth.assertThat(result.resource).isEqualTo(resource)

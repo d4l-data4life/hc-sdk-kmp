@@ -53,7 +53,7 @@ class AttachmentService internal constructor(
                     )
                     Pair(attachment, additionalIds)
                 }
-                .filter { (first) -> first.id != null } //FIXME: Should this be removed?
+                .filter { (first) -> first.id != null }
                 .toList()
     }
 

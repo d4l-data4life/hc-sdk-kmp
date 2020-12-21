@@ -1008,8 +1008,6 @@ class RecordService(
      *    matches List<String?>?, but it is actually List<String?>. This means the claim of the former author that second (the list)
      *    is a indicator for a type is wrong.
      */
-
-
     internal fun updateFhirResourceIdentifier(
             resource: Any,
             result: List<Pair<WrapperContract.Attachment, List<String?>?>>
@@ -1113,12 +1111,11 @@ class RecordService(
             }
 
             if (identifiers == null) return
-            val updatedIdentifiers: MutableList<WrapperContract.Identifier> = mutableListOf()
+            val updatedIdentifiers: MutableList<Any> = mutableListOf()
             val identifierIterator = identifiers.iterator()
 
             while (identifierIterator.hasNext()) {
                 val next = identifierFactory.wrap(identifierIterator.next())
-
                 val parts = splitAdditionalAttachmentId(next)
                 if (parts == null || currentAttachmentIds.contains(parts[FULL_ATTACHMENT_ID_POS])) {
                     updatedIdentifiers.add(next.unwrap())

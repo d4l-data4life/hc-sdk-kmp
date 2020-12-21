@@ -22,9 +22,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - run: git branch -D ${{ github.head_ref }} || true
-      - name: Reattach head
-        run: git checkout -b ${{ github.head_ref }} || true
       - name: Cleanup
         run: ./gradlew clean
       - name: Version

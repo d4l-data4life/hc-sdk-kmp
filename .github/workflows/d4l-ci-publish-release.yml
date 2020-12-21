@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0
       - run: git branch -D ${{ github.head_ref }} || true
       - name: Reattach head
-        run: git checkout -b ${{ github.head_ref }}
+        run: git checkout -b ${{ github.head_ref }} || true
       - name: Cleanup
         run: ./gradlew clean
       - name: Version

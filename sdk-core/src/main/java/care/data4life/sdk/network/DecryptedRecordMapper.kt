@@ -24,10 +24,10 @@ import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedRecordGuard
+import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
-import care.data4life.sdk.network.model.NetworkModelContract
 
 internal class DecryptedRecordMapper : NetworkModelContract.DecryptedRecordBuilder {
     private var identifier: String? = null

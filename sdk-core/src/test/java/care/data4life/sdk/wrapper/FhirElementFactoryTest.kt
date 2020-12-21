@@ -131,7 +131,7 @@ class FhirElementFactoryTest {
                 "provenance"
         )
 
-        for(type in resources) {
+        for (type in resources) {
             assertNotNull(SdkFhirElementFactory.getFhir3ClassForType(type))
         }
     }
@@ -190,7 +190,7 @@ class FhirElementFactoryTest {
                 "Provenance"
         )
 
-        for(type in resources) {
+        for (type in resources) {
             assertNotNull(SdkFhirElementFactory.getFhir4ClassForType(type))
         }
 

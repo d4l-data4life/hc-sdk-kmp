@@ -35,7 +35,7 @@ class Fhir4IdentifierTest {
         // Given
         val value = "potato"
         val fhir4Identifier = Fhir4Identifier()
-        fhir4Identifier.value  = value
+        fhir4Identifier.value = value
 
         // When
         val result = SdkFhir4Identifier(fhir4Identifier).value

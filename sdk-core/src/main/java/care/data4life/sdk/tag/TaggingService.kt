@@ -26,7 +26,7 @@ import java.util.*
 // TODO internal
 class TaggingService(
         private val clientId: String
-): TaggingContract.Service {
+) : TaggingContract.Service {
     private val partnerId: String = clientId.substringBefore(SEPARATOR)
     private val fhirElementFactory: WrapperContract.FhirElementFactory = SdkFhirElementFactory
 
@@ -58,7 +58,7 @@ class TaggingService(
             resource: Any,
             oldTags: HashMap<String, String>?
     ): HashMap<String, String> {
-        return when(resource) {
+        return when (resource) {
             is Fhir3Resource -> appendCommonDefaultTags(resource.resourceType, oldTags).also {
                 if (!it.containsKey(TAG_FHIR_VERSION)) {
                     it[TAG_FHIR_VERSION] = Fhir3Version.version

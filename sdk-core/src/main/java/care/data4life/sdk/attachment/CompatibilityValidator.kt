@@ -20,7 +20,7 @@ import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3DateTimeParser
 import care.data4life.sdk.wrapper.WrapperContract
 
-internal object CompatibilityValidator: AttachmentContract.CompatibilityValidator {
+internal object CompatibilityValidator : AttachmentContract.CompatibilityValidator {
     private val fhir3SeparationDate = Fhir3DateTimeParser.parseDateTime(
             "2019-09-15"
     )
@@ -31,7 +31,7 @@ internal object CompatibilityValidator: AttachmentContract.CompatibilityValidato
 
     override fun isHashable(attachment: WrapperContract.Attachment): Boolean {
         val rawAttachment = attachment.unwrap() as Any
-        return if(rawAttachment is Fhir3Attachment ) {
+        return if (rawAttachment is Fhir3Attachment) {
             isHashableFhir3Date(rawAttachment)
         } else {
             true

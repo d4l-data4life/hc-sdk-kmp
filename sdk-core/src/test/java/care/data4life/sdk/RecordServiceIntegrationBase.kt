@@ -54,36 +54,48 @@ abstract class RecordServiceIntegrationBase {
 
     protected lateinit var encryptedBody: String
     protected lateinit var stringifiedResource: String
-    
-    
+
+
     companion object {
         @JvmStatic
         protected val CLIENT_ID = "TEST"
+
         @JvmStatic
         protected val USER_ID = "ME"
+
         @JvmStatic
         protected val ALIAS = "alias"
+
         @JvmStatic
         protected val RECORD_ID = "42"
+
         @JvmStatic
         protected val CREATION_DATE = "2020-12-12"
+
         @JvmStatic
         protected val UPDATE_DATE = "2020-12-13T17:21:08.234123"
+
         @JvmStatic
         protected val ATTACHMENT_PAYLOAD = "data"
+
         @JvmStatic
         protected val ATTACHMENT_ID = "attachmentId"
+
         @JvmStatic
         protected val THUMBNAIL_ID = "thumbnailId"
+
         @JvmStatic
         protected val PREVIEW_ID = "previewId"
+
         @JvmStatic
         protected val ASSIGNER = "assigner"
+
         @JvmStatic
         protected val IV = ByteArray(16)
         private const val DATE_FORMAT = "yyyy-MM-dd"
         private const val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss[.SSS]"
         protected val DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.US)
+
         @JvmStatic
         protected val DATE_TIME_FORMATTER = DateTimeFormatterBuilder()
                 .parseLenient()

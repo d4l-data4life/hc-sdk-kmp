@@ -28,7 +28,7 @@ class AttachmentFactoryTest {
     fun `it is a AttachmentFactory`() {
         assertTrue((SdkAttachmentFactory as Any) is WrapperFactoryContract.AttachmentFactory)
     }
-    
+
     @Test
     fun `Given, wrap is called with a non FhirAttachment, it fails with a CoreRuntimeExceptionInternalFailure`() {
         try {

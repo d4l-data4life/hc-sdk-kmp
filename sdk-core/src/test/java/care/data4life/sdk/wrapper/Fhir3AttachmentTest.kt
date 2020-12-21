@@ -16,11 +16,11 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.fhir.stu3.model.Attachment as Fhir3Attachment
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import care.data4life.fhir.stu3.model.Attachment as Fhir3Attachment
 
 class Fhir3AttachmentTest {
     @Test
@@ -34,7 +34,7 @@ class Fhir3AttachmentTest {
         // Given
         val id = "potato"
         val fhir3Attachment = Fhir3Attachment()
-        fhir3Attachment.id  = id
+        fhir3Attachment.id = id
 
         // When
         val result = SdkFhir3Attachment(fhir3Attachment).id
@@ -67,7 +67,7 @@ class Fhir3AttachmentTest {
         // Given
         val data = "soup"
         val fhir3Attachment = Fhir3Attachment()
-        fhir3Attachment.data  = data
+        fhir3Attachment.data = data
 
         // When
         val result = SdkFhir3Attachment(fhir3Attachment).data
@@ -100,7 +100,7 @@ class Fhir3AttachmentTest {
         // Given
         val hash = "1234"
         val fhir3Attachment = Fhir3Attachment()
-        fhir3Attachment.hash  = hash
+        fhir3Attachment.hash = hash
 
         // When
         val result = SdkFhir3Attachment(fhir3Attachment).hash
@@ -133,7 +133,7 @@ class Fhir3AttachmentTest {
         // Given
         val size = 42
         val fhir3Attachment = Fhir3Attachment()
-        fhir3Attachment.size  = size
+        fhir3Attachment.size = size
 
         // When
         val result = SdkFhir3Attachment(fhir3Attachment).size

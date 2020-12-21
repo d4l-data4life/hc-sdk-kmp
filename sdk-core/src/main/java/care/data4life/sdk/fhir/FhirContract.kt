@@ -23,7 +23,7 @@ internal interface FhirContract {
     interface Service {
         fun _encryptResource(dataKey: GCKey, resource: Any): String
 
-        fun <T: Any> decryptResource(
+        fun <T : Any> decryptResource(
                 dataKey: GCKey,
                 tags: HashMap<String, String>,
                 encryptedResource: String

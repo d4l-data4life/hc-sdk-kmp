@@ -401,7 +401,7 @@ class RecordServiceCryptoTest : RecordServiceTestBase() {
                 mockDataKey,
                 mockTags,
                 ENCRYPTED_RESOURCE
-        ) ).thenReturn(mockDataResource)
+        )).thenReturn(mockDataResource)
 
         // When
         val decrypted = recordService.decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
@@ -461,7 +461,7 @@ class RecordServiceCryptoTest : RecordServiceTestBase() {
                 mockDataKey,
                 mockTags,
                 ENCRYPTED_RESOURCE
-        ) ).thenReturn(mockDataResource)
+        )).thenReturn(mockDataResource)
 
         // When
         val decrypted = recordService.decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)

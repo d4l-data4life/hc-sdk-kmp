@@ -23,10 +23,10 @@ import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 
 
-internal object SdkIdentifierFactory: WrapperFactoryContract.IdentifierFactory {
+internal object SdkIdentifierFactory : WrapperFactoryContract.IdentifierFactory {
     @Throws(DataValidationException.CustomDataLimitViolation::class)
     override fun wrap(identifier: Any): WrapperContract.Identifier {
-        return when(identifier) {
+        return when (identifier) {
             is Fhir3Identifier -> SdkFhir3Identifier(identifier)
             is Fhir4Identifier -> SdkFhir4Identifier(identifier)
             else -> throw CoreRuntimeException.InternalFailure()

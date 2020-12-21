@@ -51,8 +51,8 @@ class FhirServiceTest {
     private lateinit var mockCryptoService: CryptoService
     private lateinit var cryptoService: CryptoService
 
-    private lateinit var fhirService : FhirService
-    private lateinit var _fhirService : FhirService
+    private lateinit var fhirService: FhirService
+    private lateinit var _fhirService: FhirService
 
     @Before
     fun setUp() {
@@ -245,8 +245,8 @@ class FhirServiceTest {
     @Test
     fun `Given, decryptResource is called with a DataKey, a Type, Tags and a encrypted FhirResource, it fails on a CryptoError`() { //decryptResource_shouldThrowException_whenDecryptErrorHappens() {
         // given
-        every { cryptoService.decryptString(dataKey, ENCRYPTED_RESOURCE) } throws  unkwnownException
-        
+        every { cryptoService.decryptString(dataKey, ENCRYPTED_RESOURCE) } throws unkwnownException
+
         try {
             // when
             _fhirService.decryptResource<DataResource>(
@@ -273,7 +273,7 @@ class FhirServiceTest {
     fun `Given, decryptResource is called with a DataKey, a Type, Tags and a encrypted FhirResource, it fails on a ParserError`() {//decryptResource_shouldThrowException_whenParseErrorHappens() {
         // given
         every { cryptoService.decryptString(dataKey, ENCRYPTED_RESOURCE) } returns Single.just(JSON_RESOURCE)
-        every { SdkFhirParser.fromResource(JSON_RESOURCE) } throws  parseException
+        every { SdkFhirParser.fromResource(JSON_RESOURCE) } throws parseException
 
         try {
             // when

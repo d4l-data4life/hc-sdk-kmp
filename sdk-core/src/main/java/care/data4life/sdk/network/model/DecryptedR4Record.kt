@@ -20,7 +20,7 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 
-data class DecryptedR4Record<T: Fhir4Resource>(
+data class DecryptedR4Record<T : Fhir4Resource>(
         override var identifier: String?,
         override var resource: T,
         override var tags: HashMap<String, String>?,

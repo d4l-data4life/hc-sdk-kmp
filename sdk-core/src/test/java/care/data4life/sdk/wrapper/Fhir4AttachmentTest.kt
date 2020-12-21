@@ -34,7 +34,7 @@ class Fhir4AttachmentTest {
         // Given
         val id = "potato"
         val fhir4Attachment = Fhir4Attachment()
-        fhir4Attachment.id  = id
+        fhir4Attachment.id = id
 
         // When
         val result = SdkFhir4Attachment(fhir4Attachment).id
@@ -67,7 +67,7 @@ class Fhir4AttachmentTest {
         // Given
         val data = "soup"
         val fhir4Attachment = Fhir4Attachment()
-        fhir4Attachment.data  = data
+        fhir4Attachment.data = data
 
         // When
         val result = SdkFhir4Attachment(fhir4Attachment).data
@@ -100,7 +100,7 @@ class Fhir4AttachmentTest {
         // Given
         val hash = "1234"
         val fhir4Attachment = Fhir4Attachment()
-        fhir4Attachment.hash  = hash
+        fhir4Attachment.hash = hash
 
         // When
         val result = SdkFhir4Attachment(fhir4Attachment).hash
@@ -133,7 +133,7 @@ class Fhir4AttachmentTest {
         // Given
         val size = 42
         val fhir4Attachment = Fhir4Attachment()
-        fhir4Attachment.size  = size
+        fhir4Attachment.size = size
 
         // When
         val result = SdkFhir4Attachment(fhir4Attachment).size

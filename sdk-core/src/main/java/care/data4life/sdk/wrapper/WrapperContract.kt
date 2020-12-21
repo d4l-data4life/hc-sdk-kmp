@@ -28,12 +28,12 @@ class WrapperContract {
         var data: String?
         var hash: String?
         var size: Int?
-        fun <T: Any> unwrap(): T
+        fun <T : Any> unwrap(): T
     }
 
     internal interface Identifier {
         var value: String?
-        fun <T: Any>unwrap(): T
+        fun <T : Any> unwrap(): T
     }
 
     interface FhirElementFactory {
@@ -41,9 +41,9 @@ class WrapperContract {
         @Throws(CoreRuntimeException.InternalFailure::class)
         fun getFhirTypeForClass(resourceType: Class<out Any>): String?
 
-        fun getFhir3ClassForType(resourceType:String): Class<out Fhir3Resource>?
+        fun getFhir3ClassForType(resourceType: String): Class<out Fhir3Resource>?
 
-        fun getFhir4ClassForType(resourceType:String): Class<out Fhir4Resource>?
+        fun getFhir4ClassForType(resourceType: String): Class<out Fhir4Resource>?
     }
 
     interface FhirParser {

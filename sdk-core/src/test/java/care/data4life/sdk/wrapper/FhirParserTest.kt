@@ -40,7 +40,7 @@ class FhirParserTest {
         val resource = SdkFhirParser.toFhir3(type, source)
 
         // Then
-        assertTrue( resource is Fhir3Resource )
+        assertTrue(resource is Fhir3Resource)
     }
 
     @Test // Test is working, but the Constructor Mock causes flakyness
@@ -52,7 +52,7 @@ class FhirParserTest {
         // When
         val resource: Any = SdkFhirParser.toFhir4(type, source)
 
-        assertTrue( resource is Fhir4Resource )
+        assertTrue(resource is Fhir4Resource)
     }
 
     @Test

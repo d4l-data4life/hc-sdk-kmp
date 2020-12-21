@@ -23,8 +23,8 @@ import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedRecordGuard
-import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.NetworkModelContract
+import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -554,11 +554,11 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         DecryptedRecordMapper()
                 .setTags(tags)
                 .build(
-                    DataResource(customResource),
-                    delegatedTags,
-                    creationDate,
-                    dataKey,
-                    modelVersion
+                        DataResource(customResource),
+                        delegatedTags,
+                        creationDate,
+                        dataKey,
+                        modelVersion
                 )
 
         // Then
@@ -573,11 +573,11 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         DecryptedRecordMapper()
                 .setAnnotations(annotations)
                 .build(
-                    DataResource(customResource),
-                    tags,
-                    creationDate,
-                    dataKey,
-                    modelVersion
+                        DataResource(customResource),
+                        tags,
+                        creationDate,
+                        dataKey,
+                        modelVersion
                 )
 
         // Then

@@ -284,7 +284,7 @@ class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
 
         Mockito.doReturn(Single.just(mockRecord))
                 .`when`(recordService)
-                .updateRecord(USER_ID, RECORD_ID,  mockCarePlan, annotations)
+                .updateRecord(USER_ID, RECORD_ID, mockCarePlan, annotations)
 
         // When
         val observer = recordService.updateRecords(resources, USER_ID).test().await()

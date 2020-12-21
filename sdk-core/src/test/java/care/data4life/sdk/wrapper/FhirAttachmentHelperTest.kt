@@ -16,8 +16,6 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
-import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3AttachmentHelper
 import care.data4life.sdk.fhir.Fhir3Identifier
@@ -40,6 +38,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
+import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
+import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
 
 class FhirAttachmentHelperTest {
     @Before
@@ -109,6 +109,7 @@ class FhirAttachmentHelperTest {
     fun `Given, getAttachment is called with Fhir3Resource, it delegates to and returns of the wrapped Fhir3AttachmentHelper`() {
         // Given
         val resource = Mockito.mock(Fhir3DocumentReference::class.java)
+
         @Suppress("UNCHECKED_CAST")
         val attachments = Mockito.mock(MutableList::class.java) as MutableList<Fhir3Attachment>
 
@@ -144,6 +145,7 @@ class FhirAttachmentHelperTest {
     fun `Given, getAttachment is called with Fhir4Resource, it delegates to and returns of the wrapped Fhir4AttachmentHelper`() {
         // Given
         val resource = Mockito.mock(Fhir4DocumentReference::class.java)
+
         @Suppress("UNCHECKED_CAST")
         val attachments = Mockito.mock(MutableList::class.java) as MutableList<Fhir4Attachment>
 
@@ -313,6 +315,7 @@ class FhirAttachmentHelperTest {
     fun `Given, getIdentifier is called with a Fhir3Resource, it delegates to and returns of the wrapped Fhir3AttachmentHelper`() {
         // Given
         val resource = Mockito.mock(Fhir3Resource::class.java)
+
         @Suppress("UNCHECKED_CAST")
         val identifiers = Mockito.mock(MutableList::class.java) as MutableList<Fhir3Identifier>
 
@@ -348,6 +351,7 @@ class FhirAttachmentHelperTest {
     fun `Given, getIdentifier is called with a Fhir4Resource, it delegates to and returns of the wrapped Fhir4AttachmentHelper`() {
         // Given
         val resource = Mockito.mock(Fhir4Resource::class.java)
+
         @Suppress("UNCHECKED_CAST")
         val identifiers = Mockito.mock(MutableList::class.java) as MutableList<Fhir4Identifier>
 

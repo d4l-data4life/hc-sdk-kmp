@@ -66,7 +66,7 @@ class AttachmentService internal constructor(
         return Observable
                 .fromCallable { attachments }
                 .flatMapIterable { it }
-                .filter{ it.id != null }
+                .filter { it.id != null }
                 .map { attachment ->
                     var attachmentId = attachment.id!!
                     var isPreview = false

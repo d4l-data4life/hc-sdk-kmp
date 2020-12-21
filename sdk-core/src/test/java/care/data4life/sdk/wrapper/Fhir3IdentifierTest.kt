@@ -16,11 +16,11 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.fhir.stu3.model.Identifier as Fhir3Identifier
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import care.data4life.fhir.stu3.model.Identifier as Fhir3Identifier
 
 class Fhir3IdentifierTest {
     @Test
@@ -34,7 +34,7 @@ class Fhir3IdentifierTest {
         // Given
         val value = "potato"
         val fhir3Identifier = Fhir3Identifier()
-        fhir3Identifier.value  = value
+        fhir3Identifier.value = value
 
         // When
         val result = SdkFhir3Identifier(fhir3Identifier).value

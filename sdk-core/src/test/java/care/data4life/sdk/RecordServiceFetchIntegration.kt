@@ -16,8 +16,6 @@
 
 package care.data4life.sdk
 
-import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
-import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
 import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
@@ -37,14 +35,15 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
-import java.lang.ClassCastException
+import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
+import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
 
 
-class RecordServiceFetchIntegration: RecordServiceIntegrationBase() {
+class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
     private lateinit var encryptedRecord2: EncryptedRecord
     private lateinit var encryptedBody2: String
     private lateinit var stringifiedResource2: String
-    private val OFFSET  = 23
+    private val OFFSET = 23
     private val PAGE_SIZE = 42
 
     @Before
@@ -86,7 +85,7 @@ class RecordServiceFetchIntegration: RecordServiceIntegrationBase() {
             tags: Map<String, String>,
             annotations: Map<String, String> = mapOf()
     ) {
-        every { apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID) } returns  Single.just(encryptedRecord)
+        every { apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID) } returns Single.just(encryptedRecord)
 
         // decrypt Record
         // decrypt tags
@@ -113,7 +112,7 @@ class RecordServiceFetchIntegration: RecordServiceIntegrationBase() {
         } returns tags["resourcetype"]!!.toByteArray()
 
         //decrypt Annotations
-        if(annotations.isNotEmpty()) {
+        if (annotations.isNotEmpty()) {
             every {
                 cryptoService.symDecrypt(tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()
@@ -166,7 +165,7 @@ class RecordServiceFetchIntegration: RecordServiceIntegrationBase() {
         } returns tags["flag"]!!.toByteArray()
 
         //decrypt Annotations
-        if(annotations.isNotEmpty()) {
+        if (annotations.isNotEmpty()) {
             every {
                 cryptoService.symDecrypt(tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()
@@ -205,7 +204,7 @@ class RecordServiceFetchIntegration: RecordServiceIntegrationBase() {
         } returns tags["resourcetype"]!!.toByteArray()
 
         // encrypt annotations
-        if(annotations.isNotEmpty()) {
+        if (annotations.isNotEmpty()) {
             every {
                 cryptoService.symEncrypt(tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()
@@ -224,15 +223,17 @@ class RecordServiceFetchIntegration: RecordServiceIntegrationBase() {
         }
 
         //fetch
-        every { apiService.fetchRecords(
-                ALIAS,
-                USER_ID,
-                null,
-                null,
-                PAGE_SIZE,
-                OFFSET,
-                encryptedTags
-        ) } returns Observable.fromArray(
+        every {
+            apiService.fetchRecords(
+                    ALIAS,
+                    USER_ID,
+                    null,
+                    null,
+                    PAGE_SIZE,
+                    OFFSET,
+                    encryptedTags
+            )
+        } returns Observable.fromArray(
                 arrayListOf(
                         encryptedRecord,
                         encryptedRecord2
@@ -262,7 +263,7 @@ class RecordServiceFetchIntegration: RecordServiceIntegrationBase() {
         } returns tags["resourcetype"]!!.toByteArray()
 
         //decrypt annotations
-        if(annotations.isNotEmpty()) {
+        if (annotations.isNotEmpty()) {
             every {
                 cryptoService.symDecrypt(tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()
@@ -307,7 +308,7 @@ class RecordServiceFetchIntegration: RecordServiceIntegrationBase() {
         } returns tags["flag"]!!.toByteArray()
 
         // encrypt annotations
-        if(annotations.isNotEmpty()) {
+        if (annotations.isNotEmpty()) {
             every {
                 cryptoService.symEncrypt(tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()
@@ -360,7 +361,7 @@ class RecordServiceFetchIntegration: RecordServiceIntegrationBase() {
         } returns tags["flag"]!!.toByteArray()
 
         //decrypt Annotations
-        if(annotations.isNotEmpty()) {
+        if (annotations.isNotEmpty()) {
             every {
                 cryptoService.symDecrypt(tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()

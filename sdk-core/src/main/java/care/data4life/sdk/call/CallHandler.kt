@@ -17,11 +17,11 @@ package care.data4life.sdk.call
 
 import care.data4life.sdk.SdkContract
 import care.data4life.sdk.lang.TaskException
-import care.data4life.sdk.listener.Callback as LegacyCallback
-import care.data4life.sdk.listener.ResultListener as LegacyListener
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import care.data4life.sdk.listener.Callback as LegacyCallback
+import care.data4life.sdk.listener.ResultListener as LegacyListener
 
 class CallHandler(
         var errorHandler: SdkContract.ErrorHandler

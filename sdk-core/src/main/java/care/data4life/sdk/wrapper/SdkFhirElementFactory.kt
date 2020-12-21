@@ -23,14 +23,14 @@ import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import java.util.*
 
-internal object SdkFhirElementFactory: WrapperContract.FhirElementFactory {
+internal object SdkFhirElementFactory : WrapperContract.FhirElementFactory {
     private val fhir3Indicator = Fhir3Resource::class.java.`package`
     private val fhir4Indicator = Fhir4Resource::class.java.`package`
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun getFhirTypeForClass(resourceType: Class<out Any>): String? {
         @Suppress("UNCHECKED_CAST")
-        return when(resourceType.`package`) {
+        return when (resourceType.`package`) {
             fhir3Indicator -> Fhir3ElementFactory.getFhirTypeForClass(resourceType as Class<Fhir3Resource>)
             fhir4Indicator -> Fhir4ElementFactory.getFhirTypeForClass(resourceType as Class<Fhir4Resource>)
             else -> throw CoreRuntimeException.InternalFailure()
@@ -39,7 +39,7 @@ internal object SdkFhirElementFactory: WrapperContract.FhirElementFactory {
 
     private fun normalizeTypeNames(resourceType: String): String {
         val normalizedName = resourceType.toLowerCase(Locale.US)
-        return if(!typeNames.containsKey(normalizedName)) {
+        return if (!typeNames.containsKey(normalizedName)) {
             resourceType
         } else {
             typeNames[normalizedName]!!
@@ -50,14 +50,14 @@ internal object SdkFhirElementFactory: WrapperContract.FhirElementFactory {
         val clazz = Fhir3ElementFactory.getClassForFhirType(normalizeTypeNames(resourceType))
 
         @Suppress("UNCHECKED_CAST")
-        return  if (clazz  == null) null else clazz as Class<out Fhir3Resource>
+        return if (clazz == null) null else clazz as Class<out Fhir3Resource>
     }
 
     override fun getFhir4ClassForType(resourceType: String): Class<out Fhir4Resource>? {
         val clazz = Fhir4ElementFactory.getClassForFhirType(normalizeTypeNames(resourceType))
 
         @Suppress("UNCHECKED_CAST")
-        return  if (clazz  == null) null else (clazz as Class<out Fhir4Resource>)
+        return if (clazz == null) null else (clazz as Class<out Fhir4Resource>)
     }
 
     private val typeNames = mapOf(

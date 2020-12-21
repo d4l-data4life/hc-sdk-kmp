@@ -26,11 +26,11 @@ import care.data4life.sdk.fhir.Fhir4Identifier
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 
-internal object SdkFhirAttachmentHelper: HelperContract.FhirAttachmentHelper {
+internal object SdkFhirAttachmentHelper : HelperContract.FhirAttachmentHelper {
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun hasAttachment(resource: Any): Boolean {
-        return when(resource) {
+        return when (resource) {
             is Fhir4Resource -> Fhir4AttachmentHelper.hasAttachment(resource)
             is Fhir3Resource -> Fhir3AttachmentHelper.hasAttachment(resource)
             else -> throw CoreRuntimeException.InternalFailure()
@@ -40,7 +40,7 @@ internal object SdkFhirAttachmentHelper: HelperContract.FhirAttachmentHelper {
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun getAttachment(resource: Any): MutableList<Any?>? {
         @Suppress("UNCHECKED_CAST")
-        return when(resource) {
+        return when (resource) {
             is Fhir4Resource -> Fhir4AttachmentHelper.getAttachment(resource) as MutableList<Any?>?
             is Fhir3Resource -> Fhir3AttachmentHelper.getAttachment(resource) as MutableList<Any?>?
             else -> throw CoreRuntimeException.InternalFailure()
@@ -49,7 +49,7 @@ internal object SdkFhirAttachmentHelper: HelperContract.FhirAttachmentHelper {
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun updateAttachmentData(resource: Any, attachmentData: HashMap<Any, String?>?) {
-        return when(resource) {
+        return when (resource) {
             is Fhir4Resource -> updateFhir4AttachmentData(resource, attachmentData)
             is Fhir3Resource -> updateFhir3AttachmentData(resource, attachmentData)
             else -> throw CoreRuntimeException.InternalFailure()
@@ -57,7 +57,7 @@ internal object SdkFhirAttachmentHelper: HelperContract.FhirAttachmentHelper {
     }
 
     private fun updateFhir3AttachmentData(resource: Fhir3Resource, attachmentData: HashMap<Any, String?>?) {
-        val attachment = if( attachmentData == null) {
+        val attachment = if (attachmentData == null) {
             null
         } else {
             attachmentData as HashMap<Fhir3Attachment, String?>
@@ -70,7 +70,7 @@ internal object SdkFhirAttachmentHelper: HelperContract.FhirAttachmentHelper {
     }
 
     private fun updateFhir4AttachmentData(resource: Fhir4Resource, attachmentData: HashMap<Any, String?>?) {
-        val attachment = if( attachmentData == null) {
+        val attachment = if (attachmentData == null) {
             null
         } else {
             attachmentData as HashMap<Fhir4Attachment, String?>
@@ -84,7 +84,7 @@ internal object SdkFhirAttachmentHelper: HelperContract.FhirAttachmentHelper {
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun getIdentifier(resource: Any): List<Any>? {
-        return when(resource) {
+        return when (resource) {
             is Fhir4Resource -> Fhir4AttachmentHelper.getIdentifier(resource)
             is Fhir3Resource -> Fhir3AttachmentHelper.getIdentifier(resource)
             else -> throw CoreRuntimeException.InternalFailure()
@@ -93,7 +93,7 @@ internal object SdkFhirAttachmentHelper: HelperContract.FhirAttachmentHelper {
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun setIdentifier(resource: Any, updatedIdentifiers: List<Any>) {
-        return when(resource) {
+        return when (resource) {
             is Fhir4Resource -> Fhir4AttachmentHelper.setIdentifier(
                     resource,
                     updatedIdentifiers as List<Fhir4Identifier>
@@ -108,7 +108,7 @@ internal object SdkFhirAttachmentHelper: HelperContract.FhirAttachmentHelper {
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun appendIdentifier(resource: Any, identifier: String, assigner: String) {
-        return when(resource) {
+        return when (resource) {
             is Fhir4Resource -> Fhir4AttachmentHelper.appendIdentifier(
                     resource,
                     identifier,

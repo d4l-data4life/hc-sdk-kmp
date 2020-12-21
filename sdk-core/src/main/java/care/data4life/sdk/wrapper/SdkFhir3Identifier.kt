@@ -20,10 +20,12 @@ import care.data4life.sdk.fhir.Fhir3Identifier
 
 internal class SdkFhir3Identifier(
         private val identifier: Fhir3Identifier
-): WrapperContract.Identifier {
+) : WrapperContract.Identifier {
     override var value: String?
         get() = identifier.value
-        set(value) {identifier.value = value}
+        set(value) {
+            identifier.value = value
+        }
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Any> unwrap(): T = identifier as T

@@ -20,25 +20,33 @@ import care.data4life.sdk.fhir.Fhir3Attachment
 
 internal class SdkFhir3Attachment(
         private val attachment: Fhir3Attachment
-): WrapperContract.Attachment {
+) : WrapperContract.Attachment {
     override var id: String?
         get() = attachment.id
-        set(id) { attachment.id = id}
+        set(id) {
+            attachment.id = id
+        }
     override var data: String?
         get() = attachment.data
-        set(data) {attachment.data = data}
+        set(data) {
+            attachment.data = data
+        }
     override var hash: String?
         get() = attachment.hash
-        set(hash) {attachment.hash = hash}
+        set(hash) {
+            attachment.hash = hash
+        }
     override var size: Int?
         get() = attachment.size
-        set(size) {attachment.size = size}
+        set(size) {
+            attachment.size = size
+        }
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Any> unwrap(): T = attachment as T
 
     override fun equals(other: Any?): Boolean {
-        return if(other !is SdkFhir3Attachment) {
+        return if (other !is SdkFhir3Attachment) {
             false
         } else {
             return attachment === other.unwrap<Fhir3Attachment>()

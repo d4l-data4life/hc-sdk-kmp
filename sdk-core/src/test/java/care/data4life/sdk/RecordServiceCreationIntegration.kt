@@ -41,7 +41,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
+class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
     @Before
     fun setUp() {
         apiService = mockk()
@@ -57,7 +57,7 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
                 RecordServiceTestBase.ALIAS,
                 apiService,
                 TagEncryptionService(
-                      cryptoService
+                        cryptoService
                 ),
                 TaggingService(CLIENT_ID),
                 FhirService(
@@ -125,7 +125,7 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
         } returns tags["resourcetype"]!!.toByteArray()
 
         // encrypt annotations
-        if(annotations.isNotEmpty()) {
+        if (annotations.isNotEmpty()) {
             every {
                 cryptoService.symEncrypt(tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()
@@ -182,7 +182,7 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
         } returns tags["resourcetype"]!!.toByteArray()
 
         //decrypt annotations
-        if(annotations.isNotEmpty()) {
+        if (annotations.isNotEmpty()) {
             every {
                 cryptoService.symDecrypt(tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()
@@ -207,7 +207,7 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
         every {
             cryptoService.decryptString(dataKey, encryptedBody)
-        } returns Single.just( stringifiedResource )
+        } returns Single.just(stringifiedResource)
     }
 
     private fun runDatalow(
@@ -242,7 +242,7 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
         } returns tags["flag"]!!.toByteArray()
 
         // encrypt annotations
-        if(annotations.isNotEmpty()) {
+        if (annotations.isNotEmpty()) {
             every {
                 cryptoService.symEncrypt(tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()
@@ -286,7 +286,7 @@ class RecordServiceCreationIntegration: RecordServiceIntegrationBase() {
         } returns tags["flag"]!!.toByteArray()
 
         //decrypt annotations
-        if(annotations.isNotEmpty()) {
+        if (annotations.isNotEmpty()) {
             every {
                 cryptoService.symDecrypt(tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()

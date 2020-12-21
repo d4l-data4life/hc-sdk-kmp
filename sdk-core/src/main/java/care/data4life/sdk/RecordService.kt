@@ -41,7 +41,6 @@ import care.data4life.sdk.model.FetchResult
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
-import care.data4life.sdk.wrapper.SdkFhirAttachmentHelper
 import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
@@ -61,6 +60,7 @@ import care.data4life.sdk.util.MimeType
 import care.data4life.sdk.util.MimeType.Companion.recognizeMimeType
 import care.data4life.sdk.wrapper.HelperContract
 import care.data4life.sdk.wrapper.SdkAttachmentFactory
+import care.data4life.sdk.wrapper.SdkFhirAttachmentHelper
 import care.data4life.sdk.wrapper.SdkIdentifierFactory
 import care.data4life.sdk.wrapper.WrapperContract
 import care.data4life.sdk.wrapper.WrapperFactoryContract
@@ -522,7 +522,7 @@ class RecordService(
 
     //region utility methods
     @Throws(IOException::class)
-    internal fun <T: Any> encryptRecord(
+    internal fun <T : Any> encryptRecord(
             record: DecryptedBaseRecord<T>
     ): EncryptedRecord {
         val encryptedTags = tagEncryptionService.encryptTags(record.tags!!).also {
@@ -606,7 +606,7 @@ class RecordService(
         val commonKey: GCKey = getCommonKey(commonKeyId, userId)
         val dataKey = cryptoService.symDecryptSymmetricKey(commonKey, record.encryptedDataKey).blockingGet()
 
-        builder.setDataKey( dataKey )
+        builder.setDataKey(dataKey)
 
         if (record.encryptedAttachmentsKey != null) {
             builder.setAttachmentKey(
@@ -618,13 +618,13 @@ class RecordService(
         }
 
         return builder.build(
-                if(record.encryptedBody == null || record.encryptedBody.isEmpty()) {
+                if (record.encryptedBody == null || record.encryptedBody.isEmpty()) {
                     null// Fixme: This is a potential bug
                 } else {
                     fhirService.decryptResource<T>(
-                        dataKey,
-                        tags,
-                        record.encryptedBody
+                            dataKey,
+                            tags,
+                            record.encryptedBody
                     )
                 }
         ) as DecryptedBaseRecord<T>
@@ -719,7 +719,7 @@ class RecordService(
 
             val data = HashMap<Any, String?>(attachments.size)
             for (rawAttachment in attachments) {
-                if(rawAttachment != null) {
+                if (rawAttachment != null) {
                     val attachment = attchachmentFactory.wrap(rawAttachment)
 
                     if (attachment.data != null) {
@@ -880,7 +880,7 @@ class RecordService(
         val oldAttachments: HashMap<String?, WrapperContract.Attachment> = hashMapOf()
 
         for (rawAttachment in attachments) {
-            if(rawAttachment != null) {
+            if (rawAttachment != null) {
                 val attachment = attchachmentFactory.wrap(rawAttachment)
 
                 if (attachment.id != null) {
@@ -1104,7 +1104,7 @@ class RecordService(
             currentAttachments.forEach {
                 if (it != null) {
                     val attachment = attchachmentFactory.wrap(it)
-                    if(attachment.id != null) {
+                    if (attachment.id != null) {
                         currentAttachmentIds.add(attachment.id!!)
                     }
                 }
@@ -1149,7 +1149,7 @@ class RecordService(
             record: DecryptedBaseRecord<T>
     ): DecryptedBaseRecord<T> {
         return record.also {
-            when(record.resource) {
+            when (record.resource) {
                 is Fhir3Resource -> (record as DecryptedFhir3Record<Fhir3Resource>).resource.id = record.identifier
                 is Fhir4Resource -> (record as DecryptedFhir4Record<Fhir4Resource>).resource.id = record.identifier
             }

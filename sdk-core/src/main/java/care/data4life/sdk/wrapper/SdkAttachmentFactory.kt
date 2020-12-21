@@ -23,10 +23,10 @@ import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 
 
-internal object SdkAttachmentFactory: WrapperFactoryContract.AttachmentFactory {
+internal object SdkAttachmentFactory : WrapperFactoryContract.AttachmentFactory {
     @Throws(DataValidationException.CustomDataLimitViolation::class)
     override fun wrap(attachment: Any): WrapperContract.Attachment {
-        return when(attachment) {
+        return when (attachment) {
             is Fhir3Attachment -> SdkFhir3Attachment(attachment)
             is Fhir4Attachment -> SdkFhir4Attachment(attachment)
             else -> throw CoreRuntimeException.InternalFailure()

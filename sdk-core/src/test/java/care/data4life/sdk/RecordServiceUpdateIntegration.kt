@@ -43,9 +43,8 @@ import io.reactivex.Single
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import java.lang.ClassCastException
 
-class RecordServiceUpdateIntegration: RecordServiceIntegrationBase() {
+class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
     private lateinit var commonKeyResponse: CommonKeyResponse
     private lateinit var keyPair: GCKeyPair
     private lateinit var encryptedCommonKey: EncryptedKey
@@ -144,7 +143,7 @@ class RecordServiceUpdateIntegration: RecordServiceIntegrationBase() {
         } returns tags["resourcetype"]!!.toByteArray()
 
         //decrypt annotations
-        if(annotations.isNotEmpty()) {
+        if (annotations.isNotEmpty()) {
             every {
                 cryptoService.symDecrypt(tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()
@@ -212,7 +211,7 @@ class RecordServiceUpdateIntegration: RecordServiceIntegrationBase() {
         } returns tags["resourcetype"]!!.toByteArray()
 
         // encrypt annotations
-        if(annotations.isNotEmpty()) {
+        if (annotations.isNotEmpty()) {
             every {
                 cryptoService.symEncrypt(tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()
@@ -276,7 +275,7 @@ class RecordServiceUpdateIntegration: RecordServiceIntegrationBase() {
         } returns tags["flag"]!!.toByteArray()
 
         //decrypt annotations
-        if(annotations.isNotEmpty()) {
+        if (annotations.isNotEmpty()) {
             every {
                 cryptoService.symDecrypt(tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()
@@ -327,7 +326,7 @@ class RecordServiceUpdateIntegration: RecordServiceIntegrationBase() {
         } returns tags["flag"]!!.toByteArray()
 
         // encrypt annotations
-        if(annotations.isNotEmpty()) {
+        if (annotations.isNotEmpty()) {
             every {
                 cryptoService.symEncrypt(tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()

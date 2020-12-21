@@ -40,7 +40,7 @@ class AttachmentContract {
                 userId: String
         ): Single<List<WrapperContract.Attachment>>
 
-        
+
         fun delete(attachmentId: String, userId: String): Single<Boolean>
     }
 

@@ -21,7 +21,6 @@ import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.fhir.stu3.model.CarePlan
 import care.data4life.fhir.stu3.model.DocumentReference
 import care.data4life.fhir.stu3.model.DomainResource
-import care.data4life.fhir.r4.model.DocumentReference as Fhir4Reference
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.call.DataRecord
@@ -62,6 +61,7 @@ import org.threeten.bp.LocalDate
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import java.util.*
+import care.data4life.fhir.r4.model.DocumentReference as Fhir4Reference
 
 abstract class RecordServiceTestBase {
     //SUT

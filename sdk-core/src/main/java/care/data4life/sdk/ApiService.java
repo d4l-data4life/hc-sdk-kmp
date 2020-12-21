@@ -86,7 +86,7 @@ public final class ApiService {
 
     /**
      * Full constructor.
-     *
+     * <p>
      * If the staticToken parameter is set to null, the SDK will handle the full OAuth flow
      * and fetch  access and retrieval tokens, renewing the former as needed for later
      * requests.
@@ -267,8 +267,8 @@ public final class ApiService {
 
     // TODO remove public
     public Single<String> uploadDocument(String alias,
-                                  String userId,
-                                  byte[] encryptedAttachment) {
+                                         String userId,
+                                         byte[] encryptedAttachment) {
         return service.uploadDocument(
                 alias, userId,
                 RequestBody.create(MediaType.parse(MEDIA_TYPE_OCTET_STREAM), encryptedAttachment)
@@ -277,16 +277,16 @@ public final class ApiService {
 
     // TODO remove public
     public Single<byte[]> downloadDocument(String alias,
-                                    String userId,
-                                    String documentId) {
+                                           String userId,
+                                           String documentId) {
         return service.downloadDocument(alias, userId, documentId)
                 .map(ResponseBody::bytes);
     }
 
     // TODO remove public
     public Single<Boolean> deleteDocument(String alias,
-                                   String userId,
-                                   String documentId) {
+                                          String userId,
+                                          String documentId) {
         // network request doesn't has a response except the HTTP 204
         // on success the method will always return `true`
         return service.deleteDocument(alias, userId, documentId).map(it -> true);

@@ -17,7 +17,6 @@ package care.data4life.sdk.tag
 
 
 import care.data4life.fhir.stu3.model.Patient
-import care.data4life.fhir.r4.model.Patient as R4Patient
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir3Version
@@ -27,6 +26,7 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import java.util.*
+import care.data4life.fhir.r4.model.Patient as R4Patient
 
 class TaggingServiceTest {
     // SUT

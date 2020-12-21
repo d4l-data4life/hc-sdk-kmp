@@ -292,7 +292,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         verify(exactly = 1) { Fhir4AttachmentHelper.getAttachment(carePlan) }
         verify(exactly = 1) { Fhir4AttachmentHelper.updateAttachmentData(carePlan, null) }
     }
-    
+
     @Test
     fun `Given, removeUploadData is called with a DecryptedFhir3Record, it does nothing, if no Attachments exists`() {
         // Given
@@ -327,7 +327,7 @@ class RecordServiceTest : RecordServiceTestBase() {
                 .restoreUploadData(
                         decryptedRecord,
                         document,
-                mockUploadData as HashMap<Any, String?>
+                        mockUploadData as HashMap<Any, String?>
                 )
 
         // When
@@ -1207,7 +1207,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         val attachmentKey = mockk<GCKey>()
         val type = DownloadType.Full
 
-        val downloadedResource =  Fhir3Attachment()
+        val downloadedResource = Fhir3Attachment()
         downloadedResource.id = "abc"
 
         val serviceAttachment = Fhir3Attachment()
@@ -1232,17 +1232,21 @@ class RecordServiceTest : RecordServiceTestBase() {
         every { Fhir3AttachmentHelper.getIdentifier(resource) } returns ids
 
 
-        every { recordServiceK.setAttachmentIdForDownloadType(
-                any(),
-                ids,
-                type
-        ) } returns Unit
+        every {
+            recordServiceK.setAttachmentIdForDownloadType(
+                    any(),
+                    ids,
+                    type
+            )
+        } returns Unit
 
-        every { attachmentService.download(
-                any(),
-                attachmentKey,
-                USER_ID
-        ) } returns Single.just(listOf(downloadedAttachment))
+        every {
+            attachmentService.download(
+                    any(),
+                    attachmentKey,
+                    USER_ID
+            )
+        } returns Single.just(listOf(downloadedAttachment))
 
         every { recordServiceK.updateAttachmentMeta(any()) } returns mockk()
 
@@ -1273,11 +1277,13 @@ class RecordServiceTest : RecordServiceTestBase() {
             )
         }
 
-        verify(exactly = 1 ) { recordServiceK.setAttachmentIdForDownloadType(
-                any(),
-                ids,
-                type
-        ) }
+        verify(exactly = 1) {
+            recordServiceK.setAttachmentIdForDownloadType(
+                    any(),
+                    ids,
+                    type
+            )
+        }
 
         verify(exactly = 0) { recordServiceK.updateAttachmentMeta(any()) }
     }
@@ -1293,7 +1299,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         val attachmentKey = mockk<GCKey>()
         val type = DownloadType.Full
 
-        val downloadedResource =  Fhir3Attachment()
+        val downloadedResource = Fhir3Attachment()
         downloadedResource.id = "with ${SPLIT_CHAR} char"
 
         val serviceAttachment = Fhir3Attachment()
@@ -1320,17 +1326,21 @@ class RecordServiceTest : RecordServiceTestBase() {
         every { Fhir3AttachmentHelper.getIdentifier(resource) } returns ids
 
 
-        every { recordServiceK.setAttachmentIdForDownloadType(
-                any(),
-                ids,
-                type
-        ) } returns Unit
+        every {
+            recordServiceK.setAttachmentIdForDownloadType(
+                    any(),
+                    ids,
+                    type
+            )
+        } returns Unit
 
-        every { attachmentService.download(
-                any(),
-                attachmentKey,
-                USER_ID
-        ) } returns Single.just(listOf(downloadedAttachment))
+        every {
+            attachmentService.download(
+                    any(),
+                    attachmentKey,
+                    USER_ID
+            )
+        } returns Single.just(listOf(downloadedAttachment))
 
         every { recordServiceK.updateAttachmentMeta(any()) } returns mockk()
 
@@ -1360,11 +1370,13 @@ class RecordServiceTest : RecordServiceTestBase() {
             )
         }
 
-        verify(exactly = 1 ) { recordServiceK.setAttachmentIdForDownloadType(
-                any(),
-                ids,
-                type
-        ) }
+        verify(exactly = 1) {
+            recordServiceK.setAttachmentIdForDownloadType(
+                    any(),
+                    ids,
+                    type
+            )
+        }
 
         verify(exactly = 1) { recordServiceK.updateAttachmentMeta(any()) }
     }
@@ -1375,11 +1387,13 @@ class RecordServiceTest : RecordServiceTestBase() {
         val resource = mockk<Fhir4Resource>()
         val attachment = mockk<WrapperContract.Attachment>()
 
-        every {  Fhir4AttachmentHelper.appendIdentifier(
-                resource,
-                any(),
-                PARTNER_ID
-        ) } returns mockk()
+        every {
+            Fhir4AttachmentHelper.appendIdentifier(
+                    resource,
+                    any(),
+                    PARTNER_ID
+            )
+        } returns mockk()
 
         // When
         recordServiceK.updateFhirResourceIdentifier(
@@ -1387,11 +1401,13 @@ class RecordServiceTest : RecordServiceTestBase() {
                 listOf<Pair<WrapperContract.Attachment, List<String>?>>(attachment to null)
         )
 
-        verify(exactly = 0) { Fhir4AttachmentHelper.appendIdentifier(
-                resource,
-                any(),
-                PARTNER_ID
-        ) }
+        verify(exactly = 0) {
+            Fhir4AttachmentHelper.appendIdentifier(
+                    resource,
+                    any(),
+                    PARTNER_ID
+            )
+        }
     }
 
     @Test
@@ -1402,11 +1418,13 @@ class RecordServiceTest : RecordServiceTestBase() {
 
         every { attachment.id } returns "something"
 
-        every { Fhir4AttachmentHelper.appendIdentifier(
-                resource,
-                "d4l_f_p_t#something#abc",
-                PARTNER_ID
-        ) } returns mockk()
+        every {
+            Fhir4AttachmentHelper.appendIdentifier(
+                    resource,
+                    "d4l_f_p_t#something#abc",
+                    PARTNER_ID
+            )
+        } returns mockk()
 
         // When
         recordServiceK.updateFhirResourceIdentifier(
@@ -1414,10 +1432,12 @@ class RecordServiceTest : RecordServiceTestBase() {
                 listOf<Pair<WrapperContract.Attachment, List<String>?>>(attachment to listOf("abc"))
         )
 
-        verify(exactly = 1) { Fhir4AttachmentHelper.appendIdentifier(
-                resource,
-                "d4l_f_p_t#something#abc",
-                PARTNER_ID
-        ) }
+        verify(exactly = 1) {
+            Fhir4AttachmentHelper.appendIdentifier(
+                    resource,
+                    "d4l_f_p_t#something#abc",
+                    PARTNER_ID
+            )
+        }
     }
 }

@@ -38,10 +38,7 @@ import io.reactivex.Single
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito
 
 class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
@@ -112,15 +109,19 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         val uploadResult = listOf(Pair(SdkAttachmentFactory.wrap(document.content[0].attachment), downscaledIds))
 
         every { cryptoService.generateGCKey() } returns Single.just(mockAttachmentKey)
-        every { recordServiceK.getValidHash(
-                eq(SdkAttachmentFactory.wrap(document.content[0].attachment))
-        ) } returns DATA_HASH
+        every {
+            recordServiceK.getValidHash(
+                    eq(SdkAttachmentFactory.wrap(document.content[0].attachment))
+            )
+        } returns DATA_HASH
 
-        every { attachmentService.upload(
-                listOf(SdkAttachmentFactory.wrap(document.content[0].attachment)),
-                mockAttachmentKey,
-                USER_ID
-        ) } returns Single.just(uploadResult)
+        every {
+            attachmentService.upload(
+                    listOf(SdkAttachmentFactory.wrap(document.content[0].attachment)),
+                    mockAttachmentKey,
+                    USER_ID
+            )
+        } returns Single.just(uploadResult)
         // When
         val record = recordServiceK._uploadData(decryptedRecord, USER_ID)
 
@@ -150,25 +151,33 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         val uploadResult = listOf(Pair(SdkAttachmentFactory.wrap(document.content[0].attachment), downscaledIds))
 
         every { cryptoService.generateGCKey() } returns Single.just(mockAttachmentKey)
-        every { recordServiceK.getValidHash(
-                eq(SdkAttachmentFactory.wrap(document.content[0].attachment))
-        ) } returns DATA_HASH
+        every {
+            recordServiceK.getValidHash(
+                    eq(SdkAttachmentFactory.wrap(document.content[0].attachment))
+            )
+        } returns DATA_HASH
 
-        every { attachmentService.upload(
-                listOf(SdkAttachmentFactory.wrap(document.content[0].attachment)),
-                mockAttachmentKey,
-                USER_ID
-        ) } returns Single.just(uploadResult)
+        every {
+            attachmentService.upload(
+                    listOf(SdkAttachmentFactory.wrap(document.content[0].attachment)),
+                    mockAttachmentKey,
+                    USER_ID
+            )
+        } returns Single.just(uploadResult)
 
-        every { recordServiceK.getValidHash(
-                SdkAttachmentFactory.wrap(document.content[0].attachment)
-        ) } returns DATA_HASH
+        every {
+            recordServiceK.getValidHash(
+                    SdkAttachmentFactory.wrap(document.content[0].attachment)
+            )
+        } returns DATA_HASH
 
-        every { attachmentService.upload(
-                listOf(SdkAttachmentFactory.wrap(document.content[0].attachment)),
-                mockAttachmentKey,
-                USER_ID
-        ) } returns Single.just(uploadResult)
+        every {
+            attachmentService.upload(
+                    listOf(SdkAttachmentFactory.wrap(document.content[0].attachment)),
+                    mockAttachmentKey,
+                    USER_ID
+            )
+        } returns Single.just(uploadResult)
 
         // When
         val record = recordServiceK._uploadData(decryptedRecord, USER_ID)
@@ -291,19 +300,25 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
 
         every { cryptoService.generateGCKey() } returns Single.just(mockAttachmentKey)
 
-        every { recordServiceK.getValidHash(
-                SdkAttachmentFactory.wrap(firstAttachment)
-        ) } returns DATA_HASH
+        every {
+            recordServiceK.getValidHash(
+                    SdkAttachmentFactory.wrap(firstAttachment)
+            )
+        } returns DATA_HASH
 
-        every { recordServiceK.getValidHash(
-                SdkAttachmentFactory.wrap(secondAttachment)
-        ) } returns DATA_HASH
+        every {
+            recordServiceK.getValidHash(
+                    SdkAttachmentFactory.wrap(secondAttachment)
+            )
+        } returns DATA_HASH
 
-        every { attachmentService.upload(
-                any(),
-                mockAttachmentKey,
-                USER_ID
-        ) } returns Single.fromCallable {
+        every {
+            attachmentService.upload(
+                    any(),
+                    mockAttachmentKey,
+                    USER_ID
+            )
+        } returns Single.fromCallable {
             firstAttachment.id = ATTACHMENT_ID
             secondAttachment.id = ATTACHMENT_ID
             uploadResult as List<Pair<WrapperContract.Attachment, List<String>>>
@@ -417,15 +432,19 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
 
         every { cryptoService.generateGCKey() } returns Single.just(mockAttachmentKey)
 
-        every { recordServiceK.getValidHash(
-                SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment)
-        ) } returns DATA_HASH
+        every {
+            recordServiceK.getValidHash(
+                    SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment)
+            )
+        } returns DATA_HASH
 
-        every { attachmentService.upload(
-                listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
-                mockAttachmentKey,
-                USER_ID
-        ) } returns Single.just(uploadResult)
+        every {
+            attachmentService.upload(
+                    listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
+                    mockAttachmentKey,
+                    USER_ID
+            )
+        } returns Single.just(uploadResult)
 
 
         // When
@@ -434,7 +453,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         // Then
         Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
 
-        verify(exactly = 0 ) { cryptoService.generateGCKey() }
+        verify(exactly = 0) { cryptoService.generateGCKey() }
         verify(exactly = 0) {
             attachmentService.upload(
                     listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
@@ -481,29 +500,37 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 Pair(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment), downscaledIds)
         )
 
-        every { recordServiceK.getValidHash(
-                SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment)
-        ) } returns updatedHash
+        every {
+            recordServiceK.getValidHash(
+                    SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment)
+            )
+        } returns updatedHash
 
-        every { attachmentService.upload(
-                listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
-                mockAttachmentKey,
-                USER_ID
-        ) } returns Single.just(uploadResult)
+        every {
+            attachmentService.upload(
+                    listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
+                    mockAttachmentKey,
+                    USER_ID
+            )
+        } returns Single.just(uploadResult)
 
         // When
         recordServiceK.updateData(decryptedRecord, updatedDocument, USER_ID)
 
         // Then
 
-        verify (exactly = 1) { recordServiceK.getValidHash(
-                SdkAttachmentFactory.wrap(updatedAttachment)
-        ) }
-        verify (exactly = 1) { attachmentService.upload(
-                listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
-                mockAttachmentKey,
-                USER_ID
-        ) }
+        verify(exactly = 1) {
+            recordServiceK.getValidHash(
+                    SdkAttachmentFactory.wrap(updatedAttachment)
+            )
+        }
+        verify(exactly = 1) {
+            attachmentService.upload(
+                    listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
+                    mockAttachmentKey,
+                    USER_ID
+            )
+        }
 
         /*inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID)
         inOrder.verify(recordService).getValidHash(eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment)))
@@ -608,9 +635,11 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 -1
         )
 
-        every { recordServiceK.getValidHash(
-                eq(SdkAttachmentFactory.wrap(document.content[0].attachment))
-        ) } returns "i cannot never ever be valid"
+        every {
+            recordServiceK.getValidHash(
+                    eq(SdkAttachmentFactory.wrap(document.content[0].attachment))
+            )
+        } returns "i cannot never ever be valid"
 
         // When
         try {
@@ -624,9 +653,11 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
             Truth.assertThat(e.message).isEqualTo("Attachment.hash is not valid")
         }
 
-        verify(exactly = 1) { recordServiceK.getValidHash(
-                eq(SdkAttachmentFactory.wrap(document.content[0].attachment))
-        ) }
+        verify(exactly = 1) {
+            recordServiceK.getValidHash(
+                    eq(SdkAttachmentFactory.wrap(document.content[0].attachment))
+            )
+        }
 
         /*inOrder.verify(recordService).updateData(decryptedRecord, document, USER_ID)
         inOrder.verify(recordService).getValidHash(eq(SdkAttachmentFactory.wrap(document.content[0].attachment)))
@@ -665,11 +696,13 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         uploadResult.add(Pair(SdkAttachmentFactory.wrap(updatedAttachment), downscaledIds))
 
         every { recordServiceK.getValidHash(SdkAttachmentFactory.wrap(updatedAttachment)) } returns DATA_HASH
-        every { attachmentService.upload(
-                listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
-                mockAttachmentKey,
-                USER_ID
-        ) } returns Single.just(uploadResult)
+        every {
+            attachmentService.upload(
+                    listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
+                    mockAttachmentKey,
+                    USER_ID
+            )
+        } returns Single.just(uploadResult)
 
         // When
         try {
@@ -683,12 +716,14 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         }
 
         // Then
-        verify (exactly = 0) { attachmentService.upload(
-                listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
-                mockAttachmentKey,
-                USER_ID
-        ) }
-        verify (exactly = 1) { recordServiceK.getValidHash(SdkAttachmentFactory.wrap(updatedAttachment)) }
+        verify(exactly = 0) {
+            attachmentService.upload(
+                    listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
+                    mockAttachmentKey,
+                    USER_ID
+            )
+        }
+        verify(exactly = 1) { recordServiceK.getValidHash(SdkAttachmentFactory.wrap(updatedAttachment)) }
         /*inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID)
         inOrder.verify(recordService).getValidHash(eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment)))
         inOrder.verifyNoMoreInteractions()*/
@@ -724,9 +759,11 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 -1
         )
 
-        every {recordService.getValidHash(
-                eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment))
-        ) } returns "hash"
+        every {
+            recordService.getValidHash(
+                    eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment))
+            )
+        } returns "hash"
         /*
         Mockito.`when`(recordService.getValidHash(
                 eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment))
@@ -744,7 +781,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
 
         verify(exactly = 1) {
             recordService.getValidHash(
-                eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment))
+                    eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment))
             )
         }
         /*inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID)
@@ -782,9 +819,11 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 -1
         )
 
-        every { recordService.getValidHash(
-                eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment))
-        ) } returns "hash"
+        every {
+            recordService.getValidHash(
+                    eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment))
+            )
+        } returns "hash"
 
         // When
         recordService.updateData(decryptedRecord, updatedDocument, USER_ID)
@@ -831,23 +870,27 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         val downscaledIds = listOf("downscaledId_1", "downscaledId_2")
         uploadResult.add(Pair(SdkAttachmentFactory.wrap(updatedAttachment), downscaledIds))
 
-        every { attachmentService.upload(
-                listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
-                mockAttachmentKey,
-                USER_ID
-        ) } returns Single.just(uploadResult)
+        every {
+            attachmentService.upload(
+                    listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
+                    mockAttachmentKey,
+                    USER_ID
+            )
+        } returns Single.just(uploadResult)
         every { recordServiceK.getValidHash(SdkAttachmentFactory.wrap(updatedAttachment)) } returns DATA_HASH
 
         // When
         recordServiceK.updateData(decryptedRecord, updatedDocument, USER_ID)
 
         // Then
-        verify (exactly = 1) { attachmentService.upload(
-                listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
-                mockAttachmentKey,
-                USER_ID
-        ) }
-        verify (exactly = 1) { recordServiceK.getValidHash(SdkAttachmentFactory.wrap(updatedAttachment)) }
+        verify(exactly = 1) {
+            attachmentService.upload(
+                    listOf(SdkAttachmentFactory.wrap(updatedAttachment)),
+                    mockAttachmentKey,
+                    USER_ID
+            )
+        }
+        verify(exactly = 1) { recordServiceK.getValidHash(SdkAttachmentFactory.wrap(updatedAttachment)) }
         // Then
         /*inOrder.verify(recordService).updateData(decryptedRecord, updatedDocument, USER_ID)
         inOrder.verify(recordService).getValidHash(eq(SdkAttachmentFactory.wrap(updatedDocument.content[0].attachment)))
@@ -894,7 +937,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                     listOf(SdkAttachmentFactory.wrap(document.content[0].attachment)),
                     mockAttachmentKey,
                     USER_ID
-        ) } returns Single.just(arrayListOf())
+            )
+        } returns Single.just(arrayListOf())
 
         // When
         val record = recordServiceK.downloadData(decryptedRecord, USER_ID)
@@ -902,12 +946,13 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         // Then
         Truth.assertThat(record).isSameInstanceAs(decryptedRecord)
 
-        verify (exactly = 0) {
+        verify(exactly = 0) {
             attachmentService.download(
                     listOf(SdkAttachmentFactory.wrap(document.content[0].attachment)),
                     mockAttachmentKey,
                     USER_ID
-        ) }
+            )
+        }
         /*inOrder.verify(recordService).downloadData(decryptedRecord, USER_ID)
         inOrder.verifyNoMoreInteractions()*/
     }
@@ -935,7 +980,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                     listOf(SdkAttachmentFactory.wrap(document.content[0].attachment)),
                     mockAttachmentKey,
                     USER_ID
-        ) } returns Single.just(arrayListOf())
+            )
+        } returns Single.just(arrayListOf())
 
         // When
         val record = recordServiceK.downloadData(decryptedRecord, USER_ID)
@@ -943,12 +989,13 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         // Then
         Truth.assertThat(record).isEqualTo(decryptedRecord)
 
-        verify (exactly = 1) {
+        verify(exactly = 1) {
             attachmentService.download(
                     listOf(SdkAttachmentFactory.wrap(document.content[0].attachment)),
                     mockAttachmentKey,
                     USER_ID
-        ) }
+            )
+        }
         /*inOrder.verify(recordService).downloadData(decryptedRecord, USER_ID)
         inOrder.verify(mockAttachmentService).download(
                 ArgumentMatchers.any(),
@@ -1038,7 +1085,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                     any(),
                     mockAttachmentKey,
                     USER_ID
-        ) } returns Single.just(uploadResult)
+            )
+        } returns Single.just(uploadResult)
 
         val encrypted = ByteArray(1)
         every { HashUtil.sha1(any()) } returns encrypted
@@ -1056,13 +1104,14 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         Truth.assertThat(record).isEqualTo(decryptedRecord)
         Truth.assertThat(record.attachmentsKey).isEqualTo(mockAttachmentKey)
 
-        verify (exactly = 1) { Base64.decode(SdkAttachmentFactory.wrap(patient.photo!![0]).data!!) }
-        verify (exactly = 1) {
+        verify(exactly = 1) { Base64.decode(SdkAttachmentFactory.wrap(patient.photo!![0]).data!!) }
+        verify(exactly = 1) {
             attachmentService.upload(
                     any(),
                     mockAttachmentKey,
                     USER_ID
-        ) }
+            )
+        }
         /*inOrder.verify(recordService).uploadOrDownloadData(
                 RecordService.UploadDownloadOperation.UPLOAD,
                 decryptedRecord,
@@ -1117,7 +1166,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                     any(),
                     mockAttachmentKey,
                     USER_ID
-        ) } returns Single.just(listOf())
+            )
+        } returns Single.just(listOf())
 
         // When
         val record = recordService.uploadOrDownloadData(
@@ -1141,12 +1191,13 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 ArgumentMatchers.eq(USER_ID)
         )
         inOrder.verifyNoMoreInteractions()*/
-        verify (exactly = 1) {
+        verify(exactly = 1) {
             attachmentService.download(
                     any(),
                     mockAttachmentKey,
                     USER_ID
-        ) }
+            )
+        }
     }
 
     @Test
@@ -1188,7 +1239,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                     any(),
                     mockAttachmentKey,
                     USER_ID
-        ) } returns Single.just(listOf())
+            )
+        } returns Single.just(listOf())
 
         // When
         val record = recordService.uploadOrDownloadData(
@@ -1212,12 +1264,13 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                 ArgumentMatchers.eq(USER_ID)
         )
         inOrder.verifyNoMoreInteractions()*/
-        verify (exactly = 1) {
+        verify(exactly = 1) {
             attachmentService.download(
                     any(),
                     mockAttachmentKey,
                     USER_ID
-        ) }
+            )
+        }
     }
 
     @Test
@@ -1264,7 +1317,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                     any(),
                     mockAttachmentKey,
                     USER_ID
-        ) } returns Single.just(listOf())
+            )
+        } returns Single.just(listOf())
 
         val encrypted = ByteArray(1)
         every { HashUtil.sha1(any()) } returns encrypted
@@ -1281,13 +1335,14 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         // Then
         Truth.assertThat(record).isEqualTo(decryptedRecord)
         Truth.assertThat(record.attachmentsKey).isEqualTo(mockAttachmentKey)
-        verify (exactly = 1) {
+        verify(exactly = 1) {
             attachmentService.upload(
                     any(),
                     mockAttachmentKey,
                     USER_ID
-        ) }
-        verify (exactly = 1) { Base64.decode(SdkAttachmentFactory.wrap(medication.image!![0]).data!!) }
+            )
+        }
+        verify(exactly = 1) { Base64.decode(SdkAttachmentFactory.wrap(medication.image!![0]).data!!) }
 
         /*inOrder.verify(recordService).uploadOrDownloadData(
                 RecordService.UploadDownloadOperation.UPLOAD,
@@ -1353,7 +1408,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                     any(),
                     mockAttachmentKey,
                     USER_ID
-        ) } returns Single.just(listOf())
+            )
+        } returns Single.just(listOf())
 
         val encrypted = ByteArray(1)
         every { HashUtil.sha1(any()) } returns encrypted
@@ -1371,13 +1427,14 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         Truth.assertThat(record).isEqualTo(decryptedRecord)
         Truth.assertThat(record.attachmentsKey).isEqualTo(mockAttachmentKey)
 
-        verify (exactly = 1) {
+        verify(exactly = 1) {
             attachmentService.upload(
                     any(),
                     mockAttachmentKey,
                     USER_ID
-        ) }
-        verify (exactly = 2) { Base64.decode(SdkAttachmentFactory.wrap(observation.component!![0].valueAttachment!!).data!!) }
+            )
+        }
+        verify(exactly = 2) { Base64.decode(SdkAttachmentFactory.wrap(observation.component!![0].valueAttachment!!).data!!) }
         /*inOrder.verify(recordService).uploadOrDownloadData(
                 RecordService.UploadDownloadOperation.UPLOAD,
                 decryptedRecord,
@@ -1433,7 +1490,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                     any(),
                     mockAttachmentKey,
                     USER_ID
-        ) } returns Single.just(listOf())
+            )
+        } returns Single.just(listOf())
 
         // When
         val record = recordService.uploadOrDownloadData(
@@ -1445,12 +1503,13 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
 
         // Then
         Truth.assertThat(record).isEqualTo(decryptedRecord)
-        verify (exactly = 1) {
+        verify(exactly = 1) {
             attachmentService.download(
                     any(),
                     mockAttachmentKey,
                     USER_ID
-        ) }
+            )
+        }
         /*inOrder.verify(recordService).uploadOrDownloadData(
                 RecordService.UploadDownloadOperation.DOWNLOAD,
                 decryptedRecord,
@@ -1512,7 +1571,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                     any(),
                     mockAttachmentKey,
                     USER_ID
-            ) } returns Single.just(listOf())
+            )
+        } returns Single.just(listOf())
 
         val encrypted = ByteArray(1)
         every { HashUtil.sha1(any()) } returns encrypted
@@ -1529,14 +1589,16 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         // Then
         Truth.assertThat(record).isEqualTo(decryptedRecord)
         Truth.assertThat(record.attachmentsKey).isEqualTo(mockAttachmentKey)
-        verify (exactly = 1) {
+        verify(exactly = 1) {
             attachmentService.upload(
                     any(),
                     mockAttachmentKey,
                     USER_ID
-        ) }
-        verify (exactly = 1) { Base64.decode(
-                SdkAttachmentFactory.wrap(questionnaireResponse.item!![0].answer!![0].valueAttachment!!).data!!)
+            )
+        }
+        verify(exactly = 1) {
+            Base64.decode(
+                    SdkAttachmentFactory.wrap(questionnaireResponse.item!![0].answer!![0].valueAttachment!!).data!!)
         }
         /*inOrder.verify(recordService).uploadOrDownloadData(
                 RecordService.UploadDownloadOperation.UPLOAD,
@@ -1592,7 +1654,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                     any(),
                     mockAttachmentKey,
                     USER_ID
-        ) } returns Single.just(listOf())
+            )
+        } returns Single.just(listOf())
 
         // When
         val record = recordService.uploadOrDownloadData(
@@ -1605,12 +1668,13 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         // Then
         Truth.assertThat(record).isEqualTo(decryptedRecord)
 
-        verify (exactly = 1) {
+        verify(exactly = 1) {
             attachmentService.download(
                     any(),
                     mockAttachmentKey,
                     USER_ID
-        ) }
+            )
+        }
         /*inOrder.verify(recordService).uploadOrDownloadData(
                 RecordService.UploadDownloadOperation.DOWNLOAD,
                 decryptedRecord,
@@ -1678,7 +1742,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                     any(),
                     mockAttachmentKey,
                     USER_ID
-        ) } returns Single.fromCallable {
+            )
+        } returns Single.fromCallable {
             uploadResult.also {
                 firstAttachment.id = ATTACHMENT_ID
                 secondAttachment.id = ATTACHMENT_ID
@@ -1702,11 +1767,13 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         )
         Truth.assertThat(pat.identifier!![0].assigner!!.reference).isEqualTo(PARTNER_ID)
 
-        verify { Base64.decode(
-                SdkAttachmentFactory.wrap(patient.photo!![0]).data!!)
+        verify {
+            Base64.decode(
+                    SdkAttachmentFactory.wrap(patient.photo!![0]).data!!)
         }
-        verify { Base64.decode(
-                SdkAttachmentFactory.wrap(secondAttachment).data!!)
+        verify {
+            Base64.decode(
+                    SdkAttachmentFactory.wrap(secondAttachment).data!!)
         }
     }
 
@@ -1761,7 +1828,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                     any(),
                     mockAttachmentKey,
                     USER_ID
-        ) } returns Single.fromCallable {
+            )
+        } returns Single.fromCallable {
             uploadResult.also {
                 firstAttachment.id = ATTACHMENT_ID
                 secondAttachment.id = ATTACHMENT_ID
@@ -1779,11 +1847,13 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         //then
         Truth.assertThat(med).isEqualTo(medication)
 
-        verify { Base64.decode(
-                SdkAttachmentFactory.wrap(firstAttachment).data!!)
+        verify {
+            Base64.decode(
+                    SdkAttachmentFactory.wrap(firstAttachment).data!!)
         }
-        verify { Base64.decode(
-                SdkAttachmentFactory.wrap(secondAttachment).data!!)
+        verify {
+            Base64.decode(
+                    SdkAttachmentFactory.wrap(secondAttachment).data!!)
         }
     }
 
@@ -1844,7 +1914,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                     any(),
                     mockAttachmentKey,
                     USER_ID
-        ) } returns Single.fromCallable {
+            )
+        } returns Single.fromCallable {
             uploadResult.also {
                 firstAttachment.id = ATTACHMENT_ID
                 secondAttachment.id = ATTACHMENT_ID
@@ -1869,14 +1940,17 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         )
         Truth.assertThat(obs.identifier!![0].assigner!!.reference).isEqualTo(PARTNER_ID)
 
-        verify { Base64.decode(
-                SdkAttachmentFactory.wrap(attachment).data!!)
+        verify {
+            Base64.decode(
+                    SdkAttachmentFactory.wrap(attachment).data!!)
         }
-        verify { Base64.decode(
-                SdkAttachmentFactory.wrap(firstAttachment).data!!)
+        verify {
+            Base64.decode(
+                    SdkAttachmentFactory.wrap(firstAttachment).data!!)
         }
-        verify { Base64.decode(
-                SdkAttachmentFactory.wrap(secondAttachment).data!!)
+        verify {
+            Base64.decode(
+                    SdkAttachmentFactory.wrap(secondAttachment).data!!)
         }
     }
 
@@ -1932,7 +2006,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
                     any(),
                     mockAttachmentKey,
                     USER_ID
-            ) } returns Single.fromCallable {
+            )
+        } returns Single.fromCallable {
             uploadResult.also {
                 firstAttachment.id = ATTACHMENT_ID
                 secondAttachment.id = ATTACHMENT_ID
@@ -1955,11 +2030,13 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         )
         Truth.assertThat(response.identifier!!.assigner!!.reference).isEqualTo(PARTNER_ID)
 
-        verify { Base64.decode(
-                SdkAttachmentFactory.wrap(firstAttachment).data!!)
+        verify {
+            Base64.decode(
+                    SdkAttachmentFactory.wrap(firstAttachment).data!!)
         }
-        verify { Base64.decode(
-                SdkAttachmentFactory.wrap(secondAttachment).data!!)
+        verify {
+            Base64.decode(
+                    SdkAttachmentFactory.wrap(secondAttachment).data!!)
         }
     }
 }

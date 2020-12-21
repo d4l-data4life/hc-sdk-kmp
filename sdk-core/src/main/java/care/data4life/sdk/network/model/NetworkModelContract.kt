@@ -21,7 +21,7 @@ import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 
-class NetworkModelContract{
+class NetworkModelContract {
     internal interface DecryptedRecordBuilder {
         //mandatory
         fun setTags(tags: HashMap<String, String>?): DecryptedRecordBuilder

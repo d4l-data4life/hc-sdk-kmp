@@ -33,9 +33,8 @@ import io.mockk.mockk
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
-import java.lang.ClassCastException
 
-class RecordServiceIntegration: RecordServiceIntegrationBase() {
+class RecordServiceIntegration : RecordServiceIntegrationBase() {
     @Before
     fun setUp() {
         apiService = mockk()

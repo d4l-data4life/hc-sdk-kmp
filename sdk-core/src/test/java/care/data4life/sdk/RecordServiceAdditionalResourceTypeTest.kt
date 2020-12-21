@@ -663,7 +663,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         attachments.add(SdkAttachmentFactory.wrap(attachment))
         attachments.add(SdkAttachmentFactory.wrap(secondAttachment))
 
-        every { 
+        every {
             apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
         } returns Single.just(mockEncryptedRecord)
 
@@ -680,7 +680,8 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
                     ),
                     mockAttachmentKey,
                     USER_ID
-        ) } returns Single.just(attachments)
+            )
+        } returns Single.just(attachments)
 
         // when
         val attachmentIds = listOf(ATTACHMENT_ID, secondAttachmentId)
@@ -743,7 +744,8 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
                     ),
                     mockAttachmentKey,
                     USER_ID
-            ) } returns Single.just(attachments)
+            )
+        } returns Single.just(attachments)
 
         // when
         val attachmentIds = listOf(ATTACHMENT_ID, secondAttachmentId)

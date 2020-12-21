@@ -36,12 +36,12 @@ abstract class BaseClient(
                 createDataClient(userService, recordService, handler),
 
         override val fhir4: SdkContract.Fhir4RecordClient =
-                 createFhir4Client(userService, recordService, handler),
+                createFhir4Client(userService, recordService, handler),
 
         private val legacyDataClient: SdkContract.LegacyDataClient =
                 createLegacyDataClient(userService, recordService, handler)
 
- ) : SdkContract.Client, SdkContract.LegacyDataClient by legacyDataClient, SdkContract.AuthClient by authClient {
+) : SdkContract.Client, SdkContract.LegacyDataClient by legacyDataClient, SdkContract.AuthClient by authClient {
 
 
     companion object {

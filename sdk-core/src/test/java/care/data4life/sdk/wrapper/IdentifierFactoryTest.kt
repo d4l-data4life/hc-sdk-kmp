@@ -19,7 +19,6 @@ package care.data4life.sdk.wrapper
 import care.data4life.sdk.fhir.Fhir3AttachmentHelper
 import care.data4life.sdk.fhir.Fhir4Identifier
 import care.data4life.sdk.lang.CoreRuntimeException
-import io.mockk.mockk
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -28,7 +27,7 @@ class IdentifierFactoryTest {
     fun `it is a AttachmentFactory`() {
         assertTrue((SdkIdentifierFactory as Any) is WrapperFactoryContract.IdentifierFactory)
     }
-    
+
     @Test
     fun `Given, wrap is called with a non FhirIdentifier, it fails with a CoreRuntimeExceptionInternalFailure`() {
         try {

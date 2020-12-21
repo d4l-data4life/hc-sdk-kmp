@@ -46,12 +46,12 @@ class RecordMapperTest {
     private lateinit var id: String
     private lateinit var fhirResource: DomainResource
     private lateinit var customResource: ByteArray
-    private lateinit var  tags: HashMap<String, String>
+    private lateinit var tags: HashMap<String, String>
     private lateinit var annotations: List<String>
     private lateinit var creationDate: LocalDate
     private lateinit var updateDate: LocalDateTime
-    private lateinit var  dataKey :GCKey
-    private lateinit var attachmentKey :GCKey
+    private lateinit var dataKey: GCKey
+    private lateinit var attachmentKey: GCKey
     private var modelVersion = 0
 
     @Before
@@ -254,7 +254,7 @@ class RecordMapperTest {
         }
     }
 
-    private data class DecryptedUnknownRecord<T: Any>(
+    private data class DecryptedUnknownRecord<T : Any>(
             override var identifier: String?,
             override var resource: T,
             override var tags: HashMap<String, String>?,

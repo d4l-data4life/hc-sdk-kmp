@@ -16,10 +16,10 @@
 
 package care.data4life.sdk.tag
 
-import java.util.HashMap
+import java.util.*
 
 class TaggingContract {
-    
+
     interface Service {
         fun appendDefaultTags(
                 resource: Any,
@@ -29,13 +29,13 @@ class TaggingContract {
         fun getTagFromType(
                 resourceType: Class<Any>?
         ): HashMap<String, String>
-        
+
     }
-    
+
     interface EncryptionService {
-        
+
     }
-    
+
     interface Helper {
 
     }

@@ -29,7 +29,6 @@ import care.data4life.sdk.wrapper.SdkFhirParser
 import care.data4life.sdk.wrapper.WrapperContract
 import io.reactivex.Single
 import java.util.*
-import kotlin.collections.HashMap
 
 // TODO rename it in something like ResourceCryptoService
 // TODO remove @JvmOverloads when Data4LifeClient changed to Kotlin
@@ -66,7 +65,7 @@ class FhirService @JvmOverloads constructor(
     ): String = _encryptResource(dataKey, resource)
 
     override fun _encryptResource(dataKey: GCKey, resource: Any): String {
-        return if(resource is DataResource) {
+        return if (resource is DataResource) {
             encryptDataResource(dataKey, resource)
         } else {
             encryptFhirResource(dataKey, resource)
@@ -99,26 +98,26 @@ class FhirService @JvmOverloads constructor(
             tags: HashMap<String, String>,
             encryptedResource: String
     ): T {
-        return if(tags.containsKey(TAG_APPDATA_KEY)) {
+        return if (tags.containsKey(TAG_APPDATA_KEY)) {
             decryptData(dataKey, encryptedResource) as T
-        } else  {
+        } else {
             decryptFhir(dataKey, tags[TAG_RESOURCE_TYPE]!!, tags, encryptedResource)
         }
     }
 
-    private fun <T: Any> parseFhir(
+    private fun <T : Any> parseFhir(
             decryptedResourceJson: String,
             tags: HashMap<String, String>,
             resourceType: String
     ): T {
-        return if( tags[TAG_FHIR_VERSION] == Fhir4Version.version ) {
+        return if (tags[TAG_FHIR_VERSION] == Fhir4Version.version) {
             parser.toFhir4(resourceType, decryptedResourceJson)
         } else {
             parser.toFhir3(resourceType, decryptedResourceJson)
         } as T
     }
 
-    private fun <T: Any> decryptFhir(
+    private fun <T : Any> decryptFhir(
             dataKey: GCKey,
             resourceType: String,
             tags: HashMap<String, String>,

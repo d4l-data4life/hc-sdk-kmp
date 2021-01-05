@@ -26,8 +26,6 @@ object GradlePlugins {
     const val downloadTask = "de.undercouch:gradle-download-task:${Versions.GradlePlugins.downloadTask}"
 
     const val dokka = "org.jetbrains.dokka:dokka-gradle-plugin:${Versions.GradlePlugins.dokka}"
-
-    const val gitPublish = "care.data4life:gradle-git-publish:${Versions.GradlePlugins.gitPublish}"
 }
 
 fun PluginDependenciesSpec.kotlinMultiplatform(apply: Boolean = true): PluginDependencySpec =

@@ -48,8 +48,6 @@ buildscript {
 
         // https://github.com/jeremylong/dependency-check-gradle
         classpath("org.owasp:dependency-check-gradle:5.3.0")
-
-        classpath(GradlePlugins.gitPublish)
     }
 }
 
@@ -57,9 +55,8 @@ plugins {
     dependencyUpdates()
 
     id("scripts.versioning")
+    id("scripts.publishing")
 }
-
-apply(plugin = "care.data4life.git-publish")
 
 allprojects {
     repositories {
@@ -120,50 +117,4 @@ tasks.register("clean", Delete::class.java) {
 tasks.named<Wrapper>("wrapper") {
     gradleVersion = "6.7.1"
     distributionType = Wrapper.DistributionType.ALL
-}
-
-
-
-afterEvaluate {
-    configure<care.data4life.gradle.git.publish.GitPublishExtension> {
-        repoUri.set("git@github.com:d4l-data4life/maven-repository.git")
-
-        branch.set("main")
-
-        contents {
-        }
-
-        preserve {
-            include("**/*")
-        }
-
-        commitMessage.set("Publish ${LibraryConfig.name} ${project.version}")
-    }
-}
-
-task<Exec>("publishFeature") {
-    commandLine("./gradlew",
-            "gitPublishReset",
-            "publishAllPublicationsToFeaturePackagesRepository",
-            "gitPublishCommit",
-            "gitPublishPush"
-    )
-}
-
-task<Exec>("publishSnapshot") {
-    commandLine("./gradlew",
-            "gitPublishReset",
-            "publishAllPublicationsToSnapshotPackagesRepository",
-            "gitPublishCommit",
-            "gitPublishPush"
-    )
-}
-
-task<Exec>("publishRelease") {
-    commandLine("./gradlew",
-            "gitPublishReset",
-            "publishAllPublicationsToReleasePackagesRepository",
-            "gitPublishCommit",
-            "gitPublishPush"
-    )
 }

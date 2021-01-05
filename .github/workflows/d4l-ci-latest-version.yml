@@ -30,7 +30,7 @@ jobs:
       - name: Cleanup
         run: ./gradlew clean
       - name: Version
-        run: ./gradlew version
+        run: ./gradlew versionInfo
       - name: Configure project
         run: ./gradlew provideTestConfig
       - name: Build

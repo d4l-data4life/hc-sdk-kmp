@@ -13,7 +13,6 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
-
 import java.net.URI
 
 buildscript {
@@ -56,14 +55,13 @@ buildscript {
 
 plugins {
     dependencyUpdates()
-    gitVersioning()
+
+    id("scripts.versioning")
 }
 
 apply(plugin = "care.data4life.git-publish")
 
 allprojects {
-    version = LibraryConfig.version
-
     repositories {
         google()
         jcenter()
@@ -125,28 +123,6 @@ tasks.named<Wrapper>("wrapper") {
 }
 
 
-//jgitver {
-//    strategy(fr.brouillard.oss.jgitver.Strategies.MAVEN)
-//
-//    policy(closureOf<fr.brouillard.oss.gradle.plugins.JGitverPluginExtensionBranchPolicy> {
-//        pattern = "release/(.*)"
-//        transformations = listOf("IGNORE")
-//    })
-//
-//    policy(closureOf<fr.brouillard.oss.gradle.plugins.JGitverPluginExtensionBranchPolicy> {
-//        pattern = "feature/(.*)"
-//        transformations = listOf("LOWERCASE_EN")
-//    })
-//
-//    policy(closureOf<fr.brouillard.oss.gradle.plugins.JGitverPluginExtensionBranchPolicy> {
-//        pattern = "(main)"
-//        transformations = listOf("IGNORE")
-//    })
-//
-//    nonQualifierBranches = "main"
-//
-//    regexVersionTag("v([0-9]+(?:.[0-9]+){0,2}(?:-[a-zA-Z0-9-_]+)?)")
-//}
 
 afterEvaluate {
     configure<care.data4life.gradle.git.publish.GitPublishExtension> {

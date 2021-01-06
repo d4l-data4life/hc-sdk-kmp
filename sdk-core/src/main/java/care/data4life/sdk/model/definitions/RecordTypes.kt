@@ -25,9 +25,10 @@ interface BaseRecord<T> {
     val annotations: List<String>?
 }
 
-interface FhirRecord<T : DomainResource?> : BaseRecord<T> {
+interface Fhir3Record<T : DomainResource> : BaseRecord<T> {
     val fhirResource: T
         get() = resource
 }
 
+@Deprecated("use the SDK Contract")
 interface DataRecord : BaseRecord<ByteArray>

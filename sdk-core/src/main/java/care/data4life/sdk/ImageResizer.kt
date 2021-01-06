@@ -17,6 +17,8 @@ package care.data4life.sdk
 
 import care.data4life.sdk.lang.ImageResizeException
 
+// TODO move to attachment
+// FIXME check internal use against Java and Kotlin Clients
 internal interface ImageResizer {
 
     @Throws(ImageResizeException.JpegWriterMissing::class)

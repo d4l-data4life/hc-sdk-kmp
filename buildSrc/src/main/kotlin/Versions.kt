@@ -63,7 +63,7 @@ object Versions {
         /**
          * [jGitVer](https://github.com/jgitver/gradle-jgitver-plugin)
          */
-        const val gitVersioning = "0.6.1"
+        const val gitVersioning = "0.10.0-rc03"
 
         /**
          * [Gradle Git Publish](https://github.com/d4l-data4life/gradle-git-publish)

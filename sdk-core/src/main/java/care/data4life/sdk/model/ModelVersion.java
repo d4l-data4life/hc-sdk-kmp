@@ -19,7 +19,6 @@ package care.data4life.sdk.model;
 public class ModelVersion {
 
     public static final int CURRENT = 1;
-    public static final String FHIR_VERSION = "3.0.1";
 
     public static boolean isModelVersionSupported(int version) {
         return version <= CURRENT;

@@ -18,13 +18,13 @@
   color: 64b5f6
 - name: feature
   description: A new feature!
-  color: 81c784
+  color: 26A763
 - name: good first issue
   description: Good for newcomers
   color: ffd54f
 - name: help wanted
   description: Extra attention is needed
-  color: ffd54f
+  color: f043e1
 - name: performance
   description: Performance topics
   color: 64b5f6
@@ -47,7 +47,7 @@
   color: cfd3d7
 - name: invalid
   description: This doesn't seem right
-  color: cfd3d7
+  color: ff088c
 - name: wontfix
   description: This will not be worked on
   color: cfd3d7
@@ -58,27 +58,27 @@
 # SDK Clients
 - name: android
   description: Android client changes
-  color: 008672
+  color: 32DE84
 - name: jvm
   description: JVM client changes
-  color: 008672
+  color: F58219
 - name: ingestion
   description: Ingestion client changes
-  color: 008672
+  color: 180AF7
 
 # SDKs
 - name: core
   description: Core SDK changes
-  color: 008672
+  color: 000080
 - name: auth
   description: Auth SDK changes
-  color: 008672
+  color: 000080
 - name: crypto
   description: Crypto SDK changes
-  color: 008672
+  color: 000080
 - name: securestore
   description: Securestore SDK changes
-  color: 008672
+  color: 000080
 
 
 # Sample Apps

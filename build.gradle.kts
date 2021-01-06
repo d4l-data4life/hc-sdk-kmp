@@ -13,7 +13,6 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
-
 import java.net.URI
 
 buildscript {
@@ -49,21 +48,17 @@ buildscript {
 
         // https://github.com/jeremylong/dependency-check-gradle
         classpath("org.owasp:dependency-check-gradle:5.3.0")
-
-        classpath(GradlePlugins.gitPublish)
     }
 }
 
 plugins {
     dependencyUpdates()
-    gitVersioning()
+
+    id("scripts.versioning")
+    id("scripts.publishing")
 }
 
-apply(plugin = "care.data4life.git-publish")
-
 allprojects {
-    version = LibraryConfig.version
-
     repositories {
         google()
         jcenter()
@@ -122,72 +117,4 @@ tasks.register("clean", Delete::class.java) {
 tasks.named<Wrapper>("wrapper") {
     gradleVersion = "6.7.1"
     distributionType = Wrapper.DistributionType.ALL
-}
-
-
-//jgitver {
-//    strategy(fr.brouillard.oss.jgitver.Strategies.MAVEN)
-//
-//    policy(closureOf<fr.brouillard.oss.gradle.plugins.JGitverPluginExtensionBranchPolicy> {
-//        pattern = "release/(.*)"
-//        transformations = listOf("IGNORE")
-//    })
-//
-//    policy(closureOf<fr.brouillard.oss.gradle.plugins.JGitverPluginExtensionBranchPolicy> {
-//        pattern = "feature/(.*)"
-//        transformations = listOf("LOWERCASE_EN")
-//    })
-//
-//    policy(closureOf<fr.brouillard.oss.gradle.plugins.JGitverPluginExtensionBranchPolicy> {
-//        pattern = "(main)"
-//        transformations = listOf("IGNORE")
-//    })
-//
-//    nonQualifierBranches = "main"
-//
-//    regexVersionTag("v([0-9]+(?:.[0-9]+){0,2}(?:-[a-zA-Z0-9-_]+)?)")
-//}
-
-afterEvaluate {
-    configure<care.data4life.gradle.git.publish.GitPublishExtension> {
-        repoUri.set("git@github.com:d4l-data4life/maven-repository.git")
-
-        branch.set("main")
-
-        contents {
-        }
-
-        preserve {
-            include("**/*")
-        }
-
-        commitMessage.set("Publish ${LibraryConfig.name} ${project.version}")
-    }
-}
-
-task<Exec>("publishFeature") {
-    commandLine("./gradlew",
-            "gitPublishReset",
-            "publishAllPublicationsToFeaturePackagesRepository",
-            "gitPublishCommit",
-            "gitPublishPush"
-    )
-}
-
-task<Exec>("publishSnapshot") {
-    commandLine("./gradlew",
-            "gitPublishReset",
-            "publishAllPublicationsToSnapshotPackagesRepository",
-            "gitPublishCommit",
-            "gitPublishPush"
-    )
-}
-
-task<Exec>("publishRelease") {
-    commandLine("./gradlew",
-            "gitPublishReset",
-            "publishAllPublicationsToReleasePackagesRepository",
-            "gitPublishCommit",
-            "gitPublishPush"
-    )
 }

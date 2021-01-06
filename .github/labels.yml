@@ -38,7 +38,7 @@
   description: Breaking change
   color: f21d32
 
-# meta
+# Meta
 - name: blocked
   description: This is blocked
   color: f7ae7e
@@ -55,21 +55,33 @@
   description: Not ready yet!
   color: e56992
 
-# library
+# SDK Clients
 - name: android
-  description: Android changes
+  description: Android client changes
   color: 008672
 - name: jvm
-  description: JVM changes
+  description: JVM client changes
   color: 008672
 - name: ingestion
-  description: Ingestion changes
-  color: 008672
-- name: library
-  description: Library changes
+  description: Ingestion client changes
   color: 008672
 
-# sample
+# SDKs
+- name: core
+  description: Core SDK changes
+  color: 008672
+- name: auth
+  description: Auth SDK changes
+  color: 008672
+- name: crypto
+  description: Crypto SDK changes
+  color: 008672
+- name: securestore
+  description: Securestore SDK changes
+  color: 008672
+
+
+# Sample Apps
 - name: sample-android
   description: SampleApp Android
   color: 4514b7

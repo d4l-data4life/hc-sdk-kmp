@@ -14,15 +14,32 @@ documentation:
   - CONTRIBUTION.adoc
   - readmeOSS.adoc
 
-# Platform
-library:
+# SDK Clients
+android:
   - sdk-android/**/*
   - sdk-android-test/**/*
-  - sdk-core/**/*
-  - sdk-ingestion/**/*
+jvm:
   - sdk-jvm/**/*
+ingestion:
+  - sdk-ingestion/**/*
 
-# Sample
+# SDKs
+core:
+  - sdk-core/**/*
+auth:
+  - auth-android/**/*
+  - auth-common/**/*
+  - auth-jvm/**/*
+crypto:
+  - crypto-android/**/*
+  - crypto-common/**/*
+  - crypto-jvm/**/*
+securestore:
+  - securestore-android/**/*
+  - securestore-common/**/*
+  - securestore-jvm/**/*
+
+# Sample Apps
 sample-android:
   - sample-android/**/*
 

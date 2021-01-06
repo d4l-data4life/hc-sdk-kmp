@@ -66,6 +66,11 @@ object Versions {
         const val gitVersioning = "0.10.0-rc03"
 
         /**
+         * [Git-Version](https://github.com/palantir/gradle-git-version)
+         */
+        const val gitVersion = "0.12.3"
+
+        /**
          * [Gradle Git Publish](https://github.com/d4l-data4life/gradle-git-publish)
          */
         const val gitPublish = "3.2.0"

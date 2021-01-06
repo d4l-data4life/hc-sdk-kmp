@@ -20,10 +20,15 @@ plugins {
 
 repositories {
     jcenter()
+    mavenCentral()
+    maven("https://dl.bintray.com/data4life/maven")
 }
 
 dependencies {
     implementation("com.google.code.gson:gson:2.8.6")
+
+    implementation("com.palantir.gradle.gitversion:gradle-git-version:0.12.3")
+    implementation("care.data4life:gradle-git-publish:3.2.0")
 }
 
 kotlinDslPluginOptions {

@@ -25,11 +25,16 @@ import care.data4life.auth.AuthorizationContract;
 import care.data4life.auth.AuthorizationException;
 import care.data4life.auth.AuthorizationService;
 import care.data4life.auth.storage.InMemoryAuthStorage;
-import care.data4life.sdk.auth.OAuthService;
+import care.data4life.sdk.attachment.AttachmentService;
+import care.data4life.sdk.attachment.FileService;
+import care.data4life.sdk.auth.UserService;
 import care.data4life.sdk.call.CallHandler;
+import care.data4life.sdk.fhir.FhirService;
 import care.data4life.sdk.log.Log;
 import care.data4life.sdk.log.Logger;
 import care.data4life.sdk.network.Environment;
+import care.data4life.sdk.tag.TagEncryptionService;
+import care.data4life.sdk.tag.TaggingService;
 import care.data4life.securestore.SecureStore;
 import care.data4life.securestore.SecureStoreContract;
 import care.data4life.securestore.SecureStoreCryptor;
@@ -56,8 +61,18 @@ public final class Data4LifeClient extends BaseClient {
                 userService,
                 recordService,
                 callHandler,
-                Data4LifeClient.Companion.createLegacyDataClient(alias, userService, recordService, callHandler),
-                Data4LifeClient.Companion.createLegacyAuthClient(alias, userService, recordService, callHandler)
+                Data4LifeClient.Companion.createAuthClient(
+                        alias, userService, callHandler
+                ),
+                Data4LifeClient.Companion.createDataClient(
+                        userService, recordService, callHandler
+                ),
+                Data4LifeClient.Companion.createFhir4Client(
+                        userService, recordService, callHandler
+                ),
+                Data4LifeClient.Companion.createLegacyDataClient(
+                        userService, recordService, callHandler
+                )
         );
         this.authorizationService = authorizationService;
         this.cryptoService = cryptoService;
@@ -107,21 +122,20 @@ public final class Data4LifeClient extends BaseClient {
                 configuration,
                 authorizationStore
         );
-        OAuthService oAuthService = new OAuthService(authorizationService);
 
         NetworkConnectivityService networkConnectivityService = () -> true;
 
-        ApiService apiService = new ApiService(oAuthService, environment, clientId, clientSecret, platform, networkConnectivityService, CLIENT_NAME, DEBUG);
+        ApiService apiService = new ApiService(authorizationService, environment, clientId, clientSecret, platform, networkConnectivityService, CLIENT_NAME, DEBUG);
 
         CryptoSecureStore cryptoSecureStore = new CryptoSecureStore(secureStore);
         CryptoService cryptoService = new CryptoService(alias, cryptoSecureStore);
-        UserService userService = new UserService(alias, oAuthService, apiService, cryptoSecureStore, cryptoService);
+        UserService userService = new UserService(alias, authorizationService, apiService, cryptoSecureStore, cryptoService);
 
         TagEncryptionService tagEncryptionService = new TagEncryptionService(cryptoService);
         TaggingService taggingService = new TaggingService(clientId);
         FhirService fhirService = new FhirService(cryptoService);
         FileService fileService = new FileService(alias, apiService, cryptoService);
-        AttachmentService attachmentService = new AttachmentService(alias, fileService, new JvmImageResizer());
+        AttachmentService attachmentService = new AttachmentService(fileService, new JvmImageResizer());
         D4LErrorHandler errorHandler = new D4LErrorHandler();
         CallHandler callHandler = new CallHandler(errorHandler);
         String partnerId = clientId.split(CLIENT_ID_SPLIT_CHAR)[PARTNER_ID_INDEX];

@@ -18,12 +18,14 @@ package care.data4life.sdk;
 
 import org.threeten.bp.LocalDate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.DomainResource;
+import care.data4life.sdk.auth.UserService;
 import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.call.Task;
 import care.data4life.sdk.listener.Callback;
@@ -35,7 +37,6 @@ import care.data4life.sdk.model.DownloadType;
 import care.data4life.sdk.model.FetchResult;
 import care.data4life.sdk.model.Record;
 import care.data4life.sdk.model.UpdateResult;
-import care.data4life.sdk.model.definitions.DataRecord;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 
@@ -45,31 +46,31 @@ import io.reactivex.Single;
  * Will be removed in version v2.0.0
  */
 @Deprecated
-class LegacyDataClient implements SdkContract.LegacyDataClient {
+public class LegacyDataClient implements SdkContract.LegacyDataClient {
 
     protected CallHandler handler;
-    protected String alias;
     public UserService userService;
     protected RecordService recordService;
 
 
-    LegacyDataClient(
-            String alias,
+    public LegacyDataClient(
             UserService userService,
             RecordService recordService,
             CallHandler handler
     ) {
-        this.alias = alias;
         this.userService = userService;
         this.recordService = recordService;
         this.handler = handler;
     }
 
     @Override
-    public <T extends DomainResource> void createRecord(T resource, ResultListener<Record<T>> listener) {
+    public <T extends DomainResource> void createRecord(
+            T resource,
+            ResultListener<Record<T>> listener
+    ) {
         Single<Record<T>> operation = userService.finishLogin(true)
                 .flatMap(ignore -> userService.getUID())
-                .flatMap(uid -> recordService.createRecord(resource, uid));
+                .flatMap(uid -> recordService.createRecord(uid, resource, new ArrayList()));
         handler.executeSingle(operation, listener);
     }
 
@@ -81,7 +82,7 @@ class LegacyDataClient implements SdkContract.LegacyDataClient {
     ) {
         Single<Record<T>> operation = userService.finishLogin(true)
                 .flatMap(ignore -> userService.getUID())
-                .flatMap(uid -> recordService.createRecord(resource, uid, annotations));
+                .flatMap(uid -> recordService.createRecord(uid, resource, annotations));
         handler.executeSingle(operation, listener);
     }
 
@@ -97,7 +98,7 @@ class LegacyDataClient implements SdkContract.LegacyDataClient {
     public <T extends DomainResource> void updateRecord(T resource, ResultListener<Record<T>> listener) {
         Single<Record<T>> operation = userService.finishLogin(true)
                 .flatMap(ignore -> userService.getUID())
-                .flatMap(uid -> recordService.updateRecord(resource, uid));
+                .flatMap(uid -> recordService.updateRecord(uid, resource.id, resource, new ArrayList()));
         handler.executeSingle(operation, listener);
     }
 
@@ -109,7 +110,7 @@ class LegacyDataClient implements SdkContract.LegacyDataClient {
     ) {
         Single<Record<T>> operation = userService.finishLogin(true)
                 .flatMap(ignore -> userService.getUID())
-                .flatMap(uid -> recordService.updateRecord(resource, uid, annotations));
+                .flatMap(uid -> recordService.updateRecord(uid, resource.id, resource, annotations));
         handler.executeSingle(operation, listener);
     }
 
@@ -156,21 +157,21 @@ class LegacyDataClient implements SdkContract.LegacyDataClient {
     @Override
     public <T extends DomainResource> Task fetchRecord(String recordId, ResultListener<Record<T>> listener) {
         Single<Record<T>> operation = userService.getUID()
-                .flatMap(uid -> recordService.fetchRecord(recordId, uid));
+                .flatMap(uid -> recordService.fetchFhir3Record(recordId, uid));
         return handler.executeSingle(operation, listener);
     }
 
     @Override
     public <T extends DomainResource> Task fetchRecords(List<String> recordIds, ResultListener<FetchResult<T>> listener) {
         Single<FetchResult<T>> operation = userService.getUID()
-                .flatMap(uid -> recordService.fetchRecords(recordIds, uid));
+                .flatMap(uid -> recordService.fetchFhir3Records(recordIds, uid));
         return handler.executeSingle(operation, listener);
     }
 
     @Override
     public <T extends DomainResource> Task fetchRecords(Class<T> resourceType, @Nullable LocalDate startDate, @Nullable LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<Record<T>>> listener) {
         Single<List<Record<T>>> operation = userService.getUID()
-                .flatMap(uid -> recordService.fetchRecords(uid, resourceType, startDate, endDate, pageSize, offset));
+                .flatMap(uid -> recordService.fetchFhir3Records(uid, resourceType, startDate, endDate, pageSize, offset));
         return handler.executeSingle(operation, listener);
     }
 
@@ -185,7 +186,7 @@ class LegacyDataClient implements SdkContract.LegacyDataClient {
             ResultListener<List<Record<T>>> listener
     ) {
         Single<List<Record<T>>> operation = userService.getUID()
-                .flatMap(uid -> recordService.fetchRecords(
+                .flatMap(uid -> recordService.fetchFhir3Records(
                         uid,
                         resourceType,
                         annotations,
@@ -229,59 +230,5 @@ class LegacyDataClient implements SdkContract.LegacyDataClient {
         Single<Boolean> operation = userService.getUID()
                 .flatMap(uid -> recordService.deleteAttachment(attachmentId, uid));
         handler.executeSingle(operation, listener);
-    }
-
-    @Override
-    public void createDataRecord(byte[] data, ResultListener<DataRecord> resultListener, List<String> annotations) {
-        Single<DataRecord> operation = userService.finishLogin(true)
-                .flatMap(ignore -> userService.getUID())
-                .flatMap(uid -> recordService.createRecord(data, uid, annotations));
-        handler.executeSingle(operation, resultListener);
-    }
-
-    @Override
-    public Task fetchDataRecord(String appDataId, ResultListener<DataRecord> resultListener) {
-        Single<DataRecord> operation = userService.getUID()
-                .flatMap(uid -> recordService.fetchAppDataRecord(appDataId, uid));
-        return handler.executeSingle(operation, resultListener);
-    }
-
-    @Override
-    public Task fetchDataRecords(
-            List<String> annotations,
-            @Nullable LocalDate startDate,
-            @Nullable LocalDate endDate,
-            Integer pageSize,
-            Integer offset,
-            ResultListener<List<DataRecord>> listener
-    ) {
-        Single<List<DataRecord>> operation = userService.getUID()
-                .flatMap(uid -> recordService.fetchRecords(
-                        uid,
-                        annotations,
-                        startDate,
-                        endDate,
-                        pageSize,
-                        offset
-                ));
-        return handler.executeSingle(operation, listener);
-    }
-
-    @Override
-    public void updateDataRecord(
-            byte[] data,
-            @Nullable List<String> annotations,
-            String recordId,
-            ResultListener<DataRecord> resultListener
-    ) {
-        Single<DataRecord> operation = userService.finishLogin(true)
-                .flatMap(ignore -> userService.getUID())
-                .flatMap(uid -> recordService.updateRecord(data, recordId, uid, annotations));
-        handler.executeSingle(operation, resultListener);
-    }
-
-    @Override
-    public void deleteDataRecord(String dataId, Callback callback) {
-        deleteRecord(dataId, callback);
     }
 }

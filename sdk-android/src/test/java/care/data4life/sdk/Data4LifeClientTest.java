@@ -28,6 +28,7 @@ import care.data4life.auth.AuthorizationService;
 import care.data4life.auth.AuthorizationService.AuthorizationListener;
 import care.data4life.crypto.GCAsymmetricKey;
 import care.data4life.crypto.GCKeyPair;
+import care.data4life.sdk.auth.UserService;
 import care.data4life.sdk.call.CallHandler;
 import io.reactivex.Single;
 

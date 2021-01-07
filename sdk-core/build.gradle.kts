@@ -21,7 +21,6 @@ plugins {
 apply(from = "${project.rootDir}/gradle/jacoco-java.gradle")
 apply(from = "${project.rootDir}/gradle/deploy-java.gradle")
 
-version = LibraryConfig.version
 group = LibraryConfig.group
 
 
@@ -31,34 +30,34 @@ java {
 }
 
 dependencies {
-    api(Dependency.Multiplatform.D4L.utilJvm)
-    implementation(Dependency.Multiplatform.Kotlin.stdlib)
+    api(Dependencies.Multiplatform.D4L.utilJvm)
+    implementation(Dependencies.Multiplatform.Kotlin.stdlib)
 
     implementation(project(":securestore-jvm"))
     implementation(project(":crypto-jvm"))
     implementation(project(":auth-jvm"))
-    implementation(Dependency.Multiplatform.D4L.fhirSdk)
-    implementation(Dependency.Java.threeTenBP)
+    implementation(Dependencies.Multiplatform.D4L.fhirSdk)
+    implementation(Dependencies.Java.threeTenBP)
 
-    compileOnly(Dependency.java.javaXAnnotation)
+    compileOnly(Dependencies.java.javaXAnnotation)
 
-    implementation(Dependency.Java.rxJava)
+    implementation(Dependencies.Java.rxJava)
 
-    implementation(Dependency.Java.okHttp)
-    implementation(Dependency.Java.okHttpLoggingInterceptor)
+    implementation(Dependencies.Java.okHttp)
+    implementation(Dependencies.Java.okHttpLoggingInterceptor)
 
-    implementation(Dependency.Java.retrofit)
-    implementation(Dependency.Java.retrofitConverterMoshi)
-    implementation(Dependency.Java.retrofitAdapterRxJava)
+    implementation(Dependencies.Java.retrofit)
+    implementation(Dependencies.Java.retrofitConverterMoshi)
+    implementation(Dependencies.Java.retrofitAdapterRxJava)
 
-    testImplementation(Dependency.Multiplatform.D4L.fhirHelperJvm)
-    testImplementation(Dependency.Java.Test.junit)
+    testImplementation(Dependencies.Multiplatform.D4L.fhirHelperJvm)
+    testImplementation(Dependencies.Java.Test.junit)
 
-    testImplementation(Dependency.Java.Test.mockitoInline)
-    testImplementation(Dependency.Java.Test.truth)
+    testImplementation(Dependencies.Java.Test.mockitoInline)
+    testImplementation(Dependencies.Java.Test.truth)
 
-    testImplementation(Dependency.Multiplatform.Test.MockK.jdk)
+    testImplementation(Dependencies.Multiplatform.Test.MockK.jdk)
 
-    testImplementation(Dependency.Java.Test.okHttpMockWebServer)
-    testImplementation(Dependency.Java.Test.jsonAssert)
+    testImplementation(Dependencies.Java.Test.okHttpMockWebServer)
+    testImplementation(Dependencies.Java.Test.jsonAssert)
 }

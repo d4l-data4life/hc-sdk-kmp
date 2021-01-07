@@ -25,11 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import care.data4life.sdk.auth.OAuthService;
+import care.data4life.auth.AuthorizationService;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.lang.D4LRuntimeException;
 import care.data4life.sdk.network.Environment;
-import care.data4life.sdk.network.IHCService;
 import care.data4life.sdk.network.model.CommonKeyResponse;
 import care.data4life.sdk.network.model.DocumentUploadResponse;
 import care.data4life.sdk.network.model.EncryptedRecord;
@@ -54,7 +53,8 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
-final class ApiService {
+// TODO Kotlin and internal
+public final class ApiService {
 
     private static final String HEADER_ALIAS = "gc_alias";
     private static final String HEADER_ACCESS_TOKEN = "access_token";
@@ -75,7 +75,7 @@ final class ApiService {
 
     private final String clientID;
     private final String clientSecret;
-    private final OAuthService oAuthService;
+    private final AuthorizationService authService;
     private final Environment environment;
     private String platform;
     private final NetworkConnectivityService connectivityService;
@@ -86,14 +86,14 @@ final class ApiService {
 
     /**
      * Full constructor.
-     *
+     * <p>
      * If the staticToken parameter is set to null, the SDK will handle the full OAuth flow
      * and fetch  access and retrieval tokens, renewing the former as needed for later
      * requests.
      * If the a non-null staticToken is passed, the SDK will use this value as an access token.
      * In this case, it will not dynamical fetch or renew tokens.
      *
-     * @param oAuthService        OAuth service
+     * @param authService         AuthorizationService
      * @param environment         Deployment environment
      * @param clientID            Client ID
      * @param clientSecret        Client secret
@@ -103,7 +103,7 @@ final class ApiService {
      * @param staticAccessToken   Prefetched OAuth token - if not null, it will be used directly (no token renewal).
      * @param debug               Debug flag
      */
-    ApiService(OAuthService oAuthService,
+    ApiService(AuthorizationService authService,
                Environment environment,
                String clientID,
                String clientSecret,
@@ -112,7 +112,7 @@ final class ApiService {
                String clientName,
                byte[] staticAccessToken,
                boolean debug) {
-        this.oAuthService = oAuthService;
+        this.authService = authService;
         this.environment = environment;
         this.clientID = clientID;
         this.clientSecret = clientSecret;
@@ -127,7 +127,7 @@ final class ApiService {
     /**
      * Convenience constructor for instances that handle the OAuth flow themselves.
      *
-     * @param oAuthService        OAuth service
+     * @param authService         AuthorizationService
      * @param environment         Deployment environment
      * @param clientID            Client ID
      * @param clientSecret        Client secret
@@ -136,7 +136,7 @@ final class ApiService {
      * @param clientName          Client name
      * @param debug               Debug flag
      */
-    ApiService(OAuthService oAuthService,
+    ApiService(AuthorizationService authService,
                Environment environment,
                String clientID,
                String clientSecret,
@@ -144,7 +144,7 @@ final class ApiService {
                NetworkConnectivityService connectivityService,
                String clientName,
                boolean debug) {
-        this(oAuthService,
+        this(authService,
                 environment,
                 clientID,
                 clientSecret,
@@ -265,25 +265,28 @@ final class ApiService {
         return service.updateRecord(alias, userId, recordId, encryptedRecord);
     }
 
-    Single<String> uploadDocument(String alias,
-                                  String userId,
-                                  byte[] encryptedAttachment) {
+    // TODO remove public
+    public Single<String> uploadDocument(String alias,
+                                         String userId,
+                                         byte[] encryptedAttachment) {
         return service.uploadDocument(
                 alias, userId,
                 RequestBody.create(MediaType.parse(MEDIA_TYPE_OCTET_STREAM), encryptedAttachment)
         ).map(DocumentUploadResponse::getDocumentId);
     }
 
-    Single<byte[]> downloadDocument(String alias,
-                                    String userId,
-                                    String documentId) {
+    // TODO remove public
+    public Single<byte[]> downloadDocument(String alias,
+                                           String userId,
+                                           String documentId) {
         return service.downloadDocument(alias, userId, documentId)
                 .map(ResponseBody::bytes);
     }
 
-    Single<Boolean> deleteDocument(String alias,
-                                   String userId,
-                                   String documentId) {
+    // TODO remove public
+    public Single<Boolean> deleteDocument(String alias,
+                                          String userId,
+                                          String documentId) {
         // network request doesn't has a response except the HTTP 204
         // on success the method will always return `true`
         return service.deleteDocument(alias, userId, documentId).map(it -> true);
@@ -295,7 +298,7 @@ final class ApiService {
                 .map(response -> Integer.parseInt(response.headers().get(HEADER_TOTAL_COUNT)));
     }
 
-    Single<UserInfo> fetchUserInfo(String alias) {
+    public Single<UserInfo> fetchUserInfo(String alias) {
         return service
                 .fetchUserInfo(alias)
                 .subscribeOn(Schedulers.io());
@@ -310,12 +313,12 @@ final class ApiService {
      * @param alias Alias
      * @return Completable
      */
-    Completable logout(String alias) {
+    public Completable logout(String alias) {
         if (this.staticAccessToken != null) {
             throw new D4LRuntimeException("Cannot log out when using a static access token!");
         }
         return Single
-                .fromCallable(() -> oAuthService.getRefreshToken(alias))
+                .fromCallable(() -> authService.getRefreshToken(alias))
                 .flatMapCompletable(token -> service.logout(alias, token));
     }
 
@@ -349,7 +352,7 @@ final class ApiService {
         } else if (authHeader != null && authHeader.equals(HEADER_ACCESS_TOKEN)) {
             String tokenKey;
             try {
-                tokenKey = oAuthService.getAccessToken(alias);
+                tokenKey = authService.getAccessToken(alias);
             } catch (D4LException e) {
                 return chain.proceed(request);
             }
@@ -360,9 +363,9 @@ final class ApiService {
             Response response = chain.proceed(request);
             if (response.code() == HTTP_401_UNAUTHORIZED) {
                 try {
-                    tokenKey = oAuthService.refreshAccessToken(alias);
+                    tokenKey = authService.refreshAccessToken(alias);
                 } catch (D4LException e) {
-                    oAuthService.clearAuthData();
+                    authService.clear();
                     return response;
                 }
                 request = request.newBuilder()

@@ -29,12 +29,17 @@ import care.data4life.auth.AuthorizationService;
 import care.data4life.auth.AuthorizationService.AuthorizationListener;
 import care.data4life.auth.storage.SharedPrefsAuthStorage;
 import care.data4life.crypto.GCKeyPair;
-import care.data4life.sdk.auth.OAuthService;
+import care.data4life.sdk.attachment.AttachmentService;
+import care.data4life.sdk.attachment.FileService;
+import care.data4life.sdk.auth.UserService;
 import care.data4life.sdk.call.CallHandler;
+import care.data4life.sdk.fhir.FhirService;
 import care.data4life.sdk.lang.CoreRuntimeException;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.Callback;
 import care.data4life.sdk.network.Environment;
+import care.data4life.sdk.tag.TagEncryptionService;
+import care.data4life.sdk.tag.TaggingService;
 import care.data4life.securestore.SecureStore;
 import care.data4life.securestore.SecureStoreCryptor;
 import care.data4life.securestore.SecureStoreStorage;
@@ -71,8 +76,18 @@ public final class Data4LifeClient extends BaseClient {
                 userService,
                 recordService,
                 callHandler,
-                Data4LifeClient.Companion.createLegacyDataClient(alias, userService, recordService, callHandler),
-                Data4LifeClient.Companion.createLegacyAuthClient(alias, userService, recordService, callHandler)
+                Data4LifeClient.Companion.createAuthClient(
+                        alias, userService, callHandler
+                ),
+                Data4LifeClient.Companion.createDataClient(
+                        userService, recordService, callHandler
+                ),
+                Data4LifeClient.Companion.createFhir4Client(
+                        userService, recordService, callHandler
+                ),
+                Data4LifeClient.Companion.createLegacyDataClient(
+                        userService, recordService, callHandler
+                )
         );
         this.cryptoService = cryptoService;
         this.authorizationService = authorizationService;
@@ -155,16 +170,15 @@ public final class Data4LifeClient extends BaseClient {
 
         NetworkConnectivityService connectivityService = new NetworkConnectivityServiceAndroid(context);
 
-        OAuthService oAuthService = new OAuthService(authorizationService);
-        ApiService apiService = new ApiService(oAuthService, environment, clientId, clientSecret, platform, connectivityService, BuildConfig.VERSION_NAME, debug);
+        ApiService apiService = new ApiService(authorizationService, environment, clientId, clientSecret, platform, connectivityService, BuildConfig.VERSION_NAME, debug);
         CryptoService cryptoService = new CryptoService(initConfig.getAlias(), store);
         TagEncryptionService tagEncryptionService = new TagEncryptionService(cryptoService);
         //noinspection KotlinInternalInJava
-        UserService userService = new UserService(initConfig.getAlias(), oAuthService, apiService, store, cryptoService);
+        UserService userService = new UserService(initConfig.getAlias(), authorizationService, apiService, store, cryptoService);
         TaggingService taggingService = new TaggingService(clientId);
         FhirService fhirService = new FhirService(cryptoService);
         FileService fileService = new FileService(initConfig.getAlias(), apiService, cryptoService);
-        AttachmentService attachmentService = new AttachmentService(initConfig.getAlias(), fileService, new AndroidImageResizer());
+        AttachmentService attachmentService = new AttachmentService(fileService, new AndroidImageResizer());
         SdkContract.ErrorHandler errorHandler = new D4LErrorHandler();
         CallHandler callHandler = new CallHandler(errorHandler);
         String partnerId = clientId.split(CLIENT_ID_SPLIT_CHAR)[PARTNER_ID_INDEX];

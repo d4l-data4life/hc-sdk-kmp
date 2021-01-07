@@ -30,7 +30,8 @@ sealed class DataValidationException(message: String? = null, cause: Throwable? 
     class IdUsageViolation(message: String? = "DomainResource.id is reserved for SDK internal operations") : DataValidationException(message = message)
     class ExpectedFieldViolation(message: String? = "Field value was expected") : DataValidationException(message = message)
     class InvalidAttachmentPayloadHash(message: String? = "Attachment hash is invalid") : DataValidationException(message = message)
-
+    class TagsAndAnnotationsLimitViolation(message: String? = "Annotations and Tags are exceeding maximum length") : DataValidationException(message = message)
+    class CustomDataLimitViolation(message: String? = "The given record data exceeds the maximum size") : DataValidationException(message = message)
 
 }
 

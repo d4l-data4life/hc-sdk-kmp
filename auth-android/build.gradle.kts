@@ -23,14 +23,14 @@ val d4lClientConfig = D4LConfigHelper.loadClientConfigAndroid("$rootDir")
 val d4LTestConfig = D4LConfigHelper.loadTestConfigAndroid("$rootDir")
 
 android {
-    compileSdkVersion(AndroidConfig.compileSdkVersion)
+    compileSdkVersion(LibraryConfig.android.compileSdkVersion)
 
     defaultConfig {
-        minSdkVersion(AndroidConfig.minSdkVersion)
-        targetSdkVersion(AndroidConfig.targetSdkVersion)
+        minSdkVersion(LibraryConfig.android.minSdkVersion)
+        targetSdkVersion(LibraryConfig.android.targetSdkVersion)
 
-        versionCode = LibraryConfig.versionCode
-        versionName = LibraryConfig.versionName
+        versionCode = 1
+        versionName = "${project.version}"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments(mapOf(
@@ -86,39 +86,39 @@ android {
 }
 
 dependencies {
-    coreLibraryDesugaring(Dependency.Android.androidDesugar)
+    coreLibraryDesugaring(Dependencies.Android.androidDesugar)
 
     expectedBy(project(":auth-common"))
 
-    api(Dependency.Multiplatform.D4L.utilAndroid)
+    api(Dependencies.Multiplatform.D4L.utilAndroid)
 
     implementation(project(":securestore-android")) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
     }
-    implementation(Dependency.Multiplatform.Kotlin.stdlibAndroid)
-    implementation(Dependency.Multiplatform.Coroutines.android)
-    implementation(Dependency.Android.AndroidX.appCompat)
-    implementation(Dependency.Android.AndroidX.browser)
-    implementation(Dependency.Android.appAuthPatch)
+    implementation(Dependencies.Multiplatform.Kotlin.stdlibAndroid)
+    implementation(Dependencies.Multiplatform.Coroutines.android)
+    implementation(Dependencies.Android.AndroidX.appCompat)
+    implementation(Dependencies.Android.AndroidX.browser)
+    implementation(Dependencies.Android.appAuthPatch)
 
 
-    testImplementation(Dependency.Android.Test.core)
-    testImplementation(Dependency.Android.Test.junit)
-    testImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
-    testImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
-    testImplementation(Dependency.Multiplatform.Test.MockK.jdk)
-    testImplementation(Dependency.Android.Test.robolectric)
+    testImplementation(Dependencies.Android.Test.core)
+    testImplementation(Dependencies.Android.Test.junit)
+    testImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvm)
+    testImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvmJunit)
+    testImplementation(Dependencies.Multiplatform.Test.MockK.jdk)
+    testImplementation(Dependencies.Android.Test.robolectric)
 
 
-    androidTestImplementation(Dependency.Android.AndroidTest.core)
-    androidTestImplementation(Dependency.Android.AndroidTest.runner)
-    androidTestImplementation(Dependency.Android.AndroidTest.rules)
+    androidTestImplementation(Dependencies.Android.AndroidTest.core)
+    androidTestImplementation(Dependencies.Android.AndroidTest.runner)
+    androidTestImplementation(Dependencies.Android.AndroidTest.rules)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoCore)
+    androidTestImplementation(Dependencies.Android.AndroidTest.espressoCore)
 
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
-    androidTestImplementation(Dependency.Multiplatform.Test.MockK.android)
+    androidTestImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvm)
+    androidTestImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvmJunit)
+    androidTestImplementation(Dependencies.Multiplatform.Test.MockK.android)
 }
 
 apply(from = "${project.rootDir}/gradle/deploy-android.gradle")

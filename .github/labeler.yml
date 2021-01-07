@@ -1,0 +1,47 @@
+build:
+  - .github/**/*
+
+dependencies:
+  - buildSrc/**/*
+
+documentation:
+  - docs/**/*
+  - sdk-doc/**/*
+  - README.adoc
+  - LICENSE
+  - CHANGELOG.adoc
+  - CODE-OF-CONDUCT.adoc
+  - CONTRIBUTION.adoc
+  - readmeOSS.adoc
+
+# SDK Clients
+android:
+  - sdk-android/**/*
+  - sdk-android-test/**/*
+jvm:
+  - sdk-jvm/**/*
+ingestion:
+  - sdk-ingestion/**/*
+
+# SDKs
+core:
+  - sdk-core/**/*
+auth:
+  - auth-android/**/*
+  - auth-common/**/*
+  - auth-jvm/**/*
+crypto:
+  - crypto-android/**/*
+  - crypto-common/**/*
+  - crypto-jvm/**/*
+securestore:
+  - securestore-android/**/*
+  - securestore-common/**/*
+  - securestore-jvm/**/*
+
+# Sample Apps
+sample-android:
+  - sample-android/**/*
+
+sample-jvm:
+  - sample-jvm/**/*

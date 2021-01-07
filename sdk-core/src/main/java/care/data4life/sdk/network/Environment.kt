@@ -15,8 +15,6 @@
  */
 package care.data4life.sdk.network
 
-import java.util.*
-
 enum class Environment {
 
     LOCAL,

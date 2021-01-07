@@ -38,10 +38,11 @@ import care.data4life.sdk.util.Base64
 import com.squareup.moshi.Moshi
 import io.reactivex.Single
 import java.io.IOException
-import java.nio.charset.Charset
 import java.security.SecureRandom
 
-internal open class CryptoService : CryptoProtocol {
+//TODO internal
+//TODO remove open (only needed for Test)
+open class CryptoService : CryptoProtocol {
 
     private val moshi: Moshi
     private var alias: String
@@ -164,9 +165,9 @@ internal open class CryptoService : CryptoProtocol {
         return Single.fromCallable { exchangeKey }
                 .map { exchKey ->
                     if (exchKey.getVersion() !== KeyVersion.VERSION_1) {
-                        throw (CryptoException.InvalidKeyVersion(exchKey.getVersion().value) as D4LException)
+                        throw (CryptoException.InvalidKeyVersion(exchKey.getVersion().value))
                     } else if (exchKey.type === KeyType.APP_PUBLIC_KEY || exchKey.type === KeyType.APP_PRIVATE_KEY) {
-                        throw (CryptoException.KeyDecryptionFailed("can't decrypt asymmetric to symmetric key") as D4LException)
+                        throw (CryptoException.KeyDecryptionFailed("can't decrypt asymmetric to symmetric key"))
                     }
                     keyFactory.createGCKey(exchKey)
                 }
@@ -288,7 +289,7 @@ internal open class CryptoService : CryptoProtocol {
     @Throws(IOException::class)
     fun getCommonKeyById(commonKeyId: String): GCKey = commonKeyService.fetchCommonKey(commonKeyId)
 
-    val currentCommonKeyId: String?
+    val currentCommonKeyId: String
         get() = commonKeyService.fetchCurrentCommonKeyId()
 
     fun storeCurrentCommonKeyId(commonKeyId: String) {

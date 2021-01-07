@@ -24,7 +24,6 @@ apply(from = "${project.rootDir}/gradle/jacoco-java.gradle")
 apply(from = "${project.rootDir}/gradle/deploy-java.gradle")
 
 
-version = LibraryConfig.version
 group = LibraryConfig.group
 
 
@@ -43,19 +42,19 @@ dependencies {
     implementation(project(":securestore-jvm"))
     implementation(project(":crypto-jvm"))
     implementation(project(":auth-jvm"))
-    implementation(Dependency.Multiplatform.D4L.utilJvm)
-    implementation(Dependency.Multiplatform.D4L.fhirSdk)
+    implementation(Dependencies.Multiplatform.D4L.utilJvm)
+    implementation(Dependencies.Multiplatform.D4L.fhirSdk)
 
-    implementation(Dependency.Java.threeTenBP)
-    implementation(Dependency.Java.rxJava)
-    implementation(Dependency.Java.moshi)
+    implementation(Dependencies.Java.threeTenBP)
+    implementation(Dependencies.Java.rxJava)
+    implementation(Dependencies.Java.moshi)
 
-    compileOnly(Dependency.java.javaXAnnotation)
+    compileOnly(Dependencies.java.javaXAnnotation)
 
-    testImplementation(Dependency.Java.Test.junit)
-    testImplementation(Dependency.Java.Test.mockitoCore)
-    testImplementation(Dependency.Java.Test.truth)
-    testImplementation(Dependency.Java.Test.jsonAssert)
+    testImplementation(Dependencies.Java.Test.junit)
+    testImplementation(Dependencies.Java.Test.mockitoCore)
+    testImplementation(Dependencies.Java.Test.truth)
+    testImplementation(Dependencies.Java.Test.jsonAssert)
 }
 
 tasks {

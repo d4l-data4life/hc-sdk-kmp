@@ -34,10 +34,10 @@ import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import org.jetbrains.annotations.NotNull;
 import org.threeten.bp.LocalDate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import androidx.annotation.Nullable;
@@ -52,14 +52,15 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.DocumentReference;
 import care.data4life.sdk.Data4LifeClient;
+import care.data4life.sdk.call.DataRecord;
 import care.data4life.sdk.call.Task;
 import care.data4life.sdk.config.DataRestrictionException;
+import care.data4life.sdk.data.DataResource;
 import care.data4life.sdk.helpers.stu3.DocumentReferenceExtension;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.Callback;
 import care.data4life.sdk.listener.ResultListener;
 import care.data4life.sdk.model.Record;
-import care.data4life.sdk.model.definitions.DataRecord;
 
 public class DocumentsActivity extends AppCompatActivity {
 
@@ -392,22 +393,24 @@ public class DocumentsActivity extends AppCompatActivity {
         }
         mDocumentsSRL.setRefreshing(true);
         byte[] data = new byte[1];
+        DataResource dataResource = new DataResource(data);
         annotations.add("test");
         annotations.add("test2");
         annotations.add("test3");
 
-        client.createDataRecord(data, new ResultListener<DataRecord>() {
+        client.getData().create(dataResource, annotations, new care.data4life.sdk.call.Callback<care.data4life.sdk.call.DataRecord<DataResource>>() {
+
             @Override
-            public void onSuccess(DataRecord appDataRecord) {
-                appdata = appDataRecord;
+            public void onSuccess(DataRecord<DataResource> result) {
+                appdata = result;
                 mDocumentsSRL.setRefreshing(false);
             }
 
             @Override
-            public void onError(D4LException exception) {
+            public void onError(@NotNull D4LException exception) {
                 mDocumentsSRL.setRefreshing(false);
             }
-        }, annotations);
+        });
     }
 
     private void fetchDataRecord() {
@@ -415,14 +418,13 @@ public class DocumentsActivity extends AppCompatActivity {
             return;
         }
         mDocumentsSRL.setRefreshing(true);
-        client.fetchDataRecord(appdata.getIdentifier(), new ResultListener<DataRecord>() {
+
+        client.getData().fetch(appdata.getIdentifier(), new care.data4life.sdk.call.Callback<DataRecord<DataResource>>() {
             @Override
-            public void onSuccess(DataRecord appDataRecord) {
+            public void onSuccess(DataRecord<DataResource> result) {
                 runOnUiThread(() -> {
-                    boolean equal = Arrays.equals(
-                            appDataRecord.getResource(),
-                            appdata.getResource()
-                    ) && annotations.equals(appDataRecord.getAnnotations());
+                    boolean equal = appdata.equals(result)
+                            && annotations.equals(result.getAnnotations());
                     Toast.makeText(
                             getApplicationContext(),
                             "DonorKey test successful: " + equal, Toast.LENGTH_LONG
@@ -432,7 +434,7 @@ public class DocumentsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onError(D4LException exception) {
+            public void onError(@NotNull D4LException exception) {
                 Toast.makeText(getApplicationContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
                 mDocumentsSRL.setRefreshing(false);
             }

@@ -301,9 +301,9 @@ public class CryptoServiceTest {
     /**
      * Convert a base 64 DER format key into a java.sercurity PrivateKey object
      *
-     * @param keyFactory        java.security.KeyFactory
-     * @param privateKeyBase64  Private key as base 64 string
-     * @return                  Key
+     * @param keyFactory       java.security.KeyFactory
+     * @param privateKeyBase64 Private key as base 64 string
+     * @return Key
      * @throws InvalidKeySpecException
      */
     private PrivateKey getPrivateJavaKey(java.security.KeyFactory keyFactory, char[] privateKeyBase64) throws InvalidKeySpecException {

@@ -44,7 +44,7 @@ class CommonKeyService(
         private val keyFactory: KeyFactory
 ) : CommonKeyServiceContract {
 
-    override fun fetchCurrentCommonKeyId(): String? {
+    override fun fetchCurrentCommonKeyId(): String {
         var commonKeyId: String? = null
         try {
             commonKeyId = String(storage.getSecret(aliasCurrentCommonKeyId))

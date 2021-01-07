@@ -37,18 +37,18 @@ public final class CryptoSecureStore {
     private final Moshi moshi;
 
 
-    CryptoSecureStore(SecureStoreContract.SecureStore secureStore) {
+    public CryptoSecureStore(SecureStoreContract.SecureStore secureStore) {
         this.secureStore = secureStore;
         this.moshi = new Moshi.Builder().build();
     }
 
-    CryptoSecureStore(Moshi moshi, SecureStoreContract.SecureStore secureStore) {
+    public CryptoSecureStore(Moshi moshi, SecureStoreContract.SecureStore secureStore) {
         this.secureStore = secureStore;
         this.moshi = moshi;
     }
 
 
-    void clear() {
+    public void clear() {
         secureStore.clear();
     }
 
@@ -65,14 +65,14 @@ public final class CryptoSecureStore {
             throw (D4LException) new CryptoException.DecryptionFailed("Failed to decrypt data");
     }
 
-    <T> void storeSecret(String alias, T object) {
+    public <T> void storeSecret(String alias, T object) {
         System.out.println(object);
         Type type = Types.getRawType(object.getClass());
         String jsonData = moshi.adapter(type).toJson(object);
         storeSecret(alias, jsonData.toCharArray());
     }
 
-    <T> T getSecret(String alias, Class<T> type) throws D4LException {
+    public <T> T getSecret(String alias, Class<T> type) throws D4LException {
         String jsonData = secureStore.getData(alias) == null ? null : new String(secureStore.getData(alias));
 
         if (jsonData != null) {

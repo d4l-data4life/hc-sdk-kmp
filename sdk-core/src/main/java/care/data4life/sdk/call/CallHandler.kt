@@ -16,7 +16,9 @@
 package care.data4life.sdk.call
 
 import care.data4life.sdk.SdkContract
+import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.TaskException
+import care.data4life.sdk.log.Log
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -35,7 +37,7 @@ class CallHandler(
                 .subscribe({ t: T -> callback.onSuccess(t) }
                 ) { error ->
                     if (!task.isActive) return@subscribe
-                    callback.onError(errorHandler.handleError(error))
+                    callback.onError(prepareError(error))
                 }
         task.operationHandle = operationHandle
         return task
@@ -50,7 +52,7 @@ class CallHandler(
                 .subscribe({ t: T -> listener.onSuccess(t) }
                 ) { error ->
                     if (!task.isActive) return@subscribe
-                    listener.onError(errorHandler.handleError(error))
+                    listener.onError(prepareError(error))
                 }
         task.operationHandle = operationHandle
         return task
@@ -65,9 +67,16 @@ class CallHandler(
                 .subscribe({ listener.onSuccess() }
                 ) { error ->
                     if (!task.isActive) return@subscribe
-                    listener.onError(errorHandler.handleError(error))
+                    listener.onError(prepareError(error))
                 }
         task.operationHandle = operationHandle
         return task
+    }
+
+
+    private fun prepareError(error: Throwable) : D4LException {
+        val cleanedException = errorHandler.handleError(error)
+        Log.error(cleanedException, cleanedException.message)
+        return cleanedException
     }
 }

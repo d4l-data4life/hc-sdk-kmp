@@ -17,6 +17,7 @@
 package care.data4life.sdk.auth
 
 import care.data4life.sdk.call.CallHandler
+import care.data4life.sdk.call.Task
 import care.data4life.sdk.listener.Callback
 import care.data4life.sdk.listener.ResultListener
 
@@ -26,17 +27,17 @@ class AuthClient(
         private val handler: CallHandler
 ) : AuthContract.Client {
 
-    override fun getUserSessionToken(listener: ResultListener<String>) {
+    override fun getUserSessionToken(listener: ResultListener<String>): Task {
         val operation = userService.getSessionToken(alias)
-        handler.executeSingle(operation, listener)
+        return handler.executeSingle(operation, listener)
     }
 
-    override fun isUserLoggedIn(listener: ResultListener<Boolean>) {
+    override fun isUserLoggedIn(listener: ResultListener<Boolean>): Task {
         val operation = userService.isLoggedIn(alias)
-        handler.executeSingle(operation, listener)
+        return handler.executeSingle(operation, listener)
     }
 
-    override fun logout(listener: Callback) {
-        handler.executeCompletable(userService.logout(), listener)
+    override fun logout(listener: Callback): Task {
+        return handler.executeCompletable(userService.logout(), listener)
     }
 }

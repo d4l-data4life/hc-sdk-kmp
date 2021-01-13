@@ -31,25 +31,25 @@ internal class DataRecordClient(
         private val handler: CallHandler
 ) : DataContract.Client {
 
-    override fun create(resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>) {
+    override fun create(resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>): Task {
         val operation = userService.finishLogin(true)
                 .flatMap { userService.uID }
                 .flatMap { uid -> recordService.createRecord(uid, resource, annotations) }
-        handler.executeSingle(operation, callback)
+        return handler.executeSingle(operation, callback)
     }
 
-    override fun update(recordId: String, resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>) {
+    override fun update(recordId: String, resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>): Task {
         val operation = userService.finishLogin(true)
                 .flatMap { userService.uID }
                 .flatMap { uid -> recordService.updateRecord(uid, recordId, resource, annotations) }
-        handler.executeSingle(operation, callback)
+        return handler.executeSingle(operation, callback)
     }
 
-    override fun delete(recordId: String, callback: Callback<Boolean>) {
+    override fun delete(recordId: String, callback: Callback<Boolean>): Task {
         val operation = userService.finishLogin(true)
                 .flatMap { userService.uID }
                 .flatMap { uid -> recordService.deleteRecord(uid, recordId).toSingle { true } }
-        handler.executeSingle(operation, callback)
+        return handler.executeSingle(operation, callback)
     }
 
     override fun fetch(recordId: String, callback: Callback<DataRecord<DataResource>>): Task {

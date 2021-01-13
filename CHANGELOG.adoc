@@ -21,6 +21,7 @@ toc::[]
 === Removed
 
 === Fixed
+* RecordService#checkDataRestrictions for Resources with unextractable Attachments
 
 * missing Task in SDKContract for some of the operations
 

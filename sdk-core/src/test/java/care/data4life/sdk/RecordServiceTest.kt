@@ -16,6 +16,8 @@
 package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
+import care.data4life.fhir.r4.FhirR4Parser
+import care.data4life.fhir.r4.model.Patient as Fhir4Patient
 import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.fhir.stu3.model.CarePlan
 import care.data4life.fhir.stu3.model.DocumentReference
@@ -752,7 +754,7 @@ class RecordServiceTest : RecordServiceTestBase() {
 
     @Test
     @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
-    fun checkForUnsupportedData_shouldReturnSuccessfully() {
+    fun checkDataRestrictions_shouldReturnSuccessfully() {
         // Given
         val pdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES)
         System.arraycopy(
@@ -774,7 +776,7 @@ class RecordServiceTest : RecordServiceTestBase() {
 
     @Test
     @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
-    fun checkForUnsupportedData_shouldThrow_forUnsupportedData() {
+    fun checkDataRestrictions_shouldThrow_forUnsupportedData() {
         // Given
         val invalidData = byteArrayOf(0x00)
         val doc = buildDocumentReference(invalidData)
@@ -796,7 +798,7 @@ class RecordServiceTest : RecordServiceTestBase() {
 
     @Test
     @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
-    fun checkForUnsupportedData_shouldThrow_whenFileSizeLimitIsReached() {
+    fun checkDataRestrictions_shouldThrow_whenFileSizeLimitIsReached() {
         // Given
         val invalidSizePdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES + 1)
         System.arraycopy(
@@ -817,6 +819,79 @@ class RecordServiceTest : RecordServiceTestBase() {
             // Then
             Truth.assertThat(e.javaClass).isEqualTo(DataRestrictionException.MaxDataSizeViolation::class.java)
         }
+
+        // Then
+        inOrder.verify(recordService).checkDataRestrictions(doc)
+        inOrder.verifyNoMoreInteractions()
+    }
+
+    @Test
+    @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
+    fun `Given, checkDataRestrictions is called, with a Resource, which has non extractable Attachments, it returns without a failure`() {
+        // Given
+        val resourceStr = "{\n" +
+                "    \"resourceType\": \"Patient\",\n" +
+                "    \"id\": \"s4h-patient-example\",\n" +
+                "    \"meta\": {\n" +
+                "        \"profile\": [\n" +
+                "            \"http://fhir.smart4health.eu/StructureDefinition/s4h-patient\"\n" +
+                "        ]\n" +
+                "    },\n" +
+                "    \"name\": [{\n" +
+                "        \"text\": \"Marie Lux-Brennard\",\n" +
+                "        \"family\": \"Lux-Brennard\",\n" +
+                "        \"given\": [\n" +
+                "            \"Marie\"\n" +
+                "        ]\n" +
+                "    }],\n" +
+                "    \"telecom\": [{\n" +
+                "            \"system\": \"phone\",\n" +
+                "            \"value\": \"123-456-789\",\n" +
+                "            \"use\": \"home\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"system\": \"email\",\n" +
+                "            \"value\": \"malubr@example.com\"\n" +
+                "        }\n" +
+                "    ],\n" +
+                "    \"gender\": \"female\",\n" +
+                "    \"birthDate\": \"1998-04-17\",\n" +
+                "    \"address\": [{\n" +
+                "        \"use\": \"home\",\n" +
+                "        \"line\": [\n" +
+                "            \"Beispielstr. 17\"\n" +
+                "        ],\n" +
+                "        \"city\": \"Bärstadt\",\n" +
+                "        \"postalCode\": \"12345\",\n" +
+                "        \"country\": \"Germany\"\n" +
+                "    }],\n" +
+                "    \"contact\": [{\n" +
+                "        \"relationship\": [{\n" +
+                "            \"coding\": [{\n" +
+                "                \"system\": \"http://terminology.hl7.org/CodeSystem/v3-RoleCode\",\n" +
+                "                \"code\": \"MTH\",\n" +
+                "                \"display\": \"Mother\"\n" +
+                "            }]\n" +
+                "        }],\n" +
+                "        \"name\": {\n" +
+                "            \"text\": \"Annabel Lux-Brennard\",\n" +
+                "            \"family\": \"Lux-Brennard\",\n" +
+                "            \"given\": [\n" +
+                "                \"Annabel\"\n" +
+                "            ]\n" +
+                "        },\n" +
+                "        \"telecom\": [{\n" +
+                "            \"system\": \"phone\",\n" +
+                "            \"value\": \"987-654-321\",\n" +
+                "            \"use\": \"home\"\n" +
+                "        }]\n" +
+                "    }]\n" +
+                "}"
+
+        val doc = FhirR4Parser().toFhir(Fhir4Patient::class.java, resourceStr)
+
+        // When
+        recordService.checkDataRestrictions(doc)
 
         // Then
         inOrder.verify(recordService).checkDataRestrictions(doc)

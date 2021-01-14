@@ -810,9 +810,7 @@ class RecordService(
         val resource = record.resource
 
         if (!fhirAttachmentHelper.hasAttachment(resource)) return record
-        val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Any?>?
-
-        attachments ?: return record
+        val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Any?>? ?: return record
 
         if (record.attachmentsKey == null) {
             record.attachmentsKey = cryptoService.generateGCKey().blockingGet()
@@ -1128,7 +1126,8 @@ class RecordService(
     @Throws(DataRestrictionException.MaxDataSizeViolation::class, DataRestrictionException.UnsupportedFileType::class)
     fun <T : Any> checkDataRestrictions(resource: T?) {
         if (isFhir(resource) && fhirAttachmentHelper.hasAttachment(resource!!)) {
-            val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Any?>
+            val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Any?>? ?: return
+
             for (rawAttachment in attachments) {
                 rawAttachment ?: return
 

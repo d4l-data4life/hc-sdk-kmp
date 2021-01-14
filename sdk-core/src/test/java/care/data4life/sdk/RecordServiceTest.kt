@@ -63,11 +63,15 @@ import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import org.junit.internal.Classes.getClass
 import org.mockito.Mockito
 import org.mockito.Mockito.times
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
+import java.io.File
 import java.io.IOException
+import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 
 class RecordServiceTest : RecordServiceTestBase() {
 
@@ -80,6 +84,10 @@ class RecordServiceTest : RecordServiceTestBase() {
     fun tearDown() {
         stop()
     }
+
+    private fun getResource(
+            resourceName: String
+    ): String = this::class.java.getResource(resourceName).readText(StandardCharsets.UTF_8)
 
     //region utility methods
     @Test
@@ -829,64 +837,7 @@ class RecordServiceTest : RecordServiceTestBase() {
     @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
     fun `Given, checkDataRestrictions is called, with a Resource, which has non extractable Attachments, it returns without a failure`() {
         // Given
-        val resourceStr = "{\n" +
-                "    \"resourceType\": \"Patient\",\n" +
-                "    \"id\": \"s4h-patient-example\",\n" +
-                "    \"meta\": {\n" +
-                "        \"profile\": [\n" +
-                "            \"http://fhir.smart4health.eu/StructureDefinition/s4h-patient\"\n" +
-                "        ]\n" +
-                "    },\n" +
-                "    \"name\": [{\n" +
-                "        \"text\": \"Marie Lux-Brennard\",\n" +
-                "        \"family\": \"Lux-Brennard\",\n" +
-                "        \"given\": [\n" +
-                "            \"Marie\"\n" +
-                "        ]\n" +
-                "    }],\n" +
-                "    \"telecom\": [{\n" +
-                "            \"system\": \"phone\",\n" +
-                "            \"value\": \"123-456-789\",\n" +
-                "            \"use\": \"home\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"system\": \"email\",\n" +
-                "            \"value\": \"malubr@example.com\"\n" +
-                "        }\n" +
-                "    ],\n" +
-                "    \"gender\": \"female\",\n" +
-                "    \"birthDate\": \"1998-04-17\",\n" +
-                "    \"address\": [{\n" +
-                "        \"use\": \"home\",\n" +
-                "        \"line\": [\n" +
-                "            \"Beispielstr. 17\"\n" +
-                "        ],\n" +
-                "        \"city\": \"Bärstadt\",\n" +
-                "        \"postalCode\": \"12345\",\n" +
-                "        \"country\": \"Germany\"\n" +
-                "    }],\n" +
-                "    \"contact\": [{\n" +
-                "        \"relationship\": [{\n" +
-                "            \"coding\": [{\n" +
-                "                \"system\": \"http://terminology.hl7.org/CodeSystem/v3-RoleCode\",\n" +
-                "                \"code\": \"MTH\",\n" +
-                "                \"display\": \"Mother\"\n" +
-                "            }]\n" +
-                "        }],\n" +
-                "        \"name\": {\n" +
-                "            \"text\": \"Annabel Lux-Brennard\",\n" +
-                "            \"family\": \"Lux-Brennard\",\n" +
-                "            \"given\": [\n" +
-                "                \"Annabel\"\n" +
-                "            ]\n" +
-                "        },\n" +
-                "        \"telecom\": [{\n" +
-                "            \"system\": \"phone\",\n" +
-                "            \"value\": \"987-654-321\",\n" +
-                "            \"use\": \"home\"\n" +
-                "        }]\n" +
-                "    }]\n" +
-                "}"
+        val resourceStr = getResource("/fhir4/s4h-patient-example.patient.json")
 
         val doc = FhirR4Parser().toFhir(Fhir4Patient::class.java, resourceStr)
 

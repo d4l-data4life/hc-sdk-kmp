@@ -21,12 +21,14 @@ toc::[]
 === Removed
 
 === Fixed
-* RecordService#checkDataRestrictions for Resources with unextractable Attachments
 
+* RecordService#checkDataRestrictions for Resources with unextractable Attachments
 * missing Task in SDKContract for some of the operations
 * all Errors to be reported to our Logger
 
 === Bumped
+
+* HC-FHIR-SDK 1.1.0 -> 1.2.1
 
 === Migration
 

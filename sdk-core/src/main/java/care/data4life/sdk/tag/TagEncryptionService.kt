@@ -59,7 +59,7 @@ class TagEncryptionService @JvmOverloads constructor(
     @Throws(IOException::class)
     fun encryptTags(
             tags: HashMap<String, String>
-    ): List<String> = encryptList(TagHelper.convertToTagList(tags))
+    ): List<String> = encryptList(TagEncryptionHelper.convertToTagList(tags))
 
     @Throws(IOException::class)
     fun decryptTags(
@@ -67,7 +67,7 @@ class TagEncryptionService @JvmOverloads constructor(
     ): HashMap<String, String> = decryptList(
             encryptedTags,
             { d -> !d.startsWith(ANNOTATION_KEY) && d.contains(TaggingService.TAG_DELIMITER) },
-            { tagList: List<String> -> TagHelper.convertToTagMap(tagList) }
+            { tagList: List<String> -> TagEncryptionHelper.convertToTagMap(tagList) }
     )
 
 

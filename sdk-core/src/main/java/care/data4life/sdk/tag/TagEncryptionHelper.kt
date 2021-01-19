@@ -17,12 +17,11 @@ package care.data4life.sdk.tag
 
 import java.util.*
 
-object TagHelper : TaggingContract.Helper {
+object TagEncryptionHelper : TaggingContract.Helper {
 
     private const val TAG_DELIMITER = "="
 
-    @JvmStatic
-    fun convertToTagList(tags: HashMap<String, String>): List<String> {
+    override fun convertToTagList(tags: HashMap<String, String>): List<String> {
         return mutableListOf<String>().also {
             for ((key, value) in tags) {
                 it.add(key + TAG_DELIMITER + value)
@@ -30,8 +29,7 @@ object TagHelper : TaggingContract.Helper {
         }
     }
 
-    @JvmStatic
-    fun convertToTagMap(tagList: List<String>): HashMap<String, String> {
+    override fun convertToTagMap(tagList: List<String>): HashMap<String, String> {
         val tags = HashMap<String, String>()
         for (entry in tagList) {
             val split = entry.split(TAG_DELIMITER)

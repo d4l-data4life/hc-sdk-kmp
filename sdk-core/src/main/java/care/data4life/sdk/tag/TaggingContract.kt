@@ -16,8 +16,6 @@
 
 package care.data4life.sdk.tag
 
-import java.util.*
-
 class TaggingContract {
 
     interface Service {
@@ -26,9 +24,7 @@ class TaggingContract {
                 oldTags: HashMap<String, String>?
         ): HashMap<String, String>
 
-        fun getTagFromType(
-                resourceType: Class<Any>?
-        ): HashMap<String, String>
+        fun getTagFromType(resourceType: Class<Any>?): HashMap<String, String>
 
     }
 
@@ -37,6 +33,7 @@ class TaggingContract {
     }
 
     interface Helper {
-
+        fun convertToTagList(tags: HashMap<String, String>): List<String>
+        fun convertToTagMap(tagList: List<String>): HashMap<String, String>
     }
 }

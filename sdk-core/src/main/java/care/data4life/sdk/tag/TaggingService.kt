@@ -22,6 +22,7 @@ import care.data4life.sdk.fhir.Fhir4Version
 import care.data4life.sdk.wrapper.SdkFhirElementFactory
 import care.data4life.sdk.wrapper.WrapperContract
 import java.util.*
+import kotlin.collections.HashMap
 
 // TODO internal
 class TaggingService(

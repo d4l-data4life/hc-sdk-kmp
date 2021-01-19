@@ -28,6 +28,7 @@ fun versionName(): String {
     val details = versionDetails()
 
     return when {
+        details.branchName == null -> versionNameWithQualifier(details)
         patternNoQualifierBranch.matches(details.branchName) -> versionNameWithQualifier(details)
         patternFeatureBranch.matches(details.branchName) -> versionNameFeature(details)
         else -> throw UnsupportedOperationException("branch name not supported: ${details.branchName}")
@@ -44,7 +45,10 @@ fun versionNameFeature(details: com.palantir.gradle.gitversion.VersionDetails): 
     return versionNameWithQualifier(details, featureName)
 }
 
-fun versionNameWithQualifier(details: com.palantir.gradle.gitversion.VersionDetails, name: String = ""): String {
+fun versionNameWithQualifier(
+        details: com.palantir.gradle.gitversion.VersionDetails,
+        name: String = ""
+): String {
     val version = if (!details.isCleanTag) {
         var versionCleaned = details.version.substringBefore(".dirty")
         if (details.commitDistance > 0) {

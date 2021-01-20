@@ -32,8 +32,13 @@ class TaggingContract {
 
     }
 
-    interface Helper {
+    internal interface Helper {
         fun convertToTagList(tags: HashMap<String, String>): List<String>
         fun convertToTagMap(tagList: List<String>): HashMap<String, String>
+        fun prepare(tag: String): String
+    }
+
+    companion object {
+        const val TAG_DELIMITER = "="
     }
 }

@@ -97,4 +97,19 @@ class TagEncryptionHelperTest {
         // Then
         assertTrue(result.isEmpty())
     }
+
+    @Test
+    fun `Given, prepare is called with a String, it returns it in lower case`() {
+        // Given
+        val tag = "Tag"
+
+        // When
+        val result = TagEncryptionHelper.prepare(tag)
+
+        // Then
+        assertEquals(
+                "tag",
+                result
+        )
+    }
 }

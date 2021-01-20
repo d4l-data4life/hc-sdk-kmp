@@ -15,11 +15,10 @@
  */
 package care.data4life.sdk.tag
 
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_DELIMITER
 import java.util.*
 
 object TagEncryptionHelper : TaggingContract.Helper {
-
-    private const val TAG_DELIMITER = "="
 
     override fun convertToTagList(tags: HashMap<String, String>): List<String> {
         return mutableListOf<String>().also {
@@ -43,4 +42,6 @@ object TagEncryptionHelper : TaggingContract.Helper {
         }
         return tags
     }
+
+    override fun prepare(tag: String): String = tag.toLowerCase(Locale.US)
 }

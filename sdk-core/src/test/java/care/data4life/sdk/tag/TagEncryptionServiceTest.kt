@@ -17,6 +17,7 @@ package care.data4life.sdk.tag
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.CryptoService
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_DELIMITER
 import care.data4life.sdk.test.util.TestSchedulerRule
 import care.data4life.sdk.util.Base64
 import com.google.common.truth.Truth
@@ -303,7 +304,7 @@ class TagEncryptionServiceTest {
     }
 
     companion object {
-        private const val ANNOTATION_KEY = "custom" + TaggingService.TAG_DELIMITER
+        private const val ANNOTATION_KEY = "custom$TAG_DELIMITER"
         private val IV = ByteArray(16)
     }
 }

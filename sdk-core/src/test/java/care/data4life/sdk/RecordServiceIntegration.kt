@@ -123,8 +123,8 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
         val payload = "hello test my old friend".toByteArray()
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=3.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
@@ -135,7 +135,7 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249My4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249My4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -170,8 +170,8 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
         val payload = "hello test my old friend".toByteArray()
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=4.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
@@ -182,7 +182,7 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249NC4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249NC4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -216,8 +216,8 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
         val encodedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=3.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )

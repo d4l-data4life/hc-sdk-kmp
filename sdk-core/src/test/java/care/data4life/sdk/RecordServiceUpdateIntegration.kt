@@ -364,8 +364,8 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         val resource = buildDocumentReferenceFhir3()
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=3.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
@@ -376,7 +376,7 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249My4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249My4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -387,7 +387,7 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         updatedEncryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249My4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249My4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 updatedEncryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -432,8 +432,8 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         val resource = buildDocumentReferenceFhir3()
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=3.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
@@ -451,8 +451,8 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0",
+                        "Y2xpZW50PXRlc3Q=",
                         "ZmhpcnZlcnNpb249My4wLjE=",
                         "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl",
                         "Y3VzdG9tPXdvdw==",
@@ -470,8 +470,8 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0",
+                        "Y2xpZW50PXRlc3Q=",
                         "ZmhpcnZlcnNpb249My4wLjE=",
                         "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl",
                         "Y3VzdG9tPXdvdw==",
@@ -523,8 +523,8 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         val resource = buildDocumentReferenceFhir3("42")
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=3.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
@@ -535,7 +535,7 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249My4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249My4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -546,7 +546,7 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         updatedEncryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249My4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249My4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 updatedEncryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -593,8 +593,8 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         val resource = buildDocumentReferenceFhir4()
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=4.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
@@ -605,7 +605,7 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249NC4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249NC4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -616,7 +616,7 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         updatedEncryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249NC4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249NC4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 updatedEncryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -661,8 +661,8 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         val resource = buildDocumentReferenceFhir4()
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=4.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
@@ -680,8 +680,8 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0",
+                        "Y2xpZW50PXRlc3Q=",
                         "ZmhpcnZlcnNpb249NC4wLjE=",
                         "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl",
                         "Y3VzdG9tPXdvdw==",
@@ -699,8 +699,8 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0",
+                        "Y2xpZW50PXRlc3Q=",
                         "ZmhpcnZlcnNpb249NC4wLjE=",
                         "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl",
                         "Y3VzdG9tPXdvdw==",
@@ -752,8 +752,8 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         val resource = buildDocumentReferenceFhir4("42")
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=4.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
@@ -764,7 +764,7 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249NC4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249NC4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -775,7 +775,7 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         updatedEncryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249NC4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249NC4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 updatedEncryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -822,8 +822,8 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         val resource = DataResource("I am a new test".toByteArray())
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "flag" to "flag=appdata"
         )
 
@@ -836,8 +836,7 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=",
                         "ZmxhZz1hcHBkYXRh"
                 ),
                 encryptedBody,
@@ -850,8 +849,7 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=",
                         "ZmxhZz1hcHBkYXRh"
                 ),
                 updatedEncryptedBody,
@@ -889,8 +887,8 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         val resource = DataResource("I am a new test".toByteArray())
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "flag" to "flag=appdata"
         )
 
@@ -909,8 +907,8 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0",
+                        "Y2xpZW50PXRlc3Q=",
                         "ZmxhZz1hcHBkYXRh",
                         "Y3VzdG9tPXdvdw==",
                         "Y3VzdG9tPWl0",
@@ -927,8 +925,8 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0",
+                        "Y2xpZW50PXRlc3Q=",
                         "ZmxhZz1hcHBkYXRh",
                         "Y3VzdG9tPXdvdw==",
                         "Y3VzdG9tPWl0",
@@ -971,8 +969,8 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         val resource = buildDocumentReferenceFhir3()
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=4.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
@@ -983,7 +981,7 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249NC4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249NC4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -994,7 +992,7 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         updatedEncryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249NC4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249NC4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 updatedEncryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,

@@ -19,6 +19,7 @@ import care.data4life.crypto.GCKey
 import care.data4life.crypto.error.CryptoException
 import care.data4life.sdk.CryptoService
 import care.data4life.sdk.lang.D4LException
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_DELIMITER
 import care.data4life.sdk.util.Base64
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -35,7 +36,8 @@ class TagEncryptionService @JvmOverloads constructor(
         val tek = cryptoService.fetchTagEncryptionKey()
         return Observable
                 .fromIterable(list)
-                .map { tag -> encryptTag(tek, prefix + tag).blockingGet() }
+                .map { tag -> TagEncryptionHelper.prepare(prefix +tag) }
+                .map { tag -> encryptTag(tek,  tag).blockingGet() }
                 .toList()
                 .blockingGet()
     }
@@ -66,7 +68,7 @@ class TagEncryptionService @JvmOverloads constructor(
             encryptedTags: List<String>
     ): HashMap<String, String> = decryptList(
             encryptedTags,
-            { d -> !d.startsWith(ANNOTATION_KEY) && d.contains(TaggingService.TAG_DELIMITER) },
+            { d -> !d.startsWith(ANNOTATION_KEY) && d.contains(TAG_DELIMITER) },
             { tagList: List<String> -> TagEncryptionHelper.convertToTagMap(tagList) }
     )
 
@@ -113,7 +115,7 @@ class TagEncryptionService @JvmOverloads constructor(
 
     companion object {
         private val IV = ByteArray(16)
-        private const val ANNOTATION_KEY = "custom" + TaggingService.TAG_DELIMITER
+        private const val ANNOTATION_KEY = "custom$TAG_DELIMITER"
 
         @JvmStatic
         private fun removeAnnotationKey(

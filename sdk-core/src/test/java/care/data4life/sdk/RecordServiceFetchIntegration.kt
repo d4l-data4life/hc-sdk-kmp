@@ -395,8 +395,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
     fun `Given, fetchFhir3Record is called, with its appropriate payloads, it returns a Record`() {
         // Given
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=3.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
@@ -405,7 +405,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249My4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249My4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -429,8 +429,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
     fun `Given, fetchFhir3Record is called, with its appropriate payloads, it returns a Record with annotations`() {
         // Given
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=3.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
@@ -445,8 +445,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0",
+                        "Y2xpZW50PXRlc3Q=",
                         "ZmhpcnZlcnNpb249My4wLjE=",
                         "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl",
                         "Y3VzdG9tPXdvdw==",
@@ -477,8 +477,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
     fun `Given, fetchFhir4Record is called, with its appropriate payloads, it returns a Fhir4Record`() {
         // Given
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=4.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
@@ -487,7 +487,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249NC4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249NC4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -511,8 +511,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
     fun `Given, fetchFhir4Record is called, with its appropriate payloads, it returns a Fhir4Record with Annotations`() {
         // Given
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=4.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
@@ -527,8 +527,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0",
+                        "Y2xpZW50PXRlc3Q=",
                         "ZmhpcnZlcnNpb249NC4wLjE=",
                         "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl",
                         "Y3VzdG9tPXdvdw==",
@@ -561,8 +561,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         val resource = DataResource("I am test".toByteArray())
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "flag" to "flag=appdata"
         )
 
@@ -573,8 +573,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0",
+                        "Y2xpZW50PXRlc3Q=",
                         "ZmxhZz1hcHBkYXRh"
                 ),
                 encryptedBody,
@@ -625,8 +625,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         val resource = DataResource("I am test".toByteArray())
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "flag" to "flag=appdata"
         )
         val annotations = mapOf(
@@ -642,8 +642,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=",
                         "ZmxhZz1hcHBkYXRh",
                         "Y3VzdG9tPXdvdw==",
                         "Y3VzdG9tPWl0",
@@ -672,8 +671,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
     fun `Given, fetchFhir3Records is called, with its appropriate payloads, it returns a List of Records`() {
         // Given
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=3.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
@@ -686,7 +685,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249My4wLjE=", encodedResourceType),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249My4wLjE=", encodedResourceType),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -697,7 +696,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord2 = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249My4wLjE=", encodedResourceType),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249My4wLjE=", encodedResourceType),
                 encryptedBody2,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -733,8 +732,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
     fun `Given, fetchFhir3Records is called, with its appropriate payloads, it returns a List of Records filtered by Annotations`() {
         // Given
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=3.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
@@ -760,8 +759,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0",
+                        "Y2xpZW50PXRlc3Q=",
                         "ZmhpcnZlcnNpb249My4wLjE=",
                         encodedResourceType,
                         "Y3VzdG9tPXdvdw==",
@@ -778,7 +777,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord2 = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249My4wLjE=", encodedResourceType),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249My4wLjE=", encodedResourceType),
                 encryptedBody2,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -812,8 +811,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
     fun `Given, fetchFhir4Records is called, with its appropriate payloads, it returns a List of Fhir4Records`() {
         // Given
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=4.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
@@ -826,7 +825,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249NC4wLjE=", encodedResourceType),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249NC4wLjE=", encodedResourceType),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -837,7 +836,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord2 = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249NC4wLjE=", encodedResourceType),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249NC4wLjE=", encodedResourceType),
                 encryptedBody2,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -873,8 +872,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
     fun `Given, fetchFhir4Records is called, with its appropriate payloads, it returns a List of Fhir4Records filtered by Annotations`() {
         // Given
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=4.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
@@ -900,8 +899,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0",
+                        "Y2xpZW50PXRlc3Q=",
                         "ZmhpcnZlcnNpb249NC4wLjE=",
                         encodedResourceType,
                         "Y3VzdG9tPXdvdw==",
@@ -918,7 +917,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord2 = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249NC4wLjE=", encodedResourceType),
+                listOf("cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=", "ZmhpcnZlcnNpb249NC4wLjE=", encodedResourceType),
                 encryptedBody2,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -955,8 +954,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         val resource2 = DataResource("I am a second test".toByteArray())
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "flag" to "flag=appdata"
         )
 
@@ -972,8 +971,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=",
                         encryptedResourceType
                 ),
                 encryptedBody,
@@ -987,8 +985,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0",
+                        "Y2xpZW50PXRlc3Q=",
                         encryptedResourceType
                 ),
                 encryptedBody2,
@@ -1078,8 +1076,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         val resource2 = DataResource("I am a second test".toByteArray())
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "flag" to "flag=appdata"
         )
 
@@ -1101,8 +1099,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0",
+                        "Y2xpZW50PXRlc3Q=",
                         encryptedResourceType
                 ),
                 encryptedBody,
@@ -1116,8 +1114,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0", "Y2xpZW50PXRlc3Q=",
                         encryptedResourceType,
                         "Y3VzdG9tPXdvdw==",
                         "Y3VzdG9tPWl0",
@@ -1169,8 +1166,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
     fun `Given, fetchFhir4Record is called, with its appropriate payloads, but it fetches a Fhir3Record, it fails with`() {
         // Given
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=test",
+                "client" to "client=test",
                 "fhirversion" to "fhirversion=3.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
@@ -1185,8 +1182,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj10ZXN0",
+                        "Y2xpZW50PXRlc3Q=",
                         "ZmhpcnZlcnNpb249My4wLjE=",
                         "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl",
                         "Y3VzdG9tPXdvdw==",

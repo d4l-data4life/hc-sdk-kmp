@@ -71,7 +71,7 @@ class TagEncryptionHelperTest {
 
         // When
         try {
-            TagEncryptionHelper.prepare(tag)
+            TagEncryptionHelper.encode(tag)
             fail("convertToTagMap should fail on non lowercase")
         } catch ( e: Exception ) {
             // Then
@@ -91,7 +91,7 @@ class TagEncryptionHelperTest {
 
         // When
         try {
-            TagEncryptionHelper.prepare(tag)
+            TagEncryptionHelper.encode(tag)
             fail("convertToTagMap should fail on blank")
         } catch ( e: Exception ) {
             // Then
@@ -110,7 +110,7 @@ class TagEncryptionHelperTest {
         val tag = "tag"
 
         // When
-        val result = TagEncryptionHelper.prepare(tag)
+        val result = TagEncryptionHelper.encode(tag)
 
         // Then
         assertEquals(
@@ -125,7 +125,7 @@ class TagEncryptionHelperTest {
         val expected = "tag"
 
         // When
-        val result = TagEncryptionHelper.prepare("  $expected   ")
+        val result = TagEncryptionHelper.encode("  $expected   ")
 
         // Then
         assertEquals(
@@ -140,7 +140,7 @@ class TagEncryptionHelperTest {
         val tag = "你好，世界"
 
         // When
-        val result = TagEncryptionHelper.prepare(tag)
+        val result = TagEncryptionHelper.encode(tag)
 
         // Then
         assertEquals(
@@ -155,7 +155,7 @@ class TagEncryptionHelperTest {
         val tag = "! '()*-_.~"
 
         // When
-        val result = TagEncryptionHelper.prepare(tag)
+        val result = TagEncryptionHelper.encode(tag)
 
         // Then
         assertEquals(
@@ -170,7 +170,7 @@ class TagEncryptionHelperTest {
         val tag = "你好! world."
 
         // When
-        val result = TagEncryptionHelper.prepare(tag)
+        val result = TagEncryptionHelper.encode(tag)
 
         // Then
         assertEquals(

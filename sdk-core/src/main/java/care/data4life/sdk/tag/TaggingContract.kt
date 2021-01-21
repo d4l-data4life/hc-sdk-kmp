@@ -49,7 +49,7 @@ class TaggingContract {
         fun convertToTagMap(tagList: List<String>): HashMap<String, String>
 
         @Throws(D4LException::class)
-        fun prepare(tag: String): String
+        fun encode(tag: String): String
 
         fun decode(encodedTag: String): String
     }

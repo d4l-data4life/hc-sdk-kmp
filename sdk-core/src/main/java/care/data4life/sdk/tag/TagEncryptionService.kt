@@ -92,7 +92,7 @@ class TagEncryptionService @JvmOverloads constructor(
                 .map { entry ->
                     entry.key +
                             TAG_DELIMITER +
-                            tagHelper.prepare(entry.value.toLowerCase(Locale.US))
+                            tagHelper.encode(entry.value.toLowerCase(Locale.US))
                 }
                 .let { encryptList(it) }
     }
@@ -109,7 +109,7 @@ class TagEncryptionService @JvmOverloads constructor(
     @Throws(IOException::class)
     override fun encryptAnnotations(annotations: List<String>): List<String> {
         return annotations
-                .map { annotation -> tagHelper.prepare(annotation) }
+                .map { annotation -> tagHelper.encode(annotation) }
                 .let { validAnnotations ->
                     encryptList(
                             validAnnotations,

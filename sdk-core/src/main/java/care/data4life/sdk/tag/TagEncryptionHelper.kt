@@ -69,7 +69,7 @@ object TagEncryptionHelper : TaggingContract.Helper {
     }
 
     @Throws(D4LException::class)
-    override fun prepare(tag: String): String {
+    override fun encode(tag: String): String {
         validateTag(tag)
 
         return URLEncoder.encode(

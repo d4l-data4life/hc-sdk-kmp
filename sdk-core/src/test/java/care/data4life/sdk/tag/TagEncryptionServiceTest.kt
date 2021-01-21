@@ -60,7 +60,7 @@ class TagEncryptionServiceTest {
         val encryptedTag = "encryptedTag"
         val symEncrypted = ByteArray(23)
 
-        every { tagHelper.prepare(tag.second) } returns tag.second
+        every { tagHelper.encode(tag.second) } returns tag.second
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every { cryptoService.symEncrypt(
                 gcKey,
@@ -90,7 +90,7 @@ class TagEncryptionServiceTest {
         val encryptedTag = "encryptedTag"
         val symEncrypted = ByteArray(23)
 
-        every { tagHelper.prepare(tag.second.toLowerCase(Locale.US)) } returns tag.second.toLowerCase(Locale.US)
+        every { tagHelper.encode(tag.second.toLowerCase(Locale.US)) } returns tag.second.toLowerCase(Locale.US)
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every { cryptoService.symEncrypt(
                 gcKey,
@@ -121,7 +121,7 @@ class TagEncryptionServiceTest {
         val symEncrypted = ByteArray(23)
         val spiedBase64 = Mockito.spy(base64)
 
-        every { tagHelper.prepare(tag.second) } returns tag.second
+        every { tagHelper.encode(tag.second) } returns tag.second
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every { cryptoService.symEncrypt(
                 gcKey,
@@ -224,7 +224,7 @@ class TagEncryptionServiceTest {
         val encryptedAnnotation = "encryptedAnnotation"
         val symEncrypted = ByteArray(23)
 
-        every { tagHelper.prepare(annotations[0]) } returns annotations[0]
+        every { tagHelper.encode(annotations[0]) } returns annotations[0]
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every { cryptoService.symEncrypt(
                 gcKey,
@@ -255,7 +255,7 @@ class TagEncryptionServiceTest {
         val symEncrypted = ByteArray(23)
         val spiedBase64 = Mockito.spy(base64)
 
-        every { tagHelper.prepare(annotations[0]) } returns annotations[0]
+        every { tagHelper.encode(annotations[0]) } returns annotations[0]
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every { cryptoService.symEncrypt(
                 gcKey,

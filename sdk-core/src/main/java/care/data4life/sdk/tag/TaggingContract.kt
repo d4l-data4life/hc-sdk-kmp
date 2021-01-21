@@ -16,6 +16,9 @@
 
 package care.data4life.sdk.tag
 
+import care.data4life.sdk.lang.D4LException
+import java.io.IOException
+
 class TaggingContract {
 
     interface Service {
@@ -29,13 +32,26 @@ class TaggingContract {
     }
 
     interface EncryptionService {
+        @Throws(IOException::class)
+        fun encryptTags(tags: HashMap<String, String>): List<String>
 
+        @Throws(IOException::class)
+        fun decryptTags(encryptedTags: List<String>): HashMap<String, String>
+
+        @Throws(IOException::class)
+        fun encryptAnnotations(annotations: List<String>): List<String>
+
+        @Throws(IOException::class)
+        fun decryptAnnotations(encryptedAnnotations: List<String>): List<String>
     }
 
-    internal interface Helper {
-        fun convertToTagList(tags: HashMap<String, String>): List<String>
+    interface Helper {
         fun convertToTagMap(tagList: List<String>): HashMap<String, String>
+
+        @Throws(D4LException::class)
         fun prepare(tag: String): String
+
+        fun decode(encodedTag: String): String
     }
 
     companion object {

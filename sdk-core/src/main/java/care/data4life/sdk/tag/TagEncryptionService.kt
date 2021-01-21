@@ -25,21 +25,36 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import java.io.IOException
 import java.nio.charset.StandardCharsets
+import java.util.*
+import kotlin.collections.HashMap
 
 // TODO internal
 class TagEncryptionService @JvmOverloads constructor(
         private val cryptoService: CryptoService,
-        private val base64: Base64 = Base64
+        private val base64: Base64 = Base64,
+        private val tagHelper: TaggingContract.Helper = TagEncryptionHelper
 ) : TaggingContract.EncryptionService {
     @Throws(IOException::class)
     private fun encryptList(list: List<String>, prefix: String = ""): List<String> {
         val tek = cryptoService.fetchTagEncryptionKey()
         return Observable
                 .fromIterable(list)
-                .map { tag -> TagEncryptionHelper.prepare(prefix +tag) }
-                .map { tag -> encryptTag(tek,  tag).blockingGet() }
+                .map { tag -> encryptTag(tek, prefix+tag).blockingGet() }
                 .toList()
                 .blockingGet()
+    }
+
+    @Throws(D4LException::class)
+    private fun encryptTag(key: GCKey, tag: String): Single<String> {
+        return Single
+                .fromCallable { tag.toByteArray() }
+                .map { plain -> cryptoService.symEncrypt(key, plain, IV) }
+                .map { data -> base64.encodeToString(data) }
+                .onErrorResumeNext {
+                    Single.error(
+                            CryptoException.EncryptionFailed("Failed to encrypt tag") as D4LException
+                    )
+                }
     }
 
     @Throws(IOException::class)
@@ -52,59 +67,18 @@ class TagEncryptionService @JvmOverloads constructor(
         return Observable
                 .fromIterable(encryptedList)
                 .map { encryptedTag -> decryptTag(tek, encryptedTag).blockingGet() }
+                .map { encodedTag -> tagHelper.decode(encodedTag) }
                 .filter { decryptedItem -> condition(decryptedItem) }
                 .toList()
                 .map { decryptedList -> transform(decryptedList) }
                 .blockingGet()
     }
 
-    @Throws(IOException::class)
-    fun encryptTags(
-            tags: HashMap<String, String>
-    ): List<String> = encryptList(TagEncryptionHelper.convertToTagList(tags))
-
-    @Throws(IOException::class)
-    fun decryptTags(
-            encryptedTags: List<String>
-    ): HashMap<String, String> = decryptList(
-            encryptedTags,
-            { d -> !d.startsWith(ANNOTATION_KEY) && d.contains(TAG_DELIMITER) },
-            { tagList: List<String> -> TagEncryptionHelper.convertToTagMap(tagList) }
-    )
-
-
-    @Throws(IOException::class)
-    fun encryptAnnotations(
-            annotations: List<String>
-    ): List<String> = encryptList(annotations, ANNOTATION_KEY)
-
-    @Throws(IOException::class)
-    fun decryptAnnotations(
-            encryptedAnnotations: List<String>
-    ): List<String> = decryptList(
-            encryptedAnnotations,
-            { d -> d.startsWith(ANNOTATION_KEY) },
-            { list -> removeAnnotationKey(list) }
-    )
-
     @Throws(D4LException::class)
-    fun encryptTag(key: GCKey, tag: String): Single<String> {
-        return Single
-                .fromCallable { tag.toByteArray() }
-                .map { d -> cryptoService.symEncrypt(key, d, IV) }
-                .map { data -> base64.encodeToString(data) }
-                .onErrorResumeNext {
-                    Single.error(
-                            CryptoException.EncryptionFailed("Failed to encrypt tag") as D4LException
-                    )
-                }
-    }
-
-    @Throws(D4LException::class)
-    fun decryptTag(key: GCKey, base64tag: String): Single<String> {
+    private fun decryptTag(key: GCKey, base64tag: String): Single<String> {
         return Single
                 .fromCallable { base64.decode(base64tag) }
-                .map { d -> cryptoService.symDecrypt(key, d, IV) }
+                .map { encrypted -> cryptoService.symDecrypt(key, encrypted, IV) }
                 .map { decrypted -> String(decrypted, StandardCharsets.UTF_8) }
                 .onErrorResumeNext {
                     Single.error(
@@ -113,16 +87,56 @@ class TagEncryptionService @JvmOverloads constructor(
                 }
     }
 
+    @Throws(IOException::class)
+    override fun encryptTags(tags: HashMap<String, String>): List<String> {
+        return tags
+                .map { entry -> entry.key +
+                        TAG_DELIMITER +
+                        tagHelper.prepare(entry.value.toLowerCase(Locale.US))
+                }
+                .let { encryptList(it) }
+    }
+
+    @Throws(IOException::class)
+    override fun decryptTags(
+            encryptedTags: List<String>
+    ): HashMap<String, String> = decryptList(
+            encryptedTags,
+            { decrypted -> !decrypted.startsWith(ANNOTATION_KEY) && decrypted.contains(TAG_DELIMITER) },
+            { tagList: List<String> -> tagHelper.convertToTagMap(tagList) }
+    )
+
+    @Throws(IOException::class)
+    override fun encryptAnnotations(
+            annotations: List<String>
+    ): List<String> {
+        return annotations
+                .map { annotation -> tagHelper.prepare(annotation) }
+                .let { validAnnotations -> encryptList(
+                        validAnnotations,
+                        ANNOTATION_KEY + TAG_DELIMITER
+                ) }
+    }
+
+    @Throws(IOException::class)
+    override fun decryptAnnotations(
+            encryptedAnnotations: List<String>
+    ): List<String> = decryptList(
+            encryptedAnnotations,
+            { decrypted -> decrypted.startsWith(ANNOTATION_KEY) && decrypted.contains(TAG_DELIMITER) },
+            { list -> stripAnnotationKey(list) }
+    )
+
     companion object {
         private val IV = ByteArray(16)
-        private const val ANNOTATION_KEY = "custom$TAG_DELIMITER"
+        private const val ANNOTATION_KEY = "custom"
 
         @JvmStatic
-        private fun removeAnnotationKey(
+        private fun stripAnnotationKey(
                 list: MutableList<String>
         ): List<String> = list.also {
             for (idx in it.indices) {
-                it[idx] = it[idx].replaceFirst(ANNOTATION_KEY.toRegex(), "")
+                it[idx] = it[idx].replaceFirst(ANNOTATION_KEY + TAG_DELIMITER, "")
             }
         }
     }

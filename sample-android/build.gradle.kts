@@ -105,7 +105,9 @@ dependencies {
 
     implementation(Dependencies.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
+        exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
+    implementation(Dependencies.Multiplatform.D4L.fhirSdk)
 
     implementation(Dependencies.Multiplatform.D4L.utilAndroid)
 

@@ -706,7 +706,7 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1iNDY=","Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmxhZz1hcHBkYXRh"),
+                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmxhZz1hcHBkYXRh"),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,

@@ -44,7 +44,7 @@ toc::[]
 === Changed
 * Changed internal implementation to support FHIR 4 capabilities
 * `RecordService`, `TaggingService`, `TagEncryptionService`, `Record`, `DecryptedRecord` to Kotlin
-* `TagEncryptionHelper`, `FhirService`, `ImageResizer`, `FileService`, `NetworkConnectivityService`, `CryptoService` to Kotlin
+* `TagHelper`, `FhirService`, `ImageResizer`, `FileService`, `NetworkConnectivityService`, `CryptoService` to Kotlin
 
 === Bumped
 

@@ -22,7 +22,6 @@ import okhttp3.internal.toHexString
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import kotlin.collections.HashMap
 
 object TagEncryptionHelper : TaggingContract.Helper {
     override fun convertToTagMap(tagList: List<String>): HashMap<String, String> {
@@ -42,7 +41,7 @@ object TagEncryptionHelper : TaggingContract.Helper {
 
     private fun replaceSpecial(char: Char): String {
         val specialChars = listOf('*', '-', '_', '.')
-        return when(char) {
+        return when (char) {
             '+' -> "%20"
             in specialChars -> "%${char.toInt().toHexString()}"
             else -> char.toLowerCase().toString()
@@ -50,21 +49,19 @@ object TagEncryptionHelper : TaggingContract.Helper {
     }
 
     @Throws(D4LException::class)
-    private fun isValidateFormat(char: Char, tag: String): Char {
-        if(char.isUpperCase() && char.isLetter()) {
+    private fun isValidateFormat(char: Char, tag: String) {
+        if (char.isUpperCase() && char.isLetter()) {
             throw DataValidationException.AnnotationFormatViolation(
-                "`$tag` is not in lowercase."
+                    "`$tag` is not in lowercase."
             )
         }
-
-        return char
     }
 
     @Throws(D4LException::class)
     private fun validateTag(tag: String) {
-        if(tag.isBlank()) {
+        if (tag.isBlank()) {
             throw DataValidationException.AnnotationViolation(
-                "Annotation is empty."
+                    "Annotation is empty."
             )
         }
 

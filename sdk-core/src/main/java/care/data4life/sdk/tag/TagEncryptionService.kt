@@ -26,7 +26,6 @@ import io.reactivex.Single
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.util.*
-import kotlin.collections.HashMap
 
 // TODO internal
 class TagEncryptionService @JvmOverloads constructor(
@@ -39,7 +38,7 @@ class TagEncryptionService @JvmOverloads constructor(
         val tek = cryptoService.fetchTagEncryptionKey()
         return Observable
                 .fromIterable(list)
-                .map { tag -> encryptTag(tek, prefix+tag).blockingGet() }
+                .map { tag -> encryptTag(tek, prefix + tag).blockingGet() }
                 .toList()
                 .blockingGet()
     }
@@ -90,9 +89,10 @@ class TagEncryptionService @JvmOverloads constructor(
     @Throws(IOException::class)
     override fun encryptTags(tags: HashMap<String, String>): List<String> {
         return tags
-                .map { entry -> entry.key +
-                        TAG_DELIMITER +
-                        tagHelper.prepare(entry.value.toLowerCase(Locale.US))
+                .map { entry ->
+                    entry.key +
+                            TAG_DELIMITER +
+                            tagHelper.prepare(entry.value.toLowerCase(Locale.US))
                 }
                 .let { encryptList(it) }
     }
@@ -107,15 +107,15 @@ class TagEncryptionService @JvmOverloads constructor(
     )
 
     @Throws(IOException::class)
-    override fun encryptAnnotations(
-            annotations: List<String>
-    ): List<String> {
+    override fun encryptAnnotations(annotations: List<String>): List<String> {
         return annotations
                 .map { annotation -> tagHelper.prepare(annotation) }
-                .let { validAnnotations -> encryptList(
-                        validAnnotations,
-                        ANNOTATION_KEY + TAG_DELIMITER
-                ) }
+                .let { validAnnotations ->
+                    encryptList(
+                            validAnnotations,
+                            ANNOTATION_KEY + TAG_DELIMITER
+                    )
+                }
     }
 
     @Throws(IOException::class)
@@ -124,7 +124,7 @@ class TagEncryptionService @JvmOverloads constructor(
     ): List<String> = decryptList(
             encryptedAnnotations,
             { decrypted -> decrypted.startsWith(ANNOTATION_KEY) && decrypted.contains(TAG_DELIMITER) },
-            { list -> stripAnnotationKey(list) }
+            { list -> removeAnnotationKey(list) }
     )
 
     companion object {
@@ -132,7 +132,7 @@ class TagEncryptionService @JvmOverloads constructor(
         private const val ANNOTATION_KEY = "custom"
 
         @JvmStatic
-        private fun stripAnnotationKey(
+        private fun removeAnnotationKey(
                 list: MutableList<String>
         ): List<String> = list.also {
             for (idx in it.indices) {

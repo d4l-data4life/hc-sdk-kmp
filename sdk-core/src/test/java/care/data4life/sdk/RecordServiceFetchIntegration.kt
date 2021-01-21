@@ -411,7 +411,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=","ZmhpcnZlcnNpb249MyUyZTAlMmUx", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmhpcnZlcnNpb249MyUyZTAlMmUx", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -457,7 +457,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 listOf(
                         "cGFydG5lcj1iNDY=",
                         "Y2xpZW50PWI0NiUyM3Rlc3Q=",
-                       "ZmhpcnZlcnNpb249MyUyZTAlMmUx",
+                        "ZmhpcnZlcnNpb249MyUyZTAlMmUx",
                         "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl",
                         "Y3VzdG9tPXdvdw==",
                         "Y3VzdG9tPWl0",
@@ -688,7 +688,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=","ZmhpcnZlcnNpb249MyUyZTAlMmUx", encodedResourceType),
+                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmhpcnZlcnNpb249MyUyZTAlMmUx", encodedResourceType),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -699,7 +699,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord2 = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=","ZmhpcnZlcnNpb249MyUyZTAlMmUx", encodedResourceType),
+                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmhpcnZlcnNpb249MyUyZTAlMmUx", encodedResourceType),
                 encryptedBody2,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -768,7 +768,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 listOf(
                         "cGFydG5lcj1iNDY=",
                         "Y2xpZW50PWI0NiUyM3Rlc3Q=",
-                       "ZmhpcnZlcnNpb249MyUyZTAlMmUx",
+                        "ZmhpcnZlcnNpb249MyUyZTAlMmUx",
                         encodedResourceType,
                         "Y3VzdG9tPXdvdw==",
                         "Y3VzdG9tPWl0",
@@ -784,7 +784,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord2 = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=","ZmhpcnZlcnNpb249MyUyZTAlMmUx", encodedResourceType),
+                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmhpcnZlcnNpb249MyUyZTAlMmUx", encodedResourceType),
                 encryptedBody2,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -1207,7 +1207,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 listOf(
                         "cGFydG5lcj1iNDY=",
                         "Y2xpZW50PWI0NiUyM3Rlc3Q=",
-                       "ZmhpcnZlcnNpb249MyUyZTAlMmUx",
+                        "ZmhpcnZlcnNpb249MyUyZTAlMmUx",
                         "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl",
                         "Y3VzdG9tPXdvdw==",
                         "Y3VzdG9tPWl0",

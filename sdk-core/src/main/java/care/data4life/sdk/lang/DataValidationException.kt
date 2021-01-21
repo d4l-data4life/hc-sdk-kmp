@@ -32,6 +32,7 @@ sealed class DataValidationException(message: String? = null, cause: Throwable? 
     class InvalidAttachmentPayloadHash(message: String? = "Attachment hash is invalid") : DataValidationException(message = message)
     class TagsAndAnnotationsLimitViolation(message: String? = "Annotations and Tags are exceeding maximum length") : DataValidationException(message = message)
     class CustomDataLimitViolation(message: String? = "The given record data exceeds the maximum size") : DataValidationException(message = message)
-
+    class AnnotationFormatViolation(message: String) : DataValidationException(message = message)
+    class AnnotationViolation(message: String) : DataValidationException(message = message)
 }
 

@@ -15,19 +15,16 @@
  */
 package care.data4life.sdk.tag
 
+import care.data4life.sdk.lang.D4LException
+import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_DELIMITER
-import java.util.*
+import okhttp3.internal.toHexString
+import java.net.URLDecoder
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
+import kotlin.collections.HashMap
 
 object TagEncryptionHelper : TaggingContract.Helper {
-
-    override fun convertToTagList(tags: HashMap<String, String>): List<String> {
-        return mutableListOf<String>().also {
-            for ((key, value) in tags) {
-                it.add(key + TAG_DELIMITER + value)
-            }
-        }
-    }
-
     override fun convertToTagMap(tagList: List<String>): HashMap<String, String> {
         val tags = HashMap<String, String>()
         for (entry in tagList) {
@@ -43,5 +40,46 @@ object TagEncryptionHelper : TaggingContract.Helper {
         return tags
     }
 
-    override fun prepare(tag: String): String = tag.toLowerCase(Locale.US)
+    private fun replaceSpecial(char: Char): String {
+        val specialChars = listOf('*', '-', '_', '.')
+        return when(char) {
+            '+' -> "%20"
+            in specialChars -> "%${char.toInt().toHexString()}"
+            else -> char.toLowerCase().toString()
+        }
+    }
+
+    @Throws(D4LException::class)
+    private fun isValidateFormat(char: Char, tag: String): Char {
+        if(char.isUpperCase() && char.isLetter()) {
+            throw DataValidationException.AnnotationFormatViolation(
+                "`$tag` is not in lower case."
+            )
+        }
+
+        return char
+    }
+
+    @Throws(D4LException::class)
+    private fun validateTag(tag: String) {
+        if(tag.isBlank()) {
+            throw DataValidationException.AnnotationViolation(
+                "Annotation is empty."
+            )
+        }
+
+        tag.forEach { char -> isValidateFormat(char, tag) }
+    }
+
+    @Throws(D4LException::class)
+    override fun prepare(tag: String): String {
+        validateTag(tag)
+
+        return URLEncoder.encode(
+                tag.trim(),
+                StandardCharsets.UTF_8.displayName()
+        ).map { char -> replaceSpecial(char) }.joinToString("")
+    }
+
+    override fun decode(encodedTag: String): String = URLDecoder.decode(encodedTag, StandardCharsets.UTF_8.displayName())
 }

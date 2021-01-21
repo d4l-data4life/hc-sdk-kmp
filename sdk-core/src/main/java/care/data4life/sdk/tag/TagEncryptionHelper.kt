@@ -53,7 +53,7 @@ object TagEncryptionHelper : TaggingContract.Helper {
     private fun isValidateFormat(char: Char, tag: String): Char {
         if(char.isUpperCase() && char.isLetter()) {
             throw DataValidationException.AnnotationFormatViolation(
-                "`$tag` is not in lower case."
+                "`$tag` is not in lowercase."
             )
         }
 

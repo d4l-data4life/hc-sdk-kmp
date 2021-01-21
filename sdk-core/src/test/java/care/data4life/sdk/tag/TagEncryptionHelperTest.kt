@@ -65,21 +65,21 @@ class TagEncryptionHelperTest {
     }
 
     @Test
-    fun `Given, prepare is called with a String, it fails, if is its not in lower case`() {
+    fun `Given, prepare is called with a String, it fails, if is its not in lowercase`() {
         // Given
         val tag = "яЛюблюКартошку"
 
         // When
         try {
             TagEncryptionHelper.prepare(tag)
-            fail("convertToTagMap should fail on non lower case")
+            fail("convertToTagMap should fail on non lowercase")
         } catch ( e: Exception ) {
             // Then
             assertTrue(e is D4LException)
             assertTrue(e is DataValidationException.AnnotationFormatViolation)
             assertEquals(
                     e.message,
-                    "`$tag` is not in lower case."
+                    "`$tag` is not in lowercase."
             )
         }
     }

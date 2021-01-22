@@ -1,11 +1,11 @@
-:library_version: 0.0.1
+:library_version: 1.9.1
 :toc: macro
 :toclevels: 2
 :toc-title:
 ifdef::env-github[]
-:imagesdir: https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/assets/images/
-:link-license: https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/LICENSE
-:link-contribution: https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/CONTRIBUTION.adoc
+:imagesdir: https://github.com/d4l-data4life/hc-sdk-kmp/blob/main/assets/images/
+:link-license: https://github.com/d4l-data4life/hc-sdk-kmp/blob/main/LICENSE
+:link-contribution: https://github.com/d4l-data4life/hc-sdk-kmp/blob/main/CONTRIBUTION.adoc
 :warning-caption: :warning:
 :caution-caption: :fire:
 :important-caption: :exclamation:
@@ -23,7 +23,7 @@ endif::[]
 <div align="center">
     <!-- PROJECT LOGO -->
     <p>
-        <a><img src="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/assets/images/d4l-logo.svg" width="150"/></a>
+        <a><img src="https://github.com/d4l-data4life/hc-sdk-kmp/blob/main/assets/images/d4l-logo.svg" width="150"/></a>
     </p>
     <!-- PROJECT HEADER -->
     <h1>The Data4Life Android and Java SDK</h1>
@@ -33,18 +33,18 @@ endif::[]
 For more information about the platform, visit our website <a href="https://www.d4l.io/">www.d4l.io</a>.
     </p>
     <p><!-- PROJECT DOCUMENTATION -->
-        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp"><strong>Explore the docs »</strong></a>
+        <a href="https://github.com/d4l-data4life/hc-sdk-kmp"><strong>Explore the docs »</strong></a>
     </p>
     <p><!-- PROJECT ISSUES/FEATURES -->
-        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/issues">Report Bug</a>
+        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/issues">Report Bug</a>
         ·
-        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/issues">Request Feature</a>
+        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/issues">Request Feature</a>
     </p>
     <p><!-- PROJECT BADGES -->
-        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/actions">
-            <img src="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/workflows/D4L%20CI%20KMP/badge.svg" alt="Build Status"/>
+        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/actions">
+            <img src="https://github.com/d4l-data4life/hc-sdk-kmp/workflows/D4L%20CI%20KMP/badge.svg" alt="Build Status"/>
         </a>
-        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/LICENSE">
+        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/blob/main/LICENSE">
             <img src="https://img.shields.io/badge/license-PRIVATE-blue.svg"/>
         </a>
     </p>

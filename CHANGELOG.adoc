@@ -12,7 +12,7 @@ and this project adheres to http://semver.org/spec/v2.0.0.html[Semantic Versioni
 ==== Versions
 toc::[]
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.0-rc1...main[Unreleased]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.1...main[Unreleased]
 
 === Added
 
@@ -25,6 +25,15 @@ toc::[]
 
 === Fixed
 
+=== Bumped
+
+=== Migration
+
+
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.0...v1.9.1[1.9.1]
+
+=== Fixed
+
 * RecordService#checkDataRestrictions for Resources with unextractable Attachments
 * missing Task in SDKContract for some of the operations
 * all Errors to be reported to our Logger
@@ -34,6 +43,7 @@ toc::[]
 * HC-FHIR-SDK 1.1.0 -> 1.2.1
 
 === Migration
+
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.8.0...v1.9.0[1.9.0]
 

@@ -177,10 +177,10 @@ The exception is also thrown during the download of an `Attachment` object from 
 | Thrown when the hash attachment is different from the hash obtained from the binary data. This validation is for an upload,update or a download. The hash validation failure indicates that the file integrity has been compromised.
 
 |`DataValidationException.AnnotationFormatViolation`
-| Thrown when the when a given custom annotation contains a character in uppercase. This validation applies on creation, update and fetch.
+| Thrown when a given custom annotation contains a character in uppercase. This validation applies on create, update and fetch.
 
 |`DataValidationException.AnnotationViolation`
-| Thrown when the when a given custom annotation contains a string, which is empty or contains only space characters. This validation applies on creation, update and fetch.
+| Thrown when zhe given custom annotations contain a string, which is empty or is only composed of space characters. This validation applies on create, update and fetch.
 |===
 
 === Unrecoverable exceptions

@@ -78,5 +78,7 @@ object TagEncryptionHelper : TaggingContract.Helper {
         ).map { char -> replaceSpecial(char) }.joinToString("")
     }
 
-    override fun decode(encodedTag: String): String = URLDecoder.decode(encodedTag, StandardCharsets.UTF_8.displayName())
+    override fun decode(
+            encodedTag: String
+    ): String = URLDecoder.decode(encodedTag, StandardCharsets.UTF_8.displayName())
 }

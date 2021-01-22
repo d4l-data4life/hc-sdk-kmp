@@ -89,8 +89,7 @@ class TagEncryptionService @JvmOverloads constructor(
     @Throws(IOException::class)
     override fun encryptTags(tags: HashMap<String, String>): List<String> {
         return tags
-                .map { entry ->
-                    entry.key +
+                .map { entry -> entry.key +
                             TAG_DELIMITER +
                             tagHelper.encode(entry.value.toLowerCase(Locale.US))
                 }

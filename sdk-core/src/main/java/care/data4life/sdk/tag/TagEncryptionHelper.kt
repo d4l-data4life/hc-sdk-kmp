@@ -41,12 +41,14 @@ object TagEncryptionHelper : TaggingContract.Helper {
         return tags
     }
 
+    private fun normalizeEncodedChar(char: Char): Char = char.toLowerCase()
+
     private fun replaceSpecial(char: Char): String {
         val specialChars = listOf('*', '-', '_', '.')
         return when (char) {
             '+' -> "%20"
             in specialChars -> "%${char.toInt().toHexString()}"
-            else -> char.toLowerCase().toString()
+            else -> char.toString()
         }
     }
 
@@ -66,7 +68,9 @@ object TagEncryptionHelper : TaggingContract.Helper {
         return URLEncoder.encode(
                 tag.toLowerCase(Locale.US).trim(),
                 StandardCharsets.UTF_8.displayName()
-        ).map { char -> replaceSpecial(char) }.joinToString("")
+        ).map { char -> replaceSpecial(
+                normalizeEncodedChar(char)
+        ) }.joinToString("")
     }
 
     override fun decode(

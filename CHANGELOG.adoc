@@ -18,7 +18,7 @@ toc::[]
 
 === Changed
 * Tags are now encoded (URI) and in lowercase
-* Annotation are now encoded (URI) and fail, if they are empty or contain a uppercase character
+* Annotation are now encoded (URI), in lowercase and fail, if they are empty
 * TagHelper -> TagEncryptionHelper
 
 === Removed

@@ -65,27 +65,7 @@ class TagEncryptionHelperTest {
     }
 
     @Test
-    fun `Given, prepare is called with a String, it fails, if is its not in lowercase`() {
-        // Given
-        val tag = "яЛюблюКартошку"
-
-        // When
-        try {
-            TagEncryptionHelper.encode(tag)
-            fail("convertToTagMap should fail on non lowercase")
-        } catch ( e: Exception ) {
-            // Then
-            assertTrue(e is D4LException)
-            assertTrue(e is DataValidationException.AnnotationFormatViolation)
-            assertEquals(
-                    e.message,
-                    "`$tag` is not in lowercase."
-            )
-        }
-    }
-
-    @Test
-    fun `Given, prepare is called with a String, it fails, if is its blank`() {
+    fun `Given, encode is called with a String, it fails, if is its blank`() {
         // Given
         val tag = " "
 
@@ -105,7 +85,7 @@ class TagEncryptionHelperTest {
     }
 
     @Test
-    fun `Given, prepare is called with a String, it applies no encoding on alphanumeric chars`() {
+    fun `Given, encode is called with a String, it applies no encoding on alphanumeric chars`() {
         // Given
         val tag = "tag"
 
@@ -120,7 +100,7 @@ class TagEncryptionHelperTest {
     }
 
     @Test
-    fun `Given, prepare is called with a String, it trims it`() {
+    fun `Given, encode is called with a String, it trims it`() {
         // Given
         val expected = "tag"
 
@@ -129,13 +109,28 @@ class TagEncryptionHelperTest {
 
         // Then
         assertEquals(
-               "tag",
+                expected,
                 result
         )
     }
 
     @Test
-    fun `Given, prepare is called with a String, it encodes it`() {
+    fun `Given, encode is called with a String, it brings it into lowercase`() {
+        // Given
+        val expected = "TAG"
+
+        // When
+        val result = TagEncryptionHelper.encode("$expected")
+
+        // Then
+        assertEquals(
+                "tag",
+                result
+        )
+    }
+
+    @Test
+    fun `Given, encode is called with a String, it encodes it`() {
         // Given
         val tag = "你好，世界"
 
@@ -150,7 +145,7 @@ class TagEncryptionHelperTest {
     }
 
     @Test
-    fun `Given, prepare is called with a String, which contains special chars, it encodes it`() {
+    fun `Given, encode is called with a String, which contains special chars, it encodes it`() {
         // Given
         val tag = "! '()*-_.~"
 
@@ -165,7 +160,7 @@ class TagEncryptionHelperTest {
     }
 
     @Test
-    fun `Given, prepare is called with a String, which contains mixed chars, it encodes it`() {
+    fun `Given, encode is called with a String, which contains mixed chars, it encodes it`() {
         // Given
         val tag = "你好! world."
 

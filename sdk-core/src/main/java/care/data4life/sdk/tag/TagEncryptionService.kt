@@ -91,7 +91,7 @@ class TagEncryptionService @JvmOverloads constructor(
         return tags
                 .map { entry -> entry.key +
                             TAG_DELIMITER +
-                            tagHelper.encode(entry.value.toLowerCase(Locale.US))
+                            tagHelper.encode(entry.value)
                 }
                 .let { encryptList(it) }
     }

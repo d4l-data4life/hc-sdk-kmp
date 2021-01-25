@@ -82,36 +82,6 @@ class TagEncryptionServiceTest {
     }
 
     @Test
-    fun `Given encryptTags is called with capitalized value, it lower cases its value`() {
-        // given
-        val tag = "key" to "ValuE"
-        val tags = hashMapOf(tag)
-        val gcKey: GCKey = mockk()
-        val encryptedTag = "encryptedTag"
-        val symEncrypted = ByteArray(23)
-
-        every { tagHelper.encode(tag.second.toLowerCase(Locale.US)) } returns tag.second.toLowerCase(Locale.US)
-        every { cryptoService.fetchTagEncryptionKey() } returns gcKey
-        every { cryptoService.symEncrypt(
-                gcKey,
-                "key${TAG_DELIMITER}value".toByteArray(),
-                IV
-        ) } returns symEncrypted
-        every { base64.encodeToString(symEncrypted) } returns encryptedTag
-
-        // when
-        val encryptedTags: List<String> = subjectUnderTest.encryptTags(tags)
-
-        // then
-        Truth.assertThat(encryptedTags).containsExactly(encryptedTag)
-        verify { cryptoService.symEncrypt(
-                gcKey,
-                "key${TAG_DELIMITER}value".toByteArray(),
-                IV
-        ) }
-    }
-
-    @Test
     fun encryptTags_shouldThrowException() {
         // given
         val tag = "key" to "value"

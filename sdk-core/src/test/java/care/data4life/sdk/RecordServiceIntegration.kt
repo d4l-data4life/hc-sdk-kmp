@@ -146,9 +146,9 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
-
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         downloadAttachmentsFlow(
                 "42",
@@ -197,8 +197,9 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
 
         downloadAttachmentsFlow(

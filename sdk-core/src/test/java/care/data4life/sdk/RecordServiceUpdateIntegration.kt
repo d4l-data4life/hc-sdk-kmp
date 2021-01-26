@@ -387,8 +387,9 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         updatedEncryptedRecord = EncryptedRecord(
                 commonKeyId,
@@ -398,8 +399,9 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
         updatedResourceString = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
@@ -473,8 +475,9 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         updatedEncryptedRecord = EncryptedRecord(
                 commonKeyId,
@@ -492,8 +495,9 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
         updatedResourceString = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
@@ -554,8 +558,9 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         updatedEncryptedRecord = EncryptedRecord(
                 commonKeyId,
@@ -565,8 +570,9 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
         updatedResourceString = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
@@ -628,8 +634,9 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         updatedEncryptedRecord = EncryptedRecord(
                 commonKeyId,
@@ -639,8 +646,9 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
         updatedResourceString = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
@@ -714,8 +722,9 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         updatedEncryptedRecord = EncryptedRecord(
                 commonKeyId,
@@ -733,8 +742,9 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
         updatedResourceString = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
@@ -795,8 +805,9 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         updatedEncryptedRecord = EncryptedRecord(
                 commonKeyId,
@@ -806,8 +817,9 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
         updatedResourceString = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
@@ -871,8 +883,9 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 null,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
         updatedEncryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
@@ -884,8 +897,9 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 null,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         runDataFlow(
                 resource,
@@ -948,8 +962,9 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 null,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         updatedEncryptedRecord = EncryptedRecord(
                 commonKeyId,
@@ -966,8 +981,9 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 null,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         runDataFlow(
                 resource,
@@ -1020,8 +1036,9 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         updatedEncryptedRecord = EncryptedRecord(
                 commonKeyId,
@@ -1031,8 +1048,9 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
         updatedResourceString = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"

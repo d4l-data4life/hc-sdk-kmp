@@ -336,8 +336,9 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         val gcKeys = mutableListOf(
                 dataKey,
@@ -403,8 +404,9 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         val gcKeys = mutableListOf(
                 dataKey,
@@ -471,8 +473,9 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         val gcKeys = mutableListOf(
                 dataKey,
@@ -525,8 +528,9 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         val gcKeys = mutableListOf(
                 dataKey,
@@ -592,8 +596,9 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         val gcKeys = mutableListOf(
                 dataKey,
@@ -660,8 +665,9 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         val gcKeys = mutableListOf(
                 dataKey,
@@ -711,8 +717,9 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 null,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         val gcKeys = mutableListOf(
                 dataKey,
@@ -777,8 +784,9 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 null,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         val gcKeys = mutableListOf(
                 dataKey,

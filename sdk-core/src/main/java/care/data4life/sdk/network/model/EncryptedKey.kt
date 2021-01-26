@@ -13,34 +13,6 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
+package care.data4life.sdk.network.model
 
-package care.data4life.sdk.network.model;
-
-import java.util.Objects;
-
-public class EncryptedKey {
-
-    private String encryptedKeyBase64;
-
-
-    public EncryptedKey(String encryptedKeyBase64) {
-        this.encryptedKeyBase64 = encryptedKeyBase64;
-    }
-
-    public String getEncryptedKey() {
-        return encryptedKeyBase64;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        EncryptedKey that = (EncryptedKey) o;
-        return Objects.equals(encryptedKeyBase64, that.encryptedKeyBase64);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(encryptedKeyBase64);
-    }
-}
+data class EncryptedKey(val encryptedKey: String)

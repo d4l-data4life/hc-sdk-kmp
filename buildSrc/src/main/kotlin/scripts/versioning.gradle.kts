@@ -22,7 +22,7 @@ plugins {
 val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
 val patternNoQualifierBranch = "main|release/.*".toRegex()
 val patternFeatureBranch = "feature/(.*)".toRegex()
-val patternTicketNumber = "\\[A-Z]{2,8}-.*/(.*)".toRegex()
+val patternTicketNumber = "[A-Z]{2,8}-.*/(.*)".toRegex()
 
 fun versionName(): String {
     val details = versionDetails()

@@ -272,11 +272,13 @@ class RecordService(
 
         return Observable
                 .fromCallable { taggingService.getTagFromType(resourceType as Class<Any>?) }
-                .map { tagEncryptionService.encryptTags(it) as MutableList<String> }
-                .map { tags ->
-                    tags.also {
-                        it.addAll(tagEncryptionService.encryptAnnotations(annotations))
-                    }
+                .map { plainTags ->
+                    tagEncryptionService.encryptTags(plainTags)
+                            .also { tags ->
+                                tags.addAll(
+                                        tagEncryptionService.encryptAnnotations(annotations)
+                                )
+                            }
                 }
                 .flatMap {
                     apiService.fetchRecords(
@@ -515,8 +517,14 @@ class RecordService(
     } else {
         Single
                 .fromCallable { taggingService.getTagFromType(type as Class<Any>?) }
-                .map { tagEncryptionService.encryptTags(it) as MutableList<String> }
-                .map { tags -> tags.also { it.addAll(tagEncryptionService.encryptAnnotations(annotations)) } }
+                .map { plainTags ->
+                    tagEncryptionService.encryptTags(plainTags)
+                            .also { tags ->
+                                tags.addAll(
+                                        tagEncryptionService.encryptAnnotations(annotations)
+                                )
+                            }
+                }
                 .flatMap { apiService.getCount(alias, userId, it) }
     }
 
@@ -525,9 +533,12 @@ class RecordService(
     internal fun <T : Any> encryptRecord(
             record: DecryptedBaseRecord<T>
     ): EncryptedRecord {
-        val encryptedTags = tagEncryptionService.encryptTags(record.tags!!).also {
-            (it as MutableList<String>).addAll(tagEncryptionService.encryptAnnotations(record.annotations))
-        }
+        val encryptedTags = tagEncryptionService.encryptTags(record.tags!!)
+                .also { tags ->
+                    tags.addAll(
+                            tagEncryptionService.encryptAnnotations(record.annotations)
+                    )
+                }
 
         val commonKey = cryptoService.fetchCurrentCommonKey()
         val currentCommonKeyId = cryptoService.currentCommonKeyId
@@ -810,7 +821,8 @@ class RecordService(
         val resource = record.resource
 
         if (!fhirAttachmentHelper.hasAttachment(resource)) return record
-        val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Any?>? ?: return record
+        val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Any?>?
+                ?: return record
 
         if (record.attachmentsKey == null) {
             record.attachmentsKey = cryptoService.generateGCKey().blockingGet()

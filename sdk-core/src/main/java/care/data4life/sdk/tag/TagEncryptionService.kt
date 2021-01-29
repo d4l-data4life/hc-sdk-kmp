@@ -32,7 +32,7 @@ class TagEncryptionService @JvmOverloads constructor(
         private val tagHelper: TaggingContract.Helper = TagEncryptionHelper
 ) : TaggingContract.EncryptionService {
     @Throws(IOException::class)
-    override fun encryptTags(tags: HashMap<String, String>): List<String> {
+    override fun encryptTags(tags: HashMap<String, String>): MutableList<String> {
         return tags
                 .map { entry -> entry.key + DELIMITER + tagHelper.encode(entry.value) }
                 .let { encryptList(it) }
@@ -48,7 +48,7 @@ class TagEncryptionService @JvmOverloads constructor(
     )
 
     @Throws(IOException::class)
-    override fun encryptAnnotations(annotations: List<String>): List<String> {
+    override fun encryptAnnotations(annotations: List<String>): MutableList<String> {
         return annotations
                 .map { annotation -> tagHelper.encode(annotation) }
                 .let { validAnnotations ->
@@ -69,13 +69,13 @@ class TagEncryptionService @JvmOverloads constructor(
     )
 
     @Throws(IOException::class)
-    private fun encryptList(plainList: List<String>, prefix: String = ""): List<String> {
+    private fun encryptList(plainList: List<String>, prefix: String = ""): MutableList<String> {
         return plainList.map { tag ->
             encryptItem(
                     cryptoService.fetchTagEncryptionKey(),
                     prefix + tag
             )
-        }
+        }.toMutableList()
     }
 
     @Throws(D4LException::class)

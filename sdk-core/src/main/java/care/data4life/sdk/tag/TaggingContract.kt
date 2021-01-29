@@ -33,13 +33,13 @@ class TaggingContract {
 
     interface EncryptionService {
         @Throws(IOException::class)
-        fun encryptTags(tags: HashMap<String, String>): List<String>
+        fun encryptTags(tags: HashMap<String, String>): MutableList<String>
 
         @Throws(IOException::class)
         fun decryptTags(encryptedTags: List<String>): HashMap<String, String>
 
         @Throws(IOException::class)
-        fun encryptAnnotations(annotations: List<String>): List<String>
+        fun encryptAnnotations(annotations: List<String>): MutableList<String>
 
         @Throws(IOException::class)
         fun decryptAnnotations(encryptedAnnotations: List<String>): List<String>

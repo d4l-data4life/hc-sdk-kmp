@@ -23,7 +23,7 @@ import care.data4life.sdk.tag.TaggingContract.Companion.DELIMITER
 import care.data4life.sdk.util.Base64
 import java.io.IOException
 import java.nio.charset.StandardCharsets
-import java.util.*
+import kotlin.collections.HashMap
 
 // TODO internal
 class TagEncryptionService @JvmOverloads constructor(

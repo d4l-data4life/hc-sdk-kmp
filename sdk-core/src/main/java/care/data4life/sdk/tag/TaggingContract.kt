@@ -18,6 +18,7 @@ package care.data4life.sdk.tag
 
 import care.data4life.sdk.lang.D4LException
 import java.io.IOException
+import kotlin.collections.HashMap
 
 class TaggingContract {
 

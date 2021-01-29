@@ -22,7 +22,7 @@ import okhttp3.internal.toHexString
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import java.util.*
+import java.util.Locale
 import kotlin.collections.HashMap
 
 object TagEncryptionHelper : TaggingContract.Helper {

@@ -258,6 +258,18 @@ class RecordService(
                 .map { FetchResult(it, failedFetches) }
     }
 
+    private fun encryptTagsAndAnnotations(
+            painTags: HashMap<String, String>,
+            plainAnnotations: List<String>
+    ): List<String> {
+        return tagEncryptionService.encryptTags(painTags)
+                .also { encryptedTags ->
+                    encryptedTags.addAll(
+                            tagEncryptionService.encryptAnnotations(plainAnnotations)
+                    )
+                }
+    }
+
     internal fun <T : Any> _fetchRecords(
             userId: String,
             resourceType: Class<T>?,
@@ -272,14 +284,7 @@ class RecordService(
 
         return Observable
                 .fromCallable { taggingService.getTagFromType(resourceType as Class<Any>?) }
-                .map { plainTags ->
-                    tagEncryptionService.encryptTags(plainTags)
-                            .also { tags ->
-                                tags.addAll(
-                                        tagEncryptionService.encryptAnnotations(annotations)
-                                )
-                            }
-                }
+                .map { plainTags -> encryptTagsAndAnnotations(plainTags, annotations) }
                 .flatMap {
                     apiService.fetchRecords(
                             alias,
@@ -517,28 +522,14 @@ class RecordService(
     } else {
         Single
                 .fromCallable { taggingService.getTagFromType(type as Class<Any>?) }
-                .map { plainTags ->
-                    tagEncryptionService.encryptTags(plainTags)
-                            .also { tags ->
-                                tags.addAll(
-                                        tagEncryptionService.encryptAnnotations(annotations)
-                                )
-                            }
-                }
+                .map { plainTags -> encryptTagsAndAnnotations(plainTags, annotations) }
                 .flatMap { apiService.getCount(alias, userId, it) }
     }
 
     //region utility methods
     @Throws(IOException::class)
-    internal fun <T : Any> encryptRecord(
-            record: DecryptedBaseRecord<T>
-    ): EncryptedRecord {
-        val encryptedTags = tagEncryptionService.encryptTags(record.tags!!)
-                .also { tags ->
-                    tags.addAll(
-                            tagEncryptionService.encryptAnnotations(record.annotations)
-                    )
-                }
+    internal fun <T : Any> encryptRecord(record: DecryptedBaseRecord<T>): EncryptedRecord {
+        val encryptedTags = encryptTagsAndAnnotations(record.tags!!, record.annotations)
 
         val commonKey = cryptoService.fetchCurrentCommonKey()
         val currentCommonKeyId = cryptoService.currentCommonKeyId

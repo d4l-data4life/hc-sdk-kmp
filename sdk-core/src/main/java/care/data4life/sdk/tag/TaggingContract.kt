@@ -55,6 +55,6 @@ class TaggingContract {
     }
 
     companion object {
-        const val TAG_DELIMITER = "="
+        const val DELIMITER = "="
     }
 }

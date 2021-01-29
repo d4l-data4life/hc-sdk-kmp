@@ -17,7 +17,7 @@ package care.data4life.sdk.tag
 
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
-import care.data4life.sdk.tag.TaggingContract.Companion.TAG_DELIMITER
+import care.data4life.sdk.tag.TaggingContract.Companion.DELIMITER
 import okhttp3.internal.toHexString
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -29,7 +29,7 @@ object TagEncryptionHelper : TaggingContract.Helper {
     override fun convertToTagMap(tagList: List<String>): HashMap<String, String> {
         val tags = HashMap<String, String>()
         for (entry in tagList) {
-            val split = entry.split(TAG_DELIMITER)
+            val split = entry.split(DELIMITER)
             if (split.size == 2) {
                 val key = split[0]
                 val value = split[1]
@@ -68,9 +68,11 @@ object TagEncryptionHelper : TaggingContract.Helper {
         return URLEncoder.encode(
                 tag.toLowerCase(Locale.US).trim(),
                 StandardCharsets.UTF_8.displayName()
-        ).map { char -> replaceSpecial(
-                normalizeEncodedChar(char)
-        ) }.joinToString("")
+        ).map { char ->
+            replaceSpecial(
+                    normalizeEncodedChar(char)
+            )
+        }.joinToString("")
     }
 
     override fun decode(

@@ -17,8 +17,8 @@ package care.data4life.sdk.tag
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.CryptoService
-import care.data4life.sdk.tag.TaggingContract.Companion.TAG_DELIMITER
-import care.data4life.sdk.test.util.TestSchedulerRule
+import care.data4life.sdk.lang.D4LException
+import care.data4life.sdk.tag.TaggingContract.Companion.DELIMITER
 import care.data4life.sdk.util.Base64
 import com.google.common.truth.Truth
 import io.mockk.every
@@ -28,13 +28,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 
 class TagEncryptionServiceTest {
-    @Rule
-    @JvmField
-    var schedulerRule = TestSchedulerRule()
     private lateinit var cryptoService: CryptoService
     private lateinit var base64: Base64
     private lateinit var tagHelper: TaggingContract.Helper
@@ -60,11 +56,13 @@ class TagEncryptionServiceTest {
 
         every { tagHelper.encode(tag.second) } returns tag.second
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
-        every { cryptoService.symEncrypt(
-                gcKey,
-                "key${TAG_DELIMITER}value".toByteArray(),
-                IV
-        ) } returns symEncrypted
+        every {
+            cryptoService.symEncrypt(
+                    gcKey,
+                    "key${DELIMITER}value".toByteArray(),
+                    IV
+            )
+        } returns symEncrypted
         every { base64.encodeToString(symEncrypted) } returns encryptedTag
 
         // when
@@ -72,11 +70,13 @@ class TagEncryptionServiceTest {
 
         // then
         Truth.assertThat(encryptedTags).containsExactly(encryptedTag)
-        verify { cryptoService.symEncrypt(
-                gcKey,
-                "key${TAG_DELIMITER}value".toByteArray(),
-                IV
-        ) }
+        verify {
+            cryptoService.symEncrypt(
+                    gcKey,
+                    "key${DELIMITER}value".toByteArray(),
+                    IV
+            )
+        }
     }
 
     @Test
@@ -89,11 +89,13 @@ class TagEncryptionServiceTest {
 
         every { tagHelper.encode(tag.second) } returns tag.second
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
-        every { cryptoService.symEncrypt(
-                gcKey,
-                encryptedTag.toByteArray(),
-                IV
-        ) } throws RuntimeException("Error")
+        every {
+            cryptoService.symEncrypt(
+                    gcKey,
+                    encryptedTag.toByteArray(),
+                    IV
+            )
+        } throws RuntimeException("Error")
 
         // when
         try {
@@ -101,9 +103,9 @@ class TagEncryptionServiceTest {
             fail("encryptTags should fail")
         } catch (e: Exception) {
             // Then
-            assertTrue(e is RuntimeException)
+            assertTrue(e is D4LException)
             assertEquals(
-                    "care.data4life.crypto.error.CryptoException\$EncryptionFailed: Failed to encrypt tag",
+                    "Failed to encrypt tag",
                     e.message
             )
         }
@@ -112,7 +114,7 @@ class TagEncryptionServiceTest {
     @Test
     fun decryptTags() {
         // given
-        val tag = "key${TAG_DELIMITER}value"
+        val tag = "key${DELIMITER}value"
         val gcKey: GCKey = mockk()
         val encryptedTag = "encryptedTag"
         val encryptedTags: MutableList<String> = arrayListOf(encryptedTag)
@@ -121,11 +123,13 @@ class TagEncryptionServiceTest {
         every { tagHelper.convertToTagMap(listOf(tag)) } returns hashMapOf("key" to "value")
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every { base64.decode(encryptedTag) } returns encryptedTag.toByteArray()
-        every { cryptoService.symDecrypt(
-                gcKey,
-                encryptedTag.toByteArray(),
-                IV
-        ) } returns tag.toByteArray()
+        every {
+            cryptoService.symDecrypt(
+                    gcKey,
+                    encryptedTag.toByteArray(),
+                    IV
+            )
+        } returns tag.toByteArray()
 
         // when
         val decryptedTags = subjectUnderTest.decryptTags(encryptedTags)
@@ -137,7 +141,7 @@ class TagEncryptionServiceTest {
     @Test
     fun decryptTags_filtersAnnotationKey() {
         // given
-        val tag = "$ANNOTATION_KEY${TAG_DELIMITER}value"
+        val tag = "$ANNOTATION_KEY${DELIMITER}value"
         val gcKey: GCKey = mockk()
         val encryptedTag = "encryptedTag"
         val encryptedTags: MutableList<String> = arrayListOf(encryptedTag)
@@ -145,11 +149,13 @@ class TagEncryptionServiceTest {
         every { tagHelper.convertToTagMap(listOf()) } returns hashMapOf()
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every { base64.decode(encryptedTag) } returns encryptedTag.toByteArray()
-        every { cryptoService.symDecrypt(
-                gcKey,
-                encryptedTag.toByteArray(),
-                IV
-        ) } returns tag.toByteArray()
+        every {
+            cryptoService.symDecrypt(
+                    gcKey,
+                    encryptedTag.toByteArray(),
+                    IV
+            )
+        } returns tag.toByteArray()
         every { tagHelper.decode(tag) } returns tag
 
         // when
@@ -171,10 +177,10 @@ class TagEncryptionServiceTest {
             subjectUnderTest.decryptTags(mutableListOf("ignore me"))
             fail("decryptTags should fail")
         } catch (e: Exception) {
-            assertTrue(e is RuntimeException)
+            assertTrue(e is D4LException)
             assertEquals(
-                "care.data4life.crypto.error.CryptoException\$DecryptionFailed: Failed to decrypt tag",
-                e.message
+                    "Failed to decrypt tag",
+                    e.message
             )
         }
     }
@@ -189,11 +195,13 @@ class TagEncryptionServiceTest {
 
         every { tagHelper.encode(annotations[0]) } returns annotations[0]
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
-        every { cryptoService.symEncrypt(
-                gcKey,
-                "$ANNOTATION_KEY${TAG_DELIMITER}value".toByteArray(),
-                IV
-        ) } returns symEncrypted
+        every {
+            cryptoService.symEncrypt(
+                    gcKey,
+                    "$ANNOTATION_KEY${DELIMITER}value".toByteArray(),
+                    IV
+            )
+        } returns symEncrypted
         every { base64.encodeToString(symEncrypted) } returns encryptedAnnotation
 
         // when
@@ -203,9 +211,9 @@ class TagEncryptionServiceTest {
         Truth.assertThat(encryptedAnnotations).containsExactly(encryptedAnnotation)
         verify {
             cryptoService.symEncrypt(
-                gcKey,
-                "${ANNOTATION_KEY}${TAG_DELIMITER}value".toByteArray(),
-                IV
+                    gcKey,
+                    "${ANNOTATION_KEY}${DELIMITER}value".toByteArray(),
+                    IV
             )
         }
     }
@@ -218,11 +226,13 @@ class TagEncryptionServiceTest {
 
         every { tagHelper.encode(annotations[0]) } returns annotations[0]
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
-        every { cryptoService.symEncrypt(
-                gcKey,
-                "$ANNOTATION_KEY${TAG_DELIMITER}value".toByteArray(),
-                IV
-        ) } throws RuntimeException("Error")
+        every {
+            cryptoService.symEncrypt(
+                    gcKey,
+                    "$ANNOTATION_KEY${DELIMITER}value".toByteArray(),
+                    IV
+            )
+        } throws RuntimeException("Error")
 
         // when
         try {
@@ -230,9 +240,9 @@ class TagEncryptionServiceTest {
             fail("encryptAnnotations should fail")
         } catch (e: Exception) {
             // Then
-            assertTrue(e is RuntimeException)
+            assertTrue(e is D4LException)
             assertEquals(
-                    "care.data4life.crypto.error.CryptoException\$EncryptionFailed: Failed to encrypt tag",
+                    "Failed to encrypt tag",
                     e.message
             )
         }
@@ -242,18 +252,20 @@ class TagEncryptionServiceTest {
     fun decryptAnnotations() {
         // given
         val expected = "value"
-        val annotation = "$ANNOTATION_KEY$TAG_DELIMITER$expected"
+        val annotation = "$ANNOTATION_KEY$DELIMITER$expected"
         val gcKey: GCKey = mockk()
         val encryptedAnnotation = "encryptedAnnotation"
         val encryptedAnnotations: MutableList<String> = arrayListOf(encryptedAnnotation)
 
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every { base64.decode(encryptedAnnotation) } returns encryptedAnnotation.toByteArray()
-        every { cryptoService.symDecrypt(
-                gcKey,
-                encryptedAnnotation.toByteArray(),
-                IV
-        ) } returns annotation.toByteArray()
+        every {
+            cryptoService.symDecrypt(
+                    gcKey,
+                    encryptedAnnotation.toByteArray(),
+                    IV
+            )
+        } returns annotation.toByteArray()
         every { tagHelper.decode(annotation) } returns annotation
 
         // when
@@ -273,11 +285,13 @@ class TagEncryptionServiceTest {
 
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every { base64.decode(encryptedTag) } returns encryptedTag.toByteArray()
-        every { cryptoService.symDecrypt(
-                gcKey,
-                encryptedTag.toByteArray(),
-                IV
-        ) } returns tag.toByteArray()
+        every {
+            cryptoService.symDecrypt(
+                    gcKey,
+                    encryptedTag.toByteArray(),
+                    IV
+            )
+        } returns tag.toByteArray()
         every { tagHelper.decode(tag) } returns tag
 
         // when
@@ -299,9 +313,9 @@ class TagEncryptionServiceTest {
             fail("decryptAnnotations should fail")
         } catch (e: Exception) {
             // Then
-            assertTrue(e is RuntimeException)
+            assertTrue(e is D4LException)
             assertEquals(
-                    "care.data4life.crypto.error.CryptoException\$DecryptionFailed: Failed to decrypt tag",
+                    "Failed to decrypt tag",
                     e.message
             )
         }

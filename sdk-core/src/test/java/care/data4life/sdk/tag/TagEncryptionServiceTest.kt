@@ -30,8 +30,6 @@ import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito
-import java.util.*
 
 class TagEncryptionServiceTest {
     @Rule
@@ -82,14 +80,12 @@ class TagEncryptionServiceTest {
     }
 
     @Test
-    fun encryptTags_shouldThrowException() {
+    fun `Given encryptTags is called with malicious Tags, it throws fails with a EncryptionFailed Exception`() {
         // given
         val tag = "key" to "value"
         val tags = hashMapOf(tag)
-        val gcKey = Mockito.mock(GCKey::class.java)
+        val gcKey: GCKey = mockk()
         val encryptedTag = "encryptedTag"
-        val symEncrypted = ByteArray(23)
-        val spiedBase64 = Mockito.spy(base64)
 
         every { tagHelper.encode(tag.second) } returns tag.second
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
@@ -97,10 +93,7 @@ class TagEncryptionServiceTest {
                 gcKey,
                 encryptedTag.toByteArray(),
                 IV
-        ) } returns symEncrypted
-        Mockito.doReturn(null)
-            .`when`(spiedBase64)
-            .encodeToString(symEncrypted)
+        ) } throws RuntimeException("Error")
 
         // when
         try {
@@ -167,7 +160,7 @@ class TagEncryptionServiceTest {
     }
 
     @Test
-    fun decryptTags_shouldThrowException() {
+    fun `Given decryptTags is called with malicious Tags, it throws fails with a DecryptionFailed Exception`() {
         // Given
         val gcKey: GCKey = mockk()
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
@@ -218,12 +211,10 @@ class TagEncryptionServiceTest {
     }
 
     @Test
-    fun encryptAnnotations_shouldThrowException() {
+    fun `Given encryptAnnotations is called with malicious Annotations, it throws fails with a EncryptionFailed Exception`() {
         // given
         val annotations = listOf("value")
         val gcKey: GCKey = mockk()
-        val symEncrypted = ByteArray(23)
-        val spiedBase64 = Mockito.spy(base64)
 
         every { tagHelper.encode(annotations[0]) } returns annotations[0]
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
@@ -231,10 +222,7 @@ class TagEncryptionServiceTest {
                 gcKey,
                 "$ANNOTATION_KEY${TAG_DELIMITER}value".toByteArray(),
                 IV
-        ) } returns symEncrypted
-        Mockito.doReturn(null)
-                .`when`(spiedBase64)
-                .encodeToString(symEncrypted)
+        ) } throws RuntimeException("Error")
 
         // when
         try {
@@ -279,7 +267,7 @@ class TagEncryptionServiceTest {
     fun decryptAnnotations_filtersNonAnnotationKey() {
         // given
         val tag = "key=value"
-        val gcKey = Mockito.mock(GCKey::class.java)
+        val gcKey: GCKey = mockk()
         val encryptedTag = "encryptedTag"
         val encryptedAnnotations: MutableList<String> = arrayListOf(encryptedTag)
 
@@ -300,7 +288,7 @@ class TagEncryptionServiceTest {
     }
 
     @Test
-    fun decryptAnnotations_shouldThrowException() {
+    fun `Given decryptAnnotations is called with malicious Tags, it throws fails with a DecryptionFailed Exception`() {
         // Given
         val gcKey: GCKey = mockk()
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey

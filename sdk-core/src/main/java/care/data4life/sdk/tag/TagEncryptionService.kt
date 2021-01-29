@@ -22,7 +22,6 @@ import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_DELIMITER
 import care.data4life.sdk.util.Base64
 import io.reactivex.Observable
-import io.reactivex.Single
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -34,65 +33,9 @@ class TagEncryptionService @JvmOverloads constructor(
         private val tagHelper: TaggingContract.Helper = TagEncryptionHelper
 ) : TaggingContract.EncryptionService {
     @Throws(IOException::class)
-    private fun encryptList(list: List<String>, prefix: String = ""): List<String> {
-        val tek = cryptoService.fetchTagEncryptionKey()
-        return Observable
-                .fromIterable(list)
-                .map { tag -> encryptTag(tek, prefix + tag).blockingGet() }
-                .toList()
-                .blockingGet()
-    }
-
-    @Throws(D4LException::class)
-    private fun encryptTag(key: GCKey, tag: String): Single<String> {
-        return Single
-                .fromCallable { tag.toByteArray() }
-                .map { plain -> cryptoService.symEncrypt(key, plain, IV) }
-                .map { data -> base64.encodeToString(data) }
-                .onErrorResumeNext {
-                    Single.error(
-                            CryptoException.EncryptionFailed("Failed to encrypt tag") as D4LException
-                    )
-                }
-    }
-
-    @Throws(IOException::class)
-    private fun <T> decryptList(
-            encryptedList: List<String>,
-            condition: (decryptedItem: String) -> Boolean,
-            transform: (decryptedList: MutableList<String>) -> T
-    ): T {
-        val tek = cryptoService.fetchTagEncryptionKey()
-        return Observable
-                .fromIterable(encryptedList)
-                .map { encryptedTag -> decryptTag(tek, encryptedTag).blockingGet() }
-                .map { encodedTag -> tagHelper.decode(encodedTag) }
-                .filter { decryptedItem -> condition(decryptedItem) }
-                .toList()
-                .map { decryptedList -> transform(decryptedList) }
-                .blockingGet()
-    }
-
-    @Throws(D4LException::class)
-    private fun decryptTag(key: GCKey, base64tag: String): Single<String> {
-        return Single
-                .fromCallable { base64.decode(base64tag) }
-                .map { encrypted -> cryptoService.symDecrypt(key, encrypted, IV) }
-                .map { decrypted -> String(decrypted, StandardCharsets.UTF_8) }
-                .onErrorResumeNext {
-                    Single.error(
-                            CryptoException.DecryptionFailed("Failed to decrypt tag") as D4LException
-                    )
-                }
-    }
-
-    @Throws(IOException::class)
     override fun encryptTags(tags: HashMap<String, String>): List<String> {
         return tags
-                .map { entry -> entry.key +
-                            TAG_DELIMITER +
-                            tagHelper.encode(entry.value)
-                }
+                .map { entry -> entry.key + TAG_DELIMITER + tagHelper.encode(entry.value) }
                 .let { encryptList(it) }
     }
 
@@ -125,6 +68,54 @@ class TagEncryptionService @JvmOverloads constructor(
             { decrypted -> decrypted.startsWith(ANNOTATION_KEY) && decrypted.contains(TAG_DELIMITER) },
             { list -> removeAnnotationKey(list) }
     )
+
+    @Throws(IOException::class)
+    private fun encryptList(list: List<String>, prefix: String = ""): List<String> {
+        val tek = cryptoService.fetchTagEncryptionKey()
+        return Observable
+                .fromIterable(list)
+                .map { tag -> encryptTag(tek, prefix + tag) }
+                .toList()
+                .blockingGet()
+    }
+
+    @Throws(D4LException::class)
+    private fun encryptTag(key: GCKey, tag: String): String {
+        return try {
+            cryptoService.symEncrypt(key, tag.toByteArray(), IV)
+                    .let { data -> base64.encodeToString(data) }
+        } catch (e: Exception) {
+            throw CryptoException.EncryptionFailed("Failed to encrypt tag")
+        }
+    }
+
+    @Throws(IOException::class)
+    private fun <T> decryptList(
+            encryptedList: List<String>,
+            condition: (decryptedItem: String) -> Boolean,
+            transform: (decryptedList: MutableList<String>) -> T
+    ): T {
+        val tek = cryptoService.fetchTagEncryptionKey()
+        return Observable
+                .fromIterable(encryptedList)
+                .map { encryptedTag -> decryptTag(tek, encryptedTag) }
+                .map { encodedTag -> tagHelper.decode(encodedTag) }
+                .filter { decryptedItem -> condition(decryptedItem) }
+                .toList()
+                .map { decryptedList -> transform(decryptedList) }
+                .blockingGet()
+    }
+
+    @Throws(D4LException::class)
+    private fun decryptTag(key: GCKey, base64tag: String): String {
+        return try {
+            base64.decode(base64tag)
+                    .let { encrypted -> cryptoService.symDecrypt(key, encrypted, IV) }
+                    .let { decrypted -> String(decrypted, StandardCharsets.UTF_8) }
+        } catch (e: Exception) {
+            throw CryptoException.DecryptionFailed("Failed to decrypt tag")
+        }
+    }
 
     companion object {
         private val IV = ByteArray(16)

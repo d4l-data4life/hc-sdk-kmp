@@ -22,12 +22,14 @@ toc::[]
 * TagHelper -> TagEncryptionHelper
 
 === Removed
+* RxJava from TagEncryptionService
 
 === Fixed
 
 === Bumped
 
 === Migration
+* TODO: search strategy (fetchRecords) for the encoded tags (especially in regards to the Fhir version)
 
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.0...v1.9.1[1.9.1]

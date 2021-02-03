@@ -17,117 +17,119 @@ package care.data4life.sdk.tag
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.CryptoService
-import care.data4life.sdk.test.util.TestSchedulerRule
+import care.data4life.sdk.lang.D4LException
+import care.data4life.sdk.tag.TaggingContract.Companion.DELIMITER
 import care.data4life.sdk.util.Base64
 import com.google.common.truth.Truth
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito
 
 class TagEncryptionServiceTest {
-    @Rule
-    @JvmField
-    var schedulerRule = TestSchedulerRule()
-    private lateinit var mockCryptoService: CryptoService
-    private lateinit var mockBase64: Base64
+    private lateinit var cryptoService: CryptoService
+    private lateinit var base64: Base64
+    private lateinit var tagHelper: TaggingContract.Helper
     private lateinit var subjectUnderTest: TagEncryptionService
+
 
     @Before
     fun setUp() {
-        mockCryptoService = Mockito.mock(CryptoService::class.java)
-        mockBase64 = Mockito.mock(Base64::class.java)
-        subjectUnderTest = TagEncryptionService(mockCryptoService, mockBase64)
+        cryptoService = mockk()
+        base64 = mockk()
+        tagHelper = mockk()
+        subjectUnderTest = TagEncryptionService(cryptoService, base64, tagHelper)
     }
 
     @Test
-    @Throws(Exception::class)
     fun encryptTags() {
         // given
         val tag = "key" to "value"
         val tags = hashMapOf(tag)
-        val gcKey = Mockito.mock(GCKey::class.java)
+        val gcKey: GCKey = mockk()
         val encryptedTag = "encryptedTag"
         val symEncrypted = ByteArray(23)
 
-        Mockito.doReturn(gcKey)
-                .`when`(mockCryptoService)
-                .fetchTagEncryptionKey()
-        Mockito.doReturn(symEncrypted)
-                .`when`(mockCryptoService)
-                .symEncrypt(
-                        gcKey,
-                        "key=value".toByteArray(),
-                        IV
-                )
-        Mockito.doReturn(encryptedTag)
-                .`when`(mockBase64)
-                .encodeToString(symEncrypted)
-
+        every { tagHelper.encode(tag.second) } returns tag.second
+        every { cryptoService.fetchTagEncryptionKey() } returns gcKey
+        every {
+            cryptoService.symEncrypt(
+                    gcKey,
+                    "key${DELIMITER}value".toByteArray(),
+                    IV
+            )
+        } returns symEncrypted
+        every { base64.encodeToString(symEncrypted) } returns encryptedTag
 
         // when
         val encryptedTags: List<String> = subjectUnderTest.encryptTags(tags)
 
         // then
         Truth.assertThat(encryptedTags).containsExactly(encryptedTag)
-        Mockito.verify(mockCryptoService)
-                .symEncrypt(
-                        gcKey,
-                        "key=value".toByteArray(),
-                        IV
-                )
-    }
-
-    @Test(expected = RuntimeException::class)
-    @Throws(Exception::class)
-    fun encryptTags_shouldThrowException() {
-        // given
-        val tag = "key" to "value"
-        val tags = hashMapOf(tag)
-        val gcKey = Mockito.mock(GCKey::class.java)
-        val encryptedTag = "encryptedTag"
-        val symEncrypted = ByteArray(23)
-
-        Mockito.doReturn(gcKey)
-                .`when`(mockCryptoService)
-                .fetchTagEncryptionKey()
-        Mockito.doReturn(symEncrypted)
-                .`when`(mockCryptoService)
-                .symDecrypt(
-                        gcKey,
-                        encryptedTag.toByteArray(),
-                        IV
-                )
-        Mockito.doReturn(null)
-                .`when`(mockBase64)
-                .encodeToString(symEncrypted)
-
-        // when
-        subjectUnderTest.encryptTags(tags)
+        verify {
+            cryptoService.symEncrypt(
+                    gcKey,
+                    "key${DELIMITER}value".toByteArray(),
+                    IV
+            )
+        }
     }
 
     @Test
-    @Throws(Exception::class)
+    fun `Given encryptTags is called with malicious Tags, it throws fails with a EncryptionFailed Exception`() {
+        // given
+        val tag = "key" to "value"
+        val tags = hashMapOf(tag)
+        val gcKey: GCKey = mockk()
+        val encryptedTag = "encryptedTag"
+
+        every { tagHelper.encode(tag.second) } returns tag.second
+        every { cryptoService.fetchTagEncryptionKey() } returns gcKey
+        every {
+            cryptoService.symEncrypt(
+                    gcKey,
+                    encryptedTag.toByteArray(),
+                    IV
+            )
+        } throws RuntimeException("Error")
+
+        // when
+        try {
+            subjectUnderTest.encryptTags(tags)
+            fail("encryptTags should fail")
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is D4LException)
+            assertEquals(
+                    "Failed to encrypt tag",
+                    e.message
+            )
+        }
+    }
+
+    @Test
     fun decryptTags() {
         // given
-        val tag = "key=value"
-        val gcKey = Mockito.mock(GCKey::class.java)
+        val tag = "key${DELIMITER}value"
+        val gcKey: GCKey = mockk()
         val encryptedTag = "encryptedTag"
         val encryptedTags: MutableList<String> = arrayListOf(encryptedTag)
 
-        Mockito.doReturn(gcKey)
-                .`when`(mockCryptoService)
-                .fetchTagEncryptionKey()
-        Mockito.doReturn(encryptedTag.toByteArray())
-                .`when`(mockBase64)
-                .decode(encryptedTag)
-        Mockito.doReturn(tag.toByteArray())
-                .`when`(mockCryptoService)
-                .symDecrypt(
-                        gcKey,
-                        encryptedTag.toByteArray(),
-                        IV
-                )
+        every { tagHelper.decode(tag) } returns tag
+        every { tagHelper.convertToTagMap(listOf(tag)) } returns hashMapOf("key" to "value")
+        every { cryptoService.fetchTagEncryptionKey() } returns gcKey
+        every { base64.decode(encryptedTag) } returns encryptedTag.toByteArray()
+        every {
+            cryptoService.symDecrypt(
+                    gcKey,
+                    encryptedTag.toByteArray(),
+                    IV
+            )
+        } returns tag.toByteArray()
 
         // when
         val decryptedTags = subjectUnderTest.decryptTags(encryptedTags)
@@ -137,27 +139,24 @@ class TagEncryptionServiceTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun decryptTags_filtersAnnotationKey() {
         // given
-        val tag = "${ANNOTATION_KEY}value"
-        val gcKey = Mockito.mock(GCKey::class.java)
+        val tag = "$ANNOTATION_KEY${DELIMITER}value"
+        val gcKey: GCKey = mockk()
         val encryptedTag = "encryptedTag"
         val encryptedTags: MutableList<String> = arrayListOf(encryptedTag)
 
-        Mockito.doReturn(gcKey)
-                .`when`(mockCryptoService)
-                .fetchTagEncryptionKey()
-        Mockito.doReturn(encryptedTag.toByteArray())
-                .`when`(mockBase64)
-                .decode(encryptedTag)
-        Mockito.doReturn(tag.toByteArray())
-                .`when`(mockCryptoService)
-                .symDecrypt(
-                        gcKey,
-                        encryptedTag.toByteArray(),
-                        IV
-                )
+        every { tagHelper.convertToTagMap(listOf()) } returns hashMapOf()
+        every { cryptoService.fetchTagEncryptionKey() } returns gcKey
+        every { base64.decode(encryptedTag) } returns encryptedTag.toByteArray()
+        every {
+            cryptoService.symDecrypt(
+                    gcKey,
+                    encryptedTag.toByteArray(),
+                    IV
+            )
+        } returns tag.toByteArray()
+        every { tagHelper.decode(tag) } returns tag
 
         // when
         val decryptedTags = subjectUnderTest.decryptTags(encryptedTags)
@@ -166,98 +165,109 @@ class TagEncryptionServiceTest {
         Truth.assertThat(decryptedTags).containsExactly()
     }
 
-    @Test(expected = RuntimeException::class)
-    @Throws(Exception::class)
-    fun decryptTags_shouldThrowException() {
-        // when
-        subjectUnderTest.decryptTags(mutableListOf("ignore me"))
+    @Test
+    fun `Given decryptTags is called with malicious Tags, it throws fails with a DecryptionFailed Exception`() {
+        // Given
+        val gcKey: GCKey = mockk()
+        every { cryptoService.fetchTagEncryptionKey() } returns gcKey
+
+        // When
+        try {
+            // Then
+            subjectUnderTest.decryptTags(mutableListOf("ignore me"))
+            fail("decryptTags should fail")
+        } catch (e: Exception) {
+            assertTrue(e is D4LException)
+            assertEquals(
+                    "Failed to decrypt tag",
+                    e.message
+            )
+        }
     }
 
     @Test
-    @Throws(Exception::class)
     fun encryptAnnotations() {
         // given
         val annotations = listOf("value")
-        val gcKey = Mockito.mock(GCKey::class.java)
-        val encryptedTag = "encryptedAnnotation"
+        val gcKey: GCKey = mockk()
+        val encryptedAnnotation = "encryptedAnnotation"
         val symEncrypted = ByteArray(23)
 
-        Mockito.doReturn(gcKey)
-                .`when`(mockCryptoService)
-                .fetchTagEncryptionKey()
-        Mockito.doReturn(symEncrypted)
-                .`when`(mockCryptoService)
-                .symEncrypt(
-                        gcKey,
-                        "${ANNOTATION_KEY}value".toByteArray(),
-                        IV
-                )
-        Mockito.doReturn(encryptedTag)
-                .`when`(mockBase64)
-                .encodeToString(symEncrypted)
+        every { tagHelper.encode(annotations[0]) } returns annotations[0]
+        every { cryptoService.fetchTagEncryptionKey() } returns gcKey
+        every {
+            cryptoService.symEncrypt(
+                    gcKey,
+                    "$ANNOTATION_KEY${DELIMITER}value".toByteArray(),
+                    IV
+            )
+        } returns symEncrypted
+        every { base64.encodeToString(symEncrypted) } returns encryptedAnnotation
 
         // when
         val encryptedAnnotations: List<String> = subjectUnderTest.encryptAnnotations(annotations)
 
         // then
-        Truth.assertThat(encryptedAnnotations).containsExactly(encryptedTag)
-        Mockito.verify(mockCryptoService)
-                .symEncrypt(
-                        gcKey,
-                        "${ANNOTATION_KEY}value".toByteArray(),
-                        IV
-                )
-    }
-
-    @Test(expected = RuntimeException::class)
-    @Throws(Exception::class)
-    fun encryptAnnotations_shouldThrowException() {
-        // given
-        val annotations = listOf("value")
-        val gcKey = Mockito.mock(GCKey::class.java)
-        val symEncrypted = ByteArray(23)
-
-        Mockito.doReturn(gcKey)
-                .`when`(mockCryptoService)
-                .fetchTagEncryptionKey()
-        Mockito.doReturn(symEncrypted)
-                .`when`(mockCryptoService)
-                .symEncrypt(
-                        gcKey,
-                        "${ANNOTATION_KEY}value".toByteArray(),
-                        IV
-                )
-        Mockito.doReturn(null)
-                .`when`(mockBase64)
-                .encodeToString(symEncrypted)
-
-        // when
-        subjectUnderTest.encryptAnnotations(annotations)
+        Truth.assertThat(encryptedAnnotations).containsExactly(encryptedAnnotation)
+        verify {
+            cryptoService.symEncrypt(
+                    gcKey,
+                    "${ANNOTATION_KEY}${DELIMITER}value".toByteArray(),
+                    IV
+            )
+        }
     }
 
     @Test
-    @Throws(Exception::class)
+    fun `Given encryptAnnotations is called with malicious Annotations, it throws fails with a EncryptionFailed Exception`() {
+        // given
+        val annotations = listOf("value")
+        val gcKey: GCKey = mockk()
+
+        every { tagHelper.encode(annotations[0]) } returns annotations[0]
+        every { cryptoService.fetchTagEncryptionKey() } returns gcKey
+        every {
+            cryptoService.symEncrypt(
+                    gcKey,
+                    "$ANNOTATION_KEY${DELIMITER}value".toByteArray(),
+                    IV
+            )
+        } throws RuntimeException("Error")
+
+        // when
+        try {
+            subjectUnderTest.encryptAnnotations(annotations)
+            fail("encryptAnnotations should fail")
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is D4LException)
+            assertEquals(
+                    "Failed to encrypt tag",
+                    e.message
+            )
+        }
+    }
+
+    @Test
     fun decryptAnnotations() {
         // given
         val expected = "value"
-        val tag = "$ANNOTATION_KEY$expected"
-        val gcKey = Mockito.mock(GCKey::class.java)
-        val encryptedTag = "encryptedTag"
-        val encryptedAnnotations: MutableList<String> = arrayListOf(encryptedTag)
+        val annotation = "$ANNOTATION_KEY$DELIMITER$expected"
+        val gcKey: GCKey = mockk()
+        val encryptedAnnotation = "encryptedAnnotation"
+        val encryptedAnnotations: MutableList<String> = arrayListOf(encryptedAnnotation)
 
-        Mockito.doReturn(gcKey)
-                .`when`(mockCryptoService)
-                .fetchTagEncryptionKey()
-        Mockito.doReturn(encryptedTag.toByteArray())
-                .`when`(mockBase64)
-                .decode(encryptedTag)
-        Mockito.doReturn(tag.toByteArray())
-                .`when`(mockCryptoService)
-                .symDecrypt(
-                        gcKey,
-                        encryptedTag.toByteArray(),
-                        IV
-                )
+        every { cryptoService.fetchTagEncryptionKey() } returns gcKey
+        every { base64.decode(encryptedAnnotation) } returns encryptedAnnotation.toByteArray()
+        every {
+            cryptoService.symDecrypt(
+                    gcKey,
+                    encryptedAnnotation.toByteArray(),
+                    IV
+            )
+        } returns annotation.toByteArray()
+        every { tagHelper.decode(annotation) } returns annotation
+
         // when
         val decryptedAnnotations: List<String> = subjectUnderTest.decryptAnnotations(encryptedAnnotations)
 
@@ -266,27 +276,23 @@ class TagEncryptionServiceTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun decryptAnnotations_filtersNonAnnotationKey() {
         // given
         val tag = "key=value"
-        val gcKey = Mockito.mock(GCKey::class.java)
+        val gcKey: GCKey = mockk()
         val encryptedTag = "encryptedTag"
         val encryptedAnnotations: MutableList<String> = arrayListOf(encryptedTag)
 
-        Mockito.doReturn(gcKey)
-                .`when`(mockCryptoService)
-                .fetchTagEncryptionKey()
-        Mockito.doReturn(encryptedTag.toByteArray())
-                .`when`(mockBase64)
-                .decode(encryptedTag)
-        Mockito.doReturn(tag.toByteArray())
-                .`when`(mockCryptoService)
-                .symDecrypt(
-                        gcKey,
-                        encryptedTag.toByteArray(),
-                        IV
-                )
+        every { cryptoService.fetchTagEncryptionKey() } returns gcKey
+        every { base64.decode(encryptedTag) } returns encryptedTag.toByteArray()
+        every {
+            cryptoService.symDecrypt(
+                    gcKey,
+                    encryptedTag.toByteArray(),
+                    IV
+            )
+        } returns tag.toByteArray()
+        every { tagHelper.decode(tag) } returns tag
 
         // when
         val decryptedAnnotations = subjectUnderTest.decryptAnnotations(encryptedAnnotations)
@@ -295,15 +301,28 @@ class TagEncryptionServiceTest {
         Truth.assertThat(decryptedAnnotations).containsExactly()
     }
 
-    @Test(expected = RuntimeException::class)
-    @Throws(Exception::class)
-    fun decryptAnnotations_shouldThrowException() {
-        // given
-        subjectUnderTest.decryptAnnotations(mutableListOf("ignore me"))
+    @Test
+    fun `Given decryptAnnotations is called with malicious Tags, it throws fails with a DecryptionFailed Exception`() {
+        // Given
+        val gcKey: GCKey = mockk()
+        every { cryptoService.fetchTagEncryptionKey() } returns gcKey
+
+        try {
+            // When
+            subjectUnderTest.decryptAnnotations(mutableListOf("ignore me"))
+            fail("decryptAnnotations should fail")
+        } catch (e: Exception) {
+            // Then
+            assertTrue(e is D4LException)
+            assertEquals(
+                    "Failed to decrypt tag",
+                    e.message
+            )
+        }
     }
 
     companion object {
-        private const val ANNOTATION_KEY = "custom" + TaggingService.TAG_DELIMITER
+        private const val ANNOTATION_KEY = "custom"
         private val IV = ByteArray(16)
     }
 }

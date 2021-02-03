@@ -21,7 +21,6 @@ import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.Fhir4Version
 import care.data4life.sdk.wrapper.SdkFhirElementFactory
 import care.data4life.sdk.wrapper.WrapperContract
-import java.util.*
 
 // TODO internal
 class TaggingService(
@@ -39,7 +38,7 @@ class TaggingService(
             tags.putAll(oldTags)
         }
         if (resourceType != null && resourceType.isNotEmpty()) {
-            tags[TAG_RESOURCE_TYPE] = resourceType.toLowerCase(US_LOCALE)
+            tags[TAG_RESOURCE_TYPE] = resourceType
         }
         if (!tags.containsKey(TAG_CLIENT)) {
             tags[TAG_CLIENT] = clientId
@@ -82,23 +81,20 @@ class TaggingService(
             if (resourceType == null) {
                 it[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE
             } else {
-                it[TAG_RESOURCE_TYPE] = fhirElementFactory.getFhirTypeForClass(resourceType)!!.toLowerCase(US_LOCALE)
+                it[TAG_RESOURCE_TYPE] = fhirElementFactory.getFhirTypeForClass(resourceType)!!
             }
         }
     }
 
     companion object {
-        private val US_LOCALE = Locale.US
-        const val TAG_DELIMITER = "="
-        val TAG_RESOURCE_TYPE = "resourceType".toLowerCase(US_LOCALE)
-        const val TAG_CLIENT = "client"
-        private val TAG_UPDATED_BY_CLIENT = "updatedByClient".toLowerCase(US_LOCALE)
+        private const val TAG_RESOURCE_TYPE = "resourcetype"
+        private const val TAG_CLIENT = "client"
+        private const val TAG_UPDATED_BY_CLIENT = "updatedbyclient"
         private const val TAG_PARTNER = "partner"
-        private val TAG_UPDATED_BY_PARTNER = "updatedByPartner".toLowerCase(US_LOCALE)
-        private val TAG_FHIR_VERSION = "fhirVersion".toLowerCase(US_LOCALE)
+        private const val TAG_UPDATED_BY_PARTNER = "updatedbypartner"
+        private const val TAG_FHIR_VERSION = "fhirversion"
         private const val TAG_APPDATA_KEY = "flag"
         private const val TAG_APPDATA_VALUE = "appdata"
         private const val SEPARATOR = "#"
     }
-
 }

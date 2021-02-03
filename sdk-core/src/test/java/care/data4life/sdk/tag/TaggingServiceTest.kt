@@ -48,7 +48,7 @@ class TaggingServiceTest {
         // Then
         Assert.assertEquals(4, result.size.toLong())
         Assert.assertTrue(result.containsKey(TAG_RESOURCE_TYPE))
-        Assert.assertEquals(resource.resourceType.toLowerCase(Locale.US), result[TAG_RESOURCE_TYPE])
+        Assert.assertEquals(resource.resourceType, result[TAG_RESOURCE_TYPE])
         Assert.assertTrue(result.containsKey(TAG_CLIENT))
         Assert.assertEquals(CLIENT_ID, result[TAG_CLIENT])
         Assert.assertTrue(result.containsKey(TAG_PARTNER))
@@ -70,7 +70,7 @@ class TaggingServiceTest {
         // Then
         Assert.assertEquals(4, result.size.toLong())
         Assert.assertTrue(result.containsKey(TAG_RESOURCE_TYPE))
-        Assert.assertEquals(resource.resourceType.toLowerCase(Locale.US), result[TAG_RESOURCE_TYPE])
+        Assert.assertEquals(resource.resourceType, result[TAG_RESOURCE_TYPE])
         Assert.assertTrue(result.containsKey(TAG_CLIENT))
         Assert.assertEquals(CLIENT_ID, result[TAG_CLIENT])
         Assert.assertTrue(result.containsKey(TAG_PARTNER))
@@ -117,7 +117,7 @@ class TaggingServiceTest {
         Assert.assertTrue(result.containsKey("tag_1_key"))
         Assert.assertTrue(result.containsKey("tag_2_key"))
         Assert.assertTrue(result.containsKey(TAG_RESOURCE_TYPE))
-        Assert.assertEquals(type.resourceType.toLowerCase(Locale.US), result[TAG_RESOURCE_TYPE])
+        Assert.assertEquals(type.resourceType, result[TAG_RESOURCE_TYPE])
         Assert.assertTrue(result.containsKey(TAG_CLIENT))
         Assert.assertEquals(CLIENT_ID, result[TAG_CLIENT])
         Assert.assertTrue(result.containsKey(TAG_PARTNER))
@@ -161,7 +161,7 @@ class TaggingServiceTest {
         // Then
         Assert.assertEquals(1, result.size.toLong())
         Assert.assertTrue(result.containsKey(TAG_RESOURCE_TYPE))
-        Assert.assertEquals(type.resourceType.toLowerCase(Locale.US), result[TAG_RESOURCE_TYPE])
+        Assert.assertEquals(type.resourceType, result[TAG_RESOURCE_TYPE])
     }
 
     @Test
@@ -175,7 +175,7 @@ class TaggingServiceTest {
         // Then
         Assert.assertEquals(1, result.size.toLong())
         Assert.assertTrue(result.containsKey(TAG_RESOURCE_TYPE))
-        Assert.assertEquals(type.resourceType.toLowerCase(Locale.US), result[TAG_RESOURCE_TYPE])
+        Assert.assertEquals(type.resourceType, result[TAG_RESOURCE_TYPE])
     }
 
     @Test

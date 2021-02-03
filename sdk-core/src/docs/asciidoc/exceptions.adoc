@@ -175,6 +175,10 @@ The exception is also thrown during the download of an `Attachment` object from 
 
 |`DataValidationException.InvalidAttachmentPayloadHash`
 | Thrown when the hash attachment is different from the hash obtained from the binary data. This validation is for an upload,update or a download. The hash validation failure indicates that the file integrity has been compromised.
+
+
+|`DataValidationException.AnnotationViolation`
+| Thrown when the given custom annotations contain a string, which is empty or is only composed of space characters. This validation applies on create, update and fetch.
 |===
 
 === Unrecoverable exceptions

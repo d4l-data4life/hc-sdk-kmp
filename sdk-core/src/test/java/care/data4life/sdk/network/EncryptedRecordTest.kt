@@ -18,12 +18,32 @@ package care.data4life.sdk.network
 
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
+import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter
 import com.squareup.moshi.Moshi
+import org.junit.Assert.assertTrue
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class EncryptedRecordTest {
+    @Test
+    fun `it full fills the EncryptedRecord`() {
+        val encryptedDataKey = EncryptedKey("abc")
+        assertTrue(
+                EncryptedRecord(
+                        _commonKeyId = "asd",
+                        identifier = "abc",
+                        encryptedTags = listOf("a", "b", "c"),
+                        encryptedBody = "test",
+                        customCreationDate = null,
+                        encryptedDataKey = encryptedDataKey,
+                        encryptedAttachmentsKey = null,
+                        modelVersion = 23,
+                        updatedDate = null
+                ) as Any is NetworkModelContract.EncryptedRecord
+        )
+    }
+
     @Test
     fun `Given a EncryptedRecord is serialized, it transforms into the valid json format`() {
         val moshi = Moshi.Builder()

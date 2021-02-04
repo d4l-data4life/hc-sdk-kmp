@@ -15,38 +15,37 @@
  */
 package care.data4life.sdk.network.model
 
+import care.data4life.sdk.network.model.NetworkModelContract.EncryptedRecord.Companion.DEFAULT_COMMON_KEY_ID
 import com.squareup.moshi.Json
+
 
 data class EncryptedRecord(
         @field:Json(name = "common_key_id")
         private var _commonKeyId: String?,
         @field:Json(name = "record_id")
-        val identifier: String?,
+        override val identifier: String?,
         @field:Json(name = "encrypted_tags")
-        val encryptedTags: List<String>,
+        override val encryptedTags: List<String>,
         @field:Json(name = "encrypted_body")
-        val encryptedBody: String?,
+        override val encryptedBody: String?,
         @field:Json(name = "date")
-        val customCreationDate: String?,
+        override val customCreationDate: String?,
         @field:Json(name = "encrypted_key")
-        val encryptedDataKey: EncryptedKey,
+        override val encryptedDataKey: EncryptedKey,
         @field:Json(name = "attachment_key")
-        val encryptedAttachmentsKey: EncryptedKey?,
+        override val encryptedAttachmentsKey: EncryptedKey?,
         @field:Json(name = "model_version")
-        val modelVersion: Int,
+        override val modelVersion: Int,
         @field:Json(name = "createdAt")
-        val updatedDate: String? = null
-) {
-    init {
+        override val updatedDate: String? = null
+) : NetworkModelContract.EncryptedRecord {
+
+	init {
         _commonKeyId = _commonKeyId ?: DEFAULT_COMMON_KEY_ID
     }
 
-    val commonKeyId: String
+    override val commonKeyId: String
         get() = this._commonKeyId!!
 
-    val version = 0
-
-    companion object {
-        internal const val DEFAULT_COMMON_KEY_ID = "00000000-0000-0000-0000-000000000000"
-    }
+    override val version = 0
 }

@@ -46,6 +46,8 @@ import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.DecryptedRecordMapper
+import care.data4life.sdk.network.model.EncryptedKey
+import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
@@ -528,7 +530,7 @@ class RecordService(
 
     //region utility methods
     @Throws(IOException::class)
-    internal fun <T : Any> encryptRecord(record: DecryptedBaseRecord<T>): EncryptedRecord {
+    internal fun <T : Any> encryptRecord(record: DecryptedBaseRecord<T>): NetworkModelContract.EncryptedRecord {
         val encryptedTags = encryptTagsAndAnnotations(record.tags!!, record.annotations)
 
         val commonKey = cryptoService.fetchCurrentCommonKey()
@@ -585,7 +587,7 @@ class RecordService(
 
     @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
     internal fun <T : Any> decryptRecord(
-            record: EncryptedRecord,
+            record: NetworkModelContract.EncryptedRecord,
             userId: String
     ): DecryptedBaseRecord<T> {
         if (!ModelVersion.isModelVersionSupported(record.modelVersion)) {
@@ -610,24 +612,24 @@ class RecordService(
 
         builder.setDataKey(dataKey)
 
-        if (record.encryptedAttachmentsKey != null) {
+        if (record.encryptedAttachmentsKey is EncryptedKey) {
             builder.setAttachmentKey(
                     cryptoService.symDecryptSymmetricKey(
                             commonKey,
-                            record.encryptedAttachmentsKey
+                            record.encryptedAttachmentsKey!!
                     ).blockingGet()
             )
         }
 
         return builder.build(
-                if (record.encryptedBody == null || record.encryptedBody.isEmpty()) {
-                    null// Fixme: This is a potential bug
-                } else {
+                if (record.encryptedBody is String && record.encryptedBody!!.isNotEmpty()) {
                     fhirService.decryptResource<T>(
                             dataKey,
                             tags,
-                            record.encryptedBody
+                            record.encryptedBody!!
                     )
+                } else {
+                    null// Fixme: This is a potential bug
                 }
         ) as DecryptedBaseRecord<T>
     }

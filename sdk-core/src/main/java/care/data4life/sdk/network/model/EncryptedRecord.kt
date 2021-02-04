@@ -40,7 +40,7 @@ data class EncryptedRecord(
         override val updatedDate: String? = null
 ) : NetworkModelContract.EncryptedRecord {
 
-	init {
+    init {
         _commonKeyId = _commonKeyId ?: DEFAULT_COMMON_KEY_ID
     }
 

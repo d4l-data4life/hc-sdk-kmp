@@ -54,6 +54,7 @@ dependencies {
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
     testImplementation(Dependencies.Java.Test.junit)
+    testImplementation(Dependencies.Java.Test.kotlinTest)
 
     testImplementation(Dependencies.Java.Test.mockitoInline)
     testImplementation(Dependencies.Java.Test.truth)

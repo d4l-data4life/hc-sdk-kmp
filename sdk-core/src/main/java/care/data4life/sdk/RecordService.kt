@@ -29,7 +29,7 @@ import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3Identifier
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.FhirService
+import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
@@ -53,8 +53,7 @@ import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.record.RecordContract
-import care.data4life.sdk.tag.TagEncryptionService
-import care.data4life.sdk.tag.TaggingService
+import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
@@ -84,9 +83,9 @@ class RecordService(
         private val partnerId: String,
         private val alias: String,
         private val apiService: ApiService,
-        private val tagEncryptionService: TagEncryptionService,
-        private val taggingService: TaggingService,
-        private val fhirService: FhirService,
+        private val tagEncryptionService: TaggingContract.EncryptionService,
+        private val taggingService: TaggingContract.Service,
+        private val fhirService: FhirContract.Service,
         private val attachmentService: AttachmentContract.Service,
         private val cryptoService: CryptoService,
         private val errorHandler: SdkContract.ErrorHandler
@@ -103,7 +102,7 @@ class RecordService(
 
     private val recordFactory: RecordFactory = RecordMapper
     private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper = SdkFhirAttachmentHelper
-    private val attchachmentFactory: WrapperFactoryContract.AttachmentFactory = SdkAttachmentFactory
+    private val attachmentFactory: WrapperFactoryContract.AttachmentFactory = SdkAttachmentFactory
     private val identifierFactory: WrapperFactoryContract.IdentifierFactory = SdkIdentifierFactory
 
     private fun isFhir(resource: Any?): Boolean = resource is Fhir3Resource || resource is Fhir4Resource
@@ -726,7 +725,7 @@ class RecordService(
             val data = HashMap<Any, String?>(attachments.size)
             for (rawAttachment in attachments) {
                 if (rawAttachment != null) {
-                    val attachment = attchachmentFactory.wrap(rawAttachment)
+                    val attachment = attachmentFactory.wrap(rawAttachment)
 
                     if (attachment.data != null) {
                         data[rawAttachment] = attachment.data
@@ -827,7 +826,7 @@ class RecordService(
         for (rawAttachment in attachments) {
             if (rawAttachment != null) {
 
-                val attachment = attchachmentFactory.wrap(rawAttachment)
+                val attachment = attachmentFactory.wrap(rawAttachment)
 
                 when {
                     attachment.id != null ->
@@ -886,7 +885,7 @@ class RecordService(
 
         for (rawAttachment in attachments) {
             if (rawAttachment != null) {
-                val attachment = attchachmentFactory.wrap(rawAttachment)
+                val attachment = attachmentFactory.wrap(rawAttachment)
 
                 if (attachment.id != null) {
                     oldAttachments[attachment.id] = attachment
@@ -898,7 +897,7 @@ class RecordService(
         val newAttachments = fhirAttachmentHelper.getAttachment(newResource) ?: listOf<Any>()
         for (rawNewAttachment in newAttachments) {
             if (rawNewAttachment != null) {
-                val newAttachment = attchachmentFactory.wrap(rawNewAttachment)
+                val newAttachment = attachmentFactory.wrap(rawNewAttachment)
 
                 when {
                     newAttachment.hash == null || newAttachment.size == null ->
@@ -956,7 +955,7 @@ class RecordService(
         rawAttachments.forEach {
             it?.id ?: throw DataValidationException.IdUsageViolation("Attachment.id expected")
 
-            attachments.add(attchachmentFactory.wrap(it))
+            attachments.add(attachmentFactory.wrap(it))
         }
 
         @Suppress("CheckResult")
@@ -1038,7 +1037,7 @@ class RecordService(
             type: DownloadType?
     ) {
         for (rawAttachment in attachments) {
-            val attachment = attchachmentFactory.wrap(rawAttachment)
+            val attachment = attachmentFactory.wrap(rawAttachment)
             val additionalIds = extractAdditionalAttachmentIds(
                     identifiers,
                     attachment.id
@@ -1108,7 +1107,7 @@ class RecordService(
 
             currentAttachments.forEach {
                 if (it != null) {
-                    val attachment = attchachmentFactory.wrap(it)
+                    val attachment = attachmentFactory.wrap(it)
                     if (attachment.id != null) {
                         currentAttachmentIds.add(attachment.id!!)
                     }
@@ -1138,7 +1137,7 @@ class RecordService(
             for (rawAttachment in attachments) {
                 rawAttachment ?: return
 
-                val attachment = attchachmentFactory.wrap(rawAttachment)
+                val attachment = attachmentFactory.wrap(rawAttachment)
 
                 val data = decode(attachment.data!!)
                 if (recognizeMimeType(data) == MimeType.UNKNOWN) {

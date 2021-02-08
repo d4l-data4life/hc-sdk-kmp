@@ -18,7 +18,8 @@ package care.data4life.sdk.fhir
 
 import care.data4life.crypto.GCKey
 
-internal interface FhirContract {
+//TODO: make internal
+interface FhirContract {
 
     interface Service {
         fun _encryptResource(dataKey: GCKey, resource: Any): String

@@ -69,8 +69,6 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.times
-import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalDateTime
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import care.data4life.fhir.r4.model.Patient as Fhir4Patient
@@ -652,7 +650,7 @@ class RecordServiceTest : RecordServiceTestBase() {
 
         //then
         val d4lNamespacePos = 0
-        Truth.assertThat(additionalIds).hasLength(DOWNSCALED_ATTACHMENT_IDS_SIZE)
+        Truth.assertThat(additionalIds).hasSize(DOWNSCALED_ATTACHMENT_IDS_SIZE)
         Truth.assertThat(additionalIds!![d4lNamespacePos]).isEqualTo(DOWNSCALED_ATTACHMENT_IDS_FMT)
         Truth.assertThat(additionalIds[FULL_ATTACHMENT_ID_POS]).isEqualTo(ATTACHMENT_ID)
         Truth.assertThat(additionalIds[PREVIEW_ID_POS]).isEqualTo(PREVIEW_ID)
@@ -693,7 +691,7 @@ class RecordServiceTest : RecordServiceTestBase() {
 
         //then
         val d4lNamespacePos = 0
-        Truth.assertThat(additionalIds).hasLength(DOWNSCALED_ATTACHMENT_IDS_SIZE)
+        Truth.assertThat(additionalIds).hasSize(DOWNSCALED_ATTACHMENT_IDS_SIZE)
         Truth.assertThat(additionalIds!![d4lNamespacePos]).isEqualTo(DOWNSCALED_ATTACHMENT_IDS_FMT)
         Truth.assertThat(additionalIds[FULL_ATTACHMENT_ID_POS]).isEqualTo(ATTACHMENT_ID)
         Truth.assertThat(additionalIds[PREVIEW_ID_POS]).isEqualTo(PREVIEW_ID)

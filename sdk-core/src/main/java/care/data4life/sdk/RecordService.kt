@@ -46,6 +46,8 @@ import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.DecryptedRecordMapper
+import care.data4life.sdk.network.model.EncryptedKey
+import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
@@ -528,7 +530,7 @@ class RecordService(
 
     //region utility methods
     @Throws(IOException::class)
-    internal fun <T : Any> encryptRecord(record: DecryptedBaseRecord<T>): EncryptedRecord {
+    internal fun <T : Any> encryptRecord(record: DecryptedBaseRecord<T>): NetworkModelContract.EncryptedRecord {
         val encryptedTags = encryptTagsAndAnnotations(record.tags!!, record.annotations)
 
         val commonKey = cryptoService.fetchCurrentCommonKey()
@@ -537,7 +539,7 @@ class RecordService(
                 commonKey,
                 KeyType.DATA_KEY,
                 record.dataKey!!
-        ).blockingGet()
+        ).blockingGet() as EncryptedKey
 
         val encryptedResource = fhirService._encryptResource(record.dataKey!!, record.resource)
 
@@ -548,7 +550,7 @@ class RecordService(
                     commonKey,
                     KeyType.ATTACHMENT_KEY,
                     record.attachmentsKey!!
-            ).blockingGet()
+            ).blockingGet() as EncryptedKey
         }
 
         return EncryptedRecord(
@@ -558,7 +560,7 @@ class RecordService(
                 encryptedResource,
                 record.customCreationDate,
                 encryptedDataKey,
-                encryptedAttachmentsKey,
+                encryptedAttachmentsKey ,
                 record.modelVersion
         )
     }
@@ -585,7 +587,7 @@ class RecordService(
 
     @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
     internal fun <T : Any> decryptRecord(
-            record: EncryptedRecord,
+            record: NetworkModelContract.EncryptedRecord,
             userId: String
     ): DecryptedBaseRecord<T> {
         if (!ModelVersion.isModelVersionSupported(record.modelVersion)) {
@@ -610,25 +612,27 @@ class RecordService(
 
         builder.setDataKey(dataKey)
 
-        if (record.encryptedAttachmentsKey != null) {
+        val attachmentKey = record.encryptedAttachmentsKey
+        if (attachmentKey is EncryptedKey) {
             builder.setAttachmentKey(
-                    cryptoService.symDecryptSymmetricKey(
-                            commonKey,
-                            record.encryptedAttachmentsKey
-                    ).blockingGet()
+                cryptoService.symDecryptSymmetricKey(
+                    commonKey,
+                    attachmentKey
+                ).blockingGet()
             )
         }
 
+        val body = record.encryptedBody
         return builder.build(
-                if (record.encryptedBody == null || record.encryptedBody.isEmpty()) {
-                    null// Fixme: This is a potential bug
-                } else {
-                    fhirService.decryptResource<T>(
-                            dataKey,
-                            tags,
-                            record.encryptedBody
-                    )
-                }
+            if (body is String && body.isNotEmpty()) {
+                fhirService.decryptResource<T>(
+                    dataKey,
+                    tags,
+                    body
+                )
+            } else {
+                null// Fixme: This is a potential bug
+            }
         ) as DecryptedBaseRecord<T>
     }
 

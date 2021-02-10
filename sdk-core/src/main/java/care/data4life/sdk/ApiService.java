@@ -33,6 +33,7 @@ import care.data4life.sdk.network.IHCService;
 import care.data4life.sdk.network.model.CommonKeyResponse;
 import care.data4life.sdk.network.model.DocumentUploadResponse;
 import care.data4life.sdk.network.model.EncryptedRecord;
+import care.data4life.sdk.network.model.NetworkModelContract;
 import care.data4life.sdk.network.model.UserInfo;
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter;
 import care.data4life.sdk.util.Base64;
@@ -236,8 +237,8 @@ public final class ApiService {
         return service.uploadTagEncryptionKey(alias, userId, params);
     }
 
-    Single<EncryptedRecord> createRecord(String alias, String userId, EncryptedRecord encryptedRecord) {
-        return service.createRecord(alias, userId, encryptedRecord);
+    Single<EncryptedRecord> createRecord(String alias, String userId, NetworkModelContract.EncryptedRecord encryptedRecord) {
+        return service.createRecord(alias, userId, (EncryptedRecord) encryptedRecord);
     }
 
     Observable<List<EncryptedRecord>> fetchRecords(String alias,
@@ -261,8 +262,8 @@ public final class ApiService {
     Single<EncryptedRecord> updateRecord(String alias,
                                          String userId,
                                          String recordId,
-                                         EncryptedRecord encryptedRecord) {
-        return service.updateRecord(alias, userId, recordId, encryptedRecord);
+                                         NetworkModelContract.EncryptedRecord encryptedRecord) {
+        return service.updateRecord(alias, userId, recordId, (EncryptedRecord) encryptedRecord);
     }
 
     // TODO remove public

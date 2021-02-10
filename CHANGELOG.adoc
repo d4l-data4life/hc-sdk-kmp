@@ -20,6 +20,9 @@ toc::[]
 * Tags are now encoded (URI) and in lowercase
 * Annotations are now encoded (URI), in lowercase and fail, if they are empty
 * TagHelper -> TagEncryptionHelper
+* `EncryptedRecord`, `EncryptedKey`, `EncryptedKeyTypeAdapter` to Kotlin
+* CryptoService#encryptString -> CryptoService#encryptAndEncodeString
+* CryptoService#decryptString -> CryptoService#decodeAndDecryptString
 
 === Removed
 * RxJava from TagEncryptionService

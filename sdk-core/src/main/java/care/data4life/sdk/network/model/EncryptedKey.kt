@@ -13,25 +13,21 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
+package care.data4life.sdk.network.model
 
-package care.data4life.sdk.network.typeadapter;
+import care.data4life.sdk.util.Base64
 
-import com.squareup.moshi.FromJson;
-import com.squareup.moshi.ToJson;
+data class EncryptedKey internal constructor(
+    override val base64Key: String
+): NetworkModelContract.EncryptedKey {
+    override fun decode(): ByteArray = Base64.decode(base64Key)
 
-import care.data4life.sdk.network.model.EncryptedKey;
-
-public class EncryptedKeyTypeAdapter {
-
-    @ToJson
-    String toJson(EncryptedKey encryptedKey) {
-        return encryptedKey.getEncryptedKey();
-    }
-
-    @FromJson
-    EncryptedKey fromJson(String encryptedKey) {
-        if (encryptedKey != null && encryptedKey.length() > 0)
-            return new EncryptedKey(encryptedKey);
-        else return null;
+    companion object Factory: NetworkModelContract.EncryptedKeyMaker {
+        @JvmStatic
+        override fun create(key: ByteArray): NetworkModelContract.EncryptedKey {
+            return EncryptedKey(
+                Base64.encodeToString(key)
+            )
+        }
     }
 }

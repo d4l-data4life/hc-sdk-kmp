@@ -111,7 +111,7 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
 
         // decrypt Resource
-        every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
+        every { cryptoService.decodeAndDecryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
 
         // Get attachment
         every {
@@ -146,9 +146,9 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
-
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         downloadAttachmentsFlow(
                 "42",
@@ -197,8 +197,9 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
 
         downloadAttachmentsFlow(

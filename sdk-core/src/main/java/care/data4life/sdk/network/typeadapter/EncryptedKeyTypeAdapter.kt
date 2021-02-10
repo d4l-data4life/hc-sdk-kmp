@@ -13,25 +13,22 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
+package care.data4life.sdk.network.typeadapter
 
-package care.data4life.sdk.network.typeadapter;
+import care.data4life.sdk.network.model.EncryptedKey
+import com.squareup.moshi.FromJson
+import com.squareup.moshi.ToJson
 
-import com.squareup.moshi.FromJson;
-import com.squareup.moshi.ToJson;
-
-import care.data4life.sdk.network.model.EncryptedKey;
-
-public class EncryptedKeyTypeAdapter {
-
+class EncryptedKeyTypeAdapter {
     @ToJson
-    String toJson(EncryptedKey encryptedKey) {
-        return encryptedKey.getEncryptedKey();
-    }
+    fun toJson(encryptedKey: EncryptedKey): String = encryptedKey.base64Key
 
     @FromJson
-    EncryptedKey fromJson(String encryptedKey) {
-        if (encryptedKey != null && encryptedKey.length() > 0)
-            return new EncryptedKey(encryptedKey);
-        else return null;
+    fun fromJson(encryptedKey: String?): EncryptedKey? {
+        return if (encryptedKey != null && encryptedKey.isNotEmpty()) {
+            EncryptedKey(encryptedKey)
+        } else {
+            null
+        }
     }
 }

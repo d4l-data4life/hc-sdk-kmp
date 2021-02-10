@@ -34,13 +34,13 @@ class EncryptedKeyTest {
     }
 
     @Test
-    fun `given create is called, it creates a new EncryptedKey`() {
+    fun `Given create is called, it creates a new EncryptedKey`() {
         val key = EncryptedKey.create("test".toByteArray())
         assertTrue((key as Any) is NetworkModelContract.EncryptedKey)
     }
 
     @Test
-    fun `given create is called, it encodes the given key`() {
+    fun `Given create is called, it encodes the given key`() {
         // Given
         val expected = "potato"
         val givenValue = "test"
@@ -61,7 +61,7 @@ class EncryptedKeyTest {
     }
 
     @Test
-    fun `given decode is called, it decodes the given key`() {
+    fun `Given decode is called, it decodes the given key`() {
         // Given
         val expected = "test".toByteArray()
         val storedValue = "potato"

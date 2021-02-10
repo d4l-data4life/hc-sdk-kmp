@@ -60,6 +60,15 @@ class NetworkModelContract {
         }
     }
 
+    interface EncryptedKey {
+        val base64Key: String
+        fun decode(): ByteArray
+    }
+
+    internal interface EncryptedKeyMaker {
+        fun create(key: ByteArray): EncryptedKey
+    }
+
     // TODO: internal
     interface EncryptedRecord {
         val commonKeyId: String

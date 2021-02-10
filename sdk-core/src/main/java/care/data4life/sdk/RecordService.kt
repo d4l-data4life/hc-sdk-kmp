@@ -539,7 +539,7 @@ class RecordService(
                 commonKey,
                 KeyType.DATA_KEY,
                 record.dataKey!!
-        ).blockingGet()
+        ).blockingGet() as EncryptedKey
 
         val encryptedResource = fhirService._encryptResource(record.dataKey!!, record.resource)
 
@@ -550,7 +550,7 @@ class RecordService(
                     commonKey,
                     KeyType.ATTACHMENT_KEY,
                     record.attachmentsKey!!
-            ).blockingGet()
+            ).blockingGet() as EncryptedKey
         }
 
         return EncryptedRecord(
@@ -560,7 +560,7 @@ class RecordService(
                 encryptedResource,
                 record.customCreationDate,
                 encryptedDataKey,
-                encryptedAttachmentsKey,
+                encryptedAttachmentsKey ,
                 record.modelVersion
         )
     }

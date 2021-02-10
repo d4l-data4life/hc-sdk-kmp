@@ -15,4 +15,19 @@
  */
 package care.data4life.sdk.network.model
 
-data class EncryptedKey(val encryptedKey: String)
+import care.data4life.sdk.util.Base64
+
+data class EncryptedKey internal constructor(
+    override val base64Key: String
+): NetworkModelContract.EncryptedKey {
+    override fun decode(): ByteArray = Base64.decode(base64Key)
+
+    companion object Factory: NetworkModelContract.EncryptedKeyMaker {
+        @JvmStatic
+        override fun create(key: ByteArray): NetworkModelContract.EncryptedKey {
+            return EncryptedKey(
+                Base64.encodeToString(key)
+            )
+        }
+    }
+}

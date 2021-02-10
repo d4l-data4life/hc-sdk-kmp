@@ -145,7 +145,7 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
         every { cryptoService.fetchCurrentCommonKey() } returns commonKey
         every { cryptoService.currentCommonKeyId } returns commonKeyId
         every { cryptoService.encryptSymmetricKey(commonKey, KeyType.DATA_KEY, dataKey) } returns Single.just(encryptedDataKey)
-        every { cryptoService.encryptString(dataKey, stringifiedResource) } returns Single.just(encryptedBody)
+        every { cryptoService.encryptAndEncodeString(dataKey, stringifiedResource) } returns Single.just(encryptedBody)
 
         //encrypt Attachment
         every {
@@ -204,7 +204,7 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
         every {
-            cryptoService.decryptString(dataKey, encryptedBody)
+            cryptoService.decodeAndDecryptString(dataKey, encryptedBody)
         } returns Single.just(stringifiedResource)
     }
 

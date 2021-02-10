@@ -176,7 +176,7 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
             Single.just(dataKeys.removeAt(0))
         }
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
-        every { cryptoService.decryptString(dataKeyRound1, eq(encryptedBody)) } returns Single.just(
+        every { cryptoService.decodeAndDecryptString(dataKeyRound1, eq(encryptedBody)) } returns Single.just(
                 stringifiedResource
         )
 
@@ -235,7 +235,7 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         every { cryptoService.fetchCurrentCommonKey() } returns commonKey
         every { cryptoService.currentCommonKeyId } returns commonKeyId
         every { cryptoService.encryptSymmetricKey(commonKey, KeyType.DATA_KEY, dataKeyRound1) } returns Single.just(encryptedDataKey)
-        every { cryptoService.encryptString(dataKeyRound1, eq(updatedResourceString)) } returns Single.just(updatedEncryptedBody)
+        every { cryptoService.encryptAndEncodeString(dataKeyRound1, eq(updatedResourceString)) } returns Single.just(updatedEncryptedBody)
 
         //encrypt Attachment
         every {
@@ -247,7 +247,7 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         } returns Single.just(updatedEncryptedRecord)
 
         // decrypt Record
-        every { cryptoService.decryptString(dataKeyRound2, eq(updatedEncryptedBody)) } returns Single.just(updatedResourceString)
+        every { cryptoService.decodeAndDecryptString(dataKeyRound2, eq(updatedEncryptedBody)) } returns Single.just(updatedResourceString)
     }
 
     private fun runDataFlow(

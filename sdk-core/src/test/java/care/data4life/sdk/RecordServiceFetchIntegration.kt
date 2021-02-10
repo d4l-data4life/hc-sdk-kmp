@@ -137,7 +137,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
-        every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
+        every { cryptoService.decodeAndDecryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
     }
 
     private fun runDataFlow(
@@ -288,8 +288,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
-        every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
-        every { cryptoService.decryptString(dataKey, encryptedBody2) } returns Single.just(stringifiedResource2)
+        every { cryptoService.decodeAndDecryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
+        every { cryptoService.decodeAndDecryptString(dataKey, encryptedBody2) } returns Single.just(stringifiedResource2)
     }
 
     fun runDataFlowBatch(

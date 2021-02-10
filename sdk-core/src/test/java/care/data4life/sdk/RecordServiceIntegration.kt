@@ -111,7 +111,7 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
 
         // decrypt Resource
-        every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
+        every { cryptoService.decodeAndDecryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
 
         // Get attachment
         every {

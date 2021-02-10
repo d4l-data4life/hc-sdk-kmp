@@ -612,25 +612,27 @@ class RecordService(
 
         builder.setDataKey(dataKey)
 
-        if (record.encryptedAttachmentsKey is EncryptedKey) {
+        val attachmentKey = record.encryptedAttachmentsKey
+        if (attachmentKey is EncryptedKey) {
             builder.setAttachmentKey(
-                    cryptoService.symDecryptSymmetricKey(
-                            commonKey,
-                            record.encryptedAttachmentsKey!!
-                    ).blockingGet()
+                cryptoService.symDecryptSymmetricKey(
+                    commonKey,
+                    attachmentKey
+                ).blockingGet()
             )
         }
 
+        val body = record.encryptedBody
         return builder.build(
-                if (record.encryptedBody is String && record.encryptedBody!!.isNotEmpty()) {
-                    fhirService.decryptResource<T>(
-                            dataKey,
-                            tags,
-                            record.encryptedBody!!
-                    )
-                } else {
-                    null// Fixme: This is a potential bug
-                }
+            if (body is String && body.isNotEmpty()) {
+                fhirService.decryptResource<T>(
+                    dataKey,
+                    tags,
+                    body
+                )
+            } else {
+                null// Fixme: This is a potential bug
+            }
         ) as DecryptedBaseRecord<T>
     }
 

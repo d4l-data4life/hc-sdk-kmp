@@ -17,31 +17,72 @@
 package care.data4life.sdk
 
 import care.data4life.fhir.stu3.model.CarePlan
-import com.google.common.truth.Truth
+import care.data4life.sdk.RecordServiceTestBase.Companion.ALIAS
+import care.data4life.sdk.RecordServiceTestBase.Companion.ANNOTATIONS
+import care.data4life.sdk.RecordServiceTestBase.Companion.PARTNER_ID
+import care.data4life.sdk.RecordServiceTestBase.Companion.USER_ID
+import care.data4life.sdk.attachment.AttachmentContract
+import care.data4life.sdk.fhir.FhirContract
+import care.data4life.sdk.tag.TaggingContract
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import io.reactivex.Single
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito
 import java.io.IOException
+import java.util.*
+import kotlin.test.assertEquals
 
-class RecordServiceCountRecordsTest : RecordServiceTestBase() {
+class RecordServiceCountRecordsTest {
+    private lateinit var recordService: RecordService
+    private lateinit var apiService: ApiService
+    private lateinit var cryptoService: CryptoService
+    private lateinit var fhirService: FhirContract.Service
+    private lateinit var tagEncryptionService: TaggingContract.EncryptionService
+    private lateinit var taggingService: TaggingContract.Service
+    private lateinit var attachmentService: AttachmentContract.Service
+    private lateinit var errorHandler: SdkContract.ErrorHandler
+    private lateinit var tags: HashMap<String, String>
+    private lateinit var encryptedTags: MutableList<String>
+    private val defaultAnnotation: MutableList<String> = mutableListOf()
+    private lateinit var encryptedAnnotations: MutableList<String>
+
     @Before
-    fun setup() {
-        init()
-    }
+    fun setUp() {
+        apiService = mockk()
+        cryptoService = mockk()
+        fhirService = mockk()
+        tagEncryptionService = mockk()
+        taggingService = mockk()
+        attachmentService = mockk()
+        errorHandler = mockk()
+        tags = mockk()
+        encryptedTags = mockk()
+        encryptedAnnotations = mockk()
 
-    @After
-    fun tearDown() {
-        stop()
+        recordService = spyk(RecordService(
+                PARTNER_ID,
+                ALIAS,
+                apiService,
+                tagEncryptionService,
+                taggingService,
+                fhirService,
+                attachmentService,
+                cryptoService,
+                errorHandler
+        ))
     }
 
     @Test
-    @Throws(InterruptedException::class)
+    @Throws(InterruptedException::class, IOException::class)
     fun `Given, countRecords is called with a DomainResource and a UserId, it returns amount of occurrences`() {
         // Given
-        Mockito.`when`(mockApiService.getCount(ALIAS, USER_ID, null)).thenReturn(Single.just(2))
+        val response = 42
+
+        every { apiService.getCount(ALIAS, USER_ID, null) } returns Single.just(response)
+
         // When
         val observer = recordService.countRecords(null, USER_ID).test().await()
 
@@ -51,22 +92,25 @@ class RecordServiceCountRecordsTest : RecordServiceTestBase() {
                 .assertComplete()
                 .assertValueCount(1)
                 .values()[0]
-        Truth.assertThat(result).isEqualTo(2)
-        inOrder.verify(mockApiService).getCount(ALIAS, USER_ID, null)
-        inOrder.verifyNoMoreInteractions()
+
+        assertEquals(
+                expected = response,
+                actual = result
+        )
+        verify(exactly = 1) { apiService.getCount(ALIAS, USER_ID, null) }
     }
 
     @Test
     @Throws(InterruptedException::class, IOException::class)
     fun `Given, countRecords is called with a DomainResource, a UserId and a Tag, it returns amount of occurrences`() {
         // Given
-        @Suppress("UNCHECKED_CAST")
-        Mockito.`when`(mockTaggingService.getTagFromType(CarePlan::class.java as Class<Any>)).thenReturn(mockTags)
-        Mockito.`when`(mockTagEncryptionService.encryptTags(mockTags)).thenReturn(mockEncryptedTags)
-        Mockito.`when`(
-                mockTagEncryptionService.encryptAnnotations(ArgumentMatchers.anyList())
-        ).thenReturn(mockEncryptedAnnotations)
-        Mockito.`when`(mockApiService.getCount(ALIAS, USER_ID, mockEncryptedTags)).thenReturn(Single.just(2))
+        val response = 42
+
+        every { taggingService.getTagFromType(CarePlan::class.java as Class<Any>) } returns tags
+        every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
+        every { tagEncryptionService.encryptAnnotations(defaultAnnotation) } returns defaultAnnotation
+        every { encryptedTags.addAll(defaultAnnotation) } returns true
+        every { apiService.getCount(ALIAS, USER_ID, encryptedTags) } returns Single.just(response)
 
         // When
         val observer = recordService.countRecords(CarePlan::class.java, USER_ID).test().await()
@@ -77,19 +121,25 @@ class RecordServiceCountRecordsTest : RecordServiceTestBase() {
                 .assertComplete()
                 .assertValueCount(1)
                 .values()[0]
-        Truth.assertThat(result).isEqualTo(2)
-        inOrder.verify(mockTaggingService).getTagFromType(CarePlan::class.java as Class<Any>)
-        inOrder.verify(mockTagEncryptionService).encryptTags(mockTags)
-        inOrder.verify(mockTagEncryptionService).encryptAnnotations(ArgumentMatchers.anyList())
-        inOrder.verify(mockApiService).getCount(ALIAS, USER_ID, mockEncryptedTags)
-        inOrder.verifyNoMoreInteractions()
+
+        assertEquals(
+                expected = response,
+                actual = result
+        )
+        verify(exactly = 1) { taggingService.getTagFromType(CarePlan::class.java as Class<Any>) }
+        verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
+        verify(exactly = 1) { tagEncryptionService.encryptAnnotations(defaultAnnotation) }
+        verify(exactly = 1) { encryptedTags.addAll(defaultAnnotation) }
+        verify(exactly = 1) { apiService.getCount(ALIAS, USER_ID, encryptedTags) }
     }
 
     @Test
     @Throws(InterruptedException::class)
     fun `Given, countRecords is called with a DomainResource, a UserId and Annotations, it returns amount of occurrences`() {
         // Given
-        Mockito.`when`(mockApiService.getCount(ALIAS, USER_ID, null)).thenReturn(Single.just(2))
+        val response = 42
+
+        every { apiService.getCount(ALIAS, USER_ID, null) } returns Single.just(response)
 
         // When
         val observer = recordService.countRecords(null, USER_ID, ANNOTATIONS).test().await()
@@ -100,21 +150,25 @@ class RecordServiceCountRecordsTest : RecordServiceTestBase() {
                 .assertComplete()
                 .assertValueCount(1)
                 .values()[0]
-        Truth.assertThat(result).isEqualTo(2)
-        inOrder.verify(mockApiService).getCount(ALIAS, USER_ID, null)
-        inOrder.verifyNoMoreInteractions()
+
+        assertEquals(
+                expected = response,
+                actual = result
+        )
+        verify(exactly = 1) { apiService.getCount(ALIAS, USER_ID, null) }
     }
 
     @Test
     @Throws(InterruptedException::class, IOException::class)
     fun `Given, countRecords is called with a DomainResource, a UserId, a Tag and Annotations, it returns amount of occurrences`() {
         // Given
-        Mockito.`when`(mockTaggingService.getTagFromType(CarePlan::class.java as Class<Any>)).thenReturn(mockTags)
-        Mockito.`when`(mockTagEncryptionService.encryptTags(mockTags)).thenReturn(mockEncryptedTags)
-        Mockito.`when`(
-                mockTagEncryptionService.encryptAnnotations(ANNOTATIONS)
-        ).thenReturn(mockEncryptedAnnotations)
-        Mockito.`when`(mockApiService.getCount(ALIAS, USER_ID, mockEncryptedTags)).thenReturn(Single.just(2))
+        val response = 42
+
+        every { taggingService.getTagFromType(CarePlan::class.java as Class<Any>) } returns tags
+        every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
+        every { tagEncryptionService.encryptAnnotations(ANNOTATIONS) } returns encryptedAnnotations
+        every { encryptedTags.addAll(encryptedAnnotations) } returns true
+        every { apiService.getCount(ALIAS, USER_ID, encryptedTags) } returns Single.just(response)
 
         // When
         val observer = recordService.countRecords(CarePlan::class.java, USER_ID, ANNOTATIONS).test().await()
@@ -125,11 +179,15 @@ class RecordServiceCountRecordsTest : RecordServiceTestBase() {
                 .assertComplete()
                 .assertValueCount(1)
                 .values()[0]
-        Truth.assertThat(result).isEqualTo(2)
-        inOrder.verify(mockTaggingService).getTagFromType(CarePlan::class.java as Class<Any>)
-        inOrder.verify(mockTagEncryptionService).encryptTags(mockTags)
-        inOrder.verify(mockTagEncryptionService).encryptAnnotations(ANNOTATIONS)
-        inOrder.verify(mockApiService).getCount(ALIAS, USER_ID, mockEncryptedTags)
-        inOrder.verifyNoMoreInteractions()
+
+        assertEquals(
+                expected = response,
+                actual = result
+        )
+        verify(exactly = 1) { taggingService.getTagFromType(CarePlan::class.java as Class<Any>) }
+        verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
+        verify(exactly = 1) { tagEncryptionService.encryptAnnotations(ANNOTATIONS) }
+        verify(exactly = 1) { encryptedTags.addAll(encryptedAnnotations) }
+        verify(exactly = 1) { apiService.getCount(ALIAS, USER_ID, encryptedTags) }
     }
 }

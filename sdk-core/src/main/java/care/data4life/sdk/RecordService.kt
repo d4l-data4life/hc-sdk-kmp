@@ -200,7 +200,7 @@ class RecordService(
                 .fromCallable { recordIds }
                 .flatMapIterable { it }
                 .flatMapSingle { recordId ->
-                    deleteRecord(recordId, userId)
+                    deleteRecord(userId, recordId)
                             .doOnError { error ->
                                 failedDeletes.add(
                                         Pair(recordId, errorHandler.handleError(error)))

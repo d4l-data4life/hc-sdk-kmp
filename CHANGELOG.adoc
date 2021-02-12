@@ -23,6 +23,7 @@ toc::[]
 * `EncryptedRecord`, `EncryptedKey`, `EncryptedKeyTypeAdapter` to Kotlin
 * CryptoService#encryptString -> CryptoService#encryptAndEncodeString
 * CryptoService#decryptString -> CryptoService#decodeAndDecryptString
+* RecordService#deleteRecord invocation had mixed user and resource id.
 
 === Removed
 * RxJava from TagEncryptionService

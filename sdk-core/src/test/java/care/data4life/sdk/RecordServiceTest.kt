@@ -908,7 +908,7 @@ class RecordServiceTest : RecordServiceTestBase() {
     @Throws(InterruptedException::class)
     fun deleteRecords_shouldDeleteRecords() {
         // Given
-        Mockito.doReturn(Completable.complete()).`when`(recordService).deleteRecord(RECORD_ID, USER_ID)
+        Mockito.doReturn(Completable.complete()).`when`(recordService).deleteRecord(USER_ID, RECORD_ID)
         val ids = listOf(RECORD_ID, RECORD_ID)
 
         // When
@@ -923,7 +923,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         Truth.assertThat(result.failedDeletes).hasSize(0)
         Truth.assertThat(result.successfulDeletes).hasSize(2)
         inOrder.verify(recordService).deleteRecords(ids, USER_ID)
-        inOrder.verify(recordService, Mockito.times(2)).deleteRecord(RECORD_ID, USER_ID)
+        inOrder.verify(recordService, Mockito.times(2)).deleteRecord(USER_ID, RECORD_ID)
         inOrder.verifyNoMoreInteractions()
     }
 

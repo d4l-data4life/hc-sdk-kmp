@@ -28,6 +28,7 @@ toc::[]
 * RxJava from TagEncryptionService
 
 === Fixed
+* RecordService#deleteRecord invocation had mixed user and resource id.
 
 === Bumped
 

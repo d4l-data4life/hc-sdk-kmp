@@ -125,7 +125,7 @@ public class LegacyDataClient implements SdkContract.LegacyDataClient {
     @Override
     public void deleteRecord(String recordId, Callback listener) {
         Completable operation = userService.getUID()
-                .flatMapCompletable(uid -> recordService.deleteRecord(recordId, uid));
+                .flatMapCompletable(uid -> recordService.deleteRecord(uid, recordId));
         handler.executeCompletable(operation, listener);
     }
 

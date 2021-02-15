@@ -90,6 +90,7 @@ class TaggingService(
                 it[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE
             } else {
                 it[TAG_RESOURCE_TYPE] = fhirElementFactory.getFhirTypeForClass(resourceType)!!
+                it[TAG_FHIR_VERSION] = fhirElementFactory.resolveFhirVersion(resourceType).version
             }
         }
     }

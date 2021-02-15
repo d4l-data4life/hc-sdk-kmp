@@ -204,6 +204,11 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                     tags["resourcetype"]!!.toByteArray()
             ), IV)
         } returns tags["resourcetype"]!!.toByteArray()
+        every {
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["fhirversion"]!!.toByteArray()
+            ), IV)
+        } returns tags["fhirversion"]!!.toByteArray()
 
         // encrypt annotations
         if (annotations.isNotEmpty()) {
@@ -686,7 +691,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 "resourcetype" to "resourcetype=documentreference"
         )
 
-        val encodedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
+        val encodedEncyrptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
+        val encodedEncryptedVersion = "ZmhpcnZlcnNpb249MyUyZTAlMmUx"
 
         encryptedBody = "ZW5jcnlwdGVk"
         encryptedBody2 = "Wlc1amNubHdkR1Zr"
@@ -694,7 +700,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmhpcnZlcnNpb249MyUyZTAlMmUx", encodedResourceType),
+                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", encodedEncryptedVersion, encodedEncyrptedResourceType),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -706,7 +712,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord2 = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmhpcnZlcnNpb249MyUyZTAlMmUx", encodedResourceType),
+                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", encodedEncryptedVersion, encodedEncyrptedResourceType),
                 encryptedBody2,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -718,7 +724,10 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
         stringifiedResource2 = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
 
-        runFhirFlowBatch(tags, encryptedTags = listOf(encodedResourceType))
+        runFhirFlowBatch(
+                tags,
+                encryptedTags = listOf(encodedEncryptedVersion, encodedEncyrptedResourceType)
+        )
 
         // When
         val result = recordService.fetchFhir3Records(
@@ -759,9 +768,12 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 "works" to "custom=works"
         )
 
-        val encodedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
+        val encodedEncyrptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
+        val encodedEncryptedVersion = "ZmhpcnZlcnNpb249MyUyZTAlMmUx"
+
         val encryptedTags = mutableListOf(
-                encodedResourceType,
+                encodedEncryptedVersion,
+                encodedEncyrptedResourceType,
                 "Y3VzdG9tPXdvdw==",
                 "Y3VzdG9tPWl0",
                 "Y3VzdG9tPXdvcmtz"
@@ -776,8 +788,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 listOf(
                         "cGFydG5lcj1iNDY=",
                         "Y2xpZW50PWI0NiUyM3Rlc3Q=",
-                        "ZmhpcnZlcnNpb249MyUyZTAlMmUx",
-                        encodedResourceType,
+                        encodedEncyrptedResourceType,
+                        encodedEncryptedVersion,
                         "Y3VzdG9tPXdvdw==",
                         "Y3VzdG9tPWl0",
                         "Y3VzdG9tPXdvcmtz"
@@ -793,7 +805,13 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord2 = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmhpcnZlcnNpb249MyUyZTAlMmUx", encodedResourceType),
+                listOf(
+                        "cGFydG5lcj1iNDY=",
+                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                        "ZmhpcnZlcnNpb249MyUyZTAlMmUx",
+                        encodedEncyrptedResourceType,
+                        encodedEncryptedVersion
+                ),
                 encryptedBody2,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -838,7 +856,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 "resourcetype" to "resourcetype=documentreference"
         )
 
-        val encodedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
+        val encodedEncyrptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
+        val encodedEncryptedVersion = "ZmhpcnZlcnNpb249NCUyZTAlMmUx"
 
         encryptedBody = "ZW5jcnlwdGVk"
         encryptedBody2 = "Wlc1amNubHdkR1Zr"
@@ -846,7 +865,12 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmhpcnZlcnNpb249NCUyZTAlMmUx", encodedResourceType),
+                listOf(
+                        "cGFydG5lcj1iNDY=",
+                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                        encodedEncryptedVersion,
+                        encodedEncyrptedResourceType
+                ),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -858,7 +882,12 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord2 = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmhpcnZlcnNpb249NCUyZTAlMmUx", encodedResourceType),
+                listOf(
+                        "cGFydG5lcj1iNDY=",
+                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                        encodedEncryptedVersion,
+                        encodedEncyrptedResourceType
+                ),
                 encryptedBody2,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -870,7 +899,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
         stringifiedResource2 = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
 
-        runFhirFlowBatch(tags, encryptedTags = listOf(encodedResourceType))
+        runFhirFlowBatch(tags, encryptedTags = listOf(encodedEncryptedVersion, encodedEncyrptedResourceType))
 
         // When
         val result = recordService.fetchFhir4Records(
@@ -911,9 +940,12 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 "works" to "custom=works"
         )
 
-        val encodedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
+        val encodedEncyrptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
+        val encodedEncryptedVersion = "ZmhpcnZlcnNpb249NCUyZTAlMmUx"
+
         val encryptedTags = mutableListOf(
-                encodedResourceType,
+                encodedEncryptedVersion,
+                encodedEncyrptedResourceType,
                 "Y3VzdG9tPXdvdw==",
                 "Y3VzdG9tPWl0",
                 "Y3VzdG9tPXdvcmtz"
@@ -928,8 +960,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 listOf(
                         "cGFydG5lcj1iNDY=",
                         "Y2xpZW50PWI0NiUyM3Rlc3Q=",
-                        "ZmhpcnZlcnNpb249NCUyZTAlMmUx",
-                        encodedResourceType,
+                        encodedEncryptedVersion,
+                        encodedEncyrptedResourceType,
                         "Y3VzdG9tPXdvdw==",
                         "Y3VzdG9tPWl0",
                         "Y3VzdG9tPXdvcmtz"
@@ -945,7 +977,12 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord2 = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmhpcnZlcnNpb249NCUyZTAlMmUx", encodedResourceType),
+                listOf(
+                        "cGFydG5lcj1iNDY=",
+                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                        encodedEncryptedVersion,
+                        encodedEncyrptedResourceType
+                ),
                 encryptedBody2,
                 CREATION_DATE,
                 encryptedDataKey,

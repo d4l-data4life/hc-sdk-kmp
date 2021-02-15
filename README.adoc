@@ -1,29 +1,25 @@
+= Data4Life SDK
 :library_version: 1.9.1
+:doctype: article
+:!showtitle:
 :toc: macro
 :toclevels: 2
 :toc-title:
+:icons: font
+:imagesdir: assets/images
 ifdef::env-github[]
-:imagesdir: https://github.com/d4l-data4life/hc-sdk-kmp/blob/main/assets/images/
-:link-license: https://github.com/d4l-data4life/hc-sdk-kmp/blob/main/LICENSE
-:link-contribution: https://github.com/d4l-data4life/hc-sdk-kmp/blob/main/CONTRIBUTION.adoc
 :warning-caption: :warning:
 :caution-caption: :fire:
 :important-caption: :exclamation:
 :note-caption: :paperclip:
 :tip-caption: :bulb:
 endif::[]
-ifndef::env-github[]
-:icons: font
-:imagesdir: ./assets/images
-:link-license: ./LICENCE
-:link-contribution: ./CONTRIBUTION.adoc
-endif::[]
 
 ++++
 <div align="center">
     <!-- PROJECT LOGO -->
     <p>
-        <a><img src="https://github.com/d4l-data4life/hc-sdk-kmp/blob/main/assets/images/d4l-logo.svg" width="150"/></a>
+        <a><img src="assets/images/d4l-logo.svg" width="150"/></a>
     </p>
     <!-- PROJECT HEADER -->
     <h1>The Data4Life Android and Java SDK</h1>
@@ -97,7 +93,7 @@ The SDK has the following dependencies:
 === Setup maven repositories
 Add the following maven repository url to your root build.gradle:
 
-Please take a look over at Github https://docs.github.com/en/packages/publishing-and-managing-packages/about-github-packages#about-tokens[aboout-github-packages#tokens, window="_blank"] on how to generate your private token for accessing the Github Package Registry.
+Please take a look over at Github https://docs.github.com/en/packages/publishing-and-managing-packages/about-github-packages#about-tokens[about-github-packages#tokens, window="_blank"] on how to generate your private token for accessing the Github Package Registry.
 Add `gpr.user = {your Github username}` and `gpr.key = {private github access token}` to your `gradle.properties`
 
 [source,gradle]

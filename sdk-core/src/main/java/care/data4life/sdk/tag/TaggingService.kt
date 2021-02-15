@@ -18,6 +18,15 @@ package care.data4life.sdk.tag
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
+import care.data4life.sdk.tag.TaggingContract.Companion.SEPARATOR
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_KEY
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_VALUE
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_CLIENT
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_FHIR_VERSION
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_PARTNER
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_RESOURCE_TYPE
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_UPDATED_BY_CLIENT
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_UPDATED_BY_PARTNER
 import care.data4life.sdk.wrapper.SdkFhirElementFactory
 import care.data4life.sdk.wrapper.WrapperContract
 
@@ -83,17 +92,5 @@ class TaggingService(
                 it[TAG_RESOURCE_TYPE] = fhirElementFactory.getFhirTypeForClass(resourceType)!!
             }
         }
-    }
-
-    companion object {
-        private const val TAG_RESOURCE_TYPE = "resourcetype"
-        private const val TAG_CLIENT = "client"
-        private const val TAG_UPDATED_BY_CLIENT = "updatedbyclient"
-        private const val TAG_PARTNER = "partner"
-        private const val TAG_UPDATED_BY_PARTNER = "updatedbypartner"
-        private const val TAG_FHIR_VERSION = "fhirversion"
-        private const val TAG_APPDATA_KEY = "flag"
-        private const val TAG_APPDATA_VALUE = "appdata"
-        private const val SEPARATOR = "#"
     }
 }

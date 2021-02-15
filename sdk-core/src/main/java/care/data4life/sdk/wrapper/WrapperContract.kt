@@ -19,6 +19,7 @@ package care.data4life.sdk.wrapper
 import care.data4life.fhir.FhirException
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
 
 class WrapperContract {
@@ -41,13 +42,14 @@ class WrapperContract {
         @Throws(CoreRuntimeException.InternalFailure::class)
         fun getFhirTypeForClass(resourceType: Class<out Any>): String?
 
+        fun resolveFhirVersion(resourceType: Class<out Any>): FhirContract.FhirVersion
+
         fun getFhir3ClassForType(resourceType: String): Class<out Fhir3Resource>?
 
         fun getFhir4ClassForType(resourceType: String): Class<out Fhir4Resource>?
     }
 
     interface FhirParser {
-
         @Throws(FhirException::class)
         fun toFhir3(resourceType: String, source: String): Fhir3Resource?
 

@@ -19,14 +19,15 @@ package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir4Attachment
+import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.test.util.AttachmentBuilder
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.util.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import care.data4life.fhir.r4.model.DocumentReference as DocumentReferenceFhir4
 import care.data4life.fhir.stu3.model.DocumentReference as DocumentReferenceFhir3
 
@@ -47,8 +48,8 @@ class FhirElementFactoryTest {
 
         // Then
         assertEquals(
-                "DocumentReference",
-                name
+                expected = "DocumentReference",
+                actual = name
         )
     }
 
@@ -62,21 +63,63 @@ class FhirElementFactoryTest {
 
         // Then
         assertEquals(
-                "DocumentReference",
-                name
+                expected = "DocumentReference",
+                actual = name
         )
     }
 
     @Test
     fun `Given, getFhirTypeForClass is called with a non valid FhirResource Class, it returns fails with CoreRuntimeExceptionInternalFailure`() {
-        try {
-            // When
+        val actual = assertFailsWith<CoreRuntimeException.InternalFailure> {
             SdkFhirElementFactory.getFhirTypeForClass(String::class.java)
-            assertTrue(false)//Fixme
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
         }
+
+        assertEquals(
+                actual = actual.message,
+                expected = "Internal failure"
+        )
+    }
+
+    @Test
+    fun `Given, resolveFhirType is called with a Class of a Fhir3Resource, it returns FHIR_3 as type`() {
+        // Given
+        val resource = buildDocumentReferenceFhir3()
+
+        // When
+        val type = SdkFhirElementFactory.resolveFhirVersion(resource::class.java)
+
+        assertEquals(
+                actual = type,
+                expected = FhirContract.FhirVersion.FHIR_3
+        )
+    }
+
+    @Test
+    fun `Given, resolveFhirType is called with a Class of a Fhir3Resource, it returns FHIR_4 as type`() {
+        // Given
+        val resource = buildDocumentReferenceFhir4()
+
+        // When
+        val type = SdkFhirElementFactory.resolveFhirVersion(resource::class.java)
+
+        assertEquals(
+                actual = type,
+                expected = FhirContract.FhirVersion.FHIR_4
+        )
+    }
+
+    @Test
+    fun `Given, resolveFhirType is called with a Class of a non FhirResource, it returns NO_FHIR as type`() {
+        // Given
+        val resource = "tomato"
+
+        // When
+        val type = SdkFhirElementFactory.resolveFhirVersion(resource::class.java)
+
+        assertEquals(
+                actual = type,
+                expected = FhirContract.FhirVersion.NO_FHIR
+        )
     }
 
     @Test
@@ -84,8 +127,8 @@ class FhirElementFactoryTest {
         val klass = SdkFhirElementFactory.getFhir3ClassForType("DocumentReference")
 
         assertEquals(
-                klass,
-                DocumentReferenceFhir3::class.java
+                actual = klass,
+                expected = DocumentReferenceFhir3::class.java
         )
     }
 
@@ -94,8 +137,8 @@ class FhirElementFactoryTest {
         val klass = SdkFhirElementFactory.getFhir3ClassForType("documentreference")
 
         assertEquals(
-                klass,
-                DocumentReferenceFhir3::class.java
+                actual = klass,
+                expected = DocumentReferenceFhir3::class.java
         )
     }
 
@@ -142,8 +185,8 @@ class FhirElementFactoryTest {
         val klass = SdkFhirElementFactory.getFhir4ClassForType("DocumentReference")
 
         assertEquals(
-                klass,
-                DocumentReferenceFhir4::class.java
+                actual = klass,
+                expected = DocumentReferenceFhir4::class.java
         )
     }
 
@@ -152,8 +195,8 @@ class FhirElementFactoryTest {
         val klass = SdkFhirElementFactory.getFhir4ClassForType("documentreference")
 
         assertEquals(
-                klass,
-                DocumentReferenceFhir4::class.java
+                actual = klass,
+                expected = DocumentReferenceFhir4::class.java
         )
     }
 

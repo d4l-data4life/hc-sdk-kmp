@@ -16,9 +16,8 @@
 package care.data4life.sdk.tag
 
 import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir3Version
 import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.Fhir4Version
+import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.wrapper.SdkFhirElementFactory
 import care.data4life.sdk.wrapper.WrapperContract
 
@@ -60,12 +59,12 @@ class TaggingService(
         return when (resource) {
             is Fhir3Resource -> appendCommonDefaultTags(resource.resourceType, oldTags).also {
                 if (!it.containsKey(TAG_FHIR_VERSION)) {
-                    it[TAG_FHIR_VERSION] = Fhir3Version.version
+                    it[TAG_FHIR_VERSION] = FhirContract.FhirVersion.FHIR_3.version
                 }
             }
             is Fhir4Resource -> appendCommonDefaultTags(resource.resourceType, oldTags).also {
                 if (!it.containsKey(TAG_FHIR_VERSION)) {
-                    it[TAG_FHIR_VERSION] = Fhir4Version.version
+                    it[TAG_FHIR_VERSION] = FhirContract.FhirVersion.FHIR_4.version
                 }
             }
             else -> appendCommonDefaultTags(null, oldTags).also {

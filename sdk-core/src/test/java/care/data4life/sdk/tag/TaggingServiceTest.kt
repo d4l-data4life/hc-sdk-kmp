@@ -19,9 +19,8 @@ package care.data4life.sdk.tag
 import care.data4life.fhir.stu3.model.Patient
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir3Version
 import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.Fhir4Version
+import care.data4life.sdk.fhir.FhirContract
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -55,7 +54,7 @@ class TaggingServiceTest {
         Assert.assertEquals(PARTNER_ID, result[TAG_PARTNER])
         Assert.assertFalse(result.containsKey(TAG_APPDATA_KEY))
         Assert.assertTrue(result.containsKey(TAG_FHIR_VERSION))
-        Assert.assertEquals(Fhir3Version.version, result[TAG_FHIR_VERSION])
+        Assert.assertEquals(FhirContract.FhirVersion.FHIR_3.version, result[TAG_FHIR_VERSION])
         Assert.assertFalse(result.containsKey(TAG_APPDATA_KEY))
     }
 
@@ -77,7 +76,7 @@ class TaggingServiceTest {
         Assert.assertEquals(PARTNER_ID, result[TAG_PARTNER])
         Assert.assertFalse(result.containsKey(TAG_APPDATA_KEY))
         Assert.assertTrue(result.containsKey(TAG_FHIR_VERSION))
-        Assert.assertEquals(Fhir4Version.version, result[TAG_FHIR_VERSION])
+        Assert.assertEquals(FhirContract.FhirVersion.FHIR_4.version, result[TAG_FHIR_VERSION])
         Assert.assertFalse(result.containsKey(TAG_APPDATA_KEY))
     }
 
@@ -123,7 +122,7 @@ class TaggingServiceTest {
         Assert.assertTrue(result.containsKey(TAG_PARTNER))
         Assert.assertEquals(PARTNER_ID, result[TAG_PARTNER])
         Assert.assertTrue(result.containsKey(TAG_FHIR_VERSION))
-        Assert.assertEquals(Fhir3Version.version, result[TAG_FHIR_VERSION])
+        Assert.assertEquals(FhirContract.FhirVersion.FHIR_3.version, result[TAG_FHIR_VERSION])
         Assert.assertFalse(result.containsKey(TAG_APPDATA_KEY))
     }
 
@@ -146,7 +145,7 @@ class TaggingServiceTest {
         Assert.assertTrue(result.containsKey(TAG_PARTNER))
         Assert.assertEquals(PARTNER_ID, result[TAG_PARTNER])
         Assert.assertTrue(result.containsKey(TAG_FHIR_VERSION))
-        Assert.assertEquals(Fhir3Version.version, result[TAG_FHIR_VERSION])
+        Assert.assertEquals(FhirContract.FhirVersion.FHIR_3.version, result[TAG_FHIR_VERSION])
         Assert.assertFalse(result.containsKey(TAG_APPDATA_KEY))
     }
 

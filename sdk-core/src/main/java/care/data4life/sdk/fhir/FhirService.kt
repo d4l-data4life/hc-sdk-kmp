@@ -110,7 +110,7 @@ class FhirService @JvmOverloads constructor(
             tags: HashMap<String, String>,
             resourceType: String
     ): T {
-        return if (tags[TAG_FHIR_VERSION] == Fhir4Version.version) {
+        return if (tags[TAG_FHIR_VERSION] == FhirContract.FhirVersion.FHIR_4.version) {
             parser.toFhir4(resourceType, decryptedResourceJson)
         } else {
             parser.toFhir3(resourceType, decryptedResourceJson)

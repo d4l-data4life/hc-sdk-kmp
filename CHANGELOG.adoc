@@ -29,6 +29,7 @@ toc::[]
 
 === Fixed
 * RecordService#deleteRecord invocation had mixed user and resource id.
+* RecordService#fetchRecords invocation had mixed user and resource id.
 
 === Bumped
 

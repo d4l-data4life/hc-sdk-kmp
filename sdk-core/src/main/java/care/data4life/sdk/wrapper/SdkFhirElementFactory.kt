@@ -42,7 +42,7 @@ internal object SdkFhirElementFactory : WrapperContract.FhirElementFactory {
         return when (resourceType.`package`) {
             fhir3Indicator -> FhirContract.FhirVersion.FHIR_3
             fhir4Indicator -> FhirContract.FhirVersion.FHIR_4
-            else -> FhirContract.FhirVersion.NO_FHIR
+            else -> FhirContract.FhirVersion.UNKNOWN
         }
     }
 

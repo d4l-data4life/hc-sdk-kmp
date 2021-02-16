@@ -118,7 +118,7 @@ class FhirElementFactoryTest {
 
         assertEquals(
                 actual = type,
-                expected = FhirContract.FhirVersion.NO_FHIR
+                expected = FhirContract.FhirVersion.UNKNOWN
         )
     }
 

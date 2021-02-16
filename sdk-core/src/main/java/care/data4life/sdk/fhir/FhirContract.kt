@@ -19,7 +19,7 @@ package care.data4life.sdk.fhir
 import care.data4life.crypto.GCKey
 
 //TODO: make internal
-class FhirContract {
+interface FhirContract {
 
     interface Service {
         fun _encryptResource(dataKey: GCKey, resource: Any): String
@@ -34,6 +34,6 @@ class FhirContract {
     enum class FhirVersion(val version: String) {
         FHIR_3("3.0.1"),
         FHIR_4("4.0.1"),
-        NO_FHIR("invalid")
+        UNKNOWN("unknown")
     }
 }

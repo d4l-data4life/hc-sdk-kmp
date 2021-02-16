@@ -23,7 +23,7 @@ toc::[]
 * `EncryptedRecord`, `EncryptedKey`, `EncryptedKeyTypeAdapter` to Kotlin
 * CryptoService#encryptString -> CryptoService#encryptAndEncodeString
 * CryptoService#decryptString -> CryptoService#decodeAndDecryptString
-* TaggingService#getTagFromType now tags now FhirResourceType and FhirVersion
+* TaggingService#getTagFromType tags now FhirResourceType and FhirVersion
 
 === Removed
 * RxJava from TagEncryptionService
@@ -45,7 +45,6 @@ toc::[]
 * RecordService#checkDataRestrictions for Resources with unextractable Attachments
 * missing Task in SDKContract for some of the operations
 * all Errors to be reported to our Logger
-* RecordService#fetchRecords had been mixed up parameter.
 
 === Bumped
 

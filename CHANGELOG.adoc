@@ -16,7 +16,10 @@ toc::[]
 
 === Added
 
+* Add information how to use matching fallbacks for Android to README
+
 === Changed
+
 * Tags are now encoded (URI) and in lowercase
 * Annotations are now encoded (URI), in lowercase and fail, if they are empty
 * TagHelper -> TagEncryptionHelper
@@ -25,15 +28,18 @@ toc::[]
 * CryptoService#decryptString -> CryptoService#decodeAndDecryptString
 
 === Removed
+
 * RxJava from TagEncryptionService
 
 === Fixed
+
 * RecordService#deleteRecord invocation had mixed user and resource id.
 * RecordService#fetchRecords invocation had mixed user and resource id.
 
 === Bumped
 
 === Migration
+
 * TODO: search strategy (fetchRecords) for the encoded tags (especially in regards to the Fhir version)
 
 
@@ -49,8 +55,6 @@ toc::[]
 
 * HC-FHIR-SDK 1.1.0 -> 1.2.1
 
-=== Migration
-
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.8.0...v1.9.0[1.9.0]
 
@@ -61,6 +65,7 @@ toc::[]
 * Add FHIR 4 support
 
 === Changed
+
 * Changed internal implementation to support FHIR 4 capabilities
 * `RecordService`, `TaggingService`, `TagEncryptionService`, `Record`, `DecryptedRecord` to Kotlin
 * `TagHelper`, `FhirService`, `ImageResizer`, `FileService`, `NetworkConnectivityService`, `CryptoService` to Kotlin
@@ -79,16 +84,17 @@ toc::[]
 * https://github.com/d4l-data4life/hc-fhir-sdk-java/releases/tag/v1.0.0[FHIR SDK 1.0.0 -> BREAKING change]
 * https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/releases/tag/v1.4.0[FHIR Helper SDK 1.4.0 -> BREAKING change]
 
+
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.7.3...v1.8.0[1.8.0]
 
 === Added
 
 * Add ingestion SDK client (relies on external OAuth handling).
 
+
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.7.2...v1.7.3[1.7.3]
 
 === Added
 
 * SDKContract method to get active user session token
-
 * User service getSessionToken method now returns with an active token not the last known.

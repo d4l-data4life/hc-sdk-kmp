@@ -16,9 +16,12 @@
 
 package care.data4life.sdk.tag
 
+import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.D4LException
 import java.io.IOException
 import kotlin.collections.HashMap
+
+typealias Tags = HashMap<String, String>
 
 class TaggingContract {
 
@@ -28,16 +31,18 @@ class TaggingContract {
                 oldTags: HashMap<String, String>?
         ): HashMap<String, String>
 
-        fun getTagFromType(resourceType: Class<Any>?): HashMap<String, String>
+        fun tagVersion(tags: Tags, version: FhirContract.FhirVersion)
+
+        fun getTagsFromType(resourceType: Class<Any>?): Tags
 
     }
 
     interface EncryptionService {
         @Throws(IOException::class)
-        fun encryptTags(tags: HashMap<String, String>): MutableList<String>
+        fun encryptTags(tags: Tags): MutableList<String>
 
         @Throws(IOException::class)
-        fun decryptTags(encryptedTags: List<String>): HashMap<String, String>
+        fun decryptTags(encryptedTags: List<String>):Tags
 
         @Throws(IOException::class)
         fun encryptAnnotations(annotations: List<String>): MutableList<String>

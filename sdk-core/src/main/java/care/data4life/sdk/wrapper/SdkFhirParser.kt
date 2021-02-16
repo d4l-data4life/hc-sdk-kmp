@@ -18,9 +18,9 @@ internal object SdkFhirParser : WrapperContract.FhirParser {
     }
 
     override fun toFhir4(resourceType: String, source: String): Fhir4Resource {
-        val clazz = fhirElement.getFhir4ClassForType(resourceType)!!
+        val clazz = fhirElement.getFhir4ClassForType(resourceType)
 
-        return fhir4Parser.toFhir(clazz, source)
+        return fhir4Parser.toFhir(clazz!!, source)
     }
 
     override fun fromResource(resource: Any): String? {

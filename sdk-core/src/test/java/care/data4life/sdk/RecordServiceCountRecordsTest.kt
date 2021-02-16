@@ -106,7 +106,7 @@ class RecordServiceCountRecordsTest {
         // Given
         val response = 42
 
-        every { taggingService.getTagFromType(CarePlan::class.java as Class<Any>) } returns tags
+        every { taggingService.getTagsFromType(CarePlan::class.java as Class<Any>) } returns tags
         every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
         every { tagEncryptionService.encryptAnnotations(defaultAnnotation) } returns defaultAnnotation
         every { encryptedTags.addAll(defaultAnnotation) } returns true
@@ -126,7 +126,7 @@ class RecordServiceCountRecordsTest {
                 expected = response,
                 actual = result
         )
-        verify(exactly = 1) { taggingService.getTagFromType(CarePlan::class.java as Class<Any>) }
+        verify(exactly = 1) { taggingService.getTagsFromType(CarePlan::class.java as Class<Any>) }
         verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
         verify(exactly = 1) { tagEncryptionService.encryptAnnotations(defaultAnnotation) }
         verify(exactly = 1) { encryptedTags.addAll(defaultAnnotation) }
@@ -164,7 +164,7 @@ class RecordServiceCountRecordsTest {
         // Given
         val response = 42
 
-        every { taggingService.getTagFromType(CarePlan::class.java as Class<Any>) } returns tags
+        every { taggingService.getTagsFromType(CarePlan::class.java as Class<Any>) } returns tags
         every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
         every { tagEncryptionService.encryptAnnotations(ANNOTATIONS) } returns encryptedAnnotations
         every { encryptedTags.addAll(encryptedAnnotations) } returns true
@@ -184,7 +184,7 @@ class RecordServiceCountRecordsTest {
                 expected = response,
                 actual = result
         )
-        verify(exactly = 1) { taggingService.getTagFromType(CarePlan::class.java as Class<Any>) }
+        verify(exactly = 1) { taggingService.getTagsFromType(CarePlan::class.java as Class<Any>) }
         verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
         verify(exactly = 1) { tagEncryptionService.encryptAnnotations(ANNOTATIONS) }
         verify(exactly = 1) { encryptedTags.addAll(encryptedAnnotations) }

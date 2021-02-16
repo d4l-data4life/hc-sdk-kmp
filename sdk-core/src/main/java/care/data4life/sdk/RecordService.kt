@@ -286,7 +286,7 @@ class RecordService(
         val endTime = if (endDate != null) formatDate(endDate) else null
 
         return Observable
-                .fromCallable { taggingService.getTagFromType(resourceType as Class<Any>?) }
+                .fromCallable { taggingService.getTagsFromType(resourceType as Class<Any>?) }
                 .map { plainTags -> encryptTagsAndAnnotations(plainTags, annotations) }
                 .flatMap {
                     encryptedTags -> apiService.fetchRecords(
@@ -524,7 +524,7 @@ class RecordService(
         apiService.getCount(alias, userId, null)
     } else {
         Single
-                .fromCallable { taggingService.getTagFromType(type as Class<Any>?) }
+                .fromCallable { taggingService.getTagsFromType(type as Class<Any>?) }
                 .map { plainTags -> encryptTagsAndAnnotations(plainTags, annotations) }
                 .flatMap { apiService.getCount(alias, userId, it) }
     }

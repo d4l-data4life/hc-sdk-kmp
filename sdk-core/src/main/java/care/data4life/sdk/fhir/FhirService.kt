@@ -42,7 +42,7 @@ class FhirService @JvmOverloads constructor(
 ) : FhirContract.Service {
     private val parser: WrapperContract.FhirParser = SdkFhirParser
 
-    @Deprecated("Use the new Api")
+    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     @Suppress("UNCHECKED_CAST")
     fun <T : Fhir3Resource> decryptResource(dataKey: GCKey, resourceType: String, encryptedResource: String): T {
         return Single
@@ -60,7 +60,7 @@ class FhirService @JvmOverloads constructor(
                 .blockingGet() as T
     }
 
-    @Deprecated("Use the new Api")
+    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     fun <T : Fhir3Resource> encryptResource(
             dataKey: GCKey,
             resource: T

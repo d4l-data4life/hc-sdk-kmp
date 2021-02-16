@@ -91,12 +91,12 @@ class RecordService(
         private val cryptoService: CryptoService,
         private val errorHandler: SdkContract.ErrorHandler
 ) : RecordContract.Service {
-    @Deprecated("This method will be removed in the next major release.")
+    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     internal enum class UploadDownloadOperation {
         UPLOAD, DOWNLOAD, UPDATE
     }
 
-    @Deprecated("This method will be removed in the next major release.")
+    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     internal enum class RemoveRestoreOperation {
         REMOVE, RESTORE
     }
@@ -546,7 +546,7 @@ class RecordService(
     )
 
     @JvmOverloads
-    @Deprecated("This method will be removed in the next major release.")
+    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     fun countRecords(
             type: Class<out Fhir3Resource>?,
             userId: String,
@@ -832,7 +832,7 @@ class RecordService(
         }
     }
 
-    @Deprecated("This method will be removed in the next major release.")
+    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     internal fun <T : Fhir3Resource> removeOrRestoreUploadData(
             operation: RemoveRestoreOperation,
             record: DecryptedFhir3Record<T>,
@@ -1022,7 +1022,7 @@ class RecordService(
     // This method should not allowed to exist any longer in this shape. _uploadData should take over
     // as soon as possible so we can get rid of uploadOrDownloadData. This also means uploadData should
     // not be responsible for the actual upload and a update.
-    @Deprecated("This method will be removed in the next major release.")
+    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     @Throws(DataValidationException.IdUsageViolation::class,
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
@@ -1038,7 +1038,7 @@ class RecordService(
         }
     }
 
-    @Deprecated("This method will be removed in the next major release.")
+    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     @Throws(DataValidationException.IdUsageViolation::class,
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class,
@@ -1210,7 +1210,7 @@ class RecordService(
         }
     }
 
-    @Deprecated("This method will be removed in the next major release.")
+    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     internal fun buildMeta(
             record: DecryptedBaseRecord<*>
     ): Meta = Meta(

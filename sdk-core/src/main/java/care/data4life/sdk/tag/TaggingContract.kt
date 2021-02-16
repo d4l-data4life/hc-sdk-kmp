@@ -16,8 +16,11 @@
 
 package care.data4life.sdk.tag
 
+import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.D4LException
 import java.io.IOException
+
+typealias Tags = HashMap<String, String>
 
 typealias Tags = HashMap<String, String>
 

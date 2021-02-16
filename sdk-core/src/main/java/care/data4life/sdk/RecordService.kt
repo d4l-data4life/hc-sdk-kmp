@@ -273,7 +273,7 @@ class RecordService(
                 }
     }
 
-    internal fun <T : Any> _fetchRecords(
+    internal fun <T : Any> searchRecords(
             userId: String,
             resourceType: Class<T>,
             annotations: List<String>,
@@ -339,7 +339,7 @@ class RecordService(
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int
-    ): Single<List<Record<T>>> = _fetchRecords(
+    ): Single<List<Record<T>>> = searchRecords(
             userId,
             resourceType,
             annotations,
@@ -358,7 +358,7 @@ class RecordService(
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int
-    ): Single<List<Fhir4Record<T>>> = _fetchRecords(
+    ): Single<List<Fhir4Record<T>>> = searchRecords(
             userId,
             resourceType,
             annotations,
@@ -376,7 +376,7 @@ class RecordService(
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int
-    ): Single<List<DataRecord<DataResource>>> = _fetchRecords(
+    ): Single<List<DataRecord<DataResource>>> = searchRecords<DataResource>(
             userId,
             DataResource::class.java,
             annotations,

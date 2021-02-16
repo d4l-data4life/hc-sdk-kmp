@@ -29,6 +29,7 @@ import care.data4life.sdk.tag.TaggingContract.Companion.TAG_UPDATED_BY_CLIENT
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_UPDATED_BY_PARTNER
 import care.data4life.sdk.wrapper.SdkFhirElementFactory
 import care.data4life.sdk.wrapper.WrapperContract
+import kotlin.collections.HashMap
 
 // TODO internal
 class TaggingService(

@@ -278,6 +278,42 @@ class TaggingServiceTest {
         unmockkObject(SdkFhirElementFactory)
     }
 
+    @Test
+    fun `Given, tagVersion is called with FHIR_3 and a map, it adds the appropriate TAG_FHIR_VERSION field`() {
+        // Given
+        val map = hashMapOf<String, String>()
+
+        // When
+        taggingService.tagVersion(map, FhirContract.FhirVersion.FHIR_3)
+
+        assertTrue(map.containsKey(TAG_FHIR_VERSION))
+        assertEquals(FhirContract.FhirVersion.FHIR_3.version, map[TAG_FHIR_VERSION])
+    }
+
+    @Test
+    fun `Given, tagVersion is called with FHIR_4 and a map, it adds the appropriate TAG_FHIR_VERSION field`() {
+        // Given
+        val map = hashMapOf<String, String>()
+
+        // When
+        taggingService.tagVersion(map, FhirContract.FhirVersion.FHIR_4)
+
+        assertTrue(map.containsKey(TAG_FHIR_VERSION))
+        assertEquals(FhirContract.FhirVersion.FHIR_4.version, map[TAG_FHIR_VERSION])
+    }
+
+    @Test
+    fun `Given, tagVersion is called with UNKNOWN and a map, it adds the appropriate TAG_FHIR_VERSION field`() {
+        // Given
+        val map = hashMapOf<String, String>()
+
+        // When
+        taggingService.tagVersion(map, FhirContract.FhirVersion.UNKNOWN)
+
+        assertTrue(map.containsKey(TAG_APPDATA_KEY))
+        assertEquals(TAG_APPDATA_VALUE, map[TAG_APPDATA_KEY])
+    }
+
     companion object {
         private const val CLIENT_ID = "client_id#platform"
         private const val OTHER_CLIENT_ID = "other_client_id"

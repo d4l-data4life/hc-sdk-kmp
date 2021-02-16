@@ -19,7 +19,6 @@ package care.data4life.sdk.tag
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.D4LException
 import java.io.IOException
-import kotlin.collections.HashMap
 
 typealias Tags = HashMap<String, String>
 
@@ -42,7 +41,7 @@ class TaggingContract {
         fun encryptTags(tags: Tags): MutableList<String>
 
         @Throws(IOException::class)
-        fun decryptTags(encryptedTags: List<String>):Tags
+        fun decryptTags(encryptedTags: List<String>): Tags
 
         @Throws(IOException::class)
         fun encryptAnnotations(annotations: List<String>): MutableList<String>

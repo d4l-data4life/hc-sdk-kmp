@@ -29,7 +29,6 @@ import care.data4life.sdk.tag.TaggingContract.Companion.TAG_UPDATED_BY_CLIENT
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_UPDATED_BY_PARTNER
 import care.data4life.sdk.wrapper.SdkFhirElementFactory
 import care.data4life.sdk.wrapper.WrapperContract
-import kotlin.collections.HashMap
 
 // TODO internal
 class TaggingService(
@@ -71,7 +70,7 @@ class TaggingService(
                     resource.resourceType,
                     oldTags
             ).also { tags -> tagVersion(tags, FhirContract.FhirVersion.FHIR_3) }
-            is Fhir4Resource ->  appendCommonDefaultTags(
+            is Fhir4Resource -> appendCommonDefaultTags(
                     resource.resourceType,
                     oldTags
             ).also { tags -> tagVersion(tags, FhirContract.FhirVersion.FHIR_4) }
@@ -86,7 +85,7 @@ class TaggingService(
             tags: Tags,
             version: FhirContract.FhirVersion
     ) {
-        if(version == FhirContract.FhirVersion.UNKNOWN) {
+        if (version == FhirContract.FhirVersion.UNKNOWN) {
             tags[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE
         } else {
             tags[TAG_FHIR_VERSION] = version.version

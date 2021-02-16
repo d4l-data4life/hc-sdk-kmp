@@ -47,13 +47,14 @@ import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.DecryptedRecordMapper
 import care.data4life.sdk.network.model.EncryptedKey
-import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.EncryptedRecord
+import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
@@ -74,7 +75,7 @@ import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.DateTimeFormatterBuilder
 import java.io.IOException
-import java.util.Locale
+import java.util.*
 import kotlin.collections.HashMap
 
 
@@ -90,12 +91,12 @@ class RecordService(
         private val cryptoService: CryptoService,
         private val errorHandler: SdkContract.ErrorHandler
 ) : RecordContract.Service {
-    @Deprecated("")
+    @Deprecated("This method will be removed in the next major release.")
     internal enum class UploadDownloadOperation {
         UPLOAD, DOWNLOAD, UPDATE
     }
 
-    @Deprecated("")
+    @Deprecated("This method will be removed in the next major release.")
     internal enum class RemoveRestoreOperation {
         REMOVE, RESTORE
     }
@@ -262,10 +263,10 @@ class RecordService(
     }
 
     private fun encryptTagsAndAnnotations(
-            painTags: HashMap<String, String>,
+            plainTags: HashMap<String, String>,
             plainAnnotations: List<String>
     ): List<String> {
-        return tagEncryptionService.encryptTags(painTags)
+        return tagEncryptionService.encryptTags(plainTags)
                 .also { encryptedTags ->
                     encryptedTags.addAll(
                             tagEncryptionService.encryptAnnotations(plainAnnotations)
@@ -288,8 +289,8 @@ class RecordService(
         return Observable
                 .fromCallable { taggingService.getTagsFromType(resourceType as Class<Any>?) }
                 .map { plainTags -> encryptTagsAndAnnotations(plainTags, annotations) }
-                .flatMap {
-                    encryptedTags -> apiService.fetchRecords(
+                .flatMap { encryptedTags ->
+                    apiService.fetchRecords(
                             alias,
                             userId,
                             startTime,
@@ -515,19 +516,59 @@ class RecordService(
                 .map { UpdateResult(it, failedUpdates) }
     }
 
+    private fun _countRecords(
+            userId: String,
+            getTags: () -> Tags,
+            annotations: List<String>
+    ): Single<Int> = encryptTagsAndAnnotations(
+            getTags(),
+            annotations
+    ).let { encryptedTags -> apiService.getCount(alias, userId, encryptedTags) }
+
+    private fun countAllRecords(
+            userId: String,
+            version: FhirContract.FhirVersion,
+            annotations: List<String>
+    ): Single<Int> = _countRecords(
+            userId,
+            { hashMapOf<String, String>().also { tags -> taggingService.tagVersion(tags, version) } },
+            annotations
+    )
+
+    private fun countTypedRecords(
+            type: Class<out Fhir3Resource>,
+            userId: String,
+            annotations: List<String> = listOf()
+    ): Single<Int> = _countRecords(
+            userId,
+            { taggingService.getTagsFromType(type as Class<Any>) },
+            annotations
+    )
+
     @JvmOverloads
+    @Deprecated("This method will be removed in the next major release.")
     fun countRecords(
             type: Class<out Fhir3Resource>?,
             userId: String,
             annotations: List<String> = listOf()
-    ): Single<Int> = if (type == null) {
-        apiService.getCount(alias, userId, null)
-    } else {
-        Single
-                .fromCallable { taggingService.getTagsFromType(type as Class<Any>?) }
-                .map { plainTags -> encryptTagsAndAnnotations(plainTags, annotations) }
-                .flatMap { apiService.getCount(alias, userId, it) }
+    ): Single<Int> {
+        return if (type == null) {
+            countAllFhir3Records(userId, annotations)
+        } else {
+            countFhir3Records(type, userId, annotations)
+        }
     }
+
+    override fun countAllFhir3Records(
+            userId: String,
+            annotations: List<String>
+    ): Single<Int> = countAllRecords(userId, FhirContract.FhirVersion.FHIR_3, annotations)
+
+    override fun countFhir3Records(
+            type: Class<out Fhir3Resource>,
+            userId: String,
+            annotations: List<String>
+    ): Single<Int> = countTypedRecords(type, userId, annotations)
 
     //region utility methods
     @Throws(IOException::class)
@@ -561,7 +602,7 @@ class RecordService(
                 encryptedResource,
                 record.customCreationDate,
                 encryptedDataKey,
-                encryptedAttachmentsKey ,
+                encryptedAttachmentsKey,
                 record.modelVersion
         )
     }
@@ -616,24 +657,24 @@ class RecordService(
         val attachmentKey = record.encryptedAttachmentsKey
         if (attachmentKey is EncryptedKey) {
             builder.setAttachmentKey(
-                cryptoService.symDecryptSymmetricKey(
-                    commonKey,
-                    attachmentKey
-                ).blockingGet()
+                    cryptoService.symDecryptSymmetricKey(
+                            commonKey,
+                            attachmentKey
+                    ).blockingGet()
             )
         }
 
         val body = record.encryptedBody
         return builder.build(
-            if (body is String && body.isNotEmpty()) {
-                fhirService.decryptResource<T>(
-                    dataKey,
-                    tags,
-                    body
-                )
-            } else {
-                null// Fixme: This is a potential bug
-            }
+                if (body is String && body.isNotEmpty()) {
+                    fhirService.decryptResource<T>(
+                            dataKey,
+                            tags,
+                            body
+                    )
+                } else {
+                    null// Fixme: This is a potential bug
+                }
         ) as DecryptedBaseRecord<T>
     }
 
@@ -785,7 +826,7 @@ class RecordService(
         }
     }
 
-    @Deprecated("")
+    @Deprecated("This method will be removed in the next major release.")
     internal fun <T : Fhir3Resource> removeOrRestoreUploadData(
             operation: RemoveRestoreOperation,
             record: DecryptedFhir3Record<T>,
@@ -975,7 +1016,7 @@ class RecordService(
     // This method should not allowed to exist any longer in this shape. _uploadData should take over
     // as soon as possible so we can get rid of uploadOrDownloadData. This also means uploadData should
     // not be responsible for the actual upload and a update.
-    @Deprecated("")
+    @Deprecated("This method will be removed in the next major release.")
     @Throws(DataValidationException.IdUsageViolation::class,
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
@@ -991,7 +1032,7 @@ class RecordService(
         }
     }
 
-    @Deprecated("")
+    @Deprecated("This method will be removed in the next major release.")
     @Throws(DataValidationException.IdUsageViolation::class,
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class,
@@ -1163,7 +1204,7 @@ class RecordService(
         }
     }
 
-    @Deprecated("")
+    @Deprecated("This method will be removed in the next major release.")
     internal fun buildMeta(
             record: DecryptedBaseRecord<*>
     ): Meta = Meta(
@@ -1187,6 +1228,7 @@ class RecordService(
         const val FULL_ATTACHMENT_ID_POS = 1
         const val PREVIEW_ID_POS = 2
         const val THUMBNAIL_ID_POS = 3
+
         // TODO refactor
         private val DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.US)
         private val DATE_TIME_FORMATTER = DateTimeFormatterBuilder()

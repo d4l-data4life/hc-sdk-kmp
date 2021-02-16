@@ -16,12 +16,13 @@
 
 package care.data4life.sdk
 
-import care.data4life.fhir.stu3.model.CarePlan
 import care.data4life.fhir.stu3.model.Patient
 import care.data4life.sdk.RecordServiceTestBase.Companion.ALIAS
 import care.data4life.sdk.RecordServiceTestBase.Companion.PARTNER_ID
 import care.data4life.sdk.RecordServiceTestBase.Companion.USER_ID
 import care.data4life.sdk.attachment.AttachmentContract
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.tag.TaggingContract
 import io.mockk.every
@@ -82,7 +83,7 @@ class RecordServiceCountRecordsTest {
         val expected = 42
         val annotations: List<String> = mockk()
 
-        every { taggingService.getTagsFromType(CarePlan::class.java as Class<Any>) } returns tags
+        every { taggingService.getTagsFromType(Fhir3Resource::class.java as Class<Any>) } returns tags
         every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
         every { tagEncryptionService.encryptAnnotations(annotations) } returns encryptedAnnotations
         every { encryptedTags.addAll(encryptedAnnotations) } returns true
@@ -90,7 +91,7 @@ class RecordServiceCountRecordsTest {
 
         // When
         val observer = recordService.countFhir3Records(
-                CarePlan::class.java,
+                Fhir3Resource::class.java,
                 USER_ID,
                 annotations
         ).test().await()
@@ -106,7 +107,45 @@ class RecordServiceCountRecordsTest {
                 expected = expected,
                 actual = result
         )
-        verify(exactly = 1) { taggingService.getTagsFromType(CarePlan::class.java as Class<Any>) }
+        verify(exactly = 1) { taggingService.getTagsFromType(Fhir3Resource::class.java as Class<Any>) }
+        verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
+        verify(exactly = 1) { tagEncryptionService.encryptAnnotations(annotations) }
+        verify(exactly = 1) { encryptedTags.addAll(encryptedAnnotations) }
+        verify(exactly = 1) { apiService.getCount(ALIAS, USER_ID, encryptedTags) }
+    }
+
+    @Test
+    @Throws(InterruptedException::class, IOException::class)
+    fun `Given, countFhir4Records is called with a Fhir4Resource, a UserId and Annotations, it returns amount of occurrences`() {
+        // Given
+        val expected = 42
+        val annotations: List<String> = mockk()
+
+        every { taggingService.getTagsFromType(Fhir4Resource::class.java as Class<Any>) } returns tags
+        every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
+        every { tagEncryptionService.encryptAnnotations(annotations) } returns encryptedAnnotations
+        every { encryptedTags.addAll(encryptedAnnotations) } returns true
+        every { apiService.getCount(ALIAS, USER_ID, encryptedTags) } returns Single.just(expected)
+
+        // When
+        val observer = recordService.countFhir4Records(
+                Fhir4Resource::class.java,
+                USER_ID,
+                annotations
+        ).test().await()
+
+        // Then
+        val result = observer
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
+
+        assertEquals(
+                expected = expected,
+                actual = result
+        )
+        verify(exactly = 1) { taggingService.getTagsFromType(Fhir4Resource::class.java as Class<Any>) }
         verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
         verify(exactly = 1) { tagEncryptionService.encryptAnnotations(annotations) }
         verify(exactly = 1) { encryptedTags.addAll(encryptedAnnotations) }

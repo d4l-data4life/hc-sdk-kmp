@@ -16,7 +16,8 @@
 
 package care.data4life.sdk
 
-import care.data4life.fhir.stu3.model.DocumentReference
+import care.data4life.fhir.stu3.model.DocumentReference as Fhir3Reference
+import care.data4life.fhir.r4.model.DocumentReference as Fhir4Reference
 import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.tag.TagEncryptionService
@@ -131,7 +132,7 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
 
         // When
         val result = (recordService as RecordService).countRecords(
-                DocumentReference::class.java,
+                Fhir3Reference::class.java,
                 USER_ID
         ).blockingGet()
 
@@ -226,7 +227,56 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
 
         // When
         val result = (recordService as RecordService).countFhir3Records(
-                DocumentReference::class.java,
+                Fhir3Reference::class.java,
+                USER_ID,
+                annotations.keys.toList()
+        ).blockingGet()
+
+        // Then
+        Truth.assertThat(result).isEqualTo(23)
+    }
+
+    @Test
+    fun `Given, countFhir4Records is called with a type, UserId and Annotations, it returns the amount of Records`() {
+        val encodedEncryptedVersion = "ZmhpcnZlcnNpb249NCUyZTAlMmUx"
+        val encodedEncryptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
+
+        val annotations = mapOf(
+                "wow" to "custom=wow",
+                "it" to "custom=it",
+                "works" to "custom=works"
+        )
+
+        val tags = mapOf(
+                "partner" to "partner=${PARTNER_ID}".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
+                "fhirversion" to "fhirversion=${
+                    "4.0.1".replace(".", "%2e")
+                }",
+                "resourcetype" to "resourcetype=documentreference"
+        )
+
+        encryptTagsAndAnnotations(tags, annotations)
+
+        every {
+            apiService.getCount(
+                    ALIAS,
+                    USER_ID,
+                    listOf(
+                            encodedEncryptedVersion,
+                            encodedEncryptedResourceType,
+                            "Y3VzdG9tPXdvdw==",
+                            "Y3VzdG9tPWl0",
+                            "Y3VzdG9tPXdvcmtz"
+                    )
+            )
+        } returns Single.just(23)
+
+        // When
+        val result = (recordService as RecordService).countFhir4Records(
+                Fhir4Reference::class.java,
                 USER_ID,
                 annotations.keys.toList()
         ).blockingGet()

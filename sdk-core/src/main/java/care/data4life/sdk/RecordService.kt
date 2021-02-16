@@ -536,12 +536,12 @@ class RecordService(
     )
 
     private fun countTypedRecords(
-            type: Class<out Fhir3Resource>,
+            type: Class<Any>,
             userId: String,
             annotations: List<String> = listOf()
     ): Single<Int> = _countRecords(
             userId,
-            { taggingService.getTagsFromType(type as Class<Any>) },
+            { taggingService.getTagsFromType(type) },
             annotations
     )
 
@@ -559,16 +559,22 @@ class RecordService(
         }
     }
 
-    override fun countAllFhir3Records(
-            userId: String,
-            annotations: List<String>
-    ): Single<Int> = countAllRecords(userId, FhirContract.FhirVersion.FHIR_3, annotations)
-
     override fun countFhir3Records(
             type: Class<out Fhir3Resource>,
             userId: String,
             annotations: List<String>
-    ): Single<Int> = countTypedRecords(type, userId, annotations)
+    ): Single<Int> = countTypedRecords(type as Class<Any>, userId, annotations)
+
+    override fun countFhir4Records(
+            type: Class<out Fhir4Resource>,
+            userId: String,
+            annotations: List<String>
+    ): Single<Int> = countTypedRecords(type as Class<Any>, userId, annotations)
+
+    override fun countAllFhir3Records(
+            userId: String,
+            annotations: List<String>
+    ): Single<Int> = countAllRecords(userId, FhirContract.FhirVersion.FHIR_3, annotations)
 
     //region utility methods
     @Throws(IOException::class)

@@ -48,6 +48,7 @@ interface RecordContract {
         fun <T : Fhir4Resource> fetchFhir4Records(userId: String, resourceType: Class<T>, annotations: List<String>, startDate: LocalDate?, endDate: LocalDate?, pageSize: Int, offset: Int): Single<List<Fhir4Record<T>>>
 
         fun countFhir3Records(type: Class<out Fhir3Resource>, userId: String, annotations: List<String>): Single<Int>
+        fun countFhir4Records(type: Class<out Fhir4Resource>, userId: String, annotations: List<String>): Single<Int>
 
         fun countAllFhir3Records(userId: String, annotations: List<String>): Single<Int>
     }

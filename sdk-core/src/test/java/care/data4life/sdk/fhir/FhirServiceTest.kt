@@ -188,7 +188,7 @@ class FhirServiceTest {
         val resource = _fhirService.decryptResource<Fhir3Resource>(
                 dataKey,
                 hashMapOf(
-                        TAG_FHIR_VERSION to Fhir3Version.version,
+                        TAG_FHIR_VERSION to FhirContract.FhirVersion.FHIR_3.version,
                         TAG_RESOURCE_TYPE to fhirType
                 ),
                 ENCRYPTED_RESOURCE
@@ -211,7 +211,7 @@ class FhirServiceTest {
         val resource = _fhirService.decryptResource<Fhir4Resource>(
                 dataKey,
                 hashMapOf(
-                        TAG_FHIR_VERSION to Fhir4Version.version,
+                        TAG_FHIR_VERSION to FhirContract.FhirVersion.FHIR_4.version,
                         TAG_RESOURCE_TYPE to fhirType
                 ),
                 ENCRYPTED_RESOURCE
@@ -252,7 +252,7 @@ class FhirServiceTest {
             _fhirService.decryptResource<DataResource>(
                     dataKey,
                     hashMapOf(
-                            TAG_FHIR_VERSION to Fhir4Version.version,
+                            TAG_FHIR_VERSION to FhirContract.FhirVersion.FHIR_4.version,
                             TAG_RESOURCE_TYPE to fhirType
                     ),
                     ENCRYPTED_RESOURCE
@@ -280,7 +280,7 @@ class FhirServiceTest {
             _fhirService.decryptResource<DataResource>(
                     dataKey,
                     hashMapOf(
-                            TAG_FHIR_VERSION to Fhir4Version.version,
+                            TAG_FHIR_VERSION to FhirContract.FhirVersion.FHIR_4.version,
                             TAG_RESOURCE_TYPE to fhirType
                     ),
                     ENCRYPTED_RESOURCE

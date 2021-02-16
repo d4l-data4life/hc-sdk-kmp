@@ -32,19 +32,3 @@ typealias Fhir3ElementFactory = care.data4life.fhir.stu3.model.FhirElementFactor
 typealias Fhir4ElementFactory = care.data4life.fhir.r4.model.FhirElementFactory
 
 typealias Fhir3DateTimeParser = care.data4life.fhir.stu3.util.FhirDateTimeParser
-
-
-interface FhirVersion {
-    val version: String
-}
-
-object Fhir3Version : FhirVersion {
-    override val version: String
-        get() = "3.0.1"
-}
-
-object Fhir4Version : FhirVersion {
-    override val version: String
-        get() = "4.0.1"
-
-}

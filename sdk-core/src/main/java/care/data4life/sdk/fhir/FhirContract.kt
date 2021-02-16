@@ -30,4 +30,10 @@ interface FhirContract {
                 encryptedResource: String
         ): T
     }
+
+    enum class FhirVersion(val version: String) {
+        FHIR_3("3.0.1"),
+        FHIR_4("4.0.1"),
+        UNKNOWN("unknown")
+    }
 }

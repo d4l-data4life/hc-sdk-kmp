@@ -57,5 +57,14 @@ class TaggingContract {
 
     companion object {
         const val DELIMITER = "="
+        const val TAG_RESOURCE_TYPE = "resourcetype"
+        const val TAG_CLIENT = "client"
+        const val TAG_UPDATED_BY_CLIENT = "updatedbyclient"
+        const val TAG_PARTNER = "partner"
+        const val TAG_UPDATED_BY_PARTNER = "updatedbypartner"
+        const val TAG_FHIR_VERSION = "fhirversion"
+        const val TAG_APPDATA_KEY = "flag"
+        const val TAG_APPDATA_VALUE = "appdata"
+        const val SEPARATOR = "#"
     }
 }

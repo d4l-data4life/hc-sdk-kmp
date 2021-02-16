@@ -224,7 +224,8 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
 
     @Test
     fun `Given, countRecords is called with its appropriate parameter, it returns the amount of Records`() {
-        val encodedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
+        val encodedEncryptedVersion = "ZmhpcnZlcnNpb249MyUyZTAlMmUx"
+        val encodedEncryptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
 
         val tags = mapOf(
                 "partner" to "partner=$PARTNER_ID".toLowerCase(),
@@ -244,8 +245,17 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
                     tags["resourcetype"]!!.toByteArray()
             ), IV)
         } returns tags["resourcetype"]!!.toByteArray()
+        every {
+            cryptoService.symEncrypt(tagEncryptionKey, eq(
+                    tags["fhirversion"]!!.toByteArray()
+            ), IV)
+        } returns tags["fhirversion"]!!.toByteArray()
 
-        every { apiService.getCount(ALIAS, USER_ID, listOf(encodedResourceType)) } returns Single.just(23)
+        every { apiService.getCount(
+                ALIAS,
+                USER_ID,
+                listOf(encodedEncryptedVersion, encodedEncryptedResourceType)
+        ) } returns Single.just(23)
 
         // When
         val result = (recordService as RecordService).countRecords(

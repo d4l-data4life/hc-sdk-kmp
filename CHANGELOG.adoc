@@ -26,6 +26,7 @@ toc::[]
 * `EncryptedRecord`, `EncryptedKey`, `EncryptedKeyTypeAdapter` to Kotlin
 * CryptoService#encryptString -> CryptoService#encryptAndEncodeString
 * CryptoService#decryptString -> CryptoService#decodeAndDecryptString
+* TaggingService#getTagFromType tags now FhirResourceType and FhirVersion
 
 === Removed
 

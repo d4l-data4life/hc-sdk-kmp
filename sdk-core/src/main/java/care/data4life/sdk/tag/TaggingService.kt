@@ -16,9 +16,17 @@
 package care.data4life.sdk.tag
 
 import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir3Version
 import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.Fhir4Version
+import care.data4life.sdk.fhir.FhirContract
+import care.data4life.sdk.tag.TaggingContract.Companion.SEPARATOR
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_KEY
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_VALUE
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_CLIENT
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_FHIR_VERSION
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_PARTNER
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_RESOURCE_TYPE
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_UPDATED_BY_CLIENT
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_UPDATED_BY_PARTNER
 import care.data4life.sdk.wrapper.SdkFhirElementFactory
 import care.data4life.sdk.wrapper.WrapperContract
 
@@ -60,12 +68,12 @@ class TaggingService(
         return when (resource) {
             is Fhir3Resource -> appendCommonDefaultTags(resource.resourceType, oldTags).also {
                 if (!it.containsKey(TAG_FHIR_VERSION)) {
-                    it[TAG_FHIR_VERSION] = Fhir3Version.version
+                    it[TAG_FHIR_VERSION] = FhirContract.FhirVersion.FHIR_3.version
                 }
             }
             is Fhir4Resource -> appendCommonDefaultTags(resource.resourceType, oldTags).also {
                 if (!it.containsKey(TAG_FHIR_VERSION)) {
-                    it[TAG_FHIR_VERSION] = Fhir4Version.version
+                    it[TAG_FHIR_VERSION] = FhirContract.FhirVersion.FHIR_4.version
                 }
             }
             else -> appendCommonDefaultTags(null, oldTags).also {
@@ -82,19 +90,8 @@ class TaggingService(
                 it[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE
             } else {
                 it[TAG_RESOURCE_TYPE] = fhirElementFactory.getFhirTypeForClass(resourceType)!!
+                it[TAG_FHIR_VERSION] = fhirElementFactory.resolveFhirVersion(resourceType).version
             }
         }
-    }
-
-    companion object {
-        private const val TAG_RESOURCE_TYPE = "resourcetype"
-        private const val TAG_CLIENT = "client"
-        private const val TAG_UPDATED_BY_CLIENT = "updatedbyclient"
-        private const val TAG_PARTNER = "partner"
-        private const val TAG_UPDATED_BY_PARTNER = "updatedbypartner"
-        private const val TAG_FHIR_VERSION = "fhirversion"
-        private const val TAG_APPDATA_KEY = "flag"
-        private const val TAG_APPDATA_VALUE = "appdata"
-        private const val SEPARATOR = "#"
     }
 }

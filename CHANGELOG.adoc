@@ -15,6 +15,7 @@ toc::[]
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.1...main[Unreleased]
 
 === Added
+* Add information how to use matching fallbacks for Android to README
 
 === Changed
 * Tags are now encoded (URI) and in lowercase

@@ -179,7 +179,7 @@ android {
 }
 ----
 
-The SDK ships with link:https://github.com/ThreeTen/threetenbp[ThreeTenBP] a Java 8 Time backport.For Android, its loading mechanism of time zone information is inefficient.So we recommend to provide your favorite Android ThreeTen library here, for example link:https://github.com/JakeWharton/ThreeTenABP[ThreeTenABP].
+The SDK ships with link:https://github.com/ThreeTen/threetenbp[ThreeTenBP] a Java 8 Time backport. For Android, its loading mechanism of time zone information is inefficient.So we recommend to provide your favorite Android ThreeTen library here, for example link:https://github.com/JakeWharton/ThreeTenABP[ThreeTenABP].
 
 [source,gradle]
 ----

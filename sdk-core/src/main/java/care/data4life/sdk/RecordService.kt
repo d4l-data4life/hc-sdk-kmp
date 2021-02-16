@@ -1187,7 +1187,7 @@ class RecordService(
         const val FULL_ATTACHMENT_ID_POS = 1
         const val PREVIEW_ID_POS = 2
         const val THUMBNAIL_ID_POS = 3
-        // ToDo refactor
+        // TODO refactor
         private val DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.US)
         private val DATE_TIME_FORMATTER = DateTimeFormatterBuilder()
                 .parseLenient()

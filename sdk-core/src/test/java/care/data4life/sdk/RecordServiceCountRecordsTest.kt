@@ -35,6 +35,7 @@ import org.junit.Before
 import org.junit.Test
 import java.io.IOException
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class RecordServiceCountRecordsTest {
     private lateinit var recordService: RecordService
@@ -164,9 +165,7 @@ class RecordServiceCountRecordsTest {
         every {
             taggingService.tagVersion(capture(emptyTags), FhirContract.FhirVersion.FHIR_3)
         } answers {
-            if (emptyTags.captured.isNotEmpty()) {
-                throw RuntimeException("Expected empty tags")
-            }
+            assertTrue(emptyTags.captured.isEmpty())
             emptyTags.captured["mark"] = "mark"
         }
         every { tagEncryptionService.encryptTags(markedTags) } returns encryptedTags

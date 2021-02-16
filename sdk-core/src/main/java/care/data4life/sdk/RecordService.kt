@@ -220,9 +220,9 @@ class RecordService(
     ): Single<BaseRecord<T>> {
         return apiService
                 .fetchRecord(alias, userId, recordId)
-                .map { decryptRecord<T>(it, userId) }
-                .map { assignResourceId(it) }
-                .map { recordFactory.getInstance(it) }
+                .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
+                .map { decryptedRecord -> assignResourceId(decryptedRecord) }
+                .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -250,10 +250,12 @@ class RecordService(
                 .fromCallable { recordIds }
                 .flatMapIterable { it }
                 .flatMapSingle { recordId ->
-                    fetchFhir3Record<T>(recordId, userId)
-                            .ignoreErrors {
-                                failedFetches.add(Pair(recordId, errorHandler.handleError(it)))
-                            }
+                    fetchFhir3Record<T>(
+                            userId = userId,
+                            recordId = recordId
+                    ).ignoreErrors {
+                        failedFetches.add(Pair(recordId, errorHandler.handleError(it)))
+                    }
                 }
                 .toList()
                 .map { FetchResult(it, failedFetches) }
@@ -280,25 +282,25 @@ class RecordService(
             pageSize: Int,
             offset: Int
     ): Single<List<BaseRecord<T>>> {
-        val startTime = if (startDate != null) DATE_FORMATTER.format(startDate) else null
-        val endTime = if (endDate != null) DATE_FORMATTER.format(endDate) else null
+        val startTime = if (startDate != null) formatDate(startDate) else null
+        val endTime = if (endDate != null) formatDate(endDate) else null
 
         return Observable
                 .fromCallable { taggingService.getTagFromType(resourceType as Class<Any>?) }
                 .map { plainTags -> encryptTagsAndAnnotations(plainTags, annotations) }
                 .flatMap {
-                    apiService.fetchRecords(
+                    encryptedTags -> apiService.fetchRecords(
                             alias,
                             userId,
                             startTime,
                             endTime,
                             pageSize,
                             offset,
-                            it
+                            encryptedTags
                     )
                 }
                 .flatMapIterable { it }
-                .map { decryptRecord<T>(it, userId) }
+                .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
                 .let {
                     if (resourceType == null) {
                         it
@@ -306,8 +308,8 @@ class RecordService(
                         it.filter { decryptedRecord -> resourceType.isAssignableFrom(decryptedRecord.resource::class.java) }
                     }.filter { decryptedRecord -> decryptedRecord.annotations.containsAll(annotations) }
                 }
-                .map { assignResourceId(it) }
-                .map { recordFactory.getInstance(it) }
+                .map { decryptedRecord -> assignResourceId(decryptedRecord) }
+                .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) }
                 .toList() as Single<List<BaseRecord<T>>>
     }
 
@@ -1185,11 +1187,13 @@ class RecordService(
         const val FULL_ATTACHMENT_ID_POS = 1
         const val PREVIEW_ID_POS = 2
         const val THUMBNAIL_ID_POS = 3
+        // TODO refactor
         private val DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.US)
         private val DATE_TIME_FORMATTER = DateTimeFormatterBuilder()
                 .parseLenient()
                 .appendPattern(DATE_TIME_FORMAT)
                 .toFormatter(Locale.US)
         private val UTC_ZONE_ID = ZoneId.of("UTC")
+        internal fun formatDate(dateTime: LocalDate): String = DATE_FORMAT.format(dateTime)
     }
 }

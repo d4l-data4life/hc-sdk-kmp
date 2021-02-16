@@ -301,13 +301,6 @@ class RecordService(
                 }
                 .flatMapIterable { it }
                 .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
-                .let {
-                    if (resourceType == null) {
-                        it
-                    } else {
-                        it.filter { decryptedRecord -> resourceType.isAssignableFrom(decryptedRecord.resource::class.java) }
-                    }.filter { decryptedRecord -> decryptedRecord.annotations.containsAll(annotations) }
-                }
                 .map { decryptedRecord -> assignResourceId(decryptedRecord) }
                 .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) }
                 .toList() as Single<List<BaseRecord<T>>>

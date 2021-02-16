@@ -674,6 +674,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         Truth.assertThat(result).isInstanceOf(DataRecord::class.java)
         Truth.assertThat(result.resource).isInstanceOf(DataResource::class.java)
         Truth.assertThat(resource.value).isEqualTo(resource.value)
+        Truth.assertThat(result.annotations).isEqualTo(listOf("wow", "it", "works"))
     }
 
     // batch API
@@ -808,9 +809,11 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 listOf(
                         "cGFydG5lcj1iNDY=",
                         "Y2xpZW50PWI0NiUyM3Rlc3Q=",
-                        "ZmhpcnZlcnNpb249MyUyZTAlMmUx",
                         encodedEncyrptedResourceType,
-                        encodedEncryptedVersion
+                        encodedEncryptedVersion,
+                        "Y3VzdG9tPXdvdw==",
+                        "Y3VzdG9tPWl0",
+                        "Y3VzdG9tPXdvcmtz"
                 ),
                 encryptedBody2,
                 CREATION_DATE,
@@ -837,9 +840,11 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         ).blockingGet()
 
         // Then
-        Truth.assertThat(result).hasSize(1)
+        Truth.assertThat(result).hasSize(2)
         Truth.assertThat(result[0].resource).isInstanceOf(Fhir3Resource::class.java)
+        Truth.assertThat(result[1].resource).isInstanceOf(Fhir3Resource::class.java)
         Truth.assertThat(result[0].annotations).isEqualTo(listOf("wow", "it", "works"))
+        Truth.assertThat(result[1].annotations).isEqualTo(listOf("wow", "it", "works"))
     }
 
     @Test
@@ -1052,7 +1057,10 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                         "cGFydG5lcj1iNDY=",
                         "Y2xpZW50PWI0NiUyM3Rlc3Q=",
                         encodedEncryptedVersion,
-                        encodedEncyrptedResourceType
+                        encodedEncyrptedResourceType,
+                        "Y3VzdG9tPXdvdw==",
+                        "Y3VzdG9tPWl0",
+                        "Y3VzdG9tPXdvcmtz"
                 ),
                 encryptedBody2,
                 CREATION_DATE,
@@ -1079,9 +1087,11 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         ).blockingGet()
 
         // Then
-        Truth.assertThat(result).hasSize(1)
+        Truth.assertThat(result).hasSize(2)
         Truth.assertThat(result[0].resource).isInstanceOf(Fhir4Resource::class.java)
+        Truth.assertThat(result[1].resource).isInstanceOf(Fhir4Resource::class.java)
         Truth.assertThat(result[0].annotations).isEqualTo(listOf("wow", "it", "works"))
+        Truth.assertThat(result[1].annotations).isEqualTo(listOf("wow", "it", "works"))
     }
 
     @Test
@@ -1313,9 +1323,11 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1iNDY=",
-                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
-                        encryptedResourceType
+                        "cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                        encryptedResourceType,
+                        "Y3VzdG9tPXdvdw==",
+                        "Y3VzdG9tPWl0",
+                        "Y3VzdG9tPXdvcmtz"
                 ),
                 encryptedBody,
                 CREATION_DATE,
@@ -1371,10 +1383,13 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         ).blockingGet()
 
         // Then
-        Truth.assertThat(result).hasSize(1)
+        Truth.assertThat(result).hasSize(2)
         Truth.assertThat(result[0].resource).isInstanceOf(DataResource::class.java)
-        Truth.assertThat(result[0].resource).isEqualTo(resource2)
+        Truth.assertThat(result[0].resource).isEqualTo(resource1)
         Truth.assertThat(result[0].annotations).isEqualTo(listOf("wow", "it", "works"))
+        Truth.assertThat(result[1].resource).isInstanceOf(DataResource::class.java)
+        Truth.assertThat(result[1].resource).isEqualTo(resource2)
+        Truth.assertThat(result[1].annotations).isEqualTo(listOf("wow", "it", "works"))
     }
 
     // Compatibility

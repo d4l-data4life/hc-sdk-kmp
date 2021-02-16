@@ -17,6 +17,8 @@ toc::[]
 === Added
 
 * Add information how to use matching fallbacks for Android to README
+* `count` to Fhir4Client
+* `countFhir3Records`, `countFhir4Records` and `countAllFhir3Records` to RecordService
 
 === Changed
 
@@ -37,13 +39,14 @@ toc::[]
 * RecordService#deleteRecord invocation had mixed user and resource id.
 * RecordService#fetchRecords invocation had mixed user and resource id.
 * NullPointerException when using DomainResource as resourceType for fetch/search.
+* RecordService#countRecords filters now with Annotation when counting all Fhir3Records.
 
 === Bumped
 
 === Migration
 
 * TODO: search strategy (fetchRecords) for the encoded tags (especially in regards to the Fhir version)
-
+* RecordService#countRecords is now deprecated
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.0...v1.9.1[1.9.1]
 

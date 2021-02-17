@@ -54,7 +54,6 @@ import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.TaggingContract
-import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
@@ -516,7 +515,7 @@ class RecordService(
                 .map { UpdateResult(it, failedUpdates) }
     }
 
-    private fun countTypedRecords(
+    private fun _countRecords(
             type: Class<out Any>,
             userId: String,
             annotations: List<String> = listOf()
@@ -543,13 +542,13 @@ class RecordService(
             type: Class<out Fhir3Resource>,
             userId: String,
             annotations: List<String>
-    ): Single<Int> = countTypedRecords(type, userId, annotations)
+    ): Single<Int> = _countRecords(type, userId, annotations)
 
     override fun countFhir4Records(
             type: Class<out Fhir4Resource>,
             userId: String,
             annotations: List<String>
-    ): Single<Int> = countTypedRecords(type, userId, annotations)
+    ): Single<Int> = _countRecords(type, userId, annotations)
 
     override fun countAllFhir3Records(
             userId: String,

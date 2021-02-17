@@ -16,14 +16,12 @@
 
 package care.data4life.sdk.tag
 
-import care.data4life.sdk.fhir.FhirContract
+
 import care.data4life.sdk.lang.D4LException
 import java.io.IOException
 
 typealias Tags = HashMap<String, String>
 typealias Annotations = List<String>
-
-typealias Tags = HashMap<String, String>
 
 class TaggingContract {
 
@@ -31,7 +29,6 @@ class TaggingContract {
         fun appendDefaultTags(resource: Any, oldTags: Tags?): Tags
 
         fun getTagsFromType(resourceType: Class<out Any>): Tags
-
     }
 
     interface EncryptionService {

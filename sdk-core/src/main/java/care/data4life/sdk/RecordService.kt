@@ -56,6 +56,7 @@ import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
@@ -302,7 +303,7 @@ class RecordService internal constructor(
                 }
     }
 
-    internal fun <T : Any> searchRecords(
+    private fun <T : Any> searchRecords(
             userId: String,
             resourceType: Class<T>,
             annotations: List<String>,
@@ -315,7 +316,7 @@ class RecordService internal constructor(
         val endTime = if (endDate != null) formatDate(endDate) else null
 
         return Observable
-                .fromCallable { taggingService.getTagsFromType(resourceType as Class<Any>?) }
+                .fromCallable { taggingService.getTagsFromType(resourceType) }
                 .flatMap { tags ->
                     compatibilityService.searchRecords(
                         alias,
@@ -540,9 +541,13 @@ class RecordService internal constructor(
     private fun _countRecords(
             type: Class<out Any>,
             userId: String,
-            getTags: () -> Tags,
             annotations: List<String>
-    ): Single<Int> = compatibilityService.countRecords(alias, userId, getTags(), annotations)
+    ): Single<Int> = compatibilityService.countRecords(
+        alias,
+        userId,
+        taggingService.getTagsFromType(type),
+        annotations
+    )
 
     @JvmOverloads
     @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")

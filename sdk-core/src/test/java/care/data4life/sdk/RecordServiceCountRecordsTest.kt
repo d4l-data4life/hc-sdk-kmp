@@ -170,15 +170,6 @@ class RecordServiceCountRecordsTest {
             recordService.countFhir3Records(Fhir3Resource::class.java, USER_ID, annotations)
         } returns Single.just(expected)
 
-        every {
-            compatibilityService.countRecords(
-                ALIAS,
-                USER_ID,
-                markedTags,
-                annotations
-            )
-        } returns Single.just(expected)
-
         // When
         val observer = recordService.countAllFhir3Records(
             USER_ID,

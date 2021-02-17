@@ -28,6 +28,7 @@ import care.data4life.sdk.model.Record
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
+import care.data4life.sdk.util.Base64
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk
@@ -420,7 +421,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedResource2: ByteArray,
         tags: Map<String, String>,
         annotations: Map<String, String> = mapOf(),
-        encryptedTags: List<String>
+        encryptedTags: List<String>,
+        encryptedAndEncodedTags: List<String> = listOf()
     ) {
         val responses = listOf(
             Observable.fromArray(listOf(encryptedRecord)),
@@ -459,6 +461,16 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                     ), IV
                 )
             } returns annotations["works"]!!.toByteArray()
+
+            if (annotations.containsKey("legacyworks")) {
+                every {
+                    cryptoService.symEncrypt(
+                        tagEncryptionKey, eq(
+                            annotations["legacyworks"]!!.toByteArray()
+                        ), IV
+                    )
+                } returns annotations["legacyworks"]!!.toByteArray()
+            }
         }
 
         every {
@@ -469,7 +481,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 null,
                 PAGE_SIZE,
                 OFFSET,
-                encryptedTags
+                or(encryptedTags, encryptedAndEncodedTags)
             )
         } returnsMany responses
 
@@ -519,6 +531,16 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                     ), IV
                 )
             } returns annotations["works"]!!.toByteArray()
+
+            if (annotations.containsKey("legacyworks")) {
+                every {
+                    cryptoService.symDecrypt(
+                        tagEncryptionKey, eq(
+                            annotations["legacyworks"]!!.toByteArray()
+                        ), IV
+                    )
+                } returns annotations["legacyworks"]!!.toByteArray()
+            }
         }
 
         // decrypt body
@@ -1428,91 +1450,6 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
             "flag" to "flag=appdata"
         )
 
-        val encryptedResourceType = "ZmxhZz1hcHBkYXRh"
-
-        val encryptedResource1 = "I am a new test".toByteArray()
-        val encryptedResource2 = "I am a second test".toByteArray()
-
-        encryptedBody = "SSBhbSBhIG5ldyB0ZXN0"
-        encryptedBody2 = "SSBhbSBhIHNlY29uZCB0ZXN0"
-
-        encryptedRecord = EncryptedRecord(
-            commonKeyId,
-            RECORD_ID,
-            listOf(
-                "cGFydG5lcj1iNDY=",
-                "Y2xpZW50PWI0NiUyM3Rlc3Q=",
-                encryptedResourceType
-            ),
-            encryptedBody,
-            CREATION_DATE,
-            encryptedDataKey,
-            null,
-            ModelVersion.CURRENT,
-            UPDATE_DATE
-        )
-
-        encryptedRecord2 = EncryptedRecord(
-            commonKeyId,
-            RECORD_ID,
-            listOf(
-                "cGFydG5lcj1iNDY=",
-                "Y2xpZW50PWI0NiUyM3Rlc3Q=",
-                encryptedResourceType
-            ),
-            encryptedBody2,
-            CREATION_DATE,
-            encryptedDataKey,
-            null,
-            ModelVersion.CURRENT,
-            UPDATE_DATE
-        )
-
-        val encryptedTags = listOf(
-            encryptedResourceType
-        )
-
-        runDataFlowBatch(
-            resource1.value,
-            resource2.value,
-            encryptedResource1,
-            encryptedResource2,
-            tags,
-            mapOf(),
-            encryptedTags
-        )
-
-        // When
-        val result = recordService.fetchDataRecords(
-            USER_ID,
-            listOf(),
-            null,
-            null,
-            PAGE_SIZE,
-            OFFSET
-        ).blockingGet()
-
-        // Then
-        Truth.assertThat(result).hasSize(1)
-        Truth.assertThat(result[0].resource).isInstanceOf(DataResource::class.java)
-        Truth.assertThat(result[0].resource).isEqualTo(resource1)
-        Truth.assertThat(result[0].annotations).isEmpty()
-    }
-
-    @Test
-    fun `Given, fetchFhirDataRecords is called, with its appropriate payloads, it returns a List of DataRecords filtered by Annotations`() {
-        // Given
-        val resource1 = DataResource("I am a new test".toByteArray())
-        val resource2 = DataResource("I am a second test".toByteArray())
-
-        val tags = mapOf(
-            "partner" to "partner=$PARTNER_ID".toLowerCase(),
-            "client" to "client=${
-                URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
-            }",
-            "flag" to "flag=appdata"
-        )
-
         val annotations = mapOf(
             "wow" to "custom=wow",
             "it" to "custom=it",
@@ -1531,7 +1468,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
             commonKeyId,
             RECORD_ID,
             listOf(
-                "cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                "cGFydG5lcj1iNDY=",
+                "Y2xpZW50PWI0NiUyM3Rlc3Q=",
                 encryptedResourceType,
                 "Y3VzdG9tPXdvdw==",
                 "Y3VzdG9tPWl0",
@@ -1549,7 +1487,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
             commonKeyId,
             RECORD_ID,
             listOf(
-                "cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                "cGFydG5lcj1iNDY=",
+                "Y2xpZW50PWI0NiUyM3Rlc3Q=",
                 encryptedResourceType,
                 "Y3VzdG9tPXdvdw==",
                 "Y3VzdG9tPWl0",
@@ -1591,13 +1530,117 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         ).blockingGet()
 
         // Then
-        Truth.assertThat(result).hasSize(2)
+        Truth.assertThat(result).hasSize(1)
         Truth.assertThat(result[0].resource).isInstanceOf(DataResource::class.java)
         Truth.assertThat(result[0].resource).isEqualTo(resource1)
         Truth.assertThat(result[0].annotations).isEqualTo(listOf("wow", "it", "works"))
+    }
+
+    @Test
+    fun `Given, fetchFhirDataRecords is called, with its appropriate payloads, it returns a List of DataRecords filtered by Annotations`() {
+        // Given
+        val resource1 = DataResource("I am a new test".toByteArray())
+        val resource2 = DataResource("I am a second test".toByteArray())
+
+        val tags = mapOf(
+            "partner" to "partner=$PARTNER_ID".toLowerCase(),
+            "client" to "client=${
+                URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+            }",
+            "flag" to "flag=appdata"
+        )
+
+        val annotations = mapOf(
+            "wow" to "custom=wow",
+            "it" to "custom=it",
+            "works" to "custom=w%c3%b6rks",
+            "legacyworks" to "custom=wörks"
+        )
+        val encryptedResourceType = "ZmxhZz1hcHBkYXRh"
+
+        val encryptedResource1 = "I am a new test".toByteArray()
+        val encryptedResource2 = "I am a second test".toByteArray()
+
+        encryptedBody = "SSBhbSBhIG5ldyB0ZXN0"
+        encryptedBody2 = "SSBhbSBhIHNlY29uZCB0ZXN0"
+
+        encryptedRecord = EncryptedRecord(
+            commonKeyId,
+            RECORD_ID,
+            listOf(
+                encryptedResourceType,
+                "Y3VzdG9tPXdvdw==",
+                "Y3VzdG9tPWl0",
+                "Y3VzdG9tPXclYzMlYjZya3M="
+            ),
+            encryptedBody,
+            CREATION_DATE,
+            encryptedDataKey,
+            null,
+            ModelVersion.CURRENT,
+            UPDATE_DATE
+        )
+
+        encryptedRecord2 = EncryptedRecord(
+            commonKeyId,
+            RECORD_ID,
+            listOf(
+                encryptedResourceType,
+                "Y3VzdG9tPXdvdw==",
+                "Y3VzdG9tPWl0",
+                "Y3VzdG9tPXfDtnJrcw=="
+            ),
+            encryptedBody2,
+            CREATION_DATE,
+            encryptedDataKey,
+            null,
+            ModelVersion.CURRENT,
+            UPDATE_DATE
+        )
+
+        val encryptedTags = listOf(
+            encryptedResourceType,
+            "Y3VzdG9tPXdvdw==",
+            "Y3VzdG9tPWl0",
+            "Y3VzdG9tPXfDtnJrcw=="
+        )
+
+        val encryptedAndEncodedTags = listOf(
+            encryptedResourceType,
+            "Y3VzdG9tPXdvdw==",
+            "Y3VzdG9tPWl0",
+            "Y3VzdG9tPXclYzMlYjZya3M="
+        )
+
+        runDataFlowBatch(
+            resource1.value,
+            resource2.value,
+            encryptedResource1,
+            encryptedResource2,
+            tags,
+            annotations,
+            encryptedTags,
+            encryptedAndEncodedTags
+        )
+
+        // When
+        val result = recordService.fetchDataRecords(
+            USER_ID,
+            listOf("wow", "it", "wörks"),
+            null,
+            null,
+            PAGE_SIZE,
+            OFFSET
+        ).blockingGet()
+
+        // Then
+        Truth.assertThat(result).hasSize(2)
+        Truth.assertThat(result[0].resource).isInstanceOf(DataResource::class.java)
+        Truth.assertThat(result[0].resource).isEqualTo(resource1)
+        Truth.assertThat(result[0].annotations).isEqualTo(listOf("wow", "it", "wörks"))
         Truth.assertThat(result[1].resource).isInstanceOf(DataResource::class.java)
         Truth.assertThat(result[1].resource).isEqualTo(resource2)
-        Truth.assertThat(result[1].annotations).isEqualTo(listOf("wow", "it", "works"))
+        Truth.assertThat(result[1].annotations).isEqualTo(listOf("wow", "it", "wörks"))
     }
 
     // Compatibility

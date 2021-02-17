@@ -54,8 +54,8 @@ class CompatibilityServiceTest {
         val userId = "id"
         val tags: HashMap<String, String> = mockk()
         val annotations: List<String> = mockk()
-        val encodedAndEncryptedTags: MutableList<String> = mockk()
-        val encryptedTags: MutableList<String> = mockk()
+        val encodedAndEncryptedTags: MutableList<String> = mockk(relaxed = true)
+        val encryptedTags: MutableList<String> = mockk(relaxed = true)
         val encryptedAndEncodedAnnotations: MutableList<String> = mockk()
         val encryptedAnnotations: MutableList<String> = mockk()
         val expected = 42
@@ -114,10 +114,10 @@ class CompatibilityServiceTest {
         val offset = 42
         val tags: HashMap<String, String> = mockk()
         val annotations: List<String> = mockk()
-        val encodedAndEncryptedTags: MutableList<String> = mockk()
-        val encryptedTags: MutableList<String> = mockk()
-        val encryptedAndEncodedAnnotations: MutableList<String> = mockk()
-        val encryptedAnnotations: MutableList<String> = mockk()
+        val encodedAndEncryptedTags: MutableList<String> = mutableListOf("a", "v")
+        val encryptedTags: MutableList<String> = mutableListOf("a", "k")
+        val encryptedAndEncodedAnnotations: MutableList<String> = mutableListOf("d")
+        val encryptedAnnotations: MutableList<String> = mutableListOf("d")
         val encryptedRecord1: EncryptedRecord = mockk()
         val encryptedRecord2: EncryptedRecord = mockk()
 
@@ -125,9 +125,6 @@ class CompatibilityServiceTest {
         every { taggingEncryptionService.encryptAndEncodeAnnotations(annotations) } returns encryptedAndEncodedAnnotations
         every { taggingEncryptionService.encryptTags(tags) } returns encryptedTags
         every { taggingEncryptionService.encryptAnnotations(annotations) } returns encryptedAnnotations
-        every { encodedAndEncryptedTags.addAll(encryptedAndEncodedAnnotations) } returns true
-        every { encryptedTags.addAll(encryptedAnnotations) } returns true
-        every { encodedAndEncryptedTags.size } returns 23
         every {
             apiService.fetchRecords(
                 alias,
@@ -179,8 +176,6 @@ class CompatibilityServiceTest {
         verify(exactly = 1) { taggingEncryptionService.encryptAndEncodeAnnotations(annotations) }
         verify(exactly = 1) { taggingEncryptionService.encryptTags(tags) }
         verify(exactly = 1) { taggingEncryptionService.encryptAnnotations(annotations) }
-        verify(exactly = 1) { encodedAndEncryptedTags.addAll(encryptedAndEncodedAnnotations) }
-        verify(exactly = 1) { encryptedTags.addAll(encryptedAnnotations) }
         verify(exactly = 2) {
             apiService.fetchRecords(
                 alias,
@@ -195,7 +190,7 @@ class CompatibilityServiceTest {
     }
 
     @Test
-    fun `Given searchRecords is called with a UserId, a ResourceType, a StartDate, a EndDate, the PageSize, Offset, a single Tag and empty Annotations,  it calls the ApiService once with the encodedAndEncrypted Tags`() {
+    fun `Given searchRecords is called with its appropriate parameter, it calls the ApiService only if the legacy encrypted tags equal the current version of encrypted tags`() {
         val alias = "alias"
         val userId = "id"
         val startTime = "start"
@@ -204,10 +199,10 @@ class CompatibilityServiceTest {
         val offset = 42
         val tags: HashMap<String, String> = mockk()
         val annotations: List<String> = mockk()
-        val encodedAndEncryptedTags: MutableList<String> = mockk()
-        val encryptedTags: MutableList<String> = mockk()
-        val encryptedAndEncodedAnnotations: MutableList<String> = mockk()
-        val encryptedAnnotations: MutableList<String> = mockk()
+        val encodedAndEncryptedTags: MutableList<String> = mutableListOf("a", "b", "c")
+        val encryptedTags: MutableList<String> = mutableListOf("c", "b", "a")
+        val encryptedAndEncodedAnnotations: MutableList<String> = mutableListOf()
+        val encryptedAnnotations: MutableList<String> = mutableListOf()
         val encryptedRecord1: EncryptedRecord = mockk()
         val encryptedRecord2: EncryptedRecord = mockk()
 
@@ -215,9 +210,6 @@ class CompatibilityServiceTest {
         every { taggingEncryptionService.encryptAndEncodeAnnotations(annotations) } returns encryptedAndEncodedAnnotations
         every { taggingEncryptionService.encryptTags(tags) } returns encryptedTags
         every { taggingEncryptionService.encryptAnnotations(annotations) } returns encryptedAnnotations
-        every { encodedAndEncryptedTags.addAll(encryptedAndEncodedAnnotations) } returns true
-        every { encryptedTags.addAll(encryptedAnnotations) } returns true
-        every { encodedAndEncryptedTags.size } returns 1
         every {
             apiService.fetchRecords(
                 alias,
@@ -269,8 +261,6 @@ class CompatibilityServiceTest {
         verify(exactly = 1) { taggingEncryptionService.encryptAndEncodeAnnotations(annotations) }
         verify(exactly = 1) { taggingEncryptionService.encryptTags(tags) }
         verify(exactly = 1) { taggingEncryptionService.encryptAnnotations(annotations) }
-        verify(exactly = 1) { encodedAndEncryptedTags.addAll(encryptedAndEncodedAnnotations) }
-        verify(exactly = 1) { encryptedTags.addAll(encryptedAnnotations) }
         verify(exactly = 1) {
             apiService.fetchRecords(
                 alias,

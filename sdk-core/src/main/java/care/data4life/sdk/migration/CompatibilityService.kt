@@ -49,6 +49,11 @@ class CompatibilityService internal constructor(
         )
     }
 
+    private fun callOnlyOnce(
+        encodedAndEncryptedTags: List<String>,
+        encryptedTags: List<String>
+    ): Boolean = encodedAndEncryptedTags.sorted() == encryptedTags.sorted()
+
     override fun searchRecords(
         alias: String,
         userId: String,
@@ -61,7 +66,7 @@ class CompatibilityService internal constructor(
     ): Observable<List<EncryptedRecord>> {
         val (encodedAndEncryptedTags, encryptedTags) = encrypt(tags, annotations)
 
-        return if(encodedAndEncryptedTags.size == 1) {
+        return if(callOnlyOnce(encodedAndEncryptedTags, encryptedTags)) {
             apiService.fetchRecords(
                 alias,
                 userId,

@@ -62,6 +62,9 @@ class TaggingContract {
         @Throws(D4LException::class)
         fun encode(tag: String): String
 
+        @Throws(D4LException::class)
+        fun normalize(tag: String): String
+
         fun decode(encodedTag: String): String
     }
 

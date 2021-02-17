@@ -40,7 +40,7 @@ class TagEncryptionService @JvmOverloads constructor(
     @Throws(IOException::class)
     override fun encryptTags(tags: Tags): MutableList<String> {
         return tags
-            .map { entry -> entry.key + DELIMITER + entry.value }
+            .map { entry -> entry.key + DELIMITER + tagHelper.normalize(entry.value) }
             .let { pairedTag -> encryptList(pairedTag) }
     }
 

@@ -33,6 +33,8 @@ import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.migration.CompatibilityService
+import care.data4life.sdk.migration.MigrationContract
 import care.data4life.sdk.model.CreateResult
 import care.data4life.sdk.model.DeleteResult
 import care.data4life.sdk.model.DownloadResult
@@ -79,17 +81,44 @@ import kotlin.collections.HashMap
 
 
 // TODO internal
-class RecordService(
-        private val partnerId: String,
-        private val alias: String,
-        private val apiService: ApiService,
-        private val tagEncryptionService: TaggingContract.EncryptionService,
-        private val taggingService: TaggingContract.Service,
-        private val fhirService: FhirContract.Service,
-        private val attachmentService: AttachmentContract.Service,
-        private val cryptoService: CryptoService,
-        private val errorHandler: SdkContract.ErrorHandler
+// TODO add Factory
+class RecordService internal constructor(
+    private val partnerId: String,
+    private val alias: String,
+    private val apiService: ApiService,
+    private val tagEncryptionService: TaggingContract.EncryptionService,
+    private val taggingService: TaggingContract.Service,
+    private val fhirService: FhirContract.Service,
+    private val attachmentService: AttachmentContract.Service,
+    private val cryptoService: CryptoService,
+    private val errorHandler: SdkContract.ErrorHandler,
+    private val compatibilityService: MigrationContract.CompatibilityService
 ) : RecordContract.Service {
+
+    constructor(
+        partnerId: String,
+        alias: String,
+        apiService: ApiService,
+        tagEncryptionService: TaggingContract.EncryptionService,
+        taggingService: TaggingContract.Service,
+        fhirService: FhirContract.Service,
+        attachmentService: AttachmentContract.Service,
+        cryptoService: CryptoService,
+        errorHandler: SdkContract.ErrorHandler
+    ): this(
+        partnerId,
+        alias,
+        apiService,
+        tagEncryptionService,
+        taggingService,
+        fhirService,
+        attachmentService,
+        cryptoService,
+        errorHandler,
+        CompatibilityService(apiService, tagEncryptionService)
+    )
+
+
     @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     internal enum class UploadDownloadOperation {
         UPLOAD, DOWNLOAD, UPDATE
@@ -286,17 +315,17 @@ class RecordService(
         val endTime = if (endDate != null) formatDate(endDate) else null
 
         return Observable
-                .fromCallable { taggingService.getTagsFromType(resourceType) }
-                .map { plainTags -> encryptTagsAndAnnotations(plainTags, annotations) }
-                .flatMap { encryptedTags ->
-                    apiService.fetchRecords(
-                            alias,
-                            userId,
-                            startTime,
-                            endTime,
-                            pageSize,
-                            offset,
-                            encryptedTags
+                .fromCallable { taggingService.getTagsFromType(resourceType as Class<Any>?) }
+                .flatMap { tags ->
+                    compatibilityService.searchRecords(
+                        alias,
+                        userId,
+                        startTime,
+                        endTime,
+                        pageSize,
+                        offset,
+                        tags,
+                        annotations
                     )
                 }
                 .flatMapIterable { it }
@@ -511,11 +540,9 @@ class RecordService(
     private fun _countRecords(
             type: Class<out Any>,
             userId: String,
-            annotations: List<String> = listOf()
-    ): Single<Int> = encryptTagsAndAnnotations(
-        taggingService.getTagsFromType(type),
-        annotations
-    ).let { encryptedTags -> apiService.getCount(alias, userId, encryptedTags) }
+            getTags: () -> Tags,
+            annotations: List<String>
+    ): Single<Int> = compatibilityService.countRecords(alias, userId, getTags(), annotations)
 
     @JvmOverloads
     @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")

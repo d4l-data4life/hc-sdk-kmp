@@ -52,8 +52,8 @@ class CompatibilityService internal constructor(
     override fun searchRecords(
         alias: String,
         userId: String,
-        startDate: String,
-        endDate: String,
+        startDate: String?,
+        endDate: String?,
         pageSize: Int,
         offSet: Int,
         tags: Tags,

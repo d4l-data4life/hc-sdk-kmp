@@ -63,16 +63,20 @@ object TagEncryptionHelper : TaggingContract.Helper {
 
     @Throws(D4LException::class)
     override fun encode(tag: String): String {
-        validateTag(tag)
-
         return URLEncoder.encode(
-                tag.toLowerCase(Locale.US).trim(),
+                normalize(tag),
                 StandardCharsets.UTF_8.displayName()
         ).map { char ->
             replaceSpecial(
                     normalizeEncodedChar(char)
             )
         }.joinToString("")
+    }
+
+    @Throws(D4LException::class)
+    override fun normalize(tag: String): String {
+        validateTag(tag)
+        return tag.toLowerCase(Locale.US).trim()
     }
 
     override fun decode(

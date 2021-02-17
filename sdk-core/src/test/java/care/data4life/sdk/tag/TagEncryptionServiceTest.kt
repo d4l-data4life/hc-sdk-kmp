@@ -116,6 +116,7 @@ class TagEncryptionServiceTest {
         val encryptedTag = "encryptedTag"
         val symEncrypted = ByteArray(23)
 
+        every { tagHelper.normalize(tag.second) } returns tag.second
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(
@@ -148,6 +149,7 @@ class TagEncryptionServiceTest {
         val gcKey: GCKey = mockk()
         val encryptedTag = "encryptedTag"
 
+        every { tagHelper.normalize(tag.second) } returns tag.second
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(

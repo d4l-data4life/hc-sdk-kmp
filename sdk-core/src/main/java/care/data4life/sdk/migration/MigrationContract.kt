@@ -22,13 +22,13 @@ import care.data4life.sdk.tag.Tags
 import io.reactivex.Observable
 import io.reactivex.Single
 
-class MigrationContract {
-    internal interface CompatibilityService {
+interface MigrationContract {
+    interface CompatibilityService {
         fun searchRecords(
             alias: String,
             userId: String,
-            startDate: String,
-            endDate: String,
+            startDate: String?,
+            endDate: String?,
             pageSize: Int,
             offSet: Int,
             tags: Tags,

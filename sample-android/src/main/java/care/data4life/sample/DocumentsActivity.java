@@ -51,6 +51,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.DocumentReference;
+import care.data4life.fhir.stu3.model.DomainResource;
 import care.data4life.sdk.Data4LifeClient;
 import care.data4life.sdk.call.DataRecord;
 import care.data4life.sdk.call.Task;
@@ -67,7 +68,7 @@ public class DocumentsActivity extends AppCompatActivity {
     private static final String TAG = DocumentsActivity.class.getSimpleName();
 
     private static final int INTENT_FILE_PICKER = 434;
-    public List<Record<DocumentReference>> records = new ArrayList<>();
+    public List<Record<DomainResource>> records = new ArrayList<>();
     private Data4LifeClient client;
     private CRUDBenchmark benchmark;
     private FloatingActionButton mAddFAB;
@@ -266,9 +267,15 @@ public class DocumentsActivity extends AppCompatActivity {
     private void fetchDocuments(int offset) {
         mDocumentsSRL.setRefreshing(true);
 
-        fetchTask = client.fetchRecords(DocumentReference.class, fromDate, toDate, 20, offset, new ResultListener<List<Record<DocumentReference>>>() {
+        fetchTask = client.fetchRecords(
+                DomainResource.class,
+                fromDate,
+                toDate,
+                20,
+                offset,
+                new ResultListener<List<Record<DomainResource>>>() {
             @Override
-            public void onSuccess(List<Record<DocumentReference>> records) {
+            public void onSuccess(List<Record<DomainResource>> records) {
                 runOnUiThread(() -> {
                     DocumentsActivity.this.records.addAll(records);
                     if (records.size() == 0) {
@@ -295,9 +302,16 @@ public class DocumentsActivity extends AppCompatActivity {
             this.documents = documents;
         }
 
-        void bindDocuments(List<Record<DocumentReference>> documents) {
+        void bindDocuments(List<Record<DomainResource>> documents) {
+            List<Record<DocumentReference>> docRefs = new ArrayList<>();
+            for (Record record : documents) {
+                if (record.getResource() instanceof DocumentReference) {
+                    docRefs.add(record);
+                }
+            }
+
             this.documents.clear();
-            this.documents.addAll(documents);
+            this.documents.addAll(docRefs);
             notifyDataSetChanged();
         }
 

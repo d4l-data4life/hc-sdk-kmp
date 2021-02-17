@@ -183,6 +183,31 @@ class TaggingServiceTest {
     }
 
     @Test
+    fun `Given, getTagFromType is called with a Class of a Fhir3Resource, it does not set the TAG_RESOURCE_TYPE but the TAG_FHIR_VERSION, if the resource was not determined`() {
+        // Given
+        val type: Fhir3Resource = mockk()
+        val resourceType = null
+
+        mockkObject(SdkFhirElementFactory)
+        every { SdkFhirElementFactory.getFhirTypeForClass(Fhir3Resource::class.java) } returns resourceType
+        every { SdkFhirElementFactory.resolveFhirVersion(Fhir3Resource::class.java) } returns FhirContract.FhirVersion.FHIR_3
+        // When
+        @Suppress("UNCHECKED_CAST")
+        val result = taggingService.getTagFromType(type::class.java as Class<Any>)
+
+        // Then
+        assertEquals(1, result.size)
+        assertFalse(result.containsKey(TAG_RESOURCE_TYPE))
+        assertTrue(result.containsKey(TAG_FHIR_VERSION))
+        assertEquals(FhirContract.FhirVersion.FHIR_3.version, result[TAG_FHIR_VERSION])
+
+        verify(exactly = 1) { SdkFhirElementFactory.getFhirTypeForClass(Fhir3Resource::class.java) }
+        verify(exactly = 1) { SdkFhirElementFactory.resolveFhirVersion(Fhir3Resource::class.java) }
+
+        unmockkObject(SdkFhirElementFactory)
+    }
+
+    @Test
     fun `Given, getTagFromType is called with a Class of a Fhir4Resource, it returns a Map, which contains TAG_RESOURCE_TYPE and TAG_FHIR_VERSION for the given type`() {
         // Given
         val type: R4Patient = mockk()
@@ -204,6 +229,31 @@ class TaggingServiceTest {
 
         verify(exactly = 1) { SdkFhirElementFactory.getFhirTypeForClass(R4Patient::class.java) }
         verify(exactly = 1) { SdkFhirElementFactory.resolveFhirVersion(R4Patient::class.java) }
+
+        unmockkObject(SdkFhirElementFactory)
+    }
+
+    @Test
+    fun `Given, getTagFromType is called with a Class of a Fhir4Resource, it does not set the TAG_RESOURCE_TYPE but the TAG_FHIR_VERSION, if the resource was not determined`() {
+        // Given
+        val type: Fhir4Resource = mockk()
+        val resourceType = null
+
+        mockkObject(SdkFhirElementFactory)
+        every { SdkFhirElementFactory.getFhirTypeForClass(Fhir4Resource::class.java) } returns resourceType
+        every { SdkFhirElementFactory.resolveFhirVersion(Fhir4Resource::class.java) } returns FhirContract.FhirVersion.FHIR_4
+        // When
+        @Suppress("UNCHECKED_CAST")
+        val result = taggingService.getTagFromType(type::class.java as Class<Any>)
+
+        // Then
+        assertEquals(1, result.size)
+        assertFalse(result.containsKey(TAG_RESOURCE_TYPE))
+        assertTrue(result.containsKey(TAG_FHIR_VERSION))
+        assertEquals(FhirContract.FhirVersion.FHIR_4.version, result[TAG_FHIR_VERSION])
+
+        verify(exactly = 1) { SdkFhirElementFactory.getFhirTypeForClass(Fhir4Resource::class.java) }
+        verify(exactly = 1) { SdkFhirElementFactory.resolveFhirVersion(Fhir4Resource::class.java) }
 
         unmockkObject(SdkFhirElementFactory)
     }

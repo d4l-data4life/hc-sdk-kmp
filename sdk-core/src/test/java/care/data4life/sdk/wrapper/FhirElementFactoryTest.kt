@@ -39,7 +39,7 @@ class FhirElementFactoryTest {
     }
 
     @Test
-    fun `Given, getFhirTypeForClass is called with a valid Fhir3Resource Class, it returns its name`() {
+    fun `Given, getFhirTypeForClass is called with a subtype of Fhir3Resource Class, it returns its name`() {
         // Given
         val resource = buildDocumentReferenceFhir3()
 

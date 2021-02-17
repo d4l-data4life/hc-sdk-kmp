@@ -21,6 +21,7 @@ import care.data4life.sdk.lang.D4LException
 import java.io.IOException
 
 typealias Tags = HashMap<String, String>
+typealias Annotations = List<String>
 
 typealias Tags = HashMap<String, String>
 
@@ -49,10 +50,10 @@ class TaggingContract {
 
         @Throws(IOException::class)
         @Deprecated("This method should only be used for migration purpose.")
-        fun encryptAnnotations(annotations: List<String>): MutableList<String>
+        fun encryptAnnotations(annotations: Annotations): MutableList<String>
 
         @Throws(IOException::class)
-        fun decryptAnnotations(encryptedAnnotations: List<String>): List<String>
+        fun decryptAnnotations(encryptedAnnotations: Annotations): Annotations
     }
 
     interface Helper {

@@ -54,7 +54,7 @@ class TagEncryptionService @JvmOverloads constructor(
     )
 
     @Throws(IOException::class)
-    override fun encryptAndEncodeAnnotations(annotations: List<String>): MutableList<String> {
+    override fun encryptAndEncodeAnnotations(annotations: Annotations): MutableList<String> {
         return annotations
             .map { annotation -> tagHelper.encode(annotation) }
             .let { validAnnotations ->
@@ -67,7 +67,7 @@ class TagEncryptionService @JvmOverloads constructor(
 
     @Throws(IOException::class)
     override fun encryptAnnotations(
-        annotations: List<String>
+        annotations: Annotations
     ): MutableList<String> = encryptList(
         annotations,
         ANNOTATION_KEY + DELIMITER
@@ -76,7 +76,7 @@ class TagEncryptionService @JvmOverloads constructor(
     @Throws(IOException::class)
     override fun decryptAnnotations(
         encryptedAnnotations: List<String>
-    ): List<String> = decryptList(
+    ): Annotations = decryptList(
         encryptedAnnotations,
         { decrypted -> decrypted.startsWith(ANNOTATION_KEY) && decrypted.contains(DELIMITER) },
         { list -> removeAnnotationKey(list) }

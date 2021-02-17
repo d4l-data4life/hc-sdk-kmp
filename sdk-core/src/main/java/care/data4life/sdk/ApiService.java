@@ -241,7 +241,8 @@ public final class ApiService {
         return service.createRecord(alias, userId, (EncryptedRecord) encryptedRecord);
     }
 
-    Observable<List<EncryptedRecord>> fetchRecords(String alias,
+    // TODO remove public
+    public Observable<List<EncryptedRecord>> fetchRecords(String alias,
                                                    String userId,
                                                    String startDate,
                                                    String endDate,
@@ -293,7 +294,8 @@ public final class ApiService {
         return service.deleteDocument(alias, userId, documentId).map(it -> true);
     }
 
-    Single<Integer> getCount(String alias, String userId, List<String> tags) {
+    // TODO remove public
+    public Single<Integer> getCount(String alias, String userId, List<String> tags) {
         return service
                 .getRecordsHeader(alias, userId, tags)
                 .map(response -> Integer.parseInt(response.headers().get(HEADER_TOTAL_COUNT)));

@@ -24,11 +24,10 @@ import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class TagEncryptionServiceTest {
     private lateinit var cryptoService: CryptoService
@@ -46,7 +45,7 @@ class TagEncryptionServiceTest {
     }
 
     @Test
-    fun encryptTags() {
+    fun `Given encryptAndEncodeTags is called with Tags, it encrypts and encodes the given Tags and return the result`() {
         // given
         val tag = "key" to "value"
         val tags = hashMapOf(tag)
@@ -58,9 +57,71 @@ class TagEncryptionServiceTest {
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(
-                    gcKey,
-                    "key${DELIMITER}value".toByteArray(),
-                    IV
+                gcKey,
+                "key${DELIMITER}value".toByteArray(),
+                IV
+            )
+        } returns symEncrypted
+        every { base64.encodeToString(symEncrypted) } returns encryptedTag
+
+        // when
+        val encryptedTags: List<String> = subjectUnderTest.encryptAndEncodeTags(tags)
+
+        // then
+        Truth.assertThat(encryptedTags).containsExactly(encryptedTag)
+        verify {
+            cryptoService.symEncrypt(
+                gcKey,
+                "key${DELIMITER}value".toByteArray(),
+                IV
+            )
+        }
+    }
+
+    @Test
+    fun `Given encryptAndEncodeTags is called with malicious Tags, it throws fails with a EncryptionFailed Exception`() {
+        // Given
+        val tag = "key" to "value"
+        val tags = hashMapOf(tag)
+        val gcKey: GCKey = mockk()
+        val encryptedTag = "encryptedTag"
+
+        every { tagHelper.encode(tag.second) } returns tag.second
+        every { cryptoService.fetchTagEncryptionKey() } returns gcKey
+        every {
+            cryptoService.symEncrypt(
+                gcKey,
+                encryptedTag.toByteArray(),
+                IV
+            )
+        } throws RuntimeException("Error")
+
+        // When
+        val exception =
+            assertFailsWith<D4LException> { subjectUnderTest.encryptAndEncodeTags(tags) }
+
+        // Then
+        assertEquals(
+            expected = "Failed to encrypt tag",
+            actual = exception.message
+        )
+    }
+
+    @Test
+    fun `Given encryptTags is called with Tags, it encrypts and encodes the given Tags and return the result`() {
+        // given
+        val tag = "key" to "value"
+        val tags = hashMapOf(tag)
+        val gcKey: GCKey = mockk()
+        val encryptedTag = "encryptedTag"
+        val symEncrypted = ByteArray(23)
+
+        every { cryptoService.fetchTagEncryptionKey() } returns gcKey
+        every {
+            cryptoService.symEncrypt(
+                gcKey,
+                "key${DELIMITER}value".toByteArray(),
+                IV
             )
         } returns symEncrypted
         every { base64.encodeToString(symEncrypted) } returns encryptedTag
@@ -72,47 +133,42 @@ class TagEncryptionServiceTest {
         Truth.assertThat(encryptedTags).containsExactly(encryptedTag)
         verify {
             cryptoService.symEncrypt(
-                    gcKey,
-                    "key${DELIMITER}value".toByteArray(),
-                    IV
+                gcKey,
+                "key${DELIMITER}value".toByteArray(),
+                IV
             )
         }
     }
 
     @Test
     fun `Given encryptTags is called with malicious Tags, it throws fails with a EncryptionFailed Exception`() {
-        // given
+        // Given
         val tag = "key" to "value"
         val tags = hashMapOf(tag)
         val gcKey: GCKey = mockk()
         val encryptedTag = "encryptedTag"
 
-        every { tagHelper.encode(tag.second) } returns tag.second
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(
-                    gcKey,
-                    encryptedTag.toByteArray(),
-                    IV
+                gcKey,
+                encryptedTag.toByteArray(),
+                IV
             )
         } throws RuntimeException("Error")
 
-        // when
-        try {
-            subjectUnderTest.encryptTags(tags)
-            fail("encryptTags should fail")
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is D4LException)
-            assertEquals(
-                    "Failed to encrypt tag",
-                    e.message
-            )
-        }
+        // When
+        val exception = assertFailsWith<D4LException> { subjectUnderTest.encryptTags(tags) }
+
+        // Then
+        assertEquals(
+            expected = "Failed to encrypt tag",
+            actual = exception.message
+        )
     }
 
     @Test
-    fun decryptTags() {
+    fun `Given decryptTags is called with encrypted Tags, it decrypts and decodes the given Tags and return the result`() {
         // given
         val tag = "key${DELIMITER}value"
         val gcKey: GCKey = mockk()
@@ -125,9 +181,9 @@ class TagEncryptionServiceTest {
         every { base64.decode(encryptedTag) } returns encryptedTag.toByteArray()
         every {
             cryptoService.symDecrypt(
-                    gcKey,
-                    encryptedTag.toByteArray(),
-                    IV
+                gcKey,
+                encryptedTag.toByteArray(),
+                IV
             )
         } returns tag.toByteArray()
 
@@ -139,7 +195,7 @@ class TagEncryptionServiceTest {
     }
 
     @Test
-    fun decryptTags_filtersAnnotationKey() {
+    fun `Given decryptTags is called with encrypted Tags, it filters AnnotationKey while decrypting`() {
         // given
         val tag = "$ANNOTATION_KEY${DELIMITER}value"
         val gcKey: GCKey = mockk()
@@ -151,9 +207,9 @@ class TagEncryptionServiceTest {
         every { base64.decode(encryptedTag) } returns encryptedTag.toByteArray()
         every {
             cryptoService.symDecrypt(
-                    gcKey,
-                    encryptedTag.toByteArray(),
-                    IV
+                gcKey,
+                encryptedTag.toByteArray(),
+                IV
             )
         } returns tag.toByteArray()
         every { tagHelper.decode(tag) } returns tag
@@ -172,21 +228,19 @@ class TagEncryptionServiceTest {
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
 
         // When
-        try {
-            // Then
+        val exception = assertFailsWith<D4LException> {
             subjectUnderTest.decryptTags(mutableListOf("ignore me"))
-            fail("decryptTags should fail")
-        } catch (e: Exception) {
-            assertTrue(e is D4LException)
-            assertEquals(
-                    "Failed to decrypt tag",
-                    e.message
-            )
         }
+
+        // Then
+        assertEquals(
+            expected = "Failed to decrypt tag",
+            actual = exception.message
+        )
     }
 
     @Test
-    fun encryptAnnotations() {
+    fun `Given encryptAndEncodeAnnotations is called with Annotations, it encrypts and encodes the given Annotations and return the result`() {
         // given
         val annotations = listOf("value")
         val gcKey: GCKey = mockk()
@@ -197,9 +251,70 @@ class TagEncryptionServiceTest {
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(
-                    gcKey,
-                    "$ANNOTATION_KEY${DELIMITER}value".toByteArray(),
-                    IV
+                gcKey,
+                "$ANNOTATION_KEY${DELIMITER}value".toByteArray(),
+                IV
+            )
+        } returns symEncrypted
+        every { base64.encodeToString(symEncrypted) } returns encryptedAnnotation
+
+        // when
+        val encryptedAnnotations: List<String> = subjectUnderTest.encryptAndEncodeAnnotations(annotations)
+
+        // then
+        Truth.assertThat(encryptedAnnotations).containsExactly(encryptedAnnotation)
+        verify {
+            cryptoService.symEncrypt(
+                gcKey,
+                "${ANNOTATION_KEY}${DELIMITER}value".toByteArray(),
+                IV
+            )
+        }
+    }
+
+    @Test
+    fun `Given encryptAndEncodeAnnotations is called with malicious Annotations, it throws fails with a EncryptionFailed Exception`() {
+        // Given
+        val annotations = listOf("value")
+        val gcKey: GCKey = mockk()
+
+        every { tagHelper.encode(annotations[0]) } returns annotations[0]
+        every { cryptoService.fetchTagEncryptionKey() } returns gcKey
+        every {
+            cryptoService.symEncrypt(
+                gcKey,
+                "$ANNOTATION_KEY${DELIMITER}value".toByteArray(),
+                IV
+            )
+        } throws RuntimeException("Error")
+
+        // When
+        val exception = assertFailsWith<D4LException> {
+            subjectUnderTest.encryptAndEncodeAnnotations(annotations)
+        }
+
+        // Then
+        assertEquals(
+            expected = "Failed to encrypt tag",
+            actual = exception.message
+        )
+    }
+
+    @Test
+    fun `Given encryptAnnotations is called with Annotations, it encrypts and encodes the given Annotations and return the result`() {
+        // given
+        val annotations = listOf("value")
+        val gcKey: GCKey = mockk()
+        val encryptedAnnotation = "encryptedAnnotation"
+        val symEncrypted = ByteArray(23)
+
+        every { tagHelper.encode(annotations[0]) } returns annotations[0]
+        every { cryptoService.fetchTagEncryptionKey() } returns gcKey
+        every {
+            cryptoService.symEncrypt(
+                gcKey,
+                "$ANNOTATION_KEY${DELIMITER}value".toByteArray(),
+                IV
             )
         } returns symEncrypted
         every { base64.encodeToString(symEncrypted) } returns encryptedAnnotation
@@ -211,16 +326,16 @@ class TagEncryptionServiceTest {
         Truth.assertThat(encryptedAnnotations).containsExactly(encryptedAnnotation)
         verify {
             cryptoService.symEncrypt(
-                    gcKey,
-                    "${ANNOTATION_KEY}${DELIMITER}value".toByteArray(),
-                    IV
+                gcKey,
+                "${ANNOTATION_KEY}${DELIMITER}value".toByteArray(),
+                IV
             )
         }
     }
 
     @Test
     fun `Given encryptAnnotations is called with malicious Annotations, it throws fails with a EncryptionFailed Exception`() {
-        // given
+        // Given
         val annotations = listOf("value")
         val gcKey: GCKey = mockk()
 
@@ -228,29 +343,27 @@ class TagEncryptionServiceTest {
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(
-                    gcKey,
-                    "$ANNOTATION_KEY${DELIMITER}value".toByteArray(),
-                    IV
+                gcKey,
+                "$ANNOTATION_KEY${DELIMITER}value".toByteArray(),
+                IV
             )
         } throws RuntimeException("Error")
 
-        // when
-        try {
+        // When
+        val exception = assertFailsWith<D4LException> {
             subjectUnderTest.encryptAnnotations(annotations)
-            fail("encryptAnnotations should fail")
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is D4LException)
-            assertEquals(
-                    "Failed to encrypt tag",
-                    e.message
-            )
         }
+
+        // Then
+        assertEquals(
+            expected = "Failed to encrypt tag",
+            actual = exception.message
+        )
     }
 
     @Test
-    fun decryptAnnotations() {
-        // given
+    fun `Given decryptAnnotations is called with Annotations, it decrypts and decodes the given encrypted Annotations and return the result`() {
+        // Given
         val expected = "value"
         val annotation = "$ANNOTATION_KEY$DELIMITER$expected"
         val gcKey: GCKey = mockk()
@@ -261,22 +374,23 @@ class TagEncryptionServiceTest {
         every { base64.decode(encryptedAnnotation) } returns encryptedAnnotation.toByteArray()
         every {
             cryptoService.symDecrypt(
-                    gcKey,
-                    encryptedAnnotation.toByteArray(),
-                    IV
+                gcKey,
+                encryptedAnnotation.toByteArray(),
+                IV
             )
         } returns annotation.toByteArray()
         every { tagHelper.decode(annotation) } returns annotation
 
-        // when
-        val decryptedAnnotations: List<String> = subjectUnderTest.decryptAnnotations(encryptedAnnotations)
+        // When
+        val decryptedAnnotations: List<String> =
+            subjectUnderTest.decryptAnnotations(encryptedAnnotations)
 
-        // then
+        // Then
         Truth.assertThat(decryptedAnnotations).containsExactly(expected)
     }
 
     @Test
-    fun decryptAnnotations_filtersNonAnnotationKey() {
+    fun `Given decryptAnnotations is called with encrypted Annotations, it filters Keys, which are not the AnnotationKey, while decrypting`() {
         // given
         val tag = "key=value"
         val gcKey: GCKey = mockk()
@@ -287,9 +401,9 @@ class TagEncryptionServiceTest {
         every { base64.decode(encryptedTag) } returns encryptedTag.toByteArray()
         every {
             cryptoService.symDecrypt(
-                    gcKey,
-                    encryptedTag.toByteArray(),
-                    IV
+                gcKey,
+                encryptedTag.toByteArray(),
+                IV
             )
         } returns tag.toByteArray()
         every { tagHelper.decode(tag) } returns tag
@@ -307,18 +421,16 @@ class TagEncryptionServiceTest {
         val gcKey: GCKey = mockk()
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
 
-        try {
-            // When
+        // When
+        val exception = assertFailsWith<D4LException> {
             subjectUnderTest.decryptAnnotations(mutableListOf("ignore me"))
-            fail("decryptAnnotations should fail")
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is D4LException)
-            assertEquals(
-                    "Failed to decrypt tag",
-                    e.message
-            )
         }
+
+        // Then
+        assertEquals(
+            expected = "Failed to decrypt tag",
+            actual = exception.message
+        )
     }
 
     companion object {

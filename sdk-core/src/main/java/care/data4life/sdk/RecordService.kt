@@ -265,10 +265,10 @@ class RecordService(
             plainTags: HashMap<String, String>,
             plainAnnotations: List<String>
     ): List<String> {
-        return tagEncryptionService.encryptTags(plainTags)
+        return tagEncryptionService.encryptAndEncodeTags(plainTags)
                 .also { encryptedTags ->
                     encryptedTags.addAll(
-                            tagEncryptionService.encryptAnnotations(plainAnnotations)
+                            tagEncryptionService.encryptAndEncodeAnnotations(plainAnnotations)
                     )
                 }
     }

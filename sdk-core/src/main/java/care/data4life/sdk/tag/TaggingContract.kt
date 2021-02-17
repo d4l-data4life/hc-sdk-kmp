@@ -27,10 +27,7 @@ typealias Tags = HashMap<String, String>
 class TaggingContract {
 
     interface Service {
-        fun appendDefaultTags(
-                resource: Any,
-                oldTags: HashMap<String, String>?
-        ): HashMap<String, String>
+        fun appendDefaultTags(resource: Any, oldTags: Tags?): Tags
 
         fun getTagsFromType(resourceType: Class<out Any>): Tags
 
@@ -38,12 +35,20 @@ class TaggingContract {
 
     interface EncryptionService {
         @Throws(IOException::class)
+        fun encryptAndEncodeTags(tags: Tags): MutableList<String>
+
+        @Throws(IOException::class)
+        @Deprecated("This method should only be used for migration purpose.")
         fun encryptTags(tags: Tags): MutableList<String>
 
         @Throws(IOException::class)
         fun decryptTags(encryptedTags: List<String>): Tags
 
         @Throws(IOException::class)
+        fun encryptAndEncodeAnnotations(annotations: List<String>): MutableList<String>
+
+        @Throws(IOException::class)
+        @Deprecated("This method should only be used for migration purpose.")
         fun encryptAnnotations(annotations: List<String>): MutableList<String>
 
         @Throws(IOException::class)

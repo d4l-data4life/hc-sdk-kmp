@@ -85,8 +85,8 @@ class RecordServiceCountRecordsTest {
         val annotations: List<String> = mockk()
 
         every { taggingService.getTagsFromType(Fhir3Resource::class.java as Class<Any>) } returns tags
-        every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
-        every { tagEncryptionService.encryptAnnotations(annotations) } returns encryptedAnnotations
+        every { tagEncryptionService.encryptAndEncodeTags(tags) } returns encryptedTags
+        every { tagEncryptionService.encryptAndEncodeAnnotations(annotations) } returns encryptedAnnotations
         every { encryptedTags.addAll(encryptedAnnotations) } returns true
         every { apiService.getCount(ALIAS, USER_ID, encryptedTags) } returns Single.just(expected)
 
@@ -109,8 +109,8 @@ class RecordServiceCountRecordsTest {
                 actual = result
         )
         verify(exactly = 1) { taggingService.getTagsFromType(Fhir3Resource::class.java as Class<Any>) }
-        verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
-        verify(exactly = 1) { tagEncryptionService.encryptAnnotations(annotations) }
+        verify(exactly = 1) { tagEncryptionService.encryptAndEncodeTags(tags) }
+        verify(exactly = 1) { tagEncryptionService.encryptAndEncodeAnnotations(annotations) }
         verify(exactly = 1) { encryptedTags.addAll(encryptedAnnotations) }
         verify(exactly = 1) { apiService.getCount(ALIAS, USER_ID, encryptedTags) }
     }
@@ -123,8 +123,8 @@ class RecordServiceCountRecordsTest {
         val annotations: List<String> = mockk()
 
         every { taggingService.getTagsFromType(Fhir4Resource::class.java as Class<Any>) } returns tags
-        every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
-        every { tagEncryptionService.encryptAnnotations(annotations) } returns encryptedAnnotations
+        every { tagEncryptionService.encryptAndEncodeTags(tags) } returns encryptedTags
+        every { tagEncryptionService.encryptAndEncodeAnnotations(annotations) } returns encryptedAnnotations
         every { encryptedTags.addAll(encryptedAnnotations) } returns true
         every { apiService.getCount(ALIAS, USER_ID, encryptedTags) } returns Single.just(expected)
 
@@ -147,8 +147,8 @@ class RecordServiceCountRecordsTest {
                 actual = result
         )
         verify(exactly = 1) { taggingService.getTagsFromType(Fhir4Resource::class.java as Class<Any>) }
-        verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
-        verify(exactly = 1) { tagEncryptionService.encryptAnnotations(annotations) }
+        verify(exactly = 1) { tagEncryptionService.encryptAndEncodeTags(tags) }
+        verify(exactly = 1) { tagEncryptionService.encryptAndEncodeAnnotations(annotations) }
         verify(exactly = 1) { encryptedTags.addAll(encryptedAnnotations) }
         verify(exactly = 1) { apiService.getCount(ALIAS, USER_ID, encryptedTags) }
     }

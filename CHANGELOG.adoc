@@ -40,6 +40,7 @@ toc::[]
 * RecordService#fetchRecords invocation had mixed user and resource id.
 * NullPointerException when using DomainResource as resourceType for fetch/search.
 * RecordService#countRecords filters now with Annotation when counting all Fhir3Records.
+* RecordService did not respect legacy tags/annotations.
 
 === Bumped
 

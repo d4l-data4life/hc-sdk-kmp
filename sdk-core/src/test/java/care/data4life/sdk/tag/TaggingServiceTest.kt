@@ -261,24 +261,19 @@ class TaggingServiceTest {
     @Test
     fun `Given, getTagsFromType is called with a Class of a non Resource, it returns a Map, which contains TAG_APPDATA_KEY`() {
         // Given
-        val type: Fhir4Resource = mockk()
-        val resourceType = null
+        val type: DataResource = mockk()
 
         mockkObject(SdkFhirElementFactory)
-        every { SdkFhirElementFactory.getFhirTypeForClass(Fhir4Resource::class.java) } returns resourceType
-        every { SdkFhirElementFactory.resolveFhirVersion(Fhir4Resource::class.java) } returns FhirContract.FhirVersion.FHIR_4
+        every { SdkFhirElementFactory.resolveFhirVersion(DataResource::class.java) } returns FhirContract.FhirVersion.UNKNOWN
         // When
         @Suppress("UNCHECKED_CAST")
         val result = taggingService.getTagsFromType(type::class.java as Class<Any>)
 
         // Then
         assertEquals(1, result.size)
-        assertFalse(result.containsKey(TAG_RESOURCE_TYPE))
-        assertTrue(result.containsKey(TAG_FHIR_VERSION))
-        assertEquals(FhirContract.FhirVersion.FHIR_4.version, result[TAG_FHIR_VERSION])
+        assertTrue(result.containsKey(TAG_APPDATA_KEY))
 
-        verify(exactly = 1) { SdkFhirElementFactory.getFhirTypeForClass(Fhir4Resource::class.java) }
-        verify(exactly = 1) { SdkFhirElementFactory.resolveFhirVersion(Fhir4Resource::class.java) }
+        verify(exactly = 1) { SdkFhirElementFactory.resolveFhirVersion(DataResource::class.java) }
 
         unmockkObject(SdkFhirElementFactory)
     }

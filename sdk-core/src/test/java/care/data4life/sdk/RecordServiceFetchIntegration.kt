@@ -843,6 +843,77 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
     }
 
     @Test
+    fun `Given, fetchFhir3Records is called, with its appropriate payloads and a DomainResource as resourceType, it returns a List of Records`() {
+        // Given
+        val tags = mapOf(
+            "partner" to "partner=$PARTNER_ID".toLowerCase(),
+            "client" to "client=${
+                URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+            }",
+            "fhirversion" to "fhirversion=${
+                "3.0.1".replace(".", "%2e")
+            }",
+            "resourcetype" to "resourcetype=documentreference"
+        )
+
+        val encodedEncyrptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
+        val encodedEncryptedVersion = "ZmhpcnZlcnNpb249MyUyZTAlMmUx"
+
+        encryptedBody = "ZW5jcnlwdGVk"
+        encryptedBody2 = "Wlc1amNubHdkR1Zr"
+
+        encryptedRecord = EncryptedRecord(
+            commonKeyId,
+            RECORD_ID,
+            listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", encodedEncryptedVersion, encodedEncyrptedResourceType),
+            encryptedBody,
+            CREATION_DATE,
+            encryptedDataKey,
+            encryptedAttachmentKey,
+            ModelVersion.CURRENT,
+            UPDATE_DATE
+        )
+
+        encryptedRecord2 = EncryptedRecord(
+            commonKeyId,
+            RECORD_ID,
+            listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", encodedEncryptedVersion, encodedEncyrptedResourceType),
+            encryptedBody2,
+            CREATION_DATE,
+            encryptedDataKey,
+            encryptedAttachmentKey,
+            ModelVersion.CURRENT,
+            UPDATE_DATE
+        )
+
+        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource2 = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
+
+        runFhirFlowBatch(
+            tags,
+            encryptedTags = listOf(encodedEncryptedVersion)
+        )
+
+        // When
+        val result = recordService.fetchFhir3Records(
+            USER_ID,
+            Fhir3Resource::class.java,
+            listOf(),
+            null,
+            null,
+            42,
+            23
+        ).blockingGet()
+
+        // Then
+        Truth.assertThat(result).hasSize(2)
+        Truth.assertThat(result[0].resource).isInstanceOf(Fhir3Resource::class.java)
+        Truth.assertThat(result[1].resource).isInstanceOf(Fhir3Resource::class.java)
+        Truth.assertThat(result[0].annotations).isEmpty()
+        Truth.assertThat(result[1].annotations).isEmpty()
+    }
+
+    @Test
     fun `Given, fetchFhir4Records is called, with its appropriate payloads, it returns a List of Fhir4Records`() {
         // Given
         val tags = mapOf(
@@ -1011,6 +1082,77 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         Truth.assertThat(result).hasSize(1)
         Truth.assertThat(result[0].resource).isInstanceOf(Fhir4Resource::class.java)
         Truth.assertThat(result[0].annotations).isEqualTo(listOf("wow", "it", "works"))
+    }
+
+    @Test
+    fun `Given, fetchFhir4Records is called, with its appropriate payloads and a DomainResource as resourceType, it returns a List of Records`() {
+        // Given
+        val tags = mapOf(
+            "partner" to "partner=$PARTNER_ID".toLowerCase(),
+            "client" to "client=${
+                URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+            }",
+            "fhirversion" to "fhirversion=${
+                "4.0.1".replace(".", "%2e")
+            }",
+            "resourcetype" to "resourcetype=documentreference"
+        )
+
+        val encodedEncyrptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
+        val encodedEncryptedVersion = "ZmhpcnZlcnNpb249NCUyZTAlMmUx"
+
+        encryptedBody = "ZW5jcnlwdGVk"
+        encryptedBody2 = "Wlc1amNubHdkR1Zr"
+
+        encryptedRecord = EncryptedRecord(
+            commonKeyId,
+            RECORD_ID,
+            listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", encodedEncryptedVersion, encodedEncyrptedResourceType),
+            encryptedBody,
+            CREATION_DATE,
+            encryptedDataKey,
+            encryptedAttachmentKey,
+            ModelVersion.CURRENT,
+            UPDATE_DATE
+        )
+
+        encryptedRecord2 = EncryptedRecord(
+            commonKeyId,
+            RECORD_ID,
+            listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", encodedEncryptedVersion, encodedEncyrptedResourceType),
+            encryptedBody2,
+            CREATION_DATE,
+            encryptedDataKey,
+            encryptedAttachmentKey,
+            ModelVersion.CURRENT,
+            UPDATE_DATE
+        )
+
+        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource2 = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
+
+        runFhirFlowBatch(
+            tags,
+            encryptedTags = listOf(encodedEncryptedVersion)
+        )
+
+        // When
+        val result = recordService.fetchFhir4Records(
+            USER_ID,
+            Fhir4Resource::class.java,
+            listOf(),
+            null,
+            null,
+            42,
+            23
+        ).blockingGet()
+
+        // Then
+        Truth.assertThat(result).hasSize(2)
+        Truth.assertThat(result[0].resource).isInstanceOf(Fhir4Resource::class.java)
+        Truth.assertThat(result[1].resource).isInstanceOf(Fhir4Resource::class.java)
+        Truth.assertThat(result[0].annotations).isEmpty()
+        Truth.assertThat(result[1].annotations).isEmpty()
     }
 
     @Test

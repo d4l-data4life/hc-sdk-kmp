@@ -85,12 +85,17 @@ class TaggingService(
     override fun getTagFromType(
             resourceType: Class<Any>?
     ): HashMap<String, String> {
-        return hashMapOf<String, String>().also {
+        return hashMapOf<String, String>().also { tags ->
             if (resourceType == null) {
-                it[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE
+                tags[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE
             } else {
-                it[TAG_RESOURCE_TYPE] = fhirElementFactory.getFhirTypeForClass(resourceType)!!
-                it[TAG_FHIR_VERSION] = fhirElementFactory.resolveFhirVersion(resourceType).version
+                fhirElementFactory.getFhirTypeForClass(resourceType).also { resourceTagValue ->
+                    if(resourceTagValue is String) {
+                        tags[TAG_RESOURCE_TYPE] = resourceTagValue
+                    }
+                }
+
+                tags[TAG_FHIR_VERSION] = fhirElementFactory.resolveFhirVersion(resourceType).version
             }
         }
     }

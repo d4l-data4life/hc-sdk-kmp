@@ -63,6 +63,7 @@ class TaggingContract {
         fun encode(tag: String): String
 
         @Throws(D4LException::class)
+        @Deprecated("This method should only be used for migration purpose.")
         fun normalize(tag: String): String
 
         fun decode(encodedTag: String): String

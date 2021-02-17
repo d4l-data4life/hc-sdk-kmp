@@ -81,7 +81,7 @@ class TaggingService(
         }
     }
 
-    override fun tagVersion(
+    private fun tagVersion(
             tags: Tags,
             version: FhirContract.FhirVersion
     ) {
@@ -93,19 +93,18 @@ class TaggingService(
     }
 
     override fun getTagsFromType(
-            resourceType: Class<Any>?
+            resourceType: Class<out Any>
     ): HashMap<String, String> {
         return hashMapOf<String, String>().also { tags ->
-            if (resourceType == null) {
-                tags[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE
-            } else {
+            val version = fhirElementFactory.resolveFhirVersion(resourceType)
+            tagVersion(tags, version)
+
+            if (version != FhirContract.FhirVersion.UNKNOWN) {
                 fhirElementFactory.getFhirTypeForClass(resourceType).also { resourceTagValue ->
                     if(resourceTagValue is String) {
                         tags[TAG_RESOURCE_TYPE] = resourceTagValue
                     }
                 }
-
-                tags[TAG_FHIR_VERSION] = fhirElementFactory.resolveFhirVersion(resourceType).version
             }
         }
     }

@@ -259,50 +259,28 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, getTagsFromType is called with null, it returns a Map, which contains TAG_APPDATA_KEY`() {//getTagFromType_shouldReturnEmptyList_whenResourceTypeNull
+    fun `Given, getTagsFromType is called with a Class of a non Resource, it returns a Map, which contains TAG_APPDATA_KEY`() {
+        // Given
+        val type: Fhir4Resource = mockk()
+        val resourceType = null
+
+        mockkObject(SdkFhirElementFactory)
+        every { SdkFhirElementFactory.getFhirTypeForClass(Fhir4Resource::class.java) } returns resourceType
+        every { SdkFhirElementFactory.resolveFhirVersion(Fhir4Resource::class.java) } returns FhirContract.FhirVersion.FHIR_4
         // When
-        val result = taggingService.getTagsFromType(null)
+        @Suppress("UNCHECKED_CAST")
+        val result = taggingService.getTagsFromType(type::class.java as Class<Any>)
 
         // Then
         assertEquals(1, result.size)
-        assertTrue(result.containsKey(TAG_APPDATA_KEY))
-        assertEquals(TAG_APPDATA_VALUE, result[TAG_APPDATA_KEY])
-    }
+        assertFalse(result.containsKey(TAG_RESOURCE_TYPE))
+        assertTrue(result.containsKey(TAG_FHIR_VERSION))
+        assertEquals(FhirContract.FhirVersion.FHIR_4.version, result[TAG_FHIR_VERSION])
 
-    @Test
-    fun `Given, tagVersion is called with FHIR_3 and a map, it adds the appropriate TAG_FHIR_VERSION field`() {
-        // Given
-        val map = hashMapOf<String, String>()
+        verify(exactly = 1) { SdkFhirElementFactory.getFhirTypeForClass(Fhir4Resource::class.java) }
+        verify(exactly = 1) { SdkFhirElementFactory.resolveFhirVersion(Fhir4Resource::class.java) }
 
-        // When
-        taggingService.tagVersion(map, FhirContract.FhirVersion.FHIR_3)
-
-        assertTrue(map.containsKey(TAG_FHIR_VERSION))
-        assertEquals(FhirContract.FhirVersion.FHIR_3.version, map[TAG_FHIR_VERSION])
-    }
-
-    @Test
-    fun `Given, tagVersion is called with FHIR_4 and a map, it adds the appropriate TAG_FHIR_VERSION field`() {
-        // Given
-        val map = hashMapOf<String, String>()
-
-        // When
-        taggingService.tagVersion(map, FhirContract.FhirVersion.FHIR_4)
-
-        assertTrue(map.containsKey(TAG_FHIR_VERSION))
-        assertEquals(FhirContract.FhirVersion.FHIR_4.version, map[TAG_FHIR_VERSION])
-    }
-
-    @Test
-    fun `Given, tagVersion is called with UNKNOWN and a map, it adds the appropriate TAG_FHIR_VERSION field`() {
-        // Given
-        val map = hashMapOf<String, String>()
-
-        // When
-        taggingService.tagVersion(map, FhirContract.FhirVersion.UNKNOWN)
-
-        assertTrue(map.containsKey(TAG_APPDATA_KEY))
-        assertEquals(TAG_APPDATA_VALUE, map[TAG_APPDATA_KEY])
+        unmockkObject(SdkFhirElementFactory)
     }
 
     companion object {

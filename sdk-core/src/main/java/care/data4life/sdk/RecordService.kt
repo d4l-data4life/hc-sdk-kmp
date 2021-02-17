@@ -276,7 +276,7 @@ class RecordService(
 
     internal fun <T : Any> _fetchRecords(
             userId: String,
-            resourceType: Class<T>?,
+            resourceType: Class<T>,
             annotations: List<String>,
             startDate: LocalDate?,
             endDate: LocalDate?,
@@ -287,7 +287,7 @@ class RecordService(
         val endTime = if (endDate != null) formatDate(endDate) else null
 
         return Observable
-                .fromCallable { taggingService.getTagsFromType(resourceType as Class<Any>?) }
+                .fromCallable { taggingService.getTagsFromType(resourceType) }
                 .map { plainTags -> encryptTagsAndAnnotations(plainTags, annotations) }
                 .flatMap { encryptedTags ->
                     apiService.fetchRecords(
@@ -377,9 +377,9 @@ class RecordService(
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int
-    ): Single<List<DataRecord<DataResource>>> = _fetchRecords<DataResource>(
+    ): Single<List<DataRecord<DataResource>>> = _fetchRecords(
             userId,
-            null,
+            DataResource::class.java,
             annotations,
             startDate,
             endDate,
@@ -516,34 +516,14 @@ class RecordService(
                 .map { UpdateResult(it, failedUpdates) }
     }
 
-    private fun _countRecords(
-            userId: String,
-            getTags: () -> Tags,
-            annotations: List<String>
-    ): Single<Int> = encryptTagsAndAnnotations(
-            getTags(),
-            annotations
-    ).let { encryptedTags -> apiService.getCount(alias, userId, encryptedTags) }
-
-    private fun countAllRecords(
-            userId: String,
-            version: FhirContract.FhirVersion,
-            annotations: List<String>
-    ): Single<Int> = _countRecords(
-            userId,
-            { hashMapOf<String, String>().also { tags -> taggingService.tagVersion(tags, version) } },
-            annotations
-    )
-
     private fun countTypedRecords(
-            type: Class<Any>,
+            type: Class<out Any>,
             userId: String,
             annotations: List<String> = listOf()
-    ): Single<Int> = _countRecords(
-            userId,
-            { taggingService.getTagsFromType(type) },
-            annotations
-    )
+    ): Single<Int> = encryptTagsAndAnnotations(
+        taggingService.getTagsFromType(type),
+        annotations
+    ).let { encryptedTags -> apiService.getCount(alias, userId, encryptedTags) }
 
     @JvmOverloads
     @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
@@ -563,18 +543,18 @@ class RecordService(
             type: Class<out Fhir3Resource>,
             userId: String,
             annotations: List<String>
-    ): Single<Int> = countTypedRecords(type as Class<Any>, userId, annotations)
+    ): Single<Int> = countTypedRecords(type, userId, annotations)
 
     override fun countFhir4Records(
             type: Class<out Fhir4Resource>,
             userId: String,
             annotations: List<String>
-    ): Single<Int> = countTypedRecords(type as Class<Any>, userId, annotations)
+    ): Single<Int> = countTypedRecords(type, userId, annotations)
 
     override fun countAllFhir3Records(
             userId: String,
             annotations: List<String>
-    ): Single<Int> = countAllRecords(userId, FhirContract.FhirVersion.FHIR_3, annotations)
+    ): Single<Int> = countFhir3Records(Fhir3Resource::class.java, userId, annotations)
 
     //region utility methods
     @Throws(IOException::class)

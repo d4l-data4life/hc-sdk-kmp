@@ -16,7 +16,6 @@
 
 package care.data4life.sdk.tag
 
-import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.D4LException
 import java.io.IOException
 
@@ -30,9 +29,7 @@ class TaggingContract {
                 oldTags: HashMap<String, String>?
         ): HashMap<String, String>
 
-        fun tagVersion(tags: Tags, version: FhirContract.FhirVersion)
-
-        fun getTagsFromType(resourceType: Class<Any>?): Tags
+        fun getTagsFromType(resourceType: Class<out Any>): Tags
 
     }
 

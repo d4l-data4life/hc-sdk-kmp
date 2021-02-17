@@ -155,23 +155,14 @@ class RecordServiceCountRecordsTest {
 
     @Test
     @Throws(InterruptedException::class, IOException::class)
-    fun `Given, countAllFhir3Records is called, with a UserId and Annotations, it returns amount of occurrences`() {
+    fun `Given, countAllFhir3Records is called, with a UserId and Annotations, it delegates to the call to countFhir3Records with a Fhir3Resource as typeResource`() {
         // Given
         val expected = 42
         val annotations: List<String> = mockk()
-        val emptyTags = slot<HashMap<String, String>>()
-        val markedTags = hashMapOf("mark" to "mark")
 
         every {
-            taggingService.tagVersion(capture(emptyTags), FhirContract.FhirVersion.FHIR_3)
-        } answers {
-            assertTrue(emptyTags.captured.isEmpty())
-            emptyTags.captured["mark"] = "mark"
-        }
-        every { tagEncryptionService.encryptTags(markedTags) } returns encryptedTags
-        every { tagEncryptionService.encryptAnnotations(annotations) } returns encryptedAnnotations
-        every { encryptedTags.addAll(encryptedAnnotations) } returns true
-        every { apiService.getCount(ALIAS, USER_ID, encryptedTags) } returns Single.just(expected)
+            recordService.countFhir3Records(Fhir3Resource::class.java, USER_ID, annotations)
+        } returns Single.just(expected)
 
         // When
         val observer = recordService.countAllFhir3Records(
@@ -190,11 +181,7 @@ class RecordServiceCountRecordsTest {
                 expected = expected,
                 actual = result
         )
-        verify(exactly = 1) { taggingService.tagVersion(markedTags, FhirContract.FhirVersion.FHIR_3) }
-        verify(exactly = 1) { tagEncryptionService.encryptTags(markedTags) }
-        verify(exactly = 1) { tagEncryptionService.encryptAnnotations(annotations) }
-        verify(exactly = 1) { encryptedTags.addAll(encryptedAnnotations) }
-        verify(exactly = 1) { apiService.getCount(ALIAS, USER_ID, encryptedTags) }
+        verify(exactly = 1) { recordService.countFhir3Records(Fhir3Resource::class.java, USER_ID, annotations) }
     }
 
     @Test

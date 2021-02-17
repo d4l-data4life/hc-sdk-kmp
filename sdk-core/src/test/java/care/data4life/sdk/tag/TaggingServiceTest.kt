@@ -157,7 +157,7 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, getTagFromType is called with a Class of a Fhir3Resource, it returns a Map, which contains TAG_RESOURCE_TYPE and TAG_FHIR_VERSION for the given type`() {
+    fun `Given, getTagsFromType is called with a Class of a Fhir3Resource, it returns a Map, which contains TAG_RESOURCE_TYPE and TAG_FHIR_VERSION for the given type`() {
         // Given
         val type: Patient = mockk()
         val resourceType = "fhir4Resource"
@@ -183,7 +183,7 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, getTagFromType is called with a Class of a Fhir3Resource, it does not set the TAG_RESOURCE_TYPE but the TAG_FHIR_VERSION, if the resource was not determined`() {
+    fun `Given, getTagFromsType is called with a Class of a Fhir3Resource, it does not set the TAG_RESOURCE_TYPE but the TAG_FHIR_VERSION, if the resource was not determined`() {
         // Given
         val type: Fhir3Resource = mockk()
         val resourceType = null
@@ -193,7 +193,7 @@ class TaggingServiceTest {
         every { SdkFhirElementFactory.resolveFhirVersion(Fhir3Resource::class.java) } returns FhirContract.FhirVersion.FHIR_3
         // When
         @Suppress("UNCHECKED_CAST")
-        val result = taggingService.getTagFromType(type::class.java as Class<Any>)
+        val result = taggingService.getTagsFromType(type::class.java as Class<Any>)
 
         // Then
         assertEquals(1, result.size)
@@ -208,7 +208,7 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, getTagFromType is called with a Class of a Fhir4Resource, it returns a Map, which contains TAG_RESOURCE_TYPE and TAG_FHIR_VERSION for the given type`() {
+    fun `Given, getTagsFromType is called with a Class of a Fhir4Resource, it returns a Map, which contains TAG_RESOURCE_TYPE and TAG_FHIR_VERSION for the given type`() {
         // Given
         val type: R4Patient = mockk()
         val resourceType = "fhir4Resource"
@@ -234,7 +234,7 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, getTagFromType is called with a Class of a Fhir4Resource, it does not set the TAG_RESOURCE_TYPE but the TAG_FHIR_VERSION, if the resource was not determined`() {
+    fun `Given, getTagsFromType is called with a Class of a Fhir4Resource, it does not set the TAG_RESOURCE_TYPE but the TAG_FHIR_VERSION, if the resource was not determined`() {
         // Given
         val type: Fhir4Resource = mockk()
         val resourceType = null
@@ -244,7 +244,7 @@ class TaggingServiceTest {
         every { SdkFhirElementFactory.resolveFhirVersion(Fhir4Resource::class.java) } returns FhirContract.FhirVersion.FHIR_4
         // When
         @Suppress("UNCHECKED_CAST")
-        val result = taggingService.getTagFromType(type::class.java as Class<Any>)
+        val result = taggingService.getTagsFromType(type::class.java as Class<Any>)
 
         // Then
         assertEquals(1, result.size)
@@ -259,7 +259,7 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, getTagFromType is called with null, it returns a Map, which contains TAG_APPDATA_KEY`() {//getTagFromType_shouldReturnEmptyList_whenResourceTypeNull
+    fun `Given, getTagsFromType is called with null, it returns a Map, which contains TAG_APPDATA_KEY`() {//getTagFromType_shouldReturnEmptyList_whenResourceTypeNull
         // When
         val result = taggingService.getTagsFromType(null)
 

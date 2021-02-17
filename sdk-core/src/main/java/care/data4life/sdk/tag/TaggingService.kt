@@ -108,7 +108,5 @@ class TaggingService(
                 tags[TAG_FHIR_VERSION] = fhirElementFactory.resolveFhirVersion(resourceType).version
             }
         }
-
-        return tags.also { currentTags -> tagVersion(currentTags, version) }
     }
 }

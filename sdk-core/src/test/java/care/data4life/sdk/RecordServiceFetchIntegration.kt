@@ -1453,13 +1453,10 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         ).blockingGet()
 
         // Then
-        Truth.assertThat(result).hasSize(2)
+        Truth.assertThat(result).hasSize(1)
         Truth.assertThat(result[0].resource).isInstanceOf(DataResource::class.java)
-        Truth.assertThat(result[1].resource).isInstanceOf(DataResource::class.java)
         Truth.assertThat(result[0].resource).isEqualTo(resource1)
-        Truth.assertThat(result[1].resource).isEqualTo(resource2)
         Truth.assertThat(result[0].annotations).isEmpty()
-        Truth.assertThat(result[1].annotations).isEmpty()
     }
 
     @Test

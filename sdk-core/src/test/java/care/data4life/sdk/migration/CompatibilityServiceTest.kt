@@ -127,6 +127,7 @@ class CompatibilityServiceTest {
         every { taggingEncryptionService.encryptAnnotations(annotations) } returns encryptedAnnotations
         every { encodedAndEncryptedTags.addAll(encryptedAndEncodedAnnotations) } returns true
         every { encryptedTags.addAll(encryptedAnnotations) } returns true
+        every { encodedAndEncryptedTags.size } returns 23
         every {
             apiService.fetchRecords(
                 alias,
@@ -189,6 +190,96 @@ class CompatibilityServiceTest {
                 pageSize,
                 offset,
                 or(encodedAndEncryptedTags, encryptedTags)
+            )
+        }
+    }
+
+    @Test
+    fun `Given searchRecords is called with a UserId, a ResourceType, a StartDate, a EndDate, the PageSize, Offset, a single Tag and empty Annotations,  it calls the ApiService once with the encodedAndEncrypted Tags`() {
+        val alias = "alias"
+        val userId = "id"
+        val startTime = "start"
+        val endTime = "end"
+        val pageSize = 23
+        val offset = 42
+        val tags: HashMap<String, String> = mockk()
+        val annotations: List<String> = mockk()
+        val encodedAndEncryptedTags: MutableList<String> = mockk()
+        val encryptedTags: MutableList<String> = mockk()
+        val encryptedAndEncodedAnnotations: MutableList<String> = mockk()
+        val encryptedAnnotations: MutableList<String> = mockk()
+        val encryptedRecord1: EncryptedRecord = mockk()
+        val encryptedRecord2: EncryptedRecord = mockk()
+
+        every { taggingEncryptionService.encryptAndEncodeTags(tags) } returns encodedAndEncryptedTags
+        every { taggingEncryptionService.encryptAndEncodeAnnotations(annotations) } returns encryptedAndEncodedAnnotations
+        every { taggingEncryptionService.encryptTags(tags) } returns encryptedTags
+        every { taggingEncryptionService.encryptAnnotations(annotations) } returns encryptedAnnotations
+        every { encodedAndEncryptedTags.addAll(encryptedAndEncodedAnnotations) } returns true
+        every { encryptedTags.addAll(encryptedAnnotations) } returns true
+        every { encodedAndEncryptedTags.size } returns 1
+        every {
+            apiService.fetchRecords(
+                alias,
+                userId,
+                startTime,
+                endTime,
+                pageSize,
+                offset,
+                encodedAndEncryptedTags
+            )
+        } returns Observable.fromArray(listOf(encryptedRecord1))
+        every {
+            apiService.fetchRecords(
+                alias,
+                userId,
+                startTime,
+                endTime,
+                pageSize,
+                offset,
+                encryptedTags
+            )
+        } returns Observable.fromArray(listOf(encryptedRecord2))
+
+
+        // When
+        val observer = service.searchRecords(
+            alias,
+            userId,
+            startTime,
+            endTime,
+            pageSize,
+            offset,
+            tags,
+            annotations
+        ).test().await()
+
+        // Then
+        val result = observer
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
+
+        assertEquals(
+            expected = listOf(encryptedRecord1),
+            actual = result
+        )
+
+        verify(exactly = 1) { taggingEncryptionService.encryptAndEncodeTags(tags) }
+        verify(exactly = 1) { taggingEncryptionService.encryptAndEncodeAnnotations(annotations) }
+        verify(exactly = 1) { taggingEncryptionService.encryptTags(tags) }
+        verify(exactly = 1) { taggingEncryptionService.encryptAnnotations(annotations) }
+        verify(exactly = 1) { encodedAndEncryptedTags.addAll(encryptedAndEncodedAnnotations) }
+        verify(exactly = 1) { encryptedTags.addAll(encryptedAnnotations) }
+        verify(exactly = 1) {
+            apiService.fetchRecords(
+                alias,
+                userId,
+                startTime,
+                endTime,
+                pageSize,
+                offset,
+                encodedAndEncryptedTags
             )
         }
     }

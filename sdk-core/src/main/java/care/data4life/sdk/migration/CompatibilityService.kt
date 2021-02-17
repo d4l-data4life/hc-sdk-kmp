@@ -61,7 +61,7 @@ class CompatibilityService internal constructor(
     ): Observable<List<EncryptedRecord>> {
         val (encodedAndEncryptedTags, encryptedTags) = encrypt(tags, annotations)
 
-        return Observable.zip(
+        return if(encodedAndEncryptedTags.size == 1) {
             apiService.fetchRecords(
                 alias,
                 userId,
@@ -70,23 +70,35 @@ class CompatibilityService internal constructor(
                 pageSize,
                 offSet,
                 encodedAndEncryptedTags
-            ),
-            apiService.fetchRecords(
-                alias,
-                userId,
-                startDate,
-                endDate,
-                pageSize,
-                offSet,
-                encryptedTags
-            ),
-            BiFunction<List<EncryptedRecord>, List<EncryptedRecord>, List<EncryptedRecord>> { records1, records2 ->
-                mutableListOf<EncryptedRecord>().also {
-                    it.addAll(records1)
-                    it.addAll(records2)
+            ) as Observable<List<EncryptedRecord>>
+        } else {
+            Observable.zip(
+                apiService.fetchRecords(
+                    alias,
+                    userId,
+                    startDate,
+                    endDate,
+                    pageSize,
+                    offSet,
+                    encodedAndEncryptedTags
+                ),
+                apiService.fetchRecords(
+                    alias,
+                    userId,
+                    startDate,
+                    endDate,
+                    pageSize,
+                    offSet,
+                    encryptedTags
+                ),
+                BiFunction<List<EncryptedRecord>, List<EncryptedRecord>, List<EncryptedRecord>> { records1, records2 ->
+                    mutableListOf<EncryptedRecord>().also {
+                        it.addAll(records1)
+                        it.addAll(records2)
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 
     override fun countRecords(

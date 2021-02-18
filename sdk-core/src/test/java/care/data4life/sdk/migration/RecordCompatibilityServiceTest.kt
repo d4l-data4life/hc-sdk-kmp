@@ -29,7 +29,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class CompatibilityServiceTest {
+class RecordCompatibilityServiceTest {
     private lateinit var apiService: ApiService
     private lateinit var taggingEncryptionService: TaggingContract.EncryptionService
     private lateinit var service: MigrationContract.CompatibilityService
@@ -38,12 +38,12 @@ class CompatibilityServiceTest {
     fun setUp() {
         apiService = mockk()
         taggingEncryptionService = mockk()
-        service = CompatibilityService(apiService, taggingEncryptionService)
+        service = RecordCompatibilityService(apiService, taggingEncryptionService)
     }
 
     @Test
     fun `it fulfills the CompatibilityService`() {
-        val service: Any = CompatibilityService(mockk(), mockk())
+        val service: Any = RecordCompatibilityService(mockk(), mockk())
         assertTrue(service is MigrationContract.CompatibilityService)
     }
 

@@ -25,7 +25,8 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 
-class CompatibilityService internal constructor(
+// see: https://gesundheitscloud.atlassian.net/browse/SDK-525
+class RecordCompatibilityService internal constructor(
     private val apiService: ApiService,
     private val tagEncryptionService: TaggingContract.EncryptionService
 ) : MigrationContract.CompatibilityService {
@@ -49,10 +50,10 @@ class CompatibilityService internal constructor(
         )
     }
 
-    private fun callOnlyOnce(
+    private fun needsDoubleCall(
         encodedAndEncryptedTags: List<String>,
         encryptedTags: List<String>
-    ): Boolean = encodedAndEncryptedTags.sorted() == encryptedTags.sorted()
+    ): Boolean = encodedAndEncryptedTags.sorted() != encryptedTags.sorted()
 
     override fun searchRecords(
         alias: String,
@@ -66,17 +67,7 @@ class CompatibilityService internal constructor(
     ): Observable<List<EncryptedRecord>> {
         val (encodedAndEncryptedTags, encryptedTags) = encrypt(tags, annotations)
 
-        return if(callOnlyOnce(encodedAndEncryptedTags, encryptedTags)) {
-            apiService.fetchRecords(
-                alias,
-                userId,
-                startDate,
-                endDate,
-                pageSize,
-                offSet,
-                encodedAndEncryptedTags
-            ) as Observable<List<EncryptedRecord>>
-        } else {
+        return if(needsDoubleCall(encodedAndEncryptedTags, encryptedTags)) {
             Observable.zip(
                 apiService.fetchRecords(
                     alias,
@@ -103,6 +94,16 @@ class CompatibilityService internal constructor(
                     }
                 }
             )
+        } else {
+            apiService.fetchRecords(
+                alias,
+                userId,
+                startDate,
+                endDate,
+                pageSize,
+                offSet,
+                encodedAndEncryptedTags
+            ) as Observable<List<EncryptedRecord>>
         }
     }
 

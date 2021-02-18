@@ -33,7 +33,7 @@ import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
-import care.data4life.sdk.migration.CompatibilityService
+import care.data4life.sdk.migration.RecordCompatibilityService
 import care.data4life.sdk.migration.MigrationContract
 import care.data4life.sdk.model.CreateResult
 import care.data4life.sdk.model.DeleteResult
@@ -55,6 +55,7 @@ import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.util.Base64.decode
@@ -77,7 +78,7 @@ import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.DateTimeFormatterBuilder
 import java.io.IOException
-import java.util.*
+import java.util.Locale
 import kotlin.collections.HashMap
 
 
@@ -116,7 +117,7 @@ class RecordService internal constructor(
         attachmentService,
         cryptoService,
         errorHandler,
-        CompatibilityService(apiService, tagEncryptionService)
+        RecordCompatibilityService(apiService, tagEncryptionService)
     )
 
 
@@ -140,7 +141,7 @@ class RecordService internal constructor(
     private fun <T : Any> createRecord(
             userId: String,
             resource: T,
-            annotations: List<String>
+            annotations: Annotations
     ): Single<BaseRecord<T>> {
         checkDataRestrictions(resource)
 
@@ -292,8 +293,8 @@ class RecordService internal constructor(
     }
 
     private fun encryptTagsAndAnnotations(
-            plainTags: HashMap<String, String>,
-            plainAnnotations: List<String>
+            plainTags: Tags,
+            plainAnnotations: Annotations
     ): List<String> {
         return tagEncryptionService.encryptAndEncodeTags(plainTags)
                 .also { encryptedTags ->
@@ -306,7 +307,7 @@ class RecordService internal constructor(
     private fun <T : Any> searchRecords(
             userId: String,
             resourceType: Class<T>,
-            annotations: List<String>,
+            annotations: Annotations,
             startDate: LocalDate?,
             endDate: LocalDate?,
             pageSize: Int,
@@ -452,7 +453,7 @@ class RecordService internal constructor(
             userId: String,
             recordId: String,
             resource: T,
-            annotations: List<String>
+            annotations: Annotations
     ): Single<BaseRecord<T>> {
         checkDataRestrictions(resource)
         val data = extractUploadData(resource)
@@ -541,7 +542,7 @@ class RecordService internal constructor(
     private fun _countRecords(
             type: Class<out Any>,
             userId: String,
-            annotations: List<String>
+            annotations: Annotations
     ): Single<Int> = compatibilityService.countRecords(
         alias,
         userId,

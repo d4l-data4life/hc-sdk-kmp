@@ -1698,6 +1698,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         }
     }
 
-    // ToDo: Case any Fhir<->Data
-    // ToDo: Cases for fetch**Records
+    // TODO: Case any Fhir<->Data
+    // TODO: Cases for fetch**Records
+    // TODO: Add test cases for search with start and end dates
 }

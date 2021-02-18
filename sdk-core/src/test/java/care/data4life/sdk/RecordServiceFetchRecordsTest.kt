@@ -467,7 +467,7 @@ class RecordServiceFetchRecordsTest {
 
         every { RecordService.DATE_FORMATTER.format(startDate) } returns start
         every { RecordService.DATE_FORMATTER.format(endDate) } returns end
-		every { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
+        every { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
         every {
             compatibilityService.searchRecords(
                 ALIAS,
@@ -702,7 +702,7 @@ class RecordServiceFetchRecordsTest {
 
         every { RecordService.DATE_FORMATTER.format(startDate) } returns start
         every { RecordService.DATE_FORMATTER.format(endDate) } returns end
-		every { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
+        every { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
         every {
             compatibilityService.searchRecords(
                 ALIAS,

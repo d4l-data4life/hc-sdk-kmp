@@ -74,7 +74,7 @@ import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.DateTimeFormatterBuilder
 import java.io.IOException
-import java.util.*
+import java.util.Locale
 import kotlin.collections.HashMap
 
 
@@ -1215,12 +1215,12 @@ class RecordService(
         const val THUMBNAIL_ID_POS = 3
 
         // TODO refactor
-        private val DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.US)
+        internal val DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.US)
         private val DATE_TIME_FORMATTER = DateTimeFormatterBuilder()
                 .parseLenient()
                 .appendPattern(DATE_TIME_FORMAT)
                 .toFormatter(Locale.US)
         private val UTC_ZONE_ID = ZoneId.of("UTC")
-        internal fun formatDate(dateTime: LocalDate): String = DATE_FORMAT.format(dateTime)
+        internal fun formatDate(dateTime: LocalDate): String = DATE_FORMATTER.format(dateTime)
     }
 }

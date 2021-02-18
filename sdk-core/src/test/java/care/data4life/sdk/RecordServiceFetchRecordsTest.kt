@@ -416,8 +416,8 @@ class RecordServiceFetchRecordsTest {
         mockkObject(RecordMapper)
         mockkObject(RecordService)
 
-        every { RecordService.formatDate(startDate) } returns start
-        every { RecordService.formatDate(endDate) } returns end
+        every { RecordService.DATE_FORMATTER.format(startDate) } returns start
+        every { RecordService.DATE_FORMATTER.format(endDate) } returns end
         every { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
         every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
         every { tagEncryptionService.encryptAnnotations(defaultAnnotation) } returns defaultAnnotation
@@ -893,8 +893,8 @@ class RecordServiceFetchRecordsTest {
         mockkObject(RecordMapper)
         mockkObject(RecordService)
 
-        every { RecordService.formatDate(startDate) } returns start
-        every { RecordService.formatDate(endDate) } returns end
+        every { RecordService.DATE_FORMATTER.format(startDate) } returns start
+        every { RecordService.DATE_FORMATTER.format(endDate) } returns end
         every { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
         every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
         every { tagEncryptionService.encryptAnnotations(defaultAnnotation) } returns defaultAnnotation

@@ -52,7 +52,7 @@ class TaggingServiceTest {
         val result = taggingService.appendDefaultTags(resource, null)
 
         // Then
-        assertEquals(4, result.size.toLong())
+        assertEquals(4, result.size)
         assertTrue(result.containsKey(TAG_RESOURCE_TYPE))
         assertEquals(resource.resourceType, result[TAG_RESOURCE_TYPE])
         assertTrue(result.containsKey(TAG_CLIENT))
@@ -74,7 +74,7 @@ class TaggingServiceTest {
         val result = taggingService.appendDefaultTags(resource, null)
 
         // Then
-        assertEquals(4, result.size.toLong())
+        assertEquals(4, result.size)
         assertTrue(result.containsKey(TAG_RESOURCE_TYPE))
         assertEquals(resource.resourceType, result[TAG_RESOURCE_TYPE])
         assertTrue(result.containsKey(TAG_CLIENT))
@@ -95,7 +95,7 @@ class TaggingServiceTest {
         val result = taggingService.appendDefaultTags(resource, null)
 
         // Then
-        assertEquals(3, result.size.toLong())
+        assertEquals(3, result.size)
         assertFalse(result.containsKey(TAG_RESOURCE_TYPE))
         assertTrue(result.containsKey(TAG_CLIENT))
         assertEquals(CLIENT_ID, result[TAG_CLIENT])
@@ -119,7 +119,7 @@ class TaggingServiceTest {
         val result = taggingService.appendDefaultTags(type, existingTags)
 
         // Then
-        assertEquals(6, result.size.toLong())
+        assertEquals(6, result.size)
         assertTrue(result.containsKey("tag_1_key"))
         assertTrue(result.containsKey("tag_2_key"))
         assertTrue(result.containsKey(TAG_RESOURCE_TYPE))
@@ -144,7 +144,7 @@ class TaggingServiceTest {
         val result = taggingService.appendDefaultTags(type, existingTags)
 
         // Then
-        assertEquals(5, result.size.toLong())
+        assertEquals(5, result.size)
         assertTrue(result.containsKey(TAG_CLIENT))
         assertEquals(OTHER_CLIENT_ID, result[TAG_CLIENT])
         assertTrue(result.containsKey(TAG_UPDATED_BY_CLIENT))
@@ -157,7 +157,7 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, getTagFromType is called with a Class of a Fhir3Resource, it returns a Map, which contains TAG_RESOURCE_TYPE and TAG_FHIR_VERSION for the given type`() {
+    fun `Given, getTagsFromType is called with a Class of a Fhir3Resource, it returns a Map, which contains TAG_RESOURCE_TYPE and TAG_FHIR_VERSION for the given type`() {
         // Given
         val type: Patient = mockk()
         val resourceType = "fhir4Resource"
@@ -167,7 +167,7 @@ class TaggingServiceTest {
         every { SdkFhirElementFactory.resolveFhirVersion(Patient::class.java) } returns FhirContract.FhirVersion.FHIR_3
         // When
         @Suppress("UNCHECKED_CAST")
-        val result = taggingService.getTagFromType(type::class.java as Class<Any>)
+        val result = taggingService.getTagsFromType(type::class.java as Class<Any>)
 
         // Then
         assertEquals(2, result.size)
@@ -183,7 +183,7 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, getTagFromType is called with a Class of a Fhir3Resource, it does not set the TAG_RESOURCE_TYPE but the TAG_FHIR_VERSION, if the resource was not determined`() {
+    fun `Given, getTagFromsType is called with a Class of a Fhir3Resource, it does not set the TAG_RESOURCE_TYPE but the TAG_FHIR_VERSION, if the resource was not determined`() {
         // Given
         val type: Fhir3Resource = mockk()
         val resourceType = null
@@ -193,7 +193,7 @@ class TaggingServiceTest {
         every { SdkFhirElementFactory.resolveFhirVersion(Fhir3Resource::class.java) } returns FhirContract.FhirVersion.FHIR_3
         // When
         @Suppress("UNCHECKED_CAST")
-        val result = taggingService.getTagFromType(type::class.java as Class<Any>)
+        val result = taggingService.getTagsFromType(type::class.java as Class<Any>)
 
         // Then
         assertEquals(1, result.size)
@@ -208,7 +208,7 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, getTagFromType is called with a Class of a Fhir4Resource, it returns a Map, which contains TAG_RESOURCE_TYPE and TAG_FHIR_VERSION for the given type`() {
+    fun `Given, getTagsFromType is called with a Class of a Fhir4Resource, it returns a Map, which contains TAG_RESOURCE_TYPE and TAG_FHIR_VERSION for the given type`() {
         // Given
         val type: R4Patient = mockk()
         val resourceType = "fhir4Resource"
@@ -218,7 +218,7 @@ class TaggingServiceTest {
         every { SdkFhirElementFactory.resolveFhirVersion(R4Patient::class.java) } returns FhirContract.FhirVersion.FHIR_4
         // When
         @Suppress("UNCHECKED_CAST")
-        val result = taggingService.getTagFromType(type::class.java as Class<Any>)
+        val result = taggingService.getTagsFromType(type::class.java as Class<Any>)
 
         // Then
         assertEquals(2, result.size)
@@ -234,7 +234,7 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, getTagFromType is called with a Class of a Fhir4Resource, it does not set the TAG_RESOURCE_TYPE but the TAG_FHIR_VERSION, if the resource was not determined`() {
+    fun `Given, getTagsFromType is called with a Class of a Fhir4Resource, it does not set the TAG_RESOURCE_TYPE but the TAG_FHIR_VERSION, if the resource was not determined`() {
         // Given
         val type: Fhir4Resource = mockk()
         val resourceType = null
@@ -244,7 +244,7 @@ class TaggingServiceTest {
         every { SdkFhirElementFactory.resolveFhirVersion(Fhir4Resource::class.java) } returns FhirContract.FhirVersion.FHIR_4
         // When
         @Suppress("UNCHECKED_CAST")
-        val result = taggingService.getTagFromType(type::class.java as Class<Any>)
+        val result = taggingService.getTagsFromType(type::class.java as Class<Any>)
 
         // Then
         assertEquals(1, result.size)
@@ -259,14 +259,23 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, getTagFromType is called with null, it returns a Map, which contains TAG_APPDATA_KEY`() {//getTagFromType_shouldReturnEmptyList_whenResourceTypeNull
+    fun `Given, getTagsFromType is called with a Class of a non Resource, it returns a Map, which contains TAG_APPDATA_KEY`() {
+        // Given
+        val type: DataResource = mockk()
+
+        mockkObject(SdkFhirElementFactory)
+        every { SdkFhirElementFactory.resolveFhirVersion(DataResource::class.java) } returns FhirContract.FhirVersion.UNKNOWN
         // When
-        val result = taggingService.getTagFromType(null)
+        @Suppress("UNCHECKED_CAST")
+        val result = taggingService.getTagsFromType(type::class.java as Class<Any>)
 
         // Then
-        assertEquals(1, result.size.toLong())
+        assertEquals(1, result.size)
         assertTrue(result.containsKey(TAG_APPDATA_KEY))
-        assertEquals(TAG_APPDATA_VALUE, result[TAG_APPDATA_KEY])
+
+        verify(exactly = 1) { SdkFhirElementFactory.resolveFhirVersion(DataResource::class.java) }
+
+        unmockkObject(SdkFhirElementFactory)
     }
 
     companion object {

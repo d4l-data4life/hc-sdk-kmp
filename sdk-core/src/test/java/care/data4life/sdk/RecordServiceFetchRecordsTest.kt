@@ -314,7 +314,7 @@ class RecordServiceFetchRecordsTest {
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
         mockkObject(RecordMapper)
 
-        every { taggingService.getTagFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
+        every { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
         every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
         every { tagEncryptionService.encryptAnnotations(defaultAnnotation) } returns defaultAnnotation
         every { encryptedTags.addAll(defaultAnnotation) } returns true
@@ -375,7 +375,7 @@ class RecordServiceFetchRecordsTest {
                 expected = record2,
                 actual = fetched[1]
         )
-        verify(exactly = 1) { taggingService.getTagFromType(Fhir3CarePlan::class.java as Class<Any>) }
+        verify(exactly = 1) { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) }
         verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
         verify(exactly = 1) { tagEncryptionService.encryptAnnotations(defaultAnnotation) }
         verify(exactly = 1) { encryptedTags.addAll(defaultAnnotation) }
@@ -418,7 +418,7 @@ class RecordServiceFetchRecordsTest {
 
         every { RecordService.DATE_FORMATTER.format(startDate) } returns start
         every { RecordService.DATE_FORMATTER.format(endDate) } returns end
-        every { taggingService.getTagFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
+        every { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
         every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
         every { tagEncryptionService.encryptAnnotations(defaultAnnotation) } returns defaultAnnotation
         every { encryptedTags.addAll(defaultAnnotation) } returns true
@@ -480,7 +480,7 @@ class RecordServiceFetchRecordsTest {
                 expected = record2,
                 actual = fetched[1]
         )
-        verify(exactly = 1) { taggingService.getTagFromType(Fhir3CarePlan::class.java as Class<Any>) }
+        verify(exactly = 1) { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) }
         verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
         verify(exactly = 1) { tagEncryptionService.encryptAnnotations(defaultAnnotation) }
         verify(exactly = 1) { encryptedTags.addAll(defaultAnnotation) }
@@ -519,7 +519,7 @@ class RecordServiceFetchRecordsTest {
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
         mockkObject(RecordMapper)
 
-        every { taggingService.getTagFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
+        every { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
         every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
         every { tagEncryptionService.encryptAnnotations(defaultAnnotation) } returns defaultAnnotation
         every { encryptedTags.addAll(defaultAnnotation) } returns true
@@ -575,7 +575,7 @@ class RecordServiceFetchRecordsTest {
                 expected = record1,
                 actual = fetched[0]
         )
-        verify(exactly = 1) { taggingService.getTagFromType(Fhir3CarePlan::class.java as Class<Any>) }
+        verify(exactly = 1) { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) }
         verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
         verify(exactly = 1) { tagEncryptionService.encryptAnnotations(defaultAnnotation) }
         verify(exactly = 1) { encryptedTags.addAll(defaultAnnotation) }
@@ -611,7 +611,7 @@ class RecordServiceFetchRecordsTest {
 
         mockkObject(RecordMapper)
 
-        every { taggingService.getTagFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
+        every { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
         every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
         every { tagEncryptionService.encryptAnnotations(defaultAnnotation) } returns defaultAnnotation
         every { tagEncryptionService.encryptAnnotations(annotations) } returns annotations.toMutableList()
@@ -670,7 +670,7 @@ class RecordServiceFetchRecordsTest {
                 expected = record1,
                 actual = fetched[0]
         )
-        verify(exactly = 1) { taggingService.getTagFromType(Fhir3CarePlan::class.java as Class<Any>) }
+        verify(exactly = 1) { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) }
         verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
         verify(exactly = 1) { apiService.fetchRecords(
                 ALIAS,
@@ -703,7 +703,7 @@ class RecordServiceFetchRecordsTest {
 
         mockkObject(RecordMapper)
 
-        every { taggingService.getTagFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
+        every { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
         every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
         every { tagEncryptionService.encryptAnnotations(defaultAnnotation) } returns defaultAnnotation
         every { tagEncryptionService.encryptAnnotations(annotations) } returns annotations.toMutableList()
@@ -757,7 +757,7 @@ class RecordServiceFetchRecordsTest {
                 expected = 0,
                 actual = fetched.size
         )
-        verify(exactly = 1) { taggingService.getTagFromType(Fhir3CarePlan::class.java as Class<Any>) }
+        verify(exactly = 1) { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) }
         verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
         verify(exactly = 1) { apiService.fetchRecords(
                 ALIAS,
@@ -790,7 +790,7 @@ class RecordServiceFetchRecordsTest {
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
         mockkObject(RecordMapper)
 
-        every { taggingService.getTagFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
+        every { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
         every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
         every { tagEncryptionService.encryptAnnotations(defaultAnnotation) } returns defaultAnnotation
         every { encryptedTags.addAll(defaultAnnotation) } returns true
@@ -852,7 +852,7 @@ class RecordServiceFetchRecordsTest {
                 expected = record2,
                 actual = fetched[1]
         )
-        verify(exactly = 1) { taggingService.getTagFromType(Fhir4CarePlan::class.java as Class<Any>) }
+        verify(exactly = 1) { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) }
         verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
         verify(exactly = 1) { tagEncryptionService.encryptAnnotations(defaultAnnotation) }
         verify(exactly = 1) { encryptedTags.addAll(defaultAnnotation) }
@@ -895,7 +895,7 @@ class RecordServiceFetchRecordsTest {
 
         every { RecordService.DATE_FORMATTER.format(startDate) } returns start
         every { RecordService.DATE_FORMATTER.format(endDate) } returns end
-        every { taggingService.getTagFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
+        every { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
         every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
         every { tagEncryptionService.encryptAnnotations(defaultAnnotation) } returns defaultAnnotation
         every { encryptedTags.addAll(defaultAnnotation) } returns true
@@ -958,7 +958,7 @@ class RecordServiceFetchRecordsTest {
                 expected = record2,
                 actual = fetched[1]
         )
-        verify(exactly = 1) { taggingService.getTagFromType(Fhir4CarePlan::class.java as Class<Any>) }
+        verify(exactly = 1) { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) }
         verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
         verify(exactly = 1) { tagEncryptionService.encryptAnnotations(defaultAnnotation) }
         verify(exactly = 1) { encryptedTags.addAll(defaultAnnotation) }
@@ -997,7 +997,7 @@ class RecordServiceFetchRecordsTest {
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
         mockkObject(RecordMapper)
 
-        every { taggingService.getTagFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
+        every { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
         every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
         every { tagEncryptionService.encryptAnnotations(defaultAnnotation) } returns defaultAnnotation
         every { encryptedTags.addAll(defaultAnnotation) } returns true
@@ -1054,7 +1054,7 @@ class RecordServiceFetchRecordsTest {
                 expected = record1,
                 actual = fetched[0]
         )
-        verify(exactly = 1) { taggingService.getTagFromType(Fhir4CarePlan::class.java as Class<Any>) }
+        verify(exactly = 1) { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) }
         verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
         verify(exactly = 1) { tagEncryptionService.encryptAnnotations(defaultAnnotation) }
         verify(exactly = 1) { encryptedTags.addAll(defaultAnnotation) }
@@ -1090,7 +1090,7 @@ class RecordServiceFetchRecordsTest {
 
         mockkObject(RecordMapper)
 
-        every { taggingService.getTagFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
+        every { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
         every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
         every { tagEncryptionService.encryptAnnotations(defaultAnnotation) } returns defaultAnnotation
         every { tagEncryptionService.encryptAnnotations(annotations) } returns annotations.toMutableList()
@@ -1149,7 +1149,7 @@ class RecordServiceFetchRecordsTest {
                 expected = record1,
                 actual = fetched[0]
         )
-        verify(exactly = 1) { taggingService.getTagFromType(Fhir4CarePlan::class.java as Class<Any>) }
+        verify(exactly = 1) { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) }
         verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
         verify(exactly = 1) { apiService.fetchRecords(
                 ALIAS,
@@ -1182,7 +1182,7 @@ class RecordServiceFetchRecordsTest {
 
         mockkObject(RecordMapper)
 
-        every { taggingService.getTagFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
+        every { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
         every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
         every { tagEncryptionService.encryptAnnotations(defaultAnnotation) } returns defaultAnnotation
         every { tagEncryptionService.encryptAnnotations(annotations) } returns annotations.toMutableList()
@@ -1236,7 +1236,7 @@ class RecordServiceFetchRecordsTest {
                 expected = 0,
                 actual = fetched.size
         )
-        verify(exactly = 1) { taggingService.getTagFromType(Fhir4CarePlan::class.java as Class<Any>) }
+        verify(exactly = 1) { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) }
         verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
         verify(exactly = 1) { apiService.fetchRecords(
                 ALIAS,

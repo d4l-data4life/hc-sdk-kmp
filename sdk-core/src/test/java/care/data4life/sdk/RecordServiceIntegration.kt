@@ -16,7 +16,6 @@
 
 package care.data4life.sdk
 
-import care.data4life.fhir.stu3.model.DocumentReference
 import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.FhirService
@@ -220,50 +219,5 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
             // Then
             Truth.assertThat(e).isInstanceOf(ClassCastException::class.java)
         }
-    }
-
-    @Test
-    fun `Given, countRecords is called with its appropriate parameter, it returns the amount of Records`() {
-        val encodedEncryptedVersion = "ZmhpcnZlcnNpb249MyUyZTAlMmUx"
-        val encodedEncryptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
-
-        val tags = mapOf(
-                "partner" to "partner=$PARTNER_ID".toLowerCase(),
-                "client" to "client=${
-                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
-                }",
-                "fhirversion" to "fhirversion=${
-                    "3.0.1".replace(".", "%2e")
-                }",
-                "resourcetype" to "resourcetype=documentreference"
-        )
-
-        // encrypt tags
-        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["resourcetype"]!!.toByteArray()
-            ), IV)
-        } returns tags["resourcetype"]!!.toByteArray()
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["fhirversion"]!!.toByteArray()
-            ), IV)
-        } returns tags["fhirversion"]!!.toByteArray()
-
-        every { apiService.getCount(
-                ALIAS,
-                USER_ID,
-                listOf(encodedEncryptedVersion, encodedEncryptedResourceType)
-        ) } returns Single.just(23)
-
-        // When
-        val result = (recordService as RecordService).countRecords(
-                DocumentReference::class.java,
-                USER_ID
-        ).blockingGet()
-
-        // Then
-        Truth.assertThat(result).isEqualTo(23)
     }
 }

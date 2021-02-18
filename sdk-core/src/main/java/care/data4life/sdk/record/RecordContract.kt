@@ -46,5 +46,10 @@ interface RecordContract {
         fun fetchDataRecords(userId: String, annotations: List<String>, startDate: LocalDate?, endDate: LocalDate?, pageSize: Int, offset: Int): Single<List<DataRecord<DataResource>>>
         fun <T : Fhir3Resource> fetchFhir3Records(userId: String, resourceType: Class<T>, annotations: List<String>, startDate: LocalDate?, endDate: LocalDate?, pageSize: Int, offset: Int): Single<List<Record<T>>>
         fun <T : Fhir4Resource> fetchFhir4Records(userId: String, resourceType: Class<T>, annotations: List<String>, startDate: LocalDate?, endDate: LocalDate?, pageSize: Int, offset: Int): Single<List<Fhir4Record<T>>>
+
+        fun countFhir3Records(type: Class<out Fhir3Resource>, userId: String, annotations: List<String>): Single<Int>
+        fun countFhir4Records(type: Class<out Fhir4Resource>, userId: String, annotations: List<String>): Single<Int>
+
+        fun countAllFhir3Records(userId: String, annotations: List<String>): Single<Int>
     }
 }

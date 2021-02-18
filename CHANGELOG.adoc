@@ -37,6 +37,7 @@ toc::[]
 * RecordService#deleteRecord invocation had mixed user and resource id.
 * RecordService#fetchRecords invocation had mixed user and resource id.
 * NullPointerException when using DomainResource as resourceType for fetch/search.
+* RecordService called on fetch/search DATE_FORMAT instead DATE_FORMATTER.
 
 === Bumped
 

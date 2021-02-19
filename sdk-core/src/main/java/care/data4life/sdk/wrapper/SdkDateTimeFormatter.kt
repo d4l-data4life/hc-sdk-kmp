@@ -18,6 +18,7 @@ package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.RecordService
 import care.data4life.sdk.model.Meta
+import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.wrapper.WrapperContract.DateTimeFormatter.Companion.DATE_FORMAT
 import care.data4life.sdk.wrapper.WrapperContract.DateTimeFormatter.Companion.DATE_TIME_FORMAT
@@ -42,7 +43,7 @@ internal object SdkDateTimeFormatter : WrapperContract.DateTimeFormatter {
 
     override fun buildMeta(
         record: DecryptedBaseRecord<*>
-    ): Meta = Meta(
+    ): ModelContract.Meta = Meta(
         LocalDate.parse(record.customCreationDate, DATE_FORMATTER),
         LocalDateTime.parse(record.updatedDate, DATE_TIME_FORMATTER)
     )

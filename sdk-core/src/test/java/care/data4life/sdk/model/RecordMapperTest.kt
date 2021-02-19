@@ -17,10 +17,10 @@
 package care.data4life.sdk.model
 
 import care.data4life.crypto.GCKey
-import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.ModelContract.Fhir3Record
@@ -29,58 +29,50 @@ import care.data4life.sdk.network.model.DecryptedDataRecord
 import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.Tags
+import care.data4life.sdk.wrapper.SdkDateTimeFormatter
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.unmockkAll
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
-import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalDateTime
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 class RecordMapperTest {
     private lateinit var id: String
-    private lateinit var fhirResource: DomainResource
-    private lateinit var customResource: ByteArray
-    private lateinit var tags: HashMap<String, String>
-    private lateinit var annotations: List<String>
-    private lateinit var creationDate: LocalDate
-    private lateinit var updateDate: LocalDateTime
+    private lateinit var tags: Tags
+    private lateinit var annotations: Annotations
+    private lateinit var meta: ModelContract.Meta
     private lateinit var dataKey: GCKey
     private lateinit var attachmentKey: GCKey
     private var modelVersion = 0
 
     @Before
     fun setUp() {
-        mockkStatic(LocalDate::class)
-        mockkStatic(LocalDateTime::class)
+        mockkObject(SdkDateTimeFormatter)
 
         id = "id"
-        fhirResource = Mockito.mock(DomainResource::class.java)
-        customResource = ByteArray(23)
-        @Suppress("UNCHECKED_CAST")
-        tags = Mockito.mock(HashMap::class.java) as HashMap<String, String>
-        @Suppress("UNCHECKED_CAST")
-        annotations = Mockito.mock(List::class.java) as List<String>
-        creationDate = Mockito.mock(LocalDate::class.java)
-        updateDate = Mockito.mock(LocalDateTime::class.java)
-        dataKey = Mockito.mock(GCKey::class.java)
-        attachmentKey = Mockito.mock(GCKey::class.java)
+        tags = mockk()
+        annotations = mockk()
+        meta = mockk()
+        dataKey = mockk()
+        attachmentKey = mockk()
         modelVersion = 42
     }
 
     @After
     fun tearDown() {
-        unmockkAll()
+        unmockkObject(SdkDateTimeFormatter)
     }
 
     @Test
     fun `it is a RecordFactory`() {
-        assertTrue((RecordMapper as Any) is RecordFactory)
+        assertTrue(RecordMapper is RecordFactory)
     }
 
     @Test
@@ -88,89 +80,86 @@ class RecordMapperTest {
         // Given
         val givenCreationDate = "2020-05-03"
         val givenUpdateDate = "2019-02-28T17:21:08.234123"
-
-        every { LocalDate.parse(givenCreationDate, any()) } returns creationDate
-        every { LocalDateTime.parse(givenUpdateDate, any()) } returns updateDate
+        val resource: Fhir3Resource = mockk()
 
         val decryptedRecord = DecryptedRecord(
-                id,
-                fhirResource,
-                tags,
-                annotations,
-                givenCreationDate,
-                givenUpdateDate,
-                dataKey,
-                attachmentKey,
-                modelVersion
+            id,
+            resource,
+            tags,
+            annotations,
+            givenCreationDate,
+            givenUpdateDate,
+            dataKey,
+            attachmentKey,
+            modelVersion
         )
+
+        every { SdkDateTimeFormatter.buildMeta(decryptedRecord) } returns meta
 
         // When
         val record = RecordMapper.getInstance(decryptedRecord)
 
         // Then
         assertTrue(record is Fhir3Record)
-        // FIXME: Meta & Record should be a data class
         assertEquals(
-                record.resource,
-                fhirResource
+            actual = record.identifier,
+            expected = ""
         )
         assertEquals(
-                record.meta!!.createdDate,
-                creationDate
+            actual = record.resource,
+            expected = resource
         )
         assertEquals(
-                record.meta!!.updatedDate,
-                updateDate
+            actual = record.meta,
+            expected = meta
         )
         assertEquals(
-                record.annotations,
-                annotations
+            actual = record.annotations,
+            expected = annotations
         )
     }
 
     @Test
-    fun `Given, getInstance is called with a DecryptedFhir43Record, it returns a Fhir4Record`() {
+    fun `Given, getInstance is called with a DecryptedFhir4Record, it returns a Fhir4Record`() {
         // Given
         val givenCreationDate = "2020-05-03"
         val givenUpdateDate = "2019-02-28T17:21:08.234123"
-        val resource = mockk<Fhir4Resource>()
-
-        every { LocalDate.parse(givenCreationDate, any()) } returns creationDate
-        every { LocalDateTime.parse(givenUpdateDate, any()) } returns updateDate
+        val resource: Fhir4Resource = mockk()
 
         val decryptedRecord = DecryptedR4Record(
-                id,
-                resource,
-                tags,
-                annotations,
-                givenCreationDate,
-                givenUpdateDate,
-                dataKey,
-                attachmentKey,
-                modelVersion
+            id,
+            resource,
+            tags,
+            annotations,
+            givenCreationDate,
+            givenUpdateDate,
+            dataKey,
+            attachmentKey,
+            modelVersion
         )
+
+        every { SdkDateTimeFormatter.buildMeta(decryptedRecord) } returns meta
 
         // When
         val record = RecordMapper.getInstance(decryptedRecord)
 
         // Then
         assertTrue(record is Fhir4Record<*>)
-        // FIXME: Meta & Record should be a data class
         assertEquals(
-                record.resource,
-                resource
+            actual = record.identifier,
+            expected = id
         )
         assertEquals(
-                record.meta!!.createdDate,
-                creationDate
+            actual = record.resource,
+            expected = resource
         )
         assertEquals(
-                record.meta!!.updatedDate,
-                updateDate
+            actual = record.meta,
+            expected = meta
         )
         assertEquals(
-                record.annotations,
-                annotations
+            actual = record.annotations,
+            expected = annotations
         )
     }
 
@@ -179,90 +168,81 @@ class RecordMapperTest {
         // Given
         val givenCreationDate = "2020-05-03"
         val givenUpdateDate = "2019-02-28T17:21:08.234123"
-
-        every { LocalDate.parse(givenCreationDate, any()) } returns creationDate
-        every { LocalDateTime.parse(givenUpdateDate, any()) } returns updateDate
+        val resource: DataResource = mockk()
 
         val decryptedRecord = DecryptedDataRecord(
-                id,
-                DataResource(customResource),
-                tags,
-                annotations,
-                givenCreationDate,
-                givenUpdateDate,
-                dataKey,
-                modelVersion
+            id,
+            resource,
+            tags,
+            annotations,
+            givenCreationDate,
+            givenUpdateDate,
+            dataKey,
+            modelVersion
         )
+
+        every { SdkDateTimeFormatter.buildMeta(decryptedRecord) } returns meta
 
         // When
         val record = RecordMapper.getInstance(decryptedRecord)
 
         // Then
         assertTrue(record is DataRecord<*>)
-        // FIXME: Meta & Record should be a data class
         assertEquals(
-                record.identifier,
-                id
+            actual = record.identifier,
+            expected = id
         )
         assertEquals(
-                record.resource.value,
-                customResource
+            actual = record.resource,
+            expected = resource
         )
         assertEquals(
-                record.meta!!.createdDate,
-                creationDate
+            actual = record.meta,
+            expected = meta
         )
         assertEquals(
-                record.meta!!.updatedDate,
-                updateDate
-        )
-        assertEquals(
-                record.annotations,
-                annotations
+            actual = record.annotations,
+            expected = annotations
         )
     }
 
     @Test
     fun `Given, getInstance is called with a unknown DecryptedRecord implementation, it fails with a InternalFailure`() {
-
         // Given
         val givenCreationDate = "2020-05-03"
         val givenUpdateDate = "2019-02-28T17:21:08.234123"
 
-        every { LocalDate.parse(givenCreationDate, any()) } returns creationDate
-        every { LocalDateTime.parse(givenUpdateDate, any()) } returns updateDate
-
         val decryptedRecord = DecryptedUnknownRecord(
-                id,
-                "fail",
-                tags,
-                annotations,
-                givenCreationDate,
-                givenUpdateDate,
-                dataKey,
-                attachmentKey,
-                modelVersion
+            id,
+            "fail",
+            tags,
+            annotations,
+            givenCreationDate,
+            givenUpdateDate,
+            dataKey,
+            attachmentKey,
+            modelVersion
         )
 
+        every { SdkDateTimeFormatter.buildMeta(decryptedRecord) } returns meta
+
         // When
-        try {
-            RecordMapper.getInstance(decryptedRecord)
-            assertTrue(false)// FIXME: This is stupid
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
+        assertFailsWith<CoreRuntimeException.InternalFailure> {
+            RecordMapper.getInstance(
+                decryptedRecord
+            )
         }
     }
 
     private data class DecryptedUnknownRecord<T : Any>(
-            override var identifier: String?,
-            override var resource: T,
-            override var tags: HashMap<String, String>?,
-            override var annotations: List<String>,
-            override var customCreationDate: String?,
-            override var updatedDate: String?,
-            override var dataKey: GCKey?,
-            override var attachmentsKey: GCKey?,
-            override var modelVersion: Int
+        override var identifier: String?,
+        override var resource: T,
+        override var tags: HashMap<String, String>?,
+        override var annotations: List<String>,
+        override var customCreationDate: String?,
+        override var updatedDate: String?,
+        override var dataKey: GCKey?,
+        override var attachmentsKey: GCKey?,
+        override var modelVersion: Int
     ) : DecryptedBaseRecord<T>
 }

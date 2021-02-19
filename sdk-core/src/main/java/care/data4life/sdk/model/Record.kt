@@ -21,7 +21,7 @@ import java.util.Objects.hash
 
 open class Record<T : DomainResource>(
     fhirResource: T,
-    meta: Meta?,
+    meta: ModelContract.Meta?,
     annotations: List<String>? = null
 ) : Fhir3Record<T> {
     constructor(fhirResource: T, meta: Meta?) : this(
@@ -37,8 +37,8 @@ open class Record<T : DomainResource>(
     override val resource: T
         get() = _resource
 
-    private val _meta: Meta? = meta
-    override val meta: Meta?
+    private val _meta: ModelContract.Meta? = meta
+    override val meta: ModelContract.Meta?
         get() = _meta
 
     private var _annotations: List<String>? = annotations

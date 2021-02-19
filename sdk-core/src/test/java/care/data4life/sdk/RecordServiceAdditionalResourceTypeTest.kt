@@ -27,6 +27,7 @@ import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_FMT
 import care.data4life.sdk.test.util.AttachmentBuilder
 import care.data4life.sdk.test.util.MedicationBuilder
 import care.data4life.sdk.test.util.ObservationBuilder
@@ -524,7 +525,7 @@ class RecordServiceAdditionalResourceTypeTest : RecordServiceTestBase() {
         val currentId = ADDITIONAL_ID
         val obsoleteId = ADDITIONAL_ID.replaceFirst(ATTACHMENT_ID.toRegex(), "obsoleteId")
         val otherId = "otherId"
-        val valueId = RecordService.DOWNSCALED_ATTACHMENT_IDS_FMT + SPLIT_CHAR +
+        val valueId = DOWNSCALED_ATTACHMENT_IDS_FMT + SPLIT_CHAR +
                 "valueAttachment" + SPLIT_CHAR + PREVIEW_ID +
                 SPLIT_CHAR + THUMBNAIL_ID
         val currentIdentifier = FhirAttachmentHelper.buildIdentifier(currentId, ASSIGNER)

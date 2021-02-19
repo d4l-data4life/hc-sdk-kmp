@@ -29,6 +29,7 @@ import org.threeten.bp.LocalDate
 interface RecordContract {
 
     interface Service {
+
         fun createRecord(userId: String, resource: DataResource, annotations: List<String>): Single<DataRecord<DataResource>>
         fun <T : Fhir3Resource> createRecord(userId: String, resource: T, annotations: List<String>): Single<Record<T>>
         fun <T : Fhir4Resource> createRecord(userId: String, resource: T, annotations: List<String>): Single<Fhir4Record<T>>
@@ -51,5 +52,15 @@ interface RecordContract {
         fun countFhir4Records(type: Class<out Fhir4Resource>, userId: String, annotations: List<String>): Single<Int>
 
         fun countAllFhir3Records(userId: String, annotations: List<String>): Single<Int>
+
+        companion object {
+            const val EMPTY_RECORD_ID = ""
+            const val DOWNSCALED_ATTACHMENT_IDS_FMT =
+                "d4l_f_p_t" //d4l -> namespace, f-> full, p -> preview, t -> thumbnail
+            const val DOWNSCALED_ATTACHMENT_IDS_SIZE = 4
+            const val FULL_ATTACHMENT_ID_POS = 1
+            const val PREVIEW_ID_POS = 2
+            const val THUMBNAIL_ID_POS = 3
+        }
     }
 }

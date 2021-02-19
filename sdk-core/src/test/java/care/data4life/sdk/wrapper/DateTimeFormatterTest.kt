@@ -111,7 +111,7 @@ class DateTimeFormatterTest {
         )
 
         assertEquals(
-            expected = LocalDateTime.of(2020, 5, 3, 7, 45, 8,234123000),
+            expected = LocalDateTime.of(2020, 5, 3, 7, 45, 8, 234123000),
             actual = actual.updatedDate
         )
     }
@@ -136,7 +136,7 @@ class DateTimeFormatterTest {
         )
 
         assertEquals(
-            expected = LocalDateTime.of(2020, 5, 3, 7, 45, 8,234123000),
+            expected = LocalDateTime.of(2020, 5, 3, 7, 45, 8, 234123000),
             actual = actual.updatedDate
         )
 
@@ -174,7 +174,7 @@ class DateTimeFormatterTest {
         )
 
         assertEquals(
-            expected = LocalDateTime.of(2020, 5, 3, 7, 45, 8,234123000),
+            expected = LocalDateTime.of(2020, 5, 3, 7, 45, 8, 234123000),
             actual = actual.updatedDate
         )
 

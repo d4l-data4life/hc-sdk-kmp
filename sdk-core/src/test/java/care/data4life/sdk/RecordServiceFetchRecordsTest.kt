@@ -32,7 +32,7 @@ import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.migration.MigrationContract
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
-import care.data4life.sdk.model.definitions.BaseRecord
+import care.data4life.sdk.model.ModelContract.BaseRecord
 import care.data4life.sdk.network.model.DecryptedDataRecord
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord

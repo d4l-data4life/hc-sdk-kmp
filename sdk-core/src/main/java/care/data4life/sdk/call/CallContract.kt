@@ -17,7 +17,7 @@
 package care.data4life.sdk.call
 
 import care.data4life.sdk.model.Meta
-import care.data4life.sdk.model.definitions.BaseRecord
+import care.data4life.sdk.model.ModelContract.BaseRecord
 
 class CallContract {
 

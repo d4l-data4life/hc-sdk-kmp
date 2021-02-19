@@ -23,8 +23,8 @@ import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.model.definitions.Fhir3Record
-import care.data4life.sdk.model.definitions.RecordFactory
+import care.data4life.sdk.model.ModelContract.Fhir3Record
+import care.data4life.sdk.model.ModelContract.RecordFactory
 import care.data4life.sdk.network.model.DecryptedDataRecord
 import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
@@ -154,7 +154,7 @@ class RecordMapperTest {
         val record = RecordMapper.getInstance(decryptedRecord)
 
         // Then
-        assertTrue(record is Fhir4Record)
+        assertTrue(record is Fhir4Record<*>)
         // FIXME: Meta & Record should be a data class
         assertEquals(
                 record.resource,
@@ -198,7 +198,7 @@ class RecordMapperTest {
         val record = RecordMapper.getInstance(decryptedRecord)
 
         // Then
-        assertTrue(record is DataRecord)
+        assertTrue(record is DataRecord<*>)
         // FIXME: Meta & Record should be a data class
         assertEquals(
                 record.identifier,

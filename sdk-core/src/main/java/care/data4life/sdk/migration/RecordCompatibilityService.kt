@@ -67,7 +67,7 @@ class RecordCompatibilityService internal constructor(
     ): Observable<List<EncryptedRecord>> {
         val (encodedAndEncryptedTags, encryptedTags) = encrypt(tags, annotations)
 
-        return if(needsDoubleCall(encodedAndEncryptedTags, encryptedTags)) {
+        return if (needsDoubleCall(encodedAndEncryptedTags, encryptedTags)) {
             Observable.zip(
                 apiService.fetchRecords(
                     alias,

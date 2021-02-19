@@ -56,7 +56,7 @@ object TagEncryptionHelper : TaggingContract.Helper {
     private fun validateTag(tag: String) {
         if (tag.isBlank()) {
             throw DataValidationException.AnnotationViolation(
-                    "Annotation is empty."
+                "Annotation is empty."
             )
         }
     }
@@ -64,11 +64,11 @@ object TagEncryptionHelper : TaggingContract.Helper {
     @Throws(D4LException::class)
     override fun encode(tag: String): String {
         return URLEncoder.encode(
-                normalize(tag),
-                StandardCharsets.UTF_8.displayName()
+            normalize(tag),
+            StandardCharsets.UTF_8.displayName()
         ).map { char ->
             replaceSpecial(
-                    normalizeEncodedChar(char)
+                normalizeEncodedChar(char)
             )
         }.joinToString("")
     }
@@ -80,6 +80,6 @@ object TagEncryptionHelper : TaggingContract.Helper {
     }
 
     override fun decode(
-            encodedTag: String
+        encodedTag: String
     ): String = URLDecoder.decode(encodedTag, StandardCharsets.UTF_8.displayName())
 }

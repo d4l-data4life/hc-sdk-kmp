@@ -28,7 +28,6 @@ import care.data4life.sdk.migration.MigrationContract
 import care.data4life.sdk.tag.TaggingContract
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.spyk
 import io.mockk.verify
 import io.reactivex.Single
@@ -36,7 +35,6 @@ import org.junit.Before
 import org.junit.Test
 import java.io.IOException
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class RecordServiceCountRecordsTest {
     private lateinit var recordService: RecordService
@@ -187,7 +185,13 @@ class RecordServiceCountRecordsTest {
             expected = expected,
             actual = result
         )
-        verify(exactly = 1) { recordService.countFhir3Records(Fhir3Resource::class.java, USER_ID, annotations) }
+        verify(exactly = 1) {
+            recordService.countFhir3Records(
+                Fhir3Resource::class.java,
+                USER_ID,
+                annotations
+            )
+        }
     }
 
     @Test

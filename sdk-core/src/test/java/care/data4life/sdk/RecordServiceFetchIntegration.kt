@@ -39,6 +39,7 @@ import org.threeten.bp.LocalDate
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
 import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
 
@@ -1968,7 +1969,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
 
         // When
         assertFailsWith<ClassCastException> {
-            recordService.fetchFhir4Record<Fhir4Resource>(USER_ID, RECORD_ID).blockingGet()
+            recordService.fetchFhir4Record<Fhir4Resource>(USER_ID, RECORD_ID).blockingGet() as Fhir4Record<*>
         }
     }
 

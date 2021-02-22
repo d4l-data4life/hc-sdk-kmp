@@ -52,7 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:theme="@style/ToolBarStyle"
-            app:title="Data4LLife"
+            app:title="Data4Life"
             app:titleTextColor="#FFF"
             >
 
@@ -65,6 +65,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
+        android:layout_margin="32dp"
+        android:src="@drawable/ic_action_add"
+        android:visibility="visible"
+        />
+
+	<com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addFABAppData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         android:layout_margin="32dp"
         android:src="@drawable/ic_action_add"
         android:visibility="visible"

@@ -111,12 +111,12 @@ class SingleMainView(private val alias: String) : BaseView(), KoinComponent {
 
         runBlocking {
             client.isUserLoggedIn(object : ResultListener<Boolean> {
-                override fun onSuccess(t: Boolean?) {
-                    isLoggedIn = t ?: false
+                override fun onSuccess(t: Boolean) {
+                    isLoggedIn = t
                 }
 
-                override fun onError(exception: D4LException?) {
-                    exception?.printStackTrace()
+                override fun onError(exception: D4LException) {
+                    exception.printStackTrace()
                     isLoggedIn = false
                 }
             })
@@ -133,7 +133,7 @@ class SingleMainView(private val alias: String) : BaseView(), KoinComponent {
                     renderDefaultMenu()
                 }
 
-                override fun onError(exception: D4LException?) {
+                override fun onError(exception: D4LException) {
                     renderMessage(Message("Logout failed: $exception"))
                     renderAuthorizedMenu()
                 }

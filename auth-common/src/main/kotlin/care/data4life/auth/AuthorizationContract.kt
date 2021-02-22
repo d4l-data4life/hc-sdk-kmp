@@ -19,6 +19,7 @@ package care.data4life.auth
 interface AuthorizationContract {
 
     interface Service {
+
         fun getAccessToken(alias: String): String?
 
         fun getRefreshToken(alias: String): String?

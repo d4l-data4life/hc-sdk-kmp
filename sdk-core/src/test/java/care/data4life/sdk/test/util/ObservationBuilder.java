@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import care.data4life.fhir.stu3.model.Attachment;
-import care.data4life.fhir.stu3.model.CodeSystems;
+import care.data4life.fhir.stu3.model.CodeSystemObservationStatus;
 import care.data4life.fhir.stu3.model.CodeableConcept;
 import care.data4life.fhir.stu3.model.Observation;
 import care.data4life.sdk.util.Base64;
@@ -31,8 +31,8 @@ public class ObservationBuilder {
     private static final String ATTACHMENT_ID = "attachmentId";
 
 
-    public static Observation buildWith(CodeableConcept type, CodeSystems.ObservationStatus status, List<Attachment> attachments) {
-        Observation observation = new Observation(type, status);
+    public static Observation buildWith(CodeableConcept type, CodeSystemObservationStatus status, List<Attachment> attachments) {
+        Observation observation = new Observation(status, type);
         observation.valueAttachment = attachments.get(0);
         Observation.ObservationComponent component = buildComponent(null, attachments.get(1));
         observation.component = new ArrayList<>();
@@ -41,14 +41,14 @@ public class ObservationBuilder {
     }
 
 
-    public static Observation buildWith(CodeableConcept type, CodeSystems.ObservationStatus status, Attachment attachment) {
-        Observation observation = new Observation(type, status);
+    public static Observation buildWith(CodeableConcept type, CodeSystemObservationStatus status, Attachment attachment) {
+        Observation observation = new Observation(status, type);
         observation.valueAttachment = attachment;
         return observation;
     }
 
-    public static Observation buildWith(CodeableConcept type, CodeSystems.ObservationStatus status, Observation.ObservationComponent component) {
-        Observation observation = new Observation(type, status);
+    public static Observation buildWith(CodeableConcept type, CodeSystemObservationStatus status, Observation.ObservationComponent component) {
+        Observation observation = new Observation(status, type);
         observation.component = new ArrayList<>();
         observation.component.add(component);
         return observation;

@@ -25,12 +25,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import care.data4life.auth.AuthorizationService;
 import care.data4life.sdk.lang.D4LException;
+import care.data4life.sdk.lang.D4LRuntimeException;
 import care.data4life.sdk.network.Environment;
 import care.data4life.sdk.network.IHCService;
 import care.data4life.sdk.network.model.CommonKeyResponse;
 import care.data4life.sdk.network.model.DocumentUploadResponse;
 import care.data4life.sdk.network.model.EncryptedRecord;
+import care.data4life.sdk.network.model.NetworkModelContract;
 import care.data4life.sdk.network.model.UserInfo;
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter;
 import care.data4life.sdk.util.Base64;
@@ -51,7 +54,8 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
-final class ApiService {
+// TODO Kotlin and internal
+public final class ApiService {
 
     private static final String HEADER_ALIAS = "gc_alias";
     private static final String HEADER_ACCESS_TOKEN = "access_token";
@@ -72,24 +76,44 @@ final class ApiService {
 
     private final String clientID;
     private final String clientSecret;
-    private final OAuthService oAuthService;
+    private final AuthorizationService authService;
     private final Environment environment;
     private String platform;
     private final NetworkConnectivityService connectivityService;
     private OkHttpClient client;
     private final String clientName;
     private final boolean debug;
+    private final String staticAccessToken;
 
-
-    ApiService(OAuthService oAuthService,
+    /**
+     * Full constructor.
+     * <p>
+     * If the staticToken parameter is set to null, the SDK will handle the full OAuth flow
+     * and fetch  access and retrieval tokens, renewing the former as needed for later
+     * requests.
+     * If the a non-null staticToken is passed, the SDK will use this value as an access token.
+     * In this case, it will not dynamical fetch or renew tokens.
+     *
+     * @param authService         AuthorizationService
+     * @param environment         Deployment environment
+     * @param clientID            Client ID
+     * @param clientSecret        Client secret
+     * @param platform            Usage platform (D4L, S4H)
+     * @param connectivityService Connectivity service
+     * @param clientName          Client name
+     * @param staticAccessToken   Prefetched OAuth token - if not null, it will be used directly (no token renewal).
+     * @param debug               Debug flag
+     */
+    ApiService(AuthorizationService authService,
                Environment environment,
                String clientID,
                String clientSecret,
                String platform,
                NetworkConnectivityService connectivityService,
                String clientName,
+               byte[] staticAccessToken,
                boolean debug) {
-        this.oAuthService = oAuthService;
+        this.authService = authService;
         this.environment = environment;
         this.clientID = clientID;
         this.clientSecret = clientSecret;
@@ -97,7 +121,39 @@ final class ApiService {
         this.connectivityService = connectivityService;
         this.clientName = clientName;
         this.debug = debug;
+        this.staticAccessToken = staticAccessToken == null ? null : new String(staticAccessToken);
         configureService();
+    }
+
+    /**
+     * Convenience constructor for instances that handle the OAuth flow themselves.
+     *
+     * @param authService         AuthorizationService
+     * @param environment         Deployment environment
+     * @param clientID            Client ID
+     * @param clientSecret        Client secret
+     * @param platform            Usage platform (D4L, S4H)
+     * @param connectivityService Connectivity service
+     * @param clientName          Client name
+     * @param debug               Debug flag
+     */
+    ApiService(AuthorizationService authService,
+               Environment environment,
+               String clientID,
+               String clientSecret,
+               String platform,
+               NetworkConnectivityService connectivityService,
+               String clientName,
+               boolean debug) {
+        this(authService,
+                environment,
+                clientID,
+                clientSecret,
+                platform,
+                connectivityService,
+                clientName,
+                null,
+                debug);
     }
 
     private void configureService() {
@@ -116,7 +172,8 @@ final class ApiService {
             return chain.proceed(request);
         };
 
-        Interceptor authorizationInterceptor = this::intercept;
+        // Pick authentication interceptor based on whether a static access token is used or not
+        Interceptor authorizationInterceptor = this.staticAccessToken != null ? this::staticTokenIntercept : this::intercept;
 
         Interceptor retryInterceptor = chain -> {
             Request request = chain.request();
@@ -180,8 +237,8 @@ final class ApiService {
         return service.uploadTagEncryptionKey(alias, userId, params);
     }
 
-    Single<EncryptedRecord> createRecord(String alias, String userId, EncryptedRecord encryptedRecord) {
-        return service.createRecord(alias, userId, encryptedRecord);
+    Single<EncryptedRecord> createRecord(String alias, String userId, NetworkModelContract.EncryptedRecord encryptedRecord) {
+        return service.createRecord(alias, userId, (EncryptedRecord) encryptedRecord);
     }
 
     Observable<List<EncryptedRecord>> fetchRecords(String alias,
@@ -205,29 +262,32 @@ final class ApiService {
     Single<EncryptedRecord> updateRecord(String alias,
                                          String userId,
                                          String recordId,
-                                         EncryptedRecord encryptedRecord) {
-        return service.updateRecord(alias, userId, recordId, encryptedRecord);
+                                         NetworkModelContract.EncryptedRecord encryptedRecord) {
+        return service.updateRecord(alias, userId, recordId, (EncryptedRecord) encryptedRecord);
     }
 
-    Single<String> uploadDocument(String alias,
-                                  String userId,
-                                  byte[] encryptedAttachment) {
+    // TODO remove public
+    public Single<String> uploadDocument(String alias,
+                                         String userId,
+                                         byte[] encryptedAttachment) {
         return service.uploadDocument(
                 alias, userId,
                 RequestBody.create(MediaType.parse(MEDIA_TYPE_OCTET_STREAM), encryptedAttachment)
         ).map(DocumentUploadResponse::getDocumentId);
     }
 
-    Single<byte[]> downloadDocument(String alias,
-                                    String userId,
-                                    String documentId) {
+    // TODO remove public
+    public Single<byte[]> downloadDocument(String alias,
+                                           String userId,
+                                           String documentId) {
         return service.downloadDocument(alias, userId, documentId)
                 .map(ResponseBody::bytes);
     }
 
-    Single<Boolean> deleteDocument(String alias,
-                                   String userId,
-                                   String documentId) {
+    // TODO remove public
+    public Single<Boolean> deleteDocument(String alias,
+                                          String userId,
+                                          String documentId) {
         // network request doesn't has a response except the HTTP 204
         // on success the method will always return `true`
         return service.deleteDocument(alias, userId, documentId).map(it -> true);
@@ -239,18 +299,42 @@ final class ApiService {
                 .map(response -> Integer.parseInt(response.headers().get(HEADER_TOTAL_COUNT)));
     }
 
-    Single<UserInfo> fetchUserInfo(String alias) {
+    public Single<UserInfo> fetchUserInfo(String alias) {
         return service
                 .fetchUserInfo(alias)
                 .subscribeOn(Schedulers.io());
     }
 
-    Completable logout(String alias) {
+    /**
+     * Carry out needed logout actions.
+     * <p>
+     * When using refresh token, this will revoke the OAuth access.
+     * When using a static access token, nothing will be done.
+     *
+     * @param alias Alias
+     * @return Completable
+     */
+    public Completable logout(String alias) {
+        if (this.staticAccessToken != null) {
+            throw new D4LRuntimeException("Cannot log out when using a static access token!");
+        }
         return Single
-                .fromCallable(() -> oAuthService.getRefreshToken(alias))
+                .fromCallable(() -> authService.getRefreshToken(alias))
                 .flatMapCompletable(token -> service.logout(alias, token));
     }
 
+    /**
+     * Interceptor that attaches an authorization header to a request.
+     * <p>
+     * The authorization can be basic auth or OAuth. In the OAuth case, the
+     * interceptor will try the request snd if it comes back with a status code
+     * 401 (unauthorized), it will update the OAuth access token using the
+     * refresh token.
+     *
+     * @param chain OkHttp interceptor chain
+     * @return OkHttp response
+     * @throws IOException
+     */
     private Response intercept(Interceptor.Chain chain) throws IOException {
         Request request = chain.request();
         String alias = request.header(HEADER_ALIAS);
@@ -263,7 +347,7 @@ final class ApiService {
         } else if (authHeader != null && authHeader.equals(HEADER_ACCESS_TOKEN)) {
             String tokenKey;
             try {
-                tokenKey = oAuthService.getAccessToken(alias);
+                tokenKey = authService.getAccessToken(alias);
             } catch (D4LException e) {
                 return chain.proceed(request);
             }
@@ -274,9 +358,9 @@ final class ApiService {
             Response response = chain.proceed(request);
             if (response.code() == HTTP_401_UNAUTHORIZED) {
                 try {
-                    tokenKey = oAuthService.refreshAccessToken(alias);
+                    tokenKey = authService.refreshAccessToken(alias);
                 } catch (D4LException e) {
-                    oAuthService.clearAuthData();
+                    authService.clear();
                     return response;
                 }
                 request = request.newBuilder()
@@ -287,6 +371,29 @@ final class ApiService {
             }
             return response;
         }
+        return chain.proceed(request);
+    }
+
+    /**
+     * Interceptor that attaches an OAuth access token to a request.
+     * <p>
+     * This interceptor is used for the case where the SDK client does not
+     * handle the OAuth flow itself and merely gets an access token injected.
+     * Accordingly this interceptor does not attempt to refresh the access token
+     * if the request should fail.
+     *
+     * @param chain OkHttp interceptor chain
+     * @return OkHttp response
+     * @throws IOException
+     */
+    private Response staticTokenIntercept(Interceptor.Chain chain) throws IOException {
+        Request request = chain.request();
+        String alias = request.header(HEADER_ALIAS);
+        String authHeader = request.headers().get(HEADER_AUTHORIZATION);
+        request = request.newBuilder()
+                .removeHeader(HEADER_AUTHORIZATION)
+                .removeHeader(HEADER_ALIAS)
+                .addHeader(HEADER_AUTHORIZATION, String.format(FORMAT_BEARER_TOKEN, this.staticAccessToken)).build();
         return chain.proceed(request);
     }
 }

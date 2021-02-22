@@ -21,13 +21,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import care.data4life.fhir.stu3.model.Attachment;
-import care.data4life.fhir.stu3.model.CodeSystems;
+import care.data4life.fhir.stu3.model.CodeSystemPublicationStatus;
+import care.data4life.fhir.stu3.model.CodeSystemQuestionnaireItemType;
 import care.data4life.fhir.stu3.model.Questionnaire;
 
 public class QuestionnaireBuilder {
 
 
-    public static Questionnaire buildWith(CodeSystems.PublicationStatus status, List<Attachment> attachments) {
+    public static Questionnaire buildWith(CodeSystemPublicationStatus status, List<Attachment> attachments) {
 
         Questionnaire questionnaire = new Questionnaire(status);
         Questionnaire.QuestionnaireItem questionnaireItem = buildItem("", null, attachments.get(0));
@@ -38,7 +39,7 @@ public class QuestionnaireBuilder {
     }
 
 
-    public static Questionnaire.QuestionnaireItem buildItem(String linkId, CodeSystems.QuestionnaireItemType type, Attachment attachment) {
+    public static Questionnaire.QuestionnaireItem buildItem(String linkId, CodeSystemQuestionnaireItemType type, Attachment attachment) {
 
         Questionnaire.QuestionnaireItem item = new Questionnaire.QuestionnaireItem(linkId, type);
         item.initialAttachment = attachment;

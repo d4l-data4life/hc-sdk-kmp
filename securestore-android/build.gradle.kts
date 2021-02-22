@@ -19,27 +19,21 @@ plugins {
     id("kotlin-platform-android")
     id("com.github.dcendents.android-maven")
 }
-//apply plugin: "jacoco" //FIXME
 
 android {
-    compileSdkVersion(AndroidConfig.compileSdkVersion)
+    compileSdkVersion(LibraryConfig.android.compileSdkVersion)
 
     defaultConfig {
-        minSdkVersion(AndroidConfig.minSdkVersion)
-        targetSdkVersion(AndroidConfig.targetSdkVersion)
+        minSdkVersion(LibraryConfig.android.minSdkVersion)
+        targetSdkVersion(LibraryConfig.android.targetSdkVersion)
 
-        versionCode = LibraryConfig.versionCode
-        versionName = LibraryConfig.versionName
+        versionCode = 1
+        versionName = "${project.version}"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments(mapOf(
                 "clearPackageData" to "true"
         ))
-
-        adbOptions {
-            timeOutInMs(10 * 60 * 1000)
-            installOptions("-d")
-        }
     }
 
     resourcePrefix("d4l_securestore_")
@@ -47,7 +41,7 @@ android {
     buildTypes {
         getByName("debug") {
             isTestCoverageEnabled = false
-            matchingFallbacks = listOf("debug", "release")
+            setMatchingFallbacks("debug", "release")
         }
         getByName("release") {
             isMinifyEnabled = false
@@ -58,13 +52,11 @@ android {
     testOptions {
         animationsDisabled = true
 
-        unitTests.all(KotlinClosure1<Any, Test>({
-            (this as Test).also { testTask ->
-                testTask.testLogging {
-                    events("passed", "skipped", "failed", "standardOut", "standardError")
-                }
+        unitTests.all {
+            it.testLogging {
+                events("passed", "skipped", "failed", "standardOut", "standardError")
             }
-        }, unitTests))
+        }
 
         execution = "ANDROID_TEST_ORCHESTRATOR"
     }
@@ -74,7 +66,7 @@ android {
     }
 
     compileOptions {
-        coreLibraryDesugaringEnabled = false
+        isCoreLibraryDesugaringEnabled = false
 
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -82,29 +74,29 @@ android {
 }
 
 dependencies {
-    coreLibraryDesugaring(Dependency.Android.androidDesugar)
+    coreLibraryDesugaring(Dependencies.Android.androidDesugar)
 
     expectedBy(project(":securestore-common"))
 
-    api(Dependency.Multiplatform.D4L.utilAndroid)
-    implementation(Dependency.Multiplatform.Kotlin.stdlibAndroid)
-    implementation(Dependency.Android.AndroidX.appCompat)
-    compileOnly(Dependency.java.javaXAnnotation)
+    api(Dependencies.Multiplatform.D4L.utilAndroid)
+    implementation(Dependencies.Multiplatform.Kotlin.stdlibAndroid)
+    implementation(Dependencies.Android.AndroidX.appCompat)
+    compileOnly(Dependencies.java.javaXAnnotation)
 
-    implementation(Dependency.Android.tink)
-
-
-    testImplementation(Dependency.Android.Test.junit)
-    testImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
-    testImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
-    testImplementation(Dependency.Multiplatform.Test.MockK.jdk)
+    implementation(Dependencies.Android.tink)
 
 
-    androidTestImplementation(Dependency.Android.AndroidTest.runner)
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoCore)
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
-    androidTestImplementation(Dependency.Multiplatform.Test.MockK.android)
+    testImplementation(Dependencies.Android.Test.junit)
+    testImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvm)
+    testImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvmJunit)
+    testImplementation(Dependencies.Multiplatform.Test.MockK.jdk)
+
+
+    androidTestImplementation(Dependencies.Android.AndroidTest.runner)
+    androidTestImplementation(Dependencies.Android.AndroidTest.espressoCore)
+    androidTestImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvm)
+    androidTestImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvmJunit)
+    androidTestImplementation(Dependencies.Multiplatform.Test.MockK.android)
 }
 
 apply(from = "${project.rootDir}/gradle/deploy-android.gradle")

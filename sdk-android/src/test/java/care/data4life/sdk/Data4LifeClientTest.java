@@ -28,6 +28,8 @@ import care.data4life.auth.AuthorizationService;
 import care.data4life.auth.AuthorizationService.AuthorizationListener;
 import care.data4life.crypto.GCAsymmetricKey;
 import care.data4life.crypto.GCKeyPair;
+import care.data4life.sdk.auth.UserService;
+import care.data4life.sdk.call.CallHandler;
 import io.reactivex.Single;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -46,18 +48,19 @@ public class Data4LifeClientTest {
     private AuthorizationService authorizationService;
     private CryptoService cryptoService;
     private RecordService recordService;
+    private CallHandler callHandler;
 
     @Before
     public void setUp() {
         authorizationService = mock(AuthorizationService.class);
         cryptoService = mock(CryptoService.class);
         userService = mock(UserService.class);
-        D4LErrorHandler errorHandler = mock(D4LErrorHandler.class);
         recordService = mock(RecordService.class);
+        callHandler = mock(CallHandler.class);
 
         when(userService.getUID()).thenReturn(Single.just("uid"));
 
-        instance = spy(new Data4LifeClient(ALIAS, cryptoService, authorizationService, userService, recordService, errorHandler));
+        instance = spy(new Data4LifeClient(ALIAS, cryptoService, authorizationService, userService, recordService, callHandler));
     }
 
     @Test

@@ -23,11 +23,11 @@ val d4lClientConfig = D4LConfigHelper.loadClientConfigAndroid("$rootDir")
 val d4LTestConfig = D4LConfigHelper.loadTestConfigAndroid("$rootDir")
 
 android {
-    compileSdkVersion(AndroidConfig.compileSdkVersion)
+    compileSdkVersion(LibraryConfig.android.compileSdkVersion)
 
     defaultConfig {
-        minSdkVersion(AndroidConfig.minSdkVersion)
-        targetSdkVersion(AndroidConfig.targetSdkVersion)
+        minSdkVersion(LibraryConfig.android.minSdkVersion)
+        targetSdkVersion(LibraryConfig.android.targetSdkVersion)
 
         applicationId = "care.data4life.sdk.e2e"
         versionCode = 1
@@ -40,25 +40,20 @@ android {
                 "clearPackageData" to "true"
         ))
 
-        adbOptions {
-            timeOutInMs(10 * 60 * 1000)
-            installOptions("-d")
-        }
-
-        manifestPlaceholders = mapOf<String, Any>(
+        manifestPlaceholders(mapOf<String, Any>(
                 "clientId" to d4lClientConfig[Environment.DEVELOPMENT].id,
                 "clientSecret" to d4lClientConfig[Environment.DEVELOPMENT].secret,
                 "redirectScheme" to d4lClientConfig[Environment.DEVELOPMENT].redirectScheme,
                 "environment" to "${Environment.DEVELOPMENT}",
                 "platform" to d4lClientConfig.platform,
                 "debug" to "true"
-        )
+        ))
     }
 
     buildTypes {
         buildTypes {
             getByName("debug") {
-                matchingFallbacks = listOf("debug", "release")
+                setMatchingFallbacks("debug", "release")
             }
         }
         getByName("release") {
@@ -68,7 +63,7 @@ android {
     }
 
     compileOptions {
-        coreLibraryDesugaringEnabled = false
+        isCoreLibraryDesugaringEnabled = false
 
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -86,21 +81,18 @@ android {
     testOptions {
         animationsDisabled = true
 
-        unitTests.all(KotlinClosure1<Any, Test>({
-            (this as Test).also { testTask ->
-                testTask.testLogging {
-                    events("passed", "skipped", "failed", "standardOut", "standardError")
-                }
+        unitTests.all {
+            it.testLogging {
+                events("passed", "skipped", "failed", "standardOut", "standardError")
             }
-        }, unitTests))
+        }
 
-        // FIXME
-        // execution = "ANDROID_TEST_ORCHESTRATOR"
+         execution = "ANDROID_TEST_ORCHESTRATOR"
     }
 }
 
 dependencies {
-    coreLibraryDesugaring(Dependency.Android.androidDesugar)
+    coreLibraryDesugaring(Dependencies.Android.androidDesugar)
 
     implementation(project(":sdk-android")) {
         exclude(group = "org.threeten", module = "threetenbp")
@@ -111,37 +103,47 @@ dependencies {
         exclude(group = "care.data4life.hc-fhir-helper-sdk-kmp", module = "fhir-helper-jvm")
     }
 
-    implementation(Dependency.Android.threeTenABP)
+    implementation(Dependencies.Android.threeTenABP)
 
-    implementation(Dependency.Android.kotlinStdLib)
+    implementation(Dependencies.Android.kotlinStdLib)
 
-    implementation(Dependency.Android.AndroidX.appCompat)
-    implementation(Dependency.Android.AndroidX.constraintLayout)
-    implementation(Dependency.Android.AndroidX.browser)
-    implementation(Dependency.Android.material)
+    implementation(Dependencies.Android.AndroidX.appCompat)
+    implementation(Dependencies.Android.AndroidX.constraintLayout)
+    implementation(Dependencies.Android.AndroidX.browser)
+    implementation(Dependencies.Android.material)
 
-    implementation(Dependency.Android.googlePlayServicesBase)
+    implementation(Dependencies.Android.googlePlayServicesBase)
 
 
-    testImplementation(Dependency.Android.Test.junit)
+    testImplementation(Dependencies.Android.Test.junit)
 
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
+    androidTestUtil(Dependencies.Android.AndroidTest.orchestrator)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.runner)
-    androidTestImplementation(Dependency.Android.AndroidTest.rules)
-    androidTestImplementation(Dependency.Android.AndroidTest.orchestrator)
+    androidTestImplementation(Dependencies.Android.AndroidTest.core)
+    androidTestImplementation(Dependencies.Android.AndroidTest.runner)
+    androidTestImplementation(Dependencies.Android.AndroidTest.rules)
+    androidTestImplementation(Dependencies.Android.AndroidTest.extJUnit)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoCore)
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoIntents)
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoWeb)
-    androidTestImplementation(Dependency.Android.moshi)
+    androidTestImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvm)
+    androidTestImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvmJunit)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.uiAutomator)
-    androidTestImplementation(Dependency.Android.AndroidTest.kakao)
+    androidTestImplementation(Dependencies.Android.AndroidTest.espressoCore)
+    androidTestImplementation(Dependencies.Android.AndroidTest.espressoIntents)
+    androidTestImplementation(Dependencies.Android.AndroidTest.espressoWeb)
 
-    androidTestImplementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
+    androidTestImplementation(Dependencies.Android.AndroidTest.uiAutomator)
+    androidTestImplementation(Dependencies.Android.AndroidTest.kakao)
+
+    androidTestImplementation(Dependencies.Android.okHttp)
+    androidTestImplementation(Dependencies.Android.okHttpLoggingInterceptor)
+    androidTestImplementation(Dependencies.Android.retrofit)
+
+    androidTestImplementation(Dependencies.Android.moshi)
+    androidTestImplementation(Dependencies.Android.gson)
+
+    androidTestImplementation(Dependencies.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
+        exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
 }
 

@@ -29,10 +29,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import org.jetbrains.annotations.NotNull;
 import org.threeten.bp.LocalDate;
 
 import java.util.ArrayList;
@@ -49,10 +51,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.DocumentReference;
+import care.data4life.fhir.stu3.model.DomainResource;
 import care.data4life.sdk.Data4LifeClient;
-import care.data4life.sdk.Task;
+import care.data4life.sdk.call.DataRecord;
+import care.data4life.sdk.call.Task;
 import care.data4life.sdk.config.DataRestrictionException;
-import care.data4life.sdk.helpers.DocumentReferenceExtension;
+import care.data4life.sdk.data.DataResource;
+import care.data4life.sdk.helpers.stu3.DocumentReferenceExtension;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.Callback;
 import care.data4life.sdk.listener.ResultListener;
@@ -63,7 +68,7 @@ public class DocumentsActivity extends AppCompatActivity {
     private static final String TAG = DocumentsActivity.class.getSimpleName();
 
     private static final int INTENT_FILE_PICKER = 434;
-    public List<Record<DocumentReference>> records = new ArrayList<>();
+    public List<Record<DomainResource>> records = new ArrayList<>();
     private Data4LifeClient client;
     private CRUDBenchmark benchmark;
     private FloatingActionButton mAddFAB;
@@ -93,6 +98,7 @@ public class DocumentsActivity extends AppCompatActivity {
         mLogout = findViewById(R.id.logoutBTN);
         mDocumentsRV = findViewById(R.id.documentsRV);
         mDocumentsSRL = findViewById(R.id.documentsSRL);
+        View addFabAppData = findViewById(R.id.addFABAppData);
         Toolbar toolbar = findViewById(R.id.toolbar);
 
         mLayoutManager = new LinearLayoutManager(DocumentsActivity.this, LinearLayoutManager.VERTICAL, false);
@@ -126,6 +132,12 @@ public class DocumentsActivity extends AppCompatActivity {
                     startActivityForResult(Intent.createChooser(intent, "Select images"), INTENT_FILE_PICKER);
                 }
         );
+
+        addFabAppData.setOnClickListener(view -> {
+            fetchDataRecord();
+            createNewDataRecord();
+        });
+
 
         setSupportActionBar(toolbar);
         Snackbar.make(mRootCL, "You have signed in with Data4Life", Snackbar.LENGTH_SHORT).show();
@@ -255,9 +267,15 @@ public class DocumentsActivity extends AppCompatActivity {
     private void fetchDocuments(int offset) {
         mDocumentsSRL.setRefreshing(true);
 
-        fetchTask = client.fetchRecords(DocumentReference.class, fromDate, toDate, 20, offset, new ResultListener<List<Record<DocumentReference>>>() {
+        fetchTask = client.fetchRecords(
+                DomainResource.class,
+                fromDate,
+                toDate,
+                20,
+                offset,
+                new ResultListener<List<Record<DomainResource>>>() {
             @Override
-            public void onSuccess(List<Record<DocumentReference>> records) {
+            public void onSuccess(List<Record<DomainResource>> records) {
                 runOnUiThread(() -> {
                     DocumentsActivity.this.records.addAll(records);
                     if (records.size() == 0) {
@@ -284,9 +302,16 @@ public class DocumentsActivity extends AppCompatActivity {
             this.documents = documents;
         }
 
-        void bindDocuments(List<Record<DocumentReference>> documents) {
+        void bindDocuments(List<Record<DomainResource>> documents) {
+            List<Record<DocumentReference>> docRefs = new ArrayList<>();
+            for (Record record : documents) {
+                if (record.getResource() instanceof DocumentReference) {
+                    docRefs.add(record);
+                }
+            }
+
             this.documents.clear();
-            this.documents.addAll(documents);
+            this.documents.addAll(docRefs);
             notifyDataSetChanged();
         }
 
@@ -371,5 +396,62 @@ public class DocumentsActivity extends AppCompatActivity {
                 });
             }
         }
+    }
+
+    DataRecord appdata;
+    List<String> annotations = new ArrayList<>();
+
+    private void createNewDataRecord() {
+        if (appdata != null) {
+            return;
+        }
+        mDocumentsSRL.setRefreshing(true);
+        byte[] data = new byte[1];
+        DataResource dataResource = new DataResource(data);
+        annotations.add("test");
+        annotations.add("test2");
+        annotations.add("test3");
+
+        client.getData().create(dataResource, annotations, new care.data4life.sdk.call.Callback<care.data4life.sdk.call.DataRecord<DataResource>>() {
+
+            @Override
+            public void onSuccess(DataRecord<DataResource> result) {
+                appdata = result;
+                mDocumentsSRL.setRefreshing(false);
+            }
+
+            @Override
+            public void onError(@NotNull D4LException exception) {
+                mDocumentsSRL.setRefreshing(false);
+            }
+        });
+    }
+
+    private void fetchDataRecord() {
+        if (appdata == null) {
+            return;
+        }
+        mDocumentsSRL.setRefreshing(true);
+
+        client.getData().fetch(appdata.getIdentifier(), new care.data4life.sdk.call.Callback<DataRecord<DataResource>>() {
+            @Override
+            public void onSuccess(DataRecord<DataResource> result) {
+                runOnUiThread(() -> {
+                    boolean equal = appdata.equals(result)
+                            && annotations.equals(result.getAnnotations());
+                    Toast.makeText(
+                            getApplicationContext(),
+                            "DonorKey test successful: " + equal, Toast.LENGTH_LONG
+                    ).show();
+                    mDocumentsSRL.setRefreshing(false);
+                });
+            }
+
+            @Override
+            public void onError(@NotNull D4LException exception) {
+                Toast.makeText(getApplicationContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
+                mDocumentsSRL.setRefreshing(false);
+            }
+        });
     }
 }

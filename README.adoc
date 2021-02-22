@@ -1,29 +1,25 @@
-:library_version: 0.0.1
+= Data4Life SDK
+:library_version: 1.9.1
+:doctype: article
+:!showtitle:
 :toc: macro
 :toclevels: 2
 :toc-title:
+:icons: font
+:imagesdir: assets/images
 ifdef::env-github[]
-:imagesdir: https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/assets/images/
-:link-license: https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/LICENSE
-:link-contribution: https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/CONTRIBUTION.adoc
 :warning-caption: :warning:
 :caution-caption: :fire:
 :important-caption: :exclamation:
 :note-caption: :paperclip:
 :tip-caption: :bulb:
 endif::[]
-ifndef::env-github[]
-:icons: font
-:imagesdir: ./assets/images
-:link-license: ./LICENCE
-:link-contribution: ./CONTRIBUTION.adoc
-endif::[]
 
 ++++
 <div align="center">
     <!-- PROJECT LOGO -->
     <p>
-        <a><img src="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/assets/images/d4l-logo.svg" width="150"/></a>
+        <a><img src="assets/images/d4l-logo.svg" width="150"/></a>
     </p>
     <!-- PROJECT HEADER -->
     <h1>The Data4Life Android and Java SDK</h1>
@@ -33,18 +29,18 @@ endif::[]
 For more information about the platform, visit our website <a href="https://www.d4l.io/">www.d4l.io</a>.
     </p>
     <p><!-- PROJECT DOCUMENTATION -->
-        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp"><strong>Explore the docs »</strong></a>
+        <a href="https://github.com/d4l-data4life/hc-sdk-kmp"><strong>Explore the docs »</strong></a>
     </p>
     <p><!-- PROJECT ISSUES/FEATURES -->
-        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/issues">Report Bug</a>
+        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/issues">Report Bug</a>
         ·
-        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/issues">Request Feature</a>
+        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/issues">Request Feature</a>
     </p>
     <p><!-- PROJECT BADGES -->
-        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/actions">
-            <img src="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/workflows/D4L%20CI%20KMP/badge.svg" alt="Build Status"/>
+        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/actions">
+            <img src="https://github.com/d4l-data4life/hc-sdk-kmp/workflows/D4L%20CI%20KMP/badge.svg" alt="Build Status"/>
         </a>
-        <a href="https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/blob/main/LICENSE">
+        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/blob/main/LICENSE">
             <img src="https://img.shields.io/badge/license-PRIVATE-blue.svg"/>
         </a>
     </p>
@@ -94,9 +90,10 @@ The SDK has the following dependencies:
 
 == Install Gradle
 
+=== Setup maven repositories
 Add the following maven repository url to your root build.gradle:
 
-Please take a look over at Github https://docs.github.com/en/packages/publishing-and-managing-packages/about-github-packages#about-tokens[aboout-github-packages#tokens, window="_blank"] on how to generate your private token for accessing the Github Package Registry.
+Please take a look over at Github https://docs.github.com/en/packages/publishing-and-managing-packages/about-github-packages#about-tokens[about-github-packages#tokens, window="_blank"] on how to generate your private token for accessing the Github Package Registry.
 Add `gpr.user = {your Github username}` and `gpr.key = {private github access token}` to your `gradle.properties`
 
 [source,gradle]
@@ -139,7 +136,7 @@ gpr.user=github-username
 gpr.key=github-token
 ----
 
-=== Java
+=== Java SDK dependency
 
 Add the following dependencies to your app `build.gradle` file.
 
@@ -155,7 +152,7 @@ dependencies {
 }
 ----
 
-=== Android
+=== Android SDK dependency
 
 [source,gradle]
 ----
@@ -169,7 +166,20 @@ dependencies {
 }
 ----
 
-The SDK ships with link:https://github.com/ThreeTen/threetenbp[ThreeTenBP] a Java 8 Time backport.For Android, its loading mechanism of time zone information is inefficient.So we recommend to provide your favorite Android ThreeTen library here, for example link:https://github.com/JakeWharton/ThreeTenABP[ThreeTenABP].
+The SDK is only published as release variant. So you need to add a `matchingFallbacks` config to all of your `buildTypes` and `flavors`. See link:https://developer.android.com/studio/build/dependencies#variant_aware[variant awareness] for more details.
+
+[source, gradle]
+----
+android {
+    buildTypes {
+        debug {
+            matchingFallbacks = ["release", "debug"]
+        }
+    }
+}
+----
+
+The SDK ships with link:https://github.com/ThreeTen/threetenbp[ThreeTenBP] a Java 8 Time backport. For Android, its loading mechanism of time zone information is inefficient.So we recommend to provide your favorite Android ThreeTen library here, for example link:https://github.com/JakeWharton/ThreeTenABP[ThreeTenABP].
 
 [source,gradle]
 ----
@@ -196,8 +206,47 @@ android {
 }
 ----
 
+=== Client configuration
+After all the maven repositories and gradle dependencies are setup, the client needs to pass the configuration information to the SDK during initialization.
 
-== Building the SDK
+==== Android
+On Android side the client can set manifest placeholder in their `build.gradle` to pass the configuration to the SDK.
+
+[source,gradle,bulid.gradle]
+----
+// build.gradle
+
+android {
+    defaultConfig {
+        manifestPlaceholders = mapOf<String, Any>(
+            "clientId" to "CLIENT_ID",
+            "clientSecret" to "CLIENT_SECRET",
+            "redirectScheme" to "REDIRECT_SCHEME",
+            "environment" to "ENVIRONMENT",
+            "platform" to "D4L",
+            "debug" to "false"
+        )
+        ...
+    }
+}
+
+----
+
+==== Java
+
+On Java side the client config will be passed as arguments to the `init` function.
+
+[source,java]
+----
+Data4LifeClient.init("userAlias",
+                    "CLIENT_ID",
+                    "CLIENT_SECRET",
+                    Environment.PRODUCTION,
+                    "REDIRECT_SCHEME",
+                    "D4L");
+----
+
+== Building and Working with the SDK
 
 There are several requirements for building the SDK.
 
@@ -207,10 +256,62 @@ There are several requirements for building the SDK.
 * Kotlin 1.3.72
 * Java 8 link:https://developer.android.com/studio/write/java8-support[Limitations] link:https://jakewharton.com/d8-library-desugaring/[Desugaring]
 * Gradle 6.5
-* link:https://developer.android.com/studio#downloads[Android Studio 4.0.0]
+* link:https://developer.android.com/studio#downloads[Android Studio 4.1.1]
 * Android Emulator 21 - 29
 
 **Note:** Disable Instant Run in Android Studio, or the project fails to compile.
+
+=== Config files
+
+Before you can start to compile the SDK you need to add `d4l-client-config-android.json` and `d4l-test-config-android.json` files in the project root folder and add following content.
+
+`d4l-client-config-android.json` needs to contain a config for every environment LOCAL, DEVELOPMENT, STAGING, SANDBOX, PRODUCTION.
+
+NOTE: The CI expects this configuration from environment variables stored in GitHub secrets: `D4L_CLIENT_CONFIG_ANDROID` and `D4L_CLIENT_CONFIG_IOS`
+
+[source,json,d4l-client-config-android.json]
+----
+// d4l-client-config-android.json
+{
+  "platform": "d4l",
+  "configs": {
+    "LOCAL": {
+      "id": "{CLIENT_ID}",
+      "secret": "{CLIENT_SECRET}",
+      "redirectScheme": "{CLIENT_REDIRECT_SCHEME}"
+    },
+    "DEVELOPMENT": {
+      "id": "{CLIENT_ID}",
+      "secret": "{CLIENT_SECRET}",
+      "redirectScheme": "{CLIENT_REDIRECT_SCHEME}"
+    }
+  }
+}
+----
+
+[source,json,d4l-test-config-android.json]
+----
+// d4l-test-config-android.json
+{
+  "user": {
+    "email": "{USER_EMAIL}",
+    "password": "{USER_PASSWORD}",
+    "phoneCountryCode": "{USER_PHONE_COUNTRY_CODE}",
+    "phoneLocalNumber": "{USER_PHONE_LOCAL_NUMBER}"
+  },
+  "twillio": {
+    "accountSid": "{TWILLIO_ACCOUNT_SID}",
+    "authSid": "{TWILLIO_AUTH_SID}",
+    "authToken": "{TWILLIO_AUTH_TOKEN}"
+  }
+}
+----
+
+To provide the test config to the different modules run the following gradle task in the root directory of the project.
+[source,bash]
+----
+./gradlew provideTestConfig
+----
 
 
 === SDK
@@ -218,11 +319,6 @@ There are several requirements for building the SDK.
 ==== Releasing the SDK
 
 For release management, we use link:https://help.github.com/articles/creating-releases/[GitHub Releases].So just create a new release, set the tag according to link:https://semver.org/[Semantic Versioning] and publish.
-
-==== Testing the SDK
-
-For testing purposes, you could use the latest main commit by adding the `{latestCommitHashOnMain}` as version number to your app `build.gradle` dependency.
-Please use the latest commit id from link:https://github.com/d4l-data4life/hc-sdk-kmp/commits/main[main] which should be truncated to the first 8 characters.
 
 ===== Java
 

@@ -15,33 +15,51 @@
  */
 
 object LibraryConfig {
-    const val version = "1.7.2"
-    const val githubGroup = "care.data4life.hc-sdk-kmp"
-    const val group = githubGroup
-    const val artifactId = "hc-sdk-kmp"
-    const val name = "d4l-data4life/$artifactId"
-    const val host = "github.com"
-    const val url = "https://$host/$name"
-    const val year = "2020"
-    const val description = "Android SDK for interacting with the Data4Life Personal Health Data Platform."
+    const val group = "care.data4life"
+    const val name = "hc-sdk-kmp"
 
-    const val referenceSdkVersion = "1.7.1"
+    const val githubOwner = "d4l-data4life"
+    const val githubRepository = "hc-sdk-kmp"
 
-    // DEVELOPER
-    const val developerId = "d4l-data4life"
-    const val developerName = "D4L data4life gGmbH"
-    const val developerEmail = "mobile@data4life.care"
+    const val version = "1.9.0"
+    const val referenceSdkVersion = "1.8.0"
 
-    // LICENSE
-    const val licenseName = ""
-    const val licenseUrl = "$url/blob/main/LICENSE"
-    const val licenseDistribution = "repo"
+    val publish = PublishConfig
+    object PublishConfig {
+        const val name = LibraryConfig.name
+        const val groupId = LibraryConfig.group
+        const val description = "Android SDK for interacting with the Data4Life Personal Health Data Platform."
 
-    // SCM
-    const val scmUrl = "git://$host/$name.git"
-    const val scmConnection = "scm:$scmUrl"
-    const val scmDeveloperConnection = "$scmConnection"
+        const val year = "2020"
 
-    const val versionCode = 23
-    const val versionName = group
+        // URL
+        const val host = "github.com"
+        const val path = "$githubOwner/$githubRepository"
+
+        const val url = "https://$host/$path"
+
+        // DEVELOPER
+        const val developerId = "d4l-data4life"
+        const val developerName = "D4L data4life gGmbH"
+        const val developerEmail = "mobile@data4life.care"
+
+        // LICENSE
+        const val licenseName = "Private"
+        const val licenseUrl = "$url/blob/main/LICENSE"
+        const val licenseDistribution = "repo"
+
+        // SCM
+        const val scmUrl = "git://$host/$path.git"
+        const val scmConnection = "scm:$scmUrl"
+        const val scmDeveloperConnection = scmConnection
+    }
+
+    val android = AndroidLibraryConfig
+    object AndroidLibraryConfig {
+        const val minSdkVersion = 21
+        const val compileSdkVersion = 30
+        const val targetSdkVersion = 30
+
+        const val resourcePrefix = "hc_util_"
+    }
 }

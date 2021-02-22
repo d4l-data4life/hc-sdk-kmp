@@ -23,6 +23,8 @@ import org.junit.Test;
 import care.data4life.auth.AuthorizationService;
 import care.data4life.crypto.GCAsymmetricKey;
 import care.data4life.crypto.GCKeyPair;
+import care.data4life.sdk.auth.UserService;
+import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.test.util.TestSchedulerRule;
 import io.reactivex.Single;
 
@@ -49,6 +51,7 @@ public class Data4LifeClientTest {
     private RecordService recordService;
     private Data4LifeClient instance;
     private SdkContract.ErrorHandler errorHandler;
+    private CallHandler callHandler;
 
     @Before
     public void setUp() {
@@ -57,6 +60,7 @@ public class Data4LifeClientTest {
         userService = mock(UserService.class);
         recordService = mock(RecordService.class);
         errorHandler = mock(SdkContract.ErrorHandler.class);
+        callHandler = mock(CallHandler.class);
 
 
         instance = new Data4LifeClient(
@@ -65,7 +69,8 @@ public class Data4LifeClientTest {
                 cryptoService,
                 userService,
                 recordService,
-                errorHandler);
+                callHandler
+        );
     }
 
     @Test

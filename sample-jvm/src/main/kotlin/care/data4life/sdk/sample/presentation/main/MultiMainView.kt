@@ -64,7 +64,7 @@ class MultiMainView : BaseView(), KoinComponent {
                 renderMessage(Message("$alias was successfully logged out."))
             }
 
-            override fun onError(exception: D4LException?) {
+            override fun onError(exception: D4LException) {
                 renderMessage(Message("Failed to logout $alias"))
             }
         })

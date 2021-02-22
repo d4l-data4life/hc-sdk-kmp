@@ -21,17 +21,16 @@ plugins {
 
 apply(from = "${project.rootDir}/gradle/deploy-java.gradle")
 
-version = LibraryConfig.version
 group = LibraryConfig.group
 
 dependencies {
     implementation(project(":securestore-common"))
 
-    api(Dependency.Multiplatform.D4L.utilCommon)
+    api(Dependencies.Multiplatform.D4L.utilCommon)
 
-    implementation(Dependency.Multiplatform.Kotlin.stdlibCommon)
+    implementation(Dependencies.Multiplatform.Kotlin.stdlibCommon)
 
-    testImplementation(Dependency.Multiplatform.Test.Kotlin.testCommon)
-    testImplementation(Dependency.Multiplatform.Test.Kotlin.testAnnotationsCommon)
-    testImplementation(Dependency.Multiplatform.Test.MockK.common)
+    testImplementation(Dependencies.Multiplatform.Test.Kotlin.testCommon)
+    testImplementation(Dependencies.Multiplatform.Test.Kotlin.testAnnotationsCommon)
+    testImplementation(Dependencies.Multiplatform.Test.MockK.common)
 }

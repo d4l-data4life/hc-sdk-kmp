@@ -29,6 +29,7 @@ import care.data4life.auth.AuthorizationService;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.lang.D4LRuntimeException;
 import care.data4life.sdk.network.Environment;
+import care.data4life.sdk.network.IHCService;
 import care.data4life.sdk.network.model.CommonKeyResponse;
 import care.data4life.sdk.network.model.DocumentUploadResponse;
 import care.data4life.sdk.network.model.EncryptedRecord;
@@ -322,7 +323,7 @@ public final class ApiService {
                 .flatMapCompletable(token -> service.logout(alias, token));
     }
 
-    Single<VersionInfo> fetchVersionInfo(String alias) {
+    public Single<VersionInfo> fetchVersionInfo(String alias) {
         return service
                 .getVersionUpdateInfo(alias)
                 .subscribeOn(Schedulers.io());

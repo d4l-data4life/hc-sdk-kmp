@@ -20,6 +20,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import care.data4life.auth.AuthorizationService;
 import care.data4life.crypto.GCKey;
 import care.data4life.crypto.GCKeyPair;
@@ -30,6 +34,8 @@ import care.data4life.sdk.CryptoService;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.network.model.EncryptedKey;
 import care.data4life.sdk.network.model.UserInfo;
+import care.data4life.sdk.network.model.Version;
+import care.data4life.sdk.network.model.VersionInfo;
 import care.data4life.sdk.test.util.TestSchedulerRule;
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -138,6 +144,26 @@ public class UserServiceTest {
         testSubscriber
                 .assertError(NullPointerException.class)
                 .assertNotComplete();
+    }
+
+    @Test
+    public void getVersionInfo_shouldReturnSuccess() throws Exception {
+        // given
+        String VERSION_NAME = "1.9.0";
+        VersionInfo versionInfo = new VersionInfo(Collections.singletonList(new Version(VERSION_NAME)));
+        when(apiService.fetchVersionInfo(VERSION_NAME)).thenReturn(Single.just(versionInfo));
+
+
+
+        // when
+        TestObserver<Boolean> testSubscriber = userService.getVersionInfo(VERSION_NAME)
+                .test()
+                .await();
+
+        // then
+        testSubscriber
+                .assertNoErrors()
+                .assertComplete();
     }
 
     @Test

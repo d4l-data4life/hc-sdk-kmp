@@ -35,6 +35,12 @@ public class Version {
         this.status = KEY_UNSUPPORTED;
     }
 
+    public Version(String versionName) {
+        this.versionCode = 0;
+        this.versionName = versionName;
+        this.status = KEY_DEPRECATED;
+    }
+
     public int getVersionCode() {
         return versionCode;
     }

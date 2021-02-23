@@ -69,9 +69,9 @@ class RecordCompatibilityServiceTest {
         every { apiService.getCount(alias, userId, encryptedTags) } returns Single.just(21)
         every {
             apiService.getCount(
-                alias,
-                userId,
-                encodedAndEncryptedTags
+                    alias,
+                    userId,
+                    encodedAndEncryptedTags
             )
         } returns Single.just(21)
 
@@ -80,13 +80,13 @@ class RecordCompatibilityServiceTest {
 
         // Then
         val result = observer
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
 
         assertEquals(
-            expected = expected,
-            actual = result
+                expected = expected,
+                actual = result
         )
 
         verify(exactly = 1) { taggingEncryptionService.encryptAndEncodeTags(tags) }
@@ -97,9 +97,9 @@ class RecordCompatibilityServiceTest {
         verify(exactly = 1) { encryptedTags.addAll(encryptedAnnotations) }
         verify(exactly = 2) {
             apiService.getCount(
-                alias,
-                userId,
-                or(encodedAndEncryptedTags, encryptedTags)
+                    alias,
+                    userId,
+                    or(encodedAndEncryptedTags, encryptedTags)
             )
         }
     }
@@ -127,49 +127,49 @@ class RecordCompatibilityServiceTest {
         every { taggingEncryptionService.encryptAnnotations(annotations) } returns encryptedAnnotations
         every {
             apiService.fetchRecords(
-                alias,
-                userId,
-                startTime,
-                endTime,
-                pageSize,
-                offset,
-                encodedAndEncryptedTags
+                    alias,
+                    userId,
+                    startTime,
+                    endTime,
+                    pageSize,
+                    offset,
+                    encodedAndEncryptedTags
             )
         } returns Observable.fromArray(listOf(encryptedRecord1))
         every {
             apiService.fetchRecords(
-                alias,
-                userId,
-                startTime,
-                endTime,
-                pageSize,
-                offset,
-                encryptedTags
+                    alias,
+                    userId,
+                    startTime,
+                    endTime,
+                    pageSize,
+                    offset,
+                    encryptedTags
             )
         } returns Observable.fromArray(listOf(encryptedRecord2))
 
 
         // When
         val observer = service.searchRecords(
-            alias,
-            userId,
-            startTime,
-            endTime,
-            pageSize,
-            offset,
-            tags,
-            annotations
+                alias,
+                userId,
+                startTime,
+                endTime,
+                pageSize,
+                offset,
+                tags,
+                annotations
         ).test().await()
 
         // Then
         val result = observer
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
 
         assertEquals(
-            expected = listOf(encryptedRecord1, encryptedRecord2),
-            actual = result
+                expected = listOf(encryptedRecord1, encryptedRecord2),
+                actual = result
         )
 
         verify(exactly = 1) { taggingEncryptionService.encryptAndEncodeTags(tags) }
@@ -178,13 +178,13 @@ class RecordCompatibilityServiceTest {
         verify(exactly = 1) { taggingEncryptionService.encryptAnnotations(annotations) }
         verify(exactly = 2) {
             apiService.fetchRecords(
-                alias,
-                userId,
-                startTime,
-                endTime,
-                pageSize,
-                offset,
-                or(encodedAndEncryptedTags, encryptedTags)
+                    alias,
+                    userId,
+                    startTime,
+                    endTime,
+                    pageSize,
+                    offset,
+                    or(encodedAndEncryptedTags, encryptedTags)
             )
         }
     }
@@ -212,49 +212,49 @@ class RecordCompatibilityServiceTest {
         every { taggingEncryptionService.encryptAnnotations(annotations) } returns encryptedAnnotations
         every {
             apiService.fetchRecords(
-                alias,
-                userId,
-                startTime,
-                endTime,
-                pageSize,
-                offset,
-                encodedAndEncryptedTags
+                    alias,
+                    userId,
+                    startTime,
+                    endTime,
+                    pageSize,
+                    offset,
+                    encodedAndEncryptedTags
             )
         } returns Observable.fromArray(listOf(encryptedRecord1))
         every {
             apiService.fetchRecords(
-                alias,
-                userId,
-                startTime,
-                endTime,
-                pageSize,
-                offset,
-                encryptedTags
+                    alias,
+                    userId,
+                    startTime,
+                    endTime,
+                    pageSize,
+                    offset,
+                    encryptedTags
             )
         } returns Observable.fromArray(listOf(encryptedRecord2))
 
 
         // When
         val observer = service.searchRecords(
-            alias,
-            userId,
-            startTime,
-            endTime,
-            pageSize,
-            offset,
-            tags,
-            annotations
+                alias,
+                userId,
+                startTime,
+                endTime,
+                pageSize,
+                offset,
+                tags,
+                annotations
         ).test().await()
 
         // Then
         val result = observer
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
 
         assertEquals(
-            expected = listOf(encryptedRecord1),
-            actual = result
+                expected = listOf(encryptedRecord1),
+                actual = result
         )
 
         verify(exactly = 1) { taggingEncryptionService.encryptAndEncodeTags(tags) }
@@ -263,13 +263,13 @@ class RecordCompatibilityServiceTest {
         verify(exactly = 1) { taggingEncryptionService.encryptAnnotations(annotations) }
         verify(exactly = 1) {
             apiService.fetchRecords(
-                alias,
-                userId,
-                startTime,
-                endTime,
-                pageSize,
-                offset,
-                encodedAndEncryptedTags
+                    alias,
+                    userId,
+                    startTime,
+                    endTime,
+                    pageSize,
+                    offset,
+                    encodedAndEncryptedTags
             )
         }
     }

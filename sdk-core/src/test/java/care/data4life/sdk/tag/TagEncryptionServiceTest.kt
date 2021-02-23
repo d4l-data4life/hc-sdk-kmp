@@ -57,9 +57,9 @@ class TagEncryptionServiceTest {
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(
-                gcKey,
-                "key${DELIMITER}value".toByteArray(),
-                IV
+                    gcKey,
+                    "key${DELIMITER}value".toByteArray(),
+                    IV
             )
         } returns symEncrypted
         every { base64.encodeToString(symEncrypted) } returns encryptedTag
@@ -71,9 +71,9 @@ class TagEncryptionServiceTest {
         Truth.assertThat(encryptedTags).containsExactly(encryptedTag)
         verify {
             cryptoService.symEncrypt(
-                gcKey,
-                "key${DELIMITER}value".toByteArray(),
-                IV
+                    gcKey,
+                    "key${DELIMITER}value".toByteArray(),
+                    IV
             )
         }
     }
@@ -90,20 +90,20 @@ class TagEncryptionServiceTest {
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(
-                gcKey,
-                encryptedTag.toByteArray(),
-                IV
+                    gcKey,
+                    encryptedTag.toByteArray(),
+                    IV
             )
         } throws RuntimeException("Error")
 
         // When
         val exception =
-            assertFailsWith<D4LException> { subjectUnderTest.encryptAndEncodeTags(tags) }
+                assertFailsWith<D4LException> { subjectUnderTest.encryptAndEncodeTags(tags) }
 
         // Then
         assertEquals(
-            expected = "Failed to encrypt tag",
-            actual = exception.message
+                expected = "Failed to encrypt tag",
+                actual = exception.message
         )
     }
 
@@ -120,9 +120,9 @@ class TagEncryptionServiceTest {
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(
-                gcKey,
-                "key${DELIMITER}value".toByteArray(),
-                IV
+                    gcKey,
+                    "key${DELIMITER}value".toByteArray(),
+                    IV
             )
         } returns symEncrypted
         every { base64.encodeToString(symEncrypted) } returns encryptedTag
@@ -134,9 +134,9 @@ class TagEncryptionServiceTest {
         Truth.assertThat(encryptedTags).containsExactly(encryptedTag)
         verify {
             cryptoService.symEncrypt(
-                gcKey,
-                "key${DELIMITER}value".toByteArray(),
-                IV
+                    gcKey,
+                    "key${DELIMITER}value".toByteArray(),
+                    IV
             )
         }
     }
@@ -153,9 +153,9 @@ class TagEncryptionServiceTest {
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(
-                gcKey,
-                encryptedTag.toByteArray(),
-                IV
+                    gcKey,
+                    encryptedTag.toByteArray(),
+                    IV
             )
         } throws RuntimeException("Error")
 
@@ -164,8 +164,8 @@ class TagEncryptionServiceTest {
 
         // Then
         assertEquals(
-            expected = "Failed to encrypt tag",
-            actual = exception.message
+                expected = "Failed to encrypt tag",
+                actual = exception.message
         )
     }
 
@@ -183,9 +183,9 @@ class TagEncryptionServiceTest {
         every { base64.decode(encryptedTag) } returns encryptedTag.toByteArray()
         every {
             cryptoService.symDecrypt(
-                gcKey,
-                encryptedTag.toByteArray(),
-                IV
+                    gcKey,
+                    encryptedTag.toByteArray(),
+                    IV
             )
         } returns tag.toByteArray()
 
@@ -209,9 +209,9 @@ class TagEncryptionServiceTest {
         every { base64.decode(encryptedTag) } returns encryptedTag.toByteArray()
         every {
             cryptoService.symDecrypt(
-                gcKey,
-                encryptedTag.toByteArray(),
-                IV
+                    gcKey,
+                    encryptedTag.toByteArray(),
+                    IV
             )
         } returns tag.toByteArray()
         every { tagHelper.decode(tag) } returns tag
@@ -236,8 +236,8 @@ class TagEncryptionServiceTest {
 
         // Then
         assertEquals(
-            expected = "Failed to decrypt tag",
-            actual = exception.message
+                expected = "Failed to decrypt tag",
+                actual = exception.message
         )
     }
 
@@ -253,9 +253,9 @@ class TagEncryptionServiceTest {
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(
-                gcKey,
-                "$ANNOTATION_KEY${DELIMITER}value".toByteArray(),
-                IV
+                    gcKey,
+                    "$ANNOTATION_KEY${DELIMITER}value".toByteArray(),
+                    IV
             )
         } returns symEncrypted
         every { base64.encodeToString(symEncrypted) } returns encryptedAnnotation
@@ -267,9 +267,9 @@ class TagEncryptionServiceTest {
         Truth.assertThat(encryptedAnnotations).containsExactly(encryptedAnnotation)
         verify {
             cryptoService.symEncrypt(
-                gcKey,
-                "${ANNOTATION_KEY}${DELIMITER}value".toByteArray(),
-                IV
+                    gcKey,
+                    "${ANNOTATION_KEY}${DELIMITER}value".toByteArray(),
+                    IV
             )
         }
     }
@@ -284,9 +284,9 @@ class TagEncryptionServiceTest {
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(
-                gcKey,
-                "$ANNOTATION_KEY${DELIMITER}value".toByteArray(),
-                IV
+                    gcKey,
+                    "$ANNOTATION_KEY${DELIMITER}value".toByteArray(),
+                    IV
             )
         } throws RuntimeException("Error")
 
@@ -297,8 +297,8 @@ class TagEncryptionServiceTest {
 
         // Then
         assertEquals(
-            expected = "Failed to encrypt tag",
-            actual = exception.message
+                expected = "Failed to encrypt tag",
+                actual = exception.message
         )
     }
 
@@ -314,9 +314,9 @@ class TagEncryptionServiceTest {
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(
-                gcKey,
-                "$ANNOTATION_KEY${DELIMITER}value".toByteArray(),
-                IV
+                    gcKey,
+                    "$ANNOTATION_KEY${DELIMITER}value".toByteArray(),
+                    IV
             )
         } returns symEncrypted
         every { base64.encodeToString(symEncrypted) } returns encryptedAnnotation
@@ -328,9 +328,9 @@ class TagEncryptionServiceTest {
         Truth.assertThat(encryptedAnnotations).containsExactly(encryptedAnnotation)
         verify {
             cryptoService.symEncrypt(
-                gcKey,
-                "${ANNOTATION_KEY}${DELIMITER}value".toByteArray(),
-                IV
+                    gcKey,
+                    "${ANNOTATION_KEY}${DELIMITER}value".toByteArray(),
+                    IV
             )
         }
     }
@@ -345,9 +345,9 @@ class TagEncryptionServiceTest {
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(
-                gcKey,
-                "$ANNOTATION_KEY${DELIMITER}value".toByteArray(),
-                IV
+                    gcKey,
+                    "$ANNOTATION_KEY${DELIMITER}value".toByteArray(),
+                    IV
             )
         } throws RuntimeException("Error")
 
@@ -358,8 +358,8 @@ class TagEncryptionServiceTest {
 
         // Then
         assertEquals(
-            expected = "Failed to encrypt tag",
-            actual = exception.message
+                expected = "Failed to encrypt tag",
+                actual = exception.message
         )
     }
 
@@ -376,16 +376,16 @@ class TagEncryptionServiceTest {
         every { base64.decode(encryptedAnnotation) } returns encryptedAnnotation.toByteArray()
         every {
             cryptoService.symDecrypt(
-                gcKey,
-                encryptedAnnotation.toByteArray(),
-                IV
+                    gcKey,
+                    encryptedAnnotation.toByteArray(),
+                    IV
             )
         } returns annotation.toByteArray()
         every { tagHelper.decode(annotation) } returns annotation
 
         // When
         val decryptedAnnotations: List<String> =
-            subjectUnderTest.decryptAnnotations(encryptedAnnotations)
+                subjectUnderTest.decryptAnnotations(encryptedAnnotations)
 
         // Then
         Truth.assertThat(decryptedAnnotations).containsExactly(expected)
@@ -403,9 +403,9 @@ class TagEncryptionServiceTest {
         every { base64.decode(encryptedTag) } returns encryptedTag.toByteArray()
         every {
             cryptoService.symDecrypt(
-                gcKey,
-                encryptedTag.toByteArray(),
-                IV
+                    gcKey,
+                    encryptedTag.toByteArray(),
+                    IV
             )
         } returns tag.toByteArray()
         every { tagHelper.decode(tag) } returns tag
@@ -430,8 +430,8 @@ class TagEncryptionServiceTest {
 
         // Then
         assertEquals(
-            expected = "Failed to decrypt tag",
-            actual = exception.message
+                expected = "Failed to decrypt tag",
+                actual = exception.message
         )
     }
 

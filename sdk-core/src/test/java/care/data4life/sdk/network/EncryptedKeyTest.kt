@@ -53,8 +53,8 @@ class EncryptedKeyTest {
 
         // Then
         assertEquals(
-            expected,
-            key.base64Key
+                expected,
+                key.base64Key
         )
 
         verify(exactly = 1) { Base64.encodeToString(givenValue.toByteArray()) }
@@ -74,8 +74,8 @@ class EncryptedKeyTest {
 
         // Then
         assertEquals(
-            expected,
-            key.decode()
+                expected,
+                key.decode()
         )
     }
 }

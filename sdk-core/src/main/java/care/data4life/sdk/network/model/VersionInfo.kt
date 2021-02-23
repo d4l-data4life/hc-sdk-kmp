@@ -13,33 +13,19 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
+package care.data4life.sdk.network.model
 
-package care.data4life.sdk.network.model;
+import com.squareup.moshi.Json
 
-import com.squareup.moshi.Json;
-
-import java.util.List;
-
-import static care.data4life.sdk.network.model.Version.KEY_UNSUPPORTED;
-
-public class VersionInfo {
-    @Json(name = "versions")
-    private List<Version> versionsList;
-
-    public VersionInfo(List<Version> versionsList) {
-        this.versionsList = versionsList;
-    }
-
-    public Boolean isSupported(String currentVersion) {
-        boolean isSupported = true;
-        for (Version version : versionsList) {
-            if (version.getVersionName().equals(currentVersion) && version.getStatus().equals(KEY_UNSUPPORTED)) {
-                isSupported = false;
-                break;
+class VersionInfo(@field:Json(name = "versions") private val versionsList: List<Version>) {
+    fun isSupported(currentVersion: String): Boolean {
+        var isSupported = true
+        for (version in versionsList) {
+            if (version.versionName == currentVersion && version.status == Version.KEY_UNSUPPORTED) {
+                isSupported = false
+                break
             }
-
         }
-        return isSupported;
+        return isSupported
     }
 }
-

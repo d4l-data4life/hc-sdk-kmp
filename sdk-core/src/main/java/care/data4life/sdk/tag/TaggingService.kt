@@ -16,12 +16,19 @@
 package care.data4life.sdk.tag
 
 import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir3Version
 import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.Fhir4Version
+import care.data4life.sdk.fhir.FhirContract
+import care.data4life.sdk.tag.TaggingContract.Companion.SEPARATOR
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_KEY
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_VALUE
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_CLIENT
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_FHIR_VERSION
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_PARTNER
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_RESOURCE_TYPE
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_UPDATED_BY_CLIENT
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_UPDATED_BY_PARTNER
 import care.data4life.sdk.wrapper.SdkFhirElementFactory
 import care.data4life.sdk.wrapper.WrapperContract
-import java.util.*
 
 // TODO internal
 class TaggingService(
@@ -32,14 +39,14 @@ class TaggingService(
 
     private fun appendCommonDefaultTags(
             resourceType: String?,
-            oldTags: HashMap<String, String>?
-    ): HashMap<String, String> {
+            oldTags: Tags?
+    ): Tags {
         val tags = hashMapOf<String, String>()
         if (oldTags != null && oldTags.isNotEmpty()) {
             tags.putAll(oldTags)
         }
         if (resourceType != null && resourceType.isNotEmpty()) {
-            tags[TAG_RESOURCE_TYPE] = resourceType.toLowerCase(US_LOCALE)
+            tags[TAG_RESOURCE_TYPE] = resourceType
         }
         if (!tags.containsKey(TAG_CLIENT)) {
             tags[TAG_CLIENT] = clientId
@@ -56,49 +63,49 @@ class TaggingService(
 
     override fun appendDefaultTags(
             resource: Any,
-            oldTags: HashMap<String, String>?
-    ): HashMap<String, String> {
+            oldTags: Tags?
+    ): Tags {
         return when (resource) {
-            is Fhir3Resource -> appendCommonDefaultTags(resource.resourceType, oldTags).also {
-                if (!it.containsKey(TAG_FHIR_VERSION)) {
-                    it[TAG_FHIR_VERSION] = Fhir3Version.version
-                }
-            }
-            is Fhir4Resource -> appendCommonDefaultTags(resource.resourceType, oldTags).also {
-                if (!it.containsKey(TAG_FHIR_VERSION)) {
-                    it[TAG_FHIR_VERSION] = Fhir4Version.version
-                }
-            }
-            else -> appendCommonDefaultTags(null, oldTags).also {
-                it[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE
-            }
+            is Fhir3Resource -> appendCommonDefaultTags(
+                    resource.resourceType,
+                    oldTags
+            ).also { tags -> tagVersion(tags, FhirContract.FhirVersion.FHIR_3) }
+            is Fhir4Resource -> appendCommonDefaultTags(
+                    resource.resourceType,
+                    oldTags
+            ).also { tags -> tagVersion(tags, FhirContract.FhirVersion.FHIR_4) }
+            else -> appendCommonDefaultTags(
+                    null,
+                    oldTags
+            ).also { tags -> tags[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE }
         }
     }
 
-    override fun getTagFromType(
-            resourceType: Class<Any>?
+    private fun tagVersion(
+            tags: Tags,
+            version: FhirContract.FhirVersion
+    ) {
+        if (version == FhirContract.FhirVersion.UNKNOWN) {
+            tags[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE
+        } else {
+            tags[TAG_FHIR_VERSION] = version.version
+        }
+    }
+
+    override fun getTagsFromType(
+            resourceType: Class<out Any>
     ): HashMap<String, String> {
-        return hashMapOf<String, String>().also {
-            if (resourceType == null) {
-                it[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE
-            } else {
-                it[TAG_RESOURCE_TYPE] = fhirElementFactory.getFhirTypeForClass(resourceType)!!.toLowerCase(US_LOCALE)
+        return hashMapOf<String, String>().also { tags ->
+            val version = fhirElementFactory.resolveFhirVersion(resourceType)
+            tagVersion(tags, version)
+
+            if (version != FhirContract.FhirVersion.UNKNOWN) {
+                fhirElementFactory.getFhirTypeForClass(resourceType).also { resourceTagValue ->
+                    if(resourceTagValue is String) {
+                        tags[TAG_RESOURCE_TYPE] = resourceTagValue
+                    }
+                }
             }
         }
     }
-
-    companion object {
-        private val US_LOCALE = Locale.US
-        const val TAG_DELIMITER = "="
-        val TAG_RESOURCE_TYPE = "resourceType".toLowerCase(US_LOCALE)
-        const val TAG_CLIENT = "client"
-        private val TAG_UPDATED_BY_CLIENT = "updatedByClient".toLowerCase(US_LOCALE)
-        private const val TAG_PARTNER = "partner"
-        private val TAG_UPDATED_BY_PARTNER = "updatedByPartner".toLowerCase(US_LOCALE)
-        private val TAG_FHIR_VERSION = "fhirVersion".toLowerCase(US_LOCALE)
-        private const val TAG_APPDATA_KEY = "flag"
-        private const val TAG_APPDATA_VALUE = "appdata"
-        private const val SEPARATOR = "#"
-    }
-
 }

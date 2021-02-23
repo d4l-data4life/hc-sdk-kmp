@@ -16,6 +16,8 @@
 package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
+import care.data4life.fhir.r4.FhirR4Parser
+import care.data4life.fhir.r4.model.Patient as Fhir4Patient
 import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.fhir.stu3.model.CarePlan
 import care.data4life.fhir.stu3.model.DocumentReference
@@ -61,11 +63,15 @@ import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import org.junit.internal.Classes.getClass
 import org.mockito.Mockito
 import org.mockito.Mockito.times
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
+import java.io.File
 import java.io.IOException
+import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 
 class RecordServiceTest : RecordServiceTestBase() {
 
@@ -78,6 +84,10 @@ class RecordServiceTest : RecordServiceTestBase() {
     fun tearDown() {
         stop()
     }
+
+    private fun getResource(
+            resourceName: String
+    ): String = this::class.java.getResource(resourceName).readText(StandardCharsets.UTF_8)
 
     //region utility methods
     @Test
@@ -752,7 +762,7 @@ class RecordServiceTest : RecordServiceTestBase() {
 
     @Test
     @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
-    fun checkForUnsupportedData_shouldReturnSuccessfully() {
+    fun checkDataRestrictions_shouldReturnSuccessfully() {
         // Given
         val pdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES)
         System.arraycopy(
@@ -774,7 +784,7 @@ class RecordServiceTest : RecordServiceTestBase() {
 
     @Test
     @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
-    fun checkForUnsupportedData_shouldThrow_forUnsupportedData() {
+    fun checkDataRestrictions_shouldThrow_forUnsupportedData() {
         // Given
         val invalidData = byteArrayOf(0x00)
         val doc = buildDocumentReference(invalidData)
@@ -796,7 +806,7 @@ class RecordServiceTest : RecordServiceTestBase() {
 
     @Test
     @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
-    fun checkForUnsupportedData_shouldThrow_whenFileSizeLimitIsReached() {
+    fun checkDataRestrictions_shouldThrow_whenFileSizeLimitIsReached() {
         // Given
         val invalidSizePdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES + 1)
         System.arraycopy(
@@ -817,6 +827,22 @@ class RecordServiceTest : RecordServiceTestBase() {
             // Then
             Truth.assertThat(e.javaClass).isEqualTo(DataRestrictionException.MaxDataSizeViolation::class.java)
         }
+
+        // Then
+        inOrder.verify(recordService).checkDataRestrictions(doc)
+        inOrder.verifyNoMoreInteractions()
+    }
+
+    @Test
+    @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
+    fun `Given, checkDataRestrictions is called, with a Resource, which has non extractable Attachments, it returns without a failure`() {
+        // Given
+        val resourceStr = getResource("/fhir4/s4h-patient-example.patient.json")
+
+        val doc = FhirR4Parser().toFhir(Fhir4Patient::class.java, resourceStr)
+
+        // When
+        recordService.checkDataRestrictions(doc)
 
         // Then
         inOrder.verify(recordService).checkDataRestrictions(doc)
@@ -882,7 +908,7 @@ class RecordServiceTest : RecordServiceTestBase() {
     @Throws(InterruptedException::class)
     fun deleteRecords_shouldDeleteRecords() {
         // Given
-        Mockito.doReturn(Completable.complete()).`when`(recordService).deleteRecord(RECORD_ID, USER_ID)
+        Mockito.doReturn(Completable.complete()).`when`(recordService).deleteRecord(USER_ID, RECORD_ID)
         val ids = listOf(RECORD_ID, RECORD_ID)
 
         // When
@@ -897,7 +923,7 @@ class RecordServiceTest : RecordServiceTestBase() {
         Truth.assertThat(result.failedDeletes).hasSize(0)
         Truth.assertThat(result.successfulDeletes).hasSize(2)
         inOrder.verify(recordService).deleteRecords(ids, USER_ID)
-        inOrder.verify(recordService, Mockito.times(2)).deleteRecord(RECORD_ID, USER_ID)
+        inOrder.verify(recordService, Mockito.times(2)).deleteRecord(USER_ID, RECORD_ID)
         inOrder.verifyNoMoreInteractions()
     }
 

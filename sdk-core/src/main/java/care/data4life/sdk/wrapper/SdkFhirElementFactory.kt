@@ -20,6 +20,7 @@ import care.data4life.sdk.fhir.Fhir3ElementFactory
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4ElementFactory
 import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
 import java.util.*
 
@@ -34,6 +35,14 @@ internal object SdkFhirElementFactory : WrapperContract.FhirElementFactory {
             fhir3Indicator -> Fhir3ElementFactory.getFhirTypeForClass(resourceType as Class<Fhir3Resource>)
             fhir4Indicator -> Fhir4ElementFactory.getFhirTypeForClass(resourceType as Class<Fhir4Resource>)
             else -> throw CoreRuntimeException.InternalFailure()
+        }
+    }
+
+    override fun resolveFhirVersion(resourceType: Class<out Any>): FhirContract.FhirVersion {
+        return when (resourceType.`package`) {
+            fhir3Indicator -> FhirContract.FhirVersion.FHIR_3
+            fhir4Indicator -> FhirContract.FhirVersion.FHIR_4
+            else -> FhirContract.FhirVersion.UNKNOWN
         }
     }
 

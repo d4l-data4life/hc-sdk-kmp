@@ -24,7 +24,6 @@ import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.network.model.DecryptedDataRecord
 import care.data4life.sdk.network.model.DecryptedRecord
-import care.data4life.sdk.tag.TaggingService
 import care.data4life.sdk.util.Base64
 import com.google.common.truth.Truth
 import io.mockk.every
@@ -145,7 +144,7 @@ class RecordServiceCryptoTest : RecordServiceTestBase() {
         val commonKeyId = "mockCommonKeyId"
         val modelVersion = 1
 
-        Mockito.`when`(mockTags.containsKey(TaggingService.TAG_RESOURCE_TYPE)).thenReturn(true)
+        Mockito.`when`(mockTags.containsKey("resourcetype")).thenReturn(true)
         Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(modelVersion)
         Mockito.`when`(mockEncryptedRecord.commonKeyId).thenReturn(commonKeyId)
         Mockito.`when`(mockTagEncryptionService.decryptTags(mockEncryptedTags))
@@ -219,7 +218,7 @@ class RecordServiceCryptoTest : RecordServiceTestBase() {
         val commonKeyId = "mockCommonKeyId"
         val modelVersion = 1
 
-        Mockito.`when`(mockTags.containsKey(TaggingService.TAG_RESOURCE_TYPE)).thenReturn(true)
+        Mockito.`when`(mockTags.containsKey("resourcetype")).thenReturn(true)
         Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(modelVersion)
         Mockito.`when`(mockEncryptedRecord.commonKeyId).thenReturn(commonKeyId)
         Mockito.`when`(mockEncryptedRecord.encryptedAttachmentsKey).thenReturn(mockEncryptedAttachmentKey)
@@ -282,7 +281,7 @@ class RecordServiceCryptoTest : RecordServiceTestBase() {
         val modelVersion = 1
         val updateDate = "2000-01-01"
 
-        Mockito.`when`(mockTags.containsKey(TaggingService.TAG_RESOURCE_TYPE)).thenReturn(true)
+        Mockito.`when`(mockTags.containsKey("resourcetype")).thenReturn(true)
         Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(modelVersion)
         Mockito.`when`(mockEncryptedRecord.commonKeyId).thenReturn(commonKeyId)
         Mockito.`when`(mockEncryptedRecord.encryptedAttachmentsKey).thenReturn(mockEncryptedAttachmentKey)

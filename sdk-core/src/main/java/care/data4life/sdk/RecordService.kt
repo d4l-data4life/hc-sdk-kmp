@@ -29,7 +29,7 @@ import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3Identifier
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.FhirService
+import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
@@ -46,13 +46,14 @@ import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.definitions.BaseRecord
 import care.data4life.sdk.model.definitions.RecordFactory
 import care.data4life.sdk.network.DecryptedRecordMapper
+import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
+import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.record.RecordContract
-import care.data4life.sdk.tag.TagEncryptionService
-import care.data4life.sdk.tag.TaggingService
+import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
@@ -73,7 +74,7 @@ import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.DateTimeFormatterBuilder
 import java.io.IOException
-import java.util.*
+import java.util.Locale
 import kotlin.collections.HashMap
 
 
@@ -82,26 +83,26 @@ class RecordService(
         private val partnerId: String,
         private val alias: String,
         private val apiService: ApiService,
-        private val tagEncryptionService: TagEncryptionService,
-        private val taggingService: TaggingService,
-        private val fhirService: FhirService,
+        private val tagEncryptionService: TaggingContract.EncryptionService,
+        private val taggingService: TaggingContract.Service,
+        private val fhirService: FhirContract.Service,
         private val attachmentService: AttachmentContract.Service,
         private val cryptoService: CryptoService,
         private val errorHandler: SdkContract.ErrorHandler
 ) : RecordContract.Service {
-    @Deprecated("")
+    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     internal enum class UploadDownloadOperation {
         UPLOAD, DOWNLOAD, UPDATE
     }
 
-    @Deprecated("")
+    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     internal enum class RemoveRestoreOperation {
         REMOVE, RESTORE
     }
 
     private val recordFactory: RecordFactory = RecordMapper
     private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper = SdkFhirAttachmentHelper
-    private val attchachmentFactory: WrapperFactoryContract.AttachmentFactory = SdkAttachmentFactory
+    private val attachmentFactory: WrapperFactoryContract.AttachmentFactory = SdkAttachmentFactory
     private val identifierFactory: WrapperFactoryContract.IdentifierFactory = SdkIdentifierFactory
 
     private fun isFhir(resource: Any?): Boolean = resource is Fhir3Resource || resource is Fhir4Resource
@@ -199,7 +200,7 @@ class RecordService(
                 .fromCallable { recordIds }
                 .flatMapIterable { it }
                 .flatMapSingle { recordId ->
-                    deleteRecord(recordId, userId)
+                    deleteRecord(userId, recordId)
                             .doOnError { error ->
                                 failedDeletes.add(
                                         Pair(recordId, errorHandler.handleError(error)))
@@ -219,9 +220,9 @@ class RecordService(
     ): Single<BaseRecord<T>> {
         return apiService
                 .fetchRecord(alias, userId, recordId)
-                .map { decryptRecord<T>(it, userId) }
-                .map { assignResourceId(it) }
-                .map { recordFactory.getInstance(it) }
+                .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
+                .map { decryptedRecord -> assignResourceId(decryptedRecord) }
+                .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -249,36 +250,45 @@ class RecordService(
                 .fromCallable { recordIds }
                 .flatMapIterable { it }
                 .flatMapSingle { recordId ->
-                    fetchFhir3Record<T>(recordId, userId)
-                            .ignoreErrors {
-                                failedFetches.add(Pair(recordId, errorHandler.handleError(it)))
-                            }
+                    fetchFhir3Record<T>(
+                            userId = userId,
+                            recordId = recordId
+                    ).ignoreErrors {
+                        failedFetches.add(Pair(recordId, errorHandler.handleError(it)))
+                    }
                 }
                 .toList()
                 .map { FetchResult(it, failedFetches) }
     }
 
+    private fun encryptTagsAndAnnotations(
+            plainTags: HashMap<String, String>,
+            plainAnnotations: List<String>
+    ): List<String> {
+        return tagEncryptionService.encryptTags(plainTags)
+                .also { encryptedTags ->
+                    encryptedTags.addAll(
+                            tagEncryptionService.encryptAnnotations(plainAnnotations)
+                    )
+                }
+    }
+
     internal fun <T : Any> _fetchRecords(
             userId: String,
-            resourceType: Class<T>?,
+            resourceType: Class<T>,
             annotations: List<String>,
             startDate: LocalDate?,
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int
     ): Single<List<BaseRecord<T>>> {
-        val startTime = if (startDate != null) DATE_FORMATTER.format(startDate) else null
-        val endTime = if (endDate != null) DATE_FORMATTER.format(endDate) else null
+        val startTime = if (startDate != null) formatDate(startDate) else null
+        val endTime = if (endDate != null) formatDate(endDate) else null
 
         return Observable
-                .fromCallable { taggingService.getTagFromType(resourceType as Class<Any>?) }
-                .map { tagEncryptionService.encryptTags(it) as MutableList<String> }
-                .map { tags ->
-                    tags.also {
-                        it.addAll(tagEncryptionService.encryptAnnotations(annotations))
-                    }
-                }
-                .flatMap {
+                .fromCallable { taggingService.getTagsFromType(resourceType) }
+                .map { plainTags -> encryptTagsAndAnnotations(plainTags, annotations) }
+                .flatMap { encryptedTags ->
                     apiService.fetchRecords(
                             alias,
                             userId,
@@ -286,11 +296,11 @@ class RecordService(
                             endTime,
                             pageSize,
                             offset,
-                            it
+                            encryptedTags
                     )
                 }
                 .flatMapIterable { it }
-                .map { decryptRecord<T>(it, userId) }
+                .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
                 .let {
                     if (resourceType == null) {
                         it
@@ -298,8 +308,8 @@ class RecordService(
                         it.filter { decryptedRecord -> resourceType.isAssignableFrom(decryptedRecord.resource::class.java) }
                     }.filter { decryptedRecord -> decryptedRecord.annotations.containsAll(annotations) }
                 }
-                .map { assignResourceId(it) }
-                .map { recordFactory.getInstance(it) }
+                .map { decryptedRecord -> assignResourceId(decryptedRecord) }
+                .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) }
                 .toList() as Single<List<BaseRecord<T>>>
     }
 
@@ -366,9 +376,9 @@ class RecordService(
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int
-    ): Single<List<DataRecord<DataResource>>> = _fetchRecords<DataResource>(
+    ): Single<List<DataRecord<DataResource>>> = _fetchRecords(
             userId,
-            null,
+            DataResource::class.java,
             annotations,
             startDate,
             endDate,
@@ -505,29 +515,50 @@ class RecordService(
                 .map { UpdateResult(it, failedUpdates) }
     }
 
+    private fun _countRecords(
+            type: Class<out Any>,
+            userId: String,
+            annotations: List<String> = listOf()
+    ): Single<Int> = encryptTagsAndAnnotations(
+        taggingService.getTagsFromType(type),
+        annotations
+    ).let { encryptedTags -> apiService.getCount(alias, userId, encryptedTags) }
+
     @JvmOverloads
+    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     fun countRecords(
             type: Class<out Fhir3Resource>?,
             userId: String,
             annotations: List<String> = listOf()
-    ): Single<Int> = if (type == null) {
-        apiService.getCount(alias, userId, null)
-    } else {
-        Single
-                .fromCallable { taggingService.getTagFromType(type as Class<Any>?) }
-                .map { tagEncryptionService.encryptTags(it) as MutableList<String> }
-                .map { tags -> tags.also { it.addAll(tagEncryptionService.encryptAnnotations(annotations)) } }
-                .flatMap { apiService.getCount(alias, userId, it) }
+    ): Single<Int> {
+        return if (type == null) {
+            countAllFhir3Records(userId, annotations)
+        } else {
+            countFhir3Records(type, userId, annotations)
+        }
     }
+
+    override fun countFhir3Records(
+            type: Class<out Fhir3Resource>,
+            userId: String,
+            annotations: List<String>
+    ): Single<Int> = _countRecords(type, userId, annotations)
+
+    override fun countFhir4Records(
+            type: Class<out Fhir4Resource>,
+            userId: String,
+            annotations: List<String>
+    ): Single<Int> = _countRecords(type, userId, annotations)
+
+    override fun countAllFhir3Records(
+            userId: String,
+            annotations: List<String>
+    ): Single<Int> = countFhir3Records(Fhir3Resource::class.java, userId, annotations)
 
     //region utility methods
     @Throws(IOException::class)
-    internal fun <T : Any> encryptRecord(
-            record: DecryptedBaseRecord<T>
-    ): EncryptedRecord {
-        val encryptedTags = tagEncryptionService.encryptTags(record.tags!!).also {
-            (it as MutableList<String>).addAll(tagEncryptionService.encryptAnnotations(record.annotations))
-        }
+    internal fun <T : Any> encryptRecord(record: DecryptedBaseRecord<T>): NetworkModelContract.EncryptedRecord {
+        val encryptedTags = encryptTagsAndAnnotations(record.tags!!, record.annotations)
 
         val commonKey = cryptoService.fetchCurrentCommonKey()
         val currentCommonKeyId = cryptoService.currentCommonKeyId
@@ -535,7 +566,7 @@ class RecordService(
                 commonKey,
                 KeyType.DATA_KEY,
                 record.dataKey!!
-        ).blockingGet()
+        ).blockingGet() as EncryptedKey
 
         val encryptedResource = fhirService._encryptResource(record.dataKey!!, record.resource)
 
@@ -546,7 +577,7 @@ class RecordService(
                     commonKey,
                     KeyType.ATTACHMENT_KEY,
                     record.attachmentsKey!!
-            ).blockingGet()
+            ).blockingGet() as EncryptedKey
         }
 
         return EncryptedRecord(
@@ -583,7 +614,7 @@ class RecordService(
 
     @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
     internal fun <T : Any> decryptRecord(
-            record: EncryptedRecord,
+            record: NetworkModelContract.EncryptedRecord,
             userId: String
     ): DecryptedBaseRecord<T> {
         if (!ModelVersion.isModelVersionSupported(record.modelVersion)) {
@@ -608,24 +639,26 @@ class RecordService(
 
         builder.setDataKey(dataKey)
 
-        if (record.encryptedAttachmentsKey != null) {
+        val attachmentKey = record.encryptedAttachmentsKey
+        if (attachmentKey is EncryptedKey) {
             builder.setAttachmentKey(
                     cryptoService.symDecryptSymmetricKey(
                             commonKey,
-                            record.encryptedAttachmentsKey
+                            attachmentKey
                     ).blockingGet()
             )
         }
 
+        val body = record.encryptedBody
         return builder.build(
-                if (record.encryptedBody == null || record.encryptedBody.isEmpty()) {
-                    null// Fixme: This is a potential bug
-                } else {
+                if (body is String && body.isNotEmpty()) {
                     fhirService.decryptResource<T>(
                             dataKey,
                             tags,
-                            record.encryptedBody
+                            body
                     )
+                } else {
+                    null// Fixme: This is a potential bug
                 }
         ) as DecryptedBaseRecord<T>
     }
@@ -720,7 +753,7 @@ class RecordService(
             val data = HashMap<Any, String?>(attachments.size)
             for (rawAttachment in attachments) {
                 if (rawAttachment != null) {
-                    val attachment = attchachmentFactory.wrap(rawAttachment)
+                    val attachment = attachmentFactory.wrap(rawAttachment)
 
                     if (attachment.data != null) {
                         data[rawAttachment] = attachment.data
@@ -778,7 +811,7 @@ class RecordService(
         }
     }
 
-    @Deprecated("")
+    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     internal fun <T : Fhir3Resource> removeOrRestoreUploadData(
             operation: RemoveRestoreOperation,
             record: DecryptedFhir3Record<T>,
@@ -811,8 +844,7 @@ class RecordService(
 
         if (!fhirAttachmentHelper.hasAttachment(resource)) return record
         val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Any?>?
-
-        attachments ?: return record
+                ?: return record
 
         if (record.attachmentsKey == null) {
             record.attachmentsKey = cryptoService.generateGCKey().blockingGet()
@@ -822,7 +854,7 @@ class RecordService(
         for (rawAttachment in attachments) {
             if (rawAttachment != null) {
 
-                val attachment = attchachmentFactory.wrap(rawAttachment)
+                val attachment = attachmentFactory.wrap(rawAttachment)
 
                 when {
                     attachment.id != null ->
@@ -881,7 +913,7 @@ class RecordService(
 
         for (rawAttachment in attachments) {
             if (rawAttachment != null) {
-                val attachment = attchachmentFactory.wrap(rawAttachment)
+                val attachment = attachmentFactory.wrap(rawAttachment)
 
                 if (attachment.id != null) {
                     oldAttachments[attachment.id] = attachment
@@ -893,7 +925,7 @@ class RecordService(
         val newAttachments = fhirAttachmentHelper.getAttachment(newResource) ?: listOf<Any>()
         for (rawNewAttachment in newAttachments) {
             if (rawNewAttachment != null) {
-                val newAttachment = attchachmentFactory.wrap(rawNewAttachment)
+                val newAttachment = attachmentFactory.wrap(rawNewAttachment)
 
                 when {
                     newAttachment.hash == null || newAttachment.size == null ->
@@ -951,7 +983,7 @@ class RecordService(
         rawAttachments.forEach {
             it?.id ?: throw DataValidationException.IdUsageViolation("Attachment.id expected")
 
-            attachments.add(attchachmentFactory.wrap(it))
+            attachments.add(attachmentFactory.wrap(it))
         }
 
         @Suppress("CheckResult")
@@ -969,7 +1001,7 @@ class RecordService(
     // This method should not allowed to exist any longer in this shape. _uploadData should take over
     // as soon as possible so we can get rid of uploadOrDownloadData. This also means uploadData should
     // not be responsible for the actual upload and a update.
-    @Deprecated("")
+    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     @Throws(DataValidationException.IdUsageViolation::class,
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class)
@@ -985,7 +1017,7 @@ class RecordService(
         }
     }
 
-    @Deprecated("")
+    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     @Throws(DataValidationException.IdUsageViolation::class,
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class,
@@ -1033,7 +1065,7 @@ class RecordService(
             type: DownloadType?
     ) {
         for (rawAttachment in attachments) {
-            val attachment = attchachmentFactory.wrap(rawAttachment)
+            val attachment = attachmentFactory.wrap(rawAttachment)
             val additionalIds = extractAdditionalAttachmentIds(
                     identifiers,
                     attachment.id
@@ -1103,7 +1135,7 @@ class RecordService(
 
             currentAttachments.forEach {
                 if (it != null) {
-                    val attachment = attchachmentFactory.wrap(it)
+                    val attachment = attachmentFactory.wrap(it)
                     if (attachment.id != null) {
                         currentAttachmentIds.add(attachment.id!!)
                     }
@@ -1128,11 +1160,12 @@ class RecordService(
     @Throws(DataRestrictionException.MaxDataSizeViolation::class, DataRestrictionException.UnsupportedFileType::class)
     fun <T : Any> checkDataRestrictions(resource: T?) {
         if (isFhir(resource) && fhirAttachmentHelper.hasAttachment(resource!!)) {
-            val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Any?>
+            val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Any?>? ?: return
+
             for (rawAttachment in attachments) {
                 rawAttachment ?: return
 
-                val attachment = attchachmentFactory.wrap(rawAttachment)
+                val attachment = attachmentFactory.wrap(rawAttachment)
 
                 val data = decode(attachment.data!!)
                 if (recognizeMimeType(data) == MimeType.UNKNOWN) {
@@ -1156,7 +1189,7 @@ class RecordService(
         }
     }
 
-    @Deprecated("")
+    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     internal fun buildMeta(
             record: DecryptedBaseRecord<*>
     ): Meta = Meta(
@@ -1180,11 +1213,14 @@ class RecordService(
         const val FULL_ATTACHMENT_ID_POS = 1
         const val PREVIEW_ID_POS = 2
         const val THUMBNAIL_ID_POS = 3
-        private val DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.US)
+
+        // TODO refactor
+        internal val DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.US)
         private val DATE_TIME_FORMATTER = DateTimeFormatterBuilder()
                 .parseLenient()
                 .appendPattern(DATE_TIME_FORMAT)
                 .toFormatter(Locale.US)
         private val UTC_ZONE_ID = ZoneId.of("UTC")
+        internal fun formatDate(dateTime: LocalDate): String = DATE_FORMATTER.format(dateTime)
     }
 }

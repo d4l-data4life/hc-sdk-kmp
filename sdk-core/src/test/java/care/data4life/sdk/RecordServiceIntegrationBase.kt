@@ -58,7 +58,10 @@ abstract class RecordServiceIntegrationBase {
 
     companion object {
         @JvmStatic
-        protected val CLIENT_ID = "TEST"
+        protected val PARTNER_ID = "B46"
+
+        @JvmStatic
+        protected val CLIENT_ID = "$PARTNER_ID#TEST"
 
         @JvmStatic
         protected val USER_ID = "ME"

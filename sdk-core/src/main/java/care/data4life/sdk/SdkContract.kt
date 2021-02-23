@@ -39,23 +39,26 @@ interface SdkContract {
         /**
          * Get the currently active User session token if present.
          *
-         * @param listener result contains either User session token or Error
+         * @param listener      result contains either User session token or Error
+         * @return              {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun getUserSessionToken(listener: LegacyListener<String>)
+        fun getUserSessionToken(listener: LegacyListener<String>): Task
 
         /**
          * Checks if user is logged in.
          *
-         * @param listener resulting Boolean indicates if the user is logged in or not or Error
+         * @param listener      resulting Boolean indicates if the user is logged in or not or Error
+         * @return              {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun isUserLoggedIn(listener: LegacyListener<Boolean>)
+        fun isUserLoggedIn(listener: LegacyListener<Boolean>): Task
 
         /**
          * Logout the user
          *
-         * @param listener either [Callback.onSuccess] is called or [Callback.onError]
+         * @param listener      either [Callback.onSuccess] is called or [Callback.onError]#
+         * @return              {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun logout(listener: LegacyCallback)
+        fun logout(listener: LegacyCallback): Task
 
     }
 
@@ -66,8 +69,9 @@ interface SdkContract {
          * @param resource       the resource that will be created
          * @param annotations    custom annotations added as tags to the record
          * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
+         * @return               {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun <T : Fhir4Resource> create(resource: T, annotations: List<String>, callback: Callback<Fhir4Record<T>>)
+        fun <T : Fhir4Resource> create(resource: T, annotations: List<String>, callback: Callback<Fhir4Record<T>>): Task
 
         /**
          * Update an {@link Fhir4Record}
@@ -76,16 +80,18 @@ interface SdkContract {
          * @param resource       the updated resource that shall be uploaded
          * @param annotations    custom annotations added as tags to the record
          * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
+         * @return               {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun <T : Fhir4Resource> update(recordId: String, resource: T, annotations: List<String>, callback: Callback<Fhir4Record<T>>)
+        fun <T : Fhir4Resource> update(recordId: String, resource: T, annotations: List<String>, callback: Callback<Fhir4Record<T>>): Task
 
         /**
          * Delete an {@link Fhir4Record}
          *
          * @param recordId      the id of the record that shall be deleted
          * @param callback      either {@link Callback#onSuccess()} or {@link Callback#onError(D4LException)} will be called
+         * @return              {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun delete(recordId: String, callback: Callback<Boolean>)
+        fun delete(recordId: String, callback: Callback<Boolean>): Task
 
         /**
          * Fetch an {@link Fhir4Record} with given recordId
@@ -117,6 +123,16 @@ interface SdkContract {
                 offset: Int,
                 callback: Callback<List<Fhir4Record<T>>>
         ): Task
+
+        /**
+         * Count {@link Fhir4Record}s
+         *
+         * @param resourceType class type of the searched resource
+         * @param annotations custom annotations added as tags to the record
+         * @param callback    either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
+         * @return            {@link Task} which can be used to cancel ongoing operation or to query operation status
+         */
+        fun <T : Fhir4Resource> count(resourceType: Class<T>, annotations: List<String>, callback: Callback<Int>): Task
     }
 
     interface DataRecordClient {
@@ -126,8 +142,9 @@ interface SdkContract {
          * @param resource       the resource that will be created
          * @param annotations    custom annotations added as tags to the record
          * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
+         * @return              {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun create(resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>)
+        fun create(resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>): Task
 
         /**
          * Update an {@link DataRecord}
@@ -136,16 +153,18 @@ interface SdkContract {
          * @param resource       the updated resource that shall be uploaded
          * @param annotations    custom annotations added as tags to the record
          * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
+         * @return               {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun update(recordId: String, resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>)
+        fun update(recordId: String, resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>): Task
 
         /**
          * Delete an {@link DataRecord}
          *
          * @param recordId      the id of the record that shall be deleted
          * @param callback      either {@link Callback#onSuccess()} or {@link Callback#onError(D4LException)} will be called
+         * @return              {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun delete(recordId: String, callback: Callback<Boolean>)
+        fun delete(recordId: String, callback: Callback<Boolean>): Task
 
         /**
          * Fetch an {@link DataRecord} with given recordId

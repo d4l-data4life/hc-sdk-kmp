@@ -82,7 +82,7 @@ class FhirServiceTest {
         val resource = Fhir3Resource()
 
         every { SdkFhirParser.fromResource(resource) } returns JSON_RESOURCE
-        every { cryptoService.encryptString(dataKey, JSON_RESOURCE) } returns Single.just(ENCRYPTED_RESOURCE)
+        every { cryptoService.encryptAndEncodeString(dataKey, JSON_RESOURCE) } returns Single.just(ENCRYPTED_RESOURCE)
 
         // when
         val result = _fhirService._encryptResource(dataKey, resource)
@@ -98,7 +98,7 @@ class FhirServiceTest {
         val resource = Fhir4Resource()
 
         every { SdkFhirParser.fromResource(resource) } returns JSON_RESOURCE
-        every { cryptoService.encryptString(dataKey, JSON_RESOURCE) } returns Single.just(ENCRYPTED_RESOURCE)
+        every { cryptoService.encryptAndEncodeString(dataKey, JSON_RESOURCE) } returns Single.just(ENCRYPTED_RESOURCE)
 
         // when
         val result = _fhirService._encryptResource(dataKey, resource)
@@ -161,7 +161,7 @@ class FhirServiceTest {
         val resource = Fhir3Resource()
 
         every { SdkFhirParser.fromResource(resource) } returns JSON_RESOURCE
-        every { cryptoService.encryptString(dataKey, JSON_RESOURCE) } throws unkwnownException
+        every { cryptoService.encryptAndEncodeString(dataKey, JSON_RESOURCE) } throws unkwnownException
 
         try {
             // when
@@ -181,14 +181,14 @@ class FhirServiceTest {
     @Throws(FhirException::class)
     fun `Given, decryptResource is called with a DataKey, a Type, Tags and a encrypted Fhir3Resource, it decrypts it`() { // decryptResource_shouldReturnResource() {
         // Given
-        every { cryptoService.decryptString(dataKey, ENCRYPTED_RESOURCE) } returns Single.just(JSON_RESOURCE)
+        every { cryptoService.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE) } returns Single.just(JSON_RESOURCE)
         every { SdkFhirParser.toFhir3(fhirType, JSON_RESOURCE) } returns mockDocumentReference
 
         // When
         val resource = _fhirService.decryptResource<Fhir3Resource>(
                 dataKey,
                 hashMapOf(
-                        TAG_FHIR_VERSION to Fhir3Version.version,
+                        TAG_FHIR_VERSION to FhirContract.FhirVersion.FHIR_3.version,
                         TAG_RESOURCE_TYPE to fhirType
                 ),
                 ENCRYPTED_RESOURCE
@@ -204,14 +204,14 @@ class FhirServiceTest {
         val decrypted = mockk<Fhir4Resource>()
 
         // Given
-        every { cryptoService.decryptString(dataKey, ENCRYPTED_RESOURCE) } returns Single.just(JSON_RESOURCE)
+        every { cryptoService.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE) } returns Single.just(JSON_RESOURCE)
         every { SdkFhirParser.toFhir4(fhirType, JSON_RESOURCE) } returns decrypted
 
         // When
         val resource = _fhirService.decryptResource<Fhir4Resource>(
                 dataKey,
                 hashMapOf(
-                        TAG_FHIR_VERSION to Fhir4Version.version,
+                        TAG_FHIR_VERSION to FhirContract.FhirVersion.FHIR_4.version,
                         TAG_RESOURCE_TYPE to fhirType
                 ),
                 ENCRYPTED_RESOURCE
@@ -245,14 +245,14 @@ class FhirServiceTest {
     @Test
     fun `Given, decryptResource is called with a DataKey, a Type, Tags and a encrypted FhirResource, it fails on a CryptoError`() { //decryptResource_shouldThrowException_whenDecryptErrorHappens() {
         // given
-        every { cryptoService.decryptString(dataKey, ENCRYPTED_RESOURCE) } throws unkwnownException
+        every { cryptoService.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE) } throws unkwnownException
 
         try {
             // when
             _fhirService.decryptResource<DataResource>(
                     dataKey,
                     hashMapOf(
-                            TAG_FHIR_VERSION to Fhir4Version.version,
+                            TAG_FHIR_VERSION to FhirContract.FhirVersion.FHIR_4.version,
                             TAG_RESOURCE_TYPE to fhirType
                     ),
                     ENCRYPTED_RESOURCE
@@ -272,7 +272,7 @@ class FhirServiceTest {
     @Throws(FhirException::class)
     fun `Given, decryptResource is called with a DataKey, a Type, Tags and a encrypted FhirResource, it fails on a ParserError`() {//decryptResource_shouldThrowException_whenParseErrorHappens() {
         // given
-        every { cryptoService.decryptString(dataKey, ENCRYPTED_RESOURCE) } returns Single.just(JSON_RESOURCE)
+        every { cryptoService.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE) } returns Single.just(JSON_RESOURCE)
         every { SdkFhirParser.fromResource(JSON_RESOURCE) } throws parseException
 
         try {
@@ -280,7 +280,7 @@ class FhirServiceTest {
             _fhirService.decryptResource<DataResource>(
                     dataKey,
                     hashMapOf(
-                            TAG_FHIR_VERSION to Fhir4Version.version,
+                            TAG_FHIR_VERSION to FhirContract.FhirVersion.FHIR_4.version,
                             TAG_RESOURCE_TYPE to fhirType
                     ),
                     ENCRYPTED_RESOURCE
@@ -312,7 +312,7 @@ class FhirServiceTest {
     @Throws(FhirException::class)
     fun legacy_decryptResource_shouldReturnResource() {
         // Given
-        Mockito.`when`(mockCryptoService.decryptString(dataKey, ENCRYPTED_RESOURCE)).thenReturn(Single.just(JSON_RESOURCE))
+        Mockito.`when`(mockCryptoService.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE)).thenReturn(Single.just(JSON_RESOURCE))
         Mockito.`when`<Any>(mockFhirParser.toFhir(fhirClass, JSON_RESOURCE)).thenReturn(mockDocumentReference)
 
         // When
@@ -321,7 +321,7 @@ class FhirServiceTest {
         // Then
         Truth.assertThat(resource).isEqualTo(mockDocumentReference)
         val inOrder = Mockito.inOrder(mockCryptoService, mockFhirParser)
-        inOrder.verify(mockCryptoService)!!.decryptString(dataKey, ENCRYPTED_RESOURCE)
+        inOrder.verify(mockCryptoService)!!.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE)
         inOrder.verify(mockFhirParser)!!.toFhir(fhirClass, JSON_RESOURCE)
         inOrder.verifyNoMoreInteractions()
     }
@@ -329,7 +329,7 @@ class FhirServiceTest {
     @Test
     fun legacy_decryptResource_shouldThrowException_whenDecryptErrorHappens() {
         // given
-        Mockito.`when`(mockCryptoService.decryptString(dataKey, ENCRYPTED_RESOURCE)).thenThrow(unkwnownException)
+        Mockito.`when`(mockCryptoService.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE)).thenThrow(unkwnownException)
         try {
             // when
             fhirService.decryptResource<Fhir3Resource>(dataKey, DocumentReference.resourceType, ENCRYPTED_RESOURCE)
@@ -343,7 +343,7 @@ class FhirServiceTest {
             Truth.assertThat(e.cause!!.message).isEqualTo("Failed to decrypt resource")
         }
         val inOrder = Mockito.inOrder(mockCryptoService, mockFhirParser)
-        inOrder.verify(mockCryptoService)!!.decryptString(dataKey, ENCRYPTED_RESOURCE)
+        inOrder.verify(mockCryptoService)!!.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE)
         inOrder.verifyNoMoreInteractions()
     }
 
@@ -351,7 +351,7 @@ class FhirServiceTest {
     @Throws(FhirException::class)
     fun legacy_decryptResource_shouldThrowException_whenParseErrorHappens() {
         // given
-        Mockito.`when`(mockCryptoService.decryptString(dataKey, ENCRYPTED_RESOURCE)).thenReturn(Single.just(JSON_RESOURCE))
+        Mockito.`when`(mockCryptoService.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE)).thenReturn(Single.just(JSON_RESOURCE))
         Mockito.`when`<Any>(mockFhirParser.toFhir(DocumentReference::class.java, JSON_RESOURCE)).thenThrow(parseException)
         try {
             // when
@@ -366,7 +366,7 @@ class FhirServiceTest {
             Truth.assertThat(e.cause!!.message).isEqualTo("Failed to decrypt resource")
         }
         val inOrder = Mockito.inOrder(mockCryptoService, mockFhirParser)
-        inOrder.verify(mockCryptoService)!!.decryptString(dataKey, ENCRYPTED_RESOURCE)
+        inOrder.verify(mockCryptoService)!!.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE)
         inOrder.verify(mockFhirParser)!!.toFhir(fhirClass, JSON_RESOURCE)
         inOrder.verifyNoMoreInteractions()
     }

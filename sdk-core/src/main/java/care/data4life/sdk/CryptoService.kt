@@ -34,6 +34,7 @@ import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.D4LRuntimeException
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.network.model.EncryptedKey
+import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.util.Base64
 import com.squareup.moshi.Moshi
 import io.reactivex.Single
@@ -116,7 +117,7 @@ open class CryptoService : CryptoProtocol {
                 }
     }
 
-    fun encryptString(key: GCKey, data: String): Single<String> {
+    fun encryptAndEncodeString(key: GCKey, data: String): Single<String> {
         return encrypt(key, data.toByteArray())
                 .map { dataArray -> base64.encodeToString(dataArray) }
                 .onErrorResumeNext { error ->
@@ -125,7 +126,7 @@ open class CryptoService : CryptoProtocol {
                 }
     }
 
-    fun decryptString(key: GCKey, dataBase64: String): Single<String> {
+    fun decodeAndDecryptString(key: GCKey, dataBase64: String): Single<String> {
         return Single
                 .fromCallable { base64.decode(dataBase64) }
                 .flatMap { decoded -> decrypt(key, decoded) }
@@ -136,29 +137,32 @@ open class CryptoService : CryptoProtocol {
                 }
     }
 
-    fun encryptSymmetricKey(key: GCKey, keyType: KeyType, gckey: GCKey): Single<EncryptedKey> {
+    fun encryptSymmetricKey(key: GCKey, keyType: KeyType, gckey: GCKey): Single<NetworkModelContract.EncryptedKey> {
         return Single.fromCallable { createKey(KEY_VERSION, keyType, gckey.getKeyBase64()) }
                 .map { exchangeKey -> moshi.adapter(ExchangeKey::class.java).toJson(exchangeKey) }
-                .flatMap { jsonKey -> encryptString(key, jsonKey) }
-                .map { encryptedKeyBase64 -> EncryptedKey(encryptedKeyBase64) }
+                .flatMap { jsonKey -> encrypt(key, jsonKey.toByteArray()) }
+                .map { encryptedKeyBase64 -> EncryptedKey.create(encryptedKeyBase64) }
                 .onErrorResumeNext { error ->
                     Log.error(error, "Failed to encrypt GcKey")
                     Single.error(CryptoException.KeyEncryptionFailed("Failed to encrypt GcKey") as D4LException)
                 }
     }
 
-    fun symDecryptSymmetricKey(key: GCKey, encryptedKey: EncryptedKey): Single<GCKey> {
-        return decryptString(key, encryptedKey.encryptedKey)
-                .map { keyJson -> moshi.adapter(ExchangeKey::class.java).fromJson(keyJson) }
-                .flatMap { exchangeKey -> convertExchangeKeyToGCKey(exchangeKey) }
+    private fun decryptKey(generator: () -> Single<ByteArray>): Single<GCKey> {
+        return generator()
+            .map { keyJson -> moshi.adapter(ExchangeKey::class.java).fromJson(String(keyJson, Charsets.UTF_8)) }
+            .flatMap { exchangeKey -> convertExchangeKeyToGCKey(exchangeKey) }
     }
+    
+    fun symDecryptSymmetricKey(
+        key: GCKey, 
+        encryptedKey: NetworkModelContract.EncryptedKey
+    ): Single<GCKey> = decryptKey { decrypt(key, encryptedKey.decode()) }
 
-    fun asymDecryptSymetricKey(keyPair: GCKeyPair, encryptedKey: EncryptedKey): Single<GCKey> {
-        return Single.fromCallable { base64.decode(encryptedKey.encryptedKey) }
-                .map { decoded -> asymDecrypt(keyPair, decoded) }
-                .map { keyJson -> moshi.adapter(ExchangeKey::class.java).fromJson(String(keyJson, Charsets.UTF_8)) }
-                .flatMap { exchangeKey -> convertExchangeKeyToGCKey(exchangeKey) }
-    }
+    fun asymDecryptSymetricKey(
+        keyPair: GCKeyPair, 
+        encryptedKey: NetworkModelContract.EncryptedKey
+    ): Single<GCKey> = decryptKey { Single.fromCallable { asymDecrypt(keyPair, encryptedKey.decode()) } }
 
     private fun convertExchangeKeyToGCKey(exchangeKey: ExchangeKey): Single<GCKey> {
         return Single.fromCallable { exchangeKey }

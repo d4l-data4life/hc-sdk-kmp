@@ -78,8 +78,8 @@ abstract class RecordServiceTestBase {
     internal lateinit var mockDocumentReference: DocumentReference
     internal lateinit var mockTags: HashMap<String, String>
     internal lateinit var mockUploadData: HashMap<Attachment, String?>
-    internal lateinit var mockEncryptedTags: List<String>
-    internal lateinit var mockEncryptedAnnotations: List<String>
+    internal lateinit var mockEncryptedTags: MutableList<String>
+    internal lateinit var mockEncryptedAnnotations: MutableList<String>
     internal lateinit var mockDataKey: GCKey
     internal lateinit var mockCommonKey: GCKey
     internal lateinit var mockAttachmentKey: GCKey
@@ -152,8 +152,8 @@ abstract class RecordServiceTestBase {
         mockDocumentReference = Mockito.mock(DocumentReference::class.java)
         mockTags = Mockito.mock<HashMap<*, *>>(HashMap::class.java) as HashMap<String, String>
         mockUploadData = Mockito.mock<HashMap<*, *>>(HashMap::class.java) as HashMap<Attachment, String?>
-        mockEncryptedTags = Mockito.mock<MutableList<*>>(MutableList::class.java) as List<String>
-        mockEncryptedAnnotations = Mockito.mock<MutableList<*>>(MutableList::class.java) as List<String>
+        mockEncryptedTags = Mockito.mock<MutableList<*>>(MutableList::class.java) as MutableList<String>
+        mockEncryptedAnnotations = Mockito.mock<MutableList<*>>(MutableList::class.java) as MutableList<String>
         mockDataKey = Mockito.mock(GCKey::class.java)
         mockAttachmentKey = Mockito.mock(GCKey::class.java)
         mockCommonKey = Mockito.mock(GCKey::class.java)
@@ -269,7 +269,7 @@ abstract class RecordServiceTestBase {
         internal val LOCAL_DATE = LocalDate.of(2001, 1, 1)
         internal val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US)
         internal val UTC_ZONE_ID = ZoneId.of("UTC")
-        internal val ANNOTATIONS = listOf("potato", "tomato", "soup")
+        internal val ANNOTATIONS = mutableListOf("potato", "tomato", "soup")
         internal const val CREATION_DATE = "2020-05-03"
 
         // ToDo remove that

@@ -16,7 +16,10 @@
 
 package care.data4life.sdk.tag
 
-import java.util.*
+import care.data4life.sdk.lang.D4LException
+import java.io.IOException
+
+typealias Tags = HashMap<String, String>
 
 class TaggingContract {
 
@@ -26,17 +29,43 @@ class TaggingContract {
                 oldTags: HashMap<String, String>?
         ): HashMap<String, String>
 
-        fun getTagFromType(
-                resourceType: Class<Any>?
-        ): HashMap<String, String>
+        fun getTagsFromType(resourceType: Class<out Any>): Tags
 
     }
 
     interface EncryptionService {
+        @Throws(IOException::class)
+        fun encryptTags(tags: Tags): MutableList<String>
 
+        @Throws(IOException::class)
+        fun decryptTags(encryptedTags: List<String>): Tags
+
+        @Throws(IOException::class)
+        fun encryptAnnotations(annotations: List<String>): MutableList<String>
+
+        @Throws(IOException::class)
+        fun decryptAnnotations(encryptedAnnotations: List<String>): List<String>
     }
 
     interface Helper {
+        fun convertToTagMap(tagList: List<String>): HashMap<String, String>
 
+        @Throws(D4LException::class)
+        fun encode(tag: String): String
+
+        fun decode(encodedTag: String): String
+    }
+
+    companion object {
+        const val DELIMITER = "="
+        const val TAG_RESOURCE_TYPE = "resourcetype"
+        const val TAG_CLIENT = "client"
+        const val TAG_UPDATED_BY_CLIENT = "updatedbyclient"
+        const val TAG_PARTNER = "partner"
+        const val TAG_UPDATED_BY_PARTNER = "updatedbypartner"
+        const val TAG_FHIR_VERSION = "fhirversion"
+        const val TAG_APPDATA_KEY = "flag"
+        const val TAG_APPDATA_VALUE = "appdata"
+        const val SEPARATOR = "#"
     }
 }

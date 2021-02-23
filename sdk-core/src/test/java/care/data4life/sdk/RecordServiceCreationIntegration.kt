@@ -40,6 +40,8 @@ import io.reactivex.Single
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
     @Before
@@ -53,16 +55,12 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
         mockkObject(MimeType)
 
         recordService = RecordService(
-                RecordServiceTestBase.PARTNER_ID,
-                RecordServiceTestBase.ALIAS,
+                PARTNER_ID,
+                ALIAS,
                 apiService,
-                TagEncryptionService(
-                        cryptoService
-                ),
+                TagEncryptionService(cryptoService),
                 TaggingService(CLIENT_ID),
-                FhirService(
-                        cryptoService
-                ),
+                FhirService(cryptoService),
                 AttachmentService(
                         fileService,
                         imageResizer
@@ -147,7 +145,7 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
         every { cryptoService.fetchCurrentCommonKey() } returns commonKey
         every { cryptoService.currentCommonKeyId } returns commonKeyId
         every { cryptoService.encryptSymmetricKey(commonKey, KeyType.DATA_KEY, dataKey) } returns Single.just(encryptedDataKey)
-        every { cryptoService.encryptString(dataKey, stringifiedResource) } returns Single.just(encryptedBody)
+        every { cryptoService.encryptAndEncodeString(dataKey, stringifiedResource) } returns Single.just(encryptedBody)
 
         //encrypt Attachment
         every {
@@ -206,7 +204,7 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
         every {
-            cryptoService.decryptString(dataKey, encryptedBody)
+            cryptoService.decodeAndDecryptString(dataKey, encryptedBody)
         } returns Single.just(stringifiedResource)
     }
 
@@ -317,25 +315,30 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
         val resource = buildDocumentReferenceFhir3()
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
-                "fhirversion" to "fhirversion=3.0.1",
+                "partner" to "partner=$PARTNER_ID".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
+                "fhirversion" to "fhirversion=${
+                    "3.0.1".replace(".", "%2e")
+                }",
                 "resourcetype" to "resourcetype=documentreference"
         )
 
-        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"$PARTNER_ID\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
         encryptedBody = "ZW5jcnlwdGVk"
 
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249My4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmhpcnZlcnNpb249MyUyZTAlMmUx", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         val gcKeys = mutableListOf(
                 dataKey,
@@ -367,9 +370,13 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
         val resource = buildDocumentReferenceFhir3()
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
-                "fhirversion" to "fhirversion=3.0.1",
+                "partner" to "partner=$PARTNER_ID".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
+                "fhirversion" to "fhirversion=${
+                    "3.0.1".replace(".", "%2e")
+                }",
                 "resourcetype" to "resourcetype=documentreference"
         )
         val annotations = mapOf(
@@ -378,16 +385,16 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 "works" to "custom=works"
         )
 
-        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"$PARTNER_ID\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
         encryptedBody = "ZW5jcnlwdGVk"
 
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
-                        "ZmhpcnZlcnNpb249My4wLjE=",
+                        "cGFydG5lcj1iNDY=",
+                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                        "ZmhpcnZlcnNpb249MyUyZTAlMmUx",
                         "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl",
                         "Y3VzdG9tPXdvdw==",
                         "Y3VzdG9tPWl0",
@@ -397,8 +404,9 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         val gcKeys = mutableListOf(
                 dataKey,
@@ -431,9 +439,13 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
         resource.content = null
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
-                "fhirversion" to "fhirversion=3.0.1",
+                "partner" to "partner=$PARTNER_ID".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
+                "fhirversion" to "fhirversion=${
+                    "3.0.1".replace(".", "%2e")
+                }",
                 "resourcetype" to "resourcetype=documentreference"
         )
         val annotations = mapOf(
@@ -449,9 +461,9 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
-                        "ZmhpcnZlcnNpb249My4wLjE=",
+                        "cGFydG5lcj1iNDY=",
+                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                        "ZmhpcnZlcnNpb249MyUyZTAlMmUx",
                         "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl",
                         "Y3VzdG9tPXdvdw==",
                         "Y3VzdG9tPWl0",
@@ -461,8 +473,9 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         val gcKeys = mutableListOf(
                 dataKey,
@@ -494,25 +507,30 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
         val resource: Fhir4Resource = buildDocumentReferenceFhir4()
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
-                "fhirversion" to "fhirversion=4.0.1",
+                "partner" to "partner=$PARTNER_ID".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
+                "fhirversion" to "fhirversion=${
+                    "4.0.1".replace(".", "%2e")
+                }",
                 "resourcetype" to "resourcetype=documentreference"
         )
 
-        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"$PARTNER_ID\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
         encryptedBody = "ZW5jcnlwdGVk"
 
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249NC4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmhpcnZlcnNpb249NCUyZTAlMmUx", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         val gcKeys = mutableListOf(
                 dataKey,
@@ -544,9 +562,13 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
         val resource: Fhir4Resource = buildDocumentReferenceFhir4()
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
-                "fhirversion" to "fhirversion=4.0.1",
+                "partner" to "partner=$PARTNER_ID".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
+                "fhirversion" to "fhirversion=${
+                    "4.0.1".replace(".", "%2e")
+                }",
                 "resourcetype" to "resourcetype=documentreference"
         )
         val annotations = mapOf(
@@ -555,16 +577,16 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 "works" to "custom=works"
         )
 
-        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"$PARTNER_ID\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
         encryptedBody = "ZW5jcnlwdGVk"
 
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
-                        "ZmhpcnZlcnNpb249NC4wLjE=",
+                        "cGFydG5lcj1iNDY=",
+                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                        "ZmhpcnZlcnNpb249NCUyZTAlMmUx",
                         "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl",
                         "Y3VzdG9tPXdvdw==",
                         "Y3VzdG9tPWl0",
@@ -574,8 +596,9 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         val gcKeys = mutableListOf(
                 dataKey,
@@ -608,9 +631,13 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
         resource.content = null
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
-                "fhirversion" to "fhirversion=4.0.1",
+                "partner" to "partner=$PARTNER_ID".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
+                "fhirversion" to "fhirversion=${
+                    "4.0.1".replace(".", "%2e")
+                }",
                 "resourcetype" to "resourcetype=documentreference"
         )
         val annotations = mapOf(
@@ -626,9 +653,9 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
-                        "ZmhpcnZlcnNpb249NC4wLjE=",
+                        "cGFydG5lcj1iNDY=",
+                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                        "ZmhpcnZlcnNpb249NCUyZTAlMmUx",
                         "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl",
                         "Y3VzdG9tPXdvdw==",
                         "Y3VzdG9tPWl0",
@@ -638,8 +665,9 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         val gcKeys = mutableListOf(
                 dataKey,
@@ -671,8 +699,10 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
         val resource = DataResource("I am test".toByteArray())
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=$PARTNER_ID".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
                 "flag" to "flag=appdata"
         )
 
@@ -682,13 +712,14 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmxhZz1hcHBkYXRh"),
+                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmxhZz1hcHBkYXRh"),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
                 null,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         val gcKeys = mutableListOf(
                 dataKey,
@@ -723,8 +754,10 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
         val resource = DataResource("I am test".toByteArray())
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
+                "partner" to "partner=$PARTNER_ID".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
                 "flag" to "flag=appdata"
         )
         val annotations = mapOf(
@@ -740,8 +773,8 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1URVNU",
-                        "Y2xpZW50PVRFU1Q=",
+                        "cGFydG5lcj1iNDY=",
+                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
                         "ZmxhZz1hcHBkYXRh",
                         "Y3VzdG9tPXdvdw==",
                         "Y3VzdG9tPWl0",
@@ -751,8 +784,9 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 null,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
 
         val gcKeys = mutableListOf(
                 dataKey,

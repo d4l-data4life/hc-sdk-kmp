@@ -21,7 +21,7 @@ object Versions {
     /**
      * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)
      */
-    const val fhirSdk = "1.1.0"
+    const val fhirSdk = "1.2.1"
 
     /**
      * [hc-fhir-helper-sdk-kmp](https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp)
@@ -64,6 +64,11 @@ object Versions {
          * [jGitVer](https://github.com/jgitver/gradle-jgitver-plugin)
          */
         const val gitVersioning = "0.10.0-rc03"
+
+        /**
+         * [Git-Version](https://github.com/palantir/gradle-git-version)
+         */
+        const val gitVersion = "0.12.3"
 
         /**
          * [Gradle Git Publish](https://github.com/d4l-data4life/gradle-git-publish)

@@ -191,7 +191,7 @@ public class CryptoServiceTest {
 
         // when
         TestObserver<String> testSubscriber = cryptoService
-                .encryptString(gcKey, input)
+                .encryptAndEncodeString(gcKey, input)
                 .test();
 
         // then
@@ -207,7 +207,7 @@ public class CryptoServiceTest {
 
         // when
         TestObserver<String> testSubscriber = cryptoService
-                .decryptString(gcKey, "data")
+                .decodeAndDecryptString(gcKey, "data")
                 .test();
 
         // then
@@ -409,8 +409,10 @@ public class CryptoServiceTest {
     public void symDecryptSymmetricKey() throws IOException {
         // given
         GCKey commonKey = mock(GCKey.class);
-        EncryptedKey encryptedKey = new EncryptedKey("");
+        EncryptedKey encryptedKey = mock(EncryptedKey.class);
         ExchangeKey ek = ExchangeKeyFactory.INSTANCE.createKey(KeyVersion.VERSION_1, KeyType.DATA_KEY, "");
+
+        when(encryptedKey.decode()).thenReturn(new byte[16]);
         when(adapter.fromJson(anyString())).thenReturn(ek);
         when(mockKeyFactory.createGCKey(ek)).thenReturn(gcKey);
 
@@ -429,8 +431,10 @@ public class CryptoServiceTest {
     public void symDecryptSymmetricTagKey() throws IOException {
         // given
         GCKey commonKey = mock(GCKey.class);
-        EncryptedKey encryptedKey = new EncryptedKey("");
+        EncryptedKey encryptedKey = mock(EncryptedKey.class);
         ExchangeKey ek = ExchangeKeyFactory.INSTANCE.createKey(KeyVersion.VERSION_1, KeyType.TAG_KEY, "");
+
+        when(encryptedKey.decode()).thenReturn(new byte[16]);
         when(adapter.fromJson(anyString())).thenReturn(ek);
         when(mockKeyFactory.createGCKey(ek)).thenReturn(gcKey);
 
@@ -450,8 +454,10 @@ public class CryptoServiceTest {
     public void symDecryptSymmetricTagKey_shouldThrowException() throws IOException {
         // given
         GCKey commonKey = mock(GCKey.class);
-        EncryptedKey encryptedKey = new EncryptedKey("");
+        EncryptedKey encryptedKey = mock(EncryptedKey.class);
         ExchangeKey ek = new ExchangeKey(KeyType.TAG_KEY, null, null, null, KeyVersion.VERSION_1);
+
+        when(encryptedKey.decode()).thenReturn(new byte[16]);
         when(adapter.fromJson(anyString())).thenReturn(ek);
 
         // when

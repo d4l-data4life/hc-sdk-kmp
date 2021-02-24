@@ -17,11 +17,16 @@ package care.data4life.sdk.network.model
 
 import com.squareup.moshi.Json
 
-class VersionInfo(@field:Json(name = "versions") private val versionsList: List<Version>) {
+data class VersionList(
+        @field:Json(name = "versions")
+        override val versions: List<Version>
+) : NetworkModelContract.VersionList {
+
+
     fun isSupported(currentVersion: String): Boolean {
         var isSupported = true
-        for (version in versionsList) {
-            if (version.versionName == currentVersion && version.status == Version.KEY_UNSUPPORTED) {
+        for (version in versions) {
+            if (version.name == currentVersion && version.status == NetworkModelContract.Version.KEY_UNSUPPORTED) {
                 isSupported = false
                 break
             }

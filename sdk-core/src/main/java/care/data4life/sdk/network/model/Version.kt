@@ -17,31 +17,13 @@ package care.data4life.sdk.network.model
 
 import com.squareup.moshi.Json
 
-class Version {
-    @Json(name = "versions")
-    var versionCode: Int
+data class Version (
 
-    @Json(name = "version_name")
-    var versionName: String
+        @field:Json(name = "version_code")
+        override val code: Int,
+        @field:Json(name = "version_name")
+        override val name: String,
+        @field:Json(name = "version_status")
+        override val status: String
 
-    @Json(name = "status")
-    var status: String
-
-    constructor(versionCode: Int) {
-        this.versionCode = versionCode
-        versionName = ""
-        status = KEY_UNSUPPORTED
-    }
-
-    constructor(versionName: String) {
-        versionCode = 0
-        this.versionName = versionName
-        status = KEY_DEPRECATED
-    }
-
-    companion object {
-        var KEY_DEPRECATED = "deprecated"
-        @JvmField
-        var KEY_UNSUPPORTED = "unsupported"
-    }
-}
+) : NetworkModelContract.Version

@@ -22,6 +22,8 @@ import care.data4life.sdk.network.model.VersionList
 import com.squareup.moshi.Moshi
 import org.junit.Assert
 import org.junit.Test
+import kotlin.test.assertTrue
+import kotlin.test.assertFalse
 
 class VersionListTest {
     @Test
@@ -48,9 +50,64 @@ class VersionListTest {
 
         //When
         val actual = moshi.adapter<VersionList>(VersionList::class.java).toJson(versions)
+        //Then
         Assert.assertEquals(
                 "{\"status\":\"supported\", \"version_name\":\"1.9.0\", \"version_code\":25}",
                 actual
         )
+    }
+
+
+    @Test
+    fun `isSupported returns true when version is supported `() {
+        //Given
+        val version = Version(
+                25,
+                "1.9.0",
+                "supported"
+        )
+        val versions = VersionList(listOf<Version>(version))
+
+        //When
+        val isSupported = versions.isSupported(version.name)
+        //Then
+        assertTrue { isSupported }
+    }
+
+    @Test
+    fun `isSupported returns true when version is not in versionList `() {
+        //Given
+        val version = Version(
+                25,
+                "1.9.0",
+                "supported"
+        )
+        val currentVersion = Version(
+                25,
+                "1.9.3",
+                "supported"
+        )
+        val versions = VersionList(listOf<Version>(version))
+
+        //When
+        val isSupported = versions.isSupported(currentVersion.name)
+        //Then
+        assertTrue { isSupported }
+    }
+
+    @Test
+    fun `isSupported returns false when version is unsupported `() {
+        //Given
+        val version = Version(
+                25,
+                "1.9.0",
+                "unsupported"
+        )
+        val versions = VersionList(listOf<Version>(version))
+
+        //When
+        val isSupported = versions.isSupported(version.name)
+        //Then
+        assertFalse { isSupported }
     }
 }

@@ -41,15 +41,15 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
         errorHandler = mockk()
 
         recordService = RecordService(
-            RecordServiceTestBase.PARTNER_ID,
-            RecordServiceTestBase.ALIAS,
-            apiService,
-            TagEncryptionService(cryptoService),
-            TaggingService(CLIENT_ID),
-            FhirService(cryptoService),
-            AttachmentService(fileService, imageResizer),
-            cryptoService,
-            errorHandler
+                RecordServiceTestBase.PARTNER_ID,
+                RecordServiceTestBase.ALIAS,
+                apiService,
+                TagEncryptionService(cryptoService),
+                TaggingService(CLIENT_ID),
+                FhirService(cryptoService),
+                AttachmentService(fileService, imageResizer),
+                cryptoService,
+                errorHandler
         )
 
         dataKey = mockk()
@@ -61,30 +61,30 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
     }
 
     private fun encryptTagsAndAnnotations(
-        tags: Map<String, String>,
-        annotations: Map<String, String> = mapOf()
+            tags: Map<String, String>,
+            annotations: Map<String, String> = mapOf()
     ) {
         // encrypt tags
         every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
         every {
             cryptoService.symEncrypt(
-                tagEncryptionKey, eq(
+                    tagEncryptionKey, eq(
                     tags["resourcetype"]!!.toByteArray()
-                ), IV
+            ), IV
             )
         } returns tags["resourcetype"]!!.toByteArray()
         every {
             cryptoService.symEncrypt(
-                tagEncryptionKey, eq(
+                    tagEncryptionKey, eq(
                     tags["fhirversion"]!!.toByteArray()
-                ), IV
+            ), IV
             )
         } returns tags["fhirversion"]!!.toByteArray()
         every {
             cryptoService.symEncrypt(
-                tagEncryptionKey, eq(
+                    tagEncryptionKey, eq(
                     tags["legecyfhirversion"]!!.toByteArray()
-                ), IV
+            ), IV
             )
         } returns tags["legecyfhirversion"]!!.toByteArray()
 
@@ -92,23 +92,23 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
         if (annotations.isNotEmpty()) {
             every {
                 cryptoService.symEncrypt(
-                    tagEncryptionKey, eq(
+                        tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()
-                    ), IV
+                ), IV
                 )
             } returns annotations["wow"]!!.toByteArray()
             every {
                 cryptoService.symEncrypt(
-                    tagEncryptionKey, eq(
+                        tagEncryptionKey, eq(
                         annotations["it"]!!.toByteArray()
-                    ), IV
+                ), IV
                 )
             } returns annotations["it"]!!.toByteArray()
             every {
                 cryptoService.symEncrypt(
-                    tagEncryptionKey, eq(
+                        tagEncryptionKey, eq(
                         annotations["works"]!!.toByteArray()
-                    ), IV
+                ), IV
                 )
             } returns annotations["works"]!!.toByteArray()
         }
@@ -121,39 +121,39 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
         val encodedEncryptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
 
         val tags = mapOf(
-            "partner" to "partner=${PARTNER_ID}".toLowerCase(),
-            "client" to "client=${
-                URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
-            }",
-            "fhirversion" to "fhirversion=${
-                "3.0.1".replace(".", "%2e")
-            }",
-            "legecyfhirversion" to "fhirversion=3.0.1",
-            "resourcetype" to "resourcetype=documentreference"
+                "partner" to "partner=${PARTNER_ID}".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
+                "fhirversion" to "fhirversion=${
+                    "3.0.1".replace(".", "%2e")
+                }",
+                "legecyfhirversion" to "fhirversion=3.0.1",
+                "resourcetype" to "resourcetype=documentreference"
         )
 
         encryptTagsAndAnnotations(tags)
 
         every {
             apiService.getCount(
-                ALIAS,
-                USER_ID,
-                listOf(encodedEncryptedVersion, encodedEncryptedResourceType)
+                    ALIAS,
+                    USER_ID,
+                    listOf(encodedEncryptedVersion, encodedEncryptedResourceType)
             )
         } returns Single.just(21)
 
         every {
             apiService.getCount(
-                ALIAS,
-                USER_ID,
-                listOf(encryptedVersion, encodedEncryptedResourceType)
+                    ALIAS,
+                    USER_ID,
+                    listOf(encryptedVersion, encodedEncryptedResourceType)
             )
         } returns Single.just(21)
 
         // When
         val result = (recordService as RecordService).countRecords(
-            Fhir3Reference::class.java,
-            USER_ID
+                Fhir3Reference::class.java,
+                USER_ID
         ).blockingGet()
 
         // Then
@@ -166,55 +166,55 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
         val encryptedVersion = "ZmhpcnZlcnNpb249My4wLjE="
 
         val annotations = mapOf(
-            "wow" to "custom=wow",
-            "it" to "custom=it",
-            "works" to "custom=works"
+                "wow" to "custom=wow",
+                "it" to "custom=it",
+                "works" to "custom=works"
         )
 
         val tags = mapOf(
-            "partner" to "partner=${PARTNER_ID}".toLowerCase(),
-            "client" to "client=${
-                URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
-            }",
-            "fhirversion" to "fhirversion=${
-                "3.0.1".replace(".", "%2e")
-            }",
-            "legecyfhirversion" to "fhirversion=3.0.1",
-            "resourcetype" to "resourcetype=documentreference"
+                "partner" to "partner=${PARTNER_ID}".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
+                "fhirversion" to "fhirversion=${
+                    "3.0.1".replace(".", "%2e")
+                }",
+                "legecyfhirversion" to "fhirversion=3.0.1",
+                "resourcetype" to "resourcetype=documentreference"
         )
 
         encryptTagsAndAnnotations(tags, annotations)
 
         every {
             apiService.getCount(
-                ALIAS,
-                USER_ID,
-                listOf(
-                    encodedEncryptedVersion,
-                    "Y3VzdG9tPXdvdw==",
-                    "Y3VzdG9tPWl0",
-                    "Y3VzdG9tPXdvcmtz"
-                )
+                    ALIAS,
+                    USER_ID,
+                    listOf(
+                            encodedEncryptedVersion,
+                            "Y3VzdG9tPXdvdw==",
+                            "Y3VzdG9tPWl0",
+                            "Y3VzdG9tPXdvcmtz"
+                    )
             )
         } returns Single.just(21)
         every {
             apiService.getCount(
-                ALIAS,
-                USER_ID,
-                listOf(
-                    encryptedVersion,
-                    "Y3VzdG9tPXdvdw==",
-                    "Y3VzdG9tPWl0",
-                    "Y3VzdG9tPXdvcmtz"
-                )
+                    ALIAS,
+                    USER_ID,
+                    listOf(
+                            encryptedVersion,
+                            "Y3VzdG9tPXdvdw==",
+                            "Y3VzdG9tPWl0",
+                            "Y3VzdG9tPXdvcmtz"
+                    )
             )
         } returns Single.just(21)
 
         // When
         val result = (recordService as RecordService).countRecords(
-            null,
-            USER_ID,
-            annotations.keys.toList()
+                null,
+                USER_ID,
+                annotations.keys.toList()
         ).blockingGet()
 
         // Then
@@ -228,57 +228,57 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
         val encodedEncryptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
 
         val annotations = mapOf(
-            "wow" to "custom=wow",
-            "it" to "custom=it",
-            "works" to "custom=works"
+                "wow" to "custom=wow",
+                "it" to "custom=it",
+                "works" to "custom=works"
         )
 
         val tags = mapOf(
-            "partner" to "partner=${PARTNER_ID}".toLowerCase(),
-            "client" to "client=${
-                URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
-            }",
-            "fhirversion" to "fhirversion=${
-                "3.0.1".replace(".", "%2e")
-            }",
-            "legecyfhirversion" to "fhirversion=3.0.1",
-            "resourcetype" to "resourcetype=documentreference"
+                "partner" to "partner=${PARTNER_ID}".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
+                "fhirversion" to "fhirversion=${
+                    "3.0.1".replace(".", "%2e")
+                }",
+                "legecyfhirversion" to "fhirversion=3.0.1",
+                "resourcetype" to "resourcetype=documentreference"
         )
 
         encryptTagsAndAnnotations(tags, annotations)
 
         every {
             apiService.getCount(
-                ALIAS,
-                USER_ID,
-                listOf(
-                    encodedEncryptedVersion,
-                    encodedEncryptedResourceType,
-                    "Y3VzdG9tPXdvdw==",
-                    "Y3VzdG9tPWl0",
-                    "Y3VzdG9tPXdvcmtz"
-                )
+                    ALIAS,
+                    USER_ID,
+                    listOf(
+                            encodedEncryptedVersion,
+                            encodedEncryptedResourceType,
+                            "Y3VzdG9tPXdvdw==",
+                            "Y3VzdG9tPWl0",
+                            "Y3VzdG9tPXdvcmtz"
+                    )
             )
         } returns Single.just(21)
         every {
             apiService.getCount(
-                ALIAS,
-                USER_ID,
-                listOf(
-                    encryptedVersion,
-                    encodedEncryptedResourceType,
-                    "Y3VzdG9tPXdvdw==",
-                    "Y3VzdG9tPWl0",
-                    "Y3VzdG9tPXdvcmtz"
-                )
+                    ALIAS,
+                    USER_ID,
+                    listOf(
+                            encryptedVersion,
+                            encodedEncryptedResourceType,
+                            "Y3VzdG9tPXdvdw==",
+                            "Y3VzdG9tPWl0",
+                            "Y3VzdG9tPXdvcmtz"
+                    )
             )
         } returns Single.just(21)
 
         // When
         val result = (recordService as RecordService).countFhir3Records(
-            Fhir3Reference::class.java,
-            USER_ID,
-            annotations.keys.toList()
+                Fhir3Reference::class.java,
+                USER_ID,
+                annotations.keys.toList()
         ).blockingGet()
 
         // Then
@@ -292,57 +292,57 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
         val encodedEncryptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
 
         val annotations = mapOf(
-            "wow" to "custom=wow",
-            "it" to "custom=it",
-            "works" to "custom=works"
+                "wow" to "custom=wow",
+                "it" to "custom=it",
+                "works" to "custom=works"
         )
 
         val tags = mapOf(
-            "partner" to "partner=${PARTNER_ID}".toLowerCase(),
-            "client" to "client=${
-                URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
-            }",
-            "fhirversion" to "fhirversion=${
-                "4.0.1".replace(".", "%2e")
-            }",
-            "legecyfhirversion" to "fhirversion=4.0.1",
-            "resourcetype" to "resourcetype=documentreference"
+                "partner" to "partner=${PARTNER_ID}".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
+                "fhirversion" to "fhirversion=${
+                    "4.0.1".replace(".", "%2e")
+                }",
+                "legecyfhirversion" to "fhirversion=4.0.1",
+                "resourcetype" to "resourcetype=documentreference"
         )
 
         encryptTagsAndAnnotations(tags, annotations)
 
         every {
             apiService.getCount(
-                ALIAS,
-                USER_ID,
-                listOf(
-                    encodedEncryptedVersion,
-                    encodedEncryptedResourceType,
-                    "Y3VzdG9tPXdvdw==",
-                    "Y3VzdG9tPWl0",
-                    "Y3VzdG9tPXdvcmtz"
-                )
+                    ALIAS,
+                    USER_ID,
+                    listOf(
+                            encodedEncryptedVersion,
+                            encodedEncryptedResourceType,
+                            "Y3VzdG9tPXdvdw==",
+                            "Y3VzdG9tPWl0",
+                            "Y3VzdG9tPXdvcmtz"
+                    )
             )
         } returns Single.just(21)
         every {
             apiService.getCount(
-                ALIAS,
-                USER_ID,
-                listOf(
-                    encryptedVersion,
-                    encodedEncryptedResourceType,
-                    "Y3VzdG9tPXdvdw==",
-                    "Y3VzdG9tPWl0",
-                    "Y3VzdG9tPXdvcmtz"
-                )
+                    ALIAS,
+                    USER_ID,
+                    listOf(
+                            encryptedVersion,
+                            encodedEncryptedResourceType,
+                            "Y3VzdG9tPXdvdw==",
+                            "Y3VzdG9tPWl0",
+                            "Y3VzdG9tPXdvcmtz"
+                    )
             )
         } returns Single.just(21)
 
         // When
         val result = (recordService as RecordService).countFhir4Records(
-            Fhir4Reference::class.java,
-            USER_ID,
-            annotations.keys.toList()
+                Fhir4Reference::class.java,
+                USER_ID,
+                annotations.keys.toList()
         ).blockingGet()
 
         // Then
@@ -355,54 +355,54 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
         val encryptedVersion = "ZmhpcnZlcnNpb249My4wLjE="
 
         val annotations = mapOf(
-            "wow" to "custom=wow",
-            "it" to "custom=it",
-            "works" to "custom=works"
+                "wow" to "custom=wow",
+                "it" to "custom=it",
+                "works" to "custom=works"
         )
 
         val tags = mapOf(
-            "partner" to "partner=${PARTNER_ID}".toLowerCase(),
-            "client" to "client=${
-                URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
-            }",
-            "fhirversion" to "fhirversion=${
-                "3.0.1".replace(".", "%2e")
-            }",
-            "legecyfhirversion" to "fhirversion=3.0.1",
-            "resourcetype" to "resourcetype=documentreference"
+                "partner" to "partner=${PARTNER_ID}".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
+                "fhirversion" to "fhirversion=${
+                    "3.0.1".replace(".", "%2e")
+                }",
+                "legecyfhirversion" to "fhirversion=3.0.1",
+                "resourcetype" to "resourcetype=documentreference"
         )
 
         encryptTagsAndAnnotations(tags, annotations)
 
         every {
             apiService.getCount(
-                ALIAS,
-                USER_ID,
-                listOf(
-                    encodedEncryptedVersion,
-                    "Y3VzdG9tPXdvdw==",
-                    "Y3VzdG9tPWl0",
-                    "Y3VzdG9tPXdvcmtz"
-                )
+                    ALIAS,
+                    USER_ID,
+                    listOf(
+                            encodedEncryptedVersion,
+                            "Y3VzdG9tPXdvdw==",
+                            "Y3VzdG9tPWl0",
+                            "Y3VzdG9tPXdvcmtz"
+                    )
             )
         } returns Single.just(21)
         every {
             apiService.getCount(
-                ALIAS,
-                USER_ID,
-                listOf(
-                    encryptedVersion,
-                    "Y3VzdG9tPXdvdw==",
-                    "Y3VzdG9tPWl0",
-                    "Y3VzdG9tPXdvcmtz"
-                )
+                    ALIAS,
+                    USER_ID,
+                    listOf(
+                            encryptedVersion,
+                            "Y3VzdG9tPXdvdw==",
+                            "Y3VzdG9tPWl0",
+                            "Y3VzdG9tPXdvcmtz"
+                    )
             )
         } returns Single.just(21)
 
         // When
         val result = (recordService as RecordService).countAllFhir3Records(
-            USER_ID,
-            annotations.keys.toList()
+                USER_ID,
+                annotations.keys.toList()
         ).blockingGet()
 
         // Then

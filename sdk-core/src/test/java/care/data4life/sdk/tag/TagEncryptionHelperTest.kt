@@ -74,8 +74,8 @@ class TagEncryptionHelperTest {
 
         assertTrue(exception is DataValidationException.AnnotationViolation)
         assertEquals(
-            "Annotation is empty.",
-                    exception.message
+                "Annotation is empty.",
+                exception.message
         )
     }
 
@@ -195,8 +195,8 @@ class TagEncryptionHelperTest {
         // Then
         assertTrue(exception is DataValidationException.AnnotationViolation)
         assertEquals(
-            exception.message,
-            "Annotation is empty."
+                exception.message,
+                "Annotation is empty."
         )
     }
 
@@ -210,8 +210,8 @@ class TagEncryptionHelperTest {
 
         // Then
         assertEquals(
-            tag,
-            result
+                tag,
+                result
         )
     }
 
@@ -225,8 +225,8 @@ class TagEncryptionHelperTest {
 
         // Then
         assertEquals(
-            expected,
-            result
+                expected,
+                result
         )
     }
 
@@ -240,8 +240,8 @@ class TagEncryptionHelperTest {
 
         // Then
         assertEquals(
-            "tag",
-            result
+                "tag",
+                result
         )
     }
 

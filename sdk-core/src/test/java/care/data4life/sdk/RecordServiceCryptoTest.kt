@@ -16,496 +16,805 @@
 
 package care.data4life.sdk
 
+import care.data4life.crypto.GCKey
 import care.data4life.crypto.KeyType
-import care.data4life.fhir.stu3.model.DomainResource
+import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.data.DataResource
-import care.data4life.sdk.lang.D4LException
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.DataValidationException
-import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.network.model.DecryptedDataRecord
+import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
-import care.data4life.sdk.util.Base64
-import com.google.common.truth.Truth
+import care.data4life.sdk.network.model.EncryptedKey
+import care.data4life.sdk.network.model.NetworkModelContract
+import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
+import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
+import care.data4life.sdk.tag.TaggingContract
 import io.mockk.every
-import io.mockk.mockkObject
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import io.reactivex.Single
-import org.junit.After
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito
 import java.io.IOException
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
 
-class RecordServiceCryptoTest : RecordServiceTestBase() {
+
+class RecordServiceCryptoTest {
+    private lateinit var recordService: RecordService
+    private lateinit var apiService: ApiService
+    private lateinit var cryptoService: CryptoService
+    private lateinit var fhirService: FhirContract.Service
+    private lateinit var tagEncryptionService: TaggingContract.EncryptionService
+    private lateinit var taggingService: TaggingContract.Service
+    private lateinit var attachmentService: AttachmentContract.Service
+    private lateinit var errorHandler: SdkContract.ErrorHandler
+    private lateinit var tags: HashMap<String, String>
+    private lateinit var annotations: List<String>
+
+    private lateinit var encryptedTagsAndAnnotations: List<String>
+    private lateinit var dataKey: GCKey
+    private lateinit var commonKey: GCKey
+    private lateinit var attachmentKey: GCKey
+    private lateinit var encryptedResource: String
+    private lateinit var encryptedDataKey: EncryptedKey
+    private lateinit var encryptedAttachmentKey: EncryptedKey
+
     @Before
     fun setUp() {
-        init()
-    }
+        apiService = mockk()
+        cryptoService = mockk()
+        fhirService = mockk()
+        tagEncryptionService = mockk()
+        taggingService = mockk()
+        attachmentService = mockk()
+        errorHandler = mockk()
+        tags = hashMapOf("potato" to "soup", "resourcetype" to "pumpkin")
+        annotations = listOf("tomato", "soup")
 
-    @After
-    fun tearDown() {
-        stop()
-    }
+        dataKey = mockk()
+        commonKey = mockk()
+        attachmentKey = mockk()
 
-    @Test
-    @Throws(IOException::class)
-    fun `Given, encryptRecord is called with a DecryptedRecord, it returns a EncryptedRecord`() {
-        // Given
-        val currentCommonKeyId = "currentCommonKeyId"
+        encryptedTagsAndAnnotations = mockk()
+        encryptedResource = "potato"
+        encryptedDataKey = mockk()
+        encryptedAttachmentKey = mockk()
 
-        Mockito.`when`(mockTagEncryptionService.encryptAndEncodeTags(mockTags))
-                .thenReturn(mockEncryptedTags)
-        Mockito.`when`(mockTagEncryptionService.encryptAndEncodeAnnotations(ANNOTATIONS))
-                .thenReturn(ANNOTATIONS)
-        Mockito.`when`(mockFhirService._encryptResource(mockDataKey, mockCarePlan))
-                .thenReturn(ENCRYPTED_RESOURCE)
-        Mockito.`when`(mockCryptoService.fetchCurrentCommonKey()).thenReturn(mockCommonKey)
-        Mockito.`when`(mockCryptoService.currentCommonKeyId).thenReturn(currentCommonKeyId)
-        Mockito.`when`(
-                mockCryptoService.encryptSymmetricKey(
-                        mockCommonKey,
-                        KeyType.DATA_KEY,
-                        mockDataKey
+        recordService = spyk(
+                RecordService(
+                        RecordServiceTestBase.PARTNER_ID,
+                        RecordServiceTestBase.ALIAS,
+                        apiService,
+                        tagEncryptionService,
+                        taggingService,
+                        fhirService,
+                        attachmentService,
+                        cryptoService,
+                        errorHandler,
+                        mockk()
                 )
-        ).thenReturn(Single.just(mockEncryptedDataKey))
-
-        // When
-        val encryptedRecord = recordService.encryptRecord(mockAnnotatedDecryptedFhirRecord)
-
-        // Then
-        Truth.assertThat(encryptedRecord.commonKeyId).isEqualTo(currentCommonKeyId)
-        Truth.assertThat(encryptedRecord.encryptedAttachmentsKey).isNull()
-
-        inOrder.verify(mockTagEncryptionService).encryptAndEncodeTags(mockTags)
-        inOrder.verify(mockTagEncryptionService).encryptAndEncodeAnnotations(ANNOTATIONS)
-        inOrder.verify(mockCryptoService).fetchCurrentCommonKey()
-        inOrder.verify(mockCryptoService)
-                .encryptSymmetricKey(mockCommonKey, KeyType.DATA_KEY, mockDataKey)
-        inOrder.verify(mockFhirService)._encryptResource(mockDataKey, mockCarePlan)
-        inOrder.verifyNoMoreInteractions()
-
-        Mockito.verify((mockEncryptedTags as MutableList)).addAll(ANNOTATIONS)
+        )
     }
 
-    @Test
-    @Throws(IOException::class)
-    fun `Given, encryptRecord is called with a DecryptedRecord, it adds a encrypted AttachmentKey, if the DecryptedRecord contains a AttachmentKey`() {
-        // Given
-        val currentCommonKeyId = "currentCommonKeyId"
-        Mockito.`when`(mockAnnotatedDecryptedFhirRecord.attachmentsKey).thenReturn(mockAttachmentKey)
-        Mockito.`when`(mockTagEncryptionService.encryptAndEncodeTags(mockTags))
-                .thenReturn(mockEncryptedTags)
-        Mockito.`when`(mockTagEncryptionService.encryptAndEncodeAnnotations(ANNOTATIONS))
-                .thenReturn(mockEncryptedAnnotations)
-        Mockito.`when`(mockFhirService._encryptResource(mockDataKey, mockCarePlan))
-                .thenReturn(ENCRYPTED_RESOURCE)
-        Mockito.`when`(mockCryptoService.fetchCurrentCommonKey()).thenReturn(mockCommonKey)
-        Mockito.`when`(mockCryptoService.currentCommonKeyId).thenReturn(currentCommonKeyId)
-        Mockito.`when`(
-                mockCryptoService.encryptSymmetricKey(
-                        mockCommonKey,
-                        KeyType.DATA_KEY,
-                        mockDataKey
-                )
-        ).thenReturn(Single.just(mockEncryptedDataKey))
-        Mockito.`when`(
-                mockCryptoService.encryptSymmetricKey(
-                        mockCommonKey,
+    fun <T: Any> encryptRecordFlow(
+            decryptedRecord: DecryptedBaseRecord<T>,
+            currentCommonKeyId: String,
+            resource: T,
+            attachmentKey: GCKey? = null
+    ) {
+        every { decryptedRecord.tags } returns tags
+        every { decryptedRecord.annotations } returns annotations
+        every { decryptedRecord.dataKey } returns dataKey
+        every { decryptedRecord.resource } returns resource
+        every { decryptedRecord.attachmentsKey } returns attachmentKey
+
+        every {
+            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations)
+        } returns encryptedTagsAndAnnotations
+        every { fhirService._encryptResource(dataKey, resource) } returns encryptedResource
+        every { cryptoService.fetchCurrentCommonKey() } returns commonKey
+        every { cryptoService.currentCommonKeyId } returns currentCommonKeyId
+        every {
+            cryptoService.encryptSymmetricKey(
+                    commonKey,
+                    KeyType.DATA_KEY,
+                    dataKey
+            )
+        } returns Single.just(encryptedDataKey)
+        if (attachmentKey is GCKey) {
+            every {
+                cryptoService.encryptSymmetricKey(
+                        commonKey,
                         KeyType.ATTACHMENT_KEY,
-                        mockAttachmentKey
+                        attachmentKey
                 )
-        ).thenReturn(Single.just(mockEncryptedAttachmentKey))
-
-        // When
-        val encryptedRecord = recordService.encryptRecord(mockAnnotatedDecryptedFhirRecord)
-
-        // Then
-        Truth.assertThat(encryptedRecord.commonKeyId).isEqualTo(currentCommonKeyId)
-        Truth.assertThat(encryptedRecord.encryptedAttachmentsKey).isEqualTo(mockEncryptedAttachmentKey)
-
-        inOrder.verify(mockTagEncryptionService).encryptAndEncodeTags(mockTags)
-        inOrder.verify(mockTagEncryptionService).encryptAndEncodeAnnotations(ANNOTATIONS)
-        inOrder.verify(mockCryptoService).fetchCurrentCommonKey()
-        inOrder.verify(mockCryptoService)
-                .encryptSymmetricKey(mockCommonKey, KeyType.DATA_KEY, mockDataKey)
-        inOrder.verify(mockFhirService)._encryptResource(mockDataKey, mockCarePlan)
-        inOrder.verify(mockCryptoService)
-                .encryptSymmetricKey(mockCommonKey, KeyType.ATTACHMENT_KEY, mockAttachmentKey)
-        inOrder.verifyNoMoreInteractions()
-
-        Mockito.verify((mockEncryptedTags as MutableList)).addAll(mockEncryptedAnnotations)
+            } returns Single.just(encryptedAttachmentKey)
+        }
     }
 
-    @Test
-    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, it returns a DecryptedRecord`() {
-        // Given
-        val commonKeyId = "mockCommonKeyId"
-        val modelVersion = 1
+    fun <T: Any> verifyEncryptRecordFlow(
+            resource: T,
+            attachmentKey: GCKey? = null
+    ) {
+        verify(exactly = 1) { tagEncryptionService.encryptTagsAndAnnotations(tags, annotations) }
+        verify(exactly = 1) { fhirService._encryptResource(dataKey, resource) }
+        verify(exactly = 1) { cryptoService.fetchCurrentCommonKey() }
+        verify(exactly = 1) { cryptoService.currentCommonKeyId }
+        verify(exactly = 1) {
+            cryptoService.encryptSymmetricKey(
+                    commonKey,
+                    KeyType.DATA_KEY,
+                    dataKey
+            )
+        }
 
-        Mockito.`when`(mockTags.containsKey("resourcetype")).thenReturn(true)
-        Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(modelVersion)
-        Mockito.`when`(mockEncryptedRecord.commonKeyId).thenReturn(commonKeyId)
-        Mockito.`when`(mockTagEncryptionService.decryptTags(mockEncryptedTags))
-                .thenReturn(mockTags)
-        Mockito.`when`(mockTagEncryptionService.decryptAnnotations(mockEncryptedTags))
-                .thenReturn(ANNOTATIONS)
-        Mockito.`when`(mockCryptoService.hasCommonKey(ArgumentMatchers.anyString()))
-                .thenReturn(true)
-        Mockito.`when`(mockCryptoService.getCommonKeyById(ArgumentMatchers.anyString()))
-                .thenReturn(mockCommonKey)
-        Mockito.`when`(mockCryptoService.symDecryptSymmetricKey(mockCommonKey, mockEncryptedDataKey))
-                .thenReturn(Single.just(mockDataKey))
-        Mockito.`when`<Any>(
-                mockFhirService.decryptResource(
-                        mockDataKey,
-                        mockTags,
-                        ENCRYPTED_RESOURCE)
-        ).thenReturn(mockCarePlan)
-
-        // When
-        val decrypted = recordService.decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-
-        // Then
-        Truth.assertThat(decrypted).isEqualTo(
-                DecryptedRecord(
-                        RECORD_ID,
-                        mockCarePlan,
-                        mockTags,
-                        ANNOTATIONS,
-                        CREATION_DATE,
-                        null,
-                        mockDataKey,
-                        null,
-                        modelVersion
+        if (attachmentKey is GCKey) {
+            verify(exactly = 1) {
+                cryptoService.encryptSymmetricKey(
+                        commonKey,
+                        KeyType.ATTACHMENT_KEY,
+                        attachmentKey
                 )
-        )
-        inOrder.verify(mockTagEncryptionService).decryptTags(mockEncryptedTags)
-        inOrder.verify(mockTagEncryptionService).decryptAnnotations(mockEncryptedTags)
-        inOrder.verify(mockCryptoService).hasCommonKey(commonKeyId)
-        inOrder.verify(mockCryptoService).getCommonKeyById(commonKeyId)
-        inOrder.verify(mockCryptoService).symDecryptSymmetricKey(mockCommonKey, mockEncryptedDataKey)
-        inOrder.verify(mockFhirService).decryptResource<DomainResource>(
-                mockDataKey,
-                mockTags,
-                ENCRYPTED_RESOURCE
-        )
-        inOrder.verifyNoMoreInteractions()
-    }
-
-    @Test
-    @Throws(IOException::class)
-    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, it throws an error, if the ModelVersion is not supported`() {
-        // Given
-        Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(ModelVersion.CURRENT + 1)
-
-        // When
-        try {
-            recordService.decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-            Assert.fail("Exception expected!")
-        } catch (e: D4LException) {
-            // Then
-            Truth.assertThat(e.javaClass).isEqualTo(DataValidationException.ModelVersionNotSupported::class.java)
-            Truth.assertThat(e.message).isEqualTo("Please update SDK to latest version!")
+            }
         }
     }
 
     @Test
-    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, it adds a decrypted AttachmentKey, if the EncryptedRecord contains a encrypted AttachmentKey`() {
-        // Given
-        val commonKeyId = "mockCommonKeyId"
-        val modelVersion = 1
-
-        Mockito.`when`(mockTags.containsKey("resourcetype")).thenReturn(true)
-        Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(modelVersion)
-        Mockito.`when`(mockEncryptedRecord.commonKeyId).thenReturn(commonKeyId)
-        Mockito.`when`(mockEncryptedRecord.encryptedAttachmentsKey).thenReturn(mockEncryptedAttachmentKey)
-        Mockito.`when`(mockTagEncryptionService.decryptTags(mockEncryptedTags))
-                .thenReturn(mockTags)
-        Mockito.`when`(mockTagEncryptionService.decryptAnnotations(mockEncryptedTags))
-                .thenReturn(ANNOTATIONS)
-        Mockito.`when`(mockCryptoService.hasCommonKey(ArgumentMatchers.anyString()))
-                .thenReturn(true)
-        Mockito.`when`(mockCryptoService.getCommonKeyById(ArgumentMatchers.anyString()))
-                .thenReturn(mockCommonKey)
-        Mockito.`when`(mockCryptoService.symDecryptSymmetricKey(mockCommonKey, mockEncryptedDataKey))
-                .thenReturn(Single.just(mockDataKey))
-        Mockito.`when`(mockCryptoService.symDecryptSymmetricKey(mockCommonKey, mockEncryptedAttachmentKey))
-                .thenReturn(Single.just(mockAttachmentKey))
-        Mockito.`when`<Any>(
-                mockFhirService.decryptResource(
-                        mockDataKey,
-                        mockTags,
-                        ENCRYPTED_RESOURCE)
-        ).thenReturn(mockCarePlan)
-
-        // When
-        val decrypted = recordService.decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-
-        // Then
-        Truth.assertThat(decrypted).isEqualTo(
-                DecryptedRecord(
-                        RECORD_ID,
-                        mockCarePlan,
-                        mockTags,
-                        ANNOTATIONS,
-                        CREATION_DATE,
-                        null,
-                        mockDataKey,
-                        mockAttachmentKey,
-                        modelVersion
-                )
-        )
-
-        inOrder.verify(mockTagEncryptionService).decryptTags(mockEncryptedTags)
-        inOrder.verify(mockTagEncryptionService).decryptAnnotations(mockEncryptedTags)
-        inOrder.verify(mockCryptoService).hasCommonKey(commonKeyId)
-        inOrder.verify(mockCryptoService).getCommonKeyById(commonKeyId)
-        inOrder.verify(mockCryptoService).symDecryptSymmetricKey(mockCommonKey, mockEncryptedDataKey)
-        inOrder.verify(mockCryptoService).symDecryptSymmetricKey(mockCommonKey, mockEncryptedAttachmentKey)
-        inOrder.verify(mockFhirService).decryptResource<DomainResource>(
-                mockDataKey,
-                mockTags,
-                ENCRYPTED_RESOURCE
-        )
-        inOrder.verifyNoMoreInteractions()
-    }
-
-    @Test
-    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, it adds a UpdateDate, if the EncryptedRecord contains a UpdateDate`() {
-        // Given
-        val commonKeyId = "mockCommonKeyId"
-        val modelVersion = 1
-        val updateDate = "2000-01-01"
-
-        Mockito.`when`(mockTags.containsKey("resourcetype")).thenReturn(true)
-        Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(modelVersion)
-        Mockito.`when`(mockEncryptedRecord.commonKeyId).thenReturn(commonKeyId)
-        Mockito.`when`(mockEncryptedRecord.encryptedAttachmentsKey).thenReturn(mockEncryptedAttachmentKey)
-        Mockito.`when`(mockEncryptedRecord.updatedDate).thenReturn(updateDate)
-        Mockito.`when`(mockTagEncryptionService.decryptTags(mockEncryptedTags))
-                .thenReturn(mockTags)
-        Mockito.`when`(mockTagEncryptionService.decryptAnnotations(mockEncryptedTags))
-                .thenReturn(ANNOTATIONS)
-        Mockito.`when`(mockCryptoService.hasCommonKey(ArgumentMatchers.anyString()))
-                .thenReturn(true)
-        Mockito.`when`(mockCryptoService.getCommonKeyById(ArgumentMatchers.anyString()))
-                .thenReturn(mockCommonKey)
-        Mockito.`when`(mockCryptoService.symDecryptSymmetricKey(mockCommonKey, mockEncryptedDataKey))
-                .thenReturn(Single.just(mockDataKey))
-        Mockito.`when`(mockCryptoService.symDecryptSymmetricKey(mockCommonKey, mockEncryptedAttachmentKey))
-                .thenReturn(Single.just(mockAttachmentKey))
-        Mockito.`when`<Any>(
-                mockFhirService.decryptResource(
-                        mockDataKey,
-                        mockTags,
-                        ENCRYPTED_RESOURCE)
-        ).thenReturn(mockCarePlan)
-
-        // When
-        val decrypted = recordService.decryptRecord<DomainResource>(mockEncryptedRecord, USER_ID)
-
-        // Then
-        Truth.assertThat(decrypted).isEqualTo(
-                DecryptedRecord(
-                        RECORD_ID,
-                        mockCarePlan,
-                        mockTags,
-                        ANNOTATIONS,
-                        CREATION_DATE,
-                        updateDate,
-                        mockDataKey,
-                        mockAttachmentKey,
-                        modelVersion
-                )
-        )
-
-        /*inOrder.verify(mockTagEncryptionService).decryptTags(mockEncryptedTags)
-        inOrder.verify(mockTagEncryptionService).decryptAnnotations(mockEncryptedTags)
-        inOrder.verify(mockCryptoService).hasCommonKey(commonKeyId)
-        inOrder.verify(mockCryptoService).getCommonKeyById(commonKeyId)
-        inOrder.verify(mockCryptoService).symDecryptSymmetricKey(mockCommonKey, mockEncryptedDataKey)
-        inOrder.verify(mockCryptoService).symDecryptSymmetricKey(mockCommonKey, mockEncryptedAttachmentKey)
-        inOrder.verify(mockFhirService).decryptResource<DomainResource>(
-                mockDataKey,
-                CarePlan.resourceType,
-                ENCRYPTED_RESOURCE
-        )
-        inOrder.verifyNoMoreInteractions()*/
-    }
-
-    @Test
     @Throws(IOException::class)
-    fun `Given, encryptDataRecord is called with a DecryptedAppDataRecord, it returns a EncryptedRecord`() {
+    fun `Given, encryptRecord is called with a DecryptedRecord for Fhir3, it returns a EncryptedRecord`() {
         // Given
         val currentCommonKeyId = "currentCommonKeyId"
-        Mockito.`when`(mockTagEncryptionService.encryptAndEncodeTags(mockTags))
-                .thenReturn(mockEncryptedTags)
-        Mockito.`when`(mockTagEncryptionService.encryptAndEncodeAnnotations(ANNOTATIONS))
-                .thenReturn(ANNOTATIONS)
-        //Mockito.`when`(mockCryptoService.encrypt(mockDataKey, mockDataResource.value))
-        //        .thenReturn(Single.just(ENCRYPTED_APPDATA))
-        Mockito.`when`(mockCryptoService.fetchCurrentCommonKey()).thenReturn(mockCommonKey)
-        Mockito.`when`(mockCryptoService.currentCommonKeyId).thenReturn(currentCommonKeyId)
-        Mockito.`when`(
-                mockCryptoService.encryptSymmetricKey(
-                        mockCommonKey,
-                        KeyType.DATA_KEY,
-                        mockDataKey
-                )
-        ).thenReturn(Single.just(mockEncryptedDataKey))
+        val resource: Fhir3Resource = mockk()
+        val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk(relaxed = true)
 
-        // When
-        val encryptedRecord = recordService.encryptRecord(mockDecryptedDataRecord)
-
-        // Then
-        Truth.assertThat(encryptedRecord.commonKeyId).isEqualTo(currentCommonKeyId)
-        Truth.assertThat(encryptedRecord.encryptedAttachmentsKey).isNull()
-
-        /*
-        inOrder.verify(mockTagEncryptionService).encryptTags(mockTags)
-        inOrder.verify(mockTagEncryptionService).encryptAnnotations(ANNOTATIONS)
-        inOrder.verify(mockCryptoService).fetchCurrentCommonKey()
-        inOrder.verify(mockCryptoService)
-                .encryptSymmetricKey(mockCommonKey, KeyType.DATA_KEY, mockDataKey)
-        inOrder.verify(mockCryptoService).encrypt(mockDataKey, mockDataResource.value)
-        inOrder.verifyNoMoreInteractions()
-
-        Mockito.verify((mockEncryptedTags as MutableList)).addAll(ANNOTATIONS)*/
-    }
-
-    @Test
-    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, which encrypts a DataResource, it returns a DecryptedRecord`() {
-        // Given
-        val commonKeyId = "mockCommonKeyId"
-        val modelVersion = 1
-
-        Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(modelVersion)
-        Mockito.`when`(mockEncryptedRecord.commonKeyId).thenReturn(commonKeyId)
-        Mockito.`when`(mockTagEncryptionService.decryptTags(mockEncryptedTags))
-                .thenReturn(mockTags)
-        Mockito.`when`(mockTagEncryptionService.decryptAnnotations(mockEncryptedTags))
-                .thenReturn(ANNOTATIONS)
-        Mockito.`when`(mockCryptoService.hasCommonKey(ArgumentMatchers.anyString()))
-                .thenReturn(true)
-        Mockito.`when`(mockCryptoService.getCommonKeyById(ArgumentMatchers.anyString()))
-                .thenReturn(mockCommonKey)
-        Mockito.`when`(mockCryptoService.symDecryptSymmetricKey(mockCommonKey, mockEncryptedDataKey))
-                .thenReturn(Single.just(mockDataKey))
-        Mockito.`when`(mockFhirService.decryptResource<DataResource>(
-                mockDataKey,
-                mockTags,
-                ENCRYPTED_RESOURCE
-        )).thenReturn(mockDataResource)
-
-        // When
-        val decrypted = recordService.decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
-
-        // Then
-        Truth.assertThat(decrypted).isEqualTo(
-                DecryptedDataRecord(
-                        RECORD_ID,
-                        mockDataResource,
-                        mockTags,
-                        ANNOTATIONS,
-                        CREATION_DATE,
-                        null,
-                        mockDataKey,
-                        modelVersion
-                )
+        encryptRecordFlow(
+                decryptedRecord,
+                currentCommonKeyId,
+                resource
         )
 
-        /*inOrder.verify(mockTagEncryptionService).decryptTags(mockEncryptedTags)
-        inOrder.verify(mockTagEncryptionService).decryptAnnotations(mockEncryptedTags)
-        inOrder.verify(mockCryptoService).hasCommonKey(commonKeyId)
-        inOrder.verify(mockCryptoService).getCommonKeyById(commonKeyId)
-        inOrder.verify(mockCryptoService).symDecryptSymmetricKey(mockCommonKey, mockEncryptedDataKey)
-        inOrder.verify(mockFhirService.decryptResource<DataResource>(
-                mockDataKey,
-                mockTags,
-                ENCRYPTED_RESOURCE
-        ))
-        inOrder.verifyNoMoreInteractions()*/
-    }
-
-    @Test
-    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
-    fun `Given, decryptRecord for DataResource is called with a EncryptedRecord and UserId, it adds a UpdateDate, if the EncryptedRecord contains a UpdateDate`() {
-        // Given
-        val commonKeyId = "mockCommonKeyId"
-        val modelVersion = 1
-        val updateDate = "2000-01-01"
-
-        mockkObject(Base64)
-        every { Base64.decode(ENCRYPTED_RESOURCE) } returns ENCRYPTED_APPDATA
-
-        Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(modelVersion)
-        Mockito.`when`(mockEncryptedRecord.commonKeyId).thenReturn(commonKeyId)
-        Mockito.`when`(mockEncryptedRecord.updatedDate).thenReturn(updateDate)
-        Mockito.`when`(mockTagEncryptionService.decryptTags(mockEncryptedTags))
-                .thenReturn(mockTags)
-        Mockito.`when`(mockTagEncryptionService.decryptAnnotations(mockEncryptedTags))
-                .thenReturn(ANNOTATIONS)
-        Mockito.`when`(mockCryptoService.hasCommonKey(ArgumentMatchers.anyString()))
-                .thenReturn(true)
-        Mockito.`when`(mockCryptoService.getCommonKeyById(ArgumentMatchers.anyString()))
-                .thenReturn(mockCommonKey)
-        Mockito.`when`(mockCryptoService.symDecryptSymmetricKey(mockCommonKey, mockEncryptedDataKey))
-                .thenReturn(Single.just(mockDataKey))
-        Mockito.`when`(mockFhirService.decryptResource<DataResource>(
-                mockDataKey,
-                mockTags,
-                ENCRYPTED_RESOURCE
-        )).thenReturn(mockDataResource)
-
         // When
-        val decrypted = recordService.decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
+        val encryptedRecord = recordService.encryptRecord(decryptedRecord)
 
         // Then
-        Truth.assertThat(decrypted).isEqualTo(
-                DecryptedDataRecord(
-                        RECORD_ID,
-                        mockDataResource,
-                        mockTags,
-                        ANNOTATIONS,
-                        CREATION_DATE,
-                        updateDate,
-                        mockDataKey,
-                        modelVersion
-                )
+        assertEquals(
+                expected = currentCommonKeyId,
+                actual = encryptedRecord.commonKeyId
         )
+        assertNull(encryptedRecord.encryptedAttachmentsKey)
+        verifyEncryptRecordFlow(resource)
 
-        /*inOrder.verify(mockTagEncryptionService).decryptTags(mockEncryptedTags)
-        inOrder.verify(mockTagEncryptionService).decryptAnnotations(mockEncryptedTags)
-        inOrder.verify(mockCryptoService).hasCommonKey(commonKeyId)
-        inOrder.verify(mockCryptoService).getCommonKeyById(commonKeyId)
-        inOrder.verify(mockCryptoService).symDecryptSymmetricKey(mockCommonKey, mockEncryptedDataKey)
-        inOrder.verify(mockFhirService.decryptResource<DataResource>(
-                mockDataKey,
-                mockTags,
-                ENCRYPTED_RESOURCE
-        ))
-        inOrder.verifyNoMoreInteractions()*/
     }
 
     @Test
     @Throws(IOException::class)
-    fun `Given, decryptRecord for ByteArray is called with a EncryptedRecord and UserId, it throws an error, if the ModelVersion is not supported`() {
+    fun `Given, encryptRecord is called with a DecryptedRecord for Fhir4, it returns a EncryptedRecord`() {
         // Given
-        Mockito.`when`(mockEncryptedRecord.modelVersion).thenReturn(ModelVersion.CURRENT + 1)
+        val currentCommonKeyId = "currentCommonKeyId"
+        val resource: Fhir4Resource = mockk()
+        val decryptedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
+
+        encryptRecordFlow(
+                decryptedRecord,
+                currentCommonKeyId,
+                resource
+        )
 
         // When
-        try {
-            recordService.decryptRecord<ByteArray>(mockEncryptedRecord, USER_ID)
-            Assert.fail("Exception expected!")
-        } catch (e: D4LException) {
-            // Then
-            Truth.assertThat(e.javaClass).isEqualTo(DataValidationException.ModelVersionNotSupported::class.java)
-            Truth.assertThat(e.message).isEqualTo("Please update SDK to latest version!")
+        val encryptedRecord = recordService.encryptRecord(decryptedRecord)
+
+        // Then
+        assertEquals(
+                expected = currentCommonKeyId,
+                actual = encryptedRecord.commonKeyId
+        )
+        assertNull(encryptedRecord.encryptedAttachmentsKey)
+
+        verifyEncryptRecordFlow(resource)
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun `Given, encryptRecord is called with a DecryptedRecord for arbitrary data, it returns a EncryptedRecord`() {
+        // Given
+        val currentCommonKeyId = "currentCommonKeyId"
+        val resource: DataResource = mockk()
+        val decryptedRecord: DecryptedDataRecord = mockk(relaxed = true)
+
+        encryptRecordFlow(
+                decryptedRecord,
+                currentCommonKeyId,
+                resource
+        )
+
+        // When
+        val encryptedRecord = recordService.encryptRecord(decryptedRecord)
+
+        // Then
+        assertEquals(
+                expected = currentCommonKeyId,
+                actual = encryptedRecord.commonKeyId
+        )
+        assertNull(encryptedRecord.encryptedAttachmentsKey)
+
+        verifyEncryptRecordFlow(resource)
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun `Given, encryptRecord is called with a DecryptedRecord for Fhir3, it adds a encrypted AttachmentKey, if the DecryptedRecord contains a AttachmentKey`() {
+        // Given
+        val currentCommonKeyId = "currentCommonKeyId"
+        val resource: Fhir3Resource = mockk()
+        val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk(relaxed = true)
+
+        encryptRecordFlow(
+                decryptedRecord,
+                currentCommonKeyId,
+                resource,
+                attachmentKey
+        )
+
+        // When
+        val encryptedRecord = recordService.encryptRecord(decryptedRecord)
+
+        // Then
+        assertEquals(
+                expected = currentCommonKeyId,
+                actual = encryptedRecord.commonKeyId
+        )
+        assertEquals(
+                expected = encryptedAttachmentKey,
+                actual = encryptedRecord.encryptedAttachmentsKey
+        )
+
+        verifyEncryptRecordFlow(resource, attachmentKey)
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun `Given, encryptRecord is called with a DecryptedRecord for Fhir4, it adds a encrypted AttachmentKey, if the DecryptedRecord contains a AttachmentKey`() {
+        // Given
+        val currentCommonKeyId = "currentCommonKeyId"
+        val resource: Fhir4Resource = mockk()
+        val decryptedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
+
+        encryptRecordFlow(
+                decryptedRecord,
+                currentCommonKeyId,
+                resource,
+                attachmentKey
+        )
+
+        // When
+        val encryptedRecord = recordService.encryptRecord(decryptedRecord)
+
+        // Then
+        assertEquals(
+                expected = currentCommonKeyId,
+                actual = encryptedRecord.commonKeyId
+        )
+        assertEquals(
+                expected = encryptedAttachmentKey,
+                actual = encryptedRecord.encryptedAttachmentsKey
+        )
+
+        verifyEncryptRecordFlow(resource, attachmentKey)
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun `Given, encryptRecord is called with a DecryptedRecord for arbitrary data, it adds a encrypted AttachmentKey, if the DecryptedRecord contains a AttachmentKey`() {
+        // Given
+        val currentCommonKeyId = "currentCommonKeyId"
+        val resource: Fhir4Resource = mockk()
+        val decryptedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
+
+        encryptRecordFlow(
+                decryptedRecord,
+                currentCommonKeyId,
+                resource,
+                attachmentKey
+        )
+
+        // When
+        val encryptedRecord = recordService.encryptRecord(decryptedRecord)
+
+        // Then
+        assertEquals(
+                expected = currentCommonKeyId,
+                actual = encryptedRecord.commonKeyId
+        )
+        assertEquals(
+                expected = encryptedAttachmentKey,
+                actual = encryptedRecord.encryptedAttachmentsKey
+        )
+
+        verifyEncryptRecordFlow(resource, attachmentKey)
+    }
+
+    private fun <T: Any> decryptRecordFlow(
+            encryptedRecord: NetworkModelContract.EncryptedRecord,
+            modelVersion: Int,
+            commonKeyId: String,
+            resource: T,
+            updateDate: String? = null,
+            encryptedAttachmentsKey: NetworkModelContract.EncryptedKey? = null
+    ) {
+        every { encryptedRecord.modelVersion } returns modelVersion
+        every { encryptedRecord.commonKeyId } returns commonKeyId
+        every { encryptedRecord.encryptedTags } returns encryptedTagsAndAnnotations
+        every { encryptedRecord.encryptedDataKey } returns encryptedDataKey
+        every { encryptedRecord.encryptedBody } returns encryptedResource
+        every { encryptedRecord.customCreationDate } returns RecordServiceTestBase.CREATION_DATE
+        every { encryptedRecord.identifier } returns RecordServiceTestBase.RECORD_ID
+        every { encryptedRecord.updatedDate } returns updateDate
+        every { encryptedRecord.encryptedAttachmentsKey } returns encryptedAttachmentsKey
+
+        every {
+            tagEncryptionService.decryptTagsAndAnnotations(encryptedTagsAndAnnotations)
+        } returns Pair(tags, annotations)
+        every { cryptoService.hasCommonKey(commonKeyId) } returns true
+        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
+        every {
+            cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey)
+        } returns Single.just(dataKey)
+
+        if (encryptedAttachmentsKey is NetworkModelContract.EncryptedKey) {
+            every {
+                cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey)
+            } returns Single.just(attachmentKey)
         }
+
+        every {
+            fhirService.decryptResource<T>(
+                    dataKey,
+                    tags,
+                    encryptedResource
+            )
+        } returns resource
+    }
+
+    private fun <T: Any> verfiyDecryptRecordFlow(
+            commonKeyId: String,
+            encryptedAttachmentsKey: NetworkModelContract.EncryptedKey? = null
+    ) {
+        verify(exactly = 1) {
+            tagEncryptionService.decryptTagsAndAnnotations(encryptedTagsAndAnnotations)
+        }
+        verify(exactly = 1) { cryptoService.hasCommonKey(commonKeyId) }
+        verify(exactly = 1) { cryptoService.getCommonKeyById(commonKeyId) }
+        verify(exactly = 1) { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) }
+        if (encryptedAttachmentsKey is NetworkModelContract.EncryptedKey) {
+            verify(exactly = 1) {
+                cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey)
+            }
+        }
+        verify(exactly = 1) {
+            fhirService.decryptResource<T>(
+                    dataKey,
+                    tags,
+                    encryptedResource
+            )
+        }
+    }
+
+    @Test
+    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
+    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, it returns a DecryptedRecord for Fhir3`() {
+        // Given
+        val commonKeyId = "mockCommonKeyId"
+        val modelVersion = 1
+        val resource: Fhir3Resource = mockk()
+        val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
+
+        decryptRecordFlow(
+                encryptedRecord,
+                modelVersion,
+                commonKeyId,
+                resource
+        )
+
+        // When
+        val decrypted = recordService.decryptRecord<Fhir3Resource>(
+                encryptedRecord,
+                RecordServiceTestBase.USER_ID
+        )
+
+        // Then
+        assertEquals(
+                actual = decrypted,
+                expected = DecryptedRecord(
+                        RecordServiceTestBase.RECORD_ID,
+                        resource,
+                        tags,
+                        annotations,
+                        RecordServiceTestBase.CREATION_DATE,
+                        null,
+                        dataKey,
+                        null,
+                        modelVersion
+                )
+        )
+
+        verfiyDecryptRecordFlow<Fhir3Resource>(commonKeyId)
+    }
+
+    @Test
+    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
+    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, it returns a DecryptedRecord for Fhir4`() {
+        // Given
+        val commonKeyId = "mockCommonKeyId"
+        val modelVersion = 1
+        val resource: Fhir4Resource = mockk()
+        val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
+
+        decryptRecordFlow(
+                encryptedRecord,
+                modelVersion,
+                commonKeyId,
+                resource
+        )
+
+        // When
+        val decrypted = recordService.decryptRecord<Fhir4Resource>(
+                encryptedRecord,
+                RecordServiceTestBase.USER_ID
+        )
+
+        // Then
+        assertEquals(
+                actual = decrypted,
+                expected = DecryptedR4Record(
+                        RecordServiceTestBase.RECORD_ID,
+                        resource,
+                        tags,
+                        annotations,
+                        RecordServiceTestBase.CREATION_DATE,
+                        null,
+                        dataKey,
+                        null,
+                        modelVersion
+                )
+        )
+
+        verfiyDecryptRecordFlow<Fhir3Resource>(commonKeyId)
+    }
+
+    @Test
+    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
+    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, it returns a DecryptedRecord for arbitrary data`() {
+        // Given
+        val commonKeyId = "mockCommonKeyId"
+        val modelVersion = 1
+        val resource: DataResource = mockk()
+        val plainResource = ByteArray(23)
+        val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
+
+        every { resource.asByteArray() } returns plainResource
+
+        decryptRecordFlow(
+                encryptedRecord,
+                modelVersion,
+                commonKeyId,
+                resource
+        )
+
+        // When
+        val decrypted = recordService.decryptRecord<DataResource>(
+                encryptedRecord,
+                RecordServiceTestBase.USER_ID
+        )
+
+        // Then
+        assertEquals(
+                actual = decrypted,
+                expected = DecryptedDataRecord(
+                        RecordServiceTestBase.RECORD_ID,
+                        resource,
+                        tags,
+                        annotations,
+                        RecordServiceTestBase.CREATION_DATE,
+                        null,
+                        dataKey,
+                        modelVersion
+                )
+        )
+
+        verfiyDecryptRecordFlow<Fhir3Resource>(commonKeyId)
+    }
+
+    @Test
+    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
+    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, which contains a UpdateDate, it returns a DecryptedRecord for Fhir3`() {
+        // Given
+        val commonKeyId = "mockCommonKeyId"
+        val modelVersion = 1
+        val updateDate = "2020-05-03T07:45:08.234123"
+        val resource: Fhir3Resource = mockk()
+        val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
+
+        decryptRecordFlow(
+                encryptedRecord,
+                modelVersion,
+                commonKeyId,
+                resource,
+                updateDate = updateDate
+        )
+
+        // When
+        val decrypted = recordService.decryptRecord<Fhir3Resource>(
+                encryptedRecord,
+                RecordServiceTestBase.USER_ID
+        )
+
+        // Then
+        assertEquals(
+                actual = decrypted,
+                expected = DecryptedRecord(
+                        RecordServiceTestBase.RECORD_ID,
+                        resource,
+                        tags,
+                        annotations,
+                        RecordServiceTestBase.CREATION_DATE,
+                        updateDate,
+                        dataKey,
+                        null,
+                        modelVersion
+                )
+        )
+
+        verfiyDecryptRecordFlow<Fhir3Resource>(commonKeyId)
+    }
+
+    @Test
+    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
+    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, which contains a UpdateDate, it returns a DecryptedRecord for Fhir4`() {
+        // Given
+        val commonKeyId = "mockCommonKeyId"
+        val modelVersion = 1
+        val updateDate = "2020-05-03T07:45:08.234123"
+        val resource: Fhir4Resource = mockk()
+        val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
+
+        decryptRecordFlow(
+                encryptedRecord,
+                modelVersion,
+                commonKeyId,
+                resource,
+                updateDate = updateDate
+        )
+
+        // When
+        val decrypted = recordService.decryptRecord<Fhir4Resource>(
+                encryptedRecord,
+                RecordServiceTestBase.USER_ID
+        )
+
+        // Then
+        assertEquals(
+                actual = decrypted,
+                expected = DecryptedR4Record(
+                        RecordServiceTestBase.RECORD_ID,
+                        resource,
+                        tags,
+                        annotations,
+                        RecordServiceTestBase.CREATION_DATE,
+                        updateDate,
+                        dataKey,
+                        null,
+                        modelVersion
+                )
+        )
+
+        verfiyDecryptRecordFlow<Fhir4Resource>(commonKeyId)
+    }
+
+    @Test
+    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
+    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, which contains a UpdateDate, it returns a DecryptedRecord for arbitrary data`() {
+        // Given
+        val commonKeyId = "mockCommonKeyId"
+        val modelVersion = 1
+        val updateDate = "2020-05-03T07:45:08.234123"
+        val resource: DataResource = mockk()
+        val plainResource = ByteArray(23)
+        val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
+
+        every { resource.asByteArray() } returns plainResource
+
+        decryptRecordFlow(
+                encryptedRecord,
+                modelVersion,
+                commonKeyId,
+                resource,
+                updateDate = updateDate
+        )
+
+        // When
+        val decrypted = recordService.decryptRecord<DataResource>(
+                encryptedRecord,
+                RecordServiceTestBase.USER_ID
+        )
+
+        // Then
+        assertEquals(
+                actual = decrypted,
+                expected = DecryptedDataRecord(
+                        RecordServiceTestBase.RECORD_ID,
+                        resource,
+                        tags,
+                        annotations,
+                        RecordServiceTestBase.CREATION_DATE,
+                        updateDate,
+                        dataKey,
+                        modelVersion
+                )
+        )
+
+        verfiyDecryptRecordFlow<DataResource>(commonKeyId)
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, it throws an error, if the ModelVersion is not supported, for Fhir3`() {
+        // Given
+        val modelVersion = 1
+        val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
+
+        every { encryptedRecord.modelVersion } returns modelVersion+23
+
+        // When
+        val exception = assertFailsWith<DataValidationException.ModelVersionNotSupported> {
+            recordService.decryptRecord<Fhir3Resource>(
+                    encryptedRecord,
+                    RecordServiceTestBase.USER_ID
+            )
+        }
+        assertEquals(
+                actual = exception.message,
+                expected = "Please update SDK to latest version!"
+        )
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, it throws an error, if the ModelVersion is not supported, for Fhir4`() {
+        // Given
+        val modelVersion = 1
+        val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
+
+        every { encryptedRecord.modelVersion } returns modelVersion+23
+
+        // When
+        val exception = assertFailsWith<DataValidationException.ModelVersionNotSupported> {
+            recordService.decryptRecord<Fhir4Resource>(
+                    encryptedRecord,
+                    RecordServiceTestBase.USER_ID
+            )
+        }
+        assertEquals(
+                actual = exception.message,
+                expected = "Please update SDK to latest version!"
+        )
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, it throws an error, if the ModelVersion is not supported, for arbitrary data`() {
+        // Given
+        val modelVersion = 1
+        val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
+
+        every { encryptedRecord.modelVersion } returns modelVersion+23
+
+        // When
+        val exception = assertFailsWith<DataValidationException.ModelVersionNotSupported> {
+            recordService.decryptRecord<Fhir4Resource>(
+                    encryptedRecord,
+                    RecordServiceTestBase.USER_ID
+            )
+        }
+        assertEquals(
+                actual = exception.message,
+                expected = "Please update SDK to latest version!"
+        )
+    }
+
+    @Test
+    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
+    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, it adds a decrypted AttachmentKey, if the EncryptedRecord contains a encrypted AttachmentKey, for Fhir3`() {
+        // Given
+        val commonKeyId = "mockCommonKeyId"
+        val modelVersion = 1
+        val resource: Fhir3Resource = mockk()
+        val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
+
+        decryptRecordFlow(
+                encryptedRecord,
+                modelVersion,
+                commonKeyId,
+                resource,
+                encryptedAttachmentsKey = encryptedAttachmentKey
+        )
+
+        // When
+        val decrypted = recordService.decryptRecord<Fhir3Resource>(
+                encryptedRecord,
+                RecordServiceTestBase.USER_ID
+        )
+
+        // Then
+        assertEquals(
+                actual = decrypted,
+                expected = DecryptedRecord(
+                        RecordServiceTestBase.RECORD_ID,
+                        resource,
+                        tags,
+                        annotations,
+                        RecordServiceTestBase.CREATION_DATE,
+                        null,
+                        dataKey,
+                        attachmentKey,
+                        modelVersion
+                )
+        )
+
+        verfiyDecryptRecordFlow<Fhir3Resource>(
+                commonKeyId,
+                encryptedAttachmentsKey = encryptedAttachmentKey
+        )
+    }
+
+    @Test
+    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
+    fun `Given, decryptRecord is called with a EncryptedRecord and UserId, it adds a decrypted AttachmentKey, if the EncryptedRecord contains a encrypted AttachmentKey, for Fhir4`() {
+        // Given
+        val commonKeyId = "mockCommonKeyId"
+        val modelVersion = 1
+        val resource: Fhir4Resource = mockk()
+        val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
+
+        decryptRecordFlow(
+                encryptedRecord,
+                modelVersion,
+                commonKeyId,
+                resource,
+                encryptedAttachmentsKey = encryptedAttachmentKey
+        )
+
+        // When
+        val decrypted = recordService.decryptRecord<Fhir4Resource>(
+                encryptedRecord,
+                RecordServiceTestBase.USER_ID
+        )
+
+        // Then
+        assertEquals(
+                actual = decrypted,
+                expected = DecryptedR4Record(
+                        RecordServiceTestBase.RECORD_ID,
+                        resource,
+                        tags,
+                        annotations,
+                        RecordServiceTestBase.CREATION_DATE,
+                        null,
+                        dataKey,
+                        attachmentKey,
+                        modelVersion
+                )
+        )
+
+        verfiyDecryptRecordFlow<Fhir4Resource>(
+                commonKeyId,
+                encryptedAttachmentsKey = encryptedAttachmentKey
+        )
     }
 }

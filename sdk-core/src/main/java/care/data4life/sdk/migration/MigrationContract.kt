@@ -22,24 +22,28 @@ import care.data4life.sdk.tag.Tags
 import io.reactivex.Observable
 import io.reactivex.Single
 
+@Retention(AnnotationRetention.SOURCE)
+@MustBeDocumented
+annotation class Migration(val message: String)
+
 interface MigrationContract {
     interface CompatibilityService {
         fun searchRecords(
-            alias: String,
-            userId: String,
-            startDate: String?,
-            endDate: String?,
-            pageSize: Int,
-            offSet: Int,
-            tags: Tags,
-            annotations: Annotations
+                alias: String,
+                userId: String,
+                startDate: String?,
+                endDate: String?,
+                pageSize: Int,
+                offSet: Int,
+                tags: Tags,
+                annotations: Annotations
         ): Observable<List<NetworkModelContract.EncryptedRecord>>
 
         fun countRecords(
-            alias: String,
-            userId: String,
-            tags: Tags,
-            annotations: Annotations
+                alias: String,
+                userId: String,
+                tags: Tags,
+                annotations: Annotations
         ): Single<Int>
     }
 }

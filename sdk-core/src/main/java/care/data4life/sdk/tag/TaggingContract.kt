@@ -17,7 +17,9 @@
 package care.data4life.sdk.tag
 
 
+import care.data4life.crypto.GCKey
 import care.data4life.sdk.lang.D4LException
+import care.data4life.sdk.migration.Migration
 import java.io.IOException
 
 typealias Tags = HashMap<String, String>
@@ -32,25 +34,17 @@ class TaggingContract {
     }
 
     interface EncryptionService {
-        @Throws(IOException::class)
-        fun encryptAndEncodeTags(tags: Tags): MutableList<String>
+        fun encryptTagsAndAnnotations(tags: Tags, annotations: Annotations): List<String>
+
+        fun decryptTagsAndAnnotations(encryptedTagsAndAnnotations: List<String>): Pair<Tags, Annotations>
 
         @Throws(IOException::class)
-        @Deprecated("This method should only be used for migration purpose.")
-        fun encryptTags(tags: Tags): MutableList<String>
-
-        @Throws(IOException::class)
-        fun decryptTags(encryptedTags: List<String>): Tags
-
-        @Throws(IOException::class)
-        fun encryptAndEncodeAnnotations(annotations: List<String>): MutableList<String>
-
-        @Throws(IOException::class)
-        @Deprecated("This method should only be used for migration purpose.")
-        fun encryptAnnotations(annotations: Annotations): MutableList<String>
-
-        @Throws(IOException::class)
-        fun decryptAnnotations(encryptedAnnotations: Annotations): Annotations
+        @Migration("This method should only be used for migration purpose.")
+        fun encryptList(
+                plainList: List<String>,
+                encryptionKey: GCKey,
+                prefix: String = ""
+        ): MutableList<String>
     }
 
     interface Helper {
@@ -60,13 +54,14 @@ class TaggingContract {
         fun encode(tag: String): String
 
         @Throws(D4LException::class)
-        @Deprecated("This method should only be used for migration purpose.")
+        @Migration("This method should only be used for migration purpose.")
         fun normalize(tag: String): String
 
         fun decode(encodedTag: String): String
     }
 
     companion object {
+        const val ANNOTATION_KEY = "custom"
         const val DELIMITER = "="
         const val TAG_RESOURCE_TYPE = "resourcetype"
         const val TAG_CLIENT = "client"

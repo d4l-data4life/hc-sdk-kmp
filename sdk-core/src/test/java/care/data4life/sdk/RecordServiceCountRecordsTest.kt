@@ -48,7 +48,6 @@ class RecordServiceCountRecordsTest {
     private lateinit var tags: HashMap<String, String>
     private val defaultAnnotations = listOf<String>()
 
-    // mark
     private lateinit var compatibilityService: MigrationContract.CompatibilityService
 
     @Before

@@ -303,18 +303,6 @@ class RecordService internal constructor(
                 .map { FetchResult(it, failedFetches) }
     }
 
-    private fun encryptTagsAndAnnotations(
-            plainTags: Tags,
-            plainAnnotations: Annotations
-    ): List<String> {
-        return tagEncryptionService.encryptAndEncodeTags(plainTags)
-                .also { encryptedTags ->
-                    encryptedTags.addAll(
-                            tagEncryptionService.encryptAndEncodeAnnotations(plainAnnotations)
-                    )
-                }
-    }
-
     private fun <T : Any> searchRecords(
             userId: String,
             resourceType: Class<T>,
@@ -604,7 +592,7 @@ class RecordService internal constructor(
     //region utility methods
     @Throws(IOException::class)
     internal fun <T : Any> encryptRecord(record: DecryptedBaseRecord<T>): NetworkModelContract.EncryptedRecord {
-        val encryptedTags = encryptTagsAndAnnotations(record.tags!!, record.annotations)
+        val encryptedTags = tagEncryptionService.encryptTagsAndAnnotations(record.tags!!, record.annotations)
 
         val commonKey = cryptoService.fetchCurrentCommonKey()
         val currentCommonKeyId = cryptoService.currentCommonKeyId

@@ -54,24 +54,24 @@ class RecordCompatibilityServiceTest {
         val userId = "id"
         val tags: HashMap<String, String> = mockk()
         val annotations: List<String> = mockk()
-        val encodedAndEncryptedTags: MutableList<String> = mockk(relaxed = true)
+        val encodedAndEncryptedTagsAndAnnotations: MutableList<String> = mockk(relaxed = true)
         val encryptedTags: MutableList<String> = mockk(relaxed = true)
         val encryptedAndEncodedAnnotations: MutableList<String> = mockk()
         val encryptedAnnotations: MutableList<String> = mockk()
         val expected = 42
 
-        every { taggingEncryptionService.encryptAndEncodeTags(tags) } returns encodedAndEncryptedTags
-        every { taggingEncryptionService.encryptAndEncodeAnnotations(annotations) } returns encryptedAndEncodedAnnotations
+        every {
+            taggingEncryptionService.encryptTagsAndAnnotations(tags, annotations)
+        } returns encodedAndEncryptedTagsAndAnnotations
         every { taggingEncryptionService.encryptTags(tags) } returns encryptedTags
         every { taggingEncryptionService.encryptAnnotations(annotations) } returns encryptedAnnotations
-        every { encodedAndEncryptedTags.addAll(encryptedAndEncodedAnnotations) } returns true
         every { encryptedTags.addAll(encryptedAnnotations) } returns true
         every { apiService.getCount(alias, userId, encryptedTags) } returns Single.just(21)
         every {
             apiService.getCount(
                     alias,
                     userId,
-                    encodedAndEncryptedTags
+                    encodedAndEncryptedTagsAndAnnotations
             )
         } returns Single.just(21)
 
@@ -89,23 +89,21 @@ class RecordCompatibilityServiceTest {
                 actual = result
         )
 
-        verify(exactly = 1) { taggingEncryptionService.encryptAndEncodeTags(tags) }
-        verify(exactly = 1) { taggingEncryptionService.encryptAndEncodeAnnotations(annotations) }
+        verify(exactly = 1) { taggingEncryptionService.encryptTagsAndAnnotations(tags, annotations) }
         verify(exactly = 1) { taggingEncryptionService.encryptTags(tags) }
         verify(exactly = 1) { taggingEncryptionService.encryptAnnotations(annotations) }
-        verify(exactly = 1) { encodedAndEncryptedTags.addAll(encryptedAndEncodedAnnotations) }
         verify(exactly = 1) { encryptedTags.addAll(encryptedAnnotations) }
         verify(exactly = 2) {
             apiService.getCount(
                     alias,
                     userId,
-                    or(encodedAndEncryptedTags, encryptedTags)
+                    or(encodedAndEncryptedTagsAndAnnotations, encryptedTags)
             )
         }
     }
 
     @Test
-    fun `Given searchRecords is called with a UserId, a ResourceType, a StartDate, a EndDate, the PageSize, Offset, Tags and Annotations,  it calls the ApiService twice with the encodedAndEncrypted and the encrypted Tags`() {
+    fun `Given searchRecords is called with a UserId, a ResourceType, a StartDate, a EndDate, the PageSize, Offset, Tags and Annotations, it calls the ApiService twice with the encodedAndEncrypted and the encrypted Tags`() {
         val alias = "alias"
         val userId = "id"
         val startTime = "start"
@@ -114,15 +112,18 @@ class RecordCompatibilityServiceTest {
         val offset = 42
         val tags: HashMap<String, String> = mockk()
         val annotations: List<String> = mockk()
-        val encodedAndEncryptedTags: MutableList<String> = mutableListOf("a", "v")
+        val encodedAndEncryptedTagsAndAnnotations: MutableList<String> = mutableListOf("a", "v")
+                .also {
+                    it.addAll(listOf("d"))
+                }
         val encryptedTags: MutableList<String> = mutableListOf("a", "k")
-        val encryptedAndEncodedAnnotations: MutableList<String> = mutableListOf("d")
         val encryptedAnnotations: MutableList<String> = mutableListOf("d")
         val encryptedRecord1: EncryptedRecord = mockk()
         val encryptedRecord2: EncryptedRecord = mockk()
 
-        every { taggingEncryptionService.encryptAndEncodeTags(tags) } returns encodedAndEncryptedTags
-        every { taggingEncryptionService.encryptAndEncodeAnnotations(annotations) } returns encryptedAndEncodedAnnotations
+        every {
+            taggingEncryptionService.encryptTagsAndAnnotations(tags, annotations)
+        } returns encodedAndEncryptedTagsAndAnnotations
         every { taggingEncryptionService.encryptTags(tags) } returns encryptedTags
         every { taggingEncryptionService.encryptAnnotations(annotations) } returns encryptedAnnotations
         every {
@@ -133,7 +134,7 @@ class RecordCompatibilityServiceTest {
                     endTime,
                     pageSize,
                     offset,
-                    encodedAndEncryptedTags
+                    encodedAndEncryptedTagsAndAnnotations
             )
         } returns Observable.fromArray(listOf(encryptedRecord1))
         every {
@@ -172,8 +173,7 @@ class RecordCompatibilityServiceTest {
                 actual = result
         )
 
-        verify(exactly = 1) { taggingEncryptionService.encryptAndEncodeTags(tags) }
-        verify(exactly = 1) { taggingEncryptionService.encryptAndEncodeAnnotations(annotations) }
+        verify(exactly = 1) { taggingEncryptionService.encryptTagsAndAnnotations(tags, annotations) }
         verify(exactly = 1) { taggingEncryptionService.encryptTags(tags) }
         verify(exactly = 1) { taggingEncryptionService.encryptAnnotations(annotations) }
         verify(exactly = 2) {
@@ -184,7 +184,7 @@ class RecordCompatibilityServiceTest {
                     endTime,
                     pageSize,
                     offset,
-                    or(encodedAndEncryptedTags, encryptedTags)
+                    or(encodedAndEncryptedTagsAndAnnotations, encryptedTags)
             )
         }
     }
@@ -199,15 +199,16 @@ class RecordCompatibilityServiceTest {
         val offset = 42
         val tags: HashMap<String, String> = mockk()
         val annotations: List<String> = mockk()
-        val encodedAndEncryptedTags: MutableList<String> = mutableListOf("a", "b", "c")
+        val encodedAndEncryptedTagsAndAnnotations: MutableList<String> = mutableListOf("a", "b", "c")
         val encryptedTags: MutableList<String> = mutableListOf("c", "b", "a")
         val encryptedAndEncodedAnnotations: MutableList<String> = mutableListOf()
         val encryptedAnnotations: MutableList<String> = mutableListOf()
         val encryptedRecord1: EncryptedRecord = mockk()
         val encryptedRecord2: EncryptedRecord = mockk()
 
-        every { taggingEncryptionService.encryptAndEncodeTags(tags) } returns encodedAndEncryptedTags
-        every { taggingEncryptionService.encryptAndEncodeAnnotations(annotations) } returns encryptedAndEncodedAnnotations
+        every {
+            taggingEncryptionService.encryptTagsAndAnnotations(tags, annotations)
+        } returns encodedAndEncryptedTagsAndAnnotations
         every { taggingEncryptionService.encryptTags(tags) } returns encryptedTags
         every { taggingEncryptionService.encryptAnnotations(annotations) } returns encryptedAnnotations
         every {
@@ -218,7 +219,7 @@ class RecordCompatibilityServiceTest {
                     endTime,
                     pageSize,
                     offset,
-                    encodedAndEncryptedTags
+                    encodedAndEncryptedTagsAndAnnotations
             )
         } returns Observable.fromArray(listOf(encryptedRecord1))
         every {
@@ -257,8 +258,7 @@ class RecordCompatibilityServiceTest {
                 actual = result
         )
 
-        verify(exactly = 1) { taggingEncryptionService.encryptAndEncodeTags(tags) }
-        verify(exactly = 1) { taggingEncryptionService.encryptAndEncodeAnnotations(annotations) }
+        verify(exactly = 1) { taggingEncryptionService.encryptTagsAndAnnotations(tags, annotations) }
         verify(exactly = 1) { taggingEncryptionService.encryptTags(tags) }
         verify(exactly = 1) { taggingEncryptionService.encryptAnnotations(annotations) }
         verify(exactly = 1) {
@@ -269,7 +269,7 @@ class RecordCompatibilityServiceTest {
                     endTime,
                     pageSize,
                     offset,
-                    encodedAndEncryptedTags
+                    encodedAndEncryptedTagsAndAnnotations
             )
         }
     }

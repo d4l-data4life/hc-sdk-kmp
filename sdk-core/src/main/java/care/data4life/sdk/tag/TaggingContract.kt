@@ -33,8 +33,9 @@ class TaggingContract {
     }
 
     interface EncryptionService {
-        @Throws(IOException::class)
-        fun encryptAndEncodeTags(tags: Tags): MutableList<String>
+        fun encryptTagsAndAnnotations(tags: Tags, annotations: Annotations): List<String>
+
+        fun decryptTagsAndAnnotations(encryptedTagsAndAnnotations: List<String>): Pair<Tags, Annotations>
 
         @Throws(IOException::class)
         @Migration("This method should only be used for migration purpose.")
@@ -42,9 +43,6 @@ class TaggingContract {
 
         @Throws(IOException::class)
         fun decryptTags(encryptedTags: List<String>): Tags
-
-        @Throws(IOException::class)
-        fun encryptAndEncodeAnnotations(annotations: List<String>): MutableList<String>
 
         @Throws(IOException::class)
         @Migration("This method should only be used for migration purpose.")

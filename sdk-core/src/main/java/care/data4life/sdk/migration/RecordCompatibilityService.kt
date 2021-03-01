@@ -36,12 +36,7 @@ class RecordCompatibilityService internal constructor(
             plainAnnotations: Annotations
     ): Pair<List<String>, List<String>> {
         return Pair(
-                tagEncryptionService.encryptAndEncodeTags(plainTags)
-                        .also { encryptedTags ->
-                            encryptedTags.addAll(
-                                    tagEncryptionService.encryptAndEncodeAnnotations(plainAnnotations)
-                            )
-                        },
+                tagEncryptionService.encryptTagsAndAnnotations(plainTags, plainAnnotations),
                 tagEncryptionService.encryptTags(plainTags)
                         .also { encryptedTags ->
                             encryptedTags.addAll(

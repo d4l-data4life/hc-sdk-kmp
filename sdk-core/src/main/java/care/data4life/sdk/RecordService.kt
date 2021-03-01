@@ -117,7 +117,11 @@ class RecordService internal constructor(
             attachmentService,
             cryptoService,
             errorHandler,
-            RecordCompatibilityService(apiService, tagEncryptionService)
+            RecordCompatibilityService(
+                    apiService,
+                    tagEncryptionService,
+                    cryptoService
+            )
     )
 
 

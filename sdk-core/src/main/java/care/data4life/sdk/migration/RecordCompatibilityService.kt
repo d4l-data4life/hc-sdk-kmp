@@ -17,19 +17,25 @@
 package care.data4life.sdk.migration
 
 import care.data4life.sdk.ApiService
+import care.data4life.sdk.CryptoService
 import care.data4life.sdk.network.model.NetworkModelContract.EncryptedRecord
 import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.TagEncryptionHelper
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.tag.TaggingContract.Companion.ANNOTATION_KEY
 import care.data4life.sdk.tag.Tags
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
+import java.io.IOException
 
 // see: https://gesundheitscloud.atlassian.net/browse/SDK-525
 @Migration("This class should only be used due to migration purpose.")
 class RecordCompatibilityService internal constructor(
         private val apiService: ApiService,
-        private val tagEncryptionService: TaggingContract.EncryptionService
+        private val tagEncryptionService: TaggingContract.EncryptionService,
+        private val cryptoService: CryptoService,
+        private val tagHelper: TaggingContract.Helper = TagEncryptionHelper
 ) : MigrationContract.CompatibilityService {
     private fun encrypt(
             plainTags: Tags,
@@ -37,12 +43,32 @@ class RecordCompatibilityService internal constructor(
     ): Pair<List<String>, List<String>> {
         return Pair(
                 tagEncryptionService.encryptTagsAndAnnotations(plainTags, plainAnnotations),
-                tagEncryptionService.encryptTags(plainTags)
+                encryptTags(plainTags)
                         .also { encryptedTags ->
                             encryptedTags.addAll(
-                                    tagEncryptionService.encryptAnnotations(plainAnnotations)
+                                    encryptAnnotations(plainAnnotations)
                             )
                         }
+        )
+    }
+
+    @Throws(IOException::class)
+    private fun encryptTags(tags: Tags): MutableList<String> {
+        val encryptionKey = cryptoService.fetchTagEncryptionKey()
+        return tags
+                .map { entry -> entry.key + TaggingContract.DELIMITER + tagHelper.normalize(entry.value) }
+                .let { normalizedTags -> tagEncryptionService.encryptList(normalizedTags, encryptionKey) }
+    }
+
+    @Throws(IOException::class)
+    private fun encryptAnnotations(
+            annotations: Annotations
+    ): MutableList<String> {
+        val encryptionKey = cryptoService.fetchTagEncryptionKey()
+        return tagEncryptionService.encryptList(
+                annotations,
+                encryptionKey,
+                ANNOTATION_KEY + TaggingContract.DELIMITER
         )
     }
 
@@ -62,7 +88,6 @@ class RecordCompatibilityService internal constructor(
             annotations: Annotations
     ): Observable<List<EncryptedRecord>> {
         val (encodedAndEncryptedTags, encryptedTags) = encrypt(tags, annotations)
-
         return if (needsDoubleCall(encodedAndEncryptedTags, encryptedTags)) {
             Observable.zip(
                     apiService.fetchRecords(

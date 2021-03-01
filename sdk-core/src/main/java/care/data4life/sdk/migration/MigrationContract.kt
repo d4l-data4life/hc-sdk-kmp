@@ -22,6 +22,10 @@ import care.data4life.sdk.tag.Tags
 import io.reactivex.Observable
 import io.reactivex.Single
 
+@Retention(AnnotationRetention.SOURCE)
+@MustBeDocumented
+annotation class Migration(val message: String)
+
 interface MigrationContract {
     interface CompatibilityService {
         fun searchRecords(

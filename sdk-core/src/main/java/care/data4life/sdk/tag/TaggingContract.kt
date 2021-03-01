@@ -18,6 +18,7 @@ package care.data4life.sdk.tag
 
 
 import care.data4life.sdk.lang.D4LException
+import care.data4life.sdk.migration.Migration
 import java.io.IOException
 
 typealias Tags = HashMap<String, String>
@@ -36,7 +37,7 @@ class TaggingContract {
         fun encryptAndEncodeTags(tags: Tags): MutableList<String>
 
         @Throws(IOException::class)
-        @Deprecated("This method should only be used for migration purpose.")
+        @Migration("This method should only be used for migration purpose.")
         fun encryptTags(tags: Tags): MutableList<String>
 
         @Throws(IOException::class)
@@ -46,7 +47,7 @@ class TaggingContract {
         fun encryptAndEncodeAnnotations(annotations: List<String>): MutableList<String>
 
         @Throws(IOException::class)
-        @Deprecated("This method should only be used for migration purpose.")
+        @Migration("This method should only be used for migration purpose.")
         fun encryptAnnotations(annotations: Annotations): MutableList<String>
 
         @Throws(IOException::class)
@@ -60,7 +61,7 @@ class TaggingContract {
         fun encode(tag: String): String
 
         @Throws(D4LException::class)
-        @Deprecated("This method should only be used for migration purpose.")
+        @Migration("This method should only be used for migration purpose.")
         fun normalize(tag: String): String
 
         fun decode(encodedTag: String): String

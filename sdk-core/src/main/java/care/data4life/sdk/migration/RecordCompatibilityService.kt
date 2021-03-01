@@ -26,6 +26,7 @@ import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 
 // see: https://gesundheitscloud.atlassian.net/browse/SDK-525
+@Migration("This class should only be used due to migration purpose.")
 class RecordCompatibilityService internal constructor(
         private val apiService: ApiService,
         private val tagEncryptionService: TaggingContract.EncryptionService

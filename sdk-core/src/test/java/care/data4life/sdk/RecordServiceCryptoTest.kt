@@ -359,11 +359,8 @@ class RecordServiceCryptoTest {
         every { encryptedRecord.encryptedAttachmentsKey } returns encryptedAttachmentsKey
 
         every {
-            tagEncryptionService.decryptTags(encryptedTagsAndAnnotations)
-        } returns tags
-        every {
-            tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations)
-        } returns annotations
+            tagEncryptionService.decryptTagsAndAnnotations(encryptedTagsAndAnnotations)
+        } returns Pair(tags, annotations)
         every { cryptoService.hasCommonKey(commonKeyId) } returns true
         every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
         every {
@@ -389,8 +386,9 @@ class RecordServiceCryptoTest {
             commonKeyId: String,
             encryptedAttachmentsKey: NetworkModelContract.EncryptedKey? = null
     ) {
-        verify(exactly = 1) { tagEncryptionService.decryptTags(encryptedTagsAndAnnotations) }
-        verify(exactly = 1) { tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations) }
+        verify(exactly = 1) {
+            tagEncryptionService.decryptTagsAndAnnotations(encryptedTagsAndAnnotations)
+        }
         verify(exactly = 1) { cryptoService.hasCommonKey(commonKeyId) }
         verify(exactly = 1) { cryptoService.getCommonKeyById(commonKeyId) }
         verify(exactly = 1) { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) }

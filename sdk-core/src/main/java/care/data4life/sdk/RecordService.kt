@@ -655,14 +655,12 @@ class RecordService internal constructor(
             throw DataValidationException.ModelVersionNotSupported("Please update SDK to latest version!")
         }
 
-        val tags = tagEncryptionService.decryptTags(record.encryptedTags)
+        val (tags, annotations) = tagEncryptionService.decryptTagsAndAnnotations(record.encryptedTags)
 
         val builder = DecryptedRecordMapper()
                 .setIdentifier(record.identifier)
                 .setTags(tags)
-                .setAnnotations(
-                        tagEncryptionService.decryptAnnotations(record.encryptedTags)
-                )
+                .setAnnotations(annotations)
                 .setCreationDate(record.customCreationDate)
                 .setUpdateDate(record.updatedDate)
                 .setModelVersion(record.modelVersion)

@@ -42,14 +42,8 @@ class TaggingContract {
         fun encryptTags(tags: Tags): MutableList<String>
 
         @Throws(IOException::class)
-        fun decryptTags(encryptedTags: List<String>): Tags
-
-        @Throws(IOException::class)
         @Migration("This method should only be used for migration purpose.")
         fun encryptAnnotations(annotations: Annotations): MutableList<String>
-
-        @Throws(IOException::class)
-        fun decryptAnnotations(encryptedAnnotations: Annotations): Annotations
     }
 
     interface Helper {

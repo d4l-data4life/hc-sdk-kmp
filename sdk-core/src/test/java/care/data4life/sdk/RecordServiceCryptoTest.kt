@@ -29,6 +29,7 @@ import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.NetworkModelContract
+import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.tag.TaggingContract
@@ -44,7 +45,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 
-// TODO: make it DRY
+
 class RecordServiceCryptoTest {
     private lateinit var recordService: RecordService
     private lateinit var apiService: ApiService
@@ -56,7 +57,6 @@ class RecordServiceCryptoTest {
     private lateinit var errorHandler: SdkContract.ErrorHandler
     private lateinit var tags: HashMap<String, String>
     private lateinit var annotations: List<String>
-    private val defaultAnnotations = listOf<String>()
 
     private lateinit var encryptedTagsAndAnnotations: List<String>
     private lateinit var dataKey: GCKey
@@ -103,19 +103,17 @@ class RecordServiceCryptoTest {
         )
     }
 
-    @Test
-    @Throws(IOException::class)
-    fun `Given, encryptRecord is called with a DecryptedRecord for Fhir3, it returns a EncryptedRecord`() {
-        // Given
-        val currentCommonKeyId = "currentCommonKeyId"
-        val resource: Fhir3Resource = mockk()
-        val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk(relaxed = true)
-
+    fun <T: Any> encryptRecordFlow(
+            decryptedRecord: DecryptedBaseRecord<T>,
+            currentCommonKeyId: String,
+            resource: T,
+            attachmentKey: GCKey? = null
+    ) {
         every { decryptedRecord.tags } returns tags
         every { decryptedRecord.annotations } returns annotations
         every { decryptedRecord.dataKey } returns dataKey
         every { decryptedRecord.resource } returns resource
-        every { decryptedRecord.attachmentsKey } returns null
+        every { decryptedRecord.attachmentsKey } returns attachmentKey
 
         every {
             tagEncryptionService.encryptTagsAndAnnotations(tags, annotations)
@@ -130,17 +128,21 @@ class RecordServiceCryptoTest {
                     dataKey
             )
         } returns Single.just(encryptedDataKey)
+        if (attachmentKey is GCKey) {
+            every {
+                cryptoService.encryptSymmetricKey(
+                        commonKey,
+                        KeyType.ATTACHMENT_KEY,
+                        attachmentKey
+                )
+            } returns Single.just(encryptedAttachmentKey)
+        }
+    }
 
-        // When
-        val encryptedRecord = recordService.encryptRecord(decryptedRecord)
-
-        // Then
-        assertEquals(
-                expected = currentCommonKeyId,
-                actual = encryptedRecord.commonKeyId
-        )
-        assertNull(encryptedRecord.encryptedAttachmentsKey)
-
+    fun <T: Any> verifyEncryptRecordFlow(
+            resource: T,
+            attachmentKey: GCKey? = null
+    ) {
         verify(exactly = 1) { tagEncryptionService.encryptTagsAndAnnotations(tags, annotations) }
         verify(exactly = 1) { fhirService._encryptResource(dataKey, resource) }
         verify(exactly = 1) { cryptoService.fetchCurrentCommonKey() }
@@ -152,6 +154,43 @@ class RecordServiceCryptoTest {
                     dataKey
             )
         }
+
+        if (attachmentKey is GCKey) {
+            verify(exactly = 1) {
+                cryptoService.encryptSymmetricKey(
+                        commonKey,
+                        KeyType.ATTACHMENT_KEY,
+                        attachmentKey
+                )
+            }
+        }
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun `Given, encryptRecord is called with a DecryptedRecord for Fhir3, it returns a EncryptedRecord`() {
+        // Given
+        val currentCommonKeyId = "currentCommonKeyId"
+        val resource: Fhir3Resource = mockk()
+        val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk(relaxed = true)
+
+        encryptRecordFlow(
+                decryptedRecord,
+                currentCommonKeyId,
+                resource
+        )
+
+        // When
+        val encryptedRecord = recordService.encryptRecord(decryptedRecord)
+
+        // Then
+        assertEquals(
+                expected = currentCommonKeyId,
+                actual = encryptedRecord.commonKeyId
+        )
+        assertNull(encryptedRecord.encryptedAttachmentsKey)
+        verifyEncryptRecordFlow(resource)
+
     }
 
     @Test
@@ -162,25 +201,11 @@ class RecordServiceCryptoTest {
         val resource: Fhir4Resource = mockk()
         val decryptedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
 
-        every { decryptedRecord.tags } returns tags
-        every { decryptedRecord.annotations } returns annotations
-        every { decryptedRecord.dataKey } returns dataKey
-        every { decryptedRecord.resource } returns resource
-        every { decryptedRecord.attachmentsKey } returns null
-
-        every {
-            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations)
-        } returns encryptedTagsAndAnnotations
-        every { fhirService._encryptResource(dataKey, resource) } returns encryptedResource
-        every { cryptoService.fetchCurrentCommonKey() } returns commonKey
-        every { cryptoService.currentCommonKeyId } returns currentCommonKeyId
-        every {
-            cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.DATA_KEY,
-                    dataKey
-            )
-        } returns Single.just(encryptedDataKey)
+        encryptRecordFlow(
+                decryptedRecord,
+                currentCommonKeyId,
+                resource
+        )
 
         // When
         val encryptedRecord = recordService.encryptRecord(decryptedRecord)
@@ -192,17 +217,7 @@ class RecordServiceCryptoTest {
         )
         assertNull(encryptedRecord.encryptedAttachmentsKey)
 
-        verify(exactly = 1) { tagEncryptionService.encryptTagsAndAnnotations(tags, annotations) }
-        verify(exactly = 1) { fhirService._encryptResource(dataKey, resource) }
-        verify(exactly = 1) { cryptoService.fetchCurrentCommonKey() }
-        verify(exactly = 1) { cryptoService.currentCommonKeyId }
-        verify(exactly = 1) {
-            cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.DATA_KEY,
-                    dataKey
-            )
-        }
+        verifyEncryptRecordFlow(resource)
     }
 
     @Test
@@ -213,25 +228,11 @@ class RecordServiceCryptoTest {
         val resource: DataResource = mockk()
         val decryptedRecord: DecryptedDataRecord = mockk(relaxed = true)
 
-        every { decryptedRecord.tags } returns tags
-        every { decryptedRecord.annotations } returns annotations
-        every { decryptedRecord.dataKey } returns dataKey
-        every { decryptedRecord.resource } returns resource
-        every { decryptedRecord.attachmentsKey } returns null
-
-        every {
-            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations)
-        } returns encryptedTagsAndAnnotations
-        every { fhirService._encryptResource(dataKey, resource) } returns encryptedResource
-        every { cryptoService.fetchCurrentCommonKey() } returns commonKey
-        every { cryptoService.currentCommonKeyId } returns currentCommonKeyId
-        every {
-            cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.DATA_KEY,
-                    dataKey
-            )
-        } returns Single.just(encryptedDataKey)
+        encryptRecordFlow(
+                decryptedRecord,
+                currentCommonKeyId,
+                resource
+        )
 
         // When
         val encryptedRecord = recordService.encryptRecord(decryptedRecord)
@@ -243,17 +244,7 @@ class RecordServiceCryptoTest {
         )
         assertNull(encryptedRecord.encryptedAttachmentsKey)
 
-        verify(exactly = 1) { tagEncryptionService.encryptTagsAndAnnotations(tags, annotations) }
-        verify(exactly = 1) { fhirService._encryptResource(dataKey, resource) }
-        verify(exactly = 1) { cryptoService.fetchCurrentCommonKey() }
-        verify(exactly = 1) { cryptoService.currentCommonKeyId }
-        verify(exactly = 1) {
-            cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.DATA_KEY,
-                    dataKey
-            )
-        }
+        verifyEncryptRecordFlow(resource)
     }
 
     @Test
@@ -264,32 +255,12 @@ class RecordServiceCryptoTest {
         val resource: Fhir3Resource = mockk()
         val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk(relaxed = true)
 
-        every { decryptedRecord.tags } returns tags
-        every { decryptedRecord.annotations } returns annotations
-        every { decryptedRecord.dataKey } returns dataKey
-        every { decryptedRecord.resource } returns resource
-        every { decryptedRecord.attachmentsKey } returns attachmentKey
-
-        every {
-            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations)
-        } returns encryptedTagsAndAnnotations
-        every { fhirService._encryptResource(dataKey, resource) } returns encryptedResource
-        every { cryptoService.fetchCurrentCommonKey() } returns commonKey
-        every { cryptoService.currentCommonKeyId } returns currentCommonKeyId
-        every {
-            cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.DATA_KEY,
-                    dataKey
-            )
-        } returns Single.just(encryptedDataKey)
-        every {
-            cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.ATTACHMENT_KEY,
-                    attachmentKey
-            )
-        } returns Single.just(encryptedAttachmentKey)
+        encryptRecordFlow(
+                decryptedRecord,
+                currentCommonKeyId,
+                resource,
+                attachmentKey
+        )
 
         // When
         val encryptedRecord = recordService.encryptRecord(decryptedRecord)
@@ -304,17 +275,7 @@ class RecordServiceCryptoTest {
                 actual = encryptedRecord.encryptedAttachmentsKey
         )
 
-        verify(exactly = 1) { tagEncryptionService.encryptTagsAndAnnotations(tags, annotations) }
-        verify(exactly = 1) { fhirService._encryptResource(dataKey, resource) }
-        verify(exactly = 1) { cryptoService.fetchCurrentCommonKey() }
-        verify(exactly = 1) { cryptoService.currentCommonKeyId }
-        verify(exactly = 1) {
-            cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.DATA_KEY,
-                    dataKey
-            )
-        }
+        verifyEncryptRecordFlow(resource, attachmentKey)
     }
 
     @Test
@@ -325,32 +286,12 @@ class RecordServiceCryptoTest {
         val resource: Fhir4Resource = mockk()
         val decryptedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
 
-        every { decryptedRecord.tags } returns tags
-        every { decryptedRecord.annotations } returns annotations
-        every { decryptedRecord.dataKey } returns dataKey
-        every { decryptedRecord.resource } returns resource
-        every { decryptedRecord.attachmentsKey } returns attachmentKey
-
-        every {
-            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations)
-        } returns encryptedTagsAndAnnotations
-        every { fhirService._encryptResource(dataKey, resource) } returns encryptedResource
-        every { cryptoService.fetchCurrentCommonKey() } returns commonKey
-        every { cryptoService.currentCommonKeyId } returns currentCommonKeyId
-        every {
-            cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.DATA_KEY,
-                    dataKey
-            )
-        } returns Single.just(encryptedDataKey)
-        every {
-            cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.ATTACHMENT_KEY,
-                    attachmentKey
-            )
-        } returns Single.just(encryptedAttachmentKey)
+        encryptRecordFlow(
+                decryptedRecord,
+                currentCommonKeyId,
+                resource,
+                attachmentKey
+        )
 
         // When
         val encryptedRecord = recordService.encryptRecord(decryptedRecord)
@@ -365,17 +306,7 @@ class RecordServiceCryptoTest {
                 actual = encryptedRecord.encryptedAttachmentsKey
         )
 
-        verify(exactly = 1) { tagEncryptionService.encryptTagsAndAnnotations(tags, annotations) }
-        verify(exactly = 1) { fhirService._encryptResource(dataKey, resource) }
-        verify(exactly = 1) { cryptoService.fetchCurrentCommonKey() }
-        verify(exactly = 1) { cryptoService.currentCommonKeyId }
-        verify(exactly = 1) {
-            cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.DATA_KEY,
-                    dataKey
-            )
-        }
+        verifyEncryptRecordFlow(resource, attachmentKey)
     }
 
     @Test
@@ -386,32 +317,12 @@ class RecordServiceCryptoTest {
         val resource: Fhir4Resource = mockk()
         val decryptedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
 
-        every { decryptedRecord.tags } returns tags
-        every { decryptedRecord.annotations } returns annotations
-        every { decryptedRecord.dataKey } returns dataKey
-        every { decryptedRecord.resource } returns resource
-        every { decryptedRecord.attachmentsKey } returns attachmentKey
-
-        every {
-            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations)
-        } returns encryptedTagsAndAnnotations
-        every { fhirService._encryptResource(dataKey, resource) } returns encryptedResource
-        every { cryptoService.fetchCurrentCommonKey() } returns commonKey
-        every { cryptoService.currentCommonKeyId } returns currentCommonKeyId
-        every {
-            cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.DATA_KEY,
-                    dataKey
-            )
-        } returns Single.just(encryptedDataKey)
-        every {
-            cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.ATTACHMENT_KEY,
-                    attachmentKey
-            )
-        } returns Single.just(encryptedAttachmentKey)
+        encryptRecordFlow(
+                decryptedRecord,
+                currentCommonKeyId,
+                resource,
+                attachmentKey
+        )
 
         // When
         val encryptedRecord = recordService.encryptRecord(decryptedRecord)
@@ -426,15 +337,73 @@ class RecordServiceCryptoTest {
                 actual = encryptedRecord.encryptedAttachmentsKey
         )
 
-        verify(exactly = 1) { tagEncryptionService.encryptTagsAndAnnotations(tags, annotations) }
-        verify(exactly = 1) { fhirService._encryptResource(dataKey, resource) }
-        verify(exactly = 1) { cryptoService.fetchCurrentCommonKey() }
-        verify(exactly = 1) { cryptoService.currentCommonKeyId }
+        verifyEncryptRecordFlow(resource, attachmentKey)
+    }
+
+    private fun <T: Any> decryptRecordFlow(
+            encryptedRecord: NetworkModelContract.EncryptedRecord,
+            modelVersion: Int,
+            commonKeyId: String,
+            resource: T,
+            updateDate: String? = null,
+            encryptedAttachmentsKey: NetworkModelContract.EncryptedKey? = null
+    ) {
+        every { encryptedRecord.modelVersion } returns modelVersion
+        every { encryptedRecord.commonKeyId } returns commonKeyId
+        every { encryptedRecord.encryptedTags } returns encryptedTagsAndAnnotations
+        every { encryptedRecord.encryptedDataKey } returns encryptedDataKey
+        every { encryptedRecord.encryptedBody } returns encryptedResource
+        every { encryptedRecord.customCreationDate } returns RecordServiceTestBase.CREATION_DATE
+        every { encryptedRecord.identifier } returns RecordServiceTestBase.RECORD_ID
+        every { encryptedRecord.updatedDate } returns updateDate
+        every { encryptedRecord.encryptedAttachmentsKey } returns encryptedAttachmentsKey
+
+        every {
+            tagEncryptionService.decryptTags(encryptedTagsAndAnnotations)
+        } returns tags
+        every {
+            tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations)
+        } returns annotations
+        every { cryptoService.hasCommonKey(commonKeyId) } returns true
+        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
+        every {
+            cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey)
+        } returns Single.just(dataKey)
+
+        if (encryptedAttachmentsKey is NetworkModelContract.EncryptedKey) {
+            every {
+                cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey)
+            } returns Single.just(attachmentKey)
+        }
+
+        every {
+            fhirService.decryptResource<T>(
+                    dataKey,
+                    tags,
+                    encryptedResource
+            )
+        } returns resource
+    }
+
+    private fun <T: Any> verfiyDecryptRecordFlow(
+            commonKeyId: String,
+            encryptedAttachmentsKey: NetworkModelContract.EncryptedKey? = null
+    ) {
+        verify(exactly = 1) { tagEncryptionService.decryptTags(encryptedTagsAndAnnotations) }
+        verify(exactly = 1) { tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations) }
+        verify(exactly = 1) { cryptoService.hasCommonKey(commonKeyId) }
+        verify(exactly = 1) { cryptoService.getCommonKeyById(commonKeyId) }
+        verify(exactly = 1) { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) }
+        if (encryptedAttachmentsKey is NetworkModelContract.EncryptedKey) {
+            verify(exactly = 1) {
+                cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey)
+            }
+        }
         verify(exactly = 1) {
-            cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.DATA_KEY,
-                    dataKey
+            fhirService.decryptResource<T>(
+                    dataKey,
+                    tags,
+                    encryptedResource
             )
         }
     }
@@ -447,36 +416,13 @@ class RecordServiceCryptoTest {
         val modelVersion = 1
         val resource: Fhir3Resource = mockk()
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
-        val encryptedResource = "resource"
 
-        every { encryptedRecord.modelVersion } returns modelVersion
-        every { encryptedRecord.commonKeyId } returns commonKeyId
-        every { encryptedRecord.encryptedTags } returns encryptedTagsAndAnnotations
-        every { encryptedRecord.encryptedDataKey } returns encryptedDataKey
-        every { encryptedRecord.encryptedBody } returns encryptedResource
-        every { encryptedRecord.customCreationDate } returns RecordServiceTestBase.CREATION_DATE
-        every { encryptedRecord.identifier } returns RecordServiceTestBase.RECORD_ID
-        every { encryptedRecord.updatedDate } returns null
-        every { encryptedRecord.encryptedAttachmentsKey } returns null
-
-        every {
-            tagEncryptionService.decryptTags(encryptedTagsAndAnnotations)
-        } returns tags
-        every {
-            tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations)
-        } returns annotations
-        every { cryptoService.hasCommonKey(commonKeyId) } returns true
-        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every {
-            cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey)
-        } returns Single.just(dataKey)
-        every {
-            fhirService.decryptResource<Fhir3Resource>(
-                    dataKey,
-                    tags,
-                    encryptedResource
-            )
-        } returns resource
+        decryptRecordFlow(
+                encryptedRecord,
+                modelVersion,
+                commonKeyId,
+                resource
+        )
 
         // When
         val decrypted = recordService.decryptRecord<Fhir3Resource>(
@@ -500,18 +446,7 @@ class RecordServiceCryptoTest {
                 )
         )
 
-        verify(exactly = 1) { tagEncryptionService.decryptTags(encryptedTagsAndAnnotations) }
-        verify(exactly = 1) { tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations) }
-        verify(exactly = 1) { cryptoService.hasCommonKey(commonKeyId) }
-        verify(exactly = 1) { cryptoService.getCommonKeyById(commonKeyId) }
-        verify(exactly = 1) { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) }
-        verify(exactly = 1) {
-            fhirService.decryptResource<Fhir3Resource>(
-                    dataKey,
-                    tags,
-                    encryptedResource
-            )
-        }
+        verfiyDecryptRecordFlow<Fhir3Resource>(commonKeyId)
     }
 
     @Test
@@ -522,36 +457,13 @@ class RecordServiceCryptoTest {
         val modelVersion = 1
         val resource: Fhir4Resource = mockk()
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
-        val encryptedResource = "resource"
 
-        every { encryptedRecord.modelVersion } returns modelVersion
-        every { encryptedRecord.commonKeyId } returns commonKeyId
-        every { encryptedRecord.encryptedTags } returns encryptedTagsAndAnnotations
-        every { encryptedRecord.encryptedDataKey } returns encryptedDataKey
-        every { encryptedRecord.encryptedBody } returns encryptedResource
-        every { encryptedRecord.customCreationDate } returns RecordServiceTestBase.CREATION_DATE
-        every { encryptedRecord.identifier } returns RecordServiceTestBase.RECORD_ID
-        every { encryptedRecord.updatedDate } returns null
-        every { encryptedRecord.encryptedAttachmentsKey } returns null
-
-        every {
-            tagEncryptionService.decryptTags(encryptedTagsAndAnnotations)
-        } returns tags
-        every {
-            tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations)
-        } returns annotations
-        every { cryptoService.hasCommonKey(commonKeyId) } returns true
-        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every {
-            cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey)
-        } returns Single.just(dataKey)
-        every {
-            fhirService.decryptResource<Fhir4Resource>(
-                    dataKey,
-                    tags,
-                    encryptedResource
-            )
-        } returns resource
+        decryptRecordFlow(
+                encryptedRecord,
+                modelVersion,
+                commonKeyId,
+                resource
+        )
 
         // When
         val decrypted = recordService.decryptRecord<Fhir4Resource>(
@@ -575,18 +487,7 @@ class RecordServiceCryptoTest {
                 )
         )
 
-        verify(exactly = 1) { tagEncryptionService.decryptTags(encryptedTagsAndAnnotations) }
-        verify(exactly = 1) { tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations) }
-        verify(exactly = 1) { cryptoService.hasCommonKey(commonKeyId) }
-        verify(exactly = 1) { cryptoService.getCommonKeyById(commonKeyId) }
-        verify(exactly = 1) { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) }
-        verify(exactly = 1) {
-            fhirService.decryptResource<Fhir3Resource>(
-                    dataKey,
-                    tags,
-                    encryptedResource
-            )
-        }
+        verfiyDecryptRecordFlow<Fhir3Resource>(commonKeyId)
     }
 
     @Test
@@ -598,38 +499,15 @@ class RecordServiceCryptoTest {
         val resource: DataResource = mockk()
         val plainResource = ByteArray(23)
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
-        val encryptedResource = "resource"
 
         every { resource.asByteArray() } returns plainResource
 
-        every { encryptedRecord.modelVersion } returns modelVersion
-        every { encryptedRecord.commonKeyId } returns commonKeyId
-        every { encryptedRecord.encryptedTags } returns encryptedTagsAndAnnotations
-        every { encryptedRecord.encryptedDataKey } returns encryptedDataKey
-        every { encryptedRecord.encryptedBody } returns encryptedResource
-        every { encryptedRecord.customCreationDate } returns RecordServiceTestBase.CREATION_DATE
-        every { encryptedRecord.identifier } returns RecordServiceTestBase.RECORD_ID
-        every { encryptedRecord.updatedDate } returns null
-        every { encryptedRecord.encryptedAttachmentsKey } returns null
-
-        every {
-            tagEncryptionService.decryptTags(encryptedTagsAndAnnotations)
-        } returns tags
-        every {
-            tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations)
-        } returns annotations
-        every { cryptoService.hasCommonKey(commonKeyId) } returns true
-        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every {
-            cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey)
-        } returns Single.just(dataKey)
-        every {
-            fhirService.decryptResource<DataResource>(
-                    dataKey,
-                    tags,
-                    encryptedResource
-            )
-        } returns resource
+        decryptRecordFlow(
+                encryptedRecord,
+                modelVersion,
+                commonKeyId,
+                resource
+        )
 
         // When
         val decrypted = recordService.decryptRecord<DataResource>(
@@ -652,18 +530,7 @@ class RecordServiceCryptoTest {
                 )
         )
 
-        verify(exactly = 1) { tagEncryptionService.decryptTags(encryptedTagsAndAnnotations) }
-        verify(exactly = 1) { tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations) }
-        verify(exactly = 1) { cryptoService.hasCommonKey(commonKeyId) }
-        verify(exactly = 1) { cryptoService.getCommonKeyById(commonKeyId) }
-        verify(exactly = 1) { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) }
-        verify(exactly = 1) {
-            fhirService.decryptResource<Fhir3Resource>(
-                    dataKey,
-                    tags,
-                    encryptedResource
-            )
-        }
+        verfiyDecryptRecordFlow<Fhir3Resource>(commonKeyId)
     }
 
     @Test
@@ -675,36 +542,14 @@ class RecordServiceCryptoTest {
         val updateDate = "2020-05-03T07:45:08.234123"
         val resource: Fhir3Resource = mockk()
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
-        val encryptedResource = "resource"
 
-        every { encryptedRecord.modelVersion } returns modelVersion
-        every { encryptedRecord.commonKeyId } returns commonKeyId
-        every { encryptedRecord.encryptedTags } returns encryptedTagsAndAnnotations
-        every { encryptedRecord.encryptedDataKey } returns encryptedDataKey
-        every { encryptedRecord.encryptedBody } returns encryptedResource
-        every { encryptedRecord.customCreationDate } returns RecordServiceTestBase.CREATION_DATE
-        every { encryptedRecord.identifier } returns RecordServiceTestBase.RECORD_ID
-        every { encryptedRecord.updatedDate } returns updateDate
-        every { encryptedRecord.encryptedAttachmentsKey } returns null
-
-        every {
-            tagEncryptionService.decryptTags(encryptedTagsAndAnnotations)
-        } returns tags
-        every {
-            tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations)
-        } returns annotations
-        every { cryptoService.hasCommonKey(commonKeyId) } returns true
-        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every {
-            cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey)
-        } returns Single.just(dataKey)
-        every {
-            fhirService.decryptResource<Fhir3Resource>(
-                    dataKey,
-                    tags,
-                    encryptedResource
-            )
-        } returns resource
+        decryptRecordFlow(
+                encryptedRecord,
+                modelVersion,
+                commonKeyId,
+                resource,
+                updateDate = updateDate
+        )
 
         // When
         val decrypted = recordService.decryptRecord<Fhir3Resource>(
@@ -728,18 +573,7 @@ class RecordServiceCryptoTest {
                 )
         )
 
-        verify(exactly = 1) { tagEncryptionService.decryptTags(encryptedTagsAndAnnotations) }
-        verify(exactly = 1) { tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations) }
-        verify(exactly = 1) { cryptoService.hasCommonKey(commonKeyId) }
-        verify(exactly = 1) { cryptoService.getCommonKeyById(commonKeyId) }
-        verify(exactly = 1) { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) }
-        verify(exactly = 1) {
-            fhirService.decryptResource<Fhir3Resource>(
-                    dataKey,
-                    tags,
-                    encryptedResource
-            )
-        }
+        verfiyDecryptRecordFlow<Fhir3Resource>(commonKeyId)
     }
 
     @Test
@@ -751,36 +585,14 @@ class RecordServiceCryptoTest {
         val updateDate = "2020-05-03T07:45:08.234123"
         val resource: Fhir4Resource = mockk()
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
-        val encryptedResource = "resource"
 
-        every { encryptedRecord.modelVersion } returns modelVersion
-        every { encryptedRecord.commonKeyId } returns commonKeyId
-        every { encryptedRecord.encryptedTags } returns encryptedTagsAndAnnotations
-        every { encryptedRecord.encryptedDataKey } returns encryptedDataKey
-        every { encryptedRecord.encryptedBody } returns encryptedResource
-        every { encryptedRecord.customCreationDate } returns RecordServiceTestBase.CREATION_DATE
-        every { encryptedRecord.identifier } returns RecordServiceTestBase.RECORD_ID
-        every { encryptedRecord.updatedDate } returns updateDate
-        every { encryptedRecord.encryptedAttachmentsKey } returns null
-
-        every {
-            tagEncryptionService.decryptTags(encryptedTagsAndAnnotations)
-        } returns tags
-        every {
-            tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations)
-        } returns annotations
-        every { cryptoService.hasCommonKey(commonKeyId) } returns true
-        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every {
-            cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey)
-        } returns Single.just(dataKey)
-        every {
-            fhirService.decryptResource<Fhir4Resource>(
-                    dataKey,
-                    tags,
-                    encryptedResource
-            )
-        } returns resource
+        decryptRecordFlow(
+                encryptedRecord,
+                modelVersion,
+                commonKeyId,
+                resource,
+                updateDate = updateDate
+        )
 
         // When
         val decrypted = recordService.decryptRecord<Fhir4Resource>(
@@ -804,18 +616,7 @@ class RecordServiceCryptoTest {
                 )
         )
 
-        verify(exactly = 1) { tagEncryptionService.decryptTags(encryptedTagsAndAnnotations) }
-        verify(exactly = 1) { tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations) }
-        verify(exactly = 1) { cryptoService.hasCommonKey(commonKeyId) }
-        verify(exactly = 1) { cryptoService.getCommonKeyById(commonKeyId) }
-        verify(exactly = 1) { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) }
-        verify(exactly = 1) {
-            fhirService.decryptResource<Fhir3Resource>(
-                    dataKey,
-                    tags,
-                    encryptedResource
-            )
-        }
+        verfiyDecryptRecordFlow<Fhir4Resource>(commonKeyId)
     }
 
     @Test
@@ -828,38 +629,16 @@ class RecordServiceCryptoTest {
         val resource: DataResource = mockk()
         val plainResource = ByteArray(23)
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
-        val encryptedResource = "resource"
 
         every { resource.asByteArray() } returns plainResource
 
-        every { encryptedRecord.modelVersion } returns modelVersion
-        every { encryptedRecord.commonKeyId } returns commonKeyId
-        every { encryptedRecord.encryptedTags } returns encryptedTagsAndAnnotations
-        every { encryptedRecord.encryptedDataKey } returns encryptedDataKey
-        every { encryptedRecord.encryptedBody } returns encryptedResource
-        every { encryptedRecord.customCreationDate } returns RecordServiceTestBase.CREATION_DATE
-        every { encryptedRecord.identifier } returns RecordServiceTestBase.RECORD_ID
-        every { encryptedRecord.updatedDate } returns updateDate
-        every { encryptedRecord.encryptedAttachmentsKey } returns null
-
-        every {
-            tagEncryptionService.decryptTags(encryptedTagsAndAnnotations)
-        } returns tags
-        every {
-            tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations)
-        } returns annotations
-        every { cryptoService.hasCommonKey(commonKeyId) } returns true
-        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every {
-            cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey)
-        } returns Single.just(dataKey)
-        every {
-            fhirService.decryptResource<DataResource>(
-                    dataKey,
-                    tags,
-                    encryptedResource
-            )
-        } returns resource
+        decryptRecordFlow(
+                encryptedRecord,
+                modelVersion,
+                commonKeyId,
+                resource,
+                updateDate = updateDate
+        )
 
         // When
         val decrypted = recordService.decryptRecord<DataResource>(
@@ -882,18 +661,7 @@ class RecordServiceCryptoTest {
                 )
         )
 
-        verify(exactly = 1) { tagEncryptionService.decryptTags(encryptedTagsAndAnnotations) }
-        verify(exactly = 1) { tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations) }
-        verify(exactly = 1) { cryptoService.hasCommonKey(commonKeyId) }
-        verify(exactly = 1) { cryptoService.getCommonKeyById(commonKeyId) }
-        verify(exactly = 1) { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) }
-        verify(exactly = 1) {
-            fhirService.decryptResource<Fhir3Resource>(
-                    dataKey,
-                    tags,
-                    encryptedResource
-            )
-        }
+        verfiyDecryptRecordFlow<DataResource>(commonKeyId)
     }
 
     @Test
@@ -970,39 +738,14 @@ class RecordServiceCryptoTest {
         val modelVersion = 1
         val resource: Fhir3Resource = mockk()
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
-        val encryptedResource = "resource"
 
-        every { encryptedRecord.modelVersion } returns modelVersion
-        every { encryptedRecord.commonKeyId } returns commonKeyId
-        every { encryptedRecord.encryptedTags } returns encryptedTagsAndAnnotations
-        every { encryptedRecord.encryptedDataKey } returns encryptedDataKey
-        every { encryptedRecord.encryptedBody } returns encryptedResource
-        every { encryptedRecord.customCreationDate } returns RecordServiceTestBase.CREATION_DATE
-        every { encryptedRecord.identifier } returns RecordServiceTestBase.RECORD_ID
-        every { encryptedRecord.updatedDate } returns null
-        every { encryptedRecord.encryptedAttachmentsKey } returns encryptedAttachmentKey
-
-        every {
-            tagEncryptionService.decryptTags(encryptedTagsAndAnnotations)
-        } returns tags
-        every {
-            tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations)
-        } returns annotations
-        every { cryptoService.hasCommonKey(commonKeyId) } returns true
-        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every {
-            cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey)
-        } returns Single.just(dataKey)
-        every {
-            cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey)
-        } returns Single.just(attachmentKey)
-        every {
-            fhirService.decryptResource<Fhir3Resource>(
-                    dataKey,
-                    tags,
-                    encryptedResource
-            )
-        } returns resource
+        decryptRecordFlow(
+                encryptedRecord,
+                modelVersion,
+                commonKeyId,
+                resource,
+                encryptedAttachmentsKey = encryptedAttachmentKey
+        )
 
         // When
         val decrypted = recordService.decryptRecord<Fhir3Resource>(
@@ -1026,18 +769,10 @@ class RecordServiceCryptoTest {
                 )
         )
 
-        verify(exactly = 1) { tagEncryptionService.decryptTags(encryptedTagsAndAnnotations) }
-        verify(exactly = 1) { tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations) }
-        verify(exactly = 1) { cryptoService.hasCommonKey(commonKeyId) }
-        verify(exactly = 1) { cryptoService.getCommonKeyById(commonKeyId) }
-        verify(exactly = 1) { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) }
-        verify(exactly = 1) {
-            fhirService.decryptResource<Fhir3Resource>(
-                    dataKey,
-                    tags,
-                    encryptedResource
-            )
-        }
+        verfiyDecryptRecordFlow<Fhir3Resource>(
+                commonKeyId,
+                encryptedAttachmentsKey = encryptedAttachmentKey
+        )
     }
 
     @Test
@@ -1048,39 +783,14 @@ class RecordServiceCryptoTest {
         val modelVersion = 1
         val resource: Fhir4Resource = mockk()
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
-        val encryptedResource = "resource"
 
-        every { encryptedRecord.modelVersion } returns modelVersion
-        every { encryptedRecord.commonKeyId } returns commonKeyId
-        every { encryptedRecord.encryptedTags } returns encryptedTagsAndAnnotations
-        every { encryptedRecord.encryptedDataKey } returns encryptedDataKey
-        every { encryptedRecord.encryptedBody } returns encryptedResource
-        every { encryptedRecord.customCreationDate } returns RecordServiceTestBase.CREATION_DATE
-        every { encryptedRecord.identifier } returns RecordServiceTestBase.RECORD_ID
-        every { encryptedRecord.updatedDate } returns null
-        every { encryptedRecord.encryptedAttachmentsKey } returns encryptedAttachmentKey
-
-        every {
-            tagEncryptionService.decryptTags(encryptedTagsAndAnnotations)
-        } returns tags
-        every {
-            tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations)
-        } returns annotations
-        every { cryptoService.hasCommonKey(commonKeyId) } returns true
-        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every {
-            cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey)
-        } returns Single.just(dataKey)
-        every {
-            cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey)
-        } returns Single.just(attachmentKey)
-        every {
-            fhirService.decryptResource<Fhir4Resource>(
-                    dataKey,
-                    tags,
-                    encryptedResource
-            )
-        } returns resource
+        decryptRecordFlow(
+                encryptedRecord,
+                modelVersion,
+                commonKeyId,
+                resource,
+                encryptedAttachmentsKey = encryptedAttachmentKey
+        )
 
         // When
         val decrypted = recordService.decryptRecord<Fhir4Resource>(
@@ -1104,17 +814,9 @@ class RecordServiceCryptoTest {
                 )
         )
 
-        verify(exactly = 1) { tagEncryptionService.decryptTags(encryptedTagsAndAnnotations) }
-        verify(exactly = 1) { tagEncryptionService.decryptAnnotations(encryptedTagsAndAnnotations) }
-        verify(exactly = 1) { cryptoService.hasCommonKey(commonKeyId) }
-        verify(exactly = 1) { cryptoService.getCommonKeyById(commonKeyId) }
-        verify(exactly = 1) { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) }
-        verify(exactly = 1) {
-            fhirService.decryptResource<Fhir3Resource>(
-                    dataKey,
-                    tags,
-                    encryptedResource
-            )
-        }
+        verfiyDecryptRecordFlow<Fhir4Resource>(
+                commonKeyId,
+                encryptedAttachmentsKey = encryptedAttachmentKey
+        )
     }
 }

@@ -57,7 +57,6 @@ import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
-import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1

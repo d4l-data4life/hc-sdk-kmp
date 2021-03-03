@@ -62,7 +62,6 @@ import care.data4life.sdk.record.RecordContract.Service.Companion.PREVIEW_ID_POS
 import care.data4life.sdk.record.RecordContract.Service.Companion.THUMBNAIL_ID_POS
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
-import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1

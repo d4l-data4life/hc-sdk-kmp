@@ -17,7 +17,6 @@ package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
 import care.data4life.fhir.r4.FhirR4Parser
-import care.data4life.fhir.r4.model.Patient as Fhir4Patient
 import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.fhir.stu3.model.CarePlan
 import care.data4life.fhir.stu3.model.DocumentReference
@@ -63,15 +62,13 @@ import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import org.junit.internal.Classes.getClass
 import org.mockito.Mockito
 import org.mockito.Mockito.times
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
-import java.io.File
 import java.io.IOException
-import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
+import care.data4life.fhir.r4.model.Patient as Fhir4Patient
 
 class RecordServiceTest : RecordServiceTestBase() {
 

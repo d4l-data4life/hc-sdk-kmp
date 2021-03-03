@@ -22,7 +22,7 @@ import okhttp3.internal.toHexString
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import java.util.Locale
+import java.util.*
 import kotlin.collections.HashMap
 
 object TagEncryptionHelper : TaggingContract.Helper {
@@ -63,16 +63,20 @@ object TagEncryptionHelper : TaggingContract.Helper {
 
     @Throws(D4LException::class)
     override fun encode(tag: String): String {
-        validateTag(tag)
-
         return URLEncoder.encode(
-                tag.toLowerCase(Locale.US).trim(),
+                normalize(tag),
                 StandardCharsets.UTF_8.displayName()
         ).map { char ->
             replaceSpecial(
                     normalizeEncodedChar(char)
             )
         }.joinToString("")
+    }
+
+    @Throws(D4LException::class)
+    override fun normalize(tag: String): String {
+        validateTag(tag)
+        return tag.toLowerCase(Locale.US).trim()
     }
 
     override fun decode(

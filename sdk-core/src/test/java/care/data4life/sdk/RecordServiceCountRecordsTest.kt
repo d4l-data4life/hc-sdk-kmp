@@ -24,10 +24,10 @@ import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
+import care.data4life.sdk.migration.MigrationContract
 import care.data4life.sdk.tag.TaggingContract
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.spyk
 import io.mockk.verify
 import io.reactivex.Single
@@ -35,7 +35,6 @@ import org.junit.Before
 import org.junit.Test
 import java.io.IOException
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class RecordServiceCountRecordsTest {
     private lateinit var recordService: RecordService
@@ -47,9 +46,9 @@ class RecordServiceCountRecordsTest {
     private lateinit var attachmentService: AttachmentContract.Service
     private lateinit var errorHandler: SdkContract.ErrorHandler
     private lateinit var tags: HashMap<String, String>
-    private lateinit var encryptedTags: MutableList<String>
     private val defaultAnnotations = listOf<String>()
-    private lateinit var encryptedAnnotations: MutableList<String>
+
+    private lateinit var compatibilityService: MigrationContract.CompatibilityService
 
     @Before
     fun setUp() {
@@ -61,20 +60,22 @@ class RecordServiceCountRecordsTest {
         attachmentService = mockk()
         errorHandler = mockk()
         tags = mockk()
-        encryptedTags = mockk()
-        encryptedAnnotations = mockk()
+        compatibilityService = mockk()
 
-        recordService = spyk(RecordService(
-                PARTNER_ID,
-                ALIAS,
-                apiService,
-                tagEncryptionService,
-                taggingService,
-                fhirService,
-                attachmentService,
-                cryptoService,
-                errorHandler
-        ))
+        recordService = spyk(
+                RecordService(
+                        PARTNER_ID,
+                        ALIAS,
+                        apiService,
+                        tagEncryptionService,
+                        taggingService,
+                        fhirService,
+                        attachmentService,
+                        cryptoService,
+                        errorHandler,
+                        compatibilityService
+                )
+        )
     }
 
     @Test
@@ -85,10 +86,14 @@ class RecordServiceCountRecordsTest {
         val annotations: List<String> = mockk()
 
         every { taggingService.getTagsFromType(Fhir3Resource::class.java as Class<Any>) } returns tags
-        every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
-        every { tagEncryptionService.encryptAnnotations(annotations) } returns encryptedAnnotations
-        every { encryptedTags.addAll(encryptedAnnotations) } returns true
-        every { apiService.getCount(ALIAS, USER_ID, encryptedTags) } returns Single.just(expected)
+        every {
+            compatibilityService.countRecords(
+                    ALIAS,
+                    USER_ID,
+                    tags,
+                    annotations
+            )
+        } returns Single.just(expected)
 
         // When
         val observer = recordService.countFhir3Records(
@@ -109,10 +114,7 @@ class RecordServiceCountRecordsTest {
                 actual = result
         )
         verify(exactly = 1) { taggingService.getTagsFromType(Fhir3Resource::class.java as Class<Any>) }
-        verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
-        verify(exactly = 1) { tagEncryptionService.encryptAnnotations(annotations) }
-        verify(exactly = 1) { encryptedTags.addAll(encryptedAnnotations) }
-        verify(exactly = 1) { apiService.getCount(ALIAS, USER_ID, encryptedTags) }
+        verify(exactly = 1) { compatibilityService.countRecords(ALIAS, USER_ID, tags, annotations) }
     }
 
     @Test
@@ -123,10 +125,14 @@ class RecordServiceCountRecordsTest {
         val annotations: List<String> = mockk()
 
         every { taggingService.getTagsFromType(Fhir4Resource::class.java as Class<Any>) } returns tags
-        every { tagEncryptionService.encryptTags(tags) } returns encryptedTags
-        every { tagEncryptionService.encryptAnnotations(annotations) } returns encryptedAnnotations
-        every { encryptedTags.addAll(encryptedAnnotations) } returns true
-        every { apiService.getCount(ALIAS, USER_ID, encryptedTags) } returns Single.just(expected)
+        every {
+            compatibilityService.countRecords(
+                    ALIAS,
+                    USER_ID,
+                    tags,
+                    annotations
+            )
+        } returns Single.just(expected)
 
         // When
         val observer = recordService.countFhir4Records(
@@ -147,10 +153,7 @@ class RecordServiceCountRecordsTest {
                 actual = result
         )
         verify(exactly = 1) { taggingService.getTagsFromType(Fhir4Resource::class.java as Class<Any>) }
-        verify(exactly = 1) { tagEncryptionService.encryptTags(tags) }
-        verify(exactly = 1) { tagEncryptionService.encryptAnnotations(annotations) }
-        verify(exactly = 1) { encryptedTags.addAll(encryptedAnnotations) }
-        verify(exactly = 1) { apiService.getCount(ALIAS, USER_ID, encryptedTags) }
+        verify(exactly = 1) { compatibilityService.countRecords(ALIAS, USER_ID, tags, annotations) }
     }
 
     @Test
@@ -181,7 +184,13 @@ class RecordServiceCountRecordsTest {
                 expected = expected,
                 actual = result
         )
-        verify(exactly = 1) { recordService.countFhir3Records(Fhir3Resource::class.java, USER_ID, annotations) }
+        verify(exactly = 1) {
+            recordService.countFhir3Records(
+                    Fhir3Resource::class.java,
+                    USER_ID,
+                    annotations
+            )
+        }
     }
 
     @Test

@@ -87,57 +87,85 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
             tags: Map<String, String>,
             annotations: Map<String, String> = mapOf()
     ) {
-        every { apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID) } returns Single.just(encryptedRecord)
+        every { apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID) } returns Single.just(
+                encryptedRecord
+        )
 
         // decrypt Record
         // decrypt tags
         every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
         every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
+            cryptoService.symDecrypt(
+                    tagEncryptionKey, eq(
                     tags["partner"]!!.toByteArray()
-            ), IV)
+            ), IV
+            )
         } returns tags["partner"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
+            cryptoService.symDecrypt(
+                    tagEncryptionKey, eq(
                     tags["client"]!!.toByteArray()
-            ), IV)
+            ), IV
+            )
         } returns tags["client"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
+            cryptoService.symDecrypt(
+                    tagEncryptionKey, eq(
                     tags["fhirversion"]!!.toByteArray()
-            ), IV)
+            ), IV
+            )
         } returns tags["fhirversion"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
+            cryptoService.symDecrypt(
+                    tagEncryptionKey, eq(
                     tags["resourcetype"]!!.toByteArray()
-            ), IV)
+            ), IV
+            )
         } returns tags["resourcetype"]!!.toByteArray()
 
         //decrypt Annotations
         if (annotations.isNotEmpty()) {
             every {
-                cryptoService.symDecrypt(tagEncryptionKey, eq(
+                cryptoService.symDecrypt(
+                        tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()
-                ), IV)
+                ), IV
+                )
             } returns annotations["wow"]!!.toByteArray()
             every {
-                cryptoService.symDecrypt(tagEncryptionKey, eq(
+                cryptoService.symDecrypt(
+                        tagEncryptionKey, eq(
                         annotations["it"]!!.toByteArray()
-                ), IV)
+                ), IV
+                )
             } returns annotations["it"]!!.toByteArray()
             every {
-                cryptoService.symDecrypt(tagEncryptionKey, eq(
+                cryptoService.symDecrypt(
+                        tagEncryptionKey, eq(
                         annotations["works"]!!.toByteArray()
-                ), IV)
+                ), IV
+                )
             } returns annotations["works"]!!.toByteArray()
         }
 
         // decrypt Resource
         every { cryptoService.hasCommonKey(commonKeyId) } returns true
         every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
-        every { cryptoService.decodeAndDecryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
+        every {
+            cryptoService.symDecryptSymmetricKey(
+                    commonKey,
+                    encryptedAttachmentKey
+            )
+        } returns Single.just(attachmentKey)
+        every {
+            cryptoService.symDecryptSymmetricKey(
+                    commonKey,
+                    encryptedDataKey
+            )
+        } returns Single.just(dataKey)
+        every { cryptoService.decodeAndDecryptString(dataKey, encryptedBody) } returns Single.just(
+                stringifiedResource
+        )
     }
 
     private fun runDataFlow(
@@ -146,86 +174,128 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
             tags: Map<String, String>,
             annotations: Map<String, String> = mapOf()
     ) {
-        every { apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID) } returns Single.just(encryptedRecord)
+        every { apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID) } returns Single.just(
+                encryptedRecord
+        )
 
         // decrypt tags
         every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
         every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
+            cryptoService.symDecrypt(
+                    tagEncryptionKey, eq(
                     tags["partner"]!!.toByteArray()
-            ), IV)
+            ), IV
+            )
         } returns tags["partner"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
+            cryptoService.symDecrypt(
+                    tagEncryptionKey, eq(
                     tags["client"]!!.toByteArray()
-            ), IV)
+            ), IV
+            )
         } returns tags["client"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
+            cryptoService.symDecrypt(
+                    tagEncryptionKey, eq(
                     tags["flag"]!!.toByteArray()
-            ), IV)
+            ), IV
+            )
         } returns tags["flag"]!!.toByteArray()
 
         //decrypt Annotations
         if (annotations.isNotEmpty()) {
             every {
-                cryptoService.symDecrypt(tagEncryptionKey, eq(
+                cryptoService.symDecrypt(
+                        tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()
-                ), IV)
+                ), IV
+                )
             } returns annotations["wow"]!!.toByteArray()
             every {
-                cryptoService.symDecrypt(tagEncryptionKey, eq(
+                cryptoService.symDecrypt(
+                        tagEncryptionKey, eq(
                         annotations["it"]!!.toByteArray()
-                ), IV)
+                ), IV
+                )
             } returns annotations["it"]!!.toByteArray()
             every {
-                cryptoService.symDecrypt(tagEncryptionKey, eq(
+                cryptoService.symDecrypt(
+                        tagEncryptionKey, eq(
                         annotations["works"]!!.toByteArray()
-                ), IV)
+                ), IV
+                )
             } returns annotations["works"]!!.toByteArray()
         }
 
         // decrypt Resource
         every { cryptoService.hasCommonKey(commonKeyId) } returns true
         every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
-        every { cryptoService.decrypt(dataKey, encryptedResource) } returns Single.just(resource.value)
+        every {
+            cryptoService.symDecryptSymmetricKey(
+                    commonKey,
+                    encryptedDataKey
+            )
+        } returns Single.just(dataKey)
+        every {
+            cryptoService.decrypt(
+                    dataKey,
+                    encryptedResource
+            )
+        } returns Single.just(resource.value)
     }
 
     fun runFhirFlowBatch(
             tags: Map<String, String>,
             annotations: Map<String, String> = mapOf(),
-            encryptedTags: List<String>
+            encryptedAndEncodedTags: List<String>,
+            encryptedTags: List<String> = listOf()
     ) {
         // encrypt tags
         every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
         every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
+            cryptoService.symEncrypt(
+                    tagEncryptionKey, eq(
                     tags["resourcetype"]!!.toByteArray()
-            ), IV)
+            ), IV
+            )
         } returns tags["resourcetype"]!!.toByteArray()
         every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
+            cryptoService.symEncrypt(
+                    tagEncryptionKey, eq(
                     tags["fhirversion"]!!.toByteArray()
-            ), IV)
+            ), IV
+            )
         } returns tags["fhirversion"]!!.toByteArray()
+        every {
+            cryptoService.symEncrypt(
+                    tagEncryptionKey, eq(
+                    tags["legecyfhirversion"]!!.toByteArray()
+            ), IV
+            )
+        } returns tags["legecyfhirversion"]!!.toByteArray()
 
         // encrypt annotations
         if (annotations.isNotEmpty()) {
             every {
-                cryptoService.symEncrypt(tagEncryptionKey, eq(
+                cryptoService.symEncrypt(
+                        tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()
-                ), IV)
+                ), IV
+                )
             } returns annotations["wow"]!!.toByteArray()
             every {
-                cryptoService.symEncrypt(tagEncryptionKey, eq(
+                cryptoService.symEncrypt(
+                        tagEncryptionKey, eq(
                         annotations["it"]!!.toByteArray()
-                ), IV)
+                ), IV
+                )
             } returns annotations["it"]!!.toByteArray()
             every {
-                cryptoService.symEncrypt(tagEncryptionKey, eq(
+                cryptoService.symEncrypt(
+                        tagEncryptionKey, eq(
                         annotations["works"]!!.toByteArray()
-                ), IV)
+                ), IV
+                )
             } returns annotations["works"]!!.toByteArray()
         }
 
@@ -238,100 +308,11 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                     null,
                     PAGE_SIZE,
                     OFFSET,
-                    encryptedTags
+                    encryptedAndEncodedTags
             )
         } returns Observable.fromArray(
-                arrayListOf(
-                        encryptedRecord,
-                        encryptedRecord2
-                )
+                arrayListOf(encryptedRecord)
         )
-
-        // decryptTag
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["partner"]!!.toByteArray()
-            ), IV)
-        } returns tags["partner"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["client"]!!.toByteArray()
-            ), IV)
-        } returns tags["client"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["fhirversion"]!!.toByteArray()
-            ), IV)
-        } returns tags["fhirversion"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["resourcetype"]!!.toByteArray()
-            ), IV)
-        } returns tags["resourcetype"]!!.toByteArray()
-
-        //decrypt annotations
-        if (annotations.isNotEmpty()) {
-            every {
-                cryptoService.symDecrypt(tagEncryptionKey, eq(
-                        annotations["wow"]!!.toByteArray()
-                ), IV)
-            } returns annotations["wow"]!!.toByteArray()
-            every {
-                cryptoService.symDecrypt(tagEncryptionKey, eq(
-                        annotations["it"]!!.toByteArray()
-                ), IV)
-            } returns annotations["it"]!!.toByteArray()
-            every {
-                cryptoService.symDecrypt(tagEncryptionKey, eq(
-                        annotations["works"]!!.toByteArray()
-                ), IV)
-            } returns annotations["works"]!!.toByteArray()
-        }
-
-        // decrypt Resource
-        every { cryptoService.hasCommonKey(commonKeyId) } returns true
-        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey) } returns Single.just(attachmentKey)
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
-        every { cryptoService.decodeAndDecryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
-        every { cryptoService.decodeAndDecryptString(dataKey, encryptedBody2) } returns Single.just(stringifiedResource2)
-    }
-
-    fun runDataFlowBatch(
-            value1: ByteArray,
-            value2: ByteArray,
-            encryptedResource1: ByteArray,
-            encryptedResource2: ByteArray,
-            tags: Map<String, String>,
-            annotations: Map<String, String> = mapOf(),
-            encryptedTags: List<String>
-    ) {
-        // encrypt tags
-        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["flag"]!!.toByteArray()
-            ), IV)
-        } returns tags["flag"]!!.toByteArray()
-
-        // encrypt annotations
-        if (annotations.isNotEmpty()) {
-            every {
-                cryptoService.symEncrypt(tagEncryptionKey, eq(
-                        annotations["wow"]!!.toByteArray()
-                ), IV)
-            } returns annotations["wow"]!!.toByteArray()
-            every {
-                cryptoService.symEncrypt(tagEncryptionKey, eq(
-                        annotations["it"]!!.toByteArray()
-                ), IV)
-            } returns annotations["it"]!!.toByteArray()
-            every {
-                cryptoService.symEncrypt(tagEncryptionKey, eq(
-                        annotations["works"]!!.toByteArray()
-                ), IV)
-            } returns annotations["works"]!!.toByteArray()
-        }
 
         every {
             apiService.fetchRecords(
@@ -344,46 +325,221 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                     encryptedTags
             )
         } returns Observable.fromArray(
-                arrayListOf(
-                        encryptedRecord,
-                        encryptedRecord2
-                )
+                arrayListOf(encryptedRecord2)
         )
+
+        // decryptTag
+        every {
+            cryptoService.symDecrypt(
+                    tagEncryptionKey, eq(
+                    tags["partner"]!!.toByteArray()
+            ), IV
+            )
+        } returns tags["partner"]!!.toByteArray()
+        every {
+            cryptoService.symDecrypt(
+                    tagEncryptionKey, eq(
+                    tags["client"]!!.toByteArray()
+            ), IV
+            )
+        } returns tags["client"]!!.toByteArray()
+        every {
+            cryptoService.symDecrypt(
+                    tagEncryptionKey, eq(
+                    tags["fhirversion"]!!.toByteArray()
+            ), IV
+            )
+        } returns tags["fhirversion"]!!.toByteArray()
+        every {
+            cryptoService.symDecrypt(
+                    tagEncryptionKey, eq(
+                    tags["legecyfhirversion"]!!.toByteArray()
+            ), IV
+            )
+        } returns tags["legecyfhirversion"]!!.toByteArray()
+        every {
+            cryptoService.symDecrypt(
+                    tagEncryptionKey, eq(
+                    tags["resourcetype"]!!.toByteArray()
+            ), IV
+            )
+        } returns tags["resourcetype"]!!.toByteArray()
+
+        //decrypt annotations
+        if (annotations.isNotEmpty()) {
+            every {
+                cryptoService.symDecrypt(
+                        tagEncryptionKey, eq(
+                        annotations["wow"]!!.toByteArray()
+                ), IV
+                )
+            } returns annotations["wow"]!!.toByteArray()
+            every {
+                cryptoService.symDecrypt(
+                        tagEncryptionKey, eq(
+                        annotations["it"]!!.toByteArray()
+                ), IV
+                )
+            } returns annotations["it"]!!.toByteArray()
+            every {
+                cryptoService.symDecrypt(
+                        tagEncryptionKey, eq(
+                        annotations["works"]!!.toByteArray()
+                ), IV
+                )
+            } returns annotations["works"]!!.toByteArray()
+        }
+
+        // decrypt Resource
+        every { cryptoService.hasCommonKey(commonKeyId) } returns true
+        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
+        every {
+            cryptoService.symDecryptSymmetricKey(
+                    commonKey,
+                    encryptedAttachmentKey
+            )
+        } returns Single.just(attachmentKey)
+        every {
+            cryptoService.symDecryptSymmetricKey(
+                    commonKey,
+                    encryptedDataKey
+            )
+        } returns Single.just(dataKey)
+        every { cryptoService.decodeAndDecryptString(dataKey, encryptedBody) } returns Single.just(
+                stringifiedResource
+        )
+        every { cryptoService.decodeAndDecryptString(dataKey, encryptedBody2) } returns Single.just(
+                stringifiedResource2
+        )
+    }
+
+    fun runDataFlowBatch(
+            value1: ByteArray,
+            value2: ByteArray,
+            encryptedResource1: ByteArray,
+            encryptedResource2: ByteArray,
+            tags: Map<String, String>,
+            annotations: Map<String, String> = mapOf(),
+            encryptedTags: List<String>,
+            encryptedAndEncodedTags: List<String> = listOf()
+    ) {
+        val responses = listOf(
+                Observable.fromArray(listOf(encryptedRecord)),
+                Observable.fromArray(listOf(encryptedRecord2))
+        )
+        // encrypt tags
+        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
+        every {
+            cryptoService.symEncrypt(
+                    tagEncryptionKey, eq(
+                    tags["flag"]!!.toByteArray()
+            ), IV
+            )
+        } returns tags["flag"]!!.toByteArray()
+
+        // encrypt annotations
+        if (annotations.isNotEmpty()) {
+            every {
+                cryptoService.symEncrypt(
+                        tagEncryptionKey, eq(
+                        annotations["wow"]!!.toByteArray()
+                ), IV
+                )
+            } returns annotations["wow"]!!.toByteArray()
+            every {
+                cryptoService.symEncrypt(
+                        tagEncryptionKey, eq(
+                        annotations["it"]!!.toByteArray()
+                ), IV
+                )
+            } returns annotations["it"]!!.toByteArray()
+            every {
+                cryptoService.symEncrypt(
+                        tagEncryptionKey, eq(
+                        annotations["works"]!!.toByteArray()
+                ), IV
+                )
+            } returns annotations["works"]!!.toByteArray()
+
+            if (annotations.containsKey("legacyworks")) {
+                every {
+                    cryptoService.symEncrypt(
+                            tagEncryptionKey, eq(
+                            annotations["legacyworks"]!!.toByteArray()
+                    ), IV
+                    )
+                } returns annotations["legacyworks"]!!.toByteArray()
+            }
+        }
+
+        every {
+            apiService.fetchRecords(
+                    ALIAS,
+                    USER_ID,
+                    null,
+                    null,
+                    PAGE_SIZE,
+                    OFFSET,
+                    or(encryptedTags, encryptedAndEncodedTags)
+            )
+        } returnsMany responses
 
         // decrypt tags
         every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
+            cryptoService.symDecrypt(
+                    tagEncryptionKey, eq(
                     tags["partner"]!!.toByteArray()
-            ), IV)
+            ), IV
+            )
         } returns tags["partner"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
+            cryptoService.symDecrypt(
+                    tagEncryptionKey, eq(
                     tags["client"]!!.toByteArray()
-            ), IV)
+            ), IV
+            )
         } returns tags["client"]!!.toByteArray()
         every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
+            cryptoService.symDecrypt(
+                    tagEncryptionKey, eq(
                     tags["flag"]!!.toByteArray()
-            ), IV)
+            ), IV
+            )
         } returns tags["flag"]!!.toByteArray()
 
         //decrypt Annotations
         if (annotations.isNotEmpty()) {
             every {
-                cryptoService.symDecrypt(tagEncryptionKey, eq(
+                cryptoService.symDecrypt(
+                        tagEncryptionKey, eq(
                         annotations["wow"]!!.toByteArray()
-                ), IV)
+                ), IV
+                )
             } returns annotations["wow"]!!.toByteArray()
             every {
-                cryptoService.symDecrypt(tagEncryptionKey, eq(
+                cryptoService.symDecrypt(
+                        tagEncryptionKey, eq(
                         annotations["it"]!!.toByteArray()
-                ), IV)
+                ), IV
+                )
             } returns annotations["it"]!!.toByteArray()
             every {
-                cryptoService.symDecrypt(tagEncryptionKey, eq(
+                cryptoService.symDecrypt(
+                        tagEncryptionKey, eq(
                         annotations["works"]!!.toByteArray()
-                ), IV)
+                ), IV
+                )
             } returns annotations["works"]!!.toByteArray()
+
+            if (annotations.containsKey("legacyworks")) {
+                every {
+                    cryptoService.symDecrypt(
+                            tagEncryptionKey, eq(
+                            annotations["legacyworks"]!!.toByteArray()
+                    ), IV
+                    )
+                } returns annotations["legacyworks"]!!.toByteArray()
+            }
         }
 
         // decrypt body
@@ -393,7 +549,12 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
 
 
         // decrypt Resource
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
+        every {
+            cryptoService.symDecryptSymmetricKey(
+                    commonKey,
+                    encryptedDataKey
+            )
+        } returns Single.just(dataKey)
         every { cryptoService.decrypt(dataKey, encryptedResource1) } returns Single.just(value1)
         every { cryptoService.decrypt(dataKey, encryptedResource2) } returns Single.just(value2)
     }
@@ -416,7 +577,12 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmhpcnZlcnNpb249MyUyZTAlMmUx", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf(
+                        "cGFydG5lcj1iNDY=",
+                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                        "ZmhpcnZlcnNpb249MyUyZTAlMmUx",
+                        "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
+                ),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -425,7 +591,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 UPDATE_DATE
         )
 
-        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource =
+                "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
 
         runFhirFlow(tags)
 
@@ -477,7 +644,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 UPDATE_DATE
         )
 
-        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource =
+                "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
 
         runFhirFlow(tags, annotations)
 
@@ -508,7 +676,12 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmhpcnZlcnNpb249NCUyZTAlMmUx", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf(
+                        "cGFydG5lcj1iNDY=",
+                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                        "ZmhpcnZlcnNpb249NCUyZTAlMmUx",
+                        "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
+                ),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -517,7 +690,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 UPDATE_DATE
         )
 
-        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource =
+                "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
 
         runFhirFlow(tags)
 
@@ -569,7 +743,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 UPDATE_DATE
         )
 
-        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource =
+                "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
 
         runFhirFlow(tags, annotations)
 
@@ -674,6 +849,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         Truth.assertThat(result).isInstanceOf(DataRecord::class.java)
         Truth.assertThat(result.resource).isInstanceOf(DataResource::class.java)
         Truth.assertThat(resource.value).isEqualTo(resource.value)
+        Truth.assertThat(result.annotations).isEqualTo(listOf("wow", "it", "works"))
     }
 
     // batch API
@@ -688,11 +864,13 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 "fhirversion" to "fhirversion=${
                     "3.0.1".replace(".", "%2e")
                 }",
+                "legecyfhirversion" to "fhirversion=3.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
 
         val encodedEncyrptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
         val encodedEncryptedVersion = "ZmhpcnZlcnNpb249MyUyZTAlMmUx"
+        val encryptedVersion = "ZmhpcnZlcnNpb249My4wLjE="
 
         encryptedBody = "ZW5jcnlwdGVk"
         encryptedBody2 = "Wlc1amNubHdkR1Zr"
@@ -700,7 +878,12 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", encodedEncryptedVersion, encodedEncyrptedResourceType),
+                listOf(
+                        "cGFydG5lcj1iNDY=",
+                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                        encodedEncryptedVersion,
+                        encodedEncyrptedResourceType
+                ),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -712,7 +895,12 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedRecord2 = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", encodedEncryptedVersion, encodedEncyrptedResourceType),
+                listOf(
+                        "cGFydG5lcj1iNDY=",
+                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                        encryptedVersion,
+                        encodedEncyrptedResourceType
+                ),
                 encryptedBody2,
                 CREATION_DATE,
                 encryptedDataKey,
@@ -721,12 +909,15 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 UPDATE_DATE
         )
 
-        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
-        stringifiedResource2 = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource =
+                "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource2 =
+                "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
 
         runFhirFlowBatch(
                 tags,
-                encryptedTags = listOf(encodedEncryptedVersion, encodedEncyrptedResourceType)
+                encryptedAndEncodedTags = listOf(encodedEncryptedVersion, encodedEncyrptedResourceType),
+                encryptedTags = listOf(encryptedVersion, encodedEncyrptedResourceType)
         )
 
         // When
@@ -759,6 +950,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 "fhirversion" to "fhirversion=${
                     "3.0.1".replace(".", "%2e")
                 }",
+                "legecyfhirversion" to "fhirversion=3.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
 
@@ -770,9 +962,17 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
 
         val encodedEncyrptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
         val encodedEncryptedVersion = "ZmhpcnZlcnNpb249MyUyZTAlMmUx"
+        val encryptedVersion = "ZmhpcnZlcnNpb249My4wLjE="
 
-        val encryptedTags = mutableListOf(
+        val encryptedAndEncodedTags = mutableListOf(
                 encodedEncryptedVersion,
+                encodedEncyrptedResourceType,
+                "Y3VzdG9tPXdvdw==",
+                "Y3VzdG9tPWl0",
+                "Y3VzdG9tPXdvcmtz"
+        )
+        val encryptedTags = mutableListOf(
+                encryptedVersion,
                 encodedEncyrptedResourceType,
                 "Y3VzdG9tPXdvdw==",
                 "Y3VzdG9tPWl0",
@@ -808,9 +1008,11 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 listOf(
                         "cGFydG5lcj1iNDY=",
                         "Y2xpZW50PWI0NiUyM3Rlc3Q=",
-                        "ZmhpcnZlcnNpb249MyUyZTAlMmUx",
                         encodedEncyrptedResourceType,
-                        encodedEncryptedVersion
+                        encryptedVersion,
+                        "Y3VzdG9tPXdvdw==",
+                        "Y3VzdG9tPWl0",
+                        "Y3VzdG9tPXdvcmtz"
                 ),
                 encryptedBody2,
                 CREATION_DATE,
@@ -820,10 +1022,17 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 UPDATE_DATE
         )
 
-        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
-        stringifiedResource2 = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource =
+                "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource2 =
+                "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
 
-        runFhirFlowBatch(tags, annotations, encryptedTags)
+        runFhirFlowBatch(
+                tags,
+                annotations,
+                encryptedAndEncodedTags,
+                encryptedTags
+        )
 
         // When
         val result = recordService.fetchFhir3Records(
@@ -837,84 +1046,15 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         ).blockingGet()
 
         // Then
-        Truth.assertThat(result).hasSize(1)
+        Truth.assertThat(result).hasSize(2)
         Truth.assertThat(result[0].resource).isInstanceOf(Fhir3Resource::class.java)
+        Truth.assertThat(result[1].resource).isInstanceOf(Fhir3Resource::class.java)
         Truth.assertThat(result[0].annotations).isEqualTo(listOf("wow", "it", "works"))
+        Truth.assertThat(result[1].annotations).isEqualTo(listOf("wow", "it", "works"))
     }
 
     @Test
     fun `Given, fetchFhir3Records is called, with its appropriate payloads and a DomainResource as resourceType, it returns a List of Records`() {
-        // Given
-        val tags = mapOf(
-            "partner" to "partner=$PARTNER_ID".toLowerCase(),
-            "client" to "client=${
-                URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
-            }",
-            "fhirversion" to "fhirversion=${
-                "3.0.1".replace(".", "%2e")
-            }",
-            "resourcetype" to "resourcetype=documentreference"
-        )
-
-        val encodedEncyrptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
-        val encodedEncryptedVersion = "ZmhpcnZlcnNpb249MyUyZTAlMmUx"
-
-        encryptedBody = "ZW5jcnlwdGVk"
-        encryptedBody2 = "Wlc1amNubHdkR1Zr"
-
-        encryptedRecord = EncryptedRecord(
-            commonKeyId,
-            RECORD_ID,
-            listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", encodedEncryptedVersion, encodedEncyrptedResourceType),
-            encryptedBody,
-            CREATION_DATE,
-            encryptedDataKey,
-            encryptedAttachmentKey,
-            ModelVersion.CURRENT,
-            UPDATE_DATE
-        )
-
-        encryptedRecord2 = EncryptedRecord(
-            commonKeyId,
-            RECORD_ID,
-            listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", encodedEncryptedVersion, encodedEncyrptedResourceType),
-            encryptedBody2,
-            CREATION_DATE,
-            encryptedDataKey,
-            encryptedAttachmentKey,
-            ModelVersion.CURRENT,
-            UPDATE_DATE
-        )
-
-        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
-        stringifiedResource2 = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
-
-        runFhirFlowBatch(
-            tags,
-            encryptedTags = listOf(encodedEncryptedVersion)
-        )
-
-        // When
-        val result = recordService.fetchFhir3Records(
-            USER_ID,
-            Fhir3Resource::class.java,
-            listOf(),
-            null,
-            null,
-            42,
-            23
-        ).blockingGet()
-
-        // Then
-        Truth.assertThat(result).hasSize(2)
-        Truth.assertThat(result[0].resource).isInstanceOf(Fhir3Resource::class.java)
-        Truth.assertThat(result[1].resource).isInstanceOf(Fhir3Resource::class.java)
-        Truth.assertThat(result[0].annotations).isEmpty()
-        Truth.assertThat(result[1].annotations).isEmpty()
-    }
-
-    @Test
-    fun `Given, fetchFhir4Records is called, with its appropriate payloads, it returns a List of Fhir4Records`() {
         // Given
         val tags = mapOf(
                 "partner" to "partner=$PARTNER_ID".toLowerCase(),
@@ -922,13 +1062,22 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                     URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
                 }",
                 "fhirversion" to "fhirversion=${
-                    "4.0.1".replace(".", "%2e")
+                    "3.0.1".replace(".", "%2e")
                 }",
+                "legecyfhirversion" to "fhirversion=3.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
 
         val encodedEncyrptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
-        val encodedEncryptedVersion = "ZmhpcnZlcnNpb249NCUyZTAlMmUx"
+        val encodedEncryptedVersion = "ZmhpcnZlcnNpb249MyUyZTAlMmUx"
+        val encryptedVersion = "ZmhpcnZlcnNpb249My4wLjE="
+
+        val encryptedAndEncodedTags = mutableListOf(
+                encodedEncryptedVersion
+        )
+        val encryptedTags = mutableListOf(
+                encryptedVersion
+        )
 
         encryptedBody = "ZW5jcnlwdGVk"
         encryptedBody2 = "Wlc1amNubHdkR1Zr"
@@ -956,7 +1105,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 listOf(
                         "cGFydG5lcj1iNDY=",
                         "Y2xpZW50PWI0NiUyM3Rlc3Q=",
-                        encodedEncryptedVersion,
+                        encryptedVersion,
                         encodedEncyrptedResourceType
                 ),
                 encryptedBody2,
@@ -970,7 +1119,97 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
         stringifiedResource2 = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
 
-        runFhirFlowBatch(tags, encryptedTags = listOf(encodedEncryptedVersion, encodedEncyrptedResourceType))
+        runFhirFlowBatch(
+                tags,
+                encryptedAndEncodedTags = encryptedAndEncodedTags,
+                encryptedTags = encryptedTags
+        )
+
+        // When
+        val result = recordService.fetchFhir3Records(
+                USER_ID,
+                Fhir3Resource::class.java,
+                listOf(),
+                null,
+                null,
+                42,
+                23
+        ).blockingGet()
+
+        // Then
+        Truth.assertThat(result).hasSize(2)
+        Truth.assertThat(result[0].resource).isInstanceOf(Fhir3Resource::class.java)
+        Truth.assertThat(result[1].resource).isInstanceOf(Fhir3Resource::class.java)
+        Truth.assertThat(result[0].annotations).isEmpty()
+        Truth.assertThat(result[1].annotations).isEmpty()
+    }
+
+    @Test
+    fun `Given, fetchFhir4Records is called, with its appropriate payloads, it returns a List of Fhir4Records`() {
+        // Given
+        val tags = mapOf(
+                "partner" to "partner=$PARTNER_ID".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
+                "fhirversion" to "fhirversion=${
+                    "4.0.1".replace(".", "%2e")
+                }",
+                "legecyfhirversion" to "fhirversion=4.0.1",
+                "resourcetype" to "resourcetype=documentreference"
+        )
+
+        val encodedEncyrptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
+        val encodedEncryptedVersion = "ZmhpcnZlcnNpb249NCUyZTAlMmUx"
+        val encryptedVersion = "ZmhpcnZlcnNpb249NC4wLjE="
+
+        encryptedBody = "ZW5jcnlwdGVk"
+        encryptedBody2 = "Wlc1amNubHdkR1Zr"
+
+        encryptedRecord = EncryptedRecord(
+                commonKeyId,
+                RECORD_ID,
+                listOf(
+                        "cGFydG5lcj1iNDY=",
+                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                        encodedEncryptedVersion,
+                        encodedEncyrptedResourceType
+                ),
+                encryptedBody,
+                CREATION_DATE,
+                encryptedDataKey,
+                encryptedAttachmentKey,
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
+
+        encryptedRecord2 = EncryptedRecord(
+                commonKeyId,
+                RECORD_ID,
+                listOf(
+                        "cGFydG5lcj1iNDY=",
+                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                        encryptedVersion,
+                        encodedEncyrptedResourceType
+                ),
+                encryptedBody2,
+                CREATION_DATE,
+                encryptedDataKey,
+                encryptedAttachmentKey,
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
+
+        stringifiedResource =
+                "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource2 =
+                "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
+
+        runFhirFlowBatch(
+                tags,
+                encryptedAndEncodedTags = listOf(encodedEncryptedVersion, encodedEncyrptedResourceType),
+                encryptedTags = listOf(encryptedVersion, encodedEncyrptedResourceType)
+        )
 
         // When
         val result = recordService.fetchFhir4Records(
@@ -1002,6 +1241,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 "fhirversion" to "fhirversion=${
                     "4.0.1".replace(".", "%2e")
                 }",
+                "legecyfhirversion" to "fhirversion=4.0.1",
                 "resourcetype" to "resourcetype=documentreference"
         )
 
@@ -1013,9 +1253,17 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
 
         val encodedEncyrptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
         val encodedEncryptedVersion = "ZmhpcnZlcnNpb249NCUyZTAlMmUx"
+        val encryptedVersion = "ZmhpcnZlcnNpb249NC4wLjE="
 
-        val encryptedTags = mutableListOf(
+        val encryptedAndEncodedTags = mutableListOf(
                 encodedEncryptedVersion,
+                encodedEncyrptedResourceType,
+                "Y3VzdG9tPXdvdw==",
+                "Y3VzdG9tPWl0",
+                "Y3VzdG9tPXdvcmtz"
+        )
+        val encryptedTags = mutableListOf(
+                encryptedVersion,
                 encodedEncyrptedResourceType,
                 "Y3VzdG9tPXdvdw==",
                 "Y3VzdG9tPWl0",
@@ -1051,8 +1299,11 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 listOf(
                         "cGFydG5lcj1iNDY=",
                         "Y2xpZW50PWI0NiUyM3Rlc3Q=",
-                        encodedEncryptedVersion,
-                        encodedEncyrptedResourceType
+                        encryptedVersion,
+                        encodedEncyrptedResourceType,
+                        "Y3VzdG9tPXdvdw==",
+                        "Y3VzdG9tPWl0",
+                        "Y3VzdG9tPXdvcmtz"
                 ),
                 encryptedBody2,
                 CREATION_DATE,
@@ -1062,10 +1313,17 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 UPDATE_DATE
         )
 
-        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
-        stringifiedResource2 = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource =
+                "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource2 =
+                "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
 
-        runFhirFlowBatch(tags, annotations, encryptedTags)
+        runFhirFlowBatch(
+                tags,
+                annotations,
+                encryptedAndEncodedTags,
+                encryptedTags
+        )
 
         // When
         val result = recordService.fetchFhir4Records(
@@ -1079,72 +1337,94 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         ).blockingGet()
 
         // Then
-        Truth.assertThat(result).hasSize(1)
+        Truth.assertThat(result).hasSize(2)
         Truth.assertThat(result[0].resource).isInstanceOf(Fhir4Resource::class.java)
+        Truth.assertThat(result[1].resource).isInstanceOf(Fhir4Resource::class.java)
         Truth.assertThat(result[0].annotations).isEqualTo(listOf("wow", "it", "works"))
+        Truth.assertThat(result[1].annotations).isEqualTo(listOf("wow", "it", "works"))
     }
 
     @Test
     fun `Given, fetchFhir4Records is called, with its appropriate payloads and a DomainResource as resourceType, it returns a List of Records`() {
         // Given
         val tags = mapOf(
-            "partner" to "partner=$PARTNER_ID".toLowerCase(),
-            "client" to "client=${
-                URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
-            }",
-            "fhirversion" to "fhirversion=${
-                "4.0.1".replace(".", "%2e")
-            }",
-            "resourcetype" to "resourcetype=documentreference"
+                "partner" to "partner=$PARTNER_ID".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
+                "fhirversion" to "fhirversion=${
+                    "4.0.1".replace(".", "%2e")
+                }",
+                "legecyfhirversion" to "fhirversion=4.0.1",
+                "resourcetype" to "resourcetype=documentreference"
         )
 
         val encodedEncyrptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
         val encodedEncryptedVersion = "ZmhpcnZlcnNpb249NCUyZTAlMmUx"
+        val encryptedVersion = "ZmhpcnZlcnNpb249NC4wLjE="
+
+        val encryptedAndEncodedTags = mutableListOf(
+                encodedEncryptedVersion
+        )
+        val encryptedTags = mutableListOf(
+                encryptedVersion
+        )
 
         encryptedBody = "ZW5jcnlwdGVk"
         encryptedBody2 = "Wlc1amNubHdkR1Zr"
 
         encryptedRecord = EncryptedRecord(
-            commonKeyId,
-            RECORD_ID,
-            listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", encodedEncryptedVersion, encodedEncyrptedResourceType),
-            encryptedBody,
-            CREATION_DATE,
-            encryptedDataKey,
-            encryptedAttachmentKey,
-            ModelVersion.CURRENT,
-            UPDATE_DATE
+                commonKeyId,
+                RECORD_ID,
+                listOf(
+                        "cGFydG5lcj1iNDY=",
+                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                        encodedEncryptedVersion,
+                        encodedEncyrptedResourceType
+                ),
+                encryptedBody,
+                CREATION_DATE,
+                encryptedDataKey,
+                encryptedAttachmentKey,
+                ModelVersion.CURRENT,
+                UPDATE_DATE
         )
 
         encryptedRecord2 = EncryptedRecord(
-            commonKeyId,
-            RECORD_ID,
-            listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", encodedEncryptedVersion, encodedEncyrptedResourceType),
-            encryptedBody2,
-            CREATION_DATE,
-            encryptedDataKey,
-            encryptedAttachmentKey,
-            ModelVersion.CURRENT,
-            UPDATE_DATE
+                commonKeyId,
+                RECORD_ID,
+                listOf(
+                        "cGFydG5lcj1iNDY=",
+                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                        encryptedVersion,
+                        encodedEncyrptedResourceType
+                ),
+                encryptedBody2,
+                CREATION_DATE,
+                encryptedDataKey,
+                encryptedAttachmentKey,
+                ModelVersion.CURRENT,
+                UPDATE_DATE
         )
 
         stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
         stringifiedResource2 = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
 
         runFhirFlowBatch(
-            tags,
-            encryptedTags = listOf(encodedEncryptedVersion)
+                tags,
+                encryptedAndEncodedTags = encryptedAndEncodedTags,
+                encryptedTags = encryptedTags
         )
 
         // When
         val result = recordService.fetchFhir4Records(
-            USER_ID,
-            Fhir4Resource::class.java,
-            listOf(),
-            null,
-            null,
-            42,
-            23
+                USER_ID,
+                Fhir4Resource::class.java,
+                listOf(),
+                null,
+                null,
+                42,
+                23
         ).blockingGet()
 
         // Then
@@ -1157,132 +1437,6 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
 
     @Test
     fun `Given, fetchFhirDataRecords is called, with its appropriate payloads, it returns a List of DataRecords`() {
-        // Given
-        val resource1 = DataResource("I am a new test".toByteArray())
-        val resource2 = DataResource("I am a second test".toByteArray())
-
-        val tags = mapOf(
-                "partner" to "partner=$PARTNER_ID".toLowerCase(),
-                "client" to "client=${
-                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
-                }",
-                "flag" to "flag=appdata"
-        )
-
-        val encryptedResourceType = "ZmxhZz1hcHBkYXRh"
-
-        val encryptedResource1 = "I am a new test".toByteArray()
-        val encryptedResource2 = "I am a second test".toByteArray()
-
-        encryptedBody = "SSBhbSBhIG5ldyB0ZXN0"
-        encryptedBody2 = "SSBhbSBhIHNlY29uZCB0ZXN0"
-
-        encryptedRecord = EncryptedRecord(
-                commonKeyId,
-                RECORD_ID,
-                listOf(
-                        "cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=",
-                        encryptedResourceType
-                ),
-                encryptedBody,
-                CREATION_DATE,
-                encryptedDataKey,
-                null,
-                ModelVersion.CURRENT,
-                UPDATE_DATE
-        )
-
-        encryptedRecord2 = EncryptedRecord(
-                commonKeyId,
-                RECORD_ID,
-                listOf(
-                        "cGFydG5lcj1iNDY=",
-                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
-                        encryptedResourceType
-                ),
-                encryptedBody2,
-                CREATION_DATE,
-                encryptedDataKey,
-                null,
-                ModelVersion.CURRENT,
-                UPDATE_DATE
-        )
-
-        // encrypt tags
-        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["flag"]!!.toByteArray()
-            ), IV)
-        } returns tags["flag"]!!.toByteArray()
-
-        every {
-            apiService.fetchRecords(
-                    ALIAS,
-                    USER_ID,
-                    null,
-                    null,
-                    PAGE_SIZE,
-                    OFFSET,
-                    listOf(encryptedResourceType)
-            )
-        } returns Observable.fromArray(
-                arrayListOf(
-                        encryptedRecord,
-                        encryptedRecord2
-                )
-        )
-
-        // decrypt tags
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["partner"]!!.toByteArray()
-            ), IV)
-        } returns tags["partner"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["client"]!!.toByteArray()
-            ), IV)
-        } returns tags["client"]!!.toByteArray()
-        every {
-            cryptoService.symDecrypt(tagEncryptionKey, eq(
-                    tags["flag"]!!.toByteArray()
-            ), IV)
-        } returns tags["flag"]!!.toByteArray()
-
-        // decrypt body
-        // fetch common key
-        every { cryptoService.hasCommonKey(commonKeyId) } returns true
-        every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-
-
-        // decrypt Resource
-        every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
-        every { cryptoService.decrypt(dataKey, encryptedResource1) } returns Single.just(resource1.value)
-        every { cryptoService.decrypt(dataKey, encryptedResource2) } returns Single.just(resource2.value)
-
-        // When
-        val result = recordService.fetchDataRecords(
-                USER_ID,
-                listOf(),
-                null,
-                null,
-                PAGE_SIZE,
-                OFFSET
-        ).blockingGet()
-
-        // Then
-        Truth.assertThat(result).hasSize(2)
-        Truth.assertThat(result[0].resource).isInstanceOf(DataResource::class.java)
-        Truth.assertThat(result[1].resource).isInstanceOf(DataResource::class.java)
-        Truth.assertThat(result[0].resource).isEqualTo(resource1)
-        Truth.assertThat(result[1].resource).isEqualTo(resource2)
-        Truth.assertThat(result[0].annotations).isEmpty()
-        Truth.assertThat(result[1].annotations).isEmpty()
-    }
-
-    @Test
-    fun `Given, fetchFhirDataRecords is called, with its appropriate payloads, it returns a List of DataRecords filtered by Annotations`() {
         // Given
         val resource1 = DataResource("I am a new test".toByteArray())
         val resource2 = DataResource("I am a second test".toByteArray())
@@ -1315,7 +1469,10 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 listOf(
                         "cGFydG5lcj1iNDY=",
                         "Y2xpZW50PWI0NiUyM3Rlc3Q=",
-                        encryptedResourceType
+                        encryptedResourceType,
+                        "Y3VzdG9tPXdvdw==",
+                        "Y3VzdG9tPWl0",
+                        "Y3VzdG9tPXdvcmtz"
                 ),
                 encryptedBody,
                 CREATION_DATE,
@@ -1329,7 +1486,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 commonKeyId,
                 RECORD_ID,
                 listOf(
-                        "cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                        "cGFydG5lcj1iNDY=",
+                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
                         encryptedResourceType,
                         "Y3VzdG9tPXdvdw==",
                         "Y3VzdG9tPWl0",
@@ -1373,8 +1531,115 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         // Then
         Truth.assertThat(result).hasSize(1)
         Truth.assertThat(result[0].resource).isInstanceOf(DataResource::class.java)
-        Truth.assertThat(result[0].resource).isEqualTo(resource2)
+        Truth.assertThat(result[0].resource).isEqualTo(resource1)
         Truth.assertThat(result[0].annotations).isEqualTo(listOf("wow", "it", "works"))
+    }
+
+    @Test
+    fun `Given, fetchFhirDataRecords is called, with its appropriate payloads, it returns a List of DataRecords filtered by Annotations`() {
+        // Given
+        val resource1 = DataResource("I am a new test".toByteArray())
+        val resource2 = DataResource("I am a second test".toByteArray())
+
+        val tags = mapOf(
+                "partner" to "partner=$PARTNER_ID".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
+                "flag" to "flag=appdata"
+        )
+
+        val annotations = mapOf(
+                "wow" to "custom=wow",
+                "it" to "custom=it",
+                "works" to "custom=w%c3%b6rks",
+                "legacyworks" to "custom=wörks"
+        )
+        val encryptedResourceType = "ZmxhZz1hcHBkYXRh"
+
+        val encryptedResource1 = "I am a new test".toByteArray()
+        val encryptedResource2 = "I am a second test".toByteArray()
+
+        encryptedBody = "SSBhbSBhIG5ldyB0ZXN0"
+        encryptedBody2 = "SSBhbSBhIHNlY29uZCB0ZXN0"
+
+        encryptedRecord = EncryptedRecord(
+                commonKeyId,
+                RECORD_ID,
+                listOf(
+                        encryptedResourceType,
+                        "Y3VzdG9tPXdvdw==",
+                        "Y3VzdG9tPWl0",
+                        "Y3VzdG9tPXclYzMlYjZya3M="
+                ),
+                encryptedBody,
+                CREATION_DATE,
+                encryptedDataKey,
+                null,
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
+
+        encryptedRecord2 = EncryptedRecord(
+                commonKeyId,
+                RECORD_ID,
+                listOf(
+                        encryptedResourceType,
+                        "Y3VzdG9tPXdvdw==",
+                        "Y3VzdG9tPWl0",
+                        "Y3VzdG9tPXfDtnJrcw=="
+                ),
+                encryptedBody2,
+                CREATION_DATE,
+                encryptedDataKey,
+                null,
+                ModelVersion.CURRENT,
+                UPDATE_DATE
+        )
+
+        val encryptedTags = listOf(
+                encryptedResourceType,
+                "Y3VzdG9tPXdvdw==",
+                "Y3VzdG9tPWl0",
+                "Y3VzdG9tPXfDtnJrcw=="
+        )
+
+        val encryptedAndEncodedTags = listOf(
+                encryptedResourceType,
+                "Y3VzdG9tPXdvdw==",
+                "Y3VzdG9tPWl0",
+                "Y3VzdG9tPXclYzMlYjZya3M="
+        )
+
+        runDataFlowBatch(
+                resource1.value,
+                resource2.value,
+                encryptedResource1,
+                encryptedResource2,
+                tags,
+                annotations,
+                encryptedTags,
+                encryptedAndEncodedTags
+        )
+
+        // When
+        val result = recordService.fetchDataRecords(
+                USER_ID,
+                listOf("wow", "it", "wörks"),
+                null,
+                null,
+                PAGE_SIZE,
+                OFFSET
+        ).blockingGet()
+
+        // Then
+        Truth.assertThat(result).hasSize(2)
+        Truth.assertThat(result[0].resource).isInstanceOf(DataResource::class.java)
+        Truth.assertThat(result[0].resource).isEqualTo(resource1)
+        Truth.assertThat(result[0].annotations).isEqualTo(listOf("wow", "it", "wörks"))
+        Truth.assertThat(result[1].resource).isInstanceOf(DataResource::class.java)
+        Truth.assertThat(result[1].resource).isEqualTo(resource2)
+        Truth.assertThat(result[1].annotations).isEqualTo(listOf("wow", "it", "wörks"))
     }
 
     // Compatibility
@@ -1418,7 +1683,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 UPDATE_DATE
         )
 
-        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource =
+                "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
 
         runFhirFlow(tags, annotations)
 

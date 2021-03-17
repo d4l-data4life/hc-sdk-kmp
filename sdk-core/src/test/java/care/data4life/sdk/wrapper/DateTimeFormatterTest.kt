@@ -22,33 +22,27 @@ import care.data4life.sdk.network.model.DecryptedRecord
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
-import io.mockk.unmockkAll
+import io.mockk.unmockkStatic
 import io.mockk.verify
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class DateTimeFormatterTest {
-    private lateinit var creationDate: LocalDate
-    private lateinit var updateDate: LocalDateTime
-
     @Before
     fun setUp() {
         mockkStatic(LocalDate::class)
         mockkStatic(LocalDateTime::class)
-
-        creationDate = Mockito.mock(LocalDate::class.java)
-        updateDate = Mockito.mock(LocalDateTime::class.java)
     }
 
     @After
     fun tearDown() {
-        unmockkAll()
+        unmockkStatic(LocalDate::class)
+        unmockkStatic(LocalDateTime::class)
     }
 
     @Test

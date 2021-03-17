@@ -40,7 +40,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.reactivex.Single
-import org.junit.After
 import org.junit.Assume
 import org.junit.Before
 import org.junit.Ignore
@@ -133,7 +132,7 @@ class RecordServiceAdditionalResourceTypeModule {
         }
     }
 
-    private fun getResource(
+    private fun getFhireResource(
             resourceFolder: String,
             resourceName: String
     ): String = this::class.java.getResource(
@@ -264,7 +263,7 @@ class RecordServiceAdditionalResourceTypeModule {
         // Given
         val resource = SdkFhirParser.toFhir3(
                 resourceType,
-                getResource(determineFhir3Folder(resourcePrefixes), resourceName)
+                getFhireResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         // When
@@ -288,7 +287,7 @@ class RecordServiceAdditionalResourceTypeModule {
         // Given
         val resource = SdkFhirParser.toFhir4(
                 resourceType,
-                getResource(determineFhir4Folder(resourcePrefixes), resourceName)
+                getFhireResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
         // When
         val data = recordService.extractUploadData(resource)
@@ -313,7 +312,7 @@ class RecordServiceAdditionalResourceTypeModule {
         // Given
         val resource = SdkFhirParser.toFhir3(
                 resourceType,
-                getResource(determineFhir3Folder(resourcePrefixes), "$resourceName-nulled-attachment")
+                getFhireResource(determineFhir3Folder(resourcePrefixes), "$resourceName-nulled-attachment")
         )
 
         // When
@@ -337,7 +336,7 @@ class RecordServiceAdditionalResourceTypeModule {
         // Given
         val resource = SdkFhirParser.toFhir4(
                 resourceType,
-                getResource(determineFhir4Folder(resourcePrefixes), "$resourceName-nulled-attachment")
+                getFhireResource(determineFhir4Folder(resourcePrefixes), "$resourceName-nulled-attachment")
         )
 
         // When
@@ -354,7 +353,7 @@ class RecordServiceAdditionalResourceTypeModule {
         // Given
         val resource = SdkFhirParser.toFhir3(
                 resourceType,
-                getResource(determineFhir3Folder(resourcePrefixes), resourceName)
+                getFhireResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         val decryptedRecord = DecryptedRecord(
@@ -394,7 +393,7 @@ class RecordServiceAdditionalResourceTypeModule {
         // Given
         val resource = SdkFhirParser.toFhir4(
                 resourceType,
-                getResource(determineFhir4Folder(resourcePrefixes), resourceName)
+                getFhireResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
         val decryptedRecord = DecryptedR4Record(
@@ -431,7 +430,7 @@ class RecordServiceAdditionalResourceTypeModule {
         // Given
         val originalResource = SdkFhirParser.toFhir3(
                 resourceType,
-                getResource(determineFhir3Folder(resourcePrefixes), resourceName)
+                getFhireResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         val originalPayload: HashMap<Any, String?> = hashMapOf(selectFhir3Attachment(originalResource) to DATA)
@@ -479,7 +478,7 @@ class RecordServiceAdditionalResourceTypeModule {
         // Given
         val originalResource = SdkFhirParser.toFhir4(
                 resourceType,
-                getResource(determineFhir4Folder(resourcePrefixes), resourceName)
+                getFhireResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
         val originalPayload: HashMap<Any, String?> = hashMapOf(selectFhir4Attachment(originalResource) to DATA)
@@ -587,7 +586,7 @@ class RecordServiceAdditionalResourceTypeModule {
         // Given
         val resource = SdkFhirParser.toFhir3(
                 resourceType,
-                getResource(determineFhir3Folder(resourcePrefixes), resourceName)
+                getFhireResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         val currentIdentifier = Fhir3AttachmentHelper.buildIdentifier(ADDITIONAL_ID, ASSIGNER)
@@ -663,7 +662,7 @@ class RecordServiceAdditionalResourceTypeModule {
         // Given
         val resource = SdkFhirParser.toFhir4(
                 resourceType,
-                getResource(determineFhir4Folder(resourcePrefixes), resourceName)
+                getFhireResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
         val currentIdentifier = Fhir4AttachmentHelper.buildIdentifier(ADDITIONAL_ID, ASSIGNER)
@@ -688,21 +687,14 @@ class RecordServiceAdditionalResourceTypeModule {
         // Given
         val resource = SdkFhirParser.toFhir3(
                 resourceType,
-                getResource(determineFhir3Folder(resourcePrefixes), resourceName)
+                getFhireResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
-        val pdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES)
-        System.arraycopy(
-                MimeType.PDF.byteSignature()[0] as Any,
-                0,
-                pdf,
-                0,
-                MimeType.PDF.byteSignature()[0]?.size!!
-        )
+        val payload = PDF
 
-        selectFhir3Attachment(resource).data = Base64.encodeToString(byteArrayOf(pdf))
+        selectFhir3Attachment(resource).data = payload
         if (resource is Fhir3Observation) {
-            resource.valueAttachment!!.data = Base64.encodeToString(byteArrayOf(pdf))
+            resource.valueAttachment!!.data = payload
         }
 
         // When
@@ -719,19 +711,10 @@ class RecordServiceAdditionalResourceTypeModule {
         // Given
         val resource = SdkFhirParser.toFhir4(
                 resourceType,
-                getResource(determineFhir4Folder(resourcePrefixes), resourceName)
+                getFhireResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
-        val pdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES)
-        System.arraycopy(
-                MimeType.PDF.byteSignature()[0] as Any,
-                0,
-                pdf,
-                0,
-                MimeType.PDF.byteSignature()[0]?.size!!
-        )
-
-        selectFhir4Attachment(resource).data = Base64.encodeToString(byteArrayOf(pdf))
+        selectFhir4Attachment(resource).data = PDF
 
         // When
         recordService.checkDataRestrictions(resource)
@@ -746,12 +729,14 @@ class RecordServiceAdditionalResourceTypeModule {
 
         val resource = SdkFhirParser.toFhir3(
                 resourceType,
-                getResource(determineFhir3Folder(resourcePrefixes), resourceName)
+                getFhireResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
-        selectFhir3Attachment(resource).data = Base64.encodeToString(byteArrayOf(0))
+        val payload = Base64.encodeToString(byteArrayOf(0))
+
+        selectFhir3Attachment(resource).data = payload
         if (resource is Fhir3Observation) {
-            resource.valueAttachment!!.data = Base64.encodeToString(byteArrayOf(0))
+            resource.valueAttachment!!.data = payload
         }
 
         assertFailsWith<DataRestrictionException.UnsupportedFileType> {
@@ -765,7 +750,7 @@ class RecordServiceAdditionalResourceTypeModule {
 
         val resource = SdkFhirParser.toFhir4(
                 resourceType,
-                getResource(determineFhir4Folder(resourcePrefixes), resourceName)
+                getFhireResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
         selectFhir4Attachment(resource).data = Base64.encodeToString(byteArrayOf(0))
@@ -781,19 +766,15 @@ class RecordServiceAdditionalResourceTypeModule {
 
         val resource = SdkFhirParser.toFhir3(
                 resourceType,
-                getResource(determineFhir3Folder(resourcePrefixes), resourceName)
+                getFhireResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
-        val pdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES + 1)
-        System.arraycopy(
-                MimeType.PDF.byteSignature()[0] as Any,
-                0,
-                pdf,
-                0,
-                MimeType.PDF.byteSignature()[0]?.size!!
-        )
+        val payload = PDF_OVERSIZED
 
-        selectFhir3Attachment(resource).data = Base64.encodeToString(byteArrayOf(pdf))
+        selectFhir3Attachment(resource).data = payload
+        if (resource is Fhir3Observation) {
+            resource.valueAttachment!!.data = payload
+        }
 
         assertFailsWith<DataRestrictionException.MaxDataSizeViolation> {
             recordService.checkDataRestrictions(resource)
@@ -806,19 +787,10 @@ class RecordServiceAdditionalResourceTypeModule {
 
         val resource = SdkFhirParser.toFhir4(
                 resourceType,
-                getResource(determineFhir4Folder(resourcePrefixes), resourceName)
+                getFhireResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
-        val pdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES + 1)
-        System.arraycopy(
-                MimeType.PDF.byteSignature()[0] as Any,
-                0,
-                pdf,
-                0,
-                MimeType.PDF.byteSignature()[0]?.size!!
-        )
-
-        selectFhir4Attachment(resource).data = Base64.encodeToString(byteArrayOf(pdf))
+        selectFhir4Attachment(resource).data = PDF_OVERSIZED
 
         assertFailsWith<DataRestrictionException.MaxDataSizeViolation> {
             recordService.checkDataRestrictions(resource)
@@ -832,7 +804,7 @@ class RecordServiceAdditionalResourceTypeModule {
         // Given
         val resource = SdkFhirParser.toFhir3(
                 resourceType,
-                getResource(determineFhir3Folder(resourcePrefixes), resourceName)
+                getFhireResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         val firstAttachmentId = "1"
@@ -920,7 +892,7 @@ class RecordServiceAdditionalResourceTypeModule {
         // Given
         val resource = SdkFhirParser.toFhir4(
                 resourceType,
-                getResource(determineFhir4Folder(resourcePrefixes), resourceName)
+                getFhireResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
         val firstAttachmentId = "1"
@@ -1001,6 +973,9 @@ class RecordServiceAdditionalResourceTypeModule {
     }
 
     companion object {
+        private val PDF = makePdf(DATA_SIZE_MAX_BYTES)
+        private val PDF_OVERSIZED =  makePdf(DATA_SIZE_MAX_BYTES+1)
+
         private const val RECORD_ID = "recordId"
         private const val USER_ID = "userId"
         private const val PARTNER_ID = "partnerId"
@@ -1029,6 +1004,19 @@ class RecordServiceAdditionalResourceTypeModule {
                 PREVIEW_ID +
                 SPLIT_CHAR +
                 THUMBNAIL_ID
+
+        private fun makePdf(size: Int): String {
+            val pdf = arrayOfNulls<Byte>(size)
+            System.arraycopy(
+                MimeType.PDF.byteSignature()[0] as Any,
+                0,
+                pdf,
+                0,
+                MimeType.PDF.byteSignature()[0]?.size!!
+            )
+
+            return Base64.encodeToString(byteArrayOf(pdf))
+        }
 
         private fun byteArrayOf(elements: Array<Byte?>): ByteArray {
             val array = ByteArray(elements.size)

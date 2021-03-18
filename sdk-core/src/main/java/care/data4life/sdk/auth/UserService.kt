@@ -78,7 +78,7 @@ class UserService(
 
     fun getVersionInfo(currentVersion: String): Single<Boolean>? {
         return Single.just(currentVersion)
-                .flatMap { apiService.fetchVersionInfo(alias + "_user_id") }
+                .flatMap { apiService.fetchVersionInfo() }
                 .map { versionInfo: VersionList -> versionInfo.isSupported(currentVersion) }
                 .doOnError { throwable: Throwable -> Log.error(throwable, "Version not supported") }
                 .onErrorReturnItem(true)

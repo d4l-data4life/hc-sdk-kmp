@@ -150,7 +150,6 @@ interface IHCService {
 
     @GET("/sdk/v1/android/versions.json")
     fun getVersionUpdateInfo(
-            @Header(HEADER_ALIAS) alias: String
     ): Single<VersionList>
 
     companion object {

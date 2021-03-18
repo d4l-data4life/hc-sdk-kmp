@@ -14,11 +14,8 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.model
+package care.data4life.sdk.network.model
 
-import care.data4life.sdk.network.model.NetworkModelContract
-import care.data4life.sdk.network.model.Version
-import care.data4life.sdk.network.model.VersionList
 import com.squareup.moshi.Moshi
 import org.junit.Assert
 import org.junit.Test

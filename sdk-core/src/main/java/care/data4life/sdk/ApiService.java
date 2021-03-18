@@ -324,9 +324,9 @@ public final class ApiService {
                 .flatMapCompletable(token -> service.logout(alias, token));
     }
 
-    public Single<VersionList> fetchVersionInfo(String alias) {
+    public Single<VersionList> fetchVersionInfo() {
         return service
-                .getVersionUpdateInfo(alias)
+                .getVersionUpdateInfo()
                 .subscribeOn(Schedulers.io());
     }
 

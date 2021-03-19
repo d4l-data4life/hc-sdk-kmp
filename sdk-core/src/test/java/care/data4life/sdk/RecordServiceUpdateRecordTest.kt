@@ -42,7 +42,6 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.spyk
 import io.mockk.unmockkObject
-import io.mockk.verifyAll
 import io.mockk.verifyOrder
 import io.reactivex.Single
 import org.junit.After
@@ -191,7 +190,7 @@ class RecordServiceUpdateRecordTest {
             recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
             recordService.assignResourceId(receivedDecryptedRecord)
             RecordMapper.getInstance(receivedDecryptedRecord)
-            
+
         }
     }
 
@@ -831,7 +830,7 @@ class RecordServiceUpdateRecordTest {
                 or(resources[0], resources[1]),
                 defaultAnnotation
             )
-        } returnsMany  listOf(Single.just(expected[0]), Single.just(expected[1]))
+        } returnsMany listOf(Single.just(expected[0]), Single.just(expected[1]))
 
         // When
         val observer = recordService.updateRecords(resources, USER_ID).test().await()

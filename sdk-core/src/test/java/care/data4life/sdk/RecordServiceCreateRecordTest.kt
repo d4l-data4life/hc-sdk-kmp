@@ -199,7 +199,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         )).thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockDecryptedFhir3Record).`when`(recordService)
-                ._uploadData(
+                .uploadData(
                         mockDecryptedFhir3Record,
                         USER_ID
                 )
@@ -249,7 +249,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 mockDataKey,
                 ModelVersion.CURRENT
         )
-        inOrder.verify(recordService)._uploadData(
+        inOrder.verify(recordService).uploadData(
                 mockDecryptedFhir3Record,
                 USER_ID
         )
@@ -308,7 +308,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockDecryptedFhir3Record)
                 .`when`(recordService)
-                ._uploadData(
+                .uploadData(
                         mockDecryptedFhir3Record,
                         USER_ID
                 )
@@ -338,8 +338,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .`when`(recordService)
                 .uploadData(
                         mockDecryptedFhir3Record,
-                        null,
-                        USER_ID
+                        "null"
                 )
         @Suppress("UNCHECKED_CAST")
         every { RecordMapper.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<DomainResource>
@@ -369,7 +368,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 mockDataKey,
                 ModelVersion.CURRENT
         )
-        inOrder.verify(recordService)._uploadData(
+        inOrder.verify(recordService).uploadData(
                 mockDecryptedFhir3Record,
                 USER_ID
         )
@@ -516,7 +515,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
         )).thenReturn(mockTags)
         Mockito.`when`(mockCryptoService.generateGCKey()).thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockAnnotatedDecryptedFhirRecord).`when`(recordService)
-                ._uploadData(
+                .uploadData(
                         mockAnnotatedDecryptedFhirRecord,
                         USER_ID
                 )
@@ -565,7 +564,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 mockDataKey,
                 ModelVersion.CURRENT
         )
-        inOrder.verify(recordService)._uploadData(
+        inOrder.verify(recordService).uploadData(
                 mockAnnotatedDecryptedFhirRecord,
                 USER_ID
         )
@@ -624,7 +623,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 .thenReturn(Single.just(mockDataKey))
         Mockito.doReturn(mockAnnotatedDecryptedFhirRecord)
                 .`when`(recordService)
-                ._uploadData(
+                .uploadData(
                         mockAnnotatedDecryptedFhirRecord,
                         USER_ID
                 )
@@ -652,7 +651,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
 
         Mockito.doReturn(mockAnnotatedDecryptedFhirRecord)
                 .`when`(recordService)
-                ._uploadData(
+                .uploadData(
                         mockAnnotatedDecryptedFhirRecord,
                         USER_ID
                 )
@@ -683,7 +682,7 @@ class RecordServiceCreateRecordTest : RecordServiceTestBase() {
                 mockDataKey,
                 ModelVersion.CURRENT
         )
-        inOrder.verify(recordService)._uploadData(
+        inOrder.verify(recordService).uploadData(
                 mockAnnotatedDecryptedFhirRecord,
                 USER_ID
         )

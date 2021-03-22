@@ -21,6 +21,7 @@ toc::[]
 === Removed
 
 === Fixed
+* RecordService#downloadData failed due to attachments, which are actually null
 
 === Bumped
 

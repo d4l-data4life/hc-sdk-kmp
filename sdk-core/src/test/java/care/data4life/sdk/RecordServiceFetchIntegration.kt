@@ -35,8 +35,11 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
+import org.threeten.bp.LocalDate
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
 import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
 
@@ -248,8 +251,11 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
             tags: Map<String, String>,
             annotations: Map<String, String> = mapOf(),
             encryptedAndEncodedTags: List<String>,
-            encryptedTags: List<String> = listOf()
+            encryptedTags: List<String> = listOf(),
+            dates: Pair<String?, String?> = Pair(null, null)
     ) {
+        val (startDate, endDate) = dates
+
         // encrypt tags
         every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
         every {
@@ -300,33 +306,25 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         }
 
         //fetch
-        every {
-            apiService.fetchRecords(
-                    ALIAS,
-                    USER_ID,
-                    null,
-                    null,
-                    PAGE_SIZE,
-                    OFFSET,
-                    encryptedAndEncodedTags
-            )
-        } returns Observable.fromArray(
+        val responses = listOf(
+            Observable.fromArray(
                 arrayListOf(encryptedRecord)
+            ),
+            Observable.fromArray(
+                arrayListOf(encryptedRecord2)
+            )
         )
-
         every {
             apiService.fetchRecords(
-                    ALIAS,
-                    USER_ID,
-                    null,
-                    null,
-                    PAGE_SIZE,
-                    OFFSET,
-                    encryptedTags
+                ALIAS,
+                USER_ID,
+                startDate,
+                endDate,
+                PAGE_SIZE,
+                OFFSET,
+                or(encryptedTags, encryptedAndEncodedTags)
             )
-        } returns Observable.fromArray(
-                arrayListOf(encryptedRecord2)
-        )
+        } returnsMany responses as List<Observable<MutableList<EncryptedRecord>>>
 
         // decryptTag
         every {
@@ -421,8 +419,11 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
             tags: Map<String, String>,
             annotations: Map<String, String> = mapOf(),
             encryptedTags: List<String>,
-            encryptedAndEncodedTags: List<String> = listOf()
+            encryptedAndEncodedTags: List<String> = listOf(),
+            dates: Pair<String?, String?> = Pair(null, null)
     ) {
+        val (startDate, endDate) = dates
+
         val responses = listOf(
                 Observable.fromArray(listOf(encryptedRecord)),
                 Observable.fromArray(listOf(encryptedRecord2))
@@ -474,13 +475,13 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
 
         every {
             apiService.fetchRecords(
-                    ALIAS,
-                    USER_ID,
-                    null,
-                    null,
-                    PAGE_SIZE,
-                    OFFSET,
-                    or(encryptedTags, encryptedAndEncodedTags)
+                ALIAS,
+                USER_ID,
+                startDate,
+                endDate,
+                PAGE_SIZE,
+                OFFSET,
+                or(encryptedTags, encryptedAndEncodedTags)
             )
         } returnsMany responses
 
@@ -1116,8 +1117,10 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 UPDATE_DATE
         )
 
-        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
-        stringifiedResource2 = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource =
+            "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource2 =
+            "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
 
         runFhirFlowBatch(
                 tags,
@@ -1142,6 +1145,104 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         Truth.assertThat(result[1].resource).isInstanceOf(Fhir3Resource::class.java)
         Truth.assertThat(result[0].annotations).isEmpty()
         Truth.assertThat(result[1].annotations).isEmpty()
+    }
+
+    @Test
+    fun `Given, fetchFhir3Records is called, with its appropriate payloads, it returns a List of Records filtered by the provided date parameter`() {
+        // Given
+        val tags = mapOf(
+            "partner" to "partner=$PARTNER_ID".toLowerCase(),
+            "client" to "client=${
+                URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+            }",
+            "fhirversion" to "fhirversion=${
+                "3.0.1".replace(".", "%2e")
+            }",
+            "legecyfhirversion" to "fhirversion=3.0.1",
+            "resourcetype" to "resourcetype=documentreference"
+        )
+
+        val startDate = LocalDate.of(2020, 1, 1)
+        val endDate = LocalDate.of(2020, 12, 1)
+
+        val encodedEncyrptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
+        val encodedEncryptedVersion = "ZmhpcnZlcnNpb249MyUyZTAlMmUx"
+        val encryptedVersion = "ZmhpcnZlcnNpb249My4wLjE="
+
+        val encryptedAndEncodedTags = mutableListOf(
+            encodedEncryptedVersion,
+            encodedEncyrptedResourceType
+        )
+        val encryptedTags = mutableListOf(
+            encryptedVersion,
+            encodedEncyrptedResourceType
+        )
+
+        encryptedBody = "ZW5jcnlwdGVk"
+        encryptedBody2 = "Wlc1amNubHdkR1Zr"
+
+        encryptedRecord = EncryptedRecord(
+            commonKeyId,
+            RECORD_ID,
+            listOf(
+                "cGFydG5lcj1iNDY=",
+                "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                encodedEncyrptedResourceType,
+                encodedEncryptedVersion
+            ),
+            encryptedBody,
+            CREATION_DATE,
+            encryptedDataKey,
+            encryptedAttachmentKey,
+            ModelVersion.CURRENT,
+            UPDATE_DATE
+        )
+
+        encryptedRecord2 = EncryptedRecord(
+            commonKeyId,
+            RECORD_ID,
+            listOf(
+                "cGFydG5lcj1iNDY=",
+                "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                encodedEncyrptedResourceType,
+                encryptedVersion
+            ),
+            encryptedBody2,
+            CREATION_DATE,
+            encryptedDataKey,
+            encryptedAttachmentKey,
+            ModelVersion.CURRENT,
+            UPDATE_DATE
+        )
+
+        stringifiedResource =
+            "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource2 =
+            "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
+
+        runFhirFlowBatch(
+            tags,
+            mapOf(),
+            encryptedAndEncodedTags,
+            encryptedTags,
+            startDate.toString() to endDate.toString()
+        )
+
+        // When
+        val result = recordService.fetchFhir3Records(
+            USER_ID,
+            Fhir3DocumentReference::class.java,
+            listOf(),
+            startDate,
+            endDate,
+            PAGE_SIZE,
+            OFFSET
+        ).blockingGet()
+
+        // Then
+        Truth.assertThat(result).hasSize(2)
+        Truth.assertThat(result[0].resource).isInstanceOf(Fhir3Resource::class.java)
+        Truth.assertThat(result[1].resource).isInstanceOf(Fhir3Resource::class.java)
     }
 
     @Test
@@ -1345,6 +1446,100 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
     }
 
     @Test
+    fun `Given, fetchFhir4Records is called, with its appropriate payloads, it returns a List of Records filtered by the provided date parameter`() {
+        // Given
+        val tags = mapOf(
+            "partner" to "partner=$PARTNER_ID".toLowerCase(),
+            "client" to "client=${
+                URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+            }",
+            "fhirversion" to "fhirversion=${
+                "4.0.1".replace(".", "%2e")
+            }",
+            "legecyfhirversion" to "fhirversion=4.0.1",
+            "resourcetype" to "resourcetype=documentreference"
+        )
+
+        val startDate = LocalDate.of(2020, 1, 1)
+        val endDate = LocalDate.of(2020, 12, 1)
+
+        val encodedEncyrptedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
+        val encodedEncryptedVersion = "ZmhpcnZlcnNpb249NCUyZTAlMmUx"
+        val encryptedVersion = "ZmhpcnZlcnNpb249NC4wLjE="
+
+        val encryptedAndEncodedTags = mutableListOf(
+            encodedEncryptedVersion,
+            encodedEncyrptedResourceType
+        )
+        val encryptedTags = mutableListOf(
+            encryptedVersion,
+            encodedEncyrptedResourceType
+        )
+
+        encryptedBody = "ZW5jcnlwdGVk"
+        encryptedBody2 = "Wlc1amNubHdkR1Zr"
+
+        encryptedRecord = EncryptedRecord(
+            commonKeyId,
+            RECORD_ID,
+            listOf(
+                encodedEncyrptedResourceType,
+                encodedEncryptedVersion
+            ),
+            encryptedBody,
+            CREATION_DATE,
+            encryptedDataKey,
+            encryptedAttachmentKey,
+            ModelVersion.CURRENT,
+            UPDATE_DATE
+        )
+
+        encryptedRecord2 = EncryptedRecord(
+            commonKeyId,
+            RECORD_ID,
+            listOf(
+                encodedEncyrptedResourceType,
+                encryptedVersion
+            ),
+            encryptedBody2,
+            CREATION_DATE,
+            encryptedDataKey,
+            encryptedAttachmentKey,
+            ModelVersion.CURRENT,
+            UPDATE_DATE
+        )
+
+        stringifiedResource =
+            "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource2 =
+            "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
+
+        runFhirFlowBatch(
+            tags,
+            mapOf(),
+            encryptedAndEncodedTags,
+            encryptedTags,
+            startDate.toString() to endDate.toString()
+        )
+
+        // When
+        val result = recordService.fetchFhir4Records(
+            USER_ID,
+            Fhir4DocumentReference::class.java,
+            listOf(),
+            startDate,
+            endDate,
+            PAGE_SIZE,
+            OFFSET
+        ).blockingGet()
+
+        // Then
+        Truth.assertThat(result).hasSize(2)
+        Truth.assertThat(result[0].resource).isInstanceOf(Fhir4Resource::class.java)
+        Truth.assertThat(result[1].resource).isInstanceOf(Fhir4Resource::class.java)
+    }
+
+    @Test
     fun `Given, fetchFhir4Records is called, with its appropriate payloads and a DomainResource as resourceType, it returns a List of Records`() {
         // Given
         val tags = mapOf(
@@ -1407,8 +1602,10 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 UPDATE_DATE
         )
 
-        stringifiedResource = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
-        stringifiedResource2 = "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource =
+            "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"42\",\"size\":42}}],\"identifier\":[{\"assigner\":{\"reference\":\"partnerId\"},\"value\":\"d4l_f_p_t#42\"}],\"resourceType\":\"DocumentReference\"}"
+        stringifiedResource2 =
+            "{\"content\":[{\"attachment\":{\"hash\":\"jwZ0G6YALQ4N8RGNHzJHIgX6j+I=\",\"id\":\"attachmentId#previewId#thumbnailId\",\"size\":42}}],\"resourceType\":\"DocumentReference\"}"
 
         runFhirFlowBatch(
                 tags,
@@ -1464,41 +1661,35 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         encryptedBody2 = "SSBhbSBhIHNlY29uZCB0ZXN0"
 
         encryptedRecord = EncryptedRecord(
-                commonKeyId,
-                RECORD_ID,
-                listOf(
-                        "cGFydG5lcj1iNDY=",
-                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
-                        encryptedResourceType,
-                        "Y3VzdG9tPXdvdw==",
-                        "Y3VzdG9tPWl0",
-                        "Y3VzdG9tPXdvcmtz"
-                ),
-                encryptedBody,
-                CREATION_DATE,
-                encryptedDataKey,
-                null,
-                ModelVersion.CURRENT,
-                UPDATE_DATE
+            commonKeyId,
+            RECORD_ID,
+            listOf(
+                "cGFydG5lcj1iNDY=",
+                "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                encryptedResourceType
+            ),
+            encryptedBody,
+            CREATION_DATE,
+            encryptedDataKey,
+            null,
+            ModelVersion.CURRENT,
+            UPDATE_DATE
         )
 
         encryptedRecord2 = EncryptedRecord(
-                commonKeyId,
-                RECORD_ID,
-                listOf(
-                        "cGFydG5lcj1iNDY=",
-                        "Y2xpZW50PWI0NiUyM3Rlc3Q=",
-                        encryptedResourceType,
-                        "Y3VzdG9tPXdvdw==",
-                        "Y3VzdG9tPWl0",
-                        "Y3VzdG9tPXdvcmtz"
-                ),
-                encryptedBody2,
-                CREATION_DATE,
-                encryptedDataKey,
-                null,
-                ModelVersion.CURRENT,
-                UPDATE_DATE
+            commonKeyId,
+            RECORD_ID,
+            listOf(
+                "cGFydG5lcj1iNDY=",
+                "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                encryptedResourceType
+            ),
+            encryptedBody2,
+            CREATION_DATE,
+            encryptedDataKey,
+            null,
+            ModelVersion.CURRENT,
+            UPDATE_DATE
         )
 
         val encryptedTags = listOf(
@@ -1532,7 +1723,6 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         Truth.assertThat(result).hasSize(1)
         Truth.assertThat(result[0].resource).isInstanceOf(DataResource::class.java)
         Truth.assertThat(result[0].resource).isEqualTo(resource1)
-        Truth.assertThat(result[0].annotations).isEqualTo(listOf("wow", "it", "works"))
     }
 
     @Test
@@ -1642,6 +1832,94 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         Truth.assertThat(result[1].annotations).isEqualTo(listOf("wow", "it", "wörks"))
     }
 
+    @Test
+    fun `Given, fetchFhirDataRecords is called, with its appropriate payloads, it returns a List of DataRecords filtered by the provided date parameter`() {
+        // Given
+        val resource1 = DataResource("I am a new test".toByteArray())
+        val resource2 = DataResource("I am a second test".toByteArray())
+
+        val tags = mapOf(
+            "partner" to "partner=$PARTNER_ID".toLowerCase(),
+            "client" to "client=${
+                URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+            }",
+            "flag" to "flag=appdata"
+        )
+
+        val startDate = LocalDate.of(2020, 1, 1)
+        val endDate = LocalDate.of(2020, 12, 1)
+
+        val encryptedResourceType = "ZmxhZz1hcHBkYXRh"
+
+        val encryptedResource1 = "I am a new test".toByteArray()
+        val encryptedResource2 = "I am a second test".toByteArray()
+
+        encryptedBody = "SSBhbSBhIG5ldyB0ZXN0"
+        encryptedBody2 = "SSBhbSBhIHNlY29uZCB0ZXN0"
+
+        encryptedRecord = EncryptedRecord(
+            commonKeyId,
+            RECORD_ID,
+            listOf(
+                "cGFydG5lcj1iNDY=",
+                "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                encryptedResourceType
+            ),
+            encryptedBody,
+            CREATION_DATE,
+            encryptedDataKey,
+            null,
+            ModelVersion.CURRENT,
+            UPDATE_DATE
+        )
+
+        encryptedRecord2 = EncryptedRecord(
+            commonKeyId,
+            RECORD_ID,
+            listOf(
+                "cGFydG5lcj1iNDY=",
+                "Y2xpZW50PWI0NiUyM3Rlc3Q=",
+                encryptedResourceType
+            ),
+            encryptedBody2,
+            CREATION_DATE,
+            encryptedDataKey,
+            null,
+            ModelVersion.CURRENT,
+            UPDATE_DATE
+        )
+
+        val encryptedTags = listOf(
+            encryptedResourceType
+        )
+
+        runDataFlowBatch(
+            resource1.value,
+            resource2.value,
+            encryptedResource1,
+            encryptedResource2,
+            tags,
+            mapOf(),
+            encryptedTags,
+            dates = startDate.toString() to endDate.toString()
+        )
+
+        // When
+        val result = recordService.fetchDataRecords(
+            USER_ID,
+            listOf(),
+            startDate,
+            endDate,
+            PAGE_SIZE,
+            OFFSET
+        ).blockingGet()
+
+        // Then
+        Truth.assertThat(result).hasSize(1)
+        Truth.assertThat(result[0].resource).isInstanceOf(DataResource::class.java)
+        Truth.assertThat(result[0].resource).isEqualTo(resource1)
+    }
+
     // Compatibility
     @Test
     fun `Given, fetchFhir4Record is called, with its appropriate payloads, but it fetches a Fhir3Record, it fails with`() {
@@ -1689,15 +1967,11 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         runFhirFlow(tags, annotations)
 
         // When
-        try {
-            recordService.fetchFhir4Record<Fhir4Resource>(USER_ID, RECORD_ID).blockingGet()
-        } catch (e: Exception) {
-            // Then
-            Truth.assertThat(e).isInstanceOf(ClassCastException::class.java)
+        assertFailsWith<ClassCastException> {
+            recordService.fetchFhir4Record<Fhir4Resource>(USER_ID, RECORD_ID).blockingGet() as Fhir4Record<*>
         }
     }
 
     // TODO: Case any Fhir<->Data
     // TODO: Cases for fetch**Records
-    // TODO: Add test cases for search with start and end dates
 }

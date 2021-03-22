@@ -40,13 +40,12 @@ import care.data4life.sdk.model.DeleteResult
 import care.data4life.sdk.model.DownloadResult
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.FetchResult
-import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.model.UpdateResult
-import care.data4life.sdk.model.definitions.BaseRecord
-import care.data4life.sdk.model.definitions.RecordFactory
+import care.data4life.sdk.model.ModelContract.BaseRecord
+import care.data4life.sdk.model.ModelContract.RecordFactory
 import care.data4life.sdk.network.DecryptedRecordMapper
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
@@ -55,6 +54,12 @@ import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_FMT
+import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_SIZE
+import care.data4life.sdk.record.RecordContract.Service.Companion.EMPTY_RECORD_ID
+import care.data4life.sdk.record.RecordContract.Service.Companion.FULL_ATTACHMENT_ID_POS
+import care.data4life.sdk.record.RecordContract.Service.Companion.PREVIEW_ID_POS
+import care.data4life.sdk.record.RecordContract.Service.Companion.THUMBNAIL_ID_POS
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.util.Base64.decode
@@ -64,6 +69,7 @@ import care.data4life.sdk.util.MimeType
 import care.data4life.sdk.util.MimeType.Companion.recognizeMimeType
 import care.data4life.sdk.wrapper.HelperContract
 import care.data4life.sdk.wrapper.SdkAttachmentFactory
+import care.data4life.sdk.wrapper.SdkDateTimeFormatter
 import care.data4life.sdk.wrapper.SdkFhirAttachmentHelper
 import care.data4life.sdk.wrapper.SdkIdentifierFactory
 import care.data4life.sdk.wrapper.WrapperContract
@@ -72,12 +78,7 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.ZoneId
-import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.DateTimeFormatterBuilder
 import java.io.IOException
-import java.util.*
 import kotlin.collections.HashMap
 
 
@@ -138,6 +139,7 @@ class RecordService internal constructor(
     private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper = SdkFhirAttachmentHelper
     private val attachmentFactory: WrapperFactoryContract.AttachmentFactory = SdkAttachmentFactory
     private val identifierFactory: WrapperFactoryContract.IdentifierFactory = SdkIdentifierFactory
+    private val dateTimeFormatter: WrapperContract.DateTimeFormatter = SdkDateTimeFormatter
 
     private fun isFhir(resource: Any?): Boolean =
             resource is Fhir3Resource || resource is Fhir4Resource
@@ -151,15 +153,15 @@ class RecordService internal constructor(
 
         val data = extractUploadData(resource)
         val createdRecord = Single.just(
-                DecryptedRecordMapper()
-                        .setAnnotations(annotations)
-                        .build(
-                                resource,
-                                taggingService.appendDefaultTags(resource, null),
-                                DATE_FORMATTER.format(LocalDate.now(UTC_ZONE_ID)),
-                                cryptoService.generateGCKey().blockingGet(),
-                                ModelVersion.CURRENT
-                        )
+            DecryptedRecordMapper()
+                .setAnnotations(annotations)
+                .build(
+                    resource,
+                    taggingService.appendDefaultTags(resource, null),
+                    dateTimeFormatter.now(),
+                    cryptoService.generateGCKey().blockingGet(),
+                    ModelVersion.CURRENT
+                )
         )
 
         return createdRecord
@@ -315,8 +317,8 @@ class RecordService internal constructor(
             pageSize: Int,
             offset: Int
     ): Single<List<BaseRecord<T>>> {
-        val startTime = if (startDate != null) formatDate(startDate) else null
-        val endTime = if (endDate != null) formatDate(endDate) else null
+        val startTime = if (startDate != null) dateTimeFormatter.formatDate(startDate) else null
+        val endTime = if (endDate != null) dateTimeFormatter.formatDate(endDate) else null
 
         return Observable
                 .fromCallable { taggingService.getTagsFromType(resourceType) }
@@ -1251,41 +1253,12 @@ class RecordService internal constructor(
             }
         }
     }
-
-    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
-    internal fun buildMeta(
-            record: DecryptedBaseRecord<*>
-    ): Meta = Meta(
-            LocalDate.parse(record.customCreationDate, DATE_FORMATTER),
-            LocalDateTime.parse(record.updatedDate, DATE_TIME_FORMATTER)
-    )
     //endregion
 
     private fun <T> Single<T>.ignoreErrors(exceptionHandler: (Throwable) -> Unit) =
-            retryWhen { errors ->
-                errors
-                        .doOnNext { exceptionHandler(it) }
-                        .map { 0 }
-            }
-
-    companion object {
-        private const val DATE_FORMAT = "yyyy-MM-dd"
-        private const val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss[.SSS]"
-        private const val EMPTY_RECORD_ID = ""
-        const val DOWNSCALED_ATTACHMENT_IDS_FMT =
-                "d4l_f_p_t" //d4l -> namespace, f-> full, p -> preview, t -> thumbnail
-        const val DOWNSCALED_ATTACHMENT_IDS_SIZE = 4
-        const val FULL_ATTACHMENT_ID_POS = 1
-        const val PREVIEW_ID_POS = 2
-        const val THUMBNAIL_ID_POS = 3
-
-        // TODO refactor
-        internal val DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.US)
-        private val DATE_TIME_FORMATTER = DateTimeFormatterBuilder()
-                .parseLenient()
-                .appendPattern(DATE_TIME_FORMAT)
-                .toFormatter(Locale.US)
-        private val UTC_ZONE_ID = ZoneId.of("UTC")
-        internal fun formatDate(dateTime: LocalDate): String = DATE_FORMATTER.format(dateTime)
-    }
+        retryWhen { errors ->
+            errors
+                .doOnNext { exceptionHandler(it) }
+                .map { 0 }
+        }
 }

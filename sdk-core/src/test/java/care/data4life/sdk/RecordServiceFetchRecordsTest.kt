@@ -32,13 +32,14 @@ import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.migration.MigrationContract
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
-import care.data4life.sdk.model.definitions.BaseRecord
+import care.data4life.sdk.model.ModelContract.BaseRecord
 import care.data4life.sdk.network.model.DecryptedDataRecord
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.wrapper.SdkDateTimeFormatter
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -348,6 +349,7 @@ class RecordServiceFetchRecordsTest {
         val pageSize = 23
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
         mockkObject(RecordMapper)
+        mockkObject(SdkDateTimeFormatter)
 
         every { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
         every {
@@ -411,6 +413,7 @@ class RecordServiceFetchRecordsTest {
                 actual = fetched[1]
         )
         verify(exactly = 1) { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) }
+        verify(exactly = 0) { SdkDateTimeFormatter.formatDate(any()) }
         verify(exactly = 1) {
             compatibilityService.searchRecords(
                     ALIAS,
@@ -437,6 +440,9 @@ class RecordServiceFetchRecordsTest {
         }
         verify(exactly = 1) { RecordMapper.getInstance(decryptedRecord1) }
         verify(exactly = 1) { RecordMapper.getInstance(decryptedRecord2) }
+
+        unmockkObject(RecordMapper)
+        unmockkObject(SdkDateTimeFormatter)
     }
 
     @Test
@@ -463,10 +469,10 @@ class RecordServiceFetchRecordsTest {
         val pageSize = 23
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
         mockkObject(RecordMapper)
-        mockkObject(RecordService)
+        mockkObject(SdkDateTimeFormatter)
 
-        every { RecordService.DATE_FORMATTER.format(startDate) } returns start
-        every { RecordService.DATE_FORMATTER.format(endDate) } returns end
+        every { SdkDateTimeFormatter.formatDate(startDate) } returns start
+        every { SdkDateTimeFormatter.formatDate(endDate) } returns end
         every { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
         every {
             compatibilityService.searchRecords(
@@ -530,8 +536,7 @@ class RecordServiceFetchRecordsTest {
                 actual = fetched[1]
         )
         verify(exactly = 1) { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) }
-        verify(exactly = 1) { RecordService.formatDate(startDate) }
-        verify(exactly = 1) { RecordService.formatDate(endDate) }
+        verify(exactly = 2) { SdkDateTimeFormatter.formatDate(or(startDate, endDate)) }
         verify(exactly = 1) {
             compatibilityService.searchRecords(
                     ALIAS,
@@ -559,7 +564,8 @@ class RecordServiceFetchRecordsTest {
         verify(exactly = 1) { RecordMapper.getInstance(decryptedRecord1) }
         verify(exactly = 1) { RecordMapper.getInstance(decryptedRecord2) }
 
-        unmockkObject(RecordService)
+        unmockkObject(RecordMapper)
+        unmockkObject(SdkDateTimeFormatter)
     }
 
     @Test
@@ -582,6 +588,7 @@ class RecordServiceFetchRecordsTest {
         val pageSize = 23
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
         mockkObject(RecordMapper)
+        mockkObject(SdkDateTimeFormatter)
 
         every { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
         every {
@@ -646,6 +653,7 @@ class RecordServiceFetchRecordsTest {
                 actual = fetched[1]
         )
         verify(exactly = 1) { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) }
+        verify(exactly = 0) { SdkDateTimeFormatter.formatDate(any()) }
         verify(exactly = 1) {
             compatibilityService.searchRecords(
                     ALIAS,
@@ -672,6 +680,9 @@ class RecordServiceFetchRecordsTest {
         }
         verify(exactly = 1) { RecordMapper.getInstance(decryptedRecord1) }
         verify(exactly = 1) { RecordMapper.getInstance(decryptedRecord2) }
+
+        unmockkObject(RecordMapper)
+        unmockkObject(SdkDateTimeFormatter)
     }
 
     @Test
@@ -698,10 +709,10 @@ class RecordServiceFetchRecordsTest {
         val pageSize = 23
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
         mockkObject(RecordMapper)
-        mockkObject(RecordService)
+        mockkObject(SdkDateTimeFormatter)
 
-        every { RecordService.DATE_FORMATTER.format(startDate) } returns start
-        every { RecordService.DATE_FORMATTER.format(endDate) } returns end
+        every { SdkDateTimeFormatter.formatDate(startDate) } returns start
+        every { SdkDateTimeFormatter.formatDate(endDate) } returns end
         every { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
         every {
             compatibilityService.searchRecords(
@@ -766,8 +777,7 @@ class RecordServiceFetchRecordsTest {
                 actual = fetched[1]
         )
         verify(exactly = 1) { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) }
-        verify(exactly = 1) { RecordService.formatDate(startDate) }
-        verify(exactly = 1) { RecordService.formatDate(endDate) }
+        verify(exactly = 2) { SdkDateTimeFormatter.formatDate(or(startDate, endDate)) }
         verify(exactly = 1) {
             compatibilityService.searchRecords(
                     ALIAS,
@@ -795,6 +805,7 @@ class RecordServiceFetchRecordsTest {
         verify(exactly = 1) { RecordMapper.getInstance(decryptedRecord1) }
         verify(exactly = 1) { RecordMapper.getInstance(decryptedRecord2) }
 
-        unmockkObject(RecordService)
+        unmockkObject(RecordMapper)
+        unmockkObject(SdkDateTimeFormatter)
     }
 }

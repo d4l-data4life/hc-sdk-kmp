@@ -17,7 +17,6 @@ package care.data4life.sdk.model
 
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
-import java.io.Serializable
 
 /**
  * Meta is container for server side related informations about records.
@@ -29,6 +28,6 @@ import java.io.Serializable
  */
 // TODO add model number
 data class Meta(
-        val createdDate: LocalDate,
-        val updatedDate: LocalDateTime
-) : Serializable
+        override val createdDate: LocalDate,
+        override val updatedDate: LocalDateTime
+) : ModelContract.Meta

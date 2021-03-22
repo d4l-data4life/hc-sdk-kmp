@@ -12,27 +12,33 @@ and this project adheres to http://semver.org/spec/v2.0.0.html[Semantic Versioni
 ==== Versions
 toc::[]
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.1...main[Unreleased]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.2...main[Unreleased]
+
+=== Added
+
+=== Changed
+
+=== Removed
+
+=== Fixed
+
+=== Bumped
+
+=== Migration
+
+
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.1...v1.9.2[1.9.2]
 
 === Added
 
 * Add information how to use matching fallbacks for Android to README
 * `count` to Fhir4Client
-* `countFhir3Records`, `countFhir4Records` and `countAllFhir3Records` to RecordService
 
 === Changed
 
 * Tags are now encoded (URI) and in lowercase
 * Annotations are now encoded (URI), in lowercase and fail, if they are empty
-* TagHelper -> TagEncryptionHelper
 * `EncryptedRecord`, `EncryptedKey`, `EncryptedKeyTypeAdapter` to Kotlin
-* CryptoService#encryptString -> CryptoService#encryptAndEncodeString
-* CryptoService#decryptString -> CryptoService#decodeAndDecryptString
-* TaggingService#getTagFromType tags now FhirResourceType and FhirVersion
-
-=== Removed
-
-* RxJava from TagEncryptionService
 
 === Fixed
 
@@ -40,14 +46,8 @@ toc::[]
 * RecordService#fetchRecords invocation had mixed user and resource id.
 * NullPointerException when using DomainResource as resourceType for fetch/search.
 * RecordService#countRecords filters now with Annotation when counting all Fhir3Records.
+* RecordService did not respect legacy tags/annotations.
 * RecordService called on fetch/search DATE_FORMAT instead DATE_FORMATTER.
-
-=== Bumped
-
-=== Migration
-
-* TODO: search strategy (fetchRecords) for the encoded tags (especially in regards to the Fhir version)
-
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.0...v1.9.1[1.9.1]
 

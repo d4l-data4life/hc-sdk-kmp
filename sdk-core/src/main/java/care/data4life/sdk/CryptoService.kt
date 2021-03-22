@@ -150,18 +150,18 @@ open class CryptoService : CryptoProtocol {
 
     private fun decryptKey(generator: () -> Single<ByteArray>): Single<GCKey> {
         return generator()
-            .map { keyJson -> moshi.adapter(ExchangeKey::class.java).fromJson(String(keyJson, Charsets.UTF_8)) }
-            .flatMap { exchangeKey -> convertExchangeKeyToGCKey(exchangeKey) }
+                .map { keyJson -> moshi.adapter(ExchangeKey::class.java).fromJson(String(keyJson, Charsets.UTF_8)) }
+                .flatMap { exchangeKey -> convertExchangeKeyToGCKey(exchangeKey) }
     }
-    
+
     fun symDecryptSymmetricKey(
-        key: GCKey, 
-        encryptedKey: NetworkModelContract.EncryptedKey
+            key: GCKey,
+            encryptedKey: NetworkModelContract.EncryptedKey
     ): Single<GCKey> = decryptKey { decrypt(key, encryptedKey.decode()) }
 
     fun asymDecryptSymetricKey(
-        keyPair: GCKeyPair, 
-        encryptedKey: NetworkModelContract.EncryptedKey
+            keyPair: GCKeyPair,
+            encryptedKey: NetworkModelContract.EncryptedKey
     ): Single<GCKey> = decryptKey { Single.fromCallable { asymDecrypt(keyPair, encryptedKey.decode()) } }
 
     private fun convertExchangeKeyToGCKey(exchangeKey: ExchangeKey): Single<GCKey> {

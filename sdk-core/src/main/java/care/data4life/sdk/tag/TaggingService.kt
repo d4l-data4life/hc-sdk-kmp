@@ -101,7 +101,7 @@ class TaggingService(
 
             if (version != FhirContract.FhirVersion.UNKNOWN) {
                 fhirElementFactory.getFhirTypeForClass(resourceType).also { resourceTagValue ->
-                    if(resourceTagValue is String) {
+                    if (resourceTagValue is String) {
                         tags[TAG_RESOURCE_TYPE] = resourceTagValue
                     }
                 }

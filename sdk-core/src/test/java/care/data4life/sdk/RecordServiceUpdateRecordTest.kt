@@ -25,7 +25,7 @@ import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.RecordMapper
-import care.data4life.sdk.model.definitions.BaseRecord
+import care.data4life.sdk.model.ModelContract.BaseRecord
 import care.data4life.sdk.util.MimeType
 import com.google.common.truth.Truth
 import io.mockk.every

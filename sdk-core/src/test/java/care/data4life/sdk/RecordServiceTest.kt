@@ -17,7 +17,6 @@ package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
 import care.data4life.fhir.r4.FhirR4Parser
-import care.data4life.fhir.r4.model.Patient as Fhir4Patient
 import care.data4life.fhir.stu3.model.Attachment
 import care.data4life.fhir.stu3.model.CarePlan
 import care.data4life.fhir.stu3.model.DocumentReference
@@ -38,13 +37,18 @@ import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.RecordMapper
-import care.data4life.sdk.model.definitions.BaseRecord
+import care.data4life.sdk.model.ModelContract.BaseRecord
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedCustomDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
+import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_FMT
+import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_SIZE
+import care.data4life.sdk.record.RecordContract.Service.Companion.FULL_ATTACHMENT_ID_POS
+import care.data4life.sdk.record.RecordContract.Service.Companion.PREVIEW_ID_POS
+import care.data4life.sdk.record.RecordContract.Service.Companion.THUMBNAIL_ID_POS
 import care.data4life.sdk.test.util.AttachmentBuilder
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.MimeType
@@ -63,15 +67,13 @@ import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import org.junit.internal.Classes.getClass
 import org.mockito.Mockito
 import org.mockito.Mockito.times
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
-import java.io.File
 import java.io.IOException
-import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
+import care.data4life.fhir.r4.model.Patient as Fhir4Patient
 
 class RecordServiceTest : RecordServiceTestBase() {
 
@@ -650,11 +652,11 @@ class RecordServiceTest : RecordServiceTestBase() {
 
         //then
         val d4lNamespacePos = 0
-        Truth.assertThat(additionalIds).hasLength(RecordService.DOWNSCALED_ATTACHMENT_IDS_SIZE)
-        Truth.assertThat(additionalIds!![d4lNamespacePos]).isEqualTo(RecordService.DOWNSCALED_ATTACHMENT_IDS_FMT)
-        Truth.assertThat(additionalIds[RecordService.FULL_ATTACHMENT_ID_POS]).isEqualTo(ATTACHMENT_ID)
-        Truth.assertThat(additionalIds[RecordService.PREVIEW_ID_POS]).isEqualTo(PREVIEW_ID)
-        Truth.assertThat(additionalIds[RecordService.THUMBNAIL_ID_POS]).isEqualTo(THUMBNAIL_ID)
+        Truth.assertThat(additionalIds).hasLength(DOWNSCALED_ATTACHMENT_IDS_SIZE)
+        Truth.assertThat(additionalIds!![d4lNamespacePos]).isEqualTo(DOWNSCALED_ATTACHMENT_IDS_FMT)
+        Truth.assertThat(additionalIds[FULL_ATTACHMENT_ID_POS]).isEqualTo(ATTACHMENT_ID)
+        Truth.assertThat(additionalIds[PREVIEW_ID_POS]).isEqualTo(PREVIEW_ID)
+        Truth.assertThat(additionalIds[THUMBNAIL_ID_POS]).isEqualTo(THUMBNAIL_ID)
     }
 
     @Test
@@ -691,11 +693,11 @@ class RecordServiceTest : RecordServiceTestBase() {
 
         //then
         val d4lNamespacePos = 0
-        Truth.assertThat(additionalIds).hasLength(RecordService.DOWNSCALED_ATTACHMENT_IDS_SIZE)
-        Truth.assertThat(additionalIds!![d4lNamespacePos]).isEqualTo(RecordService.DOWNSCALED_ATTACHMENT_IDS_FMT)
-        Truth.assertThat(additionalIds[RecordService.FULL_ATTACHMENT_ID_POS]).isEqualTo(ATTACHMENT_ID)
-        Truth.assertThat(additionalIds[RecordService.PREVIEW_ID_POS]).isEqualTo(PREVIEW_ID)
-        Truth.assertThat(additionalIds[RecordService.THUMBNAIL_ID_POS]).isEqualTo(THUMBNAIL_ID)
+        Truth.assertThat(additionalIds).hasLength(DOWNSCALED_ATTACHMENT_IDS_SIZE)
+        Truth.assertThat(additionalIds!![d4lNamespacePos]).isEqualTo(DOWNSCALED_ATTACHMENT_IDS_FMT)
+        Truth.assertThat(additionalIds[FULL_ATTACHMENT_ID_POS]).isEqualTo(ATTACHMENT_ID)
+        Truth.assertThat(additionalIds[PREVIEW_ID_POS]).isEqualTo(PREVIEW_ID)
+        Truth.assertThat(additionalIds[THUMBNAIL_ID_POS]).isEqualTo(THUMBNAIL_ID)
     }
 
     @Test
@@ -846,44 +848,6 @@ class RecordServiceTest : RecordServiceTestBase() {
 
         // Then
         inOrder.verify(recordService).checkDataRestrictions(doc)
-        inOrder.verifyNoMoreInteractions()
-    }
-
-    @Test
-    fun buildMeta_shouldBuildMeta_whenUpdatedDateMillisecondsArePresent() {
-        // Given
-        val updatedDateWithMilliseconds = "2019-02-28T17:21:08.234123"
-        Mockito.`when`(mockDecryptedFhir3Record.customCreationDate).thenReturn("2019-02-28")
-        Mockito.`when`(mockDecryptedFhir3Record.updatedDate).thenReturn(updatedDateWithMilliseconds)
-
-        // When
-        val meta = recordService.buildMeta(mockDecryptedFhir3Record)
-
-        // Then
-        Truth.assertThat(meta.createdDate).isEqualTo(LocalDate.of(2019, 2, 28))
-        Truth.assertThat(meta.updatedDate).isEqualTo(LocalDateTime.of(2019, 2, 28, 17, 21, 8, 234123000))
-        inOrder.verify(recordService).buildMeta(mockDecryptedFhir3Record)
-        inOrder.verifyNoMoreInteractions()
-    }
-
-    @Test
-    fun buildMeta_shouldBuildMeta_whenUpdatedDateMillisecondsAreNotPresent() {
-        // Given
-        val updatedDateWithMilliseconds = "2019-02-28T17:21:08"
-        Mockito.`when`(mockDecryptedFhir3Record.customCreationDate).thenReturn("2019-02-28")
-        Mockito.`when`(mockDecryptedFhir3Record.updatedDate).thenReturn(updatedDateWithMilliseconds)
-
-        // When
-        val meta = recordService.buildMeta(mockDecryptedFhir3Record)
-
-        // Then
-        Truth.assertThat(meta.createdDate).isEqualTo(
-                LocalDate.of(2019, 2, 28)
-        )
-        Truth.assertThat(meta.updatedDate).isEqualTo(
-                LocalDateTime.of(2019, 2, 28, 17, 21, 8)
-        )
-        inOrder.verify(recordService).buildMeta(mockDecryptedFhir3Record)
         inOrder.verifyNoMoreInteractions()
     }
 

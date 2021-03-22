@@ -34,12 +34,13 @@ import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
-import care.data4life.sdk.model.definitions.RecordFactory
+import care.data4life.sdk.model.ModelContract.RecordFactory
 import care.data4life.sdk.network.DecryptedRecordMapper
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedCustomDataRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
+import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_FMT
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
 import care.data4life.sdk.test.util.AttachmentBuilder
@@ -259,7 +260,7 @@ abstract class RecordServiceTestBase {
         internal const val THUMBNAIL_ID = "thumbnailId"
         internal const val PREVIEW_ID = "previewId"
         internal const val ASSIGNER = "assigner"
-        internal const val ADDITIONAL_ID = RecordService.DOWNSCALED_ATTACHMENT_IDS_FMT +
+        internal const val ADDITIONAL_ID = DOWNSCALED_ATTACHMENT_IDS_FMT +
                 SPLIT_CHAR +
                 ATTACHMENT_ID +
                 SPLIT_CHAR +

@@ -29,6 +29,7 @@ import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 
+// TODO: Add factory to make testing easier
 internal class DecryptedRecordMapper : NetworkModelContract.DecryptedRecordBuilder {
     private var identifier: String? = null
     private var tags: HashMap<String, String>? = null

@@ -21,6 +21,7 @@ import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_FMT
 import care.data4life.sdk.test.util.AttachmentBuilder
 import care.data4life.sdk.test.util.MedicationBuilder
 import care.data4life.sdk.test.util.ObservationBuilder
@@ -64,7 +65,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         )
 
         // When
-        val record = recordService.uploadOrDownloadData(RecordService.UploadDownloadOperation.UPLOAD,
+        val record = recordService.uploadOrDownloadData(
+            RecordService.UploadDownloadOperation.UPLOAD,
                 mockDecryptedFhir3Record,
                 null,
                 USER_ID
@@ -334,7 +336,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         Truth.assertThat(doc).isEqualTo(docRef)
         Truth.assertThat(doc.identifier).hasSize(1)
         Truth.assertThat(doc.identifier!![0].value).isEqualTo(
-                RecordService.DOWNSCALED_ATTACHMENT_IDS_FMT + "#" + ATTACHMENT_ID + "#" +
+                DOWNSCALED_ATTACHMENT_IDS_FMT + "#" + ATTACHMENT_ID + "#" +
                         PREVIEW_ID + "#" + THUMBNAIL_ID
         )
         Truth.assertThat(doc.identifier!![0].assigner!!.reference).isEqualTo(PARTNER_ID)
@@ -353,7 +355,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         )
 
         // When
-        val record = recordService.uploadOrDownloadData(RecordService.UploadDownloadOperation.UPDATE,
+        val record = recordService.uploadOrDownloadData(
+            RecordService.UploadDownloadOperation.UPDATE,
                 mockDecryptedFhir3Record,
                 mockDocumentReference,
                 USER_ID
@@ -906,7 +909,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         Mockito.doReturn(mockDecryptedFhir3Record).`when`(recordService).downloadData(mockDecryptedFhir3Record, USER_ID)
 
         // When
-        val record = recordService.uploadOrDownloadData(RecordService.UploadDownloadOperation.DOWNLOAD,
+        val record = recordService.uploadOrDownloadData(
+            RecordService.UploadDownloadOperation.DOWNLOAD,
                 mockDecryptedFhir3Record,
                 null,
                 USER_ID
@@ -914,7 +918,8 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
 
         // Then
         Truth.assertThat(record).isEqualTo(mockDecryptedFhir3Record)
-        inOrder.verify(recordService).uploadOrDownloadData(RecordService.UploadDownloadOperation.DOWNLOAD,
+        inOrder.verify(recordService).uploadOrDownloadData(
+            RecordService.UploadDownloadOperation.DOWNLOAD,
                 mockDecryptedFhir3Record,
                 null,
                 USER_ID
@@ -1762,7 +1767,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         Truth.assertThat(pat).isEqualTo(patient)
         Truth.assertThat(pat!!.identifier).hasSize(1)
         Truth.assertThat(pat.identifier!![0].value).isEqualTo(
-                RecordService.DOWNSCALED_ATTACHMENT_IDS_FMT + "#" + ATTACHMENT_ID + "#"
+                DOWNSCALED_ATTACHMENT_IDS_FMT + "#" + ATTACHMENT_ID + "#"
                         + PREVIEW_ID + "#" + THUMBNAIL_ID
         )
         Truth.assertThat(pat.identifier!![0].assigner!!.reference).isEqualTo(PARTNER_ID)
@@ -1935,7 +1940,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         Truth.assertThat(obs).isEqualTo(observation)
         Truth.assertThat(obs!!.identifier).hasSize(1)
         Truth.assertThat(obs.identifier!![0].value).isEqualTo(
-                RecordService.DOWNSCALED_ATTACHMENT_IDS_FMT + "#" + ATTACHMENT_ID + "#" +
+                DOWNSCALED_ATTACHMENT_IDS_FMT + "#" + ATTACHMENT_ID + "#" +
                         PREVIEW_ID + "#" + THUMBNAIL_ID
         )
         Truth.assertThat(obs.identifier!![0].assigner!!.reference).isEqualTo(PARTNER_ID)
@@ -2025,7 +2030,7 @@ class RecordServiceUploadsUpdatesDownloadsTest : RecordServiceTestBase() {
         //then
         Truth.assertThat(response).isEqualTo(questionnaireResponse)
         Truth.assertThat(response!!.identifier!!.value).isEqualTo(
-                RecordService.DOWNSCALED_ATTACHMENT_IDS_FMT + "#" + ATTACHMENT_ID + "#" +
+                DOWNSCALED_ATTACHMENT_IDS_FMT + "#" + ATTACHMENT_ID + "#" +
                         PREVIEW_ID + "#" + THUMBNAIL_ID
         )
         Truth.assertThat(response.identifier!!.assigner!!.reference).isEqualTo(PARTNER_ID)

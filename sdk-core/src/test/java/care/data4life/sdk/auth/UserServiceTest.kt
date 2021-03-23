@@ -49,6 +49,7 @@ class UserServiceTest {
         private const val USER_ALIAS = "userAlias"
         private const val KEY_USER_ID = "user_id"
         private const val AUTH_TOKEN = "authToken"
+        private const val CURRENT_VERSION = "1.9.0"
     }
 
     private lateinit var apiService: ApiService
@@ -145,7 +146,7 @@ class UserServiceTest {
         mockkObject(Log)
         every { apiService.fetchVersionInfo() } returns response
         //when
-        val testSubscriber = userService.getVersionInfo("1.9.0")
+        val testSubscriber = userService.getVersionInfo(CURRENT_VERSION)
                 ?.test()
                 ?.await()
         //then
@@ -161,7 +162,7 @@ class UserServiceTest {
         every { apiService.fetchVersionInfo() } returns response
         every { versions.isSupported(currentVersion) } returns true
         //when
-        val testSubscriber = userService.getVersionInfo("1.9.0")
+        val testSubscriber = userService.getVersionInfo(CURRENT_VERSION)
                 ?.test()
         //then
         testSubscriber?.assertValue(true)

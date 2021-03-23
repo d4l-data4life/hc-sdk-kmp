@@ -160,33 +160,6 @@ class RecordServiceAttachmentDownloadsTest {
     }
 
     @Test
-    fun `Given, downloadData is called with a DecryptedRecord, which contains a Fhir3, and UserId, it ignores nulled attachments`() {
-        // Given
-        val resource: Fhir3Resource = mockk()
-        val attachmentKey: GCKey = mockk()
-        val decryptedRecord: DecryptedBaseRecord<Fhir3Resource> = mockk()
-
-        val attachments: MutableList<Fhir3Attachment?> = mutableListOf(null)
-
-        every { decryptedRecord.resource } returns resource
-        every { decryptedRecord.attachmentsKey } returns attachmentKey
-
-        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
-        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
-
-        // When
-        val record = recordService.downloadData(decryptedRecord, USER_ID)
-
-        // Then
-        assertSame(
-            actual = record,
-            expected = decryptedRecord
-        )
-
-        verify { attachmentService.download(any(), any(), any()) wasNot Called }
-    }
-
-    @Test
     fun `Given, downloadData is called with a DecryptedRecord, which contains a Fhir3, and UserId, it fails if an attachment has no id`() {
         // Given
         val resource: Fhir3Resource = mockk()
@@ -322,6 +295,65 @@ class RecordServiceAttachmentDownloadsTest {
     }
 
     @Test
+    fun `Given, downloadData is called with a DecryptedRecord, which contains a Fhir3, and UserId, it ignores Attachments, which are null`() {
+        // Given
+        val resource: Fhir3Resource = mockk()
+        val attachmentKey: GCKey = mockk()
+        val decryptedRecord: DecryptedBaseRecord<Fhir3Resource> = mockk()
+
+        val attachments: MutableList<Fhir3Attachment?> = mutableListOf(null, mockk())
+
+        val wrappedAttachment: WrapperContract.Attachment = spyk()
+
+        every { decryptedRecord.resource } returns resource
+        every { decryptedRecord.attachmentsKey } returnsMany listOf(null, attachmentKey)
+
+        every { wrappedAttachment.id } returns "id"
+
+        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
+        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
+        every { SdkAttachmentFactory.wrap(attachments[1]!!) } returns wrappedAttachment
+
+        every { cryptoService.generateGCKey() } returns Single.just(attachmentKey)
+        every { decryptedRecord.attachmentsKey = attachmentKey } returns Unit
+
+        every {
+            attachmentService.download(
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
+            )
+        } returns Single.just(mockk())
+
+        // When
+        val record = recordService.downloadData(decryptedRecord, USER_ID)
+
+        // Then
+        assertSame(
+            actual = record,
+            expected = decryptedRecord
+        )
+
+        verifyOrder {
+            cryptoService.generateGCKey()
+            decryptedRecord.attachmentsKey
+            attachmentService.download(
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
+            )
+        }
+
+        verify(exactly = 1) {
+            attachmentService.download(
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
+            )
+        }
+    }
+
+    @Test
     fun `Given, downloadData is called with a DecryptedRecord, which contains a Fhir4, and UserId, it reflects the record, if it is not capable of having attachments`() {
         // Given
         val resource: Fhir4Resource = mockk()
@@ -353,33 +385,6 @@ class RecordServiceAttachmentDownloadsTest {
 
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
         every { SdkFhirAttachmentHelper.getAttachment(resource) } returns null
-
-        // When
-        val record = recordService.downloadData(decryptedRecord, USER_ID)
-
-        // Then
-        assertSame(
-            actual = record,
-            expected = decryptedRecord
-        )
-
-        verify { attachmentService.download(any(), any(), any()) wasNot Called }
-    }
-
-    @Test
-    fun `Given, downloadData is called with a DecryptedRecord, which contains a Fhir4, and UserId, it ignores nulled attachments`() {
-        // Given
-        val resource: Fhir4Resource = mockk()
-        val attachmentKey: GCKey = mockk()
-        val decryptedRecord: DecryptedBaseRecord<Fhir4Resource> = mockk()
-
-        val attachments: MutableList<Fhir4Attachment?> = mutableListOf(null)
-
-        every { decryptedRecord.resource } returns resource
-        every { decryptedRecord.attachmentsKey } returns attachmentKey
-
-        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
-        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
 
         // When
         val record = recordService.downloadData(decryptedRecord, USER_ID)
@@ -467,6 +472,65 @@ class RecordServiceAttachmentDownloadsTest {
         )
 
         verifyOrder {
+            attachmentService.download(
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
+            )
+        }
+    }
+
+    @Test
+    fun `Given, downloadData is called with a DecryptedRecord, which contains a Fhir4, and UserId, it ignores Attachments, which are null`() {
+        // Given
+        val resource: Fhir4Resource = mockk()
+        val attachmentKey: GCKey = mockk()
+        val decryptedRecord: DecryptedBaseRecord<Fhir4Resource> = mockk()
+
+        val attachments: MutableList<Fhir4Attachment?> = mutableListOf(null, mockk())
+
+        val wrappedAttachment: WrapperContract.Attachment = spyk()
+
+        every { decryptedRecord.resource } returns resource
+        every { decryptedRecord.attachmentsKey } returnsMany listOf(null, attachmentKey)
+
+        every { wrappedAttachment.id } returns "id"
+
+        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
+        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
+        every { SdkAttachmentFactory.wrap(attachments[1]!!) } returns wrappedAttachment
+
+        every { cryptoService.generateGCKey() } returns Single.just(attachmentKey)
+        every { decryptedRecord.attachmentsKey = attachmentKey } returns Unit
+
+        every {
+            attachmentService.download(
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
+            )
+        } returns Single.just(mockk())
+
+        // When
+        val record = recordService.downloadData(decryptedRecord, USER_ID)
+
+        // Then
+        assertSame(
+            actual = record,
+            expected = decryptedRecord
+        )
+
+        verifyOrder {
+            cryptoService.generateGCKey()
+            decryptedRecord.attachmentsKey
+            attachmentService.download(
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
+            )
+        }
+
+        verify(exactly = 1) {
             attachmentService.download(
                 listOf(wrappedAttachment),
                 attachmentKey,

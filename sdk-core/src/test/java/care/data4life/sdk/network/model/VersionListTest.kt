@@ -18,24 +18,28 @@ package care.data4life.sdk.network.model
 
 import com.squareup.moshi.Moshi
 import org.junit.Test
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Assert.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class VersionListTest {
     @Test
-    fun `Given a VersionList it implements interface `() {
+    fun `Given a VersionList it fulfills the VersionList interface`() {
         //Given
-        val versions: Any = VersionList(listOf(Version(
-                25,
-                "1.9.0",
-                "supported"
-        )))
+        val versions: Any = VersionList(
+                listOf(
+                        Version(
+                                25,
+                                "1.9.0",
+                                "supported"
+                        )
+                )
+        )
         assertTrue(versions is NetworkModelContract.VersionList)
     }
 
     @Test
-    fun `VersionList is serializable `() {
+    fun `Given VersionList is serializable, it gives`() {
         //Given
         val version = Version(
                 25,
@@ -54,9 +58,36 @@ class VersionListTest {
         )
     }
 
+    @Test
+    fun `Given a VersionList is deserialized it transforms into VersionList`() {
+        //Given
+        val moshi = Moshi.Builder()
+                .build()
+        val versionListJson =
+                "{\"versions\":[{\"status\":\"supported\",\"version_code\":25,\"version_name\":\"1.9.0\"}]}"
+
+        //When
+        val versionList =
+                moshi.adapter<VersionList>(VersionList::class.java).fromJson(versionListJson)
+
+        //Then
+        assertEquals(
+                versionList,
+                VersionList(
+                        listOf(
+                                Version(
+                                        25,
+                                        "1.9.0",
+                                        "supported"
+                                )
+                        )
+                )
+        )
+    }
+
 
     @Test
-    fun `isSupported returns true when version is supported `() {
+    fun `isSupported returns true when version is supported`() {
         //Given
         val version = Version(
                 25,
@@ -72,7 +103,7 @@ class VersionListTest {
     }
 
     @Test
-    fun `isSupported returns true when version is not in versionList `() {
+    fun `isSupported returns true when version is not in versionList`() {
         //Given
         val version = Version(
                 25,
@@ -89,11 +120,11 @@ class VersionListTest {
         //When
         val isSupported = versions.isSupported(currentVersion.name)
         //Then
-        assertTrue ( isSupported )
+        assertTrue(isSupported)
     }
 
     @Test
-    fun `isSupported returns false when version is unsupported `() {
+    fun `isSupported returns false when version is unsupported`() {
         //Given
         val version = Version(
                 25,

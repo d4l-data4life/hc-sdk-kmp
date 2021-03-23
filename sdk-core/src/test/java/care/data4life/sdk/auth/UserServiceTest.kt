@@ -59,10 +59,10 @@ class UserServiceTest {
 
     @Before
     fun setUp() {
-        authService = mockk<AuthorizationService>()
-        userService = mockk<UserService>()
-        storage = mockk<CryptoSecureStore>()
-        apiService = mockk<ApiService>()
+        authService = mockk()
+        userService = mockk()
+        storage = mockk()
+        apiService = mockk()
         cryptoService = mockk()
         userService = spyk(UserService(USER_ALIAS, authService, apiService, storage, cryptoService))
     }
@@ -80,12 +80,12 @@ class UserServiceTest {
         every { cryptoService.fetchCurrentCommonKey() } returns mockGCKey
         // when
         val testSubscriber = userService.isLoggedIn(USER_ALIAS)
-            .test()
+                .test()
 
         // then
         testSubscriber
-            .assertNoErrors()
-            .assertValue(true)
+                .assertNoErrors()
+                .assertValue(true)
     }
 
     @Test
@@ -100,12 +100,12 @@ class UserServiceTest {
         every { cryptoService.fetchCurrentCommonKey() } returns mockGCKey
         // when
         val testSubscriber = userService.isLoggedIn(USER_ALIAS)
-            .test()
+                .test()
 
         // then
         testSubscriber
-            .assertNoErrors()
-            .assertValue(false)
+                .assertNoErrors()
+                .assertValue(false)
     }
 
     @Test
@@ -114,12 +114,12 @@ class UserServiceTest {
         every { authService.refreshAccessToken(USER_ALIAS) } returns AUTH_TOKEN
         // when
         val testSubscriber = userService.getSessionToken(USER_ALIAS)
-            .test()
+                .test()
 
         // then
         testSubscriber
-            .assertNoErrors()
-            .assertValue(AUTH_TOKEN)
+                .assertNoErrors()
+                .assertValue(AUTH_TOKEN)
     }
 
     @Ignore
@@ -129,12 +129,12 @@ class UserServiceTest {
         every { authService.refreshAccessToken(USER_ALIAS) } returns mockk<String>()
         // when
         val testSubscriber = userService.getSessionToken(USER_ALIAS)
-            .test()
-            .await()
+                .test()
+                .await()
 
         // then
         testSubscriber
-            .assertNoValues()
+                .assertNoValues()
     }
 
     @Test
@@ -146,8 +146,8 @@ class UserServiceTest {
         every { apiService.fetchVersionInfo() } returns response
         //when
         val testSubscriber = userService.getVersionInfo("1.9.0")
-            ?.test()
-            ?.await()
+                ?.test()
+                ?.await()
         //then
         testSubscriber?.assertValue(true)
         verify(exactly = 1) { Log.error(error, "Version not supported") }
@@ -162,10 +162,10 @@ class UserServiceTest {
         every { versions.isSupported(currentVersion) } returns true
         //when
         val testSubscriber = userService.getVersionInfo("1.9.0")
-            ?.test()
+                ?.test()
         //then
         testSubscriber?.assertValue(true)
-            ?.assertNoErrors()
+                ?.assertNoErrors()
 
     }
 
@@ -176,14 +176,14 @@ class UserServiceTest {
         every { storage.clear() } just Runs
         // when
         val testSubscriber = userService.logout()
-            .test()
-            .await()
+                .test()
+                .await()
 
         // then
         testSubscriber
-            .assertNoErrors()
-            .assertComplete()
-        verify { storage.clear() }
+                .assertNoErrors()
+                .assertComplete()
+        verify(exactly = 1) { storage.clear() }
     }
 
     @Test
@@ -192,13 +192,13 @@ class UserServiceTest {
         every { apiService.logout(USER_ALIAS) } returns Completable.error(Exception())
         // when
         val testSubscriber = userService.logout()
-            .test()
-            .await()
+                .test()
+                .await()
 
         // then
         testSubscriber
-            .assertError(Exception::class.java)
-            .assertNotComplete()
+                .assertError(Exception::class.java)
+                .assertNotComplete()
         verify { storage wasNot Called }
     }
 
@@ -224,13 +224,13 @@ class UserServiceTest {
         } returns Single.just(mockk<GCKey>())
         // when
         val testSubscriber = userService.finishLogin(true)
-            .test()
+                .test()
 
 
         // then
         testSubscriber
-            .assertValue { aBoolean: Boolean? -> aBoolean!! }
-            .assertComplete()
+                .assertValue { it }
+                .assertComplete()
     }
 
     @Test
@@ -245,7 +245,7 @@ class UserServiceTest {
 
         // then
         testObserver
-            .assertNoErrors()
-            .assertValue(uid)
+                .assertNoErrors()
+                .assertValue(uid)
     }
 }

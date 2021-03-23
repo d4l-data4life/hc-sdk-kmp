@@ -26,7 +26,7 @@ data class VersionList(
     fun isSupported(currentVersion: String): Boolean {
         var isSupported = true
         for (version in versions) {
-            if (version.name == currentVersion && version.status == NetworkModelContract.Version.KEY_UNSUPPORTED) {
+            if (version.name == currentVersion.substring(0,5) && version.status == NetworkModelContract.Version.KEY_UNSUPPORTED) {
                 isSupported = false
                 break
             }

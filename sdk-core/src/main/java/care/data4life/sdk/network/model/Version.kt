@@ -23,7 +23,7 @@ data class Version (
         override val code: Int,
         @field:Json(name = "version_name")
         override val name: String,
-        @field:Json(name = "version_status")
+        @field:Json(name = "status")
         override val status: String
 
 ) : NetworkModelContract.Version

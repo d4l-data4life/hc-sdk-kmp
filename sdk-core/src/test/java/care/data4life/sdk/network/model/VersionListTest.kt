@@ -17,10 +17,10 @@
 package care.data4life.sdk.network.model
 
 import com.squareup.moshi.Moshi
-import org.junit.Assert
 import org.junit.Test
-import kotlin.test.assertTrue
-import kotlin.test.assertFalse
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 
 class VersionListTest {
     @Test
@@ -31,7 +31,7 @@ class VersionListTest {
                 "1.9.0",
                 "supported"
         )))
-        Assert.assertTrue(versions is NetworkModelContract.VersionList)
+        assertTrue(versions is NetworkModelContract.VersionList)
     }
 
     @Test
@@ -48,8 +48,8 @@ class VersionListTest {
         //When
         val actual = moshi.adapter<VersionList>(VersionList::class.java).toJson(versions)
         //Then
-        Assert.assertEquals(
-                "{\"status\":\"supported\", \"version_name\":\"1.9.0\", \"version_code\":25}",
+        assertEquals(
+                "{\"versions\":[{\"status\":\"supported\",\"version_code\":25,\"version_name\":\"1.9.0\"}]}",
                 actual
         )
     }
@@ -68,7 +68,7 @@ class VersionListTest {
         //When
         val isSupported = versions.isSupported(version.name)
         //Then
-        assertTrue { isSupported }
+        assertTrue(isSupported)
     }
 
     @Test
@@ -89,7 +89,7 @@ class VersionListTest {
         //When
         val isSupported = versions.isSupported(currentVersion.name)
         //Then
-        assertTrue { isSupported }
+        assertTrue ( isSupported )
     }
 
     @Test
@@ -105,6 +105,6 @@ class VersionListTest {
         //When
         val isSupported = versions.isSupported(version.name)
         //Then
-        assertFalse { isSupported }
+        assertFalse(isSupported)
     }
 }

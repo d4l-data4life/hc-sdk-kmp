@@ -16,6 +16,7 @@
 package care.data4life.sdk
 
 
+import care.data4life.crypto.GCKey
 import care.data4life.fhir.r4.model.Extension
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
@@ -29,6 +30,7 @@ import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
+import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_FMT
 import care.data4life.sdk.tag.TaggingContract
@@ -807,6 +809,9 @@ class RecordServiceAdditionalResourceTypeModule {
                 getFhireResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
+        val fetchedRecord: EncryptedRecord = mockk()
+        val attachmentKey: GCKey = mockk()
+
         val firstAttachmentId = "1"
         val secondAttachmentId = "2"
 
@@ -831,21 +836,21 @@ class RecordServiceAdditionalResourceTypeModule {
                 null,
                 resource,
                 null,
-                arrayListOf(),
+                listOf(),
                 null,
                 null,
                 null,
-                mockk(),
+                attachmentKey,
                 -1
         )
 
-        every { recordService.decryptRecord<Fhir3Resource>(any(), any()) } returns decryptedRecord
+        every { recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID) } returns decryptedRecord
         every {
-            apiService.fetchRecord(ALIAS, any(), any())
-        } returns Single.just(mockk())
+            apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
+        } returns Single.just(fetchedRecord)
 
         every {
-            recordService.decryptRecord<Fhir3Resource>(any(), any())
+            recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID)
         } returns decryptedRecord as DecryptedBaseRecord<Fhir3Resource>
 
         every {
@@ -854,8 +859,8 @@ class RecordServiceAdditionalResourceTypeModule {
                             SdkAttachmentFactory.wrap(firstAttachment),
                             SdkAttachmentFactory.wrap(secondAttachment)
                     ),
-                    any(),
-                    any()
+                    attachmentKey,
+                    USER_ID
             )
         } returns Single.just(wrappedAttachments)
 
@@ -895,6 +900,9 @@ class RecordServiceAdditionalResourceTypeModule {
                 getFhireResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
+        val fetchedRecord: EncryptedRecord = mockk()
+        val attachmentKey: GCKey = mockk()
+
         val firstAttachmentId = "1"
         val secondAttachmentId = "2"
 
@@ -915,25 +923,25 @@ class RecordServiceAdditionalResourceTypeModule {
                 SdkAttachmentFactory.wrap(secondAttachment)
         )
 
-        val decryptedRecord = DecryptedR4Record(
+        val decryptedRecord = DecryptedR4Record<Fhir4Resource>(
                 null,
                 resource,
                 null,
-                arrayListOf(),
+                listOf(),
                 null,
                 null,
                 null,
-                mockk(),
+                attachmentKey,
                 -1
         )
 
-        every { recordService.decryptRecord<Fhir4Resource>(any(), any()) } returns decryptedRecord
+        every { recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID) } returns decryptedRecord
         every {
-            apiService.fetchRecord(ALIAS, any(), any())
-        } returns Single.just(mockk())
+            apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
+        } returns Single.just(fetchedRecord)
 
         every {
-            recordService.decryptRecord<Fhir4Resource>(any(), any())
+            recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID)
         } returns decryptedRecord as DecryptedBaseRecord<Fhir4Resource>
 
         every {
@@ -942,8 +950,8 @@ class RecordServiceAdditionalResourceTypeModule {
                             SdkAttachmentFactory.wrap(firstAttachment),
                             SdkAttachmentFactory.wrap(secondAttachment)
                     ),
-                    any(),
-                    any()
+                    attachmentKey,
+                    USER_ID
             )
         } returns Single.just(wrappedAttachments)
 

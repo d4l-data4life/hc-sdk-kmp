@@ -21,6 +21,7 @@ toc::[]
 === Removed
 
 === Fixed
+* RecordService#checkDataRestrictions does not check multiple attachments correctly, if one of them is null or has null as data payload.
 
 === Bumped
 

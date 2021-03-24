@@ -49,7 +49,7 @@ class UserServiceTest {
         private const val USER_ALIAS = "userAlias"
         private const val KEY_USER_ID = "user_id"
         private const val AUTH_TOKEN = "authToken"
-        private const val CURRENT_VERSION = "1.9.0"
+        private const val CURRENT_VERSION = "1.9.0-config"
     }
 
     private lateinit var apiService: ApiService
@@ -207,22 +207,28 @@ class UserServiceTest {
     fun `finish Login should Return Boolean Success`() {
         //given
         val userInfo = mockk<UserInfo>()
-        every { userInfo.commonKey } returns mockk<EncryptedKey>()
+        val commonKey = mockk<EncryptedKey>()
+        val key = mockk<GCKey>()
+        val encryptedKey = mockk<EncryptedKey>()
+        val keyPair = mockk<GCKeyPair>()
+        val symKey: GCKey = mockk()
+        every { userInfo.commonKey } returns commonKey
         every { userInfo.commonKeyId } returns "mockedCommonKeyId"
-        every { userInfo.tagEncryptionKey } returns mockk<EncryptedKey>()
+        every { userInfo.tagEncryptionKey } returns encryptedKey
         every { userInfo.uid } returns "mockedUid"
         every { apiService.fetchUserInfo(USER_ALIAS) } returns Single.just(userInfo)
         every { storage.storeSecret("userAlias_user_id", "mockedUid") } just Runs
-        every { cryptoService.storeCommonKey("mockedCommonKeyId", any()) } just Runs
+        every { cryptoService.storeCommonKey("mockedCommonKeyId", key) } just Runs
         every { cryptoService.storeCurrentCommonKeyId("mockedCommonKeyId") } just Runs
         every { cryptoService.storeTagEncryptionKey(any()) } just Runs
-        every { cryptoService.fetchGCKeyPair() } returns Single.just(mockk<GCKeyPair>())
+        every { cryptoService.fetchGCKeyPair() } returns Single.just(keyPair)
         every {
-            cryptoService.asymDecryptSymetricKey(any(), any())
-        } returns Single.just(mockk<GCKey>())
+            cryptoService.asymDecryptSymetricKey(keyPair, commonKey)
+        } returns Single.just(key)
         every {
-            cryptoService.symDecryptSymmetricKey(any(), any())
-        } returns Single.just(mockk<GCKey>())
+            cryptoService.symDecryptSymmetricKey(key, encryptedKey)
+        } returns Single.just(symKey)
+        every { cryptoService.storeTagEncryptionKey(symKey) } just Runs
         // when
         val testSubscriber = userService.finishLogin(true)
                 .test()

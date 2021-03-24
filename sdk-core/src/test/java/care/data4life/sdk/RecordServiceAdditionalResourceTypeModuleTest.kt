@@ -69,7 +69,7 @@ import care.data4life.fhir.stu3.util.FhirAttachmentHelper as Fhir3AttachmentHelp
 
 
 @RunWith(Parameterized::class)
-class RecordServiceAdditionalResourceTypeModule {
+class RecordServiceAdditionalResourceTypeModuleTest {
     private lateinit var recordService: RecordService
     private lateinit var apiService: ApiService
     private lateinit var cryptoService: CryptoService
@@ -78,6 +78,9 @@ class RecordServiceAdditionalResourceTypeModule {
     private lateinit var taggingService: TaggingContract.Service
     private lateinit var attachmentService: AttachmentContract.Service
     private lateinit var errorHandler: SdkContract.ErrorHandler
+    private val defaultAnnotations = listOf<String>() 
+    
+    private val modelVersion = -1
 
     @Before
     fun setUp() {
@@ -89,19 +92,136 @@ class RecordServiceAdditionalResourceTypeModule {
         attachmentService = mockk()
         errorHandler = mockk()
 
-        recordService = spyk(RecordService(
-                PARTNER_ID,
-                ALIAS,
-                apiService,
-                tagEncryptionService,
-                taggingService,
-                fhirService,
-                attachmentService,
-                cryptoService,
-                errorHandler
-        ))
+        recordService = spyk(
+                RecordService(
+                        PARTNER_ID,
+                        ALIAS,
+                        apiService,
+                        tagEncryptionService,
+                        taggingService,
+                        fhirService,
+                        attachmentService,
+                        cryptoService,
+                        errorHandler
+                )
+        )
     }
     
+    companion object {
+        private val PDF = makePdf(DATA_SIZE_MAX_BYTES)
+        private val PDF_OVERSIZED = makePdf(DATA_SIZE_MAX_BYTES + 1)
+
+        private const val RECORD_ID = "recordId"
+        private const val USER_ID = "userId"
+        private const val PARTNER_ID = "partnerId"
+        private const val ALIAS = "alias"
+        private const val DATA = "data"
+        private const val DATA_SIZE = 42
+        private const val DATA_HASH = "dataHash"
+        private const val ATTACHMENT_ID = "attachmentId"
+        private const val THUMBNAIL_ID = "thumbnailId"
+        private const val PREVIEW_ID = "previewId"
+        private const val ASSIGNER = "assigner"
+        private const val ADDITIONAL_ID = DOWNSCALED_ATTACHMENT_IDS_FMT +
+                SPLIT_CHAR +
+                ATTACHMENT_ID +
+                SPLIT_CHAR +
+                PREVIEW_ID +
+                SPLIT_CHAR +
+                THUMBNAIL_ID
+        private val OBSOLETE_ID = ADDITIONAL_ID.replaceFirst(ATTACHMENT_ID, "obsoleteId")
+        private const val OTHER_ID = "otherId"
+        private const val VALUE_INDICATOR = "valueAttachment"
+        private const val VALUE_ID = DOWNSCALED_ATTACHMENT_IDS_FMT +
+                SPLIT_CHAR +
+                VALUE_INDICATOR +
+                SPLIT_CHAR +
+                PREVIEW_ID +
+                SPLIT_CHAR +
+                THUMBNAIL_ID
+
+        private fun makePdf(size: Int): String {
+            val pdf = arrayOfNulls<Byte>(size)
+            System.arraycopy(
+                    MimeType.PDF.byteSignature()[0] as Any,
+                    0,
+                    pdf,
+                    0,
+                    MimeType.PDF.byteSignature()[0]?.size!!
+            )
+
+            return Base64.encodeToString(byteArrayOf(pdf))
+        }
+
+        private fun byteArrayOf(elements: Array<Byte?>): ByteArray {
+            val array = ByteArray(elements.size)
+            for (idx in elements.indices) {
+                array[idx] = elements[idx] ?: 0
+            }
+
+            return array
+        }
+
+        private fun buildFhir3Attachment(id: String): Fhir3Attachment {
+            val attachment = Fhir3Attachment()
+            attachment.id = id
+            attachment.data = DATA
+            attachment.size = DATA_SIZE
+            attachment.hash = DATA_HASH
+            return attachment
+        }
+
+        private fun buildFhir4Attachment(id: String): Fhir4Attachment {
+            val attachment = Fhir4Attachment()
+            attachment.id = id
+            attachment.data = DATA
+            attachment.size = DATA_SIZE
+            attachment.hash = DATA_HASH
+            return attachment
+        }
+
+        @JvmStatic
+        @Parameterized.Parameters(name = "applied on {1}")
+        fun parameter() = listOf(
+                arrayOf(
+                        "Patient",
+                        "patient",
+                        listOf("common"),
+                        "1"
+                ),
+                arrayOf(
+                        "QuestionnaireResponse",
+                        "questionnaireResponse",
+                        listOf("common"),
+                        "1"
+                ),
+                arrayOf(
+                        "Medication",
+                        "medication",
+                        listOf("fhir3"),
+                        "1"
+                ),
+                arrayOf(
+                        "Observation",
+                        "observation",
+                        listOf("fhir3"),
+                        "1"
+                ),
+                arrayOf(
+                        "Observation",
+                        "observation-with-component",
+                        listOf("fhir3"),
+                        "2"
+                ),
+                arrayOf(
+                        "Questionnaire",
+                        "questionnaire",
+                        listOf("fhir3", "fhir4"),
+                        "1"
+                )
+        )
+    }
+
     @Parameterized.Parameter(value = 0)
     lateinit var resourceType: String
 
@@ -362,12 +482,12 @@ class RecordServiceAdditionalResourceTypeModule {
                 null,
                 resource,
                 null,
-                arrayListOf(),
+                defaultAnnotations,
                 null,
                 null,
                 null,
                 null,
-                -1
+                modelVersion
         )
 
         // When
@@ -402,12 +522,12 @@ class RecordServiceAdditionalResourceTypeModule {
                 null,
                 resource,
                 null,
-                arrayListOf(),
+                defaultAnnotations,
                 null,
                 null,
                 null,
                 null,
-                -1
+                modelVersion
         )
 
         // When
@@ -441,12 +561,12 @@ class RecordServiceAdditionalResourceTypeModule {
                 null,
                 originalResource,
                 null,
-                arrayListOf(),
+                defaultAnnotations,
                 null,
                 null,
                 null,
                 null,
-                -1
+                modelVersion
         )
 
         val stripedRecord = recordService.removeUploadData(decryptedRecord)
@@ -489,12 +609,12 @@ class RecordServiceAdditionalResourceTypeModule {
                 null,
                 originalResource,
                 null,
-                arrayListOf(),
+                defaultAnnotations,
                 null,
                 null,
                 null,
                 null,
-                -1
+                modelVersion
         )
 
         val stripedRecord = recordService.removeUploadData(decryptedRecord)
@@ -836,12 +956,12 @@ class RecordServiceAdditionalResourceTypeModule {
                 null,
                 resource,
                 null,
-                listOf(),
+                defaultAnnotations,
                 null,
                 null,
                 null,
                 attachmentKey,
-                -1
+                modelVersion
         )
 
         every { recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID) } returns decryptedRecord
@@ -923,16 +1043,16 @@ class RecordServiceAdditionalResourceTypeModule {
                 SdkAttachmentFactory.wrap(secondAttachment)
         )
 
-        val decryptedRecord = DecryptedR4Record<Fhir4Resource>(
+        val decryptedRecord = DecryptedR4Record(
                 null,
                 resource,
                 null,
-                listOf(),
+                defaultAnnotations,
                 null,
                 null,
                 null,
                 attachmentKey,
-                -1
+                modelVersion
         )
 
         every { recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID) } returns decryptedRecord
@@ -977,121 +1097,6 @@ class RecordServiceAdditionalResourceTypeModule {
         assertEquals(
                 actual = result[1].id,
                 expected = secondAttachmentId
-        )
-    }
-
-    companion object {
-        private val PDF = makePdf(DATA_SIZE_MAX_BYTES)
-        private val PDF_OVERSIZED =  makePdf(DATA_SIZE_MAX_BYTES+1)
-
-        private const val RECORD_ID = "recordId"
-        private const val USER_ID = "userId"
-        private const val PARTNER_ID = "partnerId"
-        private const val ALIAS = "alias"
-        private const val DATA = "data"
-        private const val DATA_SIZE = 42
-        private const val DATA_HASH = "dataHash"
-        private const val ATTACHMENT_ID = "attachmentId"
-        private const val THUMBNAIL_ID = "thumbnailId"
-        private const val PREVIEW_ID = "previewId"
-        private const val ASSIGNER = "assigner"
-        private const val ADDITIONAL_ID = DOWNSCALED_ATTACHMENT_IDS_FMT +
-                SPLIT_CHAR +
-                ATTACHMENT_ID +
-                SPLIT_CHAR +
-                PREVIEW_ID +
-                SPLIT_CHAR +
-                THUMBNAIL_ID
-        private val OBSOLETE_ID = ADDITIONAL_ID.replaceFirst(ATTACHMENT_ID, "obsoleteId")
-        private const val OTHER_ID = "otherId"
-        private const val VALUE_INDICATOR = "valueAttachment"
-        private val VALUE_ID = DOWNSCALED_ATTACHMENT_IDS_FMT +
-                SPLIT_CHAR +
-                VALUE_INDICATOR +
-                SPLIT_CHAR +
-                PREVIEW_ID +
-                SPLIT_CHAR +
-                THUMBNAIL_ID
-
-        private fun makePdf(size: Int): String {
-            val pdf = arrayOfNulls<Byte>(size)
-            System.arraycopy(
-                MimeType.PDF.byteSignature()[0] as Any,
-                0,
-                pdf,
-                0,
-                MimeType.PDF.byteSignature()[0]?.size!!
-            )
-
-            return Base64.encodeToString(byteArrayOf(pdf))
-        }
-
-        private fun byteArrayOf(elements: Array<Byte?>): ByteArray {
-            val array = ByteArray(elements.size)
-            for (idx in elements.indices) {
-                array[idx] = elements[idx] ?: 0
-            }
-
-            return array
-        }
-
-        private fun buildFhir3Attachment(id: String): Fhir3Attachment {
-            val attachment = Fhir3Attachment()
-            attachment.id = id
-            attachment.data = DATA
-            attachment.size = DATA_SIZE
-            attachment.hash = DATA_HASH
-            return attachment
-        }
-
-        private fun buildFhir4Attachment(id: String): Fhir4Attachment {
-            val attachment = Fhir4Attachment()
-            attachment.id = id
-            attachment.data = DATA
-            attachment.size = DATA_SIZE
-            attachment.hash = DATA_HASH
-            return attachment
-        }
-
-        @JvmStatic
-        @Parameterized.Parameters(name = "applied on {1}")
-        fun parameter() = listOf(
-                arrayOf(
-                        "Patient",
-                        "patient",
-                        listOf("common"),
-                        "1"
-                ),
-                arrayOf(
-                        "QuestionnaireResponse",
-                        "questionnaireResponse",
-                        listOf("common"),
-                        "1"
-                ),
-                arrayOf(
-                        "Medication",
-                        "medication",
-                        listOf("fhir3"),
-                        "1"
-                ),
-                arrayOf(
-                        "Observation",
-                        "observation",
-                        listOf("fhir3"),
-                        "1"
-                ),
-                arrayOf(
-                        "Observation",
-                        "observation-with-component",
-                        listOf("fhir3"),
-                        "2"
-                ),
-                arrayOf(
-                        "Questionnaire",
-                        "questionnaire",
-                        listOf("fhir3", "fhir4"),
-                        "1"
-                )
         )
     }
 }

@@ -87,162 +87,6 @@ class RecordServiceTest : RecordServiceTestBase() {
 
     //region utility methods
     @Test
-    @Throws(DataValidationException.IdUsageViolation::class)
-    fun cleanObsoleteAdditionalIdentifiers_shouldCleanObsoleteIdentifiers() {
-        //given
-        val currentId = ADDITIONAL_ID
-        val obsoleteId = ADDITIONAL_ID.replaceFirst(ATTACHMENT_ID.toRegex(), "obsoleteId")
-        val otherId = "otherId"
-        val currentIdentifier = Fhir3AttachmentHelper.buildIdentifier(currentId, ASSIGNER)
-        val obsoleteIdentifier = Fhir3AttachmentHelper.buildIdentifier(obsoleteId, ASSIGNER)
-        val otherIdentifier = Fhir3AttachmentHelper.buildIdentifier(otherId, ASSIGNER)
-        val identifiers: MutableList<Identifier> = arrayListOf()
-        identifiers.add(currentIdentifier)
-        identifiers.add(obsoleteIdentifier)
-        identifiers.add(otherIdentifier)
-        val doc = buildDocumentReference()
-        doc.content[0].attachment.id = ATTACHMENT_ID
-        doc.identifier = identifiers
-
-        //when
-        recordService.cleanObsoleteAdditionalIdentifiers(doc)
-
-        //then
-        Truth.assertThat(doc.identifier).hasSize(2)
-        Truth.assertThat(doc.identifier!![0]).isEqualTo(currentIdentifier)
-        Truth.assertThat(doc.identifier!![1]).isEqualTo(otherIdentifier)
-    }
-
-    @Test
-    @Throws(DataValidationException.IdUsageViolation::class)
-    fun setAttachmentIdForDownloadType_shouldSetAttachmentId() {
-        //given
-        val attachment = AttachmentBuilder.buildAttachment(ATTACHMENT_ID)
-        val additionalId = Fhir3AttachmentHelper.buildIdentifier(ADDITIONAL_ID, ASSIGNER)
-        val attachments = listOf(attachment)
-        val identifiers = listOf(additionalId)
-
-        //when downloadType is Full
-        recordService.setAttachmentIdForDownloadType(attachments, identifiers, DownloadType.Full)
-        //then
-        Truth.assertThat(attachment.id).isEqualTo(ATTACHMENT_ID)
-
-        //given
-        attachment.id = ATTACHMENT_ID
-        //when downloadType is Medium
-        recordService.setAttachmentIdForDownloadType(attachments, identifiers, DownloadType.Medium)
-        //then
-        Truth.assertThat(attachment.id).isEqualTo(ATTACHMENT_ID + SPLIT_CHAR + PREVIEW_ID)
-
-        //given
-        attachment.id = ATTACHMENT_ID
-        //when downloadType is Small
-        recordService.setAttachmentIdForDownloadType(attachments, identifiers, DownloadType.Small)
-        //then
-        Truth.assertThat(attachment.id).isEqualTo(ATTACHMENT_ID + SPLIT_CHAR + THUMBNAIL_ID)
-    }
-
-    @Test
-    @Throws(DataValidationException.IdUsageViolation::class)
-    fun extractAdditionalAttachmentIds_shouldExtractAdditionalIds() {
-        //given
-        val additionalIdentifier = Fhir3AttachmentHelper.buildIdentifier(ADDITIONAL_ID, ASSIGNER)
-
-        //when
-        val additionalIds = recordService.extractAdditionalAttachmentIds(listOf(additionalIdentifier), ATTACHMENT_ID)
-
-        //then
-        val d4lNamespacePos = 0
-        Truth.assertThat(additionalIds).hasSize(DOWNSCALED_ATTACHMENT_IDS_SIZE)
-        Truth.assertThat(additionalIds!![d4lNamespacePos]).isEqualTo(DOWNSCALED_ATTACHMENT_IDS_FMT)
-        Truth.assertThat(additionalIds[FULL_ATTACHMENT_ID_POS]).isEqualTo(ATTACHMENT_ID)
-        Truth.assertThat(additionalIds[PREVIEW_ID_POS]).isEqualTo(PREVIEW_ID)
-        Truth.assertThat(additionalIds[THUMBNAIL_ID_POS]).isEqualTo(THUMBNAIL_ID)
-    }
-
-    @Test
-    @Throws(DataValidationException.IdUsageViolation::class)
-    fun extractAdditionalAttachmentIds_shouldReturnNull_whenAdditionalIdentifiersAreNull() {
-        //when
-        val additionalIds = recordService.extractAdditionalAttachmentIds(null, ATTACHMENT_ID)
-
-        //then
-        Truth.assertThat(additionalIds).isNull()
-    }
-
-    @Test
-    @Throws(DataValidationException.IdUsageViolation::class)
-    fun extractAdditionalAttachmentIds_shouldReturnNull_whenAdditionalIdentifiersAreNotAdditionalAttachmentIds() {
-        //given
-        val identifier = Fhir3AttachmentHelper.buildIdentifier("otherId", ASSIGNER)
-
-        //when
-        val additionalIds = recordService.extractAdditionalAttachmentIds(listOf(identifier), ATTACHMENT_ID)
-
-        //then
-        Truth.assertThat(additionalIds).isNull()
-    }
-
-    @Test
-    @Throws(DataValidationException.IdUsageViolation::class)
-    fun splitAdditionalAttachmentId_shouldSplitAdditionalId() {
-        //given
-        val additionalIdentifier = Fhir3AttachmentHelper.buildIdentifier(ADDITIONAL_ID, ASSIGNER)
-
-        //when
-        val additionalIds = recordService.splitAdditionalAttachmentId(SdkIdentifierFactory.wrap(additionalIdentifier))
-
-        //then
-        val d4lNamespacePos = 0
-        Truth.assertThat(additionalIds).hasSize(DOWNSCALED_ATTACHMENT_IDS_SIZE)
-        Truth.assertThat(additionalIds!![d4lNamespacePos]).isEqualTo(DOWNSCALED_ATTACHMENT_IDS_FMT)
-        Truth.assertThat(additionalIds[FULL_ATTACHMENT_ID_POS]).isEqualTo(ATTACHMENT_ID)
-        Truth.assertThat(additionalIds[PREVIEW_ID_POS]).isEqualTo(PREVIEW_ID)
-        Truth.assertThat(additionalIds[THUMBNAIL_ID_POS]).isEqualTo(THUMBNAIL_ID)
-    }
-
-    @Test
-    @Throws(DataValidationException.IdUsageViolation::class)
-    fun splitAdditionalAttachmentId_shouldReturnNull_whenAdditionalIdentifierIsNull() {
-        //given
-        val additionalIdentifier = Fhir3AttachmentHelper.buildIdentifier(null, ASSIGNER)
-        //when
-        val additionalIds = recordService.splitAdditionalAttachmentId(SdkIdentifierFactory.wrap(additionalIdentifier))
-        //then
-        Truth.assertThat(additionalIds).isNull()
-    }
-
-    @Test
-    @Throws(DataValidationException.IdUsageViolation::class)
-    fun splitAdditionalAttachmentId_shouldReturnNull_whenAdditionalIdentifierIsNotAdditionalAttachmentId() {
-        //given
-        val additionalIdentifier = Fhir3AttachmentHelper.buildIdentifier("otherId", ASSIGNER)
-
-        //when
-        val additionalIds = recordService.splitAdditionalAttachmentId(SdkIdentifierFactory.wrap(additionalIdentifier))
-
-        //then
-        Truth.assertThat(additionalIds).isNull()
-    }
-
-    @Test
-    fun splitAdditionalAttachmentId_shouldThrow_whenAdditionalAttachmentIdIsMalformed() {
-        //given
-        val malformedAdditionalId = ADDITIONAL_ID + SPLIT_CHAR + "unexpectedId"
-        val additionalIdentifier = Fhir3AttachmentHelper.buildIdentifier(malformedAdditionalId, ASSIGNER)
-
-        //when
-        try {
-            recordService.splitAdditionalAttachmentId(SdkIdentifierFactory.wrap(additionalIdentifier))
-            Assert.fail("Exception expected!")
-        } catch (ex: DataValidationException.IdUsageViolation) {
-
-            //then
-            Truth.assertThat(ex.message).isEqualTo(malformedAdditionalId)
-        }
-    }
-
-    @Test
     fun updateAttachmentMeta_shouldUpdateAttachmentMeta() {
         //given
         val attachment = Fhir3Attachment()
@@ -791,23 +635,23 @@ class RecordServiceTest : RecordServiceTestBase() {
 
         every {
             Fhir4AttachmentHelper.appendIdentifier(
-                    resource,
-                    any(),
-                    PARTNER_ID
+                resource,
+                any(),
+                RecordServiceTestBase.PARTNER_ID
             )
         } returns mockk()
 
         // When
         recordServiceK.updateFhirResourceIdentifier(
-                resource,
-                listOf<Pair<WrapperContract.Attachment, List<String>?>>(attachment to null)
+            resource,
+            listOf<Pair<WrapperContract.Attachment, List<String>?>>(attachment to null)
         )
 
         verify(exactly = 0) {
             Fhir4AttachmentHelper.appendIdentifier(
-                    resource,
-                    any(),
-                    PARTNER_ID
+                resource,
+                any(),
+                RecordServiceTestBase.PARTNER_ID
             )
         }
     }
@@ -822,23 +666,23 @@ class RecordServiceTest : RecordServiceTestBase() {
 
         every {
             Fhir4AttachmentHelper.appendIdentifier(
-                    resource,
-                    "d4l_f_p_t#something#abc",
-                    PARTNER_ID
+                resource,
+                "d4l_f_p_t#something#abc",
+                RecordServiceTestBase.PARTNER_ID
             )
         } returns mockk()
 
         // When
         recordServiceK.updateFhirResourceIdentifier(
-                resource,
-                listOf<Pair<WrapperContract.Attachment, List<String>?>>(attachment to listOf("abc"))
+            resource,
+            listOf<Pair<WrapperContract.Attachment, List<String>?>>(attachment to listOf("abc"))
         )
 
         verify(exactly = 1) {
             Fhir4AttachmentHelper.appendIdentifier(
-                    resource,
-                    "d4l_f_p_t#something#abc",
-                    PARTNER_ID
+                resource,
+                "d4l_f_p_t#something#abc",
+                RecordServiceTestBase.PARTNER_ID
             )
         }
     }

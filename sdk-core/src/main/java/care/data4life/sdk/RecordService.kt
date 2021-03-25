@@ -766,7 +766,7 @@ class RecordService internal constructor(
                     decryptedRecord.attachmentsKey!!,
                     userId
             )
-                    .flattenAsObservable { it }
+                    .flattenAsObservable { attachment -> attachment }
                     .map { attachment ->
                         attachment.unwrap<Fhir3Attachment>().also {
                             if (it.id!!.contains(SPLIT_CHAR)) updateAttachmentMeta(it)
@@ -835,7 +835,7 @@ class RecordService internal constructor(
     internal fun <T : Any> restoreUploadData(
             record: DecryptedBaseRecord<T>,
             originalResource: T,
-            attachmentData: HashMap<Any, String?>?
+            attachmentData: HashMap<Any, String?>? // TODO: Match Any as Attachment against Fhir version
     ): DecryptedBaseRecord<T> {
         if (!isFhir(record.resource) || !isFhir(originalResource)) {
             return record
@@ -1148,21 +1148,23 @@ class RecordService internal constructor(
     internal fun extractAdditionalAttachmentIds(
             additionalIds: List<Any>?,
             attachmentId: String?
-    ): Array<String>? {
+    ): List<String>? {
         if (additionalIds == null) return null
+
         for (i in additionalIds) {
             val parts = splitAdditionalAttachmentId(identifierFactory.wrap(i))
             if (parts != null && parts[FULL_ATTACHMENT_ID_POS] == attachmentId) return parts
         }
+
         return null //Attachment is not of image type
     }
 
     @Throws(DataValidationException.IdUsageViolation::class)
-    internal fun splitAdditionalAttachmentId(identifier: WrapperContract.Identifier): Array<String>? {
+    internal fun splitAdditionalAttachmentId(identifier: WrapperContract.Identifier): List<String>? {
         if (identifier.value == null || !identifier.value!!.startsWith(DOWNSCALED_ATTACHMENT_IDS_FMT)) {
             return null
         }
-        val parts = identifier.value!!.split(ThumbnailService.SPLIT_CHAR.toRegex()).toTypedArray()
+        val parts = identifier.value!!.split(ThumbnailService.SPLIT_CHAR.toRegex())
 
         if (parts.size != DOWNSCALED_ATTACHMENT_IDS_SIZE) {
             throw DataValidationException.IdUsageViolation(identifier.value)
@@ -1193,8 +1195,7 @@ class RecordService internal constructor(
         ) {
             val identifiers = fhirAttachmentHelper.getIdentifier(resource)
             val currentAttachments = fhirAttachmentHelper.getAttachment(resource)!!
-            val currentAttachmentIds: MutableList<String> =
-                    arrayListOf(currentAttachments.size.toString())
+            val currentAttachmentIds = mutableListOf(currentAttachments.size.toString())
 
             currentAttachments.forEach {
                 if (it != null) {

@@ -42,6 +42,7 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.spyk
 import io.mockk.unmockkObject
+import io.mockk.verify
 import io.mockk.verifyOrder
 import io.reactivex.Single
 import org.junit.After
@@ -118,6 +119,9 @@ class RecordServiceUpdateRecordTest {
         val receivedRecord: EncryptedRecord = mockk()
         val receivedDecryptedRecord: DecryptedRecord<Fhir3Resource> = mockk(relaxed = true)
         val record: Record<Fhir3Resource> = mockk()
+        val identifier = "id"
+
+        every { receivedDecryptedRecord.identifier } returns identifier
 
         every {
             apiService.fetchRecord(
@@ -188,7 +192,7 @@ class RecordServiceUpdateRecordTest {
             )
             recordService.decryptRecord<Fhir3Resource>(receivedRecord, USER_ID)
             recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
-            recordService.assignResourceId(receivedDecryptedRecord)
+            resource.id = receivedDecryptedRecord.identifier
             RecordMapper.getInstance(receivedDecryptedRecord)
 
         }
@@ -204,6 +208,9 @@ class RecordServiceUpdateRecordTest {
         val receivedRecord: EncryptedRecord = mockk()
         val receivedDecryptedRecord: DecryptedR4Record<Fhir4Resource> = mockk(relaxed = true)
         val record: Fhir4Record<Fhir4Resource> = mockk()
+        val identifier = "id"
+
+        every { receivedDecryptedRecord.identifier } returns identifier
 
         every {
             apiService.fetchRecord(
@@ -274,7 +281,7 @@ class RecordServiceUpdateRecordTest {
             )
             recordService.decryptRecord<Fhir4Resource>(receivedRecord, USER_ID)
             recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
-            recordService.assignResourceId(receivedDecryptedRecord)
+            resource.id = receivedDecryptedRecord.identifier
             RecordMapper.getInstance(receivedDecryptedRecord)
 
         }
@@ -360,10 +367,10 @@ class RecordServiceUpdateRecordTest {
             )
             recordService.decryptRecord<DataResource>(receivedRecord, USER_ID)
             recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
-            recordService.assignResourceId(receivedDecryptedRecord)
             RecordMapper.getInstance(receivedDecryptedRecord)
-
         }
+
+        verify(exactly = 0) { receivedDecryptedRecord.identifier = any() }
     }
 
     @Test
@@ -377,6 +384,9 @@ class RecordServiceUpdateRecordTest {
         val receivedDecryptedRecord: DecryptedRecord<Fhir3Resource> = mockk(relaxed = true)
         val record: Record<Fhir3Resource> = mockk()
         val annotations: List<String> = mockk()
+        val identifier = "id"
+
+        every { receivedDecryptedRecord.identifier } returns identifier
 
         every {
             apiService.fetchRecord(
@@ -448,9 +458,8 @@ class RecordServiceUpdateRecordTest {
             )
             recordService.decryptRecord<Fhir3Resource>(receivedRecord, USER_ID)
             recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
-            recordService.assignResourceId(receivedDecryptedRecord)
+            resource.id = receivedDecryptedRecord.identifier
             RecordMapper.getInstance(receivedDecryptedRecord)
-
         }
     }
 
@@ -465,6 +474,9 @@ class RecordServiceUpdateRecordTest {
         val receivedDecryptedRecord: DecryptedR4Record<Fhir4Resource> = mockk(relaxed = true)
         val record: Fhir4Record<Fhir4Resource> = mockk()
         val annotations: List<String> = mockk()
+        val identifier = "id"
+
+        every { receivedDecryptedRecord.identifier } returns identifier
 
         every {
             apiService.fetchRecord(
@@ -536,9 +548,8 @@ class RecordServiceUpdateRecordTest {
             )
             recordService.decryptRecord<Fhir4Resource>(receivedRecord, USER_ID)
             recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
-            recordService.assignResourceId(receivedDecryptedRecord)
+            resource.id = receivedDecryptedRecord.identifier
             RecordMapper.getInstance(receivedDecryptedRecord)
-
         }
     }
 
@@ -624,10 +635,10 @@ class RecordServiceUpdateRecordTest {
             )
             recordService.decryptRecord<DataResource>(receivedRecord, USER_ID)
             recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
-            recordService.assignResourceId(receivedDecryptedRecord)
             RecordMapper.getInstance(receivedDecryptedRecord)
-
         }
+
+        verify(exactly = 0) { receivedDecryptedRecord.identifier = any() }
     }
 
     @Test
@@ -641,6 +652,9 @@ class RecordServiceUpdateRecordTest {
         val receivedDecryptedRecord: DecryptedRecord<Fhir3Resource> = mockk(relaxed = true)
         val record: Record<Fhir3Resource> = mockk()
         val attachment: HashMap<Any, String?> = mockk()
+        val identifier = "id"
+
+        every { receivedDecryptedRecord.identifier } returns identifier
 
         every {
             apiService.fetchRecord(
@@ -712,7 +726,7 @@ class RecordServiceUpdateRecordTest {
             )
             recordService.decryptRecord<Fhir3Resource>(receivedRecord, USER_ID)
             recordService.restoreUploadData(receivedDecryptedRecord, resource, attachment)
-            recordService.assignResourceId(receivedDecryptedRecord)
+            resource.id = receivedDecryptedRecord.identifier
             RecordMapper.getInstance(receivedDecryptedRecord)
 
         }
@@ -729,6 +743,9 @@ class RecordServiceUpdateRecordTest {
         val receivedDecryptedRecord: DecryptedR4Record<Fhir4Resource> = mockk(relaxed = true)
         val record: Fhir4Record<Fhir4Resource> = mockk()
         val attachment: HashMap<Any, String?> = mockk()
+        val identifier = "id"
+
+        every { receivedDecryptedRecord.identifier } returns identifier
 
         every {
             apiService.fetchRecord(
@@ -800,9 +817,8 @@ class RecordServiceUpdateRecordTest {
             )
             recordService.decryptRecord<Fhir4Resource>(receivedRecord, USER_ID)
             recordService.restoreUploadData(receivedDecryptedRecord, resource, attachment)
-            recordService.assignResourceId(receivedDecryptedRecord)
+            resource.id = receivedDecryptedRecord.identifier
             RecordMapper.getInstance(receivedDecryptedRecord)
-
         }
     }
 

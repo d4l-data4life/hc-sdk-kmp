@@ -45,6 +45,7 @@ import io.mockk.mockkObject
 import io.mockk.spyk
 import io.mockk.unmockkConstructor
 import io.mockk.unmockkObject
+import io.mockk.verify
 import io.mockk.verifyOrder
 import io.reactivex.Single
 import org.junit.After
@@ -122,10 +123,12 @@ class RecordServiceCreateRecordTest {
         val receivedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk(relaxed = true)
         val record: Record<Fhir3Resource> = mockk()
         val date = "now"
+        val identifier = "id"
 
         every { SdkDateTimeFormatter.now() } returns date
         every { createdRecord.resource } returns resource
         every { receivedRecord.resource } returns resource
+        every { receivedRecord.identifier } returns identifier
 
         every {
             anyConstructed<DecryptedRecordMapper>().setAnnotations(defaultAnnotation)
@@ -204,7 +207,7 @@ class RecordServiceCreateRecordTest {
                 resource,
                 null
             )
-            recordService.assignResourceId(receivedRecord)
+            resource.id = receivedRecord.identifier
             RecordMapper.getInstance(receivedRecord)
         }
     }
@@ -217,10 +220,12 @@ class RecordServiceCreateRecordTest {
         val receivedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
         val record: Fhir4Record<Fhir4Resource> = mockk()
         val date = "now"
+        val identifier = "id"
 
         every { SdkDateTimeFormatter.now() } returns date
         every { createdRecord.resource } returns resource
         every { receivedRecord.resource } returns resource
+        every { receivedRecord.identifier } returns identifier
 
         every {
             anyConstructed<DecryptedRecordMapper>().setAnnotations(defaultAnnotation)
@@ -299,7 +304,7 @@ class RecordServiceCreateRecordTest {
                 resource,
                 null
             )
-            recordService.assignResourceId(receivedRecord)
+            resource.id = receivedRecord.identifier
             RecordMapper.getInstance(receivedRecord)
         }
     }
@@ -394,9 +399,10 @@ class RecordServiceCreateRecordTest {
                 resource,
                 null
             )
-            recordService.assignResourceId(receivedRecord)
             RecordMapper.getInstance(receivedRecord)
         }
+
+        verify(exactly = 0) { receivedRecord.identifier = any() }
     }
 
     @Test
@@ -408,10 +414,12 @@ class RecordServiceCreateRecordTest {
         val record: Record<Fhir3Resource> = mockk()
         val uploadData: HashMap<Any, String?> = mockk()
         val date = "now"
+        val identifier = "id"
 
         every { SdkDateTimeFormatter.now() } returns date
         every { createdRecord.resource } returns resource
         every { receivedRecord.resource } returns resource
+        every { record.identifier } returns identifier
 
         every {
             anyConstructed<DecryptedRecordMapper>().setAnnotations(defaultAnnotation)
@@ -491,7 +499,7 @@ class RecordServiceCreateRecordTest {
                 resource,
                 uploadData
             )
-            recordService.assignResourceId(receivedRecord)
+            resource.id = receivedRecord.identifier
             RecordMapper.getInstance(receivedRecord)
         }
     }
@@ -505,10 +513,12 @@ class RecordServiceCreateRecordTest {
         val record: Fhir4Record<Fhir4Resource> = mockk()
         val uploadData: HashMap<Any, String?> = mockk()
         val date = "now"
+        val identifier = "id"
 
         every { SdkDateTimeFormatter.now() } returns date
         every { createdRecord.resource } returns resource
         every { receivedRecord.resource } returns resource
+        every { record.identifier } returns identifier
 
         every {
             anyConstructed<DecryptedRecordMapper>().setAnnotations(defaultAnnotation)
@@ -588,7 +598,7 @@ class RecordServiceCreateRecordTest {
                 resource,
                 uploadData
             )
-            recordService.assignResourceId(receivedRecord)
+            resource.id = receivedRecord.identifier
             RecordMapper.getInstance(receivedRecord)
         }
     }
@@ -601,11 +611,13 @@ class RecordServiceCreateRecordTest {
         val receivedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk(relaxed = true)
         val record: Record<Fhir3Resource> = mockk()
         val date = "now"
+        val identifier = "id"
         val annotations: List<String> = mockk()
 
         every { SdkDateTimeFormatter.now() } returns date
         every { createdRecord.resource } returns resource
         every { receivedRecord.resource } returns resource
+        every { receivedRecord.identifier } returns identifier
 
         every {
             anyConstructed<DecryptedRecordMapper>().setAnnotations(annotations)
@@ -683,7 +695,7 @@ class RecordServiceCreateRecordTest {
                 resource,
                 null
             )
-            recordService.assignResourceId(receivedRecord)
+            resource.id = receivedRecord.identifier
             RecordMapper.getInstance(receivedRecord)
         }
     }
@@ -696,11 +708,13 @@ class RecordServiceCreateRecordTest {
         val receivedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
         val record: Fhir4Record<Fhir4Resource> = mockk()
         val date = "now"
+        val identifier = "id"
         val annotations: List<String> = mockk()
 
         every { SdkDateTimeFormatter.now() } returns date
         every { createdRecord.resource } returns resource
         every { receivedRecord.resource } returns resource
+        every { receivedRecord.identifier } returns identifier
 
         every {
             anyConstructed<DecryptedRecordMapper>().setAnnotations(annotations)
@@ -778,7 +792,7 @@ class RecordServiceCreateRecordTest {
                 resource,
                 null
             )
-            recordService.assignResourceId(receivedRecord)
+            resource.id = receivedRecord.identifier
             RecordMapper.getInstance(receivedRecord)
         }
     }
@@ -873,9 +887,10 @@ class RecordServiceCreateRecordTest {
                 resource,
                 null
             )
-            recordService.assignResourceId(receivedRecord)
             RecordMapper.getInstance(receivedRecord)
         }
+
+        verify(exactly = 0) { receivedRecord.identifier = any() }
     }
 
     @Test

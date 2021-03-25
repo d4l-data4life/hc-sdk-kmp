@@ -1241,6 +1241,7 @@ class RecordService internal constructor(
         }
     }
 
+    // TODO: make it private
     internal fun <T : Any> assignResourceId(
             record: DecryptedBaseRecord<T>
     ): DecryptedBaseRecord<T> {

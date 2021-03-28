@@ -869,6 +869,14 @@ class RecordService internal constructor(
         }
     }
 
+    private fun <T : Any> resolveAttachmentKey(record: DecryptedBaseRecord<T>): GCKey {
+        if (record.attachmentsKey !is GCKey) {
+            record.attachmentsKey = cryptoService.generateGCKey().blockingGet()
+        }
+
+        return record.attachmentsKey!!
+    }
+
     @Throws(
             DataValidationException.IdUsageViolation::class,
             DataValidationException.ExpectedFieldViolation::class,
@@ -1014,7 +1022,7 @@ class RecordService internal constructor(
     )
     internal fun <T : Any> downloadData(
             record: DecryptedBaseRecord<T>,
-            userId: String?
+            userId: String
     ): DecryptedBaseRecord<T> {
         if (!isFhir(record.resource)) {
             return record
@@ -1022,25 +1030,30 @@ class RecordService internal constructor(
 
         val resource = record.resource
         if (!fhirAttachmentHelper.hasAttachment(resource)) return record
-        val rawAttachments = fhirAttachmentHelper.getAttachment(resource) as List<Fhir3Attachment?>?
+        val rawAttachments = fhirAttachmentHelper.getAttachment(resource)
+                ?: return record
+
         val attachments = mutableListOf<WrapperContract.Attachment>()
 
-        rawAttachments ?: return record
+        for (rawAttachment in rawAttachments) {
+            if (rawAttachment != null) {
+                val attachment = attachmentFactory.wrap(rawAttachment)
 
-        rawAttachments.forEach {
-            it?.id ?: throw DataValidationException.IdUsageViolation("Attachment.id expected")
+                attachment.id ?: throw DataValidationException.IdUsageViolation("Attachment.id expected")
 
-            attachments.add(attachmentFactory.wrap(it))
+                attachments.add(attachment)
+            }
         }
 
-        @Suppress("CheckResult")
-        attachmentService.download(
-                attachments,
-                // FIXME this is forced
-                record.attachmentsKey!!,
-                // FIXME this is forced
-                userId!!
-        ).blockingGet()
+        if(attachments.isNotEmpty()) {
+            @Suppress("CheckResult")
+            attachmentService.download(
+                    attachments,
+                    resolveAttachmentKey(record),
+                    userId
+            ).blockingGet()
+        }
+
         return record
     }
 

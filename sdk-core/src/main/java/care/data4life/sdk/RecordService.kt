@@ -124,12 +124,6 @@ class RecordService internal constructor(
             )
     )
 
-
-    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
-    internal enum class UploadDownloadOperation {
-        UPLOAD, DOWNLOAD, UPDATE
-    }
-
     @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     internal enum class RemoveRestoreOperation {
         REMOVE, RESTORE
@@ -165,7 +159,7 @@ class RecordService internal constructor(
         )
 
         return createdRecord
-                .map { _uploadData(it, userId) }
+                .map { uploadData(it, userId) }
                 .map { removeUploadData(it) }
                 .map { encryptRecord(it) }
                 .flatMap { apiService.createRecord(alias, userId, it) }
@@ -900,7 +894,7 @@ class RecordService internal constructor(
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class
     )
-    internal fun <T : Any> _uploadData(
+    internal fun <T : Any> uploadData(
             record: DecryptedBaseRecord<T>,
             userId: String
     ): DecryptedBaseRecord<T> {
@@ -911,12 +905,8 @@ class RecordService internal constructor(
         val resource = record.resource
 
         if (!fhirAttachmentHelper.hasAttachment(resource)) return record
-        val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Any?>?
+        val attachments = fhirAttachmentHelper.getAttachment(resource)
                 ?: return record
-
-        if (record.attachmentsKey == null) {
-            record.attachmentsKey = cryptoService.generateGCKey().blockingGet()
-        }
 
         val validAttachments: MutableList<WrapperContract.Attachment> = arrayListOf()
         for (rawAttachment in attachments) {
@@ -941,17 +931,7 @@ class RecordService internal constructor(
             }
         }
 
-        if (validAttachments.isNotEmpty()) {
-            updateFhirResourceIdentifier(
-                    resource,
-                    attachmentService.upload(
-                            validAttachments,
-                            // FIXME this is forced
-                            record.attachmentsKey!!,
-                            userId
-                    ).blockingGet()
-            )
-        }
+        uploadAttachmentsOnDemand(record, resource, validAttachments, userId)
         return record
     }
 
@@ -1048,13 +1028,14 @@ class RecordService internal constructor(
             if (rawAttachment != null) {
                 val attachment = attachmentFactory.wrap(rawAttachment)
 
-                attachment.id ?: throw DataValidationException.IdUsageViolation("Attachment.id expected")
+                attachment.id
+                        ?: throw DataValidationException.IdUsageViolation("Attachment.id expected")
 
                 attachments.add(attachment)
             }
         }
 
-        if(attachments.isNotEmpty()) {
+        if (attachments.isNotEmpty()) {
             @Suppress("CheckResult")
             attachmentService.download(
                     attachments,
@@ -1064,55 +1045,6 @@ class RecordService internal constructor(
         }
 
         return record
-    }
-
-    // FIXME
-    // This method should not allowed to exist any longer in this shape. _uploadData should take over
-    // as soon as possible so we can get rid of uploadOrDownloadData. This also means uploadData should
-    // not be responsible for the actual upload and a update.
-    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
-    @Throws(
-            DataValidationException.IdUsageViolation::class,
-            DataValidationException.ExpectedFieldViolation::class,
-            DataValidationException.InvalidAttachmentPayloadHash::class
-    )
-    internal fun <T : Fhir3Resource> uploadData(
-            record: DecryptedFhir3Record<T>,
-            newResource: T?,
-            userId: String
-    ): DecryptedFhir3Record<T> {
-        return if (newResource == null) {
-            _uploadData(record, userId) as DecryptedFhir3Record<T>
-        } else {
-            updateData(record, newResource, userId) as DecryptedFhir3Record<T>
-        }
-    }
-
-    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
-    @Throws(
-            DataValidationException.IdUsageViolation::class,
-            DataValidationException.ExpectedFieldViolation::class,
-            DataValidationException.InvalidAttachmentPayloadHash::class,
-            CoreRuntimeException.UnsupportedOperation::class
-    )
-    internal fun <T : Fhir3Resource> uploadOrDownloadData(
-            operation: UploadDownloadOperation,
-            record: DecryptedFhir3Record<T>,
-            newResource: T?,
-            userId: String
-    ): DecryptedFhir3Record<T> {
-        return when (operation) {
-            UploadDownloadOperation.UPDATE -> updateData(
-                    record,
-                    newResource!!,
-                    userId
-            ) as DecryptedFhir3Record
-            UploadDownloadOperation.UPLOAD -> _uploadData(record, userId) as DecryptedFhir3Record<T>
-            UploadDownloadOperation.DOWNLOAD -> downloadData(
-                    record,
-                    userId
-            ) as DecryptedFhir3Record<T>
-        }
     }
 
     /*

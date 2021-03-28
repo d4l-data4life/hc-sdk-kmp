@@ -22,10 +22,10 @@ toc::[]
 
 === Fixed
 * RecordService#downloadData failed due to attachments, which are null.
+
 === Bumped
 
 === Migration
-
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.1...v1.9.2[1.9.2]
 

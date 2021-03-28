@@ -877,6 +877,24 @@ class RecordService internal constructor(
         return record.attachmentsKey!!
     }
 
+    private fun <T : Any> uploadAttachmentsOnDemand(
+            record: DecryptedBaseRecord<T>,
+            resource: T,
+            attachments:  List<WrapperContract.Attachment>,
+            userId: String
+    ) {
+        if (attachments.isNotEmpty()) {
+            updateFhirResourceIdentifier(
+                    resource,
+                    attachmentService.upload(
+                            attachments,
+                            resolveAttachmentKey(record),
+                            userId
+                    ).blockingGet()
+            )
+        }
+    }
+
     @Throws(
             DataValidationException.IdUsageViolation::class,
             DataValidationException.ExpectedFieldViolation::class,
@@ -945,22 +963,22 @@ class RecordService internal constructor(
     )
     internal fun <T : Any> updateData(
             record: DecryptedBaseRecord<T>,
-            newResource: T?,
-            userId: String?
+            newResource: T,
+            userId: String
     ): DecryptedBaseRecord<T> {
         if (!isFhir(record.resource)) {
             return record
         }
 
-        if (newResource == null || !isFhir(newResource)) {
+        if (!isFhir(newResource)) {
             throw CoreRuntimeException.UnsupportedOperation()
         }
 
-        var resource: T? = record.resource
-        if (!fhirAttachmentHelper.hasAttachment(resource!!)) return record
+        var resource = record.resource
+        if (!fhirAttachmentHelper.hasAttachment(resource)) return record
         val attachments = fhirAttachmentHelper.getAttachment(resource) ?: listOf<Any>()
 
-        val validAttachments: MutableList<WrapperContract.Attachment> = arrayListOf()
+        val validAttachments: MutableList<WrapperContract.Attachment> = mutableListOf()
         val oldAttachments: HashMap<String?, WrapperContract.Attachment> = hashMapOf()
 
         for (rawAttachment in attachments) {
@@ -975,6 +993,7 @@ class RecordService internal constructor(
 
         resource = newResource
         val newAttachments = fhirAttachmentHelper.getAttachment(newResource) ?: listOf<Any>()
+
         for (rawNewAttachment in newAttachments) {
             if (rawNewAttachment != null) {
                 val newAttachment = attachmentFactory.wrap(rawNewAttachment)
@@ -1001,18 +1020,8 @@ class RecordService internal constructor(
                 }
             }
         }
-        if (validAttachments.isNotEmpty()) {
-            updateFhirResourceIdentifier(
-                    resource,
-                    attachmentService.upload(
-                            validAttachments,
-                            // FIXME this is forced
-                            record.attachmentsKey!!,
-                            // FIXME this is forced
-                            userId!!
-                    ).blockingGet()
-            )
-        }
+
+        uploadAttachmentsOnDemand(record, resource, validAttachments, userId)
         return record
     }
 

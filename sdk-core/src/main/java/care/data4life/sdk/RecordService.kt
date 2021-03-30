@@ -413,7 +413,6 @@ class RecordService(
                 .map { DownloadResult(it, failedDownloads) }
     }
 
-    @ExperimentalStdlibApi
     @Throws(DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class)
     internal fun <T : Any> updateRecord(

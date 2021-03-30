@@ -33,10 +33,11 @@ class GCKey(val algorithm: GCAESKeyAlgorithm,
                 ?: GCSymmetricKey(SecretKeySpec(Base64.decode(String(keyBase64)), algorithm.transformation)).also { symmetricKey = it }
     }
 
-    @ExperimentalStdlibApi
+
+    @OptIn(ExperimentalStdlibApi::class)
     fun getKeyBase64(): CharArray {
         return if (keyBase64.isEmpty())
-            Base64.encodeToString(symmetricKey!!.value.getEncoded()).toCharArray().also { keyBase64 = it };
+            Base64.encodeToString(symmetricKey!!.value.getEncoded()).toCharArray().also { keyBase64 = it }
         else
             keyBase64;
     }

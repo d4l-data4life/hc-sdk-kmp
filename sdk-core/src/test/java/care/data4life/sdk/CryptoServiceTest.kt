@@ -40,14 +40,16 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import io.mockk.clearAllMocks
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import io.mockk.verify
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Ignore
-import org.junit.Rule
 import org.junit.Test
+import org.mockito.AdditionalMatchers
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers
 import java.io.IOException
@@ -68,6 +70,7 @@ import javax.crypto.IllegalBlockSizeException
 import javax.crypto.KeyGenerator
 import javax.crypto.NoSuchPaddingException
 import javax.crypto.SecretKey
+import javax.crypto.spec.IvParameterSpec
 
 class CryptoServiceTest {
 
@@ -93,15 +96,16 @@ class CryptoServiceTest {
         mockCommonKeyService = mockk()
         adapter = mockk()
         val cipher = mockk<Cipher>()
-        val array: ByteArray = mockk()
         every { cipher.iv } returns ByteArray(1)
-        every { cipher.doFinal(array) } returns ByteArray(1)
-        every { mockBase64.decode(array.toString()) } returns ByteArray(16)
-        every { mockBase64.encodeToString(array) } returns "encoded"
-        every { mockBase64.encodeToString(array.toString()) } returns "encoded"
+        every { cipher.doFinal(any<ByteArray>()) } returns ByteArray(1)
+        every { mockBase64.decode(any<ByteArray>()) } returns ByteArray(16)
+        every { mockBase64.decode(any<String>()) } returns ByteArray(16)
+        every { mockBase64.encodeToString(any<ByteArray>()) } returns "encoded"
+        every { mockBase64.encodeToString(any<String>()) } returns "encoded"
 
         val keyGenerator = mockk<KeyGenerator>()
         every { keyGenerator.generateKey() } returns mockk<SecretKey>()
+        every { keyGenerator.init(256) } just runs
         val algorithm = createDataAlgorithm()
         val key = GCSymmetricKey(mockk<SecretKey>())
         gcKey = GCKey(algorithm, key, 256)
@@ -115,7 +119,8 @@ class CryptoServiceTest {
         every { privateKey.value } returns mockKey
         every { publicKey.value } returns mockKey
         every { rsaAlgorithm.transformation } returns ""
-        rnd = mockk<SecureRandom>()
+        every { cipher.init(1, gcKey.getSymmetricKey().value, any<IvParameterSpec>()) } just runs
+        rnd = SecureRandom()
         adapter = mockk()
         every { mockMoshi.adapter(ExchangeKey::class.java) } returns adapter
         cryptoService = MockCryptoService(
@@ -134,7 +139,7 @@ class CryptoServiceTest {
     @Test
     fun encrypt_shouldCompleteWithoutErrors() {
         // given
-        val data = ByteArray(1)
+        val data = byteArrayOf(0xA1.toByte())
 
         // when
         val testSubscriber = cryptoService
@@ -154,7 +159,7 @@ class CryptoServiceTest {
 
         // when
         val testSubscriber = cryptoService
-                .decrypt(gcKey!!, data)
+                .decrypt(gcKey, data)
                 .test()
 
         // then
@@ -169,8 +174,7 @@ class CryptoServiceTest {
         val input = "data"
 
         // when
-        val testSubscriber = cryptoService
-                ?.encryptString(gcKey!!, input)
+        val testSubscriber = cryptoService.encryptString(gcKey, input)
                 .test()
 
         // then
@@ -186,7 +190,7 @@ class CryptoServiceTest {
 
         // when
         val testSubscriber = cryptoService
-                .decryptString(gcKey!!, "data")
+                .decryptString(gcKey, input)
                 .test()
 
         // then
@@ -210,7 +214,7 @@ class CryptoServiceTest {
     @Test
     fun generateGCKeyPair() {
         // when
-        val testSubscriber = cryptoService!!.generateGCKeyPair()
+        val testSubscriber = cryptoService.generateGCKeyPair()
                 .test()
 
         // then
@@ -218,7 +222,6 @@ class CryptoServiceTest {
                 .onComplete()
     }
 
-    @Ignore
     @Test
     @Throws(NoSuchAlgorithmException::class, InvalidKeySpecException::class)
     fun setGCKeyPairFromPemPrivateKey_shouldStoreCorrectPrivateKey() {

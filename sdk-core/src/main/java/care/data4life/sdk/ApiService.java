@@ -248,7 +248,7 @@ public final class ApiService {
                                                    String endDate,
                                                    Integer pageSize,
                                                    Integer offset,
-                                                   List<String> tags) {
+                                                   String tags) {
         return service.searchRecords(alias, userId, startDate, endDate, pageSize, offset, tags);
     }
 
@@ -295,7 +295,7 @@ public final class ApiService {
     }
 
     // TODO remove public
-    public Single<Integer> getCount(String alias, String userId, List<String> tags) {
+    public Single<Integer> getCount(String alias, String userId, String tags) {
         return service
                 .getRecordsHeader(alias, userId, tags)
                 .map(response -> Integer.parseInt(response.headers().get(HEADER_TOTAL_COUNT)));

@@ -322,7 +322,10 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 endDate,
                 PAGE_SIZE,
                 OFFSET,
-                or(encryptedTags, encryptedAndEncodedTags)
+                or(
+                    encryptedTags.joinToString(","),
+                    encryptedAndEncodedTags.joinToString(",")
+                )
             )
         } returnsMany responses as List<Observable<MutableList<EncryptedRecord>>>
 
@@ -481,7 +484,10 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 endDate,
                 PAGE_SIZE,
                 OFFSET,
-                or(encryptedTags, encryptedAndEncodedTags)
+                or(
+                    encryptedTags.joinToString(","),
+                    encryptedAndEncodedTags.joinToString(",")
+                )
             )
         } returnsMany responses
 

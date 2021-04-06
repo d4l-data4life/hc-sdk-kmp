@@ -106,6 +106,8 @@ class RecordServiceFetchRecordsTest {
                         compatibilityService
                 )
         )
+
+        mockkObject(RecordMapper)
     }
 
     @After
@@ -123,7 +125,6 @@ class RecordServiceFetchRecordsTest {
         // Given
         val expected: Record<Fhir3CarePlan> = mockk()
         val decrypted: DecryptedFhir3Record<Fhir3Resource> = mockk()
-        mockkObject(RecordMapper)
 
         every { apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID) } returns Single.just(
                 encryptedRecord
@@ -168,7 +169,6 @@ class RecordServiceFetchRecordsTest {
         // Given
         val expected: Fhir4Record<Fhir4CarePlan> = mockk()
         val decrypted: DecryptedFhir4Record<Fhir4Resource> = mockk()
-        mockkObject(RecordMapper)
 
         every { apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID) } returns Single.just(
                 encryptedRecord
@@ -213,7 +213,6 @@ class RecordServiceFetchRecordsTest {
         // Given
         val expected: DataRecord<DataResource> = mockk()
         val decrypted: DecryptedDataRecord = mockk()
-        mockkObject(RecordMapper)
 
         every { apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID) } returns Single.just(
                 encryptedRecord
@@ -252,6 +251,7 @@ class RecordServiceFetchRecordsTest {
         val record1: Record<Fhir3CarePlan> = mockk()
         val record2: Record<Fhir3CarePlan> = mockk()
         val record3: Record<Fhir3CarePlan> = mockk()
+
         // When
         every {
             recordService.fetchFhir3Record<Fhir3CarePlan>(USER_ID, match { id -> ids[0] == id })
@@ -289,8 +289,6 @@ class RecordServiceFetchRecordsTest {
         val decrypted: DecryptedFhir3Record<Fhir3CarePlan> = mockk()
         val thrownError = RuntimeException("error")
         val expectedError: D4LException = mockk()
-
-        mockkObject(RecordMapper)
 
         // When
         every {
@@ -348,7 +346,6 @@ class RecordServiceFetchRecordsTest {
         val offset = 42
         val pageSize = 23
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
-        mockkObject(RecordMapper)
         mockkObject(SdkDateTimeFormatter)
 
         every { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
@@ -441,7 +438,6 @@ class RecordServiceFetchRecordsTest {
         verify(exactly = 1) { RecordMapper.getInstance(decryptedRecord1) }
         verify(exactly = 1) { RecordMapper.getInstance(decryptedRecord2) }
 
-        unmockkObject(RecordMapper)
         unmockkObject(SdkDateTimeFormatter)
     }
 
@@ -468,7 +464,6 @@ class RecordServiceFetchRecordsTest {
         val offset = 42
         val pageSize = 23
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
-        mockkObject(RecordMapper)
         mockkObject(SdkDateTimeFormatter)
 
         every { SdkDateTimeFormatter.formatDate(startDate) } returns start
@@ -564,7 +559,6 @@ class RecordServiceFetchRecordsTest {
         verify(exactly = 1) { RecordMapper.getInstance(decryptedRecord1) }
         verify(exactly = 1) { RecordMapper.getInstance(decryptedRecord2) }
 
-        unmockkObject(RecordMapper)
         unmockkObject(SdkDateTimeFormatter)
     }
 
@@ -587,7 +581,6 @@ class RecordServiceFetchRecordsTest {
         val offset = 42
         val pageSize = 23
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
-        mockkObject(RecordMapper)
         mockkObject(SdkDateTimeFormatter)
 
         every { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
@@ -681,7 +674,6 @@ class RecordServiceFetchRecordsTest {
         verify(exactly = 1) { RecordMapper.getInstance(decryptedRecord1) }
         verify(exactly = 1) { RecordMapper.getInstance(decryptedRecord2) }
 
-        unmockkObject(RecordMapper)
         unmockkObject(SdkDateTimeFormatter)
     }
 
@@ -708,7 +700,6 @@ class RecordServiceFetchRecordsTest {
         val offset = 42
         val pageSize = 23
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
-        mockkObject(RecordMapper)
         mockkObject(SdkDateTimeFormatter)
 
         every { SdkDateTimeFormatter.formatDate(startDate) } returns start
@@ -805,7 +796,6 @@ class RecordServiceFetchRecordsTest {
         verify(exactly = 1) { RecordMapper.getInstance(decryptedRecord1) }
         verify(exactly = 1) { RecordMapper.getInstance(decryptedRecord2) }
 
-        unmockkObject(RecordMapper)
         unmockkObject(SdkDateTimeFormatter)
     }
 }

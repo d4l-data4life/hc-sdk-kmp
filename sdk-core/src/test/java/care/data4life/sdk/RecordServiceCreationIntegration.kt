@@ -815,4 +815,6 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
         Truth.assertThat(result.annotations).isEqualTo(listOf("wow", "it", "works"))
         Truth.assertThat(result.resource).isEqualTo(resource)
     }
+
+    // TODO Add tests with attachments
 }

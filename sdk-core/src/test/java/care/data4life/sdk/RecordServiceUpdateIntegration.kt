@@ -1080,4 +1080,6 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
             Truth.assertThat(e).isInstanceOf(ClassCastException::class.java)
         }
     }
+
+    // TODO Test with attachments
 }

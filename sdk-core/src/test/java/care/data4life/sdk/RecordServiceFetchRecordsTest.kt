@@ -249,6 +249,7 @@ class RecordServiceFetchRecordsTest {
         val record1: Record<Fhir3CarePlan> = mockk()
         val record2: Record<Fhir3CarePlan> = mockk()
         val record3: Record<Fhir3CarePlan> = mockk()
+
         // When
         every {
             recordService.fetchFhir3Record<Fhir3CarePlan>(USER_ID, match { id -> ids[0] == id })
@@ -595,7 +596,6 @@ class RecordServiceFetchRecordsTest {
         val offset = 42
         val pageSize = 23
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
-
 
         every {
             hint(Fhir4CarePlan::class)

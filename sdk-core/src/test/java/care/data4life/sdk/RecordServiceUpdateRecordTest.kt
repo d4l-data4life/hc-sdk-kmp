@@ -16,462 +16,879 @@
 
 package care.data4life.sdk
 
-import care.data4life.fhir.stu3.model.CarePlan
+import care.data4life.crypto.GCKey
+import care.data4life.sdk.RecordServiceTestBase.Companion.ALIAS
+import care.data4life.sdk.RecordServiceTestBase.Companion.PARTNER_ID
+import care.data4life.sdk.RecordServiceTestBase.Companion.RECORD_ID
+import care.data4life.sdk.RecordServiceTestBase.Companion.USER_ID
+import care.data4life.sdk.attachment.AttachmentContract
+import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
-import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
-import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.fhir.FhirContract
+import care.data4life.sdk.migration.MigrationContract
+import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
-import care.data4life.sdk.model.ModelContract.BaseRecord
-import care.data4life.sdk.util.MimeType
-import com.google.common.truth.Truth
+import care.data4life.sdk.network.DecryptedRecordMapper
+import care.data4life.sdk.network.model.DecryptedDataRecord
+import care.data4life.sdk.network.model.DecryptedR4Record
+import care.data4life.sdk.network.model.DecryptedRecord
+import care.data4life.sdk.network.model.EncryptedRecord
+import care.data4life.sdk.tag.TaggingContract
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.spyk
+import io.mockk.unmockkObject
+import io.mockk.verify
+import io.mockk.verifyOrder
 import io.reactivex.Single
 import org.junit.After
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito
-import java.io.IOException
+import kotlin.test.assertEquals
+import kotlin.test.assertSame
 
-class RecordServiceUpdateRecordTest : RecordServiceTestBase() {
+class RecordServiceUpdateRecordTest {
+    private lateinit var recordService: RecordService
+    private lateinit var apiService: ApiService
+    private lateinit var cryptoService: CryptoService
+    private lateinit var fhirService: FhirContract.Service
+    private lateinit var tagEncryptionService: TaggingContract.EncryptionService
+    private lateinit var taggingService: TaggingContract.Service
+    private lateinit var attachmentService: AttachmentContract.Service
+    private lateinit var errorHandler: SdkContract.ErrorHandler
+    private lateinit var tags: HashMap<String, String>
+    private val defaultAnnotation: MutableList<String> = mutableListOf()
+
+    private lateinit var compatibilityService: MigrationContract.CompatibilityService
+    private lateinit var decryptedRecordMapper: DecryptedRecordMapper
+    private lateinit var uploadData: HashMap<Any, String?>
+    private lateinit var dataKey: GCKey
+    private lateinit var encryptedRecord: EncryptedRecord
 
     @Before
     fun setUp() {
-        init()
+        apiService = mockk()
+        cryptoService = mockk()
+        fhirService = mockk()
+        tagEncryptionService = mockk()
+        taggingService = mockk()
+        attachmentService = mockk()
+        errorHandler = mockk()
+        tags = mockk()
+
+        compatibilityService = mockk()
+        decryptedRecordMapper = mockk()
+        dataKey = mockk()
+        uploadData = mockk()
+        encryptedRecord = mockk()
+
+        recordService = spyk(
+            RecordService(
+                PARTNER_ID,
+                ALIAS,
+                apiService,
+                tagEncryptionService,
+                taggingService,
+                fhirService,
+                attachmentService,
+                cryptoService,
+                errorHandler,
+                compatibilityService
+            )
+        )
+
+        mockkObject(RecordMapper)
     }
 
     @After
     fun tearDown() {
-        stop()
+        unmockkObject(RecordMapper)
     }
 
     @Test
-    @Throws(
-            InterruptedException::class,
-            IOException::class,
-            DataValidationException.ModelVersionNotSupported::class,
-            DataRestrictionException.UnsupportedFileType::class,
-            DataRestrictionException.MaxDataSizeViolation::class
-    )
-    fun `Given, updateRecord is called with a Fhir3Resource and a UserId, it returns a updated Record`() {
+    fun `Given, updateRecord is called with a Fhir3 resource and a UserId, it returns a updated Record`() {
         // Given
-        mockCarePlan.id = RECORD_ID
-        Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
-        Mockito.`when`(
-                mockApiService.fetchRecord(
-                        ALIAS,
-                        USER_ID,
-                        RECORD_ID
-                )
-        ).thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedFhir3Record)
-                .`when`(recordService)
-                .decryptRecord<Fhir3Resource>(mockEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockEncryptedRecord).`when`(recordService).encryptRecord(mockDecryptedFhir3Record)
-        Mockito.`when`(
-                mockApiService.updateRecord(
-                        ALIAS,
-                        USER_ID,
-                        RECORD_ID,
-                        mockEncryptedRecord
-                )
-        ).thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedDataRecord)
-                .`when`(recordService)
-                .assignResourceId(mockDecryptedDataRecord)
-        @Suppress("UNCHECKED_CAST")
-        every { RecordMapper.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<Fhir3Resource>
-        val annotations = listOf<String>()
+        val resource: Fhir3Resource = mockk(relaxed = true)
+        val fetchedRecord: EncryptedRecord = mockk()
+        val decryptedFetchedRecord: DecryptedRecord<Fhir3Resource> = mockk(relaxed = true)
+        val encryptedRecord: EncryptedRecord = mockk()
+        val receivedRecord: EncryptedRecord = mockk()
+        val receivedDecryptedRecord: DecryptedRecord<Fhir3Resource> = mockk(relaxed = true)
+        val record: Record<Fhir3Resource> = mockk()
+        val identifier = "id"
+
+        every { receivedDecryptedRecord.identifier } returns identifier
+
+        every {
+            apiService.fetchRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID
+            )
+        } returns Single.just(fetchedRecord)
+        every {
+            recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID)
+        } returns decryptedFetchedRecord
+        every {
+            recordService.encryptRecord(decryptedFetchedRecord)
+        } returns encryptedRecord
+        every {
+            apiService.updateRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID,
+                encryptedRecord
+            )
+        } returns Single.just(receivedRecord)
+        every {
+            recordService.decryptRecord<Fhir3Resource>(receivedRecord, USER_ID)
+        } returns receivedDecryptedRecord
+        every { RecordMapper.getInstance(receivedDecryptedRecord) } returns record
 
         // When
-        val observer = recordService.updateRecord(USER_ID, RECORD_ID, mockCarePlan, annotations).test().await()
+        val observer = recordService.updateRecord(
+            USER_ID,
+            RECORD_ID,
+            resource,
+            defaultAnnotation
+        ).test().await()
 
         // Then
         val result = observer.assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
-        Truth.assertThat(result).isSameInstanceAs(mockRecord)
-
-        inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
-        inOrder.verify(recordService).decryptRecord<Fhir3Resource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).encryptRecord(mockDecryptedFhir3Record)
-        inOrder.verify(mockApiService).updateRecord(ALIAS, USER_ID, RECORD_ID, mockEncryptedRecord)
-        inOrder.verify(recordService).decryptRecord<Fhir3Resource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).restoreUploadData(
-                mockDecryptedFhir3Record,
-                mockCarePlan,
-                null
+        assertSame(
+            actual = result,
+            expected = record
         )
-        inOrder.verify(recordService).assignResourceId(mockDecryptedFhir3Record)
-        inOrder.verifyNoMoreInteractions()
 
-        Mockito.verify(mockDecryptedFhir3Record, Mockito.times(7)).resource
-        Mockito.verify(
-                mockDecryptedFhir3Record,
-                Mockito.times(2)
-        ).resource = mockCarePlan
-        Mockito.verify(
-                mockDecryptedFhir3Record,
-                Mockito.times(1)
-        ).annotations = annotations
-    }
+        verifyOrder {
+            recordService.updateRecord(USER_ID, RECORD_ID, resource, defaultAnnotation)
+            recordService.updateRecord(USER_ID, RECORD_ID, resource as Any, defaultAnnotation)
+            recordService.checkDataRestrictions(resource)
+            recordService.extractUploadData(resource)
+            apiService.fetchRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID
+            )
+            recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID)
+            recordService.updateData(decryptedFetchedRecord, resource, USER_ID)
+            recordService.cleanObsoleteAdditionalIdentifiers(resource)
+            decryptedFetchedRecord.resource = resource
+            recordService.removeUploadData(decryptedFetchedRecord)
+            recordService.encryptRecord(decryptedFetchedRecord)
+            apiService.updateRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID,
+                encryptedRecord
+            )
+            recordService.decryptRecord<Fhir3Resource>(receivedRecord, USER_ID)
+            recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
+            resource.id = receivedDecryptedRecord.identifier
+            RecordMapper.getInstance(receivedDecryptedRecord)
 
-    @Test
-    @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
-    fun `Given, updateRecord is called with a unsupported data and a UserId, it throws an error on update`() {
-        // Given
-        val invalidData = byteArrayOf(0x00)
-        val doc = buildDocumentReference(invalidData)
-        val annotations = listOf<String>()
-
-        // When
-        try {
-            recordService.updateRecord(USER_ID, RECORD_ID, doc, annotations).test().await()
-            Assert.fail("Exception expected!")
-        } catch (ex: Exception) {
-            // Then
-            Truth.assertThat(ex).isInstanceOf(DataRestrictionException.UnsupportedFileType::class.java)
         }
-
-        inOrder.verify(recordService).updateRecord(USER_ID, RECORD_ID, doc, annotations)
-        inOrder.verify(recordService).checkDataRestrictions(doc)
-        inOrder.verifyNoMoreInteractions()
     }
 
     @Test
-    @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
-    fun `Given, updateRecord is called with data, which exceeds the file size limitations and a UserId, it throws an error on update`() {
+    fun `Given, updateRecord is called with a Fhir4 resource and a UserId, it returns a updated Record`() {
         // Given
-        val invalidSizePdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES + 1)
-        System.arraycopy(
-                MimeType.PDF.byteSignature()[0] as Any,
-                0,
-                invalidSizePdf,
-                0,
-                MimeType.PDF.byteSignature()[0]!!.size
-        )
-        val doc = buildDocumentReference(unboxByteArray(invalidSizePdf))
-        val annotations = listOf<String>()
+        val resource: Fhir4Resource = mockk(relaxed = true)
+        val fetchedRecord: EncryptedRecord = mockk()
+        val decryptedFetchedRecord: DecryptedR4Record<Fhir4Resource> = mockk(relaxed = true)
+        val encryptedRecord: EncryptedRecord = mockk()
+        val receivedRecord: EncryptedRecord = mockk()
+        val receivedDecryptedRecord: DecryptedR4Record<Fhir4Resource> = mockk(relaxed = true)
+        val record: Fhir4Record<Fhir4Resource> = mockk()
+        val identifier = "id"
+
+        every { receivedDecryptedRecord.identifier } returns identifier
+
+        every {
+            apiService.fetchRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID
+            )
+        } returns Single.just(fetchedRecord)
+        every {
+            recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID)
+        } returns decryptedFetchedRecord
+        every {
+            recordService.encryptRecord(decryptedFetchedRecord)
+        } returns encryptedRecord
+        every {
+            apiService.updateRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID,
+                encryptedRecord
+            )
+        } returns Single.just(receivedRecord)
+        every {
+            recordService.decryptRecord<Fhir4Resource>(receivedRecord, USER_ID)
+        } returns receivedDecryptedRecord
+        every { RecordMapper.getInstance(receivedDecryptedRecord) } returns record
 
         // When
-        try {
-            recordService.updateRecord(USER_ID, RECORD_ID, doc, annotations).test().await()
-            Assert.fail("Exception expected!")
-        } catch (ex: Exception) {
-            // Then
-            Truth.assertThat(ex).isInstanceOf(DataRestrictionException.MaxDataSizeViolation::class.java)
-        }
-        inOrder.verify(recordService).updateRecord(USER_ID, RECORD_ID, doc, annotations)
-        inOrder.verify(recordService).checkDataRestrictions(doc)
-        inOrder.verifyNoMoreInteractions()
-    }
-
-    @Test
-    @Throws(
-            InterruptedException::class,
-            IOException::class,
-            DataValidationException.ModelVersionNotSupported::class,
-            DataRestrictionException.UnsupportedFileType::class,
-            DataRestrictionException.MaxDataSizeViolation::class
-    )
-    fun `Given, updateRecord is called with a Fhir3Resource, Annotations and a UserId, it returns updated a Record`() {
-        // Given
-        mockCarePlan.id = RECORD_ID
-        Mockito.`when`(mockCarePlan.resourceType).thenReturn(CarePlan.resourceType)
-        Mockito.`when`(
-                mockApiService.fetchRecord(
-                        ALIAS,
-                        USER_ID,
-                        RECORD_ID
-                )
-        ).thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedFhir3Record)
-                .`when`(recordService)
-                .decryptRecord<Fhir3Resource>(mockEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockEncryptedRecord).`when`(recordService).encryptRecord(mockDecryptedFhir3Record)
-        Mockito.`when`(
-                mockApiService.updateRecord(
-                        ALIAS,
-                        USER_ID,
-                        RECORD_ID,
-                        mockEncryptedRecord
-                )
-        ).thenReturn(Single.just(mockEncryptedRecord))
-        @Suppress("UNCHECKED_CAST")
-        every { RecordMapper.getInstance(mockDecryptedFhir3Record) } returns mockRecord as BaseRecord<Fhir3Resource>
-
-        // When
-        val observer = recordService.updateRecord(USER_ID, RECORD_ID, mockCarePlan, ANNOTATIONS).test().await()
+        val observer = recordService.updateRecord(
+            USER_ID,
+            RECORD_ID,
+            resource,
+            defaultAnnotation
+        ).test().await()
 
         // Then
         val result = observer.assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
-        Truth.assertThat(result).isSameInstanceAs(mockRecord)
-
-        inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
-        inOrder.verify(recordService).decryptRecord<Fhir3Resource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).encryptRecord(mockDecryptedFhir3Record)
-        inOrder.verify(mockApiService).updateRecord(ALIAS, USER_ID, RECORD_ID, mockEncryptedRecord)
-        inOrder.verify(recordService).decryptRecord<Fhir3Resource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).restoreUploadData(
-                mockDecryptedFhir3Record,
-                mockCarePlan,
-                null
+        assertSame(
+            actual = result,
+            expected = record
         )
-        inOrder.verify(recordService).assignResourceId(mockDecryptedFhir3Record)
-        inOrder.verifyNoMoreInteractions()
 
-        Mockito.verify(mockDecryptedFhir3Record, Mockito.times(7)).resource
-        Mockito.verify(
-                mockDecryptedFhir3Record,
-                Mockito.times(2)
-        ).resource = mockCarePlan
-        Mockito.verify(
-                mockDecryptedFhir3Record,
-                Mockito.times(1)
-        ).annotations = ANNOTATIONS
+        verifyOrder {
+            recordService.updateRecord(USER_ID, RECORD_ID, resource, defaultAnnotation)
+            recordService.updateRecord(USER_ID, RECORD_ID, resource as Any, defaultAnnotation)
+            recordService.checkDataRestrictions(resource)
+            recordService.extractUploadData(resource)
+            apiService.fetchRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID
+            )
+            recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID)
+            recordService.updateData(decryptedFetchedRecord, resource, USER_ID)
+            recordService.cleanObsoleteAdditionalIdentifiers(resource)
+            decryptedFetchedRecord.resource = resource
+            recordService.removeUploadData(decryptedFetchedRecord)
+            recordService.encryptRecord(decryptedFetchedRecord)
+            apiService.updateRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID,
+                encryptedRecord
+            )
+            recordService.decryptRecord<Fhir4Resource>(receivedRecord, USER_ID)
+            recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
+            resource.id = receivedDecryptedRecord.identifier
+            RecordMapper.getInstance(receivedDecryptedRecord)
+
+        }
     }
 
     @Test
-    @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
-    fun `Given, updateRecord called with data, which exceeds the file size limitations, Annotations and a UserId, it throws an error on update`() {
+    fun `Given, updateRecord is called with a DataResource and a UserId, it returns a updated Record`() {
         // Given
-        val invalidSizePdf = arrayOfNulls<Byte>(DATA_SIZE_MAX_BYTES + 1)
-        System.arraycopy(
-                MimeType.PDF.byteSignature()[0] as Any,
-                0,
-                invalidSizePdf,
-                0,
-                MimeType.PDF.byteSignature()[0]!!.size
-        )
-        val doc = buildDocumentReference(unboxByteArray(invalidSizePdf))
+        val resource: DataResource = mockk(relaxed = true)
+        val fetchedRecord: EncryptedRecord = mockk()
+        val decryptedFetchedRecord: DecryptedDataRecord = mockk(relaxed = true)
+        val encryptedRecord: EncryptedRecord = mockk()
+        val receivedRecord: EncryptedRecord = mockk()
+        val receivedDecryptedRecord: DecryptedDataRecord = mockk(relaxed = true)
+        val record: DataRecord<DataResource> = mockk()
+
+        every {
+            apiService.fetchRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID
+            )
+        } returns Single.just(fetchedRecord)
+        every {
+            recordService.decryptRecord<DataResource>(fetchedRecord, USER_ID)
+        } returns decryptedFetchedRecord
+        every {
+            recordService.encryptRecord(decryptedFetchedRecord)
+        } returns encryptedRecord
+        every {
+            apiService.updateRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID,
+                encryptedRecord
+            )
+        } returns Single.just(receivedRecord)
+        every {
+            recordService.decryptRecord<DataResource>(receivedRecord, USER_ID)
+        } returns receivedDecryptedRecord
+        every { RecordMapper.getInstance(receivedDecryptedRecord) } returns record
 
         // When
-        try {
-            recordService.updateRecord(USER_ID, RECORD_ID, doc, ANNOTATIONS).test().await()
-            Assert.fail("Exception expected!")
-        } catch (ex: Exception) {
-            // Then
-            Truth.assertThat(ex).isInstanceOf(DataRestrictionException.MaxDataSizeViolation::class.java)
+        val observer = recordService.updateRecord(
+            USER_ID,
+            RECORD_ID,
+            resource,
+            defaultAnnotation
+        ).test().await()
+
+        // Then
+        val result = observer.assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
+
+        assertSame(
+            actual = result,
+            expected = record
+        )
+
+        verifyOrder {
+            recordService.updateRecord(USER_ID, RECORD_ID, resource, defaultAnnotation)
+            recordService.updateRecord(USER_ID, RECORD_ID, resource as Any, defaultAnnotation)
+            recordService.checkDataRestrictions(resource)
+            recordService.extractUploadData(resource)
+            apiService.fetchRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID
+            )
+            recordService.decryptRecord<DataResource>(fetchedRecord, USER_ID)
+            recordService.updateData(decryptedFetchedRecord, resource, USER_ID)
+            recordService.cleanObsoleteAdditionalIdentifiers(resource)
+            decryptedFetchedRecord.resource = resource
+            recordService.removeUploadData(decryptedFetchedRecord)
+            recordService.encryptRecord(decryptedFetchedRecord)
+            apiService.updateRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID,
+                encryptedRecord
+            )
+            recordService.decryptRecord<DataResource>(receivedRecord, USER_ID)
+            recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
+            RecordMapper.getInstance(receivedDecryptedRecord)
         }
-        inOrder.verify(recordService).updateRecord(USER_ID, RECORD_ID, doc, ANNOTATIONS)
-        inOrder.verify(recordService).checkDataRestrictions(doc)
-        inOrder.verifyNoMoreInteractions()
+
+        verify(exactly = 0) { receivedDecryptedRecord.identifier = any() }
     }
 
     @Test
-    @Throws(
-            InterruptedException::class,
-            DataRestrictionException.UnsupportedFileType::class,
-            DataRestrictionException.MaxDataSizeViolation::class
-    )
-    fun `Given, updateRecords is called with multiple resources, Annotations and a UserId, returns multiple updated Records`() {
+    fun `Given, updateRecord is called with a Fhir3 resource, a UserId and annotations, it returns a updated Record`() {
         // Given
-        mockCarePlan.id = RECORD_ID
-        val resources = listOf(mockCarePlan, mockCarePlan)
-        val annotations = listOf<String>()
+        val resource: Fhir3Resource = mockk(relaxed = true)
+        val fetchedRecord: EncryptedRecord = mockk()
+        val decryptedFetchedRecord: DecryptedRecord<Fhir3Resource> = mockk(relaxed = true)
+        val encryptedRecord: EncryptedRecord = mockk()
+        val receivedRecord: EncryptedRecord = mockk()
+        val receivedDecryptedRecord: DecryptedRecord<Fhir3Resource> = mockk(relaxed = true)
+        val record: Record<Fhir3Resource> = mockk()
+        val annotations: List<String> = mockk()
+        val identifier = "id"
 
-        Mockito.doReturn(Single.just(mockRecord))
-                .`when`(recordService)
-                .updateRecord(USER_ID, RECORD_ID, mockCarePlan, annotations)
+        every { receivedDecryptedRecord.identifier } returns identifier
+
+        every {
+            apiService.fetchRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID
+            )
+        } returns Single.just(fetchedRecord)
+        every {
+            recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID)
+        } returns decryptedFetchedRecord
+        every {
+            recordService.encryptRecord(decryptedFetchedRecord)
+        } returns encryptedRecord
+        every {
+            apiService.updateRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID,
+                encryptedRecord
+            )
+        } returns Single.just(receivedRecord)
+        every {
+            recordService.decryptRecord<Fhir3Resource>(receivedRecord, USER_ID)
+        } returns receivedDecryptedRecord
+        every { RecordMapper.getInstance(receivedDecryptedRecord) } returns record
+
+        // When
+        val observer = recordService.updateRecord(
+            USER_ID,
+            RECORD_ID,
+            resource,
+            annotations
+        ).test().await()
+
+        // Then
+        val result = observer.assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
+
+        assertSame(
+            actual = result,
+            expected = record
+        )
+
+        verifyOrder {
+            recordService.updateRecord(USER_ID, RECORD_ID, resource, annotations)
+            recordService.updateRecord(USER_ID, RECORD_ID, resource as Any, annotations)
+            recordService.checkDataRestrictions(resource)
+            recordService.extractUploadData(resource)
+            apiService.fetchRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID
+            )
+            recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID)
+            recordService.updateData(decryptedFetchedRecord, resource, USER_ID)
+            recordService.cleanObsoleteAdditionalIdentifiers(resource)
+            decryptedFetchedRecord.resource = resource
+            decryptedFetchedRecord.annotations = annotations
+            recordService.removeUploadData(decryptedFetchedRecord)
+            recordService.encryptRecord(decryptedFetchedRecord)
+            apiService.updateRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID,
+                encryptedRecord
+            )
+            recordService.decryptRecord<Fhir3Resource>(receivedRecord, USER_ID)
+            recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
+            resource.id = receivedDecryptedRecord.identifier
+            RecordMapper.getInstance(receivedDecryptedRecord)
+        }
+    }
+
+    @Test
+    fun `Given, updateRecord is called with a Fhir4 resource, a UserId and annotations, it returns a updated Record`() {
+        // Given
+        val resource: Fhir4Resource = mockk(relaxed = true)
+        val fetchedRecord: EncryptedRecord = mockk()
+        val decryptedFetchedRecord: DecryptedR4Record<Fhir4Resource> = mockk(relaxed = true)
+        val encryptedRecord: EncryptedRecord = mockk()
+        val receivedRecord: EncryptedRecord = mockk()
+        val receivedDecryptedRecord: DecryptedR4Record<Fhir4Resource> = mockk(relaxed = true)
+        val record: Fhir4Record<Fhir4Resource> = mockk()
+        val annotations: List<String> = mockk()
+        val identifier = "id"
+
+        every { receivedDecryptedRecord.identifier } returns identifier
+
+        every {
+            apiService.fetchRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID
+            )
+        } returns Single.just(fetchedRecord)
+        every {
+            recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID)
+        } returns decryptedFetchedRecord
+        every {
+            recordService.encryptRecord(decryptedFetchedRecord)
+        } returns encryptedRecord
+        every {
+            apiService.updateRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID,
+                encryptedRecord
+            )
+        } returns Single.just(receivedRecord)
+        every {
+            recordService.decryptRecord<Fhir4Resource>(receivedRecord, USER_ID)
+        } returns receivedDecryptedRecord
+        every { RecordMapper.getInstance(receivedDecryptedRecord) } returns record
+
+        // When
+        val observer = recordService.updateRecord(
+            USER_ID,
+            RECORD_ID,
+            resource,
+            annotations
+        ).test().await()
+
+        // Then
+        val result = observer.assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
+
+        assertSame(
+            actual = result,
+            expected = record
+        )
+
+        verifyOrder {
+            recordService.updateRecord(USER_ID, RECORD_ID, resource, annotations)
+            recordService.updateRecord(USER_ID, RECORD_ID, resource as Any, annotations)
+            recordService.checkDataRestrictions(resource)
+            recordService.extractUploadData(resource)
+            apiService.fetchRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID
+            )
+            recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID)
+            recordService.updateData(decryptedFetchedRecord, resource, USER_ID)
+            recordService.cleanObsoleteAdditionalIdentifiers(resource)
+            decryptedFetchedRecord.resource = resource
+            decryptedFetchedRecord.annotations = annotations
+            recordService.removeUploadData(decryptedFetchedRecord)
+            recordService.encryptRecord(decryptedFetchedRecord)
+            apiService.updateRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID,
+                encryptedRecord
+            )
+            recordService.decryptRecord<Fhir4Resource>(receivedRecord, USER_ID)
+            recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
+            resource.id = receivedDecryptedRecord.identifier
+            RecordMapper.getInstance(receivedDecryptedRecord)
+        }
+    }
+
+    @Test
+    fun `Given, updateRecord is called with a DataResource, a UserId and annotations, it returns a updated Record`() {
+        // Given
+        val resource: DataResource = mockk(relaxed = true)
+        val fetchedRecord: EncryptedRecord = mockk()
+        val decryptedFetchedRecord: DecryptedDataRecord = mockk(relaxed = true)
+        val encryptedRecord: EncryptedRecord = mockk()
+        val receivedRecord: EncryptedRecord = mockk()
+        val receivedDecryptedRecord: DecryptedDataRecord = mockk(relaxed = true)
+        val record: DataRecord<DataResource> = mockk()
+        val annotations: List<String> = mockk()
+
+        every {
+            apiService.fetchRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID
+            )
+        } returns Single.just(fetchedRecord)
+        every {
+            recordService.decryptRecord<DataResource>(fetchedRecord, USER_ID)
+        } returns decryptedFetchedRecord
+        every {
+            recordService.encryptRecord(decryptedFetchedRecord)
+        } returns encryptedRecord
+        every {
+            apiService.updateRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID,
+                encryptedRecord
+            )
+        } returns Single.just(receivedRecord)
+        every {
+            recordService.decryptRecord<DataResource>(receivedRecord, USER_ID)
+        } returns receivedDecryptedRecord
+        every { RecordMapper.getInstance(receivedDecryptedRecord) } returns record
+
+        // When
+        val observer = recordService.updateRecord(
+            USER_ID,
+            RECORD_ID,
+            resource,
+            annotations
+        ).test().await()
+
+        // Then
+        val result = observer.assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
+
+        assertSame(
+            actual = result,
+            expected = record
+        )
+
+        verifyOrder {
+            recordService.updateRecord(USER_ID, RECORD_ID, resource, annotations)
+            recordService.updateRecord(USER_ID, RECORD_ID, resource as Any, annotations)
+            recordService.checkDataRestrictions(resource)
+            recordService.extractUploadData(resource)
+            apiService.fetchRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID
+            )
+            recordService.decryptRecord<DataResource>(fetchedRecord, USER_ID)
+            recordService.updateData(decryptedFetchedRecord, resource, USER_ID)
+            recordService.cleanObsoleteAdditionalIdentifiers(resource)
+            decryptedFetchedRecord.resource = resource
+            decryptedFetchedRecord.annotations = annotations
+            recordService.removeUploadData(decryptedFetchedRecord)
+            recordService.encryptRecord(decryptedFetchedRecord)
+            apiService.updateRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID,
+                encryptedRecord
+            )
+            recordService.decryptRecord<DataResource>(receivedRecord, USER_ID)
+            recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
+            RecordMapper.getInstance(receivedDecryptedRecord)
+        }
+
+        verify(exactly = 0) { receivedDecryptedRecord.identifier = any() }
+    }
+
+    @Test
+    fun `Given, updateRecord is called with a Fhir3 resource, which contains an attachment, and a UserId, it returns a updated Record`() {
+        // Given
+        val resource: Fhir3Resource = mockk(relaxed = true)
+        val fetchedRecord: EncryptedRecord = mockk()
+        val decryptedFetchedRecord: DecryptedRecord<Fhir3Resource> = mockk(relaxed = true)
+        val encryptedRecord: EncryptedRecord = mockk()
+        val receivedRecord: EncryptedRecord = mockk()
+        val receivedDecryptedRecord: DecryptedRecord<Fhir3Resource> = mockk(relaxed = true)
+        val record: Record<Fhir3Resource> = mockk()
+        val attachment: HashMap<Any, String?> = mockk()
+        val identifier = "id"
+
+        every { receivedDecryptedRecord.identifier } returns identifier
+
+        every {
+            apiService.fetchRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID
+            )
+        } returns Single.just(fetchedRecord)
+        every { recordService.extractUploadData(resource) } returns attachment
+        every {
+            recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID)
+        } returns decryptedFetchedRecord
+        every {
+            recordService.encryptRecord(decryptedFetchedRecord)
+        } returns encryptedRecord
+        every {
+            apiService.updateRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID,
+                encryptedRecord
+            )
+        } returns Single.just(receivedRecord)
+        every {
+            recordService.decryptRecord<Fhir3Resource>(receivedRecord, USER_ID)
+        } returns receivedDecryptedRecord
+        every { RecordMapper.getInstance(receivedDecryptedRecord) } returns record
+
+        // When
+        val observer = recordService.updateRecord(
+            USER_ID,
+            RECORD_ID,
+            resource,
+            defaultAnnotation
+        ).test().await()
+
+        // Then
+        val result = observer.assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
+
+        assertSame(
+            actual = result,
+            expected = record
+        )
+
+        verifyOrder {
+            recordService.updateRecord(USER_ID, RECORD_ID, resource, defaultAnnotation)
+            recordService.updateRecord(USER_ID, RECORD_ID, resource as Any, defaultAnnotation)
+            recordService.checkDataRestrictions(resource)
+            recordService.extractUploadData(resource)
+            apiService.fetchRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID
+            )
+            recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID)
+            recordService.updateData(decryptedFetchedRecord, resource, USER_ID)
+            recordService.cleanObsoleteAdditionalIdentifiers(resource)
+            decryptedFetchedRecord.resource = resource
+            recordService.removeUploadData(decryptedFetchedRecord)
+            recordService.encryptRecord(decryptedFetchedRecord)
+            apiService.updateRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID,
+                encryptedRecord
+            )
+            recordService.decryptRecord<Fhir3Resource>(receivedRecord, USER_ID)
+            recordService.restoreUploadData(receivedDecryptedRecord, resource, attachment)
+            resource.id = receivedDecryptedRecord.identifier
+            RecordMapper.getInstance(receivedDecryptedRecord)
+
+        }
+    }
+
+    @Test
+    fun `Given, updateRecord is called with a Fhir4 resource, which contains an attachment, and a UserId, it returns a updated Record`() {
+        // Given
+        val resource: Fhir4Resource = mockk(relaxed = true)
+        val fetchedRecord: EncryptedRecord = mockk()
+        val decryptedFetchedRecord: DecryptedR4Record<Fhir4Resource> = mockk(relaxed = true)
+        val encryptedRecord: EncryptedRecord = mockk()
+        val receivedRecord: EncryptedRecord = mockk()
+        val receivedDecryptedRecord: DecryptedR4Record<Fhir4Resource> = mockk(relaxed = true)
+        val record: Fhir4Record<Fhir4Resource> = mockk()
+        val attachment: HashMap<Any, String?> = mockk()
+        val identifier = "id"
+
+        every { receivedDecryptedRecord.identifier } returns identifier
+
+        every {
+            apiService.fetchRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID
+            )
+        } returns Single.just(fetchedRecord)
+        every { recordService.extractUploadData(resource) } returns attachment
+        every {
+            recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID)
+        } returns decryptedFetchedRecord
+        every {
+            recordService.encryptRecord(decryptedFetchedRecord)
+        } returns encryptedRecord
+        every {
+            apiService.updateRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID,
+                encryptedRecord
+            )
+        } returns Single.just(receivedRecord)
+        every {
+            recordService.decryptRecord<Fhir4Resource>(receivedRecord, USER_ID)
+        } returns receivedDecryptedRecord
+        every { RecordMapper.getInstance(receivedDecryptedRecord) } returns record
+
+        // When
+        val observer = recordService.updateRecord(
+            USER_ID,
+            RECORD_ID,
+            resource,
+            defaultAnnotation
+        ).test().await()
+
+        // Then
+        val result = observer.assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
+
+        assertSame(
+            actual = result,
+            expected = record
+        )
+
+        verifyOrder {
+            recordService.updateRecord(USER_ID, RECORD_ID, resource, defaultAnnotation)
+            recordService.updateRecord(USER_ID, RECORD_ID, resource as Any, defaultAnnotation)
+            recordService.checkDataRestrictions(resource)
+            recordService.extractUploadData(resource)
+            apiService.fetchRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID
+            )
+            recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID)
+            recordService.updateData(decryptedFetchedRecord, resource, USER_ID)
+            recordService.cleanObsoleteAdditionalIdentifiers(resource)
+            decryptedFetchedRecord.resource = resource
+            recordService.removeUploadData(decryptedFetchedRecord)
+            recordService.encryptRecord(decryptedFetchedRecord)
+            apiService.updateRecord(
+                ALIAS,
+                USER_ID,
+                RECORD_ID,
+                encryptedRecord
+            )
+            recordService.decryptRecord<Fhir4Resource>(receivedRecord, USER_ID)
+            recordService.restoreUploadData(receivedDecryptedRecord, resource, attachment)
+            resource.id = receivedDecryptedRecord.identifier
+            RecordMapper.getInstance(receivedDecryptedRecord)
+        }
+    }
+
+    @Test
+    fun `Given, updateRecords is called with multiple resources and a UserId, returns multiple updated Records`() {
+        // Given
+        val ids = listOf("1", "2")
+        val resources = listOf<Fhir3Resource>(
+            mockk(),
+            mockk()
+        )
+
+        val expected = listOf<Record<Fhir3Resource>>(
+            mockk(),
+            mockk()
+        )
+
+        resources[0].id = ids[0]
+        resources[1].id = ids[1]
+
+        every {
+            recordService.updateRecord(
+                USER_ID,
+                or(ids[0], ids[1]),
+                or(resources[0], resources[1]),
+                defaultAnnotation
+            )
+        } returnsMany listOf(Single.just(expected[0]), Single.just(expected[1]))
 
         // When
         val observer = recordService.updateRecords(resources, USER_ID).test().await()
 
         // Then
         val result = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
-        Truth.assertThat(result.failedUpdates).hasSize(0)
-        Truth.assertThat(result.successfulUpdates).hasSize(2)
-        Truth.assertThat(result.successfulUpdates).containsExactly(mockRecord, mockRecord)
-        inOrder.verify(recordService).updateRecords(resources, USER_ID)
-        inOrder.verify(
-                recordService,
-                Mockito.times(2)
-        ).updateRecord(USER_ID, RECORD_ID, mockCarePlan, annotations)
-        inOrder.verifyNoMoreInteractions()
-    }
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
-    @Test
-    @Throws(
-            InterruptedException::class,
-            DataRestrictionException.UnsupportedFileType::class,
-            DataRestrictionException.MaxDataSizeViolation::class
-    )
-    fun `Given, updateRecord is called with a DataResource, Annotations and a UserId, it returns a updated DataRecord`() {
-        // Given
-        Mockito.`when`(
-                mockApiService.fetchRecord(
-                        ALIAS,
-                        USER_ID,
-                        RECORD_ID
-                )
-        ).thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedDataRecord)
-                .`when`(recordService)
-                .decryptRecord<DataResource>(mockEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockEncryptedRecord).`when`(recordService).encryptRecord(mockDecryptedDataRecord)
-        Mockito.`when`(
-                mockApiService.updateRecord(
-                        ALIAS,
-                        USER_ID,
-                        RECORD_ID,
-                        mockEncryptedRecord
-                )
-        ).thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedDataRecord)
-                .`when`(recordService)
-                .assignResourceId(mockDecryptedDataRecord)
-        @Suppress("UNCHECKED_CAST")
-        every { RecordMapper.getInstance(mockDecryptedDataRecord) } returns mockDataRecord
-
-        // When
-        val observer = recordService.updateRecord(
-                USER_ID,
-                RECORD_ID,
-                mockDataResource,
-                ANNOTATIONS
-        ).test().await()
-
-        // Then
-        val result = observer.assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
-
-        Truth.assertThat(result).isSameInstanceAs(mockDataRecord)
-
-        inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
-        inOrder.verify(recordService).decryptRecord<DataResource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).encryptRecord(mockDecryptedDataRecord)
-        inOrder.verify(mockApiService).updateRecord(ALIAS, USER_ID, RECORD_ID, mockEncryptedRecord)
-        inOrder.verify(recordService).decryptRecord<DataResource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).assignResourceId(mockDecryptedDataRecord)
-        inOrder.verifyNoMoreInteractions()
-
-        Mockito.verify(
-                mockDecryptedDataRecord,
-                Mockito.times(1)
-        ).resource = mockDataResource
-        Mockito.verify(
-                mockDecryptedDataRecord,
-                Mockito.times(1)
-        ).annotations = ANNOTATIONS
-    }
-
-    @Test
-    @Throws(
-            InterruptedException::class,
-            DataRestrictionException.UnsupportedFileType::class,
-            DataRestrictionException.MaxDataSizeViolation::class
-    )
-    fun `Given, updateRecord is called with a DataResource, empty list Annotations and a UserId, it returns a updated DataRecord`() {
-        // Given
-        Mockito.`when`(
-                mockApiService.fetchRecord(
-                        ALIAS,
-                        USER_ID,
-                        RECORD_ID
-                )
-        ).thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedDataRecord)
-                .`when`(recordService)
-                .decryptRecord<DataResource>(mockEncryptedRecord, USER_ID)
-        Mockito.doReturn(mockEncryptedRecord).`when`(recordService).encryptRecord(mockDecryptedDataRecord)
-        Mockito.`when`(
-                mockApiService.updateRecord(
-                        ALIAS,
-                        USER_ID,
-                        RECORD_ID,
-                        mockEncryptedRecord
-                )
-        ).thenReturn(Single.just(mockEncryptedRecord))
-        Mockito.doReturn(mockDecryptedDataRecord)
-                .`when`(recordService)
-                .assignResourceId(mockDecryptedDataRecord)
-        @Suppress("UNCHECKED_CAST")
-        every { RecordMapper.getInstance(mockDecryptedDataRecord) } returns mockDataRecord
-
-        // When
-        val observer = recordService.updateRecord(
-                USER_ID,
-                RECORD_ID,
-                mockDataResource,
-                listOf()
-        ).test().await()
-
-        // Then
-        val result = observer.assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
-
-        Truth.assertThat(result).isSameInstanceAs(mockDataRecord)
-
-        inOrder.verify(mockApiService).fetchRecord(ALIAS, USER_ID, RECORD_ID)
-        inOrder.verify(recordService).decryptRecord<DataResource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).encryptRecord(mockDecryptedDataRecord)
-        inOrder.verify(mockApiService).updateRecord(ALIAS, USER_ID, RECORD_ID, mockEncryptedRecord)
-        inOrder.verify(recordService).decryptRecord<DataResource>(mockEncryptedRecord, USER_ID)
-        inOrder.verify(recordService).assignResourceId(mockDecryptedDataRecord)
-        inOrder.verifyNoMoreInteractions()
-
-        Mockito.verify(
-                mockDecryptedDataRecord,
-                Mockito.times(1)
-        ).resource = mockDataResource
-        Mockito.verify(
-                mockDecryptedDataRecord,
-                Mockito.times(1)
-        ).annotations = ArgumentMatchers.anyList()
-    }
-
-    @Test
-    fun `Given, updateRecord is called with a UserId, recordId, a Fhir4Resource and Annotations, it wraps it and delegates it to the generic createRecord and return its Result`() {
-        // Given
-        val userId = "id"
-        val recordId = "absd"
-        val resource = Fhir4Resource()
-
-        val createdRecord = mockk<Fhir4Record<Fhir4Resource>>()
-
-        @Suppress("UNCHECKED_CAST")
-        every {
-            recordServiceK.updateRecord(userId, recordId, resource as Any, ANNOTATIONS)
-        } returns Single.just(createdRecord as BaseRecord<Any>)
-
-        // When
-        val subscriber = recordServiceK.updateRecord(
-                userId,
-                recordId,
-                resource,
-                ANNOTATIONS
-        ).test().await()
-
-        val record = subscriber
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
-
-        // Then
-        Assert.assertSame(
-                record,
-                createdRecord
+        assertEquals(
+            actual = result.failedUpdates.size,
+            expected = 0
         )
+        assertEquals(
+            actual = result.successfulUpdates.size,
+            expected = 2
+        )
+        assertSame(
+            actual = result.successfulUpdates[0],
+            expected = expected[0]
+        )
+        assertSame(
+            actual = result.successfulUpdates[1],
+            expected = expected[1]
+        )
+
+
+        verifyOrder {
+            recordService.updateRecord(
+                USER_ID,
+                or(ids[0], ids[1]),
+                or(resources[0], resources[1]),
+                defaultAnnotation
+            )
+            recordService.updateRecord(
+                USER_ID,
+                or(ids[0], ids[1]),
+                or(resources[0], resources[1]),
+                defaultAnnotation
+            )
+        }
     }
 }

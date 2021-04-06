@@ -466,25 +466,23 @@ class RecordService internal constructor(
 
         return apiService
                 .fetchRecord(alias, userId, recordId)
-                .map { decryptRecord<T>(it, userId) } //Fixme: Resource clash
-                .map { updateData(it, resource, userId) }
+                .map { fetchedRecord -> decryptRecord<T>(fetchedRecord, userId) } //Fixme: Resource clash
+                .map { decryptedRecord -> updateData(decryptedRecord, resource, userId) }
                 .map { decryptedRecord ->
                     cleanObsoleteAdditionalIdentifiers(resource)
 
                     decryptedRecord.also {
                         it.resource = resource
-                        if (annotations != null) {
-                            it.annotations = annotations
-                        }
+                        it.annotations = annotations
                     }
                 }
-                .map { removeUploadData(it) }
-                .map { encryptRecord(it) }
-                .flatMap { apiService.updateRecord(alias, userId, recordId, it) }
-                .map { decryptRecord<T>(it, userId) }
-                .map { restoreUploadData(it, resource, data) }
-                .map { assignResourceId(it) }
-                .map { recordFactory.getInstance(it) }
+                .map { decryptedRecord -> removeUploadData(decryptedRecord) }
+                .map { decryptedRecord -> encryptRecord(decryptedRecord) }
+                .flatMap { encryptedRecord -> apiService.updateRecord(alias, userId, recordId, encryptedRecord) }
+                .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
+                .map { decryptedRecord -> restoreUploadData(decryptedRecord, resource, data) }
+                .map { decryptedRecord -> assignResourceId(decryptedRecord) }
+                .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) }
     }
 
     @Suppress("UNCHECKED_CAST")

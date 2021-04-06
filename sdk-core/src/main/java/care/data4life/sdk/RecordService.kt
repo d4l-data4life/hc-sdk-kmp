@@ -146,7 +146,7 @@ class RecordService internal constructor(
         checkDataRestrictions(resource)
 
         val data = extractUploadData(resource)
-        val createdRecord = Single.just(
+        val record = Single.just(
             DecryptedRecordMapper()
                 .setAnnotations(annotations)
                 .build(
@@ -158,15 +158,15 @@ class RecordService internal constructor(
                 )
         )
 
-        return createdRecord
-                .map { uploadData(it, userId) }
-                .map { removeUploadData(it) }
-                .map { encryptRecord(it) }
-                .flatMap { apiService.createRecord(alias, userId, it) }
-                .map { decryptRecord<T>(it, userId) }
-                .map { restoreUploadData(it, resource, data) }
-                .map { assignResourceId(it) }
-                .map { recordFactory.getInstance(it) }
+        return record
+                .map { createdRecord -> uploadData(createdRecord, userId) }
+                .map { createdRecord -> removeUploadData(createdRecord) }
+                .map { createdRecord -> encryptRecord(createdRecord) }
+                .flatMap { encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord) }
+                .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
+                .map { receivedRecord -> restoreUploadData(receivedRecord, resource, data) }
+                .map { receivedRecord -> assignResourceId(receivedRecord) }
+                .map { receivedRecord -> recordFactory.getInstance(receivedRecord) }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -460,25 +460,23 @@ class RecordService internal constructor(
 
         return apiService
                 .fetchRecord(alias, userId, recordId)
-                .map { decryptRecord<T>(it, userId) } //Fixme: Resource clash
-                .map { updateData(it, resource, userId) }
+                .map { fetchedRecord -> decryptRecord<T>(fetchedRecord, userId) } //Fixme: Resource clash
+                .map { decryptedRecord -> updateData(decryptedRecord, resource, userId) }
                 .map { decryptedRecord ->
                     cleanObsoleteAdditionalIdentifiers(resource)
 
                     decryptedRecord.also {
                         it.resource = resource
-                        if (annotations != null) {
-                            it.annotations = annotations
-                        }
+                        it.annotations = annotations
                     }
                 }
-                .map { removeUploadData(it) }
-                .map { encryptRecord(it) }
-                .flatMap { apiService.updateRecord(alias, userId, recordId, it) }
-                .map { decryptRecord<T>(it, userId) }
-                .map { restoreUploadData(it, resource, data) }
-                .map { assignResourceId(it) }
-                .map { recordFactory.getInstance(it) }
+                .map { decryptedRecord -> removeUploadData(decryptedRecord) }
+                .map { decryptedRecord -> encryptRecord(decryptedRecord) }
+                .flatMap { encryptedRecord -> apiService.updateRecord(alias, userId, recordId, encryptedRecord) }
+                .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
+                .map { decryptedRecord -> restoreUploadData(decryptedRecord, resource, data) }
+                .map { decryptedRecord -> assignResourceId(decryptedRecord) }
+                .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -779,10 +777,14 @@ class RecordService internal constructor(
             userId: String
     ): Single<Boolean> = attachmentService.delete(attachmentId, userId)
 
+    private fun isFhirWithPossibleAttachments(
+        resource: Any
+    ): Boolean = isFhir(resource) && fhirAttachmentHelper.hasAttachment(resource)
+
     fun <T : Any> extractUploadData(resource: T): HashMap<Any, String?>? {
-        return if (isFhir(resource)) {
-            val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Any?>?
-            if (attachments == null || attachments.isEmpty()) return null
+        return if (isFhirWithPossibleAttachments(resource)) {
+            val attachments = fhirAttachmentHelper.getAttachment(resource)
+                ?: return null
 
             val data = HashMap<Any, String?>(attachments.size)
             for (rawAttachment in attachments) {
@@ -814,7 +816,7 @@ class RecordService internal constructor(
     internal fun <T : Any> removeUploadData(
             record: DecryptedBaseRecord<T>
     ): DecryptedBaseRecord<T> {
-        return if (isFhir(record.resource)) {
+        return if (isFhirWithPossibleAttachments(record.resource)) {
             setUploadData(
                     record,
                     null
@@ -826,16 +828,17 @@ class RecordService internal constructor(
 
     internal fun <T : Any> restoreUploadData(
             record: DecryptedBaseRecord<T>,
-            originalResource: T?,
+            originalResource: T,
             attachmentData: HashMap<Any, String?>? // TODO: Match Any as Attachment against Fhir version
     ): DecryptedBaseRecord<T> {
-        if (!isFhir(record.resource) || originalResource == null || originalResource is DataResource) {
+        if (!isFhir(record.resource) || !isFhir(originalResource)) {
             return record
         }
 
+        // ToDo: This should not be done here, also should this not also resign Fhir onto Arbitrary Data?
         record.resource = originalResource
 
-        return if (attachmentData == null) {
+        return if (attachmentData == null || !fhirAttachmentHelper.hasAttachment(record.resource)) {
             record
         } else {
             setUploadData(
@@ -849,7 +852,7 @@ class RecordService internal constructor(
     internal fun <T : Fhir3Resource> removeOrRestoreUploadData(
             operation: RemoveRestoreOperation,
             record: DecryptedFhir3Record<T>,
-            originalResource: T?,
+            originalResource: T,
             attachmentData: HashMap<Fhir3Attachment, String?>?
     ): DecryptedFhir3Record<T> {
         return if (operation == RemoveRestoreOperation.RESTORE) {
@@ -1176,26 +1179,29 @@ class RecordService internal constructor(
             DataRestrictionException.MaxDataSizeViolation::class,
             DataRestrictionException.UnsupportedFileType::class
     )
-    fun <T : Any> checkDataRestrictions(resource: T?) {
-        if (isFhir(resource) && fhirAttachmentHelper.hasAttachment(resource!!)) {
-            val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Any?>? ?: return
+    fun <T : Any> checkDataRestrictions(resource: T) {
+        if (isFhirWithPossibleAttachments(resource)) {
+            val attachments = fhirAttachmentHelper.getAttachment(resource)
+                ?: return
 
             for (rawAttachment in attachments) {
-                rawAttachment ?: return
+                rawAttachment ?: continue
 
                 val attachment = attachmentFactory.wrap(rawAttachment)
-
-                val data = decode(attachment.data!!)
-                if (recognizeMimeType(data) == MimeType.UNKNOWN) {
-                    throw DataRestrictionException.UnsupportedFileType()
-                }
-                if (data.size > DATA_SIZE_MAX_BYTES) {
-                    throw DataRestrictionException.MaxDataSizeViolation()
+                if (attachment.data is String) {
+                    val data = decode(attachment.data!!)
+                    if (recognizeMimeType(data) == MimeType.UNKNOWN) {
+                        throw DataRestrictionException.UnsupportedFileType()
+                    }
+                    if (data.size > DATA_SIZE_MAX_BYTES) {
+                        throw DataRestrictionException.MaxDataSizeViolation()
+                    }
                 }
             }
         }
     }
 
+    // TODO: make it private
     internal fun <T : Any> assignResourceId(
             record: DecryptedBaseRecord<T>
     ): DecryptedBaseRecord<T> {

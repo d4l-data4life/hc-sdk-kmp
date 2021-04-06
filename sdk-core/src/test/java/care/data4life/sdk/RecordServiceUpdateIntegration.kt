@@ -32,6 +32,7 @@ import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
+import care.data4life.sdk.test.util.GenericTestDataProvider
 import care.data4life.sdk.util.Base64
 import care.data4life.sdk.util.MimeType
 import com.google.common.truth.Truth
@@ -65,8 +66,8 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         mockkObject(MimeType)
 
         recordService = RecordService(
-                RecordServiceTestProvider.PARTNER_ID,
-                RecordServiceTestProvider.ALIAS,
+                GenericTestDataProvider.PARTNER_ID,
+                GenericTestDataProvider.ALIAS,
                 apiService,
                 TagEncryptionService(
                         cryptoService

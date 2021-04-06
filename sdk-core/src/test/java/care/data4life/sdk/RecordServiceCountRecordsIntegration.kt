@@ -20,6 +20,7 @@ import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
+import care.data4life.sdk.test.util.GenericTestDataProvider
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk
@@ -41,8 +42,8 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
         errorHandler = mockk()
 
         recordService = RecordService(
-                RecordServiceTestProvider.PARTNER_ID,
-                RecordServiceTestProvider.ALIAS,
+                GenericTestDataProvider.PARTNER_ID,
+                GenericTestDataProvider.ALIAS,
                 apiService,
                 TagEncryptionService(cryptoService),
                 TaggingService(CLIENT_ID),

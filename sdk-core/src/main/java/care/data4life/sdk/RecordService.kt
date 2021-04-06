@@ -152,7 +152,7 @@ class RecordService internal constructor(
         checkDataRestrictions(resource)
 
         val data = extractUploadData(resource)
-        val createdRecord = Single.just(
+        val record = Single.just(
             DecryptedRecordMapper()
                 .setAnnotations(annotations)
                 .build(
@@ -164,15 +164,15 @@ class RecordService internal constructor(
                 )
         )
 
-        return createdRecord
-                .map { _uploadData(it, userId) }
-                .map { removeUploadData(it) }
-                .map { encryptRecord(it) }
-                .flatMap { apiService.createRecord(alias, userId, it) }
-                .map { decryptRecord<T>(it, userId) }
-                .map { restoreUploadData(it, resource, data) }
-                .map { assignResourceId(it) }
-                .map { recordFactory.getInstance(it) }
+        return record
+                .map { createdRecord -> _uploadData(createdRecord, userId) }
+                .map { createdRecord -> removeUploadData(createdRecord) }
+                .map { createdRecord -> encryptRecord(createdRecord) }
+                .flatMap { encryptedRecord -> apiService.createRecord(alias, userId, encryptedRecord) }
+                .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
+                .map { receivedRecord -> restoreUploadData(receivedRecord, resource, data) }
+                .map { receivedRecord -> assignResourceId(receivedRecord) }
+                .map { receivedRecord -> recordFactory.getInstance(receivedRecord) }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -1247,6 +1247,7 @@ class RecordService internal constructor(
         }
     }
 
+    // TODO: make it private
     internal fun <T : Any> assignResourceId(
             record: DecryptedBaseRecord<T>
     ): DecryptedBaseRecord<T> {

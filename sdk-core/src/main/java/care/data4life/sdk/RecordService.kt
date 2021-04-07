@@ -124,7 +124,6 @@ class RecordService internal constructor(
             )
     )
 
-
     @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     internal enum class UploadDownloadOperation {
         UPLOAD, DOWNLOAD, UPDATE
@@ -422,13 +421,13 @@ class RecordService internal constructor(
             .map { encryptedRecord ->
                 decryptRecord<T>(encryptedRecord, userId) as DecryptedFhir3Record<T>
             }
-            .map { downloadData(it, userId) }
+            .map { decryptedRecord -> downloadData(decryptedRecord, userId) }
             .map { decryptedRecord ->
                 decryptedRecord.also {
                     checkDataRestrictions(decryptedRecord.resource)
                 }
             }
-            .map { assignResourceId(it) }
+            .map { decryptedRecord -> assignResourceId(decryptedRecord) }
             .map { decryptedRecord ->
                 recordFactory.getInstance(decryptedRecord) as Record<T>
             }
@@ -706,7 +705,7 @@ class RecordService internal constructor(
             type: DownloadType
     ): Single<Fhir3Attachment> = downloadAttachments(
             recordId,
-            arrayListOf(attachmentId),
+            listOf(attachmentId),
             userId,
             type
     ).map { it[0] }
@@ -1096,134 +1095,9 @@ class RecordService internal constructor(
         }
     }
 
-    /*
-     *   TODO: This function makes a false assumption. It claims, that the output of the attachmentService.upload
-     *    matches List<String?>?, but it is actually List<String?>. This means the claim of the former author that second (the list)
-     *    is a indicator for a type is wrong.
-     */
-    internal fun updateFhirResourceIdentifier(
-            resource: Any,
-            result: List<Pair<WrapperContract.Attachment, List<String?>?>>
-    ) {
-        val sb = StringBuilder()
-        for ((attachment, second) in result) {
-            if (second != null) { //Attachment is a of image type
-                sb.setLength(0)
-                sb.append(DOWNSCALED_ATTACHMENT_IDS_FMT).append(ThumbnailService.SPLIT_CHAR)
-                        .append(attachment.id)
-                for (additionalId in second) {
-                    sb.append(ThumbnailService.SPLIT_CHAR).append(additionalId)
-                }
-                fhirAttachmentHelper.appendIdentifier(resource, sb.toString(), partnerId)
-            }
-        }
-    }
-
-    // TODO move to AttachmentService -> Thumbnail handling
-    @Throws(DataValidationException.IdUsageViolation::class)
-    fun setAttachmentIdForDownloadType(
-            attachments: List<Any>,
-            identifiers: List<Any>?,
-            type: DownloadType?
-    ) {
-        for (rawAttachment in attachments) {
-            val attachment = attachmentFactory.wrap(rawAttachment)
-            val additionalIds = extractAdditionalAttachmentIds(
-                    identifiers,
-                    attachment.id
-            )
-            if (additionalIds != null) {
-                when (type) {
-                    DownloadType.Full -> {
-                    }
-                    DownloadType.Medium -> attachment.id += ThumbnailService.SPLIT_CHAR + additionalIds[PREVIEW_ID_POS]
-                    DownloadType.Small -> attachment.id += ThumbnailService.SPLIT_CHAR + additionalIds[THUMBNAIL_ID_POS]
-                    else -> throw CoreRuntimeException.UnsupportedOperation()
-                }
-            }
-        }
-    }
-
-    @Throws(DataValidationException.IdUsageViolation::class)
-    internal fun extractAdditionalAttachmentIds(
-            additionalIds: List<Any>?,
-            attachmentId: String?
-    ): List<String>? {
-        if (additionalIds == null) return null
-
-        for (i in additionalIds) {
-            val parts = splitAdditionalAttachmentId(identifierFactory.wrap(i))
-            if (parts != null && parts[FULL_ATTACHMENT_ID_POS] == attachmentId) return parts
-        }
-
-        return null //Attachment is not of image type
-    }
-
-    @Throws(DataValidationException.IdUsageViolation::class)
-    internal fun splitAdditionalAttachmentId(identifier: WrapperContract.Identifier): List<String>? {
-        if (identifier.value == null || !identifier.value!!.startsWith(DOWNSCALED_ATTACHMENT_IDS_FMT)) {
-            return null
-        }
-        val parts = identifier.value!!.split(ThumbnailService.SPLIT_CHAR.toRegex())
-
-        if (parts.size != DOWNSCALED_ATTACHMENT_IDS_SIZE) {
-            throw DataValidationException.IdUsageViolation(identifier.value)
-        }
-        return parts
-    }
-
-    // TODO move to AttachmentService
-    fun updateAttachmentMeta(attachment: Fhir3Attachment): Fhir3Attachment {
-        val data = decode(attachment.data!!)
-        attachment.size = data.size
-        attachment.hash = encodeToString(sha1(data))
-        return attachment
-    }
-
-    // TODO move to AttachmentService
-    internal fun getValidHash(attachment: WrapperContract.Attachment): String {
-        val data = decode(attachment.data!!)
-        return encodeToString(sha1(data))
-    }
-
-    @Throws(DataValidationException.IdUsageViolation::class)
-    fun <T : Any> cleanObsoleteAdditionalIdentifiers(resource: T?) {
-        if (
-                isFhir(resource) &&
-                fhirAttachmentHelper.hasAttachment(resource!!) &&
-                fhirAttachmentHelper.getAttachment(resource)?.isNotEmpty() == true
-        ) {
-            val identifiers = fhirAttachmentHelper.getIdentifier(resource)
-            val currentAttachments = fhirAttachmentHelper.getAttachment(resource)!!
-            val currentAttachmentIds = mutableListOf(currentAttachments.size.toString())
-
-            currentAttachments.forEach {
-                if (it != null) {
-                    val attachment = attachmentFactory.wrap(it)
-                    if (attachment.id != null) {
-                        currentAttachmentIds.add(attachment.id!!)
-                    }
-                }
-            }
-
-            if (identifiers == null) return
-            val updatedIdentifiers: MutableList<Any> = mutableListOf()
-            val identifierIterator = identifiers.iterator()
-
-            while (identifierIterator.hasNext()) {
-                val next = identifierFactory.wrap(identifierIterator.next())
-                val parts = splitAdditionalAttachmentId(next)
-                if (parts == null || currentAttachmentIds.contains(parts[FULL_ATTACHMENT_ID_POS])) {
-                    updatedIdentifiers.add(next.unwrap())
-                }
-            }
-            fhirAttachmentHelper.setIdentifier(resource, updatedIdentifiers)
-        }
-    }
-
     @Throws(
-            DataRestrictionException.MaxDataSizeViolation::class,
-            DataRestrictionException.UnsupportedFileType::class
+        DataRestrictionException.MaxDataSizeViolation::class,
+        DataRestrictionException.UnsupportedFileType::class
     )
     fun <T : Any> checkDataRestrictions(resource: T) {
         if (isFhirWithPossibleAttachments(resource)) {
@@ -1245,6 +1119,133 @@ class RecordService internal constructor(
                 }
             }
         }
+    }
+
+    /*
+     *   TODO: This function makes a false assumption. It claims, that the output of the attachmentService.upload
+     *    matches List<String?>?, but it is actually List<String?>. This means the claim of the former author that second (the list)
+     *    is a indicator for a type is wrong.
+     */
+    internal fun updateFhirResourceIdentifier(
+            resource: Any,
+            result: List<Pair<WrapperContract.Attachment, List<String?>?>>
+    ) {
+        val sb = StringBuilder()
+        for ((attachment, second) in result) {
+            if (second != null) { //Attachment is a of image type
+                sb.setLength(0)
+                sb.append(DOWNSCALED_ATTACHMENT_IDS_FMT)
+                    .append(ThumbnailService.SPLIT_CHAR)
+                    .append(attachment.id)
+
+                for (additionalId in second) {
+                    sb.append(ThumbnailService.SPLIT_CHAR).append(additionalId)
+                }
+                fhirAttachmentHelper.appendIdentifier(resource, sb.toString(), partnerId)
+            }
+        }
+    }
+
+    // TODO move to AttachmentService -> Thumbnail handling
+    @Throws(DataValidationException.IdUsageViolation::class)
+    fun setAttachmentIdForDownloadType(
+            attachments: List<Any>,
+            identifiers: List<Any>?,
+            type: DownloadType
+    ) {
+        for (rawAttachment in attachments) {
+            val attachment = attachmentFactory.wrap(rawAttachment)
+            val additionalIds = extractAdditionalAttachmentIds(
+                    identifiers,
+                    attachment.id
+            )
+            if (additionalIds != null) {
+                when (type) {
+                    DownloadType.Full -> { /* do nothing */ }
+                    DownloadType.Medium -> attachment.id += ThumbnailService.SPLIT_CHAR + additionalIds[PREVIEW_ID_POS]
+                    DownloadType.Small -> attachment.id += ThumbnailService.SPLIT_CHAR + additionalIds[THUMBNAIL_ID_POS]
+                }
+            }
+        }
+    }
+
+    @Throws(DataValidationException.IdUsageViolation::class)
+    internal fun extractAdditionalAttachmentIds(
+            additionalIds: List<Any>?,
+            attachmentId: String?
+    ): List<String>? {
+        if (additionalIds == null) return null
+
+        for (id in additionalIds) {
+            val parts = splitAdditionalAttachmentId(identifierFactory.wrap(id))
+            if (parts != null && parts[FULL_ATTACHMENT_ID_POS] == attachmentId) return parts
+        }
+
+        return null //Attachment is not of image type
+    }
+
+    @Throws(DataValidationException.IdUsageViolation::class)
+    fun <T : Any> cleanObsoleteAdditionalIdentifiers(resource: T) {
+        if (isFhirWithPossibleAttachments(resource)) {
+            val currentAttachments = fhirAttachmentHelper.getAttachment(resource)
+            if (currentAttachments !is List<*> || currentAttachments.isEmpty()) {
+                return
+            }
+
+            val identifiers = fhirAttachmentHelper.getIdentifier(resource) ?: return
+            val currentAttachmentIds = mutableListOf<String>()
+
+            currentAttachments.forEach {
+                if (it != null) {
+                    val attachment = attachmentFactory.wrap(it)
+                    if (attachment.id != null) {
+                        currentAttachmentIds.add(attachment.id!!)
+                    }
+                }
+            }
+
+            val updatedIdentifiers: MutableList<Any> = mutableListOf()
+            val identifierIterator = identifiers.iterator()
+
+            while (identifierIterator.hasNext()) {
+                val next = identifierFactory.wrap(identifierIterator.next())
+                val parts = splitAdditionalAttachmentId(next)
+                if (parts == null || currentAttachmentIds.contains(parts[FULL_ATTACHMENT_ID_POS])) {
+                    updatedIdentifiers.add(next.unwrap())
+                }
+            }
+
+            fhirAttachmentHelper.setIdentifier(resource, updatedIdentifiers)
+        }
+    }
+
+    @Throws(DataValidationException.IdUsageViolation::class)
+    internal fun splitAdditionalAttachmentId(identifier: WrapperContract.Identifier): List<String>? {
+        if (identifier.value == null || !identifier.value!!.startsWith(DOWNSCALED_ATTACHMENT_IDS_FMT)) {
+            return null
+        }
+        val parts = identifier.value!!.split(ThumbnailService.SPLIT_CHAR.toRegex())
+
+        if (parts.size != DOWNSCALED_ATTACHMENT_IDS_SIZE) {
+            throw DataValidationException.IdUsageViolation(identifier.value)
+        }
+        return parts
+    }
+
+    private fun hashAttachmentData(data: ByteArray): String = encodeToString(sha1(data))
+
+    // TODO move to AttachmentService
+    fun updateAttachmentMeta(attachment: Fhir3Attachment): Fhir3Attachment {
+        val data = decode(attachment.data!!)
+        attachment.size = data.size
+        attachment.hash = hashAttachmentData(data)
+        return attachment
+    }
+
+    // TODO move to AttachmentService
+    internal fun getValidHash(attachment: WrapperContract.Attachment): String {
+        val data = decode(attachment.data!!)
+        return hashAttachmentData(data)
     }
 
     // TODO: make it private

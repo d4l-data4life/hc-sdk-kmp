@@ -17,10 +17,10 @@
 package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.RecordServiceTestBase.Companion.ALIAS
-import care.data4life.sdk.RecordServiceTestBase.Companion.PARTNER_ID
-import care.data4life.sdk.RecordServiceTestBase.Companion.RECORD_ID
-import care.data4life.sdk.RecordServiceTestBase.Companion.USER_ID
+import care.data4life.sdk.RecordServiceTestProvider.ALIAS
+import care.data4life.sdk.RecordServiceTestProvider.PARTNER_ID
+import care.data4life.sdk.RecordServiceTestProvider.RECORD_ID
+import care.data4life.sdk.RecordServiceTestProvider.USER_ID
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
@@ -37,6 +37,7 @@ import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.tag.TaggingContract
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -53,52 +54,40 @@ import kotlin.test.assertSame
 
 class RecordServiceUpdateRecordTest {
     private lateinit var recordService: RecordService
-    private lateinit var apiService: ApiService
-    private lateinit var cryptoService: CryptoService
-    private lateinit var fhirService: FhirContract.Service
-    private lateinit var tagEncryptionService: TaggingContract.EncryptionService
-    private lateinit var taggingService: TaggingContract.Service
-    private lateinit var attachmentService: AttachmentContract.Service
-    private lateinit var errorHandler: SdkContract.ErrorHandler
-    private lateinit var tags: HashMap<String, String>
-    private val defaultAnnotation: MutableList<String> = mutableListOf()
+    private val apiService: ApiService = mockk()
+    private val cryptoService: CryptoService = mockk()
+    private val fhirService: FhirContract.Service = mockk()
+    private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
+    private val taggingService: TaggingContract.Service = mockk()
+    private val attachmentService: AttachmentContract.Service = mockk()
+    private val errorHandler: SdkContract.ErrorHandler = mockk()
 
-    private lateinit var compatibilityService: MigrationContract.CompatibilityService
-    private lateinit var decryptedRecordMapper: DecryptedRecordMapper
-    private lateinit var uploadData: HashMap<Any, String?>
-    private lateinit var dataKey: GCKey
-    private lateinit var encryptedRecord: EncryptedRecord
+    private val tags: HashMap<String, String> = mockk()
+    private val defaultAnnotation: List<String> = emptyList()
+
+    private val compatibilityService: MigrationContract.CompatibilityService = mockk()
+    private val decryptedRecordMapper: DecryptedRecordMapper = mockk()
+    private val uploadData: HashMap<Any, String?> = mockk()
+    private val dataKey: GCKey = mockk()
+    private val encryptedRecord: EncryptedRecord = mockk()
 
     @Before
     fun setUp() {
-        apiService = mockk()
-        cryptoService = mockk()
-        fhirService = mockk()
-        tagEncryptionService = mockk()
-        taggingService = mockk()
-        attachmentService = mockk()
-        errorHandler = mockk()
-        tags = mockk()
-
-        compatibilityService = mockk()
-        decryptedRecordMapper = mockk()
-        dataKey = mockk()
-        uploadData = mockk()
-        encryptedRecord = mockk()
+        clearAllMocks()
 
         recordService = spyk(
-            RecordService(
-                PARTNER_ID,
-                ALIAS,
-                apiService,
-                tagEncryptionService,
-                taggingService,
-                fhirService,
-                attachmentService,
-                cryptoService,
-                errorHandler,
-                compatibilityService
-            )
+                RecordService(
+                        PARTNER_ID,
+                        ALIAS,
+                        apiService,
+                        tagEncryptionService,
+                        taggingService,
+                        fhirService,
+                        attachmentService,
+                        cryptoService,
+                        errorHandler,
+                        compatibilityService
+                )
         )
 
         mockkObject(RecordMapper)
@@ -125,9 +114,9 @@ class RecordServiceUpdateRecordTest {
 
         every {
             apiService.fetchRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID
             )
         } returns Single.just(fetchedRecord)
         every {
@@ -138,10 +127,10 @@ class RecordServiceUpdateRecordTest {
         } returns encryptedRecord
         every {
             apiService.updateRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID,
-                encryptedRecord
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID,
+                    encryptedRecord
             )
         } returns Single.just(receivedRecord)
         every {
@@ -151,21 +140,21 @@ class RecordServiceUpdateRecordTest {
 
         // When
         val observer = recordService.updateRecord(
-            USER_ID,
-            RECORD_ID,
-            resource,
-            defaultAnnotation
+                USER_ID,
+                RECORD_ID,
+                resource,
+                defaultAnnotation
         ).test().await()
 
         // Then
         val result = observer.assertNoErrors()
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
 
         assertSame(
-            actual = result,
-            expected = record
+                actual = result,
+                expected = record
         )
 
         verifyOrder {
@@ -174,9 +163,9 @@ class RecordServiceUpdateRecordTest {
             recordService.checkDataRestrictions(resource)
             recordService.extractUploadData(resource)
             apiService.fetchRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID
             )
             recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID)
             recordService.updateData(decryptedFetchedRecord, resource, USER_ID)
@@ -185,10 +174,10 @@ class RecordServiceUpdateRecordTest {
             recordService.removeUploadData(decryptedFetchedRecord)
             recordService.encryptRecord(decryptedFetchedRecord)
             apiService.updateRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID,
-                encryptedRecord
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID,
+                    encryptedRecord
             )
             recordService.decryptRecord<Fhir3Resource>(receivedRecord, USER_ID)
             recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
@@ -214,9 +203,9 @@ class RecordServiceUpdateRecordTest {
 
         every {
             apiService.fetchRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID
             )
         } returns Single.just(fetchedRecord)
         every {
@@ -227,10 +216,10 @@ class RecordServiceUpdateRecordTest {
         } returns encryptedRecord
         every {
             apiService.updateRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID,
-                encryptedRecord
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID,
+                    encryptedRecord
             )
         } returns Single.just(receivedRecord)
         every {
@@ -240,21 +229,21 @@ class RecordServiceUpdateRecordTest {
 
         // When
         val observer = recordService.updateRecord(
-            USER_ID,
-            RECORD_ID,
-            resource,
-            defaultAnnotation
+                USER_ID,
+                RECORD_ID,
+                resource,
+                defaultAnnotation
         ).test().await()
 
         // Then
         val result = observer.assertNoErrors()
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
 
         assertSame(
-            actual = result,
-            expected = record
+                actual = result,
+                expected = record
         )
 
         verifyOrder {
@@ -263,9 +252,9 @@ class RecordServiceUpdateRecordTest {
             recordService.checkDataRestrictions(resource)
             recordService.extractUploadData(resource)
             apiService.fetchRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID
             )
             recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID)
             recordService.updateData(decryptedFetchedRecord, resource, USER_ID)
@@ -274,10 +263,10 @@ class RecordServiceUpdateRecordTest {
             recordService.removeUploadData(decryptedFetchedRecord)
             recordService.encryptRecord(decryptedFetchedRecord)
             apiService.updateRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID,
-                encryptedRecord
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID,
+                    encryptedRecord
             )
             recordService.decryptRecord<Fhir4Resource>(receivedRecord, USER_ID)
             recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
@@ -300,9 +289,9 @@ class RecordServiceUpdateRecordTest {
 
         every {
             apiService.fetchRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID
             )
         } returns Single.just(fetchedRecord)
         every {
@@ -313,10 +302,10 @@ class RecordServiceUpdateRecordTest {
         } returns encryptedRecord
         every {
             apiService.updateRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID,
-                encryptedRecord
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID,
+                    encryptedRecord
             )
         } returns Single.just(receivedRecord)
         every {
@@ -326,21 +315,21 @@ class RecordServiceUpdateRecordTest {
 
         // When
         val observer = recordService.updateRecord(
-            USER_ID,
-            RECORD_ID,
-            resource,
-            defaultAnnotation
+                USER_ID,
+                RECORD_ID,
+                resource,
+                defaultAnnotation
         ).test().await()
 
         // Then
         val result = observer.assertNoErrors()
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
 
         assertSame(
-            actual = result,
-            expected = record
+                actual = result,
+                expected = record
         )
 
         verifyOrder {
@@ -349,9 +338,9 @@ class RecordServiceUpdateRecordTest {
             recordService.checkDataRestrictions(resource)
             recordService.extractUploadData(resource)
             apiService.fetchRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID
             )
             recordService.decryptRecord<DataResource>(fetchedRecord, USER_ID)
             recordService.updateData(decryptedFetchedRecord, resource, USER_ID)
@@ -360,10 +349,10 @@ class RecordServiceUpdateRecordTest {
             recordService.removeUploadData(decryptedFetchedRecord)
             recordService.encryptRecord(decryptedFetchedRecord)
             apiService.updateRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID,
-                encryptedRecord
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID,
+                    encryptedRecord
             )
             recordService.decryptRecord<DataResource>(receivedRecord, USER_ID)
             recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
@@ -390,9 +379,9 @@ class RecordServiceUpdateRecordTest {
 
         every {
             apiService.fetchRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID
             )
         } returns Single.just(fetchedRecord)
         every {
@@ -403,10 +392,10 @@ class RecordServiceUpdateRecordTest {
         } returns encryptedRecord
         every {
             apiService.updateRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID,
-                encryptedRecord
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID,
+                    encryptedRecord
             )
         } returns Single.just(receivedRecord)
         every {
@@ -416,21 +405,21 @@ class RecordServiceUpdateRecordTest {
 
         // When
         val observer = recordService.updateRecord(
-            USER_ID,
-            RECORD_ID,
-            resource,
-            annotations
+                USER_ID,
+                RECORD_ID,
+                resource,
+                annotations
         ).test().await()
 
         // Then
         val result = observer.assertNoErrors()
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
 
         assertSame(
-            actual = result,
-            expected = record
+                actual = result,
+                expected = record
         )
 
         verifyOrder {
@@ -439,9 +428,9 @@ class RecordServiceUpdateRecordTest {
             recordService.checkDataRestrictions(resource)
             recordService.extractUploadData(resource)
             apiService.fetchRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID
             )
             recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID)
             recordService.updateData(decryptedFetchedRecord, resource, USER_ID)
@@ -451,10 +440,10 @@ class RecordServiceUpdateRecordTest {
             recordService.removeUploadData(decryptedFetchedRecord)
             recordService.encryptRecord(decryptedFetchedRecord)
             apiService.updateRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID,
-                encryptedRecord
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID,
+                    encryptedRecord
             )
             recordService.decryptRecord<Fhir3Resource>(receivedRecord, USER_ID)
             recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
@@ -480,9 +469,9 @@ class RecordServiceUpdateRecordTest {
 
         every {
             apiService.fetchRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID
             )
         } returns Single.just(fetchedRecord)
         every {
@@ -493,10 +482,10 @@ class RecordServiceUpdateRecordTest {
         } returns encryptedRecord
         every {
             apiService.updateRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID,
-                encryptedRecord
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID,
+                    encryptedRecord
             )
         } returns Single.just(receivedRecord)
         every {
@@ -506,21 +495,21 @@ class RecordServiceUpdateRecordTest {
 
         // When
         val observer = recordService.updateRecord(
-            USER_ID,
-            RECORD_ID,
-            resource,
-            annotations
+                USER_ID,
+                RECORD_ID,
+                resource,
+                annotations
         ).test().await()
 
         // Then
         val result = observer.assertNoErrors()
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
 
         assertSame(
-            actual = result,
-            expected = record
+                actual = result,
+                expected = record
         )
 
         verifyOrder {
@@ -529,9 +518,9 @@ class RecordServiceUpdateRecordTest {
             recordService.checkDataRestrictions(resource)
             recordService.extractUploadData(resource)
             apiService.fetchRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID
             )
             recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID)
             recordService.updateData(decryptedFetchedRecord, resource, USER_ID)
@@ -541,10 +530,10 @@ class RecordServiceUpdateRecordTest {
             recordService.removeUploadData(decryptedFetchedRecord)
             recordService.encryptRecord(decryptedFetchedRecord)
             apiService.updateRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID,
-                encryptedRecord
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID,
+                    encryptedRecord
             )
             recordService.decryptRecord<Fhir4Resource>(receivedRecord, USER_ID)
             recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
@@ -567,9 +556,9 @@ class RecordServiceUpdateRecordTest {
 
         every {
             apiService.fetchRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID
             )
         } returns Single.just(fetchedRecord)
         every {
@@ -580,10 +569,10 @@ class RecordServiceUpdateRecordTest {
         } returns encryptedRecord
         every {
             apiService.updateRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID,
-                encryptedRecord
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID,
+                    encryptedRecord
             )
         } returns Single.just(receivedRecord)
         every {
@@ -593,21 +582,21 @@ class RecordServiceUpdateRecordTest {
 
         // When
         val observer = recordService.updateRecord(
-            USER_ID,
-            RECORD_ID,
-            resource,
-            annotations
+                USER_ID,
+                RECORD_ID,
+                resource,
+                annotations
         ).test().await()
 
         // Then
         val result = observer.assertNoErrors()
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
 
         assertSame(
-            actual = result,
-            expected = record
+                actual = result,
+                expected = record
         )
 
         verifyOrder {
@@ -616,9 +605,9 @@ class RecordServiceUpdateRecordTest {
             recordService.checkDataRestrictions(resource)
             recordService.extractUploadData(resource)
             apiService.fetchRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID
             )
             recordService.decryptRecord<DataResource>(fetchedRecord, USER_ID)
             recordService.updateData(decryptedFetchedRecord, resource, USER_ID)
@@ -628,10 +617,10 @@ class RecordServiceUpdateRecordTest {
             recordService.removeUploadData(decryptedFetchedRecord)
             recordService.encryptRecord(decryptedFetchedRecord)
             apiService.updateRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID,
-                encryptedRecord
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID,
+                    encryptedRecord
             )
             recordService.decryptRecord<DataResource>(receivedRecord, USER_ID)
             recordService.restoreUploadData(receivedDecryptedRecord, resource, null)
@@ -658,9 +647,9 @@ class RecordServiceUpdateRecordTest {
 
         every {
             apiService.fetchRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID
             )
         } returns Single.just(fetchedRecord)
         every { recordService.extractUploadData(resource) } returns attachment
@@ -672,10 +661,10 @@ class RecordServiceUpdateRecordTest {
         } returns encryptedRecord
         every {
             apiService.updateRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID,
-                encryptedRecord
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID,
+                    encryptedRecord
             )
         } returns Single.just(receivedRecord)
         every {
@@ -685,21 +674,21 @@ class RecordServiceUpdateRecordTest {
 
         // When
         val observer = recordService.updateRecord(
-            USER_ID,
-            RECORD_ID,
-            resource,
-            defaultAnnotation
+                USER_ID,
+                RECORD_ID,
+                resource,
+                defaultAnnotation
         ).test().await()
 
         // Then
         val result = observer.assertNoErrors()
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
 
         assertSame(
-            actual = result,
-            expected = record
+                actual = result,
+                expected = record
         )
 
         verifyOrder {
@@ -708,9 +697,9 @@ class RecordServiceUpdateRecordTest {
             recordService.checkDataRestrictions(resource)
             recordService.extractUploadData(resource)
             apiService.fetchRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID
             )
             recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID)
             recordService.updateData(decryptedFetchedRecord, resource, USER_ID)
@@ -719,10 +708,10 @@ class RecordServiceUpdateRecordTest {
             recordService.removeUploadData(decryptedFetchedRecord)
             recordService.encryptRecord(decryptedFetchedRecord)
             apiService.updateRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID,
-                encryptedRecord
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID,
+                    encryptedRecord
             )
             recordService.decryptRecord<Fhir3Resource>(receivedRecord, USER_ID)
             recordService.restoreUploadData(receivedDecryptedRecord, resource, attachment)
@@ -749,9 +738,9 @@ class RecordServiceUpdateRecordTest {
 
         every {
             apiService.fetchRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID
             )
         } returns Single.just(fetchedRecord)
         every { recordService.extractUploadData(resource) } returns attachment
@@ -763,10 +752,10 @@ class RecordServiceUpdateRecordTest {
         } returns encryptedRecord
         every {
             apiService.updateRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID,
-                encryptedRecord
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID,
+                    encryptedRecord
             )
         } returns Single.just(receivedRecord)
         every {
@@ -776,21 +765,21 @@ class RecordServiceUpdateRecordTest {
 
         // When
         val observer = recordService.updateRecord(
-            USER_ID,
-            RECORD_ID,
-            resource,
-            defaultAnnotation
+                USER_ID,
+                RECORD_ID,
+                resource,
+                defaultAnnotation
         ).test().await()
 
         // Then
         val result = observer.assertNoErrors()
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
 
         assertSame(
-            actual = result,
-            expected = record
+                actual = result,
+                expected = record
         )
 
         verifyOrder {
@@ -799,9 +788,9 @@ class RecordServiceUpdateRecordTest {
             recordService.checkDataRestrictions(resource)
             recordService.extractUploadData(resource)
             apiService.fetchRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID
             )
             recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID)
             recordService.updateData(decryptedFetchedRecord, resource, USER_ID)
@@ -810,10 +799,10 @@ class RecordServiceUpdateRecordTest {
             recordService.removeUploadData(decryptedFetchedRecord)
             recordService.encryptRecord(decryptedFetchedRecord)
             apiService.updateRecord(
-                ALIAS,
-                USER_ID,
-                RECORD_ID,
-                encryptedRecord
+                    ALIAS,
+                    USER_ID,
+                    RECORD_ID,
+                    encryptedRecord
             )
             recordService.decryptRecord<Fhir4Resource>(receivedRecord, USER_ID)
             recordService.restoreUploadData(receivedDecryptedRecord, resource, attachment)
@@ -827,13 +816,13 @@ class RecordServiceUpdateRecordTest {
         // Given
         val ids = listOf("1", "2")
         val resources = listOf<Fhir3Resource>(
-            mockk(),
-            mockk()
+                mockk(),
+                mockk()
         )
 
         val expected = listOf<Record<Fhir3Resource>>(
-            mockk(),
-            mockk()
+                mockk(),
+                mockk()
         )
 
         resources[0].id = ids[0]
@@ -841,10 +830,10 @@ class RecordServiceUpdateRecordTest {
 
         every {
             recordService.updateRecord(
-                USER_ID,
-                or(ids[0], ids[1]),
-                or(resources[0], resources[1]),
-                defaultAnnotation
+                    USER_ID,
+                    or(ids[0], ids[1]),
+                    or(resources[0], resources[1]),
+                    defaultAnnotation
             )
         } returnsMany listOf(Single.just(expected[0]), Single.just(expected[1]))
 
@@ -853,41 +842,41 @@ class RecordServiceUpdateRecordTest {
 
         // Then
         val result = observer
-            .assertNoErrors()
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
 
         assertEquals(
-            actual = result.failedUpdates.size,
-            expected = 0
+                actual = result.failedUpdates.size,
+                expected = 0
         )
         assertEquals(
-            actual = result.successfulUpdates.size,
-            expected = 2
+                actual = result.successfulUpdates.size,
+                expected = 2
         )
         assertSame(
-            actual = result.successfulUpdates[0],
-            expected = expected[0]
+                actual = result.successfulUpdates[0],
+                expected = expected[0]
         )
         assertSame(
-            actual = result.successfulUpdates[1],
-            expected = expected[1]
+                actual = result.successfulUpdates[1],
+                expected = expected[1]
         )
 
 
         verifyOrder {
             recordService.updateRecord(
-                USER_ID,
-                or(ids[0], ids[1]),
-                or(resources[0], resources[1]),
-                defaultAnnotation
+                    USER_ID,
+                    or(ids[0], ids[1]),
+                    or(resources[0], resources[1]),
+                    defaultAnnotation
             )
             recordService.updateRecord(
-                USER_ID,
-                or(ids[0], ids[1]),
-                or(resources[0], resources[1]),
-                defaultAnnotation
+                    USER_ID,
+                    or(ids[0], ids[1]),
+                    or(resources[0], resources[1]),
+                    defaultAnnotation
             )
         }
     }

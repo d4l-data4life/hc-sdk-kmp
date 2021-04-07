@@ -16,10 +16,10 @@
 
 package care.data4life.sdk
 
-import care.data4life.sdk.RecordServiceTestBase.Companion.ALIAS
-import care.data4life.sdk.RecordServiceTestBase.Companion.PARTNER_ID
-import care.data4life.sdk.RecordServiceTestBase.Companion.RECORD_ID
-import care.data4life.sdk.RecordServiceTestBase.Companion.USER_ID
+import care.data4life.sdk.RecordServiceTestProvider.ALIAS
+import care.data4life.sdk.RecordServiceTestProvider.PARTNER_ID
+import care.data4life.sdk.RecordServiceTestProvider.RECORD_ID
+import care.data4life.sdk.RecordServiceTestProvider.USER_ID
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
@@ -39,6 +39,7 @@ import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.wrapper.SdkDateTimeFormatter
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -60,36 +61,23 @@ import care.data4life.fhir.stu3.model.CarePlan as Fhir3CarePlan
 
 class RecordServiceFetchRecordsTest {
     private lateinit var recordService: RecordService
-    private lateinit var apiService: ApiService
-    private lateinit var cryptoService: CryptoService
-    private lateinit var fhirService: FhirContract.Service
-    private lateinit var tagEncryptionService: TaggingContract.EncryptionService
-    private lateinit var taggingService: TaggingContract.Service
-    private lateinit var attachmentService: AttachmentContract.Service
-    private lateinit var errorHandler: SdkContract.ErrorHandler
-    private lateinit var tags: HashMap<String, String>
-    private lateinit var encryptedTags: MutableList<String>
-    private val defaultAnnotation: MutableList<String> = mutableListOf()
-    private lateinit var encryptedAnnotations: MutableList<String>
+    private val apiService: ApiService = mockk()
+    private val cryptoService: CryptoService = mockk()
+    private val fhirService: FhirContract.Service = mockk()
+    private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
+    private val taggingService: TaggingContract.Service = mockk()
+    private val attachmentService: AttachmentContract.Service = mockk()
+    private val errorHandler: SdkContract.ErrorHandler = mockk()
 
+    private val tags: HashMap<String, String> = mockk()
+    private val defaultAnnotation: List<String> = emptyList()
 
-    private lateinit var compatibilityService: MigrationContract.CompatibilityService
-    private lateinit var encryptedRecord: EncryptedRecord
+    private val compatibilityService: MigrationContract.CompatibilityService = mockk()
+    private val encryptedRecord: EncryptedRecord = mockk(relaxed = true)
 
     @Before
     fun setUp() {
-        apiService = mockk()
-        cryptoService = mockk()
-        fhirService = mockk()
-        tagEncryptionService = mockk()
-        taggingService = mockk()
-        attachmentService = mockk()
-        errorHandler = mockk()
-        tags = mockk()
-        encryptedTags = mockk()
-        encryptedAnnotations = mockk()
-        encryptedRecord = mockk(relaxed = true)
-        compatibilityService = mockk()
+        clearAllMocks()
 
         recordService = spyk(
                 RecordService(

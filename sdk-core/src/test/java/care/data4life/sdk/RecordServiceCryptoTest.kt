@@ -18,6 +18,10 @@ package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
 import care.data4life.crypto.KeyType
+import care.data4life.sdk.RecordServiceTestProvider.ALIAS
+import care.data4life.sdk.RecordServiceTestProvider.PARTNER_ID
+import care.data4life.sdk.RecordServiceTestProvider.RECORD_ID
+import care.data4life.sdk.RecordServiceTestProvider.USER_ID
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
@@ -33,6 +37,7 @@ import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.tag.TaggingContract
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
@@ -47,49 +52,34 @@ import kotlin.test.assertNull
 
 class RecordServiceCryptoTest {
     private lateinit var recordService: RecordService
-    private lateinit var apiService: ApiService
-    private lateinit var cryptoService: CryptoService
-    private lateinit var fhirService: FhirContract.Service
-    private lateinit var tagEncryptionService: TaggingContract.EncryptionService
-    private lateinit var taggingService: TaggingContract.Service
-    private lateinit var attachmentService: AttachmentContract.Service
-    private lateinit var errorHandler: SdkContract.ErrorHandler
-    private lateinit var tags: HashMap<String, String>
-    private lateinit var annotations: List<String>
+    private val apiService: ApiService = mockk()
+    private val cryptoService: CryptoService = mockk()
+    private val fhirService: FhirContract.Service = mockk()
+    private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
+    private val taggingService: TaggingContract.Service = mockk()
+    private val attachmentService: AttachmentContract.Service = mockk()
+    private val errorHandler: SdkContract.ErrorHandler = mockk()
+    private val tags: HashMap<String, String> = hashMapOf("potato" to "soup", "resourcetype" to "pumpkin")
+    private val annotations: List<String> = listOf("tomato", "soup")
 
-    private lateinit var encryptedTagsAndAnnotations: List<String>
-    private lateinit var dataKey: GCKey
-    private lateinit var commonKey: GCKey
-    private lateinit var attachmentKey: GCKey
-    private lateinit var encryptedResource: String
-    private lateinit var encryptedDataKey: EncryptedKey
-    private lateinit var encryptedAttachmentKey: EncryptedKey
+    private val encryptedTagsAndAnnotations: List<String> = mockk()
+    private val dataKey: GCKey = mockk()
+    private val commonKey: GCKey = mockk()
+    private val attachmentKey: GCKey = mockk()
+    private val encryptedResource: String = "potato"
+    private val encryptedDataKey: EncryptedKey = mockk()
+    private val encryptedAttachmentKey: EncryptedKey = mockk()
+
+    private val creationDate = "2020-05-03"
 
     @Before
     fun setUp() {
-        apiService = mockk()
-        cryptoService = mockk()
-        fhirService = mockk()
-        tagEncryptionService = mockk()
-        taggingService = mockk()
-        attachmentService = mockk()
-        errorHandler = mockk()
-        tags = hashMapOf("potato" to "soup", "resourcetype" to "pumpkin")
-        annotations = listOf("tomato", "soup")
-
-        dataKey = mockk()
-        commonKey = mockk()
-        attachmentKey = mockk()
-
-        encryptedTagsAndAnnotations = mockk()
-        encryptedResource = "potato"
-        encryptedDataKey = mockk()
-        encryptedAttachmentKey = mockk()
+        clearAllMocks()
 
         recordService = spyk(
                 RecordService(
-                        RecordServiceTestBase.PARTNER_ID,
-                        RecordServiceTestBase.ALIAS,
+                        PARTNER_ID,
+                        ALIAS,
                         apiService,
                         tagEncryptionService,
                         taggingService,
@@ -354,8 +344,8 @@ class RecordServiceCryptoTest {
         every { encryptedRecord.encryptedTags } returns encryptedTagsAndAnnotations
         every { encryptedRecord.encryptedDataKey } returns encryptedDataKey
         every { encryptedRecord.encryptedBody } returns encryptedResource
-        every { encryptedRecord.customCreationDate } returns RecordServiceTestBase.CREATION_DATE
-        every { encryptedRecord.identifier } returns RecordServiceTestBase.RECORD_ID
+        every { encryptedRecord.customCreationDate } returns creationDate
+        every { encryptedRecord.identifier } returns RECORD_ID
         every { encryptedRecord.updatedDate } returns updateDate
         every { encryptedRecord.encryptedAttachmentsKey } returns encryptedAttachmentKey
 
@@ -433,18 +423,18 @@ class RecordServiceCryptoTest {
         // When
         val decrypted = recordService.decryptRecord<Fhir3Resource>(
                 encryptedRecord,
-                RecordServiceTestBase.USER_ID
+                USER_ID
         )
 
         // Then
         assertEquals(
                 actual = decrypted,
                 expected = DecryptedRecord(
-                        RecordServiceTestBase.RECORD_ID,
+                        RECORD_ID,
                         resource,
                         tags,
                         annotations,
-                        RecordServiceTestBase.CREATION_DATE,
+                        creationDate,
                         null,
                         dataKey,
                         null,
@@ -473,18 +463,18 @@ class RecordServiceCryptoTest {
         // When
         val decrypted = recordService.decryptRecord<Fhir4Resource>(
                 encryptedRecord,
-                RecordServiceTestBase.USER_ID
+                USER_ID
         )
 
         // Then
         assertEquals(
                 actual = decrypted,
                 expected = DecryptedR4Record(
-                        RecordServiceTestBase.RECORD_ID,
+                        RECORD_ID,
                         resource,
                         tags,
                         annotations,
-                        RecordServiceTestBase.CREATION_DATE,
+                        creationDate,
                         null,
                         dataKey,
                         null,
@@ -516,18 +506,18 @@ class RecordServiceCryptoTest {
         // When
         val decrypted = recordService.decryptRecord<DataResource>(
                 encryptedRecord,
-                RecordServiceTestBase.USER_ID
+                USER_ID
         )
 
         // Then
         assertEquals(
                 actual = decrypted,
                 expected = DecryptedDataRecord(
-                        RecordServiceTestBase.RECORD_ID,
+                        RECORD_ID,
                         resource,
                         tags,
                         annotations,
-                        RecordServiceTestBase.CREATION_DATE,
+                        creationDate,
                         null,
                         dataKey,
                         modelVersion
@@ -557,18 +547,18 @@ class RecordServiceCryptoTest {
         // When
         val decrypted = recordService.decryptRecord<Fhir3Resource>(
                 encryptedRecord,
-                RecordServiceTestBase.USER_ID
+                USER_ID
         )
 
         // Then
         assertEquals(
                 actual = decrypted,
                 expected = DecryptedRecord(
-                        RecordServiceTestBase.RECORD_ID,
+                        RECORD_ID,
                         resource,
                         tags,
                         annotations,
-                        RecordServiceTestBase.CREATION_DATE,
+                        creationDate,
                         updateDate,
                         dataKey,
                         null,
@@ -599,18 +589,18 @@ class RecordServiceCryptoTest {
         // When
         val decrypted = recordService.decryptRecord<Fhir4Resource>(
                 encryptedRecord,
-                RecordServiceTestBase.USER_ID
+                USER_ID
         )
 
         // Then
         assertEquals(
                 actual = decrypted,
                 expected = DecryptedR4Record(
-                        RecordServiceTestBase.RECORD_ID,
+                        RECORD_ID,
                         resource,
                         tags,
                         annotations,
-                        RecordServiceTestBase.CREATION_DATE,
+                        creationDate,
                         updateDate,
                         dataKey,
                         null,
@@ -644,18 +634,18 @@ class RecordServiceCryptoTest {
         // When
         val decrypted = recordService.decryptRecord<DataResource>(
                 encryptedRecord,
-                RecordServiceTestBase.USER_ID
+                USER_ID
         )
 
         // Then
         assertEquals(
                 actual = decrypted,
                 expected = DecryptedDataRecord(
-                        RecordServiceTestBase.RECORD_ID,
+                        RECORD_ID,
                         resource,
                         tags,
                         annotations,
-                        RecordServiceTestBase.CREATION_DATE,
+                        creationDate,
                         updateDate,
                         dataKey,
                         modelVersion
@@ -677,7 +667,7 @@ class RecordServiceCryptoTest {
         val exception = assertFailsWith<DataValidationException.ModelVersionNotSupported> {
             recordService.decryptRecord<Fhir3Resource>(
                     encryptedRecord,
-                    RecordServiceTestBase.USER_ID
+                    USER_ID
             )
         }
         assertEquals(
@@ -698,7 +688,7 @@ class RecordServiceCryptoTest {
         val exception = assertFailsWith<DataValidationException.ModelVersionNotSupported> {
             recordService.decryptRecord<Fhir4Resource>(
                     encryptedRecord,
-                    RecordServiceTestBase.USER_ID
+                    USER_ID
             )
         }
         assertEquals(
@@ -719,7 +709,7 @@ class RecordServiceCryptoTest {
         val exception = assertFailsWith<DataValidationException.ModelVersionNotSupported> {
             recordService.decryptRecord<Fhir4Resource>(
                     encryptedRecord,
-                    RecordServiceTestBase.USER_ID
+                    USER_ID
             )
         }
         assertEquals(
@@ -747,18 +737,18 @@ class RecordServiceCryptoTest {
         // When
         val decrypted = recordService.decryptRecord<Fhir3Resource>(
                 encryptedRecord,
-                RecordServiceTestBase.USER_ID
+                USER_ID
         )
 
         // Then
         assertEquals(
                 actual = decrypted,
                 expected = DecryptedRecord(
-                        RecordServiceTestBase.RECORD_ID,
+                        RECORD_ID,
                         resource,
                         tags,
                         annotations,
-                        RecordServiceTestBase.CREATION_DATE,
+                        creationDate,
                         null,
                         dataKey,
                         attachmentKey,
@@ -791,18 +781,18 @@ class RecordServiceCryptoTest {
         // When
         val decrypted = recordService.decryptRecord<Fhir4Resource>(
                 encryptedRecord,
-                RecordServiceTestBase.USER_ID
+                USER_ID
         )
 
         // Then
         assertEquals(
                 actual = decrypted,
                 expected = DecryptedR4Record(
-                        RecordServiceTestBase.RECORD_ID,
+                        RECORD_ID,
                         resource,
                         tags,
                         annotations,
-                        RecordServiceTestBase.CREATION_DATE,
+                        creationDate,
                         null,
                         dataKey,
                         attachmentKey,

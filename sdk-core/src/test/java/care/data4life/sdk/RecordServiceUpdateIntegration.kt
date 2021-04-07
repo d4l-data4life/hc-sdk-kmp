@@ -65,8 +65,8 @@ class RecordServiceUpdateIntegration : RecordServiceIntegrationBase() {
         mockkObject(MimeType)
 
         recordService = RecordService(
-                RecordServiceTestBase.PARTNER_ID,
-                RecordServiceTestBase.ALIAS,
+                RecordServiceTestProvider.PARTNER_ID,
+                RecordServiceTestProvider.ALIAS,
                 apiService,
                 TagEncryptionService(
                         cryptoService

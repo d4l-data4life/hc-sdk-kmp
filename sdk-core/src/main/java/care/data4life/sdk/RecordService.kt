@@ -124,11 +124,6 @@ class RecordService internal constructor(
             )
     )
 
-    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
-    internal enum class RemoveRestoreOperation {
-        REMOVE, RESTORE
-    }
-
     private val recordFactory: RecordFactory = RecordMapper
     private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper = SdkFhirAttachmentHelper
     private val attachmentFactory: WrapperFactoryContract.AttachmentFactory = SdkAttachmentFactory
@@ -174,7 +169,6 @@ class RecordService internal constructor(
             DataRestrictionException.UnsupportedFileType::class,
             DataRestrictionException.MaxDataSizeViolation::class
     )
-    @JvmOverloads
     override fun <T : Fhir3Resource> createRecord(
             userId: String,
             resource: T,
@@ -251,7 +245,7 @@ class RecordService internal constructor(
     }
 
     // ToDo throw error on false error
-    internal fun <T : Any> _fetchRecord(
+    private fun <T : Any> _fetchRecord(
             recordId: String,
             userId: String
     ): Single<BaseRecord<T>> {
@@ -398,7 +392,7 @@ class RecordService internal constructor(
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int
-    ): Single<List<DataRecord<DataResource>>> = searchRecords<DataResource>(
+    ): Single<List<DataRecord<DataResource>>> = searchRecords(
             userId,
             DataResource::class.java,
             annotations,
@@ -845,24 +839,6 @@ class RecordService internal constructor(
                     record,
                     attachmentData
             )
-        }
-    }
-
-    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
-    internal fun <T : Fhir3Resource> removeOrRestoreUploadData(
-            operation: RemoveRestoreOperation,
-            record: DecryptedFhir3Record<T>,
-            originalResource: T,
-            attachmentData: HashMap<Fhir3Attachment, String?>?
-    ): DecryptedFhir3Record<T> {
-        return if (operation == RemoveRestoreOperation.RESTORE) {
-            restoreUploadData(
-                    record as DecryptedBaseRecord<T>,
-                    originalResource,
-                    attachmentData as HashMap<Any, String?>
-            ) as DecryptedFhir3Record<T>
-        } else {
-            removeUploadData(record as DecryptedBaseRecord<T>) as DecryptedFhir3Record<T>
         }
     }
 

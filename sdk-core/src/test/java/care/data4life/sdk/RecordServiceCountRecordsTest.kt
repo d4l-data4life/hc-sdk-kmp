@@ -17,15 +17,16 @@
 package care.data4life.sdk
 
 import care.data4life.fhir.stu3.model.Patient
-import care.data4life.sdk.RecordServiceTestBase.Companion.ALIAS
-import care.data4life.sdk.RecordServiceTestBase.Companion.PARTNER_ID
-import care.data4life.sdk.RecordServiceTestBase.Companion.USER_ID
+import care.data4life.sdk.RecordServiceTestProvider.ALIAS
+import care.data4life.sdk.RecordServiceTestProvider.PARTNER_ID
+import care.data4life.sdk.RecordServiceTestProvider.USER_ID
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.migration.MigrationContract
 import care.data4life.sdk.tag.TaggingContract
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
@@ -38,29 +39,21 @@ import kotlin.test.assertEquals
 
 class RecordServiceCountRecordsTest {
     private lateinit var recordService: RecordService
-    private lateinit var apiService: ApiService
-    private lateinit var cryptoService: CryptoService
-    private lateinit var fhirService: FhirContract.Service
-    private lateinit var tagEncryptionService: TaggingContract.EncryptionService
-    private lateinit var taggingService: TaggingContract.Service
-    private lateinit var attachmentService: AttachmentContract.Service
-    private lateinit var errorHandler: SdkContract.ErrorHandler
-    private lateinit var tags: HashMap<String, String>
-    private val defaultAnnotations = listOf<String>()
+    private val apiService: ApiService = mockk()
+    private val cryptoService: CryptoService = mockk()
+    private val fhirService: FhirContract.Service = mockk()
+    private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
+    private val taggingService: TaggingContract.Service = mockk()
+    private val attachmentService: AttachmentContract.Service = mockk()
+    private val errorHandler: SdkContract.ErrorHandler = mockk()
 
-    private lateinit var compatibilityService: MigrationContract.CompatibilityService
+    private val tags: HashMap<String, String> = mockk()
+    private val defaultAnnotations: List<String> = emptyList()
+    private val compatibilityService: MigrationContract.CompatibilityService = mockk()
 
     @Before
     fun setUp() {
-        apiService = mockk()
-        cryptoService = mockk()
-        fhirService = mockk()
-        tagEncryptionService = mockk()
-        taggingService = mockk()
-        attachmentService = mockk()
-        errorHandler = mockk()
-        tags = mockk()
-        compatibilityService = mockk()
+        clearAllMocks()
 
         recordService = spyk(
                 RecordService(

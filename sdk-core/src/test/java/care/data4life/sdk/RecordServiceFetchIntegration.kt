@@ -39,7 +39,6 @@ import org.threeten.bp.LocalDate
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import kotlin.test.assertFailsWith
-import kotlin.test.assertTrue
 import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
 import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
 
@@ -60,8 +59,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         errorHandler = mockk()
 
         recordService = RecordService(
-                RecordServiceTestBase.PARTNER_ID,
-                RecordServiceTestBase.ALIAS,
+                RecordServiceTestProvider.PARTNER_ID,
+                RecordServiceTestProvider.ALIAS,
                 apiService,
                 TagEncryptionService(
                         cryptoService

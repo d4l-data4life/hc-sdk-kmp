@@ -45,8 +45,8 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
         errorHandler = mockk()
 
         recordService = RecordService(
-                RecordServiceTestBase.PARTNER_ID,
-                RecordServiceTestBase.ALIAS,
+                RecordServiceTestProvider.PARTNER_ID,
+                RecordServiceTestProvider.ALIAS,
                 apiService,
                 TagEncryptionService(
                         cryptoService

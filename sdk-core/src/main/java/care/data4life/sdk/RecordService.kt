@@ -416,13 +416,13 @@ class RecordService internal constructor(
             .map { encryptedRecord ->
                 decryptRecord<T>(encryptedRecord, userId) as DecryptedFhir3Record<T>
             }
-            .map { downloadData(it, userId) }
+            .map { decryptedRecord -> downloadData(decryptedRecord, userId) }
             .map { decryptedRecord ->
                 decryptedRecord.also {
                     checkDataRestrictions(decryptedRecord.resource)
                 }
             }
-            .map { assignResourceId(it) }
+            .map { decryptedRecord -> assignResourceId(decryptedRecord) }
             .map { decryptedRecord ->
                 recordFactory.getInstance(decryptedRecord) as Record<T>
             }
@@ -700,7 +700,7 @@ class RecordService internal constructor(
             type: DownloadType
     ): Single<Fhir3Attachment> = downloadAttachments(
             recordId,
-            arrayListOf(attachmentId),
+            listOf(attachmentId),
             userId,
             type
     ).map { it[0] }
@@ -1098,8 +1098,10 @@ class RecordService internal constructor(
         for ((attachment, second) in result) {
             if (second != null) { //Attachment is a of image type
                 sb.setLength(0)
-                sb.append(DOWNSCALED_ATTACHMENT_IDS_FMT).append(ThumbnailService.SPLIT_CHAR)
-                        .append(attachment.id)
+                sb.append(DOWNSCALED_ATTACHMENT_IDS_FMT)
+                    .append(ThumbnailService.SPLIT_CHAR)
+                    .append(attachment.id)
+
                 for (additionalId in second) {
                     sb.append(ThumbnailService.SPLIT_CHAR).append(additionalId)
                 }
@@ -1185,18 +1187,20 @@ class RecordService internal constructor(
         return parts
     }
 
+    private fun hashAttachmentData(data: ByteArray): String = encodeToString(sha1(data))
+
     // TODO move to AttachmentService
     fun updateAttachmentMeta(attachment: Fhir3Attachment): Fhir3Attachment {
         val data = decode(attachment.data!!)
         attachment.size = data.size
-        attachment.hash = encodeToString(sha1(data))
+        attachment.hash = hashAttachmentData(data)
         return attachment
     }
 
     // TODO move to AttachmentService
     internal fun getValidHash(attachment: WrapperContract.Attachment): String {
         val data = decode(attachment.data!!)
-        return encodeToString(sha1(data))
+        return hashAttachmentData(data)
     }
 
     // TODO: make it private

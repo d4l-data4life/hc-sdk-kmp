@@ -193,7 +193,7 @@ class RecordServiceCreateRecordTest {
                 dataKey,
                 ModelVersion.CURRENT
             )
-            recordService._uploadData(createdRecord, USER_ID)
+            recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
             recordService.encryptRecord(createdRecord)
             apiService.createRecord(
@@ -290,7 +290,7 @@ class RecordServiceCreateRecordTest {
                 dataKey,
                 ModelVersion.CURRENT
             )
-            recordService._uploadData(createdRecord, USER_ID)
+            recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
             recordService.encryptRecord(createdRecord)
             apiService.createRecord(
@@ -357,8 +357,7 @@ class RecordServiceCreateRecordTest {
         every { RecordMapper.getInstance(receivedRecord) } returns record as BaseRecord<DataResource>
 
         // When
-        val subscriber =
-            recordService.createRecord(USER_ID, resource, defaultAnnotation).test().await()
+        val subscriber = recordService.createRecord(USER_ID, resource, defaultAnnotation).test().await()
 
         // Then
         val result = subscriber
@@ -385,7 +384,7 @@ class RecordServiceCreateRecordTest {
                 dataKey,
                 ModelVersion.CURRENT
             )
-            recordService._uploadData(createdRecord, USER_ID)
+            recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
             recordService.encryptRecord(createdRecord)
             apiService.createRecord(
@@ -457,8 +456,7 @@ class RecordServiceCreateRecordTest {
         every { RecordMapper.getInstance(receivedRecord) } returns record as BaseRecord<Fhir3Resource>
 
         // When
-        val subscriber =
-            recordService.createRecord(USER_ID, resource, defaultAnnotation).test().await()
+        val subscriber = recordService.createRecord(USER_ID, resource, defaultAnnotation).test().await()
 
         // Then
         val result = subscriber
@@ -485,7 +483,7 @@ class RecordServiceCreateRecordTest {
                 dataKey,
                 ModelVersion.CURRENT
             )
-            recordService._uploadData(createdRecord, USER_ID)
+            recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
             recordService.encryptRecord(createdRecord)
             apiService.createRecord(
@@ -584,7 +582,7 @@ class RecordServiceCreateRecordTest {
                 dataKey,
                 ModelVersion.CURRENT
             )
-            recordService._uploadData(createdRecord, USER_ID)
+            recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
             recordService.encryptRecord(createdRecord)
             apiService.createRecord(
@@ -681,7 +679,7 @@ class RecordServiceCreateRecordTest {
                 dataKey,
                 ModelVersion.CURRENT
             )
-            recordService._uploadData(createdRecord, USER_ID)
+            recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
             recordService.encryptRecord(createdRecord)
             apiService.createRecord(
@@ -778,7 +776,7 @@ class RecordServiceCreateRecordTest {
                 dataKey,
                 ModelVersion.CURRENT
             )
-            recordService._uploadData(createdRecord, USER_ID)
+            recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
             recordService.encryptRecord(createdRecord)
             apiService.createRecord(
@@ -873,7 +871,7 @@ class RecordServiceCreateRecordTest {
                 dataKey,
                 ModelVersion.CURRENT
             )
-            recordService._uploadData(createdRecord, USER_ID)
+            recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
             recordService.encryptRecord(createdRecord)
             apiService.createRecord(

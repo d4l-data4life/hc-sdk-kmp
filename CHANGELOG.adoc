@@ -30,7 +30,6 @@ toc::[]
 
 === Migration
 
-
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.1...v1.9.2[1.9.2]
 
 === Added

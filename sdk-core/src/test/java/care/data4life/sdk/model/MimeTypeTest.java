@@ -17,13 +17,10 @@
 package care.data4life.sdk.model;
 
 import org.junit.Test;
-
 import java.io.IOException;
 import java.util.Arrays;
-
-import care.data4life.sdk.test.util.FileHelper;
+import care.data4life.sdk.test.util.TestResourceHelper;
 import care.data4life.sdk.util.MimeType;
-
 import static com.google.common.truth.Truth.assertThat;
 
 public class MimeTypeTest {
@@ -58,7 +55,7 @@ public class MimeTypeTest {
     @Test
     public void recognizeMimeType_shouldRecognizeJPEGfile() throws IOException {
         //given
-        byte[] jpeg = FileHelper.loadBytes("sample.jpg");
+        byte[] jpeg = TestResourceHelper.INSTANCE.getByteResource("attachments", "sample.jpg");
 
         //when
         MimeType mimeType = MimeType.Companion.recognizeMimeType(jpeg);
@@ -84,7 +81,7 @@ public class MimeTypeTest {
     @Test
     public void recognizeMimeType_shouldRecognizePNGfile() throws IOException {
         //given
-        byte[] png = FileHelper.loadBytes("sample.png");
+        byte[] png = TestResourceHelper.INSTANCE.getByteResource("attachments", "sample.png");
 
         //when
         MimeType mimeType = MimeType.Companion.recognizeMimeType(png);
@@ -109,7 +106,7 @@ public class MimeTypeTest {
     @Test
     public void recognizeMimeType_shouldRecognizeTIFFfile() throws IOException {
         //given
-        byte[] tiff = FileHelper.loadBytes("sample.tiff");
+        byte[] tiff = TestResourceHelper.INSTANCE.getByteResource("attachments", "sample.tiff");
 
         //when
         MimeType mimeType = MimeType.Companion.recognizeMimeType(tiff);
@@ -135,7 +132,7 @@ public class MimeTypeTest {
     @Test
     public void recognizeMimeType_shouldRecognizePDF() throws IOException {
         //given
-        byte[] pdf = FileHelper.loadBytes("sample.pdf");
+        byte[] pdf = TestResourceHelper.INSTANCE.getByteResource("attachments", "sample.pdf");
 
         //when
         MimeType mimeType = MimeType.Companion.recognizeMimeType(pdf);
@@ -161,7 +158,7 @@ public class MimeTypeTest {
     @Test
     public void recognizeMimeType_shouldRecognizeDCMfile() throws IOException {
         //given
-        byte[] dcm = FileHelper.loadBytes("sample.dcm");
+        byte[] dcm = TestResourceHelper.INSTANCE.getByteResource("attachments", "sample.dcm");
 
         //when
         MimeType mimeType = MimeType.Companion.recognizeMimeType(dcm);

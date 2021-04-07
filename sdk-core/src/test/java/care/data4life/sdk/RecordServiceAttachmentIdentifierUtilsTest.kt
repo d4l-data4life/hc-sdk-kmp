@@ -16,8 +16,8 @@
 
 package care.data4life.sdk
 
-import care.data4life.sdk.RecordServiceTestProvider.ALIAS
-import care.data4life.sdk.RecordServiceTestProvider.PARTNER_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
+import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.ThumbnailService
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR

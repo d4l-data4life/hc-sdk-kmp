@@ -17,14 +17,13 @@
 package care.data4life.sdk
 
 
-import care.data4life.sdk.RecordServiceTestProvider.ALIAS
-import care.data4life.sdk.RecordServiceTestProvider.ATTACHMENT_ID
-import care.data4life.sdk.RecordServiceTestProvider.PARTNER_ID
-import care.data4life.sdk.RecordServiceTestProvider.PDF
-import care.data4life.sdk.RecordServiceTestProvider.PDF_OVERSIZED
-import care.data4life.sdk.RecordServiceTestProvider.UNKNOWN
-import care.data4life.sdk.RecordServiceTestProvider.USER_ID
-import care.data4life.sdk.RecordServiceTestProvider.getResource
+import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
+import care.data4life.sdk.test.util.GenericTestDataProvider.ATTACHMENT_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.PDF
+import care.data4life.sdk.test.util.GenericTestDataProvider.PDF_OVERSIZED
+import care.data4life.sdk.test.util.GenericTestDataProvider.UNKNOWN
+import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.data.DataResource
@@ -35,6 +34,7 @@ import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.test.util.TestResourceHelper.getJSONResource
 import care.data4life.sdk.util.Base64
 import care.data4life.sdk.wrapper.SdkAttachmentFactory
 import care.data4life.sdk.wrapper.SdkFhirAttachmentHelper
@@ -514,7 +514,10 @@ class RecordServiceAttachmentUtilsTest {
     @Test
     fun `Given, checkDataRestrictions is called, with a Resource, which has non extractable Attachments, it returns without a failure`() {
         // Given
-        val resourceStr = getResource("/fhir4/s4h-patient-example.patient.json")
+        val resourceStr = getJSONResource(
+                "fhir4",
+                "s4h-patient-example.patient"
+        )
 
         val doc = SdkFhirParser.toFhir4("Patient", resourceStr)
 

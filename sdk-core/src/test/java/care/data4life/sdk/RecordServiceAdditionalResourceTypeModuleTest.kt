@@ -18,25 +18,22 @@ package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
 import care.data4life.fhir.r4.model.Extension
-import care.data4life.sdk.RecordServiceTestProvider.ADDITIONAL_ID
-import care.data4life.sdk.RecordServiceTestProvider.ALIAS
-import care.data4life.sdk.RecordServiceTestProvider.ASSIGNER
-import care.data4life.sdk.RecordServiceTestProvider.ATTACHMENT_ID
-import care.data4life.sdk.RecordServiceTestProvider.DATA_HASH
-import care.data4life.sdk.RecordServiceTestProvider.DATA_PAYLOAD
-import care.data4life.sdk.RecordServiceTestProvider.DATA_SIZE
-import care.data4life.sdk.RecordServiceTestProvider.OBSOLETE_ID
-import care.data4life.sdk.RecordServiceTestProvider.OTHER_ID
-import care.data4life.sdk.RecordServiceTestProvider.PARTNER_ID
-import care.data4life.sdk.RecordServiceTestProvider.PDF_ENCODED
-import care.data4life.sdk.RecordServiceTestProvider.PDF_OVERSIZED_ENCODED
-import care.data4life.sdk.RecordServiceTestProvider.RECORD_ID
-import care.data4life.sdk.RecordServiceTestProvider.USER_ID
-import care.data4life.sdk.RecordServiceTestProvider.VALUE_ID
-import care.data4life.sdk.RecordServiceTestProvider.VALUE_INDICATOR
-import care.data4life.sdk.RecordServiceTestProvider.buildFhir3Attachment
-import care.data4life.sdk.RecordServiceTestProvider.buildFhir4Attachment
-import care.data4life.sdk.RecordServiceTestProvider.getResource
+import care.data4life.sdk.test.util.GenericTestDataProvider.ADDITIONAL_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
+import care.data4life.sdk.test.util.GenericTestDataProvider.ASSIGNER
+import care.data4life.sdk.test.util.GenericTestDataProvider.ATTACHMENT_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.DATA_HASH
+import care.data4life.sdk.test.util.GenericTestDataProvider.DATA_PAYLOAD
+import care.data4life.sdk.test.util.GenericTestDataProvider.DATA_SIZE
+import care.data4life.sdk.test.util.GenericTestDataProvider.OBSOLETE_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.OTHER_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.PDF_ENCODED
+import care.data4life.sdk.test.util.GenericTestDataProvider.PDF_OVERSIZED_ENCODED
+import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.VALUE_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.VALUE_INDICATOR
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.fhir.Fhir3Attachment
@@ -50,6 +47,8 @@ import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.test.util.TestAttachmentHelper
+import care.data4life.sdk.test.util.TestResourceHelper
 import care.data4life.sdk.util.Base64
 import care.data4life.sdk.wrapper.SdkAttachmentFactory
 import care.data4life.sdk.wrapper.SdkFhirParser
@@ -191,13 +190,6 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         }
     }
 
-    private fun getFhirResource(
-            resourceFolder: String,
-            resourceName: String
-    ): String = getResource(
-            "/$resourceFolder/$resourceName.json"
-    )
-
     private fun selectObservation(resource: Fhir3Observation): Fhir3Attachment {
         return if (resource.component == null) {
             resource.valueAttachment!!
@@ -322,7 +314,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir3(
                 resourceType,
-                getFhirResource(determineFhir3Folder(resourcePrefixes), resourceName)
+                TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         // When
@@ -346,7 +338,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir4(
                 resourceType,
-                getFhirResource(determineFhir4Folder(resourcePrefixes), resourceName)
+                TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
         // When
         val data = recordService.extractUploadData(resource)
@@ -371,7 +363,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir3(
                 resourceType,
-                getFhirResource(determineFhir3Folder(resourcePrefixes), "$resourceName-nulled-attachment")
+                TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), "$resourceName-nulled-attachment")
         )
 
         // When
@@ -395,7 +387,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir4(
                 resourceType,
-                getFhirResource(determineFhir4Folder(resourcePrefixes), "$resourceName-nulled-attachment")
+                TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), "$resourceName-nulled-attachment")
         )
 
         // When
@@ -412,7 +404,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir3(
                 resourceType,
-                getFhirResource(determineFhir3Folder(resourcePrefixes), resourceName)
+                TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         val decryptedRecord = DecryptedRecord(
@@ -452,7 +444,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir4(
                 resourceType,
-                getFhirResource(determineFhir4Folder(resourcePrefixes), resourceName)
+                TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
         val decryptedRecord = DecryptedR4Record(
@@ -489,7 +481,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val originalResource = SdkFhirParser.toFhir3(
                 resourceType,
-                getFhirResource(determineFhir3Folder(resourcePrefixes), resourceName)
+                TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         val originalPayload: HashMap<Any, String?> = hashMapOf(selectFhir3Attachment(originalResource) to DATA_PAYLOAD)
@@ -537,7 +529,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val originalResource = SdkFhirParser.toFhir4(
                 resourceType,
-                getFhirResource(determineFhir4Folder(resourcePrefixes), resourceName)
+                TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
         val originalPayload: HashMap<Any, String?> = hashMapOf(selectFhir4Attachment(originalResource) to DATA_PAYLOAD)
@@ -645,7 +637,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir3(
                 resourceType,
-                getFhirResource(determineFhir3Folder(resourcePrefixes), resourceName)
+                TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         val currentIdentifier = Fhir3AttachmentHelper.buildIdentifier(ADDITIONAL_ID, ASSIGNER)
@@ -721,7 +713,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir4(
                 resourceType,
-                getFhirResource(determineFhir4Folder(resourcePrefixes), resourceName)
+                TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
         val currentIdentifier = Fhir4AttachmentHelper.buildIdentifier(ADDITIONAL_ID, ASSIGNER)
@@ -746,7 +738,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir3(
                 resourceType,
-                getFhirResource(determineFhir3Folder(resourcePrefixes), resourceName)
+                TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         val payload = PDF_ENCODED
@@ -770,7 +762,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir4(
                 resourceType,
-                getFhirResource(determineFhir4Folder(resourcePrefixes), resourceName)
+                TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
         selectFhir4Attachment(resource).data = PDF_ENCODED
@@ -788,7 +780,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         val resource = SdkFhirParser.toFhir3(
                 resourceType,
-                getFhirResource(determineFhir3Folder(resourcePrefixes), resourceName)
+                TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         val payload = Base64.encodeToString(byteArrayOf(0))
@@ -809,7 +801,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         val resource = SdkFhirParser.toFhir4(
                 resourceType,
-                getFhirResource(determineFhir4Folder(resourcePrefixes), resourceName)
+                TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
         selectFhir4Attachment(resource).data = Base64.encodeToString(byteArrayOf(0))
@@ -825,7 +817,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         val resource = SdkFhirParser.toFhir3(
                 resourceType,
-                getFhirResource(determineFhir3Folder(resourcePrefixes), resourceName)
+                TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         val payload = PDF_OVERSIZED_ENCODED
@@ -846,7 +838,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         val resource = SdkFhirParser.toFhir4(
                 resourceType,
-                getFhirResource(determineFhir4Folder(resourcePrefixes), resourceName)
+                TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
         selectFhir4Attachment(resource).data = PDF_OVERSIZED_ENCODED
@@ -863,7 +855,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir3(
                 resourceType,
-                getFhirResource(determineFhir3Folder(resourcePrefixes), resourceName)
+                TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         val fetchedRecord: EncryptedRecord = mockk()
@@ -874,13 +866,13 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         val attachmentIds = listOf(firstAttachmentId, secondAttachmentId)
 
-        val firstAttachment = buildFhir3Attachment(
+        val firstAttachment = TestAttachmentHelper.buildFhir3Attachment(
                 firstAttachmentId,
                 DATA_PAYLOAD,
                 DATA_SIZE,
                 DATA_HASH
         )
-        val secondAttachment = buildFhir3Attachment(
+        val secondAttachment = TestAttachmentHelper.buildFhir3Attachment(
                 secondAttachmentId,
                 DATA_PAYLOAD,
                 DATA_SIZE,
@@ -964,7 +956,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir4(
                 resourceType,
-                getFhirResource(determineFhir4Folder(resourcePrefixes), resourceName)
+                TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
         val fetchedRecord: EncryptedRecord = mockk()
@@ -975,13 +967,13 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         val attachmentIds = listOf(firstAttachmentId, secondAttachmentId)
 
-        val firstAttachment = buildFhir4Attachment(
+        val firstAttachment = TestAttachmentHelper.buildFhir4Attachment(
                 firstAttachmentId,
                 DATA_PAYLOAD,
                 DATA_SIZE,
                 DATA_HASH
         )
-        val secondAttachment = buildFhir4Attachment(
+        val secondAttachment = TestAttachmentHelper.buildFhir4Attachment(
                 secondAttachmentId,
                 DATA_PAYLOAD,
                 DATA_SIZE,

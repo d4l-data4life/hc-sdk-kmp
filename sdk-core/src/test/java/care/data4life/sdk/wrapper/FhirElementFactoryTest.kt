@@ -21,7 +21,10 @@ import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.test.util.AttachmentBuilder
+import care.data4life.sdk.test.util.GenericTestDataProvider.DATA_HASH
+import care.data4life.sdk.test.util.GenericTestDataProvider.DATA_PAYLOAD
+import care.data4life.sdk.test.util.GenericTestDataProvider.DATA_SIZE
+import care.data4life.sdk.test.util.TestAttachmentHelper
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -35,7 +38,8 @@ class FhirElementFactoryTest {
 
     @Test
     fun `it is a FhirElementFactory`() {
-        assertTrue((SdkFhirElementFactory as Any) is WrapperContract.FhirElementFactory)
+        val factory: Any = SdkFhirElementFactory
+        assertTrue(factory is WrapperContract.FhirElementFactory)
     }
 
     @Test
@@ -240,17 +244,20 @@ class FhirElementFactoryTest {
     }
 
     companion object {
-        private val DATA = "data"
-        private val DATA_SIZE = 42
-        private val DATA_HASH = "dataHash"
-
         private fun buildDocRefContentFhir3(attachment: Fhir3Attachment): DocumentReferenceFhir3.DocumentReferenceContent {
             return DocumentReferenceFhir3.DocumentReferenceContent(attachment)
         }
 
         private fun buildDocumentReferenceFhir3(): DocumentReferenceFhir3 {
-            val content = buildDocRefContentFhir3(AttachmentBuilder.buildAttachment(null))
-            val contents: MutableList<DocumentReferenceFhir3.DocumentReferenceContent> = ArrayList()
+            val content = buildDocRefContentFhir3(
+                    TestAttachmentHelper.buildFhir3Attachment(
+                            null,
+                            DATA_PAYLOAD,
+                            DATA_SIZE,
+                            DATA_HASH
+                    )
+            )
+            val contents: MutableList<DocumentReferenceFhir3.DocumentReferenceContent> = mutableListOf()
             contents.add(content)
             return DocumentReferenceFhir3(
                     null,
@@ -260,21 +267,19 @@ class FhirElementFactoryTest {
             )
         }
 
-        private fun buildFhir4Attachment(): Fhir4Attachment {
-            val attachment = Fhir4Attachment()
-            attachment.id = null
-            attachment.data = DATA
-            attachment.size = DATA_SIZE
-            attachment.hash = DATA_HASH
-            return attachment
-        }
-
         private fun buildDocRefContentFhir4(attachment: Fhir4Attachment): DocumentReferenceFhir4.DocumentReferenceContent {
             return DocumentReferenceFhir4.DocumentReferenceContent(attachment)
         }
 
         private fun buildDocumentReferenceFhir4(): DocumentReferenceFhir4 {
-            val content = buildDocRefContentFhir4(buildFhir4Attachment())
+            val content = buildDocRefContentFhir4(
+                    TestAttachmentHelper.buildFhir4Attachment(
+                            null,
+                            DATA_PAYLOAD,
+                            DATA_SIZE,
+                            DATA_HASH
+                    )
+            )
             val contents: MutableList<DocumentReferenceFhir4.DocumentReferenceContent> = ArrayList()
             contents.add(content)
             return DocumentReferenceFhir4(

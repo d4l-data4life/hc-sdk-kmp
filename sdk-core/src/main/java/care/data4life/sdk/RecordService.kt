@@ -124,7 +124,6 @@ class RecordService internal constructor(
             )
     )
 
-
     @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     internal enum class UploadDownloadOperation {
         UPLOAD, DOWNLOAD, UPDATE
@@ -1096,6 +1095,32 @@ class RecordService internal constructor(
         }
     }
 
+    @Throws(
+        DataRestrictionException.MaxDataSizeViolation::class,
+        DataRestrictionException.UnsupportedFileType::class
+    )
+    fun <T : Any> checkDataRestrictions(resource: T) {
+        if (isFhirWithPossibleAttachments(resource)) {
+            val attachments = fhirAttachmentHelper.getAttachment(resource)
+                ?: return
+
+            for (rawAttachment in attachments) {
+                rawAttachment ?: continue
+
+                val attachment = attachmentFactory.wrap(rawAttachment)
+                if (attachment.data is String) {
+                    val data = decode(attachment.data!!)
+                    if (recognizeMimeType(data) == MimeType.UNKNOWN) {
+                        throw DataRestrictionException.UnsupportedFileType()
+                    }
+                    if (data.size > DATA_SIZE_MAX_BYTES) {
+                        throw DataRestrictionException.MaxDataSizeViolation()
+                    }
+                }
+            }
+        }
+    }
+
     /*
      *   TODO: This function makes a false assumption. It claims, that the output of the attachmentService.upload
      *    matches List<String?>?, but it is actually List<String?>. This means the claim of the former author that second (the list)
@@ -1124,7 +1149,7 @@ class RecordService internal constructor(
     fun setAttachmentIdForDownloadType(
             attachments: List<Any>,
             identifiers: List<Any>?,
-            type: DownloadType?
+            type: DownloadType
     ) {
         for (rawAttachment in attachments) {
             val attachment = attachmentFactory.wrap(rawAttachment)
@@ -1134,11 +1159,9 @@ class RecordService internal constructor(
             )
             if (additionalIds != null) {
                 when (type) {
-                    DownloadType.Full -> {
-                    }
+                    DownloadType.Full -> { /* do nothing */ }
                     DownloadType.Medium -> attachment.id += ThumbnailService.SPLIT_CHAR + additionalIds[PREVIEW_ID_POS]
                     DownloadType.Small -> attachment.id += ThumbnailService.SPLIT_CHAR + additionalIds[THUMBNAIL_ID_POS]
-                    else -> throw CoreRuntimeException.UnsupportedOperation()
                 }
             }
         }
@@ -1151,12 +1174,47 @@ class RecordService internal constructor(
     ): List<String>? {
         if (additionalIds == null) return null
 
-        for (i in additionalIds) {
-            val parts = splitAdditionalAttachmentId(identifierFactory.wrap(i))
+        for (id in additionalIds) {
+            val parts = splitAdditionalAttachmentId(identifierFactory.wrap(id))
             if (parts != null && parts[FULL_ATTACHMENT_ID_POS] == attachmentId) return parts
         }
 
         return null //Attachment is not of image type
+    }
+
+    @Throws(DataValidationException.IdUsageViolation::class)
+    fun <T : Any> cleanObsoleteAdditionalIdentifiers(resource: T) {
+        if (isFhirWithPossibleAttachments(resource)) {
+            val currentAttachments = fhirAttachmentHelper.getAttachment(resource)
+            if (currentAttachments !is List<*> || currentAttachments.isEmpty()) {
+                return
+            }
+
+            val identifiers = fhirAttachmentHelper.getIdentifier(resource) ?: return
+            val currentAttachmentIds = mutableListOf<String>()
+
+            currentAttachments.forEach {
+                if (it != null) {
+                    val attachment = attachmentFactory.wrap(it)
+                    if (attachment.id != null) {
+                        currentAttachmentIds.add(attachment.id!!)
+                    }
+                }
+            }
+
+            val updatedIdentifiers: MutableList<Any> = mutableListOf()
+            val identifierIterator = identifiers.iterator()
+
+            while (identifierIterator.hasNext()) {
+                val next = identifierFactory.wrap(identifierIterator.next())
+                val parts = splitAdditionalAttachmentId(next)
+                if (parts == null || currentAttachmentIds.contains(parts[FULL_ATTACHMENT_ID_POS])) {
+                    updatedIdentifiers.add(next.unwrap())
+                }
+            }
+
+            fhirAttachmentHelper.setIdentifier(resource, updatedIdentifiers)
+        }
     }
 
     @Throws(DataValidationException.IdUsageViolation::class)
@@ -1184,67 +1242,6 @@ class RecordService internal constructor(
     internal fun getValidHash(attachment: WrapperContract.Attachment): String {
         val data = decode(attachment.data!!)
         return encodeToString(sha1(data))
-    }
-
-    @Throws(DataValidationException.IdUsageViolation::class)
-    fun <T : Any> cleanObsoleteAdditionalIdentifiers(resource: T?) {
-        if (
-                isFhir(resource) &&
-                fhirAttachmentHelper.hasAttachment(resource!!) &&
-                fhirAttachmentHelper.getAttachment(resource)?.isNotEmpty() == true
-        ) {
-            val identifiers = fhirAttachmentHelper.getIdentifier(resource)
-            val currentAttachments = fhirAttachmentHelper.getAttachment(resource)!!
-            val currentAttachmentIds = mutableListOf(currentAttachments.size.toString())
-
-            currentAttachments.forEach {
-                if (it != null) {
-                    val attachment = attachmentFactory.wrap(it)
-                    if (attachment.id != null) {
-                        currentAttachmentIds.add(attachment.id!!)
-                    }
-                }
-            }
-
-            if (identifiers == null) return
-            val updatedIdentifiers: MutableList<Any> = mutableListOf()
-            val identifierIterator = identifiers.iterator()
-
-            while (identifierIterator.hasNext()) {
-                val next = identifierFactory.wrap(identifierIterator.next())
-                val parts = splitAdditionalAttachmentId(next)
-                if (parts == null || currentAttachmentIds.contains(parts[FULL_ATTACHMENT_ID_POS])) {
-                    updatedIdentifiers.add(next.unwrap())
-                }
-            }
-            fhirAttachmentHelper.setIdentifier(resource, updatedIdentifiers)
-        }
-    }
-
-    @Throws(
-            DataRestrictionException.MaxDataSizeViolation::class,
-            DataRestrictionException.UnsupportedFileType::class
-    )
-    fun <T : Any> checkDataRestrictions(resource: T) {
-        if (isFhirWithPossibleAttachments(resource)) {
-            val attachments = fhirAttachmentHelper.getAttachment(resource)
-                ?: return
-
-            for (rawAttachment in attachments) {
-                rawAttachment ?: continue
-
-                val attachment = attachmentFactory.wrap(rawAttachment)
-                if (attachment.data is String) {
-                    val data = decode(attachment.data!!)
-                    if (recognizeMimeType(data) == MimeType.UNKNOWN) {
-                        throw DataRestrictionException.UnsupportedFileType()
-                    }
-                    if (data.size > DATA_SIZE_MAX_BYTES) {
-                        throw DataRestrictionException.MaxDataSizeViolation()
-                    }
-                }
-            }
-        }
     }
 
     // TODO: make it private

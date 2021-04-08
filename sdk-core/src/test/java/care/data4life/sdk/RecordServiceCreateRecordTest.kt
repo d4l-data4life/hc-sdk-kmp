@@ -28,7 +28,7 @@ import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.migration.MigrationContract
 import care.data4life.sdk.model.ModelContract.BaseRecord
-import care.data4life.sdk.model.ModelVersion
+import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.network.DecryptedRecordMapper
@@ -133,7 +133,7 @@ class RecordServiceCreateRecordTest {
                     tags,
                     date,
                     dataKey,
-                    ModelVersion.CURRENT
+                    CURRENT
             )
         } returns createdRecord
         every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
@@ -181,7 +181,7 @@ class RecordServiceCreateRecordTest {
                     tags,
                     date,
                     dataKey,
-                    ModelVersion.CURRENT
+                    CURRENT
             )
             recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
@@ -230,7 +230,7 @@ class RecordServiceCreateRecordTest {
                     tags,
                     date,
                     dataKey,
-                    ModelVersion.CURRENT
+                    CURRENT
             )
         } returns createdRecord
         every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
@@ -278,7 +278,7 @@ class RecordServiceCreateRecordTest {
                     tags,
                     date,
                     dataKey,
-                    ModelVersion.CURRENT
+                    CURRENT
             )
             recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
@@ -325,7 +325,7 @@ class RecordServiceCreateRecordTest {
                     tags,
                     date,
                     dataKey,
-                    ModelVersion.CURRENT
+                    CURRENT
             )
         } returns createdRecord
         every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
@@ -372,7 +372,7 @@ class RecordServiceCreateRecordTest {
                     tags,
                     date,
                     dataKey,
-                    ModelVersion.CURRENT
+                    CURRENT
             )
             recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
@@ -424,7 +424,7 @@ class RecordServiceCreateRecordTest {
                     tags,
                     date,
                     dataKey,
-                    ModelVersion.CURRENT
+                    CURRENT
             )
         } returns createdRecord
         every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
@@ -471,7 +471,7 @@ class RecordServiceCreateRecordTest {
                     tags,
                     date,
                     dataKey,
-                    ModelVersion.CURRENT
+                    CURRENT
             )
             recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
@@ -522,7 +522,7 @@ class RecordServiceCreateRecordTest {
                     tags,
                     date,
                     dataKey,
-                    ModelVersion.CURRENT
+                    CURRENT
             )
         } returns createdRecord
         every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
@@ -570,7 +570,7 @@ class RecordServiceCreateRecordTest {
                     tags,
                     date,
                     dataKey,
-                    ModelVersion.CURRENT
+                    CURRENT
             )
             recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
@@ -620,7 +620,7 @@ class RecordServiceCreateRecordTest {
                     tags,
                     date,
                     dataKey,
-                    ModelVersion.CURRENT
+                    CURRENT
             )
         } returns createdRecord
         every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
@@ -667,7 +667,7 @@ class RecordServiceCreateRecordTest {
                     tags,
                     date,
                     dataKey,
-                    ModelVersion.CURRENT
+                    CURRENT
             )
             recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
@@ -717,7 +717,7 @@ class RecordServiceCreateRecordTest {
                     tags,
                     date,
                     dataKey,
-                    ModelVersion.CURRENT
+                    CURRENT
             )
         } returns createdRecord
         every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
@@ -764,7 +764,7 @@ class RecordServiceCreateRecordTest {
                     tags,
                     date,
                     dataKey,
-                    ModelVersion.CURRENT
+                    CURRENT
             )
             recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
@@ -812,7 +812,7 @@ class RecordServiceCreateRecordTest {
                     tags,
                     date,
                     dataKey,
-                    ModelVersion.CURRENT
+                    CURRENT
             )
         } returns createdRecord
         every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
@@ -859,7 +859,7 @@ class RecordServiceCreateRecordTest {
                     tags,
                     date,
                     dataKey,
-                    ModelVersion.CURRENT
+                    CURRENT
             )
             recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)

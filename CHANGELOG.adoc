@@ -18,6 +18,8 @@ toc::[]
 
 === Changed
 
+* `CryptoSecureStore` to Kotlin.
+
 === Removed
 
 === Fixed

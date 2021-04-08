@@ -23,7 +23,7 @@ import kotlin.test.assertTrue
 class ModelVersionTest {
 
     @Test
-    fun `it fulfils ModelVersion`() {
+    fun `It fulfils ModelVersion`() {
         val version: Any = ModelVersion
         assertTrue(version is ModelContract.ModelVersion)
     }

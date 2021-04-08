@@ -20,7 +20,7 @@ import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.model.DownloadType
-import care.data4life.sdk.model.ModelVersion
+import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
@@ -146,7 +146,7 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -197,7 +197,7 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 

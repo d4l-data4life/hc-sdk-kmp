@@ -45,6 +45,7 @@ import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.model.ModelContract.BaseRecord
+import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.model.ModelContract.RecordFactory
 import care.data4life.sdk.network.DecryptedRecordMapper
 import care.data4life.sdk.network.model.EncryptedKey
@@ -149,7 +150,7 @@ class RecordService internal constructor(
                     taggingService.appendDefaultTags(resource, null),
                     dateTimeFormatter.now(),
                     cryptoService.generateGCKey().blockingGet(),
-                    ModelVersion.CURRENT
+                    CURRENT
                 )
         )
 

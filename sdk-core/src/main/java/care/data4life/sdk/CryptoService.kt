@@ -235,7 +235,11 @@ open class CryptoService : CryptoProtocol {
             deleteGCKeyPair()
             // Create a new key pair based on the passed private key
             val algorithm = GCRSAKeyAlgorithm()
-            val gcKeyPair = convertPrivateKeyPemStringToGCKeyPair(privateKeyAsPem, algorithm, KEY_VERSION.asymmetricKeySize)
+            val gcKeyPair = convertPrivateKeyPemStringToGCKeyPair(
+                privateKeyAsPem,
+                algorithm,
+                KEY_VERSION.asymmetricKeySize
+            ) ?: throw RuntimeException("Unable to create new keys.")
             // Store new key pair
             saveGCKeyPair(gcKeyPair)
         } catch (e: Exception) {
@@ -244,7 +248,7 @@ open class CryptoService : CryptoProtocol {
         }
     }
 
-    fun saveGCKeyPair(keyPair: GCKeyPair?) {
+    fun saveGCKeyPair(keyPair: GCKeyPair) {
         storage.storeKey(prefix() + GC_KEYPAIR, keyPair)
     }
 

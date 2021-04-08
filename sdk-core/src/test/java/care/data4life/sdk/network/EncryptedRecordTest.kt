@@ -21,15 +21,35 @@ import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter
 import com.squareup.moshi.Moshi
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class EncryptedRecordTest {
     @Test
-    fun `it full fills the EncryptedRecord contract`() {
+    fun `It full fills the EncryptedRecord contract`() {
         val record: Any = ENCRYPTED_RECORD
         assertTrue(record is NetworkModelContract.EncryptedRecord)
+    }
+
+    @Test
+    fun `It sets a default CommonKeyId, if no was given`() {
+        val record = EncryptedRecord(
+                _commonKeyId = null,
+                identifier = "abc",
+                encryptedTags = listOf("a", "b", "c"),
+                encryptedBody = "test",
+                customCreationDate = "asdasd",
+                encryptedDataKey = ENCRYPTED_DATA_KEY,
+                encryptedAttachmentsKey = ENCRYPTED_ATTACHMENT_KEY,
+                modelVersion = 23,
+                updatedDate = "awqwe"
+        )
+
+        assertEquals(
+                expected = NetworkModelContract.DEFAULT_COMMON_KEY_ID,
+                actual = record.commonKeyId
+        )
     }
 
     @Test

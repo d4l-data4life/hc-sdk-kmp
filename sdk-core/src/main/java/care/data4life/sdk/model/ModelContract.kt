@@ -42,6 +42,14 @@ class ModelContract {
             get() = resource
     }
 
+    interface ModelVersion {
+        fun isModelVersionSupported(version: Int): Boolean
+
+        companion object {
+            const val CURRENT = 1
+        }
+    }
+
     // TODO: model this platform independent
     interface Meta : Serializable {
         val createdDate: LocalDate

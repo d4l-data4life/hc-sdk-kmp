@@ -239,7 +239,7 @@ open class CryptoService : CryptoProtocol {
                 privateKeyAsPem,
                 algorithm,
                 KEY_VERSION.asymmetricKeySize
-            ) ?: throw RuntimeException("Unable to create new keys.")
+            )
             // Store new key pair
             saveGCKeyPair(gcKeyPair)
         } catch (e: Exception) {

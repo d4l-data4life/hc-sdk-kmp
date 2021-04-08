@@ -20,6 +20,7 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import com.squareup.moshi.Json
 
 class NetworkModelContract {
     internal interface DecryptedRecordBuilder {
@@ -58,6 +59,10 @@ class NetworkModelContract {
             const val MAX_LENGTH_TAGS_AND_ANNOTATIONS = 1000
             const val MAX_SIZE_CUSTOM_DATA = 10485760 // = 10 MiB in Bytes
         }
+    }
+
+    internal interface DocumentUploadResponse {
+        var documentId: String
     }
 
     interface EncryptedKey {

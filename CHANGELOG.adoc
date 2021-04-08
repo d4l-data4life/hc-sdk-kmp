@@ -18,6 +18,8 @@ toc::[]
 
 === Changed
 
+* `DocumentUploadResponse` to Kotlin.
+
 === Removed
 
 === Fixed

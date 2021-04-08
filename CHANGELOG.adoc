@@ -18,6 +18,8 @@ toc::[]
 
 === Changed
 
+* `CommonKeyResponse` to Kotlin.
+
 === Removed
 
 === Fixed

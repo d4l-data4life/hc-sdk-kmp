@@ -60,6 +60,10 @@ class NetworkModelContract {
         }
     }
 
+    internal interface CommonKeyResponse {
+        val commonKey: EncryptedKey
+    }
+
     interface EncryptedKey {
         val base64Key: String
         fun decode(): ByteArray

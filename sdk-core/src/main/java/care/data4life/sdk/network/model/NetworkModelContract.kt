@@ -20,6 +20,7 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import com.squareup.moshi.Json
 
 class NetworkModelContract {
     internal interface DecryptedRecordBuilder {
@@ -69,6 +70,13 @@ class NetworkModelContract {
         fun create(key: ByteArray): EncryptedKey
     }
 
+    internal interface UserInfo {
+        val uid: String?
+        val commonKey: EncryptedKey?
+        val commonKeyId: String?
+        val tagEncryptionKey: EncryptedKey?
+    }
+
     // TODO: internal
     interface EncryptedRecord {
         val commonKeyId: String
@@ -82,8 +90,10 @@ class NetworkModelContract {
         val updatedDate: String?
         val version: Int
 
-        companion object {
-            const val DEFAULT_COMMON_KEY_ID: String = "00000000-0000-0000-0000-000000000000"
-        }
+
+    }
+
+    companion object {
+        const val DEFAULT_COMMON_KEY_ID: String = "00000000-0000-0000-0000-000000000000"
     }
 }

@@ -15,7 +15,7 @@
  */
 package care.data4life.sdk.network.model
 
-import care.data4life.sdk.network.model.NetworkModelContract.EncryptedRecord.Companion.DEFAULT_COMMON_KEY_ID
+import care.data4life.sdk.network.model.NetworkModelContract.Companion.DEFAULT_COMMON_KEY_ID
 import com.squareup.moshi.Json
 
 

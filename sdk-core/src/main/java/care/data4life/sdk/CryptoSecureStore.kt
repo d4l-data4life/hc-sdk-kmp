@@ -36,8 +36,10 @@ class CryptoSecureStore @JvmOverloads constructor(
 
     override fun clear(): Unit = secureStore.clear()
 
-    override fun storeSecret(alias: String, secret: CharArray): Unit =
-        secureStore.addData(alias, secret)
+    override fun storeSecret(
+        alias: String,
+        secret: CharArray
+    ): Unit = secureStore.addData(alias, secret)
 
     @Throws(D4LException::class)
     override fun getSecret(alias: String): CharArray {
@@ -96,7 +98,5 @@ class CryptoSecureStore @JvmOverloads constructor(
         return moshi.adapter(ExchangeKey::class.java).fromJson(String(data))!!
     }
 
-    override operator fun contains(alias: String): Boolean {
-        return secureStore.containsData(alias)
-    }
+    override operator fun contains(alias: String): Boolean = secureStore.containsData(alias)
 }

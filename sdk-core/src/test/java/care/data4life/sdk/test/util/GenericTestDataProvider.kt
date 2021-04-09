@@ -75,6 +75,8 @@ object GenericTestDataProvider {
 
     const val COMMON_KEY_ID = "commonKeyId"
 
+    const val ARBITRARY_DATA_KEY = "appdata"
+
     const val ADDITIONAL_ID = RecordContract.Service.DOWNSCALED_ATTACHMENT_IDS_FMT +
             ThumbnailService.SPLIT_CHAR +
             ATTACHMENT_ID +
@@ -89,7 +91,7 @@ object GenericTestDataProvider {
 
     const val VALUE_INDICATOR = "valueAttachment"
 
-    val VALUE_ID = RecordContract.Service.DOWNSCALED_ATTACHMENT_IDS_FMT +
+    const val VALUE_ID = RecordContract.Service.DOWNSCALED_ATTACHMENT_IDS_FMT +
             ThumbnailService.SPLIT_CHAR +
             VALUE_INDICATOR +
             ThumbnailService.SPLIT_CHAR +
@@ -99,9 +101,9 @@ object GenericTestDataProvider {
 
     val IV = ByteArray(16)
 
-    const val DATE_FORMAT = "yyyy-MM-dd"
+    private const val DATE_FORMAT = "yyyy-MM-dd"
 
-    const val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss[.SSS]"
+    private const val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss[.SSS]"
 
     val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.US)
 

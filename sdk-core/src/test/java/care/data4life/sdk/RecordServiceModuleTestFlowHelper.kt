@@ -45,7 +45,7 @@ import javax.xml.bind.DatatypeConverter
 typealias CryptoMap = Map<Pair<Triple<GCKey, GCKey, GCKey?>, String>, Pair<EncryptedKey, EncryptedKey?>>
 typealias CommonKeyList = List<Pair<String, GCKey>>
 
-class RecordServiceModuleTestFlowProvider(
+class RecordServiceModuleTestFlowHelper(
     private val apiService: ApiService,
     private val cryptoService: CryptoService,
     private val fileService: FileService,
@@ -61,6 +61,26 @@ class RecordServiceModuleTestFlowProvider(
             .replace("-", "%2d")
             .replace("_", "%5f")
             .toLowerCase()
+    }
+
+    fun prepareTags(
+        tags: Tags
+    ) {
+        tags.forEach { (key, value) ->
+            tags[key] = "$key=${encode(value)}"
+        }
+    }
+
+    fun prepareAnnotations(
+        annotations: List<String>
+    ): Map<String, String> {
+        val mappedAnnotations = mutableMapOf<String, String>()
+
+        annotations.forEach {
+            mappedAnnotations[it] = "custom=${encode(it)}"
+        }
+
+        return mappedAnnotations
     }
 
     private fun encrypt(tags: Map<String, String>, cryptoKey: GCKey) {
@@ -90,7 +110,7 @@ class RecordServiceModuleTestFlowProvider(
     }
 
     private fun encryptTagsAndAnnotations(
-        gcKeys: MutableList<GCKey>,
+        gcKeys: MutableList<GCKey?>,
         tags: Map<String, String>,
         annotations: Map<String, String>,
         tagEncryptionKey: GCKey
@@ -99,19 +119,14 @@ class RecordServiceModuleTestFlowProvider(
             Single.just(gcKeys.removeAt(0))
         }
 
-        // Encrypt Record
-        // encrypt tags
-        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey andThen { mockk() }
         encryptTags(tags as Tags, tagEncryptionKey)
 
-        // encrypt annotations
         encryptAnnotation(annotations, tagEncryptionKey)
     }
 
-    fun encryptFhirRecord(
+    private fun encryptResourcePreamble(
         commonKeyPairs: CommonKeyList,
-        cryptoMap: CryptoMap,
-        gcKeys: MutableList<GCKey>,
+        gcKeys: MutableList<GCKey?>,
         tags: Map<String, String>,
         annotations: Map<String, String>,
         tagEncryptionKey: GCKey
@@ -128,8 +143,43 @@ class RecordServiceModuleTestFlowProvider(
         every { cryptoService.currentCommonKeyId } answers { ids.removeAt(0) }
 
         encryptTagsAndAnnotations(gcKeys, tags, annotations, tagEncryptionKey)
+    }
 
+    fun encryptFhirResource(
+        commonKeyPairs: CommonKeyList,
+        cryptoMap: CryptoMap,
+        gcKeys: MutableList<GCKey?>,
+        tags: Map<String, String>,
+        annotations: Map<String, String>,
+        tagEncryptionKey: GCKey
+    ) {
+        encryptResourcePreamble(
+            commonKeyPairs,
+            gcKeys,
+            tags,
+            annotations,
+            tagEncryptionKey
+        )
         encryptFhirResource(cryptoMap)
+    }
+
+    fun encryptDataRecord(
+        commonKeyPairs: CommonKeyList,
+        cryptoMap: CryptoMap,
+        gcKeys: MutableList<GCKey?>,
+        tags: Map<String, String>,
+        annotations: Map<String, String>,
+        tagEncryptionKey: GCKey
+    ) {
+        encryptResourcePreamble(
+            commonKeyPairs,
+            gcKeys,
+            tags,
+            annotations,
+            tagEncryptionKey
+        )
+
+        encryptDataResource(cryptoMap)
     }
 
     private fun md5(str: String): String {
@@ -166,9 +216,27 @@ class RecordServiceModuleTestFlowProvider(
 
             if (attachmentKey is GCKey) {
                 every {
-                    cryptoService.encryptSymmetricKey(commonKey, KeyType.ATTACHMENT_KEY, attachmentKey)
+                    cryptoService.encryptSymmetricKey(
+                        commonKey,
+                        KeyType.ATTACHMENT_KEY,
+                        attachmentKey
+                    )
                 } returns Single.just(encryptedAttachmentKey!!)
             }
+        }
+    }
+
+    fun encryptDataResource(cryptoMap: CryptoMap) {
+        cryptoMap.forEach { (plain, encrypted) ->
+            val (commonKey, dataKey, _) = plain.first
+            val (encryptedDataKey, _) = encrypted
+
+            every {
+                cryptoService.encryptSymmetricKey(commonKey, KeyType.DATA_KEY, dataKey)
+            } returns Single.just(encryptedDataKey)
+            every {
+                cryptoService.encrypt(dataKey, plain.second.toByteArray())
+            } returns Single.just(md5(plain.second).toByteArray())
         }
     }
 
@@ -184,18 +252,33 @@ class RecordServiceModuleTestFlowProvider(
         }
     }
 
-    fun decryptTags(
+    private fun decryptTags(
         tags: Map<String, String>,
         tagEncryptionKey: GCKey
     ): Unit = decrypt(tags, tagEncryptionKey)
 
-    fun decryptAnnotation(
+    private fun decryptAnnotation(
         annotations: Map<String, String>,
         tagEncryptionKey: GCKey
     ) {
         if (annotations.isNotEmpty()) {
             decryptTags(annotations, tagEncryptionKey)
         }
+    }
+
+    fun decryptTagsAndAnnotations(
+        tags: Map<String, String>,
+        annotations: Map<String, String>,
+        tagEncryptionKey: GCKey
+    ) {
+        decryptTags(tags, tagEncryptionKey)
+        decryptAnnotation(annotations, tagEncryptionKey)
+    }
+
+    fun tagEncryptionKeyCallOrder(keys: List<GCKey>) {
+        every {
+            cryptoService.fetchTagEncryptionKey()
+        } returnsMany keys andThen { mockk() }
     }
 
     fun runWithoutStoredCommonKey(
@@ -232,20 +315,6 @@ class RecordServiceModuleTestFlowProvider(
         commonKeyPairs.forEach { (commonKeyId, commonKey) ->
             every { cryptoService.hasCommonKey(commonKeyId) } returns true
             every { cryptoService.getCommonKeyById(commonKeyId) } returns commonKey
-        }
-    }
-
-    fun encryptDataResource(cryptoMap: CryptoMap) {
-        cryptoMap.forEach { (plain, encrypted) ->
-            val (commonKey, dataKey, _) = plain.first
-            val (encryptedDataKey, _) = encrypted
-
-            every {
-                cryptoService.encryptSymmetricKey(commonKey, KeyType.DATA_KEY, dataKey)
-            } returns Single.just(encryptedDataKey)
-            every {
-                cryptoService.encrypt(dataKey, plain.second.toByteArray())
-            } returns Single.just(md5(plain.second).toByteArray())
         }
     }
 
@@ -367,7 +436,8 @@ class RecordServiceModuleTestFlowProvider(
         dataKeys: List<Pair<GCKey, EncryptedKey>>,
         attachmentKeys: List<Pair<GCKey?, EncryptedKey?>>? = null
     ): Pair<CryptoMap, List<Pair<EncryptedKey, EncryptedKey?>>> {
-        val cryptoMap = mutableMapOf<Pair<Triple<GCKey, GCKey, GCKey?>, String>, Pair<EncryptedKey, EncryptedKey?>>()
+        val cryptoMap =
+            mutableMapOf<Pair<Triple<GCKey, GCKey, GCKey?>, String>, Pair<EncryptedKey, EncryptedKey?>>()
         val encryptedKeys = mutableListOf<Pair<EncryptedKey, EncryptedKey?>>()
         for (idx in 0..serializedResources.lastIndex) {
             val attachmentKey = if (attachmentKeys is List<*>) attachmentKeys[idx].first else null
@@ -451,7 +521,7 @@ class RecordServiceModuleTestFlowProvider(
         dates,
         keys
     )
-    
+
     fun buildMeta(
         customCreationDate: String,
         updatedDate: String

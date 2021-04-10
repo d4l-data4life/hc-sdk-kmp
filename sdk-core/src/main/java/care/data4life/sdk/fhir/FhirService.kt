@@ -21,7 +21,7 @@ import care.data4life.crypto.error.CryptoException.EncryptionFailed
 import care.data4life.fhir.Fhir
 import care.data4life.fhir.FhirParser
 import care.data4life.fhir.stu3.model.FhirElementFactory
-import care.data4life.sdk.CryptoService
+import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_KEY
@@ -37,8 +37,8 @@ import io.reactivex.Single
 // TODO use of Single is not necessary as it's finalized with blockingGet()
 // TODO internal
 class FhirService @JvmOverloads constructor(
-        private val cryptoService: CryptoService,
-        private val parserFhir3: FhirParser<Any> = Fhir().createStu3Parser()
+    private val cryptoService: CryptoContract.Service,
+    private val parserFhir3: FhirParser<Any> = Fhir().createStu3Parser()
 ) : FhirContract.Service {
     private val parser: WrapperContract.FhirParser = SdkFhirParser
 

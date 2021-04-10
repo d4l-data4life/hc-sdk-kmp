@@ -24,6 +24,7 @@ import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
+import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3Identifier
@@ -93,7 +94,7 @@ class RecordService internal constructor(
         private val taggingService: TaggingContract.Service,
         private val fhirService: FhirContract.Service,
         private val attachmentService: AttachmentContract.Service,
-        private val cryptoService: CryptoService,
+        private val cryptoService: CryptoContract.Service,
         private val errorHandler: SdkContract.ErrorHandler,
         private val compatibilityService: MigrationContract.CompatibilityService
 ) : RecordContract.Service {
@@ -106,7 +107,7 @@ class RecordService internal constructor(
             taggingService: TaggingContract.Service,
             fhirService: FhirContract.Service,
             attachmentService: AttachmentContract.Service,
-            cryptoService: CryptoService,
+            cryptoService: CryptoContract.Service,
             errorHandler: SdkContract.ErrorHandler
     ) : this(
             partnerId,

@@ -36,6 +36,7 @@ import care.data4life.sdk.test.util.GenericTestDataProvider.VALUE_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.VALUE_INDICATOR
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.config.DataRestrictionException
+import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Attachment
@@ -86,7 +87,7 @@ import care.data4life.fhir.stu3.util.FhirAttachmentHelper as Fhir3AttachmentHelp
 class RecordServiceAdditionalResourceTypeModuleTest {
     private lateinit var recordService: RecordService
     private val apiService: ApiService = mockk()
-    private val cryptoService: CryptoService = mockk()
+    private val cryptoService: CryptoContract.Service = mockk()
     private val fhirService: FhirContract.Service = mockk()
     private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
     private val taggingService: TaggingContract.Service = mockk()

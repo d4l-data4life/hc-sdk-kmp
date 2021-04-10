@@ -31,7 +31,7 @@ import java.lang.reflect.Type
 class CryptoSecureStore @JvmOverloads constructor(
     moshi: Moshi? = null,
     private val secureStore: SecureStoreContract.SecureStore
-) : CryptoContract.CryptoSecureStore {
+) : CryptoContract.SecureStore {
     private val moshi: Moshi = if (moshi is Moshi) moshi else Moshi.Builder().build()
 
     override fun clear(): Unit = secureStore.clear()

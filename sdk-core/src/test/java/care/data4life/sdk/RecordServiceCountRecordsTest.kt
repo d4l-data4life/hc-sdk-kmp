@@ -21,6 +21,7 @@ import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.attachment.AttachmentContract
+import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
@@ -40,7 +41,7 @@ import kotlin.test.assertEquals
 class RecordServiceCountRecordsTest {
     private lateinit var recordService: RecordService
     private val apiService: ApiService = mockk()
-    private val cryptoService: CryptoService = mockk()
+    private val cryptoService: CryptoContract.Service = mockk()
     private val fhirService: FhirContract.Service = mockk()
     private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
     private val taggingService: TaggingContract.Service = mockk()

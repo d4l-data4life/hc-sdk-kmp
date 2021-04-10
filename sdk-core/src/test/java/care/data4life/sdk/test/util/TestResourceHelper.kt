@@ -16,6 +16,8 @@
 
 package care.data4life.sdk.test.util
 
+import care.data4life.sdk.util.Base64
+import care.data4life.sdk.util.HashUtil
 import java.nio.charset.StandardCharsets
 
 object TestResourceHelper {
@@ -41,4 +43,39 @@ object TestResourceHelper {
             resourceFolder,
             "$resourceName.json"
     )
+
+    fun loadTemplate(
+        path: String,
+        file: String,
+        recordId: String,
+        partnerId: String
+    ): String = getJSONResource(
+        path,
+        file
+    ).replace("\$RESOURCE_IDENTIFIERS", "d4l_f_p_t#$recordId")
+        .replace("\$RESOURCE_ID", recordId)
+        .replace("\$PARTNER_ID", partnerId)
+
+    fun loadTemplateWithAttachments(
+        path: String,
+        file: String,
+        recordId: String,
+        partnerId: String,
+        attachmentTitle: String,
+        attachmentType: String,
+        attachmentData: String
+    ): String = loadTemplate(
+        path,
+        file,
+        recordId,
+        partnerId
+    ).replace("\$ATTACHMENT_TITLE", attachmentTitle)
+        .replace("\$ATTACHMENT_TYPE", attachmentType)
+        .replace("\$ATTACHMENT_HASH", getValidHash(attachmentData))
+        .replace("\$ATTACHMENT_SIZE", attachmentData.length.toString())
+        .replace("\$ATTACHMENT_PAYLOAD", attachmentData)
+
+    private fun getValidHash(
+        data: String
+    ): String = Base64.encodeToString(HashUtil.sha1(Base64.decode(data)))
 }

@@ -660,8 +660,10 @@ class RecordService internal constructor(
 
         val commonKeyId = record.commonKeyId
         val commonKey: GCKey = getCommonKey(commonKeyId, userId)
-        val dataKey =
-                cryptoService.symDecryptSymmetricKey(commonKey, record.encryptedDataKey).blockingGet()
+        val dataKey = cryptoService.symDecryptSymmetricKey(
+            commonKey,
+            record.encryptedDataKey
+        ).blockingGet()
 
         builder.setDataKey(dataKey)
 

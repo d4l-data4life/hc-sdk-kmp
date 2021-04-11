@@ -24,28 +24,26 @@ import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.IV
-import care.data4life.sdk.util.toChars
-import io.mockk.InternalPlatformDsl.toStr
 import io.mockk.mockk
 import io.reactivex.Single
 
 data class CryptoServiceIteration(
-    val gcKeyOrder: List<GCKey>,
-    val commonKey: GCKey,
-    val commonKeyId: String,
-    val commonKeyIsStored: Boolean,
-    val commonKeyFetchCalls: Int,
-    val encryptedCommonKey: EncryptedKey?,
-    val dataKey: GCKey,
-    val encryptedDataKey: EncryptedKey,
-    val attachmentKey: GCKey?,
-    val encryptedAttachmentKey: EncryptedKey?,
-    val tagEncryptionKey: GCKey,
-    val tagEncryptionKeyCalls: Int,
-    val resource: String,
-    val tags: List<String>,
-    val annotations: List<String>,
-    val hashFunction: (payload: String) -> String
+        val gcKeyOrder: List<GCKey>,
+        val commonKey: GCKey,
+        val commonKeyId: String,
+        val commonKeyIsStored: Boolean,
+        val commonKeyFetchCalls: Int,
+        val encryptedCommonKey: EncryptedKey?,
+        val dataKey: GCKey,
+        val encryptedDataKey: EncryptedKey,
+        val attachmentKey: GCKey?,
+        val encryptedAttachmentKey: EncryptedKey?,
+        val tagEncryptionKey: GCKey,
+        val tagEncryptionKeyCalls: Int,
+        val resources: List<String>,
+        val tags: List<String>,
+        val annotations: List<String>,
+        val hashFunction: (payload: String) -> String
 )
 
 class CryptoServiceFake : CryptoContract.Service {
@@ -53,7 +51,7 @@ class CryptoServiceFake : CryptoContract.Service {
     private var commonKeyIdPointer: String? = null
     private lateinit var tagsAndAnnotations: Map<String, String>
     private lateinit var hashedTagsAndAnnotations: Map<String, String>
-    private lateinit var hashedResource: String
+    private lateinit var hashedResources: List<String>
     private lateinit var currentKeyPair: GCKeyPair
     private var remainingTagEncryptionKeyCalls: Int = 0
     private var remainingCommonKeyFetchCalls: Int = 0
@@ -75,35 +73,52 @@ class CryptoServiceFake : CryptoContract.Service {
             }
         }
 
-    private fun isEncryptable(key: GCKey, data: ByteArray): Boolean {
-        return key == currentIteration.dataKey &&
-                data.contentEquals(currentIteration.resource.toByteArray())
+    private fun indexOfResource(resource: String): Int {
+        return currentIteration.resources.indexOf(resource)
+    }
+
+    private fun findResource(key: GCKey, resource: String): Int {
+        return if(key == currentIteration.dataKey) {
+            indexOfResource(resource)
+        } else {
+            -1
+        }
     }
 
     override fun encrypt(key: GCKey, data: ByteArray): Single<ByteArray> {
-        return if (isEncryptable(key, data)) {
-            Single.just(hashedResource.toByteArray())
+        val idx = findResource(key, String(data))
+        return if (idx > -1) {
+            Single.just(hashedResources[idx].toByteArray())
         } else {
             throw RuntimeException("Unable to fake resource encryption: \nKey: $key \nData: $data")
         }
     }
 
-    private fun isDecryptable(key: GCKey, data: ByteArray): Boolean {
-        return key == currentIteration.dataKey &&
-                data.contentEquals(hashedResource.toByteArray())
+    private fun indexOfEncryptedResource(hashedResource: String): Int {
+        return hashedResources.indexOf(hashedResource)
+    }
+
+    private fun findHashedResource(key: GCKey, hashedResource: String): Int {
+        return if(key == currentIteration.dataKey) {
+            indexOfEncryptedResource(hashedResource)
+        } else {
+            -1
+        }
     }
 
     override fun decrypt(key: GCKey, data: ByteArray): Single<ByteArray> {
-        return if (isDecryptable(key, data)) {
-            Single.just(currentIteration.resource.toByteArray())
+        val idx = findHashedResource(key, String(data))
+        return if (idx > -1) {
+            Single.just(currentIteration.resources[idx].toByteArray())
         } else {
             throw RuntimeException("Unable to fake resource decryption: \nKey: $key \nData: $data")
         }
     }
 
     override fun encryptAndEncodeString(key: GCKey, data: String): Single<String> {
-        return if (isEncryptable(key, data.toByteArray())) {
-            Single.just(hashedResource)
+        val idx = findResource(key, data)
+        return if (idx > -1) {
+            Single.just(hashedResources[idx])
         } else {
             throw RuntimeException(
                 "Unable to fake resource encryptAndEncodeString: \nKey: $key \nData: $data"
@@ -112,8 +127,9 @@ class CryptoServiceFake : CryptoContract.Service {
     }
 
     override fun decodeAndDecryptString(key: GCKey, dataBase64: String): Single<String> {
-        return if (isDecryptable(key, dataBase64.toByteArray())) {
-            Single.just(currentIteration.resource)
+        val idx = findHashedResource(key, dataBase64)
+        return if (idx > -1) {
+            Single.just(currentIteration.resources[idx])
         } else {
             throw RuntimeException(
                 "Unable to fake resource decodeAndDecryptString: \nKey: $key \nData: $dataBase64"
@@ -319,7 +335,9 @@ class CryptoServiceFake : CryptoContract.Service {
 
     // Fake util
     private fun hashResource(iteration: CryptoServiceIteration) {
-        hashedResource = iteration.hashFunction(iteration.resource)
+        val hashedResources = mutableListOf<String>()
+        iteration.resources.forEach { hashedResources.add(iteration.hashFunction(it)) }
+        this.hashedResources = hashedResources
     }
 
     private fun hashAndSetTagOrAnnotation(

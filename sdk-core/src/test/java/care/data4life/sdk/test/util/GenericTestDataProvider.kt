@@ -108,7 +108,7 @@ object GenericTestDataProvider {
     val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.US)
 
     val DATE_TIME_FORMATTER: DateTimeFormatter = DateTimeFormatterBuilder()
-        .parseLenient()
-        .appendPattern(DATE_TIME_FORMAT)
-        .toFormatter(Locale.US)
+            .parseLenient()
+            .appendPattern(DATE_TIME_FORMAT)
+            .toFormatter(Locale.US)
 }

@@ -45,37 +45,40 @@ object TestResourceHelper {
     )
 
     fun loadTemplate(
-        path: String,
-        file: String,
-        recordId: String,
-        partnerId: String
+            path: String,
+            file: String,
+            recordId: String,
+            partnerId: String,
+            resourceId: String = recordId
     ): String = getJSONResource(
-        path,
-        file
-    ).replace("\$RESOURCE_IDENTIFIERS", "d4l_f_p_t#$recordId")
-        .replace("\$RESOURCE_ID", recordId)
-        .replace("\$PARTNER_ID", partnerId)
+            path,
+            file
+    ).replace("\$RESOURCE_IDENTIFIERS", resourceId)
+            .replace("\$RESOURCE_ID", recordId)
+            .replace("\$PARTNER_ID", partnerId)
 
     fun loadTemplateWithAttachments(
-        path: String,
-        file: String,
-        recordId: String,
-        partnerId: String,
-        attachmentTitle: String,
-        attachmentType: String,
-        attachmentData: String
+            path: String,
+            file: String,
+            recordId: String,
+            partnerId: String,
+            attachmentTitle: String,
+            attachmentType: String,
+            attachmentData: String,
+            resourceId: String = recordId
     ): String = loadTemplate(
-        path,
-        file,
-        recordId,
-        partnerId
+            path,
+            file,
+            recordId,
+            partnerId,
+            resourceId
     ).replace("\$ATTACHMENT_TITLE", attachmentTitle)
-        .replace("\$ATTACHMENT_TYPE", attachmentType)
-        .replace("\$ATTACHMENT_HASH", getValidHash(attachmentData))
-        .replace("\$ATTACHMENT_SIZE", attachmentData.length.toString())
-        .replace("\$ATTACHMENT_PAYLOAD", attachmentData)
+            .replace("\$ATTACHMENT_TYPE", attachmentType)
+            .replace("\$ATTACHMENT_HASH", getValidHash(attachmentData))
+            .replace("\$ATTACHMENT_SIZE", attachmentData.length.toString())
+            .replace("\$ATTACHMENT_PAYLOAD", attachmentData)
 
     private fun getValidHash(
-        data: String
+            data: String
     ): String = Base64.encodeToString(HashUtil.sha1(Base64.decode(data)))
 }

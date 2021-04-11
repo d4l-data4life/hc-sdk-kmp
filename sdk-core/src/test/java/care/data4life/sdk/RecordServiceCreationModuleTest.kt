@@ -572,19 +572,19 @@ class RecordServiceCreationModuleTest {
                 actual = result.resource
         )
         assertEquals(
-                actual = resource.content.size,
+                actual = result.resource.content.size,
                 expected = 1
         )
         assertEquals(
-                actual = resource.content[0].attachment.data,
+                actual = result.resource.content[0].attachment.data,
                 expected = attachment
         )
         assertEquals(
-                actual = resource.content[0].attachment.id,
+                actual = result.resource.content[0].attachment.id,
                 expected = ATTACHMENT_ID
         )
         assertEquals(
-                actual = resource.identifier?.get(1)?.value,
+                actual = result.resource.identifier?.get(1)?.value,
                 expected = "d4l_f_p_t#$ATTACHMENT_ID"
         )
     }
@@ -676,19 +676,19 @@ class RecordServiceCreationModuleTest {
                 actual = result.resource
         )
         assertEquals(
-                actual = resource.content.size,
+                actual = result.resource.content.size,
                 expected = 1
         )
         assertEquals(
-                actual = resource.content[0].attachment.data,
+                actual = result.resource.content[0].attachment.data,
                 expected = attachment
         )
         assertEquals(
-                actual = resource.content[0].attachment.id,
+                actual = result.resource.content[0].attachment.id,
                 expected = ATTACHMENT_ID
         )
         assertEquals(
-                actual = resource.identifier?.get(1)?.value,
+                actual = result.resource.identifier?.get(1)?.value,
                 expected = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
         )
     }
@@ -945,19 +945,19 @@ class RecordServiceCreationModuleTest {
                 actual = result.resource
         )
         assertEquals(
-                actual = resource.content.size,
+                actual = result.resource.content.size,
                 expected = 1
         )
         assertEquals(
-                actual = resource.content[0].attachment.data,
+                actual = result.resource.content[0].attachment.data,
                 expected = attachment
         )
         assertEquals(
-                actual = resource.content[0].attachment.id,
+                actual = result.resource.content[0].attachment.id,
                 expected = ATTACHMENT_ID
         )
         assertEquals(
-                actual = resource.identifier?.get(1)?.value,
+                actual = result.resource.identifier?.get(1)?.value,
                 expected = "d4l_f_p_t#$ATTACHMENT_ID"
         )
     }
@@ -1050,19 +1050,19 @@ class RecordServiceCreationModuleTest {
                 actual = result.resource
         )
         assertEquals(
-                actual = resource.content.size,
+                actual = result.resource.content.size,
                 expected = 1
         )
         assertEquals(
-                actual = resource.content[0].attachment.data,
+                actual = result.resource.content[0].attachment.data,
                 expected = attachment
         )
         assertEquals(
-                actual = resource.content[0].attachment.id,
+                actual = result.resource.content[0].attachment.id,
                 expected = ATTACHMENT_ID
         )
         assertEquals(
-                actual = resource.identifier?.get(1)?.value,
+                actual = result.resource.identifier?.get(1)?.value,
                 expected = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
         )
     }

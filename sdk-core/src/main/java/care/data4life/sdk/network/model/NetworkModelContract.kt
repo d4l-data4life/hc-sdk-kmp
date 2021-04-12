@@ -61,8 +61,13 @@ class NetworkModelContract {
         }
     }
 
+<<<<<<< HEAD
     internal interface DocumentUploadResponse {
         var documentId: String
+=======
+    internal interface CommonKeyResponse {
+        val commonKey: EncryptedKey
+>>>>>>> main
     }
 
     interface EncryptedKey {

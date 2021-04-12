@@ -18,11 +18,8 @@ toc::[]
 
 === Changed
 
-<<<<<<< HEAD
-* `CryptoSecureStore` to Kotlin.
+* `CryptoSecureStore`, `CommonKeyResponse`, `UserInfo` to Kotlin.
 
-=======
->>>>>>> main
 === Removed
 
 === Fixed

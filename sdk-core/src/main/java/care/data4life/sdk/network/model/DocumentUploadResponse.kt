@@ -13,22 +13,11 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
+package care.data4life.sdk.network.model
 
-package care.data4life.sdk.network.model;
+import com.squareup.moshi.Json
 
-import com.squareup.moshi.Json;
-
-public class DocumentUploadResponse {
-
+data class DocumentUploadResponse(
     @Json(name = "document_id")
-    private String documentId;
-
-
-    public String getDocumentId() {
-        return documentId;
-    }
-
-    public void setDocumentId(String documentId) {
-        this.documentId = documentId;
-    }
-}
+    override var documentId: String
+) : NetworkModelContract.DocumentUploadResponse

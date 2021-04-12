@@ -60,6 +60,10 @@ class NetworkModelContract {
         }
     }
 
+    internal interface CommonKeyResponse {
+        val commonKey: EncryptedKey
+    }
+
     interface EncryptedKey {
         val base64Key: String
         fun decode(): ByteArray
@@ -67,6 +71,13 @@ class NetworkModelContract {
 
     internal interface EncryptedKeyMaker {
         fun create(key: ByteArray): EncryptedKey
+    }
+
+    internal interface UserInfo {
+        val uid: String
+        val commonKey: EncryptedKey
+        val commonKeyId: String
+        val tagEncryptionKey: EncryptedKey
     }
 
     // TODO: internal
@@ -82,8 +93,10 @@ class NetworkModelContract {
         val updatedDate: String?
         val version: Int
 
-        companion object {
-            const val DEFAULT_COMMON_KEY_ID: String = "00000000-0000-0000-0000-000000000000"
-        }
+
+    }
+
+    companion object {
+        const val DEFAULT_COMMON_KEY_ID: String = "00000000-0000-0000-0000-000000000000"
     }
 }

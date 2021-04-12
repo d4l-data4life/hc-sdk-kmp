@@ -25,8 +25,10 @@ data class VersionList(
 
     fun isSupported(currentVersion: String): Boolean {
         var isSupported = true
+        val regex = Regex("^(\\d+\\.)?(\\d+\\.)?(\\d)")
+        val matchVersion = regex.find(currentVersion)?.groups?.first()?.value
         for (version in versions) {
-            if (version.name == currentVersion.substring(0,5) && version.status == NetworkModelContract.Version.KEY_UNSUPPORTED) {
+            if ( version.name == matchVersion && version.status == NetworkModelContract.Version.KEY_UNSUPPORTED) {
                 isSupported = false
                 break
             }

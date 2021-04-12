@@ -91,7 +91,7 @@ class VersionListTest {
         //Given
         val version = Version(
                 25,
-                "1.9.0",
+                "1.10.0-config.debug",
                 "supported"
         )
         val versions = VersionList(listOf<Version>(version))

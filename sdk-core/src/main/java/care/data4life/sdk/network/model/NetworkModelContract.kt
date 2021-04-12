@@ -69,6 +69,13 @@ class NetworkModelContract {
         fun create(key: ByteArray): EncryptedKey
     }
 
+    internal interface UserInfo {
+        val uid: String
+        val commonKey: EncryptedKey
+        val commonKeyId: String
+        val tagEncryptionKey: EncryptedKey
+    }
+
     // TODO: internal
     interface EncryptedRecord {
         val commonKeyId: String
@@ -82,8 +89,10 @@ class NetworkModelContract {
         val updatedDate: String?
         val version: Int
 
-        companion object {
-            const val DEFAULT_COMMON_KEY_ID: String = "00000000-0000-0000-0000-000000000000"
-        }
+
+    }
+
+    companion object {
+        const val DEFAULT_COMMON_KEY_ID: String = "00000000-0000-0000-0000-000000000000"
     }
 }

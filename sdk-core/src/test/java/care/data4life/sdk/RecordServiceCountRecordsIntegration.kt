@@ -20,6 +20,7 @@ import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
+import care.data4life.sdk.test.util.GenericTestDataProvider
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk
@@ -41,8 +42,8 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
         errorHandler = mockk()
 
         recordService = RecordService(
-                RecordServiceTestBase.PARTNER_ID,
-                RecordServiceTestBase.ALIAS,
+                GenericTestDataProvider.PARTNER_ID,
+                GenericTestDataProvider.ALIAS,
                 apiService,
                 TagEncryptionService(cryptoService),
                 TaggingService(CLIENT_ID),
@@ -138,7 +139,8 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
             apiService.getCount(
                     ALIAS,
                     USER_ID,
-                    listOf(encodedEncryptedVersion, encodedEncryptedResourceType)
+                    listOf(encodedEncryptedVersion,  encodedEncryptedResourceType
+                    ).joinToString(",")
             )
         } returns Single.just(21)
 
@@ -146,7 +148,7 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
             apiService.getCount(
                     ALIAS,
                     USER_ID,
-                    listOf(encryptedVersion, encodedEncryptedResourceType)
+                    listOf(encryptedVersion, encodedEncryptedResourceType).joinToString(",")
             )
         } returns Single.just(21)
 
@@ -194,7 +196,7 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
                             "Y3VzdG9tPXdvdw==",
                             "Y3VzdG9tPWl0",
                             "Y3VzdG9tPXdvcmtz"
-                    )
+                    ).joinToString(",")
             )
         } returns Single.just(21)
         every {
@@ -206,7 +208,7 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
                             "Y3VzdG9tPXdvdw==",
                             "Y3VzdG9tPWl0",
                             "Y3VzdG9tPXdvcmtz"
-                    )
+                    ).joinToString(",")
             )
         } returns Single.just(21)
 
@@ -257,7 +259,7 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
                             "Y3VzdG9tPXdvdw==",
                             "Y3VzdG9tPWl0",
                             "Y3VzdG9tPXdvcmtz"
-                    )
+                    ).joinToString(",")
             )
         } returns Single.just(21)
         every {
@@ -270,7 +272,7 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
                             "Y3VzdG9tPXdvdw==",
                             "Y3VzdG9tPWl0",
                             "Y3VzdG9tPXdvcmtz"
-                    )
+                    ).joinToString(",")
             )
         } returns Single.just(21)
 
@@ -321,7 +323,7 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
                             "Y3VzdG9tPXdvdw==",
                             "Y3VzdG9tPWl0",
                             "Y3VzdG9tPXdvcmtz"
-                    )
+                    ).joinToString(",")
             )
         } returns Single.just(21)
         every {
@@ -334,7 +336,7 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
                             "Y3VzdG9tPXdvdw==",
                             "Y3VzdG9tPWl0",
                             "Y3VzdG9tPXdvcmtz"
-                    )
+                    ).joinToString(",")
             )
         } returns Single.just(21)
 
@@ -383,7 +385,7 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
                             "Y3VzdG9tPXdvdw==",
                             "Y3VzdG9tPWl0",
                             "Y3VzdG9tPXdvcmtz"
-                    )
+                    ).joinToString(",")
             )
         } returns Single.just(21)
         every {
@@ -395,7 +397,7 @@ class RecordServiceCountRecordsIntegration : RecordServiceIntegrationBase() {
                             "Y3VzdG9tPXdvdw==",
                             "Y3VzdG9tPWl0",
                             "Y3VzdG9tPXdvcmtz"
-                    )
+                    ).joinToString(",")
             )
         } returns Single.just(21)
 

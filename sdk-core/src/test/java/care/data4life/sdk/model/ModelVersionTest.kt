@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+ * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
  *
  * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
@@ -14,24 +14,27 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.test.util;
+package care.data4life.sdk.model
 
-import care.data4life.fhir.stu3.model.Attachment;
+import org.junit.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
-public class AttachmentBuilder {
+class ModelVersionTest {
 
-    private static final String DATA = "data";
-    private static final Integer DATA_SIZE = 42;
-    private static final String DATA_HASH = "dataHash";
-
-
-    public static Attachment buildAttachment(String id) {
-        Attachment attachment = new Attachment();
-        attachment.id = id;
-        attachment.data = DATA;
-        attachment.size = DATA_SIZE;
-        attachment.hash = DATA_HASH;
-        return attachment;
+    @Test
+    fun `It fulfils ModelVersion`() {
+        val version: Any = ModelVersion
+        assertTrue(version is ModelContract.ModelVersion)
     }
 
+    @Test
+    fun `Given isModelVersionSupported is called, with a supported version, it returns true`() {
+        assertTrue(ModelVersion.isModelVersionSupported(1))
+    }
+
+    @Test
+    fun `Given isModelVersionSupported is called, with a unsupported version, it returns false`() {
+        assertFalse(ModelVersion.isModelVersionSupported(2))
+    }
 }

@@ -74,7 +74,7 @@ interface IHCService {
             @Query("end_date") endDate: String?,
             @Query("limit") pageSize: Int,
             @Query("offset") offset: Int,
-            @Query("tags") tags: List<String>
+            @Query("tags") tags: String
     ): Observable<List<EncryptedRecord>>
 
     @HEAD("/users/{userId}/records")
@@ -82,7 +82,7 @@ interface IHCService {
     fun getRecordsHeader(
             @Header(HEADER_ALIAS) alias: String,
             @Path("userId") userId: String,
-            @Query("tags") tags: List<String>
+            @Query("tags") tags: String
     ): Single<Response<Void>>
 
     @GET("/users/{userId}/records/{recordId}")

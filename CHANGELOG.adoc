@@ -27,6 +27,22 @@ Add Version control for supported/unsupported versions
 
 === Migration
 
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.2...v1.10.0[1.10.0]
+
+=== Changed
+
+* `ModelVersion` to Kotlin.
+
+=== Fixed
+
+* RecordService#downloadData failed due to attachments, which are null.
+* RecordService#checkDataRestrictions does not check multiple attachments correctly, if one of them is null or has null as data payload.
+* Api calls for search and count did not respect the query schema, which results always in a query of all records.
+
+=== Bumped
+
+* HC-FHIR-SDK 1.2.1 -> 1.3.1
+
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.1...v1.9.2[1.9.2]
 

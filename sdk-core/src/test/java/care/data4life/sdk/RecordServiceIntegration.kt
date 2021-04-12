@@ -20,10 +20,11 @@ import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.model.DownloadType
-import care.data4life.sdk.model.ModelVersion
+import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
+import care.data4life.sdk.test.util.GenericTestDataProvider
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
 import com.google.common.truth.Truth
@@ -45,8 +46,8 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
         errorHandler = mockk()
 
         recordService = RecordService(
-                RecordServiceTestBase.PARTNER_ID,
-                RecordServiceTestBase.ALIAS,
+                GenericTestDataProvider.PARTNER_ID,
+                GenericTestDataProvider.ALIAS,
                 apiService,
                 TagEncryptionService(
                         cryptoService
@@ -145,7 +146,7 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -196,7 +197,7 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 

@@ -18,6 +18,8 @@ toc::[]
 
 === Changed
 
+* `UserInfo` to Kotlin.
+
 === Removed
 
 === Fixed

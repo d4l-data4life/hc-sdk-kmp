@@ -18,7 +18,7 @@ toc::[]
 
 === Changed
 
-* `CryptoSecureStore`, `CommonKeyResponse`, `UserInfo` to Kotlin.
+* `CryptoSecureStore`, `DocumentUploadResponse`, `CommonKeyResponse`, `UserInfo` to Kotlin.
 
 === Removed
 

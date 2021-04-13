@@ -91,9 +91,11 @@ class CryptoSecureStore @JvmOverloads constructor(
 
     @Throws(IOException::class)
     override fun getExchangeKey(alias: String): ExchangeKey {
-        val data = secureStore.getData(alias) ?: CharArray(0)
+        val data = secureStore.getData(alias)
+            ?: throw (CryptoException.DecryptionFailed("Failed to decrypt data"))
 
-        return moshi.adapter(ExchangeKey::class.java).fromJson(String(data))!!
+        return moshi.adapter(ExchangeKey::class.java).fromJson(String(data))
+            ?: throw (CryptoException.DecryptionFailed("Failed to decrypt data"))
     }
 
     override operator fun contains(alias: String): Boolean = secureStore.containsData(alias)

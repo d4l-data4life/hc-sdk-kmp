@@ -13,14 +13,12 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
+package care.data4life.sdk.model
 
-package care.data4life.sdk.model;
+import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 
-public class ModelVersion {
-
-    public static final int CURRENT = 1;
-
-    public static boolean isModelVersionSupported(int version) {
-        return version <= CURRENT;
+object ModelVersion: ModelContract.ModelVersion {
+    override fun isModelVersionSupported(version: Int): Boolean {
+        return version <= CURRENT
     }
 }

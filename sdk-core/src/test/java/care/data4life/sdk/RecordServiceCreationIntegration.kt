@@ -24,7 +24,7 @@ import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirService
-import care.data4life.sdk.model.ModelVersion
+import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.tag.TagEncryptionService
@@ -336,7 +336,7 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -404,7 +404,7 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -473,7 +473,7 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -528,7 +528,7 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -596,7 +596,7 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -665,7 +665,7 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -717,7 +717,7 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 null,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -784,7 +784,7 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 null,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -815,4 +815,6 @@ class RecordServiceCreationIntegration : RecordServiceIntegrationBase() {
         Truth.assertThat(result.annotations).isEqualTo(listOf("wow", "it", "works"))
         Truth.assertThat(result.resource).isEqualTo(resource)
     }
+
+    // TODO Add tests with attachments
 }

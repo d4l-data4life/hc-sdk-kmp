@@ -23,11 +23,12 @@ import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirService
-import care.data4life.sdk.model.ModelVersion
+import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
+import care.data4life.sdk.test.util.GenericTestDataProvider
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk
@@ -39,7 +40,6 @@ import org.threeten.bp.LocalDate
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import kotlin.test.assertFailsWith
-import kotlin.test.assertTrue
 import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
 import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
 
@@ -60,8 +60,8 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
         errorHandler = mockk()
 
         recordService = RecordService(
-                RecordServiceTestBase.PARTNER_ID,
-                RecordServiceTestBase.ALIAS,
+                GenericTestDataProvider.PARTNER_ID,
+                GenericTestDataProvider.ALIAS,
                 apiService,
                 TagEncryptionService(
                         cryptoService
@@ -322,7 +322,10 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 endDate,
                 PAGE_SIZE,
                 OFFSET,
-                or(encryptedTags, encryptedAndEncodedTags)
+                or(
+                    encryptedTags.joinToString(","),
+                    encryptedAndEncodedTags.joinToString(",")
+                )
             )
         } returnsMany responses as List<Observable<MutableList<EncryptedRecord>>>
 
@@ -481,7 +484,10 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 endDate,
                 PAGE_SIZE,
                 OFFSET,
-                or(encryptedTags, encryptedAndEncodedTags)
+                or(
+                    encryptedTags.joinToString(","),
+                    encryptedAndEncodedTags.joinToString(",")
+                )
             )
         } returnsMany responses
 
@@ -588,7 +594,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -641,7 +647,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -687,7 +693,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -740,7 +746,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -786,7 +792,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 null,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -837,7 +843,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 null,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -889,7 +895,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -906,7 +912,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -999,7 +1005,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -1019,7 +1025,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -1096,7 +1102,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -1113,7 +1119,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -1194,7 +1200,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
             CREATION_DATE,
             encryptedDataKey,
             encryptedAttachmentKey,
-            ModelVersion.CURRENT,
+            CURRENT,
             UPDATE_DATE
         )
 
@@ -1211,7 +1217,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
             CREATION_DATE,
             encryptedDataKey,
             encryptedAttachmentKey,
-            ModelVersion.CURRENT,
+            CURRENT,
             UPDATE_DATE
         )
 
@@ -1280,7 +1286,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -1297,7 +1303,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -1390,7 +1396,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -1410,7 +1416,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -1490,7 +1496,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
             CREATION_DATE,
             encryptedDataKey,
             encryptedAttachmentKey,
-            ModelVersion.CURRENT,
+            CURRENT,
             UPDATE_DATE
         )
 
@@ -1505,7 +1511,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
             CREATION_DATE,
             encryptedDataKey,
             encryptedAttachmentKey,
-            ModelVersion.CURRENT,
+            CURRENT,
             UPDATE_DATE
         )
 
@@ -1581,7 +1587,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -1598,7 +1604,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -1672,7 +1678,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
             CREATION_DATE,
             encryptedDataKey,
             null,
-            ModelVersion.CURRENT,
+            CURRENT,
             UPDATE_DATE
         )
 
@@ -1688,7 +1694,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
             CREATION_DATE,
             encryptedDataKey,
             null,
-            ModelVersion.CURRENT,
+            CURRENT,
             UPDATE_DATE
         )
 
@@ -1766,7 +1772,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 null,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -1783,7 +1789,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 null,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 
@@ -1869,7 +1875,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
             CREATION_DATE,
             encryptedDataKey,
             null,
-            ModelVersion.CURRENT,
+            CURRENT,
             UPDATE_DATE
         )
 
@@ -1885,7 +1891,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
             CREATION_DATE,
             encryptedDataKey,
             null,
-            ModelVersion.CURRENT,
+            CURRENT,
             UPDATE_DATE
         )
 
@@ -1957,7 +1963,7 @@ class RecordServiceFetchIntegration : RecordServiceIntegrationBase() {
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT,
+                CURRENT,
                 UPDATE_DATE
         )
 

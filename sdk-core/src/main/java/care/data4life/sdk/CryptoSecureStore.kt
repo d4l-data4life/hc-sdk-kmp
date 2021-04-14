@@ -29,11 +29,9 @@ import java.io.IOException
 import java.lang.reflect.Type
 
 class CryptoSecureStore @JvmOverloads constructor(
-    moshi: Moshi? = null,
+    private val moshi: Moshi = Moshi.Builder().build(),
     private val secureStore: SecureStoreContract.SecureStore
 ) : CryptoContract.SecureStore {
-    private val moshi: Moshi = if (moshi is Moshi) moshi else Moshi.Builder().build()
-
     override fun clear(): Unit = secureStore.clear()
 
     override fun storeSecret(
@@ -93,9 +91,11 @@ class CryptoSecureStore @JvmOverloads constructor(
 
     @Throws(IOException::class)
     override fun getExchangeKey(alias: String): ExchangeKey {
-        val data = secureStore.getData(alias) ?: CharArray(0)
+        val data = secureStore.getData(alias)
+            ?: throw (CryptoException.DecryptionFailed("Failed to decrypt data"))
 
-        return moshi.adapter(ExchangeKey::class.java).fromJson(String(data))!!
+        return moshi.adapter(ExchangeKey::class.java).fromJson(String(data))
+            ?: throw (CryptoException.DecryptionFailed("Failed to decrypt data"))
     }
 
     override operator fun contains(alias: String): Boolean = secureStore.containsData(alias)

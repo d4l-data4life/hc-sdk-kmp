@@ -17,7 +17,7 @@ package care.data4life.sdk.tag
 
 import care.data4life.crypto.GCKey
 import care.data4life.crypto.error.CryptoException
-import care.data4life.sdk.CryptoService
+import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.tag.TaggingContract.Companion.ANNOTATION_KEY
 import care.data4life.sdk.tag.TaggingContract.Companion.DELIMITER
@@ -27,7 +27,7 @@ import java.nio.charset.StandardCharsets
 
 // TODO internal
 class TagEncryptionService @JvmOverloads constructor(
-        private val cryptoService: CryptoService,
+        private val cryptoService: CryptoContract.Service,
         private val base64: Base64 = Base64,
         private val tagHelper: TaggingContract.Helper = TagEncryptionHelper
 ) : TaggingContract.EncryptionService {

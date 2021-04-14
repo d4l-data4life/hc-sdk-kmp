@@ -76,7 +76,7 @@ class UserService(
         return Single.fromCallable { authService.refreshAccessToken(alias) }
     }
 
-    fun getVersionInfo(currentVersion: String): Single<Boolean>? {
+    fun getVersionInfo(currentVersion: String): Single<Boolean> {
         return Single.just(currentVersion)
                 .flatMap { apiService.fetchVersionInfo() }
                 .map { versionInfo: VersionList -> versionInfo.isSupported(currentVersion) }

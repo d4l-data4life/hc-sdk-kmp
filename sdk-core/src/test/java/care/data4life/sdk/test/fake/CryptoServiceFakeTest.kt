@@ -71,7 +71,7 @@ class CryptoServiceFakeTest {
         // Given
         val resource = "Just a test"
 
-        every { iteration.resource } returns resource
+        every { iteration.resources } returns listOf(resource)
 
         // Then
         val error = assertFailsWith<RuntimeException> {
@@ -93,7 +93,7 @@ class CryptoServiceFakeTest {
         val dataKey: GCKey = mockk()
 
         every { iteration.dataKey } returns dataKey
-        every { iteration.resource } returns "Just a test"
+        every { iteration.resources } returns listOf("Just a test")
 
         // Then
         val error = assertFailsWith<RuntimeException> {
@@ -119,7 +119,7 @@ class CryptoServiceFakeTest {
         val hash = { _: String -> hashedResource }
 
         every { iteration.dataKey } returns dataKey
-        every { iteration.resource } returns resource
+        every { iteration.resources } returns listOf(resource)
         every { iteration.hashFunction } returns hash
 
         // When
@@ -139,7 +139,7 @@ class CryptoServiceFakeTest {
         // Given
         val resource = "Just a test"
 
-        every { iteration.resource } returns resource
+        every { iteration.resources } returns listOf(resource)
 
         // Then
         val error = assertFailsWith<RuntimeException> {
@@ -164,7 +164,7 @@ class CryptoServiceFakeTest {
         val hash = { _: String -> "something" }
 
         every { iteration.dataKey } returns dataKey
-        every { iteration.resource } returns resource
+        every { iteration.resources } returns listOf(resource)
         every { iteration.hashFunction } returns hash
 
         // Then
@@ -191,7 +191,7 @@ class CryptoServiceFakeTest {
         val hash = { _: String -> hashedResource }
 
         every { iteration.dataKey } returns dataKey
-        every { iteration.resource } returns resource
+        every { iteration.resources } returns listOf(resource)
         every { iteration.hashFunction } returns hash
 
         // When
@@ -211,7 +211,7 @@ class CryptoServiceFakeTest {
         // Given
         val resource = "Just a test"
 
-        every { iteration.resource } returns resource
+        every { iteration.resources } returns listOf(resource)
 
         // Then
         val error = assertFailsWith<RuntimeException> {
@@ -233,7 +233,7 @@ class CryptoServiceFakeTest {
         val dataKey: GCKey = mockk()
 
         every { iteration.dataKey } returns dataKey
-        every { iteration.resource } returns "Just a test"
+        every { iteration.resources } returns listOf("Just a test")
 
         // Then
         val error = assertFailsWith<RuntimeException> {
@@ -259,7 +259,7 @@ class CryptoServiceFakeTest {
         val hash = { _: String -> hashedResource }
 
         every { iteration.dataKey } returns dataKey
-        every { iteration.resource } returns resource
+        every { iteration.resources } returns listOf(resource)
         every { iteration.hashFunction } returns hash
 
         // When
@@ -282,7 +282,7 @@ class CryptoServiceFakeTest {
         // Given
         val resource = "Just a test"
 
-        every { iteration.resource } returns resource
+        every { iteration.resources } returns listOf(resource)
 
         // Then
         val error = assertFailsWith<RuntimeException> {
@@ -307,7 +307,7 @@ class CryptoServiceFakeTest {
         val hash = { _: String -> "something" }
 
         every { iteration.dataKey } returns dataKey
-        every { iteration.resource } returns resource
+        every { iteration.resources } returns listOf(resource)
         every { iteration.hashFunction } returns hash
 
         // Then
@@ -334,7 +334,7 @@ class CryptoServiceFakeTest {
         val hash = { _: String -> hashedResource }
 
         every { iteration.dataKey } returns dataKey
-        every { iteration.resource } returns resource
+        every { iteration.resources } returns listOf(resource)
         every { iteration.hashFunction } returns hash
 
         // When

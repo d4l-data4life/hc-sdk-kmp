@@ -65,6 +65,8 @@ object GenericTestDataProvider {
 
     const val ASSIGNER = "assigner"
 
+    const val COMMON_KEY_ID = "commonKeyId"
+
     const val ADDITIONAL_ID = RecordContract.Service.DOWNSCALED_ATTACHMENT_IDS_FMT +
             ThumbnailService.SPLIT_CHAR +
             ATTACHMENT_ID +
@@ -79,11 +81,13 @@ object GenericTestDataProvider {
 
     const val VALUE_INDICATOR = "valueAttachment"
 
-    val VALUE_ID = RecordContract.Service.DOWNSCALED_ATTACHMENT_IDS_FMT +
+    const val VALUE_ID = RecordContract.Service.DOWNSCALED_ATTACHMENT_IDS_FMT +
             ThumbnailService.SPLIT_CHAR +
             VALUE_INDICATOR +
             ThumbnailService.SPLIT_CHAR +
             PREVIEW_ID +
             ThumbnailService.SPLIT_CHAR +
             THUMBNAIL_ID
+
+    val IV = ByteArray(16)
 }

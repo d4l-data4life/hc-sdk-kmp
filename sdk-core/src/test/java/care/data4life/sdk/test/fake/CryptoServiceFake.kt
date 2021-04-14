@@ -24,6 +24,8 @@ import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.IV
+import care.data4life.sdk.util.toChars
+import io.mockk.InternalPlatformDsl.toStr
 import io.mockk.mockk
 import io.reactivex.Single
 
@@ -202,7 +204,7 @@ class CryptoServiceFake : CryptoContract.Service {
         } else {
             throw RuntimeException(
                 "Unexpected payload for symEncrypt(probably tag/annotation encryption):" +
-                        "\nKey: $key\nData: $data\nIV: $iv"
+                        "\nKey: $key\nData: ${String(data)}\nIV: $iv"
             )
         }
     }

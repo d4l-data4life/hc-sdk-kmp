@@ -27,6 +27,8 @@ repositories {
 dependencies {
     implementation("com.google.code.gson:gson:2.8.6")
 
+    // dependency check
+    implementation("com.github.ben-manes:gradle-versions-plugin:0.38.0")
     // download scripts
     implementation("de.undercouch:gradle-download-task:4.1.1")
     // publishing.gradle.kts

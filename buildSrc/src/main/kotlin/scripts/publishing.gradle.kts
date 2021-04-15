@@ -16,8 +16,37 @@
 
 package scripts
 
+import LibraryConfig
 import org.gradle.api.tasks.Exec
 
+/**
+ * Usage:
+ *
+ * You need to add following dependencies to the buildSrc/build.gradle.kts
+ *
+ * dependencies {
+ *     implementation("care.data4life:gradle-git-publish:3.2.0")
+ * }
+ *
+ * and ensure that the gradlePluginPortal is available
+ *
+ * repositories {
+ *     gradlePluginPortal()
+ * }
+ *
+ * Now just add id("scripts.publishing") to your rootProject build.gradle.kts plugins
+ *
+ * plugins {
+ *     id("scripts.publishing")
+ * }
+ *
+ * To publish to to https://github.com/d4l-data4life/maven-repository/ just run:
+ * - ./gradlew publishFeature
+ * - ./gradlew publishSnapshot
+ * - ./gradlew publishRelease
+ *
+ * This requires publishing-config.gradle.kts!
+ */
 plugins {
     id("care.data4life.git-publish")
 }

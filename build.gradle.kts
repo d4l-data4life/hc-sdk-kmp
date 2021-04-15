@@ -52,8 +52,8 @@ buildscript {
 }
 
 plugins {
-    dependencyUpdates()
-
+    id("scripts.dependency-updates")
+    id("scripts.download-scripts")
     id("scripts.versioning")
     id("scripts.publishing")
 }

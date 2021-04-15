@@ -60,7 +60,7 @@ import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
 import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
 
 
-class RecordServiceFetchModuleTest {
+class RecordServiceFetchRecordsModuleTest {
     private val dataKey: GCKey = mockk()
     private val attachmentKey: GCKey = mockk()
     private val tagEncryptionKey: GCKey = mockk()
@@ -303,7 +303,7 @@ class RecordServiceFetchModuleTest {
             hashFunction = { value -> flowHelper.md5(value) }
         )
 
-        val sendTagsAndAnnotations = slot<String>()
+        val search = slot<String>()
 
         (cryptoService as CryptoServiceFake).iteration = receivedIteration
 
@@ -315,14 +315,14 @@ class RecordServiceFetchModuleTest {
                 endDate,
                 pageSize,
                 offset,
-                capture(sendTagsAndAnnotations)
+                capture(search)
             )
         } answers {
-            val record = when (sendTagsAndAnnotations.captured) {
+            val record = when (search.captured) {
                 encryptedTagsAndAnnotations.joinToString(",") -> encryptedRecord
                 encryptedLegacyTagsAndAnnotations.joinToString(",") -> encryptedLegacyRecord
                 else -> throw RuntimeException(
-                    "Unexpected tags and annotations:\n${sendTagsAndAnnotations.captured}"
+                    "Unexpected tags and annotations:\n${search.captured}"
                 )
             }
 

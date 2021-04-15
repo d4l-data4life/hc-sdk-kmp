@@ -43,7 +43,3 @@ fun PluginDependenciesSpec.androidLibrary(): PluginDependencySpec =
 
 fun PluginDependenciesSpec.androidKotlin(): PluginDependencySpec =
         id("kotlin-android")
-
-
-fun PluginDependenciesSpec.dependencyUpdates(): PluginDependencySpec =
-        id("com.github.ben-manes.versions").version(Versions.GradlePlugins.dependencyUpdates)

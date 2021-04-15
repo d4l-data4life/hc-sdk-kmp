@@ -17,7 +17,7 @@
 package care.data4life.sdk.migration
 
 import care.data4life.sdk.ApiService
-import care.data4life.sdk.CryptoService
+import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.network.model.NetworkModelContract.EncryptedRecord
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TagEncryptionHelper
@@ -34,7 +34,7 @@ import java.io.IOException
 class RecordCompatibilityService internal constructor(
     private val apiService: ApiService,
     private val tagEncryptionService: TaggingContract.EncryptionService,
-    private val cryptoService: CryptoService,
+    private val cryptoService: CryptoContract.Service,
     private val tagHelper: TaggingContract.Helper = TagEncryptionHelper
 ) : MigrationContract.CompatibilityService {
     private fun encrypt(

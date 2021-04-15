@@ -19,6 +19,8 @@ Add Version control for supported/unsupported versions
 
 === Changed
 
+* `CryptoSecureStore`, `DocumentUploadResponse`, `CommonKeyResponse`, `UserInfo` to Kotlin.
+
 === Removed
 
 === Fixed

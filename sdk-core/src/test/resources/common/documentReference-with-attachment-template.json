@@ -1,0 +1,40 @@
+{
+    "resourceType": "DocumentReference",
+    "id": "$RESOURCE_ID",
+    "meta": {
+        "profile": [
+            "http://fhir.smart4health.eu/StructureDefinition/s4h-documentreference"
+        ]
+    },
+    "status": "current",
+    "type": {
+        "coding": [{
+            "system": "http://fhir.smart4health.eu/CodeSystem/s4h-user-doc-type",
+            "code": "x-ray",
+            "display": "X-ray image"
+        }]
+    },
+    "subject": {
+        "reference": "Patient/JUST-A-MOCK",
+        "display": "Johnna Doe"
+    },
+    "date": "2020-05-04T07:45:08.2112Z",
+    "author": [{
+        "identifier": {
+            "system": "http://fhir.smart4health.eu/CodeSystem/ittm-location-id",
+            "value": "dr-crusher-ng"
+        },
+        "display": "ITTM dr crusher ng"
+    }],
+    "description": "A nice mock for tests",
+    "content": [{
+        "attachment": {
+            "contentType": "$ATTACHMENT_TYPE",
+            "title": "$ATTACHMENT_TITLE",
+            "hash": "$ATTACHMENT_HASH",
+            "data": "$ATTACHMENT_PAYLOAD",
+            "size": $ATTACHMENT_SIZE
+        }
+    }],
+    "identifier":[{"assigner":{"reference":"$PARTNER_ID"},"value":"$RESOURCE_IDENTIFIERS"}]
+}

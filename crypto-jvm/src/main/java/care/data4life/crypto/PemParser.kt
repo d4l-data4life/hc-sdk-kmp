@@ -51,7 +51,11 @@ import java.security.spec.RSAPublicKeySpec
  * @throws Exception        Covers the variety of possible errors during parsing
  */
 @Throws(Exception::class)
-fun convertPrivateKeyPemStringToGCKeyPair(privateKeyAsPem: String, algorithm: GCRSAKeyAlgorithm, keySize: Int): GCKeyPair? {
+fun convertPrivateKeyPemStringToGCKeyPair(
+    privateKeyAsPem: String,
+    algorithm: GCRSAKeyAlgorithm,
+    keySize: Int
+): GCKeyPair {
     val pemReader = PemReader(StringReader(privateKeyAsPem))
     val pemObject = pemReader.readPemObject()
     pemReader.close()
@@ -62,7 +66,7 @@ fun convertPrivateKeyPemStringToGCKeyPair(privateKeyAsPem: String, algorithm: GC
     val gcPrivateKey = GCAsymmetricKey(privateKey, GCAsymmetricKey.Type.Private)
 
     val rsaPrivCertKey = privateKey as RSAPrivateCrtKey
-    val publicKeySpec = RSAPublicKeySpec(rsaPrivCertKey.getModulus(), rsaPrivCertKey.getPublicExponent())
+    val publicKeySpec = RSAPublicKeySpec(rsaPrivCertKey.modulus, rsaPrivCertKey.publicExponent)
     val publicKey: PublicKey = keyFactory.generatePublic(publicKeySpec)
     val gcPublicKey = GCAsymmetricKey(publicKey, GCAsymmetricKey.Type.Public)
 

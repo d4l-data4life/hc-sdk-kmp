@@ -16,7 +16,6 @@
 
 package care.data4life.sdk
 
-import care.data4life.crypto.GCKey
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID
@@ -24,6 +23,7 @@ import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
+import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
@@ -31,7 +31,6 @@ import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.migration.MigrationContract
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
-import care.data4life.sdk.network.DecryptedRecordMapper
 import care.data4life.sdk.network.model.DecryptedDataRecord
 import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
@@ -55,21 +54,16 @@ import kotlin.test.assertSame
 class RecordServiceUpdateRecordTest {
     private lateinit var recordService: RecordService
     private val apiService: ApiService = mockk()
-    private val cryptoService: CryptoService = mockk()
+    private val cryptoService: CryptoContract.Service = mockk()
     private val fhirService: FhirContract.Service = mockk()
     private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
     private val taggingService: TaggingContract.Service = mockk()
     private val attachmentService: AttachmentContract.Service = mockk()
     private val errorHandler: SdkContract.ErrorHandler = mockk()
 
-    private val tags: HashMap<String, String> = mockk()
     private val defaultAnnotation: List<String> = emptyList()
 
     private val compatibilityService: MigrationContract.CompatibilityService = mockk()
-    private val decryptedRecordMapper: DecryptedRecordMapper = mockk()
-    private val uploadData: HashMap<Any, String?> = mockk()
-    private val dataKey: GCKey = mockk()
-    private val encryptedRecord: EncryptedRecord = mockk()
 
     @Before
     fun setUp() {

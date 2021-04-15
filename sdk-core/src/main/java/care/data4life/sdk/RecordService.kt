@@ -404,7 +404,7 @@ class RecordService internal constructor(
             offset
     ) as Single<List<DataRecord<DataResource>>>
 
-    fun <T : Fhir3Resource> downloadRecord(
+    override fun <T : Fhir3Resource> downloadRecord(
             recordId: String,
             userId: String
     ): Single<Record<T>> = apiService
@@ -691,7 +691,7 @@ class RecordService internal constructor(
         ) as DecryptedBaseRecord<T>
     }
 
-    fun downloadAttachment(
+    override fun downloadAttachment(
             recordId: String,
             attachmentId: String,
             userId: String,
@@ -703,7 +703,7 @@ class RecordService internal constructor(
             type
     ).map { it[0] }
 
-    fun downloadAttachments(
+    override fun downloadAttachments(
             recordId: String,
             attachmentIds: List<String>,
             userId: String,
@@ -1103,7 +1103,7 @@ class RecordService internal constructor(
                     identifiers,
                     attachment.id
             )
-            if (additionalIds != null) {
+            if (additionalIds is List<*>) {
                 when (type) {
                     DownloadType.Full -> { /* do nothing */ }
                     DownloadType.Medium -> attachment.id += ThumbnailService.SPLIT_CHAR + additionalIds[PREVIEW_ID_POS]

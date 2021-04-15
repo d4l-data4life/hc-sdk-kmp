@@ -69,7 +69,7 @@ import care.data4life.fhir.r4.model.Reference as Fhir4Reference
 import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
 import care.data4life.fhir.stu3.model.Reference as Fhir3Reference
 
-class RecordServiceUpdateModuleTest {
+class RecordServiceUpdateRecordModuleTest {
     private val dataKey: GCKey = mockk()
     private val attachmentKey: GCKey = mockk()
     private val tagEncryptionKey: GCKey = mockk()

@@ -19,8 +19,10 @@ package care.data4life.sdk.record
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.Record
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -52,6 +54,22 @@ interface RecordContract {
         fun countFhir4Records(type: Class<out Fhir4Resource>, userId: String, annotations: List<String>): Single<Int>
 
         fun countAllFhir3Records(userId: String, annotations: List<String>): Single<Int>
+
+        fun <T : Fhir3Resource> downloadRecord(recordId: String, userId: String): Single<Record<T>>
+
+        fun downloadAttachment(
+            recordId: String,
+            attachmentId: String,
+            userId: String,
+            type: DownloadType
+        ): Single<Fhir3Attachment>
+
+        fun downloadAttachments(
+            recordId: String,
+            attachmentIds: List<String>,
+            userId: String,
+            type: DownloadType
+        ): Single<List<Fhir3Attachment>>
 
         companion object {
             const val EMPTY_RECORD_ID = ""

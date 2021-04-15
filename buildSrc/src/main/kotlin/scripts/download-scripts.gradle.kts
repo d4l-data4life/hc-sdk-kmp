@@ -45,8 +45,6 @@ val scriptFiles = listOf(
     "$scriptLink/dependency-updates.gradle.kts",
     "$scriptLink/download-scripts.gradle.kts",
     "$scriptLink/publishing.gradle.kts",
-    "$scriptLink/publishing-config.gradle.kts",
-    "$scriptLink/quality-spotless.gradle.kts",
     "$scriptLink/versioning.gradle.kts"
 )
 

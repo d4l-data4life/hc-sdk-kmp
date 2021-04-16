@@ -27,17 +27,17 @@ class AttachmentContract {
     interface Service {
 
         fun upload(
-                attachments: List<WrapperContract.Attachment>,
-                attachmentsKey: GCKey,
-                userId: String
+            attachments: List<WrapperContract.Attachment>,
+            attachmentsKey: GCKey,
+            userId: String
         ): Single<List<Pair<WrapperContract.Attachment, List<String>>>>
 
 
         @Throws(DataValidationException.InvalidAttachmentPayloadHash::class)
         fun download(
-                attachments: List<WrapperContract.Attachment>,
-                attachmentsKey: GCKey,
-                userId: String
+            attachments: List<WrapperContract.Attachment>,
+            attachmentsKey: GCKey,
+            userId: String
         ): Single<List<WrapperContract.Attachment>>
 
 
@@ -46,5 +46,11 @@ class AttachmentContract {
 
     internal interface CompatibilityValidator {
         fun isHashable(attachment: WrapperContract.Attachment): Boolean
+    }
+
+    interface FileService {
+        fun downloadFile(key: GCKey, userId: String, fileId: String): Single<ByteArray>
+        fun uploadFile(key: GCKey, userId: String, data: ByteArray): Single<String>
+        fun deleteFile(userId: String, fileId: String): Single<Boolean>
     }
 }

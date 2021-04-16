@@ -49,7 +49,7 @@ class AttachmentServiceTest {
     private val DATA_HASH = "dataHash"
     private val attachmentKey = Mockito.mock(GCKey::class.java)
 
-    private lateinit var mockFileService: FileService
+    private lateinit var mockFileService: AttachmentContract.FileService
     private lateinit var mockImageResizer: ImageResizer
     private lateinit var attachment: WrapperContract.Attachment
 

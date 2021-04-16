@@ -26,23 +26,23 @@ class FileService(
         private val alias: String,
         private val apiService: ApiService,
         private val cryptoService: CryptoService
-) {
+) : AttachmentContract.FileService {
 
-    fun downloadFile(key: GCKey, userId: String, fileId: String): Single<ByteArray> {
+    override fun downloadFile(key: GCKey, userId: String, fileId: String): Single<ByteArray> {
         return apiService
                 .downloadDocument(alias, userId, fileId)
                 .flatMap { downloadedFile -> cryptoService.decrypt(key, downloadedFile) }
                 .onErrorResumeNext { error -> Single.error(FileException.DownloadFailed(error)) }
     }
 
-    fun uploadFile(key: GCKey, userId: String, data: ByteArray): Single<String> {
+    override fun uploadFile(key: GCKey, userId: String, data: ByteArray): Single<String> {
         return cryptoService
                 .encrypt(key, data)
                 .flatMap { encryptedData -> apiService.uploadDocument(alias, userId, encryptedData) }
                 .onErrorResumeNext { error -> Single.error(FileException.UploadFailed(error)) }
     }
 
-    fun deleteFile(userId: String, fileId: String): Single<Boolean> {
+    override fun deleteFile(userId: String, fileId: String): Single<Boolean> {
         return apiService.deleteDocument(alias, userId, fileId)
     }
 }

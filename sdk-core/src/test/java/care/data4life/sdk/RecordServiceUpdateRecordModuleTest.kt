@@ -18,8 +18,8 @@ package care.data4life.sdk
 
 
 import care.data4life.crypto.GCKey
+import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.AttachmentService
-import care.data4life.sdk.attachment.FileService
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.config.DataRestrictionException
@@ -81,7 +81,7 @@ class RecordServiceUpdateRecordModuleTest {
     private lateinit var flowHelper: RecordServiceModuleTestFlowHelper
     private val apiService: ApiService = mockk()
     private lateinit var cryptoService: CryptoContract.Service
-    private val fileService: FileService = mockk()
+    private val fileService: AttachmentContract.FileService = mockk()
     private val imageResizer: ImageResizer = mockk()
     private val errorHandler: D4LErrorHandler = mockk()
 

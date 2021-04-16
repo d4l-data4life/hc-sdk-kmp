@@ -17,7 +17,7 @@
 package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.attachment.FileService
+import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.network.model.CommonKeyResponse
@@ -38,7 +38,7 @@ import javax.xml.bind.DatatypeConverter
 
 class RecordServiceModuleTestFlowHelper(
     private val apiService: ApiService,
-    private val fileService: FileService,
+    private val fileService: AttachmentContract.FileService,
     private val imageResizer: ImageResizer
 ) {
     private val mdHandle = MessageDigest.getInstance("MD5")

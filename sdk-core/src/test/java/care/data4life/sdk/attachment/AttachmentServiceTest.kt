@@ -18,7 +18,6 @@ package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
 import care.data4life.fhir.stu3.util.FhirDateTimeParser
-import care.data4life.sdk.ImageResizer
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.helpers.stu3.AttachmentBuilder.buildWith
@@ -50,7 +49,7 @@ class AttachmentServiceTest {
     private val attachmentKey = Mockito.mock(GCKey::class.java)
 
     private lateinit var mockFileService: AttachmentContract.FileService
-    private lateinit var mockImageResizer: ImageResizer
+    private lateinit var mockImageResizer: AttachmentContract.ImageResizer
     private lateinit var attachment: WrapperContract.Attachment
 
     private lateinit var attachmentService: AttachmentService
@@ -60,7 +59,7 @@ class AttachmentServiceTest {
     fun setUp() {
         attachment = SdkAttachmentFactory.wrap(buildWith(TITLE, creationDate, CONTENT_TYPE, pdf))
         mockFileService = Mockito.mock(FileService::class.java)
-        mockImageResizer = Mockito.mock(ImageResizer::class.java)
+        mockImageResizer = Mockito.mock(AttachmentContract.ImageResizer::class.java)
         attachmentService = AttachmentService(mockFileService, mockImageResizer)
     }
 

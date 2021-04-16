@@ -17,7 +17,7 @@ package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.ApiService
-import care.data4life.sdk.CryptoService
+import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.lang.FileException
 import io.reactivex.Single
 
@@ -25,7 +25,7 @@ import io.reactivex.Single
 class FileService(
         private val alias: String,
         private val apiService: ApiService,
-        private val cryptoService: CryptoService
+        private val cryptoService: CryptoContract.Service
 ) : AttachmentContract.FileService {
 
     override fun downloadFile(key: GCKey, userId: String, fileId: String): Single<ByteArray> {

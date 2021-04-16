@@ -16,7 +16,9 @@
 package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.ImageResizer
+import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_JPEG_QUALITY_PERCENT
+import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_PREVIEW_SIZE_PX
+import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_THUMBNAIL_SIZE_PX
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.lang.ImageResizeException
@@ -33,7 +35,7 @@ import java.util.*
 class AttachmentService internal constructor(
         private val fileService: AttachmentContract.FileService,
         // TODO move imageResizer to thumbnail service
-        private val imageResizer: ImageResizer
+        private val imageResizer: AttachmentContract.ImageResizer
 ) : AttachmentContract.Service {
     override fun upload(
             attachments: List<WrapperContract.Attachment>,
@@ -114,7 +116,7 @@ class AttachmentService internal constructor(
                         userId,
                         attachment,
                         originalData,
-                        if (position == POSITION_PREVIEW) ImageResizer.DEFAULT_PREVIEW_SIZE_PX else ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX
+                        if (position == POSITION_PREVIEW) DEFAULT_PREVIEW_SIZE_PX else DEFAULT_THUMBNAIL_SIZE_PX
                 )
                 if (downscaledId != null)
                     additionalIds.add(downscaledId)
@@ -132,7 +134,11 @@ class AttachmentService internal constructor(
             targetHeight: Int
     ): String? {
         val downscaledImage = try {
-            imageResizer.resizeToHeight(originalData, targetHeight, ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT)
+            imageResizer.resizeToHeight(
+                originalData,
+                targetHeight,
+                DEFAULT_JPEG_QUALITY_PERCENT
+            )
         } catch (exception: ImageResizeException.JpegWriterMissing) {
             Log.error(exception, exception.message)
             return null

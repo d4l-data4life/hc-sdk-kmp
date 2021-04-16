@@ -69,7 +69,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
     private val apiService: ApiService = mockk()
     private lateinit var cryptoService: CryptoContract.Service
     private val fileService: AttachmentContract.FileService = mockk()
-    private val imageResizer: ImageResizer = mockk()
+    private val imageResizer: AttachmentContract.ImageResizer = mockk()
     private val errorHandler: D4LErrorHandler = mockk()
 
     @Before

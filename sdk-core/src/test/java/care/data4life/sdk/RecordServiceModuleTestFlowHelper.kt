@@ -18,6 +18,9 @@ package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.AttachmentContract
+import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_JPEG_QUALITY_PERCENT
+import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_PREVIEW_SIZE_PX
+import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_THUMBNAIL_SIZE_PX
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.network.model.CommonKeyResponse
@@ -39,7 +42,7 @@ import javax.xml.bind.DatatypeConverter
 class RecordServiceModuleTestFlowHelper(
     private val apiService: ApiService,
     private val fileService: AttachmentContract.FileService,
-    private val imageResizer: ImageResizer
+    private val imageResizer: AttachmentContract.ImageResizer
 ) {
     private val mdHandle = MessageDigest.getInstance("MD5")
 
@@ -143,7 +146,7 @@ class RecordServiceModuleTestFlowHelper(
                 data,
                 resizedImages.first.first,
                 resizedImages.first.second,
-                ImageResizer.DEFAULT_PREVIEW_SIZE_PX,
+                DEFAULT_PREVIEW_SIZE_PX,
                 userId,
                 attachmentKey
             )
@@ -153,7 +156,7 @@ class RecordServiceModuleTestFlowHelper(
                     data,
                     resizedImages.second!!.first,
                     resizedImages.second!!.second,
-                    ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX,
+                    DEFAULT_THUMBNAIL_SIZE_PX,
                     userId,
                     attachmentKey
                 )
@@ -162,7 +165,7 @@ class RecordServiceModuleTestFlowHelper(
                     data,
                     null,
                     null,
-                    ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX,
+                    DEFAULT_THUMBNAIL_SIZE_PX,
                     userId,
                     attachmentKey
                 )
@@ -182,7 +185,7 @@ class RecordServiceModuleTestFlowHelper(
             imageResizer.resizeToHeight(
                 data,
                 targetHeight,
-                ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT
+                DEFAULT_JPEG_QUALITY_PERCENT
             )
         } returns resizedImage
 

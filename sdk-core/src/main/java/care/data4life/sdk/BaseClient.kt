@@ -24,26 +24,37 @@ import care.data4life.sdk.fhir.Fhir4RecordClient
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.log.Logger
 
-abstract class BaseClient(
+abstract class BaseClient private constructor(
         protected var alias: String,
         protected var userService: AuthContract.UserService,
         protected var recordService: RecordService,
         protected var handler: CallHandler,
-
-        private val authClient: SdkContract.AuthClient =
-                createAuthClient(alias, userService, handler),
-
-        override val data: SdkContract.DataRecordClient =
-                createDataClient(userService, recordService, handler),
-
-        override val fhir4: SdkContract.Fhir4RecordClient =
-                createFhir4Client(userService, recordService, handler),
-
-        private val legacyDataClient: SdkContract.LegacyDataClient =
-                createLegacyDataClient(userService, recordService, handler)
-
+        private val authClient: SdkContract.AuthClient,
+        override val data: SdkContract.DataRecordClient,
+        override val fhir4: SdkContract.Fhir4RecordClient,
+        private val legacyDataClient: SdkContract.LegacyDataClient,
+        override val userId: String
 ) : SdkContract.Client, SdkContract.LegacyDataClient by legacyDataClient, SdkContract.AuthClient by authClient {
-
+    constructor(
+            alias: String,
+            userService: AuthContract.UserService,
+            recordService: RecordService,
+            handler: CallHandler,
+            authClient: SdkContract.AuthClient = createAuthClient(alias, userService, handler),
+            data: SdkContract.DataRecordClient = createDataClient(userService, recordService, handler),
+            fhir4: SdkContract.Fhir4RecordClient = createFhir4Client(userService, recordService, handler),
+            legacyDataClient: SdkContract.LegacyDataClient = createLegacyDataClient(userService, recordService, handler)
+    ) : this(
+            alias,
+            userService,
+            recordService,
+            handler,
+            authClient,
+            data,
+            fhir4,
+            legacyDataClient,
+            userService.userID.blockingGet()
+    )
 
     companion object {
 

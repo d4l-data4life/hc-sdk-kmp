@@ -29,6 +29,7 @@ import care.data4life.sdk.listener.ResultListener as LegacyListener
 interface SdkContract {
 
     interface Client {
+        val userId: String
 
         val data: DataRecordClient
 

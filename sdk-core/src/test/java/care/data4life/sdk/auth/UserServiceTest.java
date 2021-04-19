@@ -207,7 +207,7 @@ public class UserServiceTest {
         when(storage.getSecret(USER_ALIAS + "_" + KEY_USER_ID, String.class)).thenReturn(uid);
 
         // when
-        TestObserver<String> testObserver = userService.getUID().test();
+        TestObserver<String> testObserver = userService.getUserID().test();
 
         // then
         testObserver

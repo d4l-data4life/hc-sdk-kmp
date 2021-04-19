@@ -32,35 +32,35 @@ internal class DataRecordClient(
 
     override fun create(resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>): Task {
         val operation = userService.finishLogin(true)
-                .flatMap { userService.uID }
+                .flatMap { userService.userID }
                 .flatMap { uid -> recordService.createRecord(uid, resource, annotations) }
         return handler.executeSingle(operation, callback)
     }
 
     override fun update(recordId: String, resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>): Task {
         val operation = userService.finishLogin(true)
-                .flatMap { userService.uID }
+                .flatMap { userService.userID }
                 .flatMap { uid -> recordService.updateRecord(uid, recordId, resource, annotations) }
         return handler.executeSingle(operation, callback)
     }
 
     override fun delete(recordId: String, callback: Callback<Boolean>): Task {
         val operation = userService.finishLogin(true)
-                .flatMap { userService.uID }
+                .flatMap { userService.userID }
                 .flatMap { uid -> recordService.deleteRecord(uid, recordId).toSingle { true } }
         return handler.executeSingle(operation, callback)
     }
 
     override fun fetch(recordId: String, callback: Callback<DataRecord<DataResource>>): Task {
         val operation = userService.finishLogin(true)
-                .flatMap { userService.uID }
+                .flatMap { userService.userID }
                 .flatMap { uid -> recordService.fetchDataRecord(uid, recordId) }
         return handler.executeSingle(operation, callback)
     }
 
     override fun search(annotations: List<String>, startDate: LocalDate?, endDate: LocalDate?, pageSize: Int, offset: Int, callback: Callback<List<DataRecord<DataResource>>>): Task {
         val operation = userService.finishLogin(true)
-                .flatMap { userService.uID }
+                .flatMap { userService.userID }
                 .flatMap { uid ->
                     recordService.fetchDataRecords(
                             uid,

@@ -28,6 +28,7 @@ import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.test.util.TestSchedulerRule;
 import io.reactivex.Single;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,6 +36,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class Data4LifeClientTest {
 
@@ -62,6 +64,8 @@ public class Data4LifeClientTest {
         errorHandler = mock(SdkContract.ErrorHandler.class);
         callHandler = mock(CallHandler.class);
 
+        when(userService.getUserID()).thenReturn(Single.just("uid"));
+
 
         instance = new Data4LifeClient(
                 ALIAS,
@@ -71,6 +75,11 @@ public class Data4LifeClientTest {
                 recordService,
                 callHandler
         );
+    }
+
+    @Test
+    public void hasUserId() {
+        assertThat(instance.getUserId()).isEqualTo("uid");
     }
 
     @Test

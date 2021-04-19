@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.fhir
 
-import care.data4life.sdk.auth.UserService
+import care.data4life.sdk.auth.AuthContract
 import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.call.Callback
 import care.data4life.sdk.call.Task
@@ -33,7 +33,7 @@ class FhirRecordClientTest {
     @Test
     fun `Given count is called, with a resourceType, Annotations and a Callback it returns its Task`() {
         // Given
-        val userService: UserService = mockk()
+        val userService: AuthContract.UserService = mockk()
         val recordService: RecordContract.Service = mockk()
         val callHandler: CallHandler = mockk()
         val client = Fhir4RecordClient(

@@ -17,7 +17,7 @@
 package care.data4life.sdk.fhir
 
 import care.data4life.sdk.SdkContract
-import care.data4life.sdk.auth.UserService
+import care.data4life.sdk.auth.AuthContract
 import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.call.Callback
 import care.data4life.sdk.call.Fhir4Record
@@ -26,7 +26,7 @@ import care.data4life.sdk.record.RecordContract
 import org.threeten.bp.LocalDate
 
 internal class Fhir4RecordClient(
-        private val userService: UserService,
+        private val userService: AuthContract.UserService,
         private val recordService: RecordContract.Service,
         private val handler: CallHandler
 ) : SdkContract.Fhir4RecordClient {

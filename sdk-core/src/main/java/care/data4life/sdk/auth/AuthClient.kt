@@ -23,7 +23,7 @@ import care.data4life.sdk.listener.ResultListener
 
 class AuthClient(
         private val alias: String,
-        private val userService: UserService,
+        private val userService: AuthContract.UserService,
         private val handler: CallHandler
 ) : AuthContract.Client {
 

@@ -16,6 +16,7 @@
 package care.data4life.sdk
 
 import care.data4life.sdk.auth.AuthClient
+import care.data4life.sdk.auth.AuthContract
 import care.data4life.sdk.auth.UserService
 import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.data.DataRecordClient
@@ -25,7 +26,7 @@ import care.data4life.sdk.log.Logger
 
 abstract class BaseClient(
         protected var alias: String,
-        protected var userService: UserService,
+        protected var userService: AuthContract.UserService,
         protected var recordService: RecordService,
         protected var handler: CallHandler,
 
@@ -48,14 +49,14 @@ abstract class BaseClient(
 
         fun createAuthClient(
                 alias: String,
-                userService: UserService,
+                userService: AuthContract.UserService,
                 handler: CallHandler
         ): SdkContract.AuthClient {
             return AuthClient(alias, userService, handler)
         }
 
         fun createDataClient(
-                userService: UserService,
+                userService: AuthContract.UserService,
                 recordService: RecordService,
                 handler: CallHandler
         ): SdkContract.DataRecordClient {
@@ -63,7 +64,7 @@ abstract class BaseClient(
         }
 
         fun createFhir4Client(
-                userService: UserService,
+                userService: AuthContract.UserService,
                 recordService: RecordService,
                 handler: CallHandler
         ): SdkContract.Fhir4RecordClient {
@@ -72,11 +73,11 @@ abstract class BaseClient(
 
 
         fun createLegacyDataClient(
-                userService: UserService,
+                userService: AuthContract.UserService,
                 recordService: RecordService,
                 handler: CallHandler
         ): SdkContract.LegacyDataClient {
-            return LegacyDataClient(userService, recordService, handler)
+            return LegacyDataClient(userService as UserService, recordService, handler)
         }
 
 

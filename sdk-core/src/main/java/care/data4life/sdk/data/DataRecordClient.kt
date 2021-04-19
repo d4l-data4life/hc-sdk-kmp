@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.data
 
-import care.data4life.sdk.auth.UserService
+import care.data4life.sdk.auth.AuthContract
 import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.call.Callback
 import care.data4life.sdk.call.DataRecord
@@ -24,9 +24,8 @@ import care.data4life.sdk.call.Task
 import care.data4life.sdk.record.RecordContract
 import org.threeten.bp.LocalDate
 
-
 internal class DataRecordClient(
-        private val userService: UserService,
+        private val userService: AuthContract.UserService,
         private val recordService: RecordContract.Service,
         private val handler: CallHandler
 ) : DataContract.Client {

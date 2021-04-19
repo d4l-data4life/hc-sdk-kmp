@@ -19,6 +19,7 @@ package care.data4life.sdk
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.AttachmentService
+import care.data4life.sdk.attachment.FileService
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.fhir.Fhir3Identifier
 import care.data4life.sdk.fhir.FhirService
@@ -43,6 +44,7 @@ import care.data4life.sdk.test.util.GenericTestDataProvider.UPDATE_DATE
 import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.test.util.TestResourceHelper
 import care.data4life.sdk.util.Base64
+import care.data4life.sdk.util.HashUtil
 import care.data4life.sdk.wrapper.SdkFhirParser
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -68,7 +70,6 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
     private lateinit var flowHelper: RecordServiceModuleTestFlowHelper
     private val apiService: ApiService = mockk()
     private lateinit var cryptoService: CryptoContract.Service
-    private val fileService: AttachmentContract.FileService = mockk()
     private val imageResizer: AttachmentContract.ImageResizer = mockk()
     private val errorHandler: D4LErrorHandler = mockk()
 
@@ -86,7 +87,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
             TaggingService(CLIENT_ID),
             FhirService(cryptoService),
             AttachmentService(
-                fileService,
+                FileService(ALIAS, apiService, cryptoService),
                 imageResizer
             ),
             cryptoService,
@@ -95,7 +96,6 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
 
         flowHelper = RecordServiceModuleTestFlowHelper(
             apiService,
-            fileService,
             imageResizer
         )
     }
@@ -151,20 +151,20 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
             encryptedAttachmentKey = attachmentKey.second,
             tagEncryptionKey = tagEncryptionKey,
             tagEncryptionKeyCalls = 1,
-            resources = listOf(serializedResource),
+            resources = listOf(serializedResource, String(rawAttachment)),
             tags = encodedTags,
             annotations = encodedAnnotations,
             hashFunction = { value -> flowHelper.md5(value) }
         )
 
-        var hadAnswered = false
+        var answeredRecord = false
 
         // Get resource kicks off the flow
         every {
             apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
         } answers {
-            if (!hadAnswered) {
-                hadAnswered = true
+            if (!answeredRecord) {
+                answeredRecord = true
                 (cryptoService as CryptoServiceFake).iteration = receivedIteration
                 Single.just(encryptedRecord)
             } else {
@@ -173,14 +173,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
         }
 
         // Get attachment
-        every {
-            fileService.downloadFile(
-                attachmentKey.first,
-                USER_ID,
-                attachmentId
-            )
-        } returns Single.just(rawAttachment)
-
+        flowHelper.downloadAttachment(userId, alias, Pair(rawAttachment, attachmentId))
     }
 
     // Attachments
@@ -223,6 +216,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
 
         internalResource.content[0].attachment.id = ATTACHMENT_ID
         internalResource.content[0].attachment.data = null
+        internalResource.content[0].attachment.hash = Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
 
         runAttachmentDownloadFlow(
             serializedResource = SdkFhirParser.fromResource(internalResource)!!,
@@ -241,8 +235,8 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
 
         // Then
         assertEquals(
-            actual = result.data,
-            expected = attachment
+            actual = Base64.decodeToString(result.data!!),
+            expected = String(rawAttachment)
         )
     }
 
@@ -285,6 +279,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
 
         internalResource.content[0].attachment.id = ATTACHMENT_ID
         internalResource.content[0].attachment.data = null
+        internalResource.content[0].attachment.hash = Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
 
         runAttachmentDownloadFlow(
             serializedResource = SdkFhirParser.fromResource(internalResource)!!,
@@ -319,7 +314,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
         )
 
         val rawAttachment = TestResourceHelper.getByteResource("attachments", "sample.pdf")
-        val attachment = Base64.encodeToString(rawAttachment)
+        val attachment = Base64.encodeToString(String(rawAttachment))
 
         val template = TestResourceHelper.loadTemplateWithAttachments(
             "common",
@@ -349,6 +344,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
         )
 
         resource.content[0].attachment.id = ATTACHMENT_ID
+        resource.content[0].attachment.hash = Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
 
         internalResource.identifier!!.add(
             Fhir3Identifier().also {
@@ -359,6 +355,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
 
         internalResource.content[0].attachment.id = ATTACHMENT_ID
         internalResource.content[0].attachment.data = null
+        internalResource.content[0].attachment.hash = Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
 
         runAttachmentDownloadFlow(
             serializedResource = SdkFhirParser.fromResource(internalResource)!!,

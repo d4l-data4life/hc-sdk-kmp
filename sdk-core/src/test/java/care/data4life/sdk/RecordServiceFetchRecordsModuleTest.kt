@@ -99,7 +99,6 @@ class RecordServiceFetchRecordsModuleTest {
 
         flowHelper = RecordServiceModuleTestFlowHelper(
             apiService,
-            fileService,
             imageResizer
         )
     }

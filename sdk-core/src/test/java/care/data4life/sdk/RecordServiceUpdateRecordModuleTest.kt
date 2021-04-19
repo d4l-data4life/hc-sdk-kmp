@@ -20,6 +20,7 @@ package care.data4life.sdk
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.AttachmentService
+import care.data4life.sdk.attachment.FileService
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.config.DataRestrictionException
@@ -81,7 +82,6 @@ class RecordServiceUpdateRecordModuleTest {
     private lateinit var flowHelper: RecordServiceModuleTestFlowHelper
     private val apiService: ApiService = mockk()
     private lateinit var cryptoService: CryptoContract.Service
-    private val fileService: AttachmentContract.FileService = mockk()
     private val imageResizer: AttachmentContract.ImageResizer = mockk()
     private val errorHandler: D4LErrorHandler = mockk()
 
@@ -99,7 +99,7 @@ class RecordServiceUpdateRecordModuleTest {
             TaggingService(CLIENT_ID),
             FhirService(cryptoService),
             AttachmentService(
-                fileService,
+                FileService(ALIAS, apiService, cryptoService),
                 imageResizer
             ),
             cryptoService,
@@ -108,7 +108,6 @@ class RecordServiceUpdateRecordModuleTest {
 
         flowHelper = RecordServiceModuleTestFlowHelper(
             apiService,
-            fileService,
             imageResizer
         )
     }
@@ -158,7 +157,8 @@ class RecordServiceUpdateRecordModuleTest {
         tagEncryptionKey: GCKey,
         userId: String,
         alias: String,
-        recordId: String
+        recordId: String,
+        attachments: List<String>? = null
     ) {
         val encryptedCommonKey = flowHelper.prepareStoredOrUnstoredCommonKeyRun(
             alias,
@@ -167,11 +167,12 @@ class RecordServiceUpdateRecordModuleTest {
             useStoredCommonKey
         )
 
-        val keyOrder = if (attachmentKey is Pair<*, *>) {
-            listOf(dataKey.first, attachmentKey.first)
-        } else {
-            listOf(dataKey.first)
-        }
+        val keyOrder = flowHelper.makeKeyOrder(dataKey, attachmentKey)
+
+        val resources = flowHelper.packResources(
+                listOf(serializedResourceOld, serializedResourceNew),
+                attachments
+        )
 
         val uploadIteration = CryptoServiceIteration(
             gcKeyOrder = keyOrder,
@@ -186,7 +187,7 @@ class RecordServiceUpdateRecordModuleTest {
             encryptedAttachmentKey = attachmentKey?.second,
             tagEncryptionKey = tagEncryptionKey,
             tagEncryptionKeyCalls = 2,
-            resources = listOf(serializedResourceOld, serializedResourceNew),
+            resources = resources,
             tags = tags,
             annotations = annotations,
             hashFunction = { value -> flowHelper.md5(value) }
@@ -349,6 +350,8 @@ class RecordServiceUpdateRecordModuleTest {
             updateDates.second
         )
 
+        val mappedAttachments = flowHelper.mapAttachments(attachmentData, resizedImages)
+
         runFlow(
             encryptedUploadRecord,
             encryptedReceivedRecord,
@@ -363,11 +366,12 @@ class RecordServiceUpdateRecordModuleTest {
             tagEncryptionKey,
             userId,
             alias,
-            recordId
+            recordId,
+            mappedAttachments
         )
 
         flowHelper.uploadAttachment(
-            attachmentKey = attachmentKey.first,
+            alias = alias,
             payload = Pair(attachmentData, attachmentId),
             userId = userId,
             resized = resizedImages

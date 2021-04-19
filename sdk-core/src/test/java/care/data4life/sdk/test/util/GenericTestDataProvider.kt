@@ -45,6 +45,10 @@ object GenericTestDataProvider {
 
     val PDF_OVERSIZED_ENCODED = Base64.encodeToString(PDF_OVERSIZED)
 
+    val PREVIEW = "preview".toByteArray()
+
+    val THUMBNAIL = "thumbnail".toByteArray()
+
     const val RECORD_ID = "recordId"
 
     const val RECORD_ID_COMPATIBILITY = "otherRecordId"

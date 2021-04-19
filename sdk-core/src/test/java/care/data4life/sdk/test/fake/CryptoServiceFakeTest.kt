@@ -67,7 +67,7 @@ class CryptoServiceFakeTest {
     }
 
     @Test
-    fun `Given, a CryptoServiceIteration is set and encrypt is called, it fails, if the key does not match the Iterations dataKey`() {
+    fun `Given, a CryptoServiceIteration is set and encrypt is called, it fails, if the key does not match the Iterations dataKey or attachmentKey`() {
         // Given
         val resource = "Just a test"
 
@@ -88,7 +88,7 @@ class CryptoServiceFakeTest {
     }
 
     @Test
-    fun `Given, a CryptoServiceIteration is set and encrypt is called, it fails, if the data does not match the Iterations resource`() {
+    fun `Given, a CryptoServiceIteration is set and encrypt is called, it fails, if the data does not match the Iterations resources`() {
         // Given
         val dataKey: GCKey = mockk()
 
@@ -110,7 +110,7 @@ class CryptoServiceFakeTest {
     }
 
     @Test
-    fun `Given, a CryptoServiceIteration is set and encrypt is called, it returns the encrypted resource, while using the hash function of the Iteration`() {
+    fun `Given, a CryptoServiceIteration is set and encrypt is called, with a resource and the dataKey, it returns the encrypted resource, while using the hash function of the Iteration`() {
         // Given
         val dataKey: GCKey = mockk()
         val resource = "Just a test"
@@ -135,7 +135,33 @@ class CryptoServiceFakeTest {
     }
 
     @Test
-    fun `Given, a CryptoServiceIteration is set and decrypt is called, it fails, if the key does not match the Iterations dataKey`() {
+    fun `Given, a CryptoServiceIteration is set and encrypt is called, with a resource and the attachmentKey, it returns the encrypted resource, while using the hash function of the Iteration`() {
+        // Given
+        val attachmentKey: GCKey = mockk()
+        val resource = "Just a test"
+        val hashedResource = "Jo"
+
+        val hash = { _: String -> hashedResource }
+
+        every { iteration.dataKey } returns mockk()
+        every { iteration.attachmentKey } returns attachmentKey
+        every { iteration.resources } returns listOf(resource)
+        every { iteration.hashFunction } returns hash
+
+        // When
+        fake.iteration = iteration
+
+        val actual = fake.encrypt(
+                attachmentKey,
+                resource.toByteArray()
+        ).blockingGet()
+
+        // Then
+        assertTrue(actual!!.contentEquals(hashedResource.toByteArray()))
+    }
+
+    @Test
+    fun `Given, a CryptoServiceIteration is set and decrypt is called, it fails, if the key does not match the Iterations dataKey or attachmentKey`() {
         // Given
         val resource = "Just a test"
 
@@ -182,7 +208,7 @@ class CryptoServiceFakeTest {
     }
 
     @Test
-    fun `Given, a CryptoServiceIteration is set and decrypt is called, it returns the Iterations resource`() {
+    fun `Given, a CryptoServiceIteration is set and decrypt is called, with the dataKey and the encrypted resource, it returns the Iterations resource`() {
         // Given
         val dataKey: GCKey = mockk()
         val resource = "Just a test"
@@ -200,6 +226,32 @@ class CryptoServiceFakeTest {
         val actual = fake.decrypt(
             dataKey,
             hashedResource.toByteArray()
+        ).blockingGet()
+
+        // Then
+        assertTrue(actual!!.contentEquals(resource.toByteArray()))
+    }
+
+    @Test
+    fun `Given, a CryptoServiceIteration is set and decrypt is called, with the attachmentKey and the encrypted resource, it returns the Iterations resource`() {
+        // Given
+        val attachmentKey: GCKey = mockk()
+        val resource = "Just a test"
+        val hashedResource = "Jo"
+
+        val hash = { _: String -> hashedResource }
+
+        every { iteration.dataKey } returns mockk()
+        every { iteration.attachmentKey } returns attachmentKey
+        every { iteration.resources } returns listOf(resource)
+        every { iteration.hashFunction } returns hash
+
+        // When
+        fake.iteration = iteration
+
+        val actual = fake.decrypt(
+                attachmentKey,
+                hashedResource.toByteArray()
         ).blockingGet()
 
         // Then

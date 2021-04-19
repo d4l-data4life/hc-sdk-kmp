@@ -16,6 +16,10 @@
 
 package care.data4life.sdk.test.util
 
+import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
+import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
+import care.data4life.sdk.fhir.Fhir3Attachment
+import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.util.Base64
 import care.data4life.sdk.util.HashUtil
 import java.nio.charset.StandardCharsets
@@ -81,4 +85,48 @@ object TestResourceHelper {
     private fun getValidHash(
             data: String
     ): String = Base64.encodeToString(HashUtil.sha1(Base64.decode(data)))
+
+    private fun buildDocRefContentFhir3(attachment: Fhir3Attachment): Fhir3DocumentReference.DocumentReferenceContent {
+        return Fhir3DocumentReference.DocumentReferenceContent(attachment)
+    }
+
+    fun buildDocumentReferenceFhir3(): Fhir3DocumentReference {
+        val content = buildDocRefContentFhir3(
+                TestAttachmentHelper.buildFhir3Attachment(
+                        null,
+                        GenericTestDataProvider.DATA_PAYLOAD,
+                        GenericTestDataProvider.DATA_SIZE,
+                        GenericTestDataProvider.DATA_HASH
+                )
+        )
+        val contents: MutableList<Fhir3DocumentReference.DocumentReferenceContent> = mutableListOf()
+        contents.add(content)
+        return Fhir3DocumentReference(
+                null,
+                null,
+                null,
+                contents
+        )
+    }
+
+    fun buildDocRefContentFhir4(attachment: Fhir4Attachment): Fhir4DocumentReference.DocumentReferenceContent {
+        return Fhir4DocumentReference.DocumentReferenceContent(attachment)
+    }
+
+    fun buildDocumentReferenceFhir4(): Fhir4DocumentReference {
+        val content = buildDocRefContentFhir4(
+                TestAttachmentHelper.buildFhir4Attachment(
+                        null,
+                        GenericTestDataProvider.DATA_PAYLOAD,
+                        GenericTestDataProvider.DATA_SIZE,
+                        GenericTestDataProvider.DATA_HASH
+                )
+        )
+        val contents: MutableList<Fhir4DocumentReference.DocumentReferenceContent> = mutableListOf()
+        contents.add(content)
+        return Fhir4DocumentReference(
+                null,
+                contents
+        )
+    }
 }

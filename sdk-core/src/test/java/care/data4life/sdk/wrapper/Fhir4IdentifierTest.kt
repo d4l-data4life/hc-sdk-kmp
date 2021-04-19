@@ -18,14 +18,14 @@ package care.data4life.sdk.wrapper
 
 
 import care.data4life.sdk.fhir.Fhir4Identifier
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertSame
-import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
 
 class Fhir4IdentifierTest {
     @Test
-    fun `it is a Identifier`() {
+    fun `It fulfils Identifier`() {
         val wrapper: Any = SdkFhir4Identifier(Fhir4Identifier())
         assertTrue(wrapper is WrapperContract.Identifier)
     }
@@ -66,7 +66,6 @@ class Fhir4IdentifierTest {
     @Test
     fun `Given, unwrap is called, it returns its a wrapped Fhir4Identifier`() {
         // Given
-        val value = "potato"
         val fhir4Identifier = Fhir4Identifier()
 
         assertSame(

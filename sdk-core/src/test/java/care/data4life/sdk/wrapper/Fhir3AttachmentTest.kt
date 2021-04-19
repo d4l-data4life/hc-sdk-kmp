@@ -16,15 +16,15 @@
 
 package care.data4life.sdk.wrapper
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertSame
-import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
 import care.data4life.fhir.stu3.model.Attachment as Fhir3Attachment
 
 class Fhir3AttachmentTest {
     @Test
-    fun `it is a Attachment`() {
+    fun `It fulfils Attachment`() {
         val wrapper: Any = SdkFhir3Attachment(Fhir3Attachment())
         assertTrue(wrapper is WrapperContract.Attachment)
     }

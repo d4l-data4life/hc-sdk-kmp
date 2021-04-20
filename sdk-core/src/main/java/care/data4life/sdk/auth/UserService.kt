@@ -22,6 +22,7 @@ import care.data4life.sdk.CryptoSecureStore
 import care.data4life.sdk.CryptoService
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.network.model.UserInfo
+import care.data4life.sdk.network.model.VersionList
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -73,5 +74,14 @@ class UserService(
 
     override fun getSessionToken(alias: String): Single<String> {
         return Single.fromCallable { authService.refreshAccessToken(alias) }
+    }
+
+    fun getVersionInfo(currentVersion: String): Single<Boolean> {
+        return Single.just(currentVersion)
+                .flatMap { apiService.fetchVersionInfo() }
+                .map { versionInfo: VersionList -> versionInfo.isSupported(currentVersion) }
+                .doOnError { throwable: Throwable -> Log.error(throwable, "Version not supported") }
+                .onErrorReturnItem(true)
+
     }
 }

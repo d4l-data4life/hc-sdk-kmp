@@ -156,7 +156,6 @@ public final class Data4LifeClient extends BaseClient {
     @SuppressWarnings("ConstantConditions")
     public boolean finishLogin(String url) throws Throwable {
         boolean authorized = authorizationService.finishAuthorization(getAlias(), url);
-
         if (!authorized) {
             throw (Throwable) new AuthorizationException.FailedToLogin();
         }

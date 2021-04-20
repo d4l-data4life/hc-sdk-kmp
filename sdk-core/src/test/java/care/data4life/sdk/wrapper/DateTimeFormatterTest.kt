@@ -46,8 +46,9 @@ class DateTimeFormatterTest {
     }
 
     @Test
-    fun `it fulfills DateTimeFormatter`() {
-        assertTrue((SdkDateTimeFormatter as Any) is WrapperContract.DateTimeFormatter)
+    fun `It fulfills DateTimeFormatter`() {
+        val formatter: Any = SdkDateTimeFormatter
+        assertTrue(formatter is WrapperContract.DateTimeFormatter)
     }
 
     @Test
@@ -82,7 +83,6 @@ class DateTimeFormatterTest {
         )
 
         verify(exactly = 1) { LocalDate.now(SdkDateTimeFormatter.UTC_ZONE_ID) }
-
     }
 
     @Test

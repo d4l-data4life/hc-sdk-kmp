@@ -16,27 +16,65 @@
 
 package care.data4life.sdk.tag
 
-import java.util.*
+
+import care.data4life.crypto.GCKey
+import care.data4life.sdk.lang.D4LException
+import care.data4life.sdk.migration.Migration
+import java.io.IOException
+
+typealias Tags = HashMap<String, String>
+typealias Annotations = List<String>
 
 class TaggingContract {
 
     interface Service {
-        fun appendDefaultTags(
-                resource: Any,
-                oldTags: HashMap<String, String>?
-        ): HashMap<String, String>
+        fun appendDefaultTags(resource: Any, oldTags: Tags?): Tags
 
-        fun getTagFromType(
-                resourceType: Class<Any>?
-        ): HashMap<String, String>
-
+        fun getTagsFromType(resourceType: Class<out Any>): Tags
     }
 
     interface EncryptionService {
+        fun encryptTagsAndAnnotations(
+            tags: Tags,
+            annotations: Annotations,
+            tagEncryptionKey: GCKey? = null
+        ): List<String>
 
+        fun decryptTagsAndAnnotations(encryptedTagsAndAnnotations: List<String>): Pair<Tags, Annotations>
+
+        @Throws(IOException::class)
+        @Migration("This method should only be used for migration purpose.")
+        fun encryptList(
+                plainList: List<String>,
+                encryptionKey: GCKey,
+                prefix: String = ""
+        ): MutableList<String>
     }
 
     interface Helper {
+        fun convertToTagMap(tagList: List<String>): HashMap<String, String>
 
+        @Throws(D4LException::class)
+        fun encode(tag: String): String
+
+        @Throws(D4LException::class)
+        @Migration("This method should only be used for migration purpose.")
+        fun normalize(tag: String): String
+
+        fun decode(encodedTag: String): String
+    }
+
+    companion object {
+        const val ANNOTATION_KEY = "custom"
+        const val DELIMITER = "="
+        const val TAG_RESOURCE_TYPE = "resourcetype"
+        const val TAG_CLIENT = "client"
+        const val TAG_UPDATED_BY_CLIENT = "updatedbyclient"
+        const val TAG_PARTNER = "partner"
+        const val TAG_UPDATED_BY_PARTNER = "updatedbypartner"
+        const val TAG_FHIR_VERSION = "fhirversion"
+        const val TAG_APPDATA_KEY = "flag"
+        const val TAG_APPDATA_VALUE = "appdata"
+        const val SEPARATOR = "#"
     }
 }

@@ -30,10 +30,10 @@ import java.security.spec.X509EncodedKeySpec
 import javax.crypto.spec.SecretKeySpec
 
 class KeyFactory(
-        val base64: Base64
-) {
+        private val base64: Base64
+) : CryptoContract.KeyFactory {
 
-    fun createGCKey(exchangeKey: ExchangeKey): GCKey {
+    override fun createGCKey(exchangeKey: ExchangeKey): GCKey {
         val algorithm: GCAESKeyAlgorithm = if (exchangeKey.type === KeyType.TAG_KEY) {
             GCAESKeyAlgorithm.createTagAlgorithm()
         } else {
@@ -49,7 +49,7 @@ class KeyFactory(
     }
 
 
-    fun createGCKeyPair(exchangeKey: ExchangeKey): GCKeyPair {
+    override fun createGCKeyPair(exchangeKey: ExchangeKey): GCKeyPair {
         val algorithm = GCRSAKeyAlgorithm()
         val privateKeyBase64 = exchangeKey.privateKey
         val publicKeyBase64 = exchangeKey.publicKey

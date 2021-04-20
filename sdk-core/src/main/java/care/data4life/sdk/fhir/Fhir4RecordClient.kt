@@ -31,25 +31,30 @@ internal class Fhir4RecordClient(
         private val handler: CallHandler
 ) : SdkContract.Fhir4RecordClient {
 
-    override fun <T : Fhir4Resource> create(resource: T, annotations: List<String>, callback: Callback<Fhir4Record<T>>) {
+    override fun <T : Fhir4Resource> create(resource: T, annotations: List<String>, callback: Callback<Fhir4Record<T>>): Task {
         val operation = userService.finishLogin(true)
                 .flatMap { userService.uID }
                 .flatMap { uid -> recordService.createRecord(uid, resource, annotations) }
-        handler.executeSingle(operation, callback)
+        return handler.executeSingle(operation, callback)
     }
 
-    override fun <T : Fhir4Resource> update(recordId: String, resource: T, annotations: List<String>, callback: Callback<Fhir4Record<T>>) {
+    override fun <T : Fhir4Resource> update(
+            recordId: String,
+            resource: T,
+            annotations: List<String>,
+            callback: Callback<Fhir4Record<T>>
+    ): Task {
         val operation = userService.finishLogin(true)
                 .flatMap { userService.uID }
                 .flatMap { uid -> recordService.updateRecord(uid, recordId, resource, annotations) }
-        handler.executeSingle(operation, callback)
+        return handler.executeSingle(operation, callback)
     }
 
-    override fun delete(recordId: String, callback: Callback<Boolean>) {
+    override fun delete(recordId: String, callback: Callback<Boolean>): Task {
         val operation = userService.finishLogin(true)
                 .flatMap { userService.uID }
                 .flatMap { uid -> recordService.deleteRecord(uid, recordId).toSingle { true } }
-        handler.executeSingle(operation, callback)
+        return handler.executeSingle(operation, callback)
     }
 
     override fun <T : Fhir4Resource> fetch(recordId: String, callback: Callback<Fhir4Record<T>>): Task {
@@ -59,7 +64,14 @@ internal class Fhir4RecordClient(
         return handler.executeSingle(operation, callback)
     }
 
-    override fun <T : Fhir4Resource> search(resourceType: Class<T>, annotations: List<String>, startDate: LocalDate?, endDate: LocalDate?, pageSize: Int, offset: Int, callback: Callback<List<Fhir4Record<T>>>): Task {
+    override fun <T : Fhir4Resource> search(
+            resourceType: Class<T>,
+            annotations: List<String>,
+            startDate: LocalDate?, endDate: LocalDate?,
+            pageSize: Int,
+            offset: Int,
+            callback: Callback<List<Fhir4Record<T>>>
+    ): Task {
         val operation = userService.finishLogin(true)
                 .flatMap { userService.uID }
                 .flatMap { uid ->
@@ -71,6 +83,23 @@ internal class Fhir4RecordClient(
                             endDate,
                             pageSize,
                             offset
+                    )
+                }
+        return handler.executeSingle(operation, callback)
+    }
+
+    override fun <T : Fhir4Resource> count(
+            resourceType: Class<T>,
+            annotations: List<String>,
+            callback: Callback<Int>
+    ): Task {
+        val operation = userService.finishLogin(true)
+                .flatMap { userService.uID }
+                .flatMap { uid ->
+                    recordService.countFhir4Records(
+                            resourceType,
+                            uid,
+                            annotations
                     )
                 }
         return handler.executeSingle(operation, callback)

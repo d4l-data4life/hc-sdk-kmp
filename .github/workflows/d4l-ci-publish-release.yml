@@ -8,7 +8,7 @@ on:
 jobs:
   publish-release:
 
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, macos]
 
     env:
       D4L_CLIENT_CONFIG_ANDROID: ${{ secrets.D4L_CLIENT_CONFIG_ANDROID }}
@@ -25,7 +25,7 @@ jobs:
       - name: Cleanup
         run: ./gradlew clean
       - name: Version
-        run: ./gradlew version
+        run: ./gradlew versionInfo
       - name: Configure project
         run: ./gradlew provideTestConfig
       - name: Build project

@@ -16,7 +16,9 @@
 package care.data4life.sdk.call
 
 import care.data4life.sdk.SdkContract
+import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.TaskException
+import care.data4life.sdk.log.Log
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -26,48 +28,55 @@ import care.data4life.sdk.listener.ResultListener as LegacyListener
 class CallHandler(
         var errorHandler: SdkContract.ErrorHandler
 ) {
+
     fun <T> executeSingle(operation: Single<T>, callback: Callback<T>): Task {
-        val task = Task()
-        val operationHandle = operation
-                .doOnDispose { if (task.isCanceled) callback.onError(errorHandler.handleError(TaskException.CancelException())) }
-                .doFinally { task.finish() }
-                .subscribeOn(Schedulers.io())
-                .subscribe({ t: T -> callback.onSuccess(t) }
-                ) { error ->
-                    if (!task.isActive) return@subscribe
-                    callback.onError(errorHandler.handleError(error))
-                }
-        task.operationHandle = operationHandle
-        return task
+        return Task().also { task ->
+            task.operationHandle = wireTask(
+                    task,
+                    operation,
+                    { callback.onSuccess(it) },
+                    { callback.onError(it) }
+            )
+        }
     }
 
     fun <T> executeSingle(operation: Single<T>, listener: LegacyListener<T>): Task {
-        val task = Task()
-        val operationHandle = operation
-                .doOnDispose { if (task.isCanceled) listener.onError(errorHandler.handleError(TaskException.CancelException())) }
-                .doFinally { task.finish() }
-                .subscribeOn(Schedulers.io())
-                .subscribe({ t: T -> listener.onSuccess(t) }
-                ) { error ->
-                    if (!task.isActive) return@subscribe
-                    listener.onError(errorHandler.handleError(error))
-                }
-        task.operationHandle = operationHandle
-        return task
+        return Task().also { task ->
+            task.operationHandle = wireTask(
+                    task,
+                    operation,
+                    { listener.onSuccess(it) },
+                    { listener.onError(it) }
+            )
+        }
     }
 
     fun executeCompletable(operation: Completable, listener: LegacyCallback): Task {
-        val task = Task()
-        val operationHandle = operation
-                .doOnDispose { if (task.isCanceled) listener.onError(errorHandler.handleError(TaskException.CancelException())) }
-                .doFinally { task.finish() }
-                .subscribeOn(Schedulers.io())
-                .subscribe({ listener.onSuccess() }
-                ) { error ->
-                    if (!task.isActive) return@subscribe
-                    listener.onError(errorHandler.handleError(error))
-                }
-        task.operationHandle = operationHandle
-        return task
+        return Task().also { task ->
+            task.operationHandle = wireTask(
+                    task,
+                    operation.toSingleDefault("Ignore"),
+                    { listener.onSuccess() },
+                    { listener.onError(it) }
+            )
+        }
+    }
+
+
+    private fun <T> wireTask(task: Task, operation: Single<T>, onSuccess: (T) -> Unit, onError: (D4LException) -> Unit) =
+            operation
+                    .doOnDispose { if (task.isCanceled) onError(prepareError(TaskException.CancelException())) }
+                    .doFinally { task.finish() }
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({ t: T -> onSuccess(t) }
+                    ) { error ->
+                        if (!task.isActive) return@subscribe
+                        onError(prepareError(error))
+                    }
+
+    private fun prepareError(error: Throwable): D4LException {
+        val cleanedException = errorHandler.handleError(error)
+        Log.error(cleanedException, cleanedException.message)
+        return cleanedException
     }
 }

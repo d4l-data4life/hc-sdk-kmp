@@ -19,11 +19,25 @@ plugins {
 }
 
 repositories {
-    jcenter()
+    gradlePluginPortal()
+    mavenCentral()
+    maven("https://dl.bintray.com/data4life/maven")
 }
 
 dependencies {
     implementation("com.google.code.gson:gson:2.8.6")
+
+    // dependency check
+    implementation("com.github.ben-manes:gradle-versions-plugin:0.38.0")
+    // download scripts
+    implementation("de.undercouch:gradle-download-task:4.1.1")
+    // publishing.gradle.kts
+    implementation("care.data4life:gradle-git-publish:3.2.0")
+    // quality.gradle.kts
+    implementation("com.diffplug.spotless:spotless-plugin-gradle:5.10.2")
+    implementation("com.pinterest:ktlint:0.40.0")
+    // versioning.gradle.kts
+    implementation("com.palantir.gradle.gitversion:gradle-git-version:0.12.3")
 }
 
 kotlinDslPluginOptions {

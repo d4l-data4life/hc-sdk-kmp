@@ -21,12 +21,14 @@ import com.squareup.moshi.Moshi;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.concurrent.TimeUnit;
 
 import care.data4life.auth.AuthorizationService;
 import care.data4life.sdk.network.Environment;
 import care.data4life.sdk.network.IHCService;
+import care.data4life.sdk.network.model.EncryptedKey;
 import care.data4life.sdk.network.model.EncryptedRecord;
 import care.data4life.sdk.network.model.UserInfo;
 import care.data4life.sdk.test.util.TestSchedulerRule;
@@ -40,7 +42,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
-
+import care.data4life.sdk.network.IHCService;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -105,7 +107,12 @@ public class ApiServiceTest {
     public void fetchToken_shouldReturnToken() {
         // given
         MockWebServer mockWebServer = new MockWebServer();
-        UserInfo userInfo = new UserInfo();
+        UserInfo userInfo = new UserInfo(
+                "abc",
+                Mockito.mock(EncryptedKey.class),
+                null,
+                Mockito.mock(EncryptedKey.class)
+        );
         mockWebServer.enqueue(new MockResponse().setBody(moshi.adapter(UserInfo.class).toJson(userInfo)));
         service = new Retrofit.Builder()
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -154,7 +161,12 @@ public class ApiServiceTest {
     @Test
     public void testNetworkTimeoutShouldRetryRequest() throws Throwable {
         // given
-        UserInfo userInfo = new UserInfo();
+        UserInfo userInfo = new UserInfo(
+                "abc",
+                Mockito.mock(EncryptedKey.class),
+                null,
+                Mockito.mock(EncryptedKey.class)
+        );
         server.enqueue(new MockResponse()
                 .setResponseCode(401)
                 .setBody(moshi.adapter(UserInfo.class).toJson(userInfo)));

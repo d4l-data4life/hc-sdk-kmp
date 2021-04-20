@@ -24,9 +24,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - run: git branch -D ${{ github.head_ref }} || true
-      - name: Reattach head
-        run: git checkout -b ${{ github.head_ref }}
+          ref: ${{ github.head_ref }}
       - name: Start emulator and wait for it
         run: ./script/ci/android/prepare_start_and_wait_for_emulator.sh
       - name: Install Chrome Browser
@@ -34,7 +32,7 @@ jobs:
       - name: Cleanup
         run: ./gradlew clean
       - name: Version
-        run: ./gradlew version
+        run: ./gradlew versionInfo
       - name: Configure project
         run: ./gradlew provideTestConfig
       - name: Build

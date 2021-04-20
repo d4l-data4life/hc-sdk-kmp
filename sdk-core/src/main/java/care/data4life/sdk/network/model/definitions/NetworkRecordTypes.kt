@@ -22,7 +22,7 @@ import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 
 // ToDo -> to contract
-internal interface DecryptedBaseRecord<T> {
+interface DecryptedBaseRecord<T> {
     var identifier: String?
     var resource: T
     var tags: HashMap<String, String>?

@@ -19,8 +19,14 @@ package care.data4life.sdk.wrapper
 import care.data4life.fhir.FhirException
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
+import care.data4life.sdk.model.Meta
+import care.data4life.sdk.model.ModelContract
+import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import org.threeten.bp.LocalDate
 
+// TODO restructure this
 class WrapperContract {
 
     interface Attachment {
@@ -41,13 +47,14 @@ class WrapperContract {
         @Throws(CoreRuntimeException.InternalFailure::class)
         fun getFhirTypeForClass(resourceType: Class<out Any>): String?
 
+        fun resolveFhirVersion(resourceType: Class<out Any>): FhirContract.FhirVersion
+
         fun getFhir3ClassForType(resourceType: String): Class<out Fhir3Resource>?
 
         fun getFhir4ClassForType(resourceType: String): Class<out Fhir4Resource>?
     }
 
     interface FhirParser {
-
         @Throws(FhirException::class)
         fun toFhir3(resourceType: String, source: String): Fhir3Resource?
 
@@ -56,5 +63,16 @@ class WrapperContract {
 
         @Throws(FhirException::class)
         fun fromResource(resource: Any): String?
+    }
+
+    internal interface DateTimeFormatter {
+        fun now(): String
+        fun formatDate(dateTime: LocalDate): String
+        fun buildMeta(record: DecryptedBaseRecord<*>): ModelContract.Meta
+
+        companion object {
+            const val DATE_FORMAT = "yyyy-MM-dd"
+            const val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss[.SSS]"
+        }
     }
 }

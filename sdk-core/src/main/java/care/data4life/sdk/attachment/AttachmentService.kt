@@ -108,7 +108,7 @@ class AttachmentService internal constructor(
         if (imageResizer.isResizable(originalData)) {
             additionalIds = ArrayList()
             var downscaledId: String?
-            for (position in 0..1) {
+            for (position in 0..1) {// TODO: Remove the loop
                 downscaledId = resizeAndUpload(
                         attachmentsKey,
                         userId,

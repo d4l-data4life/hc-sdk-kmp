@@ -17,12 +17,17 @@ package care.data4life.sdk.call
 
 import care.data4life.sdk.SdkContract
 import io.mockk.mockk
-import junit.framework.Assert.assertTrue
+import io.reactivex.Completable
+import io.reactivex.Single
+import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 
+import care.data4life.sdk.listener.Callback as LegacyCallback
+import care.data4life.sdk.listener.ResultListener as LegacyListener
+
 class CallHandlerTest {
+
 
     private lateinit var errorHandler: SdkContract.ErrorHandler
 
@@ -34,13 +39,47 @@ class CallHandlerTest {
     @Before
     fun setup() {
         errorHandler = mockk()
-
         callHandler = CallHandler(errorHandler)
     }
 
+
     @Test
-    @Ignore
-    fun test() {
-        assertTrue(false)
+    fun `Given, executeSingle is called with a Callback, it returns a task`() {
+        // Given
+        val operation: Single<Any> = mockk(relaxed = true)
+        val callback: Callback<Any> = mockk()
+
+        // When
+        val result: Any = callHandler.executeSingle(operation, callback)
+
+        // Then
+        assertTrue(result is Task)
+    }
+
+    @Test
+    fun `Given, executeSingle is called with LegacyListener, it returns a task`() {
+        // Given
+        val operation: Single<Any> = mockk(relaxed = true)
+        val listener: LegacyListener<Any> = mockk()
+
+        // When
+        val result: Any = callHandler.executeSingle(operation, listener)
+
+        // Then
+        assertTrue(result is Task)
+    }
+
+
+    @Test
+    fun `Given, executeCompletable is called with LegacyCallback, it returns a task`() {
+        // Given
+        val operation: Completable = mockk(relaxed = true)
+        val callback: LegacyCallback = mockk()
+
+        // When
+        val result: Any = callHandler.executeCompletable(operation, callback)
+
+        // Then
+        assertTrue(result is Task)
     }
 }

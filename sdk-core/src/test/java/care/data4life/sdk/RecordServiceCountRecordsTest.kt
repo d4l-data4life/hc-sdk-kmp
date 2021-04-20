@@ -16,60 +16,85 @@
 
 package care.data4life.sdk
 
-import care.data4life.fhir.stu3.model.CarePlan
-import com.google.common.truth.Truth
+import care.data4life.fhir.stu3.model.Patient
+import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
+import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
+import care.data4life.sdk.attachment.AttachmentContract
+import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.fhir.FhirContract
+import care.data4life.sdk.migration.MigrationContract
+import care.data4life.sdk.tag.TaggingContract
+import io.mockk.clearAllMocks
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import io.reactivex.Single
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito
 import java.io.IOException
+import kotlin.test.assertEquals
 
-class RecordServiceCountRecordsTest : RecordServiceTestBase() {
+class RecordServiceCountRecordsTest {
+    private lateinit var recordService: RecordService
+    private val apiService: ApiService = mockk()
+    private val cryptoService: CryptoContract.Service = mockk()
+    private val fhirService: FhirContract.Service = mockk()
+    private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
+    private val taggingService: TaggingContract.Service = mockk()
+    private val attachmentService: AttachmentContract.Service = mockk()
+    private val errorHandler: SdkContract.ErrorHandler = mockk()
+
+    private val tags: HashMap<String, String> = mockk()
+    private val defaultAnnotations: List<String> = emptyList()
+    private val compatibilityService: MigrationContract.CompatibilityService = mockk()
+
     @Before
-    fun setup() {
-        init()
-    }
+    fun setUp() {
+        clearAllMocks()
 
-    @After
-    fun tearDown() {
-        stop()
-    }
-
-    @Test
-    @Throws(InterruptedException::class)
-    fun `Given, countRecords is called with a DomainResource and a UserId, it returns amount of occurrences`() {
-        // Given
-        Mockito.`when`(mockApiService.getCount(ALIAS, USER_ID, null)).thenReturn(Single.just(2))
-        // When
-        val observer = recordService.countRecords(null, USER_ID).test().await()
-
-        // Then
-        val result = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
-        Truth.assertThat(result).isEqualTo(2)
-        inOrder.verify(mockApiService).getCount(ALIAS, USER_ID, null)
-        inOrder.verifyNoMoreInteractions()
+        recordService = spyk(
+                RecordService(
+                        PARTNER_ID,
+                        ALIAS,
+                        apiService,
+                        tagEncryptionService,
+                        taggingService,
+                        fhirService,
+                        attachmentService,
+                        cryptoService,
+                        errorHandler,
+                        compatibilityService
+                )
+        )
     }
 
     @Test
     @Throws(InterruptedException::class, IOException::class)
-    fun `Given, countRecords is called with a DomainResource, a UserId and a Tag, it returns amount of occurrences`() {
+    fun `Given, countFhir3Records is called with a Fhir3Resource, a UserId and Annotations, it returns amount of occurrences`() {
         // Given
-        @Suppress("UNCHECKED_CAST")
-        Mockito.`when`(mockTaggingService.getTagFromType(CarePlan::class.java as Class<Any>)).thenReturn(mockTags)
-        Mockito.`when`(mockTagEncryptionService.encryptTags(mockTags)).thenReturn(mockEncryptedTags)
-        Mockito.`when`(
-                mockTagEncryptionService.encryptAnnotations(ArgumentMatchers.anyList())
-        ).thenReturn(mockEncryptedAnnotations)
-        Mockito.`when`(mockApiService.getCount(ALIAS, USER_ID, mockEncryptedTags)).thenReturn(Single.just(2))
+        val expected = 42
+        val annotations: List<String> = mockk()
+
+        every { taggingService.getTagsFromType(Fhir3Resource::class.java as Class<Any>) } returns tags
+        every {
+            compatibilityService.countRecords(
+                    ALIAS,
+                    USER_ID,
+                    tags,
+                    annotations
+            )
+        } returns Single.just(expected)
 
         // When
-        val observer = recordService.countRecords(CarePlan::class.java, USER_ID).test().await()
+        val observer = recordService.countFhir3Records(
+                Fhir3Resource::class.java,
+                USER_ID,
+                annotations
+        ).test().await()
 
         // Then
         val result = observer
@@ -77,47 +102,38 @@ class RecordServiceCountRecordsTest : RecordServiceTestBase() {
                 .assertComplete()
                 .assertValueCount(1)
                 .values()[0]
-        Truth.assertThat(result).isEqualTo(2)
-        inOrder.verify(mockTaggingService).getTagFromType(CarePlan::class.java as Class<Any>)
-        inOrder.verify(mockTagEncryptionService).encryptTags(mockTags)
-        inOrder.verify(mockTagEncryptionService).encryptAnnotations(ArgumentMatchers.anyList())
-        inOrder.verify(mockApiService).getCount(ALIAS, USER_ID, mockEncryptedTags)
-        inOrder.verifyNoMoreInteractions()
-    }
 
-    @Test
-    @Throws(InterruptedException::class)
-    fun `Given, countRecords is called with a DomainResource, a UserId and Annotations, it returns amount of occurrences`() {
-        // Given
-        Mockito.`when`(mockApiService.getCount(ALIAS, USER_ID, null)).thenReturn(Single.just(2))
-
-        // When
-        val observer = recordService.countRecords(null, USER_ID, ANNOTATIONS).test().await()
-
-        // Then
-        val result = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
-        Truth.assertThat(result).isEqualTo(2)
-        inOrder.verify(mockApiService).getCount(ALIAS, USER_ID, null)
-        inOrder.verifyNoMoreInteractions()
+        assertEquals(
+                expected = expected,
+                actual = result
+        )
+        verify(exactly = 1) { taggingService.getTagsFromType(Fhir3Resource::class.java as Class<Any>) }
+        verify(exactly = 1) { compatibilityService.countRecords(ALIAS, USER_ID, tags, annotations) }
     }
 
     @Test
     @Throws(InterruptedException::class, IOException::class)
-    fun `Given, countRecords is called with a DomainResource, a UserId, a Tag and Annotations, it returns amount of occurrences`() {
+    fun `Given, countFhir4Records is called with a Fhir4Resource, a UserId and Annotations, it returns amount of occurrences`() {
         // Given
-        Mockito.`when`(mockTaggingService.getTagFromType(CarePlan::class.java as Class<Any>)).thenReturn(mockTags)
-        Mockito.`when`(mockTagEncryptionService.encryptTags(mockTags)).thenReturn(mockEncryptedTags)
-        Mockito.`when`(
-                mockTagEncryptionService.encryptAnnotations(ANNOTATIONS)
-        ).thenReturn(mockEncryptedAnnotations)
-        Mockito.`when`(mockApiService.getCount(ALIAS, USER_ID, mockEncryptedTags)).thenReturn(Single.just(2))
+        val expected = 42
+        val annotations: List<String> = mockk()
+
+        every { taggingService.getTagsFromType(Fhir4Resource::class.java as Class<Any>) } returns tags
+        every {
+            compatibilityService.countRecords(
+                    ALIAS,
+                    USER_ID,
+                    tags,
+                    annotations
+            )
+        } returns Single.just(expected)
 
         // When
-        val observer = recordService.countRecords(CarePlan::class.java, USER_ID, ANNOTATIONS).test().await()
+        val observer = recordService.countFhir4Records(
+                Fhir4Resource::class.java,
+                USER_ID,
+                annotations
+        ).test().await()
 
         // Then
         val result = observer
@@ -125,11 +141,207 @@ class RecordServiceCountRecordsTest : RecordServiceTestBase() {
                 .assertComplete()
                 .assertValueCount(1)
                 .values()[0]
-        Truth.assertThat(result).isEqualTo(2)
-        inOrder.verify(mockTaggingService).getTagFromType(CarePlan::class.java as Class<Any>)
-        inOrder.verify(mockTagEncryptionService).encryptTags(mockTags)
-        inOrder.verify(mockTagEncryptionService).encryptAnnotations(ANNOTATIONS)
-        inOrder.verify(mockApiService).getCount(ALIAS, USER_ID, mockEncryptedTags)
-        inOrder.verifyNoMoreInteractions()
+
+        assertEquals(
+                expected = expected,
+                actual = result
+        )
+        verify(exactly = 1) { taggingService.getTagsFromType(Fhir4Resource::class.java as Class<Any>) }
+        verify(exactly = 1) { compatibilityService.countRecords(ALIAS, USER_ID, tags, annotations) }
+    }
+
+    @Test
+    @Throws(InterruptedException::class, IOException::class)
+    fun `Given, countAllFhir3Records is called, with a UserId and Annotations, it delegates to the call to countFhir3Records with a Fhir3Resource as typeResource`() {
+        // Given
+        val expected = 42
+        val annotations: List<String> = mockk()
+
+        every {
+            recordService.countFhir3Records(Fhir3Resource::class.java, USER_ID, annotations)
+        } returns Single.just(expected)
+
+        // When
+        val observer = recordService.countAllFhir3Records(
+                USER_ID,
+                annotations
+        ).test().await()
+
+        // Then
+        val result = observer
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
+
+        assertEquals(
+                expected = expected,
+                actual = result
+        )
+        verify(exactly = 1) {
+            recordService.countFhir3Records(
+                    Fhir3Resource::class.java,
+                    USER_ID,
+                    annotations
+            )
+        }
+    }
+
+    @Test
+    @Throws(InterruptedException::class, IOException::class)
+    fun `Given, countRecords is called, with a UserId and resourceType, it delegate its call to countFhir3Records`() {
+        // Given
+        val resourceType = Patient::class.java
+        val expected = 23
+
+        every {
+            recordService.countFhir3Records(
+                    resourceType,
+                    USER_ID,
+                    defaultAnnotations
+            )
+        } returns Single.just(expected)
+
+        val observer = recordService.countRecords(
+                resourceType,
+                USER_ID
+        ).test().await()
+
+        // Then
+        val result = observer
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
+
+        assertEquals(
+                expected = expected,
+                actual = result
+        )
+        verify(exactly = 1) {
+            recordService.countFhir3Records(
+                    resourceType,
+                    USER_ID,
+                    defaultAnnotations
+            )
+        }
+    }
+
+    @Test
+    @Throws(InterruptedException::class, IOException::class)
+    fun `Given, countRecords is called, with a UserId, resourceType and Annotations, it delegate its call to countFhir3Records`() {
+        // Given
+        val resourceType = Patient::class.java
+        val expected = 23
+        val annotations: List<String> = mockk()
+
+        every {
+            recordService.countFhir3Records(
+                    resourceType,
+                    USER_ID,
+                    annotations
+            )
+        } returns Single.just(expected)
+
+        val observer = recordService.countRecords(
+                resourceType,
+                USER_ID,
+                annotations
+        ).test().await()
+
+        // Then
+        val result = observer
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
+
+        assertEquals(
+                expected = expected,
+                actual = result
+        )
+        verify(exactly = 1) {
+            recordService.countFhir3Records(
+                    resourceType,
+                    USER_ID,
+                    annotations
+            )
+        }
+    }
+
+    @Test
+    @Throws(InterruptedException::class, IOException::class)
+    fun `Given, countRecords is called, with a null as resourceType and a UserId, it delegate its call to countAllFhir3Records`() {
+        // Given
+        val expected = 23
+
+        every {
+            recordService.countAllFhir3Records(
+                    USER_ID,
+                    defaultAnnotations
+            )
+        } returns Single.just(expected)
+
+        val observer = recordService.countRecords(
+                null,
+                USER_ID
+        ).test().await()
+
+        // Then
+        val result = observer
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
+
+        assertEquals(
+                expected = expected,
+                actual = result
+        )
+        verify(exactly = 1) {
+            recordService.countAllFhir3Records(
+                    USER_ID,
+                    defaultAnnotations
+            )
+        }
+    }
+
+    @Test
+    @Throws(InterruptedException::class, IOException::class)
+    fun `Given, countRecords is called, with a null as resourceType, a UserId and Annotations, it delegate its call to countAllFhir3Records`() {
+        // Given
+        val expected = 23
+        val annotations: List<String> = mockk()
+
+        every {
+            recordService.countAllFhir3Records(
+                    USER_ID,
+                    annotations
+            )
+        } returns Single.just(expected)
+
+        val observer = recordService.countRecords(
+                null,
+                USER_ID,
+                annotations
+        ).test().await()
+
+        // Then
+        val result = observer
+                .assertNoErrors()
+                .assertComplete()
+                .assertValueCount(1)
+                .values()[0]
+
+        assertEquals(
+                expected = expected,
+                actual = result
+        )
+        verify(exactly = 1) {
+            recordService.countAllFhir3Records(
+                    USER_ID,
+                    annotations
+            )
+        }
     }
 }

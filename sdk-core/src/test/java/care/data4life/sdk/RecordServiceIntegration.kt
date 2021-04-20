@@ -16,15 +16,15 @@
 
 package care.data4life.sdk
 
-import care.data4life.fhir.stu3.model.DocumentReference
 import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.model.DownloadType
-import care.data4life.sdk.model.ModelVersion
+import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
+import care.data4life.sdk.test.util.GenericTestDataProvider
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.util.HashUtil.sha1
 import com.google.common.truth.Truth
@@ -33,6 +33,8 @@ import io.mockk.mockk
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 class RecordServiceIntegration : RecordServiceIntegrationBase() {
     @Before
@@ -44,8 +46,8 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
         errorHandler = mockk()
 
         recordService = RecordService(
-                RecordServiceTestBase.PARTNER_ID,
-                RecordServiceTestBase.ALIAS,
+                GenericTestDataProvider.PARTNER_ID,
+                GenericTestDataProvider.ALIAS,
                 apiService,
                 TagEncryptionService(
                         cryptoService
@@ -109,7 +111,7 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
         every { cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey) } returns Single.just(dataKey)
 
         // decrypt Resource
-        every { cryptoService.decryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
+        every { cryptoService.decodeAndDecryptString(dataKey, encryptedBody) } returns Single.just(stringifiedResource)
 
         // Get attachment
         every {
@@ -123,9 +125,13 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
         val payload = "hello test my old friend".toByteArray()
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
-                "fhirversion" to "fhirversion=3.0.1",
+                "partner" to "partner=$PARTNER_ID".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
+                "fhirversion" to "fhirversion=${
+                    "3.0.1".replace(".", "%2e")
+                }",
                 "resourcetype" to "resourcetype=documentreference"
         )
 
@@ -135,14 +141,14 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249My4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmhpcnZlcnNpb249MyUyZTAlMmUx", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
-
+                CURRENT,
+                UPDATE_DATE
+        )
 
         downloadAttachmentsFlow(
                 "42",
@@ -170,9 +176,13 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
         val payload = "hello test my old friend".toByteArray()
 
         val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
-                "fhirversion" to "fhirversion=4.0.1",
+                "partner" to "partner=$PARTNER_ID".toLowerCase(),
+                "client" to "client=${
+                    URLEncoder.encode(CLIENT_ID.toLowerCase(), StandardCharsets.UTF_8.displayName())
+                }",
+                "fhirversion" to "fhirversion=${
+                    "4.0.1".replace(".", "%2e")
+                }",
                 "resourcetype" to "resourcetype=documentreference"
         )
 
@@ -182,13 +192,14 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
         encryptedRecord = EncryptedRecord(
                 commonKeyId,
                 RECORD_ID,
-                listOf("cGFydG5lcj1URVNU", "Y2xpZW50PVRFU1Q=", "ZmhpcnZlcnNpb249NC4wLjE=", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
+                listOf("cGFydG5lcj1iNDY=", "Y2xpZW50PWI0NiUyM3Rlc3Q=", "ZmhpcnZlcnNpb249NCUyZTAlMmUx", "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"),
                 encryptedBody,
                 CREATION_DATE,
                 encryptedDataKey,
                 encryptedAttachmentKey,
-                ModelVersion.CURRENT
-        ).also { it.updatedDate = UPDATE_DATE }
+                CURRENT,
+                UPDATE_DATE
+        )
 
 
         downloadAttachmentsFlow(
@@ -209,36 +220,5 @@ class RecordServiceIntegration : RecordServiceIntegrationBase() {
             // Then
             Truth.assertThat(e).isInstanceOf(ClassCastException::class.java)
         }
-    }
-
-    @Test
-    fun `Given, countRecords is called with its appropriate parameter, it returns the amount of Records`() {
-        val encodedResourceType = "cmVzb3VyY2V0eXBlPWRvY3VtZW50cmVmZXJlbmNl"
-
-        val tags = mapOf(
-                "partner" to "partner=TEST",
-                "client" to "client=TEST",
-                "fhirversion" to "fhirversion=3.0.1",
-                "resourcetype" to "resourcetype=documentreference"
-        )
-
-        // encrypt tags
-        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
-        every {
-            cryptoService.symEncrypt(tagEncryptionKey, eq(
-                    tags["resourcetype"]!!.toByteArray()
-            ), IV)
-        } returns tags["resourcetype"]!!.toByteArray()
-
-        every { apiService.getCount(ALIAS, USER_ID, listOf(encodedResourceType)) } returns Single.just(23)
-
-        // When
-        val result = (recordService as RecordService).countRecords(
-                DocumentReference::class.java,
-                USER_ID
-        ).blockingGet()
-
-        // Then
-        Truth.assertThat(result).isEqualTo(23)
     }
 }

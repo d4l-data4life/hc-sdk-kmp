@@ -59,4 +59,63 @@ class NetworkModelContract {
             const val MAX_SIZE_CUSTOM_DATA = 10485760 // = 10 MiB in Bytes
         }
     }
+
+
+    internal interface Version {
+        val code: Int
+        val name: String
+        val status: String
+
+        companion object{
+            var KEY_DEPRECATED = "deprecated"
+            var KEY_UNSUPPORTED = "unsupported"
+        }
+    }
+
+    internal interface VersionList {
+        val versions: List<Version>
+    }
+    internal interface DocumentUploadResponse {
+        var documentId: String
+    }
+
+    internal interface CommonKeyResponse {
+        val commonKey: EncryptedKey
+    }
+
+    interface EncryptedKey {
+        val base64Key: String
+        fun decode(): ByteArray
+    }
+
+    internal interface EncryptedKeyMaker {
+        fun create(key: ByteArray): EncryptedKey
+    }
+
+    internal interface UserInfo {
+        val uid: String
+        val commonKey: EncryptedKey
+        val commonKeyId: String
+        val tagEncryptionKey: EncryptedKey
+    }
+
+    // TODO: internal
+    interface EncryptedRecord {
+        val commonKeyId: String
+        val identifier: String?
+        val encryptedTags: List<String>
+        val encryptedBody: String?
+        val customCreationDate: String?
+        val encryptedDataKey: EncryptedKey
+        val encryptedAttachmentsKey: EncryptedKey?
+        val modelVersion: Int
+        val updatedDate: String?
+        val version: Int
+
+
+    }
+
+    companion object {
+        const val DEFAULT_COMMON_KEY_ID: String = "00000000-0000-0000-0000-000000000000"
+    }
 }

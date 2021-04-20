@@ -18,7 +18,8 @@ package care.data4life.sdk.fhir
 
 import care.data4life.crypto.GCKey
 
-internal interface FhirContract {
+//TODO: make internal
+interface FhirContract {
 
     interface Service {
         fun _encryptResource(dataKey: GCKey, resource: Any): String
@@ -28,5 +29,11 @@ internal interface FhirContract {
                 tags: HashMap<String, String>,
                 encryptedResource: String
         ): T
+    }
+
+    enum class FhirVersion(val version: String) {
+        FHIR_3("3.0.1"),
+        FHIR_4("4.0.1"),
+        UNKNOWN("unknown")
     }
 }

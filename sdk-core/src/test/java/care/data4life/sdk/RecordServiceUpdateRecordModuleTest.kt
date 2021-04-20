@@ -16,7 +16,6 @@
 
 package care.data4life.sdk
 
-
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.attachment.FileService
@@ -416,8 +415,6 @@ class RecordServiceUpdateRecordModuleTest {
             updateDates.second
         )
 
-
-
         runFlow(
             encryptedUploadRecord,
             encryptedReceivedRecord,
@@ -599,7 +596,7 @@ class RecordServiceUpdateRecordModuleTest {
             "Sample PDF",
             "application/pdf",
             attachment,
-            "d4l_f_p_t#${ATTACHMENT_ID}#${PREVIEW_ID}#${THUMBNAIL_ID}"
+            "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
         )
 
         val internalResource = SdkFhirParser.toFhir3(
@@ -622,7 +619,7 @@ class RecordServiceUpdateRecordModuleTest {
 
         resourceNew.identifier = mutableListOf(
             Fhir3Identifier().also {
-                it.value = "d4l_f_p_t#${ATTACHMENT_ID}#${PREVIEW_ID}#${THUMBNAIL_ID}"
+                it.value = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
                 it.assigner = Fhir3Reference().also { ref -> ref.reference = PARTNER_ID }
             },
             Fhir3Identifier().also {
@@ -643,7 +640,7 @@ class RecordServiceUpdateRecordModuleTest {
             Fhir3Identifier().also { it.value = THUMBNAIL_ID },
             Fhir3Identifier().also { it.value = "AdditionalId" }
         )
-        internalResource.content[0].attachment.id = "${ATTACHMENT_ID}#${PREVIEW_ID}#${THUMBNAIL_ID}"
+        internalResource.content[0].attachment.id = "$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
         internalResource.content[0].attachment.data = null
 
         runFhirFlowWithAttachment(
@@ -652,7 +649,7 @@ class RecordServiceUpdateRecordModuleTest {
             tags = tags,
             annotations = annotations,
             updateDates = Pair(SdkDateTimeFormatter.now(), UPDATE_DATE),
-            attachmentId = "${ATTACHMENT_ID}#${PREVIEW_ID}#${THUMBNAIL_ID}",
+            attachmentId = "$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID",
             attachmentData = rawAttachment
         )
 
@@ -688,7 +685,7 @@ class RecordServiceUpdateRecordModuleTest {
         )
         assertEquals(
             actual = result.resource.content[0].attachment.id,
-            expected = "${ATTACHMENT_ID}#${PREVIEW_ID}#${THUMBNAIL_ID}"
+            expected = "$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
         )
         assertEquals(
             actual = result.resource.identifier!!.size,
@@ -752,7 +749,7 @@ class RecordServiceUpdateRecordModuleTest {
         internalResource.content[0].attachment.data = null
         internalResource.identifier = mutableListOf(
             Fhir3Identifier().also {
-                it.value = "d4l_f_p_t#${ATTACHMENT_ID}#${PREVIEW_ID}#${THUMBNAIL_ID}"
+                it.value = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
                 it.assigner = Fhir3Reference().also { ref -> ref.reference = PARTNER_ID }
             }
         )
@@ -1044,7 +1041,7 @@ class RecordServiceUpdateRecordModuleTest {
             "Sample PDF",
             "application/pdf",
             attachment,
-            "d4l_f_p_t#${ATTACHMENT_ID}#${PREVIEW_ID}#${THUMBNAIL_ID}"
+            "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
         )
 
         val internalResource = SdkFhirParser.toFhir4(
@@ -1067,7 +1064,7 @@ class RecordServiceUpdateRecordModuleTest {
 
         resourceNew.identifier = mutableListOf(
             Fhir4Identifier().also {
-                it.value = "d4l_f_p_t#${ATTACHMENT_ID}#${PREVIEW_ID}#${THUMBNAIL_ID}"
+                it.value = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
                 it.assigner = Fhir4Reference().also { ref -> ref.reference = PARTNER_ID }
             },
             Fhir4Identifier().also {
@@ -1088,7 +1085,7 @@ class RecordServiceUpdateRecordModuleTest {
             Fhir4Identifier().also { it.value = THUMBNAIL_ID },
             Fhir4Identifier().also { it.value = "AdditionalId" }
         )
-        internalResource.content[0].attachment.id = "${ATTACHMENT_ID}#${PREVIEW_ID}#${THUMBNAIL_ID}"
+        internalResource.content[0].attachment.id = "$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
         internalResource.content[0].attachment.data = null
 
         runFhirFlowWithAttachment(
@@ -1097,7 +1094,7 @@ class RecordServiceUpdateRecordModuleTest {
             tags = tags,
             annotations = annotations,
             updateDates = Pair(SdkDateTimeFormatter.now(), UPDATE_DATE),
-            attachmentId = "${ATTACHMENT_ID}#${PREVIEW_ID}#${THUMBNAIL_ID}",
+            attachmentId = "$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID",
             attachmentData = rawAttachment
         )
 
@@ -1133,7 +1130,7 @@ class RecordServiceUpdateRecordModuleTest {
         )
         assertEquals(
             actual = result.resource.content[0].attachment.id,
-            expected = "${ATTACHMENT_ID}#${PREVIEW_ID}#${THUMBNAIL_ID}"
+            expected = "$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
         )
         assertEquals(
             actual = result.resource.identifier!!.size,
@@ -1197,7 +1194,7 @@ class RecordServiceUpdateRecordModuleTest {
         internalResource.content[0].attachment.data = null
         internalResource.identifier = mutableListOf(
             Fhir4Identifier().also {
-                it.value = "d4l_f_p_t#${ATTACHMENT_ID}#${PREVIEW_ID}#${THUMBNAIL_ID}"
+                it.value = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
                 it.assigner = Fhir4Reference().also { ref -> ref.reference = PARTNER_ID }
             }
         )

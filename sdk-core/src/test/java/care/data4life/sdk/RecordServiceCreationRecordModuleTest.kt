@@ -60,6 +60,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.reactivex.Single
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -169,7 +170,6 @@ class RecordServiceCreationRecordModuleTest {
         } else {
             listOf(dataKey.first)
         }
-
 
         val uploadIteration = CryptoServiceIteration(
             gcKeyOrder = keyOrder,
@@ -676,6 +676,7 @@ class RecordServiceCreationRecordModuleTest {
         )
     }
 
+    @Ignore("Gradle runs out of heap memory")
     @Test
     fun `Given, createFhir3Record is called with the appropriate payload with Annotations and Attachments, it fails due to a ill Attachment`() {
         // Given
@@ -1050,6 +1051,7 @@ class RecordServiceCreationRecordModuleTest {
         )
     }
 
+    @Ignore("Gradle runs out of heap memory")
     @Test
     fun `Given, createFhir4Record is called with the appropriate payload with Annotations and Attachments, it fails due to a ill Attachment`() {
         // Given
@@ -1086,7 +1088,6 @@ class RecordServiceCreationRecordModuleTest {
             resourceType,
             template
         ) as Fhir4DocumentReference
-
 
         runFhirFlowWithAttachment(
             serializedResource = SdkFhirParser.fromResource(resource)!!,

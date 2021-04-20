@@ -273,9 +273,10 @@ class CryptoServiceTest {
         val algorithm = GCRSAKeyAlgorithm()
         val keyFactory = java.security.KeyFactory.getInstance(algorithm.cipher)
         val storedPrivateKeyBase64 = keyPairArg.captured.getPrivateKeyBase64()
-        val storedJavaKey = getPrivateJavaKey(keyFactory, storedPrivateKeyBase64.toString())
+        val storedJavaKey = getPrivateJavaKey(keyFactory, storedPrivateKeyBase64.joinToString(""))
+
         val testKeyNoLinebreaksBase64 = base64TestKey.replace("\n", "").toCharArray()
-        val testJavaKey = getPrivateJavaKey(keyFactory, testKeyNoLinebreaksBase64.toString())
+        val testJavaKey = getPrivateJavaKey(keyFactory, testKeyNoLinebreaksBase64.joinToString(""))
         Assert.assertEquals(testJavaKey, storedJavaKey)
     }
 

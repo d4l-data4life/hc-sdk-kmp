@@ -35,6 +35,7 @@ import care.data4life.sdk.network.model.DocumentUploadResponse;
 import care.data4life.sdk.network.model.EncryptedRecord;
 import care.data4life.sdk.network.model.NetworkModelContract;
 import care.data4life.sdk.network.model.UserInfo;
+import care.data4life.sdk.network.model.VersionList;
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter;
 import care.data4life.sdk.util.Base64;
 import io.reactivex.Completable;
@@ -323,6 +324,12 @@ public final class ApiService {
         return Single
                 .fromCallable(() -> authService.getRefreshToken(alias))
                 .flatMapCompletable(token -> service.logout(alias, token));
+    }
+
+    public Single<VersionList> fetchVersionInfo() {
+        return service
+                .getVersionUpdateInfo()
+                .subscribeOn(Schedulers.io());
     }
 
     /**

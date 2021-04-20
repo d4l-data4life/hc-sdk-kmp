@@ -68,8 +68,8 @@ class CryptoSecureStore @JvmOverloads constructor(
     override fun storeKey(alias: String, key: GCKey, keyType: KeyType) {
         val exchangeKey = ExchangeKey(
             keyType,
-            null,
-            null,
+            charArrayOf(),
+            charArrayOf(),
             key.getKeyBase64(),
             key.keyVersion
         )
@@ -82,7 +82,7 @@ class CryptoSecureStore @JvmOverloads constructor(
             KeyType.APP_PRIVATE_KEY,
             key.getPrivateKeyBase64(),
             key.getPublicKeyBase64(),
-            null,
+            charArrayOf(),
             key.keyVersion
         )
         val json = moshi.adapter(ExchangeKey::class.java).toJson(exchangeKey)

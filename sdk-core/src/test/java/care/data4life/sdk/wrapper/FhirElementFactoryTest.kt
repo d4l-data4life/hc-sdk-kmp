@@ -16,7 +16,6 @@
 
 package care.data4life.sdk.wrapper
 
-
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.test.util.TestResourceHelper.buildDocumentReferenceFhir3
@@ -48,8 +47,8 @@ class FhirElementFactoryTest {
 
         // Then
         assertEquals(
-                expected = "DocumentReference",
-                actual = name
+            expected = "DocumentReference",
+            actual = name
         )
     }
 
@@ -63,8 +62,8 @@ class FhirElementFactoryTest {
 
         // Then
         assertEquals(
-                expected = "DocumentReference",
-                actual = name
+            expected = "DocumentReference",
+            actual = name
         )
     }
 
@@ -75,8 +74,8 @@ class FhirElementFactoryTest {
         }
 
         assertEquals(
-                actual = actual.message,
-                expected = "Internal failure"
+            actual = actual.message,
+            expected = "Internal failure"
         )
     }
 
@@ -89,8 +88,8 @@ class FhirElementFactoryTest {
         val type = SdkFhirElementFactory.resolveFhirVersion(resource::class.java)
 
         assertEquals(
-                actual = type,
-                expected = FhirContract.FhirVersion.FHIR_3
+            actual = type,
+            expected = FhirContract.FhirVersion.FHIR_3
         )
     }
 
@@ -103,8 +102,8 @@ class FhirElementFactoryTest {
         val type = SdkFhirElementFactory.resolveFhirVersion(resource::class.java)
 
         assertEquals(
-                actual = type,
-                expected = FhirContract.FhirVersion.FHIR_4
+            actual = type,
+            expected = FhirContract.FhirVersion.FHIR_4
         )
     }
 
@@ -117,8 +116,8 @@ class FhirElementFactoryTest {
         val type = SdkFhirElementFactory.resolveFhirVersion(resource::class.java)
 
         assertEquals(
-                actual = type,
-                expected = FhirContract.FhirVersion.UNKNOWN
+            actual = type,
+            expected = FhirContract.FhirVersion.UNKNOWN
         )
     }
 
@@ -127,8 +126,8 @@ class FhirElementFactoryTest {
         val klass = SdkFhirElementFactory.getFhir3ClassForType("DocumentReference")
 
         assertEquals(
-                actual = klass,
-                expected = DocumentReferenceFhir3::class.java
+            actual = klass,
+            expected = DocumentReferenceFhir3::class.java
         )
     }
 
@@ -137,8 +136,8 @@ class FhirElementFactoryTest {
         val klass = SdkFhirElementFactory.getFhir3ClassForType("documentreference")
 
         assertEquals(
-                actual = klass,
-                expected = DocumentReferenceFhir3::class.java
+            actual = klass,
+            expected = DocumentReferenceFhir3::class.java
         )
     }
 
@@ -150,28 +149,28 @@ class FhirElementFactoryTest {
     @Test
     fun `Given, getFhir3ClassForType is called, with any valid Fhir3Resource in string representation, it returns its resource class`() {
         val resources = listOf(
-                "specimen",
-                "substance",
-                "valueSet",
-                "referralRequest",
-                "documentReference",
-                "diagnosticReport",
-                "medication",
-                "questionnaire",
-                "goal",
-                "carePlan",
-                "careTeam",
-                "questionnaireResponse",
-                "procedureRequest",
-                "practitioner",
-                "patient",
-                "procedure",
-                "condition",
-                "familyMemberHistory",
-                "organization",
-                "medicationRequest",
-                "observation",
-                "provenance"
+            "specimen",
+            "substance",
+            "valueSet",
+            "referralRequest",
+            "documentReference",
+            "diagnosticReport",
+            "medication",
+            "questionnaire",
+            "goal",
+            "carePlan",
+            "careTeam",
+            "questionnaireResponse",
+            "procedureRequest",
+            "practitioner",
+            "patient",
+            "procedure",
+            "condition",
+            "familyMemberHistory",
+            "organization",
+            "medicationRequest",
+            "observation",
+            "provenance"
         )
 
         for (type in resources) {
@@ -179,14 +178,13 @@ class FhirElementFactoryTest {
         }
     }
 
-
     @Test
     fun `Given, getFhir4ClassForType is called with a Fhir4Resource String, it returns a Fhir4 resource class`() {
         val klass = SdkFhirElementFactory.getFhir4ClassForType("DocumentReference")
 
         assertEquals(
-                actual = klass,
-                expected = DocumentReferenceFhir4::class.java
+            actual = klass,
+            expected = DocumentReferenceFhir4::class.java
         )
     }
 
@@ -195,8 +193,8 @@ class FhirElementFactoryTest {
         val klass = SdkFhirElementFactory.getFhir4ClassForType("documentreference")
 
         assertEquals(
-                actual = klass,
-                expected = DocumentReferenceFhir4::class.java
+            actual = klass,
+            expected = DocumentReferenceFhir4::class.java
         )
     }
 
@@ -208,31 +206,31 @@ class FhirElementFactoryTest {
     @Test
     fun `Given, getFhir4ClassForType is called, with any valid Fhir4Resource in string representation, it returns its resource class`() {
         val resources = listOf(
-                "Specimen",
-                "ServiceRequest",
-                "Substance",
-                "ValueSet",
-                "DocumentReference",
-                "DiagnosticReport",
-                "Encounter",
-                "Medication",
-                "Questionnaire",
-                "Goal",
-                "CarePlan",
-                "CareTeam",
-                "QuestionnaireResponse",
-                "MedicationStatement",
-                "PractitionerRole",
-                "Practitioner",
-                "Patient",
-                "Procedure",
-                "Condition",
-                "FamilyMemberHistory",
-                "Organization",
-                "MedicationRequest",
-                "Observation",
-                "Location",
-                "Provenance"
+            "Specimen",
+            "ServiceRequest",
+            "Substance",
+            "ValueSet",
+            "DocumentReference",
+            "DiagnosticReport",
+            "Encounter",
+            "Medication",
+            "Questionnaire",
+            "Goal",
+            "CarePlan",
+            "CareTeam",
+            "QuestionnaireResponse",
+            "MedicationStatement",
+            "PractitionerRole",
+            "Practitioner",
+            "Patient",
+            "Procedure",
+            "Condition",
+            "FamilyMemberHistory",
+            "Organization",
+            "MedicationRequest",
+            "Observation",
+            "Location",
+            "Provenance"
         )
 
         for (type in resources) {

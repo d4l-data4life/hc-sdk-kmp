@@ -41,8 +41,8 @@ class Fhir3IdentifierTest {
 
         // Then
         assertEquals(
-                value,
-                result
+            value,
+            result
         )
     }
 
@@ -57,8 +57,8 @@ class Fhir3IdentifierTest {
 
         // Then
         assertEquals(
-                value,
-                fhir3Identifier.value
+            value,
+            fhir3Identifier.value
         )
     }
 
@@ -69,8 +69,8 @@ class Fhir3IdentifierTest {
         val fhir3Identifier = Fhir3Identifier()
 
         assertSame(
-                fhir3Identifier,
-                SdkFhir3Identifier(fhir3Identifier).unwrap()
+            fhir3Identifier,
+            SdkFhir3Identifier(fhir3Identifier).unwrap()
         )
     }
 }

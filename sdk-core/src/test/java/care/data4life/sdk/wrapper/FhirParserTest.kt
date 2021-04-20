@@ -69,8 +69,8 @@ class FhirParserTest {
         val resource = Fhir3Resource()
 
         assertEquals(
-                SdkFhirParser.fromResource(resource),
-                "{\"resourceType\":\"DomainResource\"}"
+            SdkFhirParser.fromResource(resource),
+            "{\"resourceType\":\"DomainResource\"}"
         )
     }
 
@@ -79,8 +79,8 @@ class FhirParserTest {
         val resource = Fhir4Resource()
 
         assertEquals(
-                SdkFhirParser.fromResource(resource),
-                "{\"resourceType\":\"DomainResource\"}"
+            SdkFhirParser.fromResource(resource),
+            "{\"resourceType\":\"DomainResource\"}"
         )
     }
 }

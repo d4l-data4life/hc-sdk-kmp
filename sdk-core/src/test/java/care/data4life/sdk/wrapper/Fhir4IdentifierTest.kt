@@ -16,7 +16,6 @@
 
 package care.data4life.sdk.wrapper
 
-
 import care.data4life.sdk.fhir.Fhir4Identifier
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -42,8 +41,8 @@ class Fhir4IdentifierTest {
 
         // Then
         assertEquals(
-                value,
-                result
+            value,
+            result
         )
     }
 
@@ -58,8 +57,8 @@ class Fhir4IdentifierTest {
 
         // Then
         assertEquals(
-                value,
-                fhir4Identifier.value
+            value,
+            fhir4Identifier.value
         )
     }
 
@@ -69,8 +68,8 @@ class Fhir4IdentifierTest {
         val fhir4Identifier = Fhir4Identifier()
 
         assertSame(
-                fhir4Identifier,
-                SdkFhir4Identifier(fhir4Identifier).unwrap()
+            fhir4Identifier,
+            SdkFhir4Identifier(fhir4Identifier).unwrap()
         )
     }
 }

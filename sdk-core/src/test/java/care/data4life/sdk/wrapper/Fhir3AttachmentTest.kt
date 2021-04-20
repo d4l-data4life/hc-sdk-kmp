@@ -41,8 +41,8 @@ class Fhir3AttachmentTest {
 
         // Then
         assertEquals(
-                id,
-                result
+            id,
+            result
         )
     }
 
@@ -57,8 +57,8 @@ class Fhir3AttachmentTest {
 
         // Then
         assertEquals(
-                id,
-                fhir3Attachment.id
+            id,
+            fhir3Attachment.id
         )
     }
 
@@ -74,8 +74,8 @@ class Fhir3AttachmentTest {
 
         // Then
         assertEquals(
-                data,
-                result
+            data,
+            result
         )
     }
 
@@ -90,8 +90,8 @@ class Fhir3AttachmentTest {
 
         // Then
         assertEquals(
-                data,
-                fhir3Attachment.data
+            data,
+            fhir3Attachment.data
         )
     }
 
@@ -107,8 +107,8 @@ class Fhir3AttachmentTest {
 
         // Then
         assertEquals(
-                hash,
-                result
+            hash,
+            result
         )
     }
 
@@ -123,8 +123,8 @@ class Fhir3AttachmentTest {
 
         // Then
         assertEquals(
-                hash,
-                fhir3Attachment.hash
+            hash,
+            fhir3Attachment.hash
         )
     }
 
@@ -140,8 +140,8 @@ class Fhir3AttachmentTest {
 
         // Then
         assertEquals(
-                size,
-                result
+            size,
+            result
         )
     }
 
@@ -156,8 +156,8 @@ class Fhir3AttachmentTest {
 
         // Then
         assertEquals(
-                size,
-                fhir3Attachment.size
+            size,
+            fhir3Attachment.size
         )
     }
 
@@ -168,8 +168,8 @@ class Fhir3AttachmentTest {
 
         // When
         assertSame(
-                fhir3Attachment,
-                SdkFhir3Attachment(fhir3Attachment).unwrap()
+            fhir3Attachment,
+            SdkFhir3Attachment(fhir3Attachment).unwrap()
         )
     }
 
@@ -180,8 +180,8 @@ class Fhir3AttachmentTest {
 
         // When
         assertEquals(
-                SdkFhir3Attachment(fhir3Attachment),
-                SdkFhir3Attachment(fhir3Attachment)
+            SdkFhir3Attachment(fhir3Attachment),
+            SdkFhir3Attachment(fhir3Attachment)
         )
     }
 
@@ -192,8 +192,8 @@ class Fhir3AttachmentTest {
 
         // When
         assertEquals(
-                fhir3Attachment.hashCode(),
-                SdkFhir3Attachment(fhir3Attachment).hashCode()
+            fhir3Attachment.hashCode(),
+            SdkFhir3Attachment(fhir3Attachment).hashCode()
         )
     }
 }

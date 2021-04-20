@@ -113,10 +113,9 @@ class FhirAttachmentHelperTest {
 
         // Then
         assertSame(
-                attachments as MutableList<*>,
-                SdkFhirAttachmentHelper.getAttachment(resource) as MutableList<*>
+            attachments as MutableList<*>,
+            SdkFhirAttachmentHelper.getAttachment(resource) as MutableList<*>
         )
-
 
         verify(exactly = 1) { Fhir3AttachmentHelper.getAttachment(resource) }
     }
@@ -141,16 +140,15 @@ class FhirAttachmentHelperTest {
     fun `Given, getAttachment is called with Fhir4Resource, it delegates to and returns of the wrapped Fhir4AttachmentHelper`() {
         // Given
         val resource: Fhir4DocumentReference = mockk()
-        val attachments: MutableList<Fhir4Attachment> = mockk() 
+        val attachments: MutableList<Fhir4Attachment> = mockk()
 
         every { Fhir4AttachmentHelper.getAttachment(resource) } returns attachments
 
         // Then
         assertSame(
-                attachments as MutableList<*>,
-                SdkFhirAttachmentHelper.getAttachment(resource) as MutableList<*>
+            attachments as MutableList<*>,
+            SdkFhirAttachmentHelper.getAttachment(resource) as MutableList<*>
         )
-
 
         verify(exactly = 1) { Fhir4AttachmentHelper.getAttachment(resource) }
     }
@@ -212,10 +210,10 @@ class FhirAttachmentHelperTest {
     fun `Given, updateAttachmentData is called with a Fhir3Resource and a HashMap Attachment to String, it delegates to and returns of the wrapped Fhir3AttachmentHelper`() {
         // Given
         val resource: Fhir3DocumentReference = mockk()
-        
+
         val attachments = hashMapOf(
-                mockk<Fhir3Attachment>() to "1",
-                mockk<Fhir3Attachment>() to "2"
+            mockk<Fhir3Attachment>() to "1",
+            mockk<Fhir3Attachment>() to "2"
         )
 
         every {
@@ -268,8 +266,8 @@ class FhirAttachmentHelperTest {
         val resource: Fhir4DocumentReference = mockk()
 
         val attachments = hashMapOf(
-                mockk<Fhir4Attachment>() to "1",
-                mockk<Fhir4Attachment>() to "2"
+            mockk<Fhir4Attachment>() to "1",
+            mockk<Fhir4Attachment>() to "2"
         )
 
         every {
@@ -305,8 +303,8 @@ class FhirAttachmentHelperTest {
 
         // Then
         assertSame(
-                identifiers,
-                SdkFhirAttachmentHelper.getIdentifier(resource)
+            identifiers,
+            SdkFhirAttachmentHelper.getIdentifier(resource)
         )
 
         verify(exactly = 1) { Fhir3AttachmentHelper.getIdentifier(resource) }
@@ -328,7 +326,6 @@ class FhirAttachmentHelperTest {
         verify(exactly = 1) { Fhir3AttachmentHelper.getIdentifier(resource) }
     }
 
-
     @Test
     fun `Given, getIdentifier is called with a Fhir4Resource, it delegates to and returns of the wrapped Fhir4AttachmentHelper`() {
         // Given
@@ -341,8 +338,8 @@ class FhirAttachmentHelperTest {
 
         // Then
         assertSame(
-                identifiers,
-                SdkFhirAttachmentHelper.getIdentifier(resource)
+            identifiers,
+            SdkFhirAttachmentHelper.getIdentifier(resource)
         )
 
         verify(exactly = 1) { Fhir4AttachmentHelper.getIdentifier(resource) }
@@ -384,18 +381,16 @@ class FhirAttachmentHelperTest {
         verify(exactly = 1) { Fhir3AttachmentHelper.setIdentifier(any(), any()) }
     }
 
-
     @Test
     fun `Given, setIdentifier is called with a Fhir3Resource and a List of Identifiers, it delegates to and returns of the wrapped Fhir3AttachmentHelper`() {
         // Given
         val resource: Fhir3Resource = mockk()
         val identifiers: List<Fhir3Identifier> = listOf(
-                mockk(),
-                mockk()
+            mockk(),
+            mockk()
         )
 
         every { Fhir3AttachmentHelper.setIdentifier(resource, identifiers) } just Runs
-
 
         // When
         SdkFhirAttachmentHelper.setIdentifier(resource, identifiers)
@@ -417,18 +412,16 @@ class FhirAttachmentHelperTest {
         verify(exactly = 1) { Fhir4AttachmentHelper.setIdentifier(any(), any()) }
     }
 
-
     @Test
     fun `Given, setIdentifier is called with a Fhir4Resource and a List of Identifiers, it delegates to and returns of the wrapped Fhir4AttachmentHelper`() {
         // Given
         val resource: Fhir4Resource = mockk()
         val identifiers: List<Fhir4Identifier> = listOf(
-                mockk(),
-                mockk()
+            mockk(),
+            mockk()
         )
 
         every { Fhir4AttachmentHelper.setIdentifier(resource, identifiers) } just Runs
-
 
         // When
         SdkFhirAttachmentHelper.setIdentifier(resource, identifiers)

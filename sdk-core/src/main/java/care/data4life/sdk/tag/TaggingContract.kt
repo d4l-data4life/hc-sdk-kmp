@@ -34,7 +34,11 @@ class TaggingContract {
     }
 
     interface EncryptionService {
-        fun encryptTagsAndAnnotations(tags: Tags, annotations: Annotations): List<String>
+        fun encryptTagsAndAnnotations(
+            tags: Tags,
+            annotations: Annotations,
+            tagEncryptionKey: GCKey? = null
+        ): List<String>
 
         fun decryptTagsAndAnnotations(encryptedTagsAndAnnotations: List<String>): Pair<Tags, Annotations>
 

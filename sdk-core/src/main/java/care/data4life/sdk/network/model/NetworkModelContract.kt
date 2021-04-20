@@ -60,6 +60,21 @@ class NetworkModelContract {
         }
     }
 
+
+    internal interface Version {
+        val code: Int
+        val name: String
+        val status: String
+
+        companion object{
+            var KEY_DEPRECATED = "deprecated"
+            var KEY_UNSUPPORTED = "unsupported"
+        }
+    }
+
+    internal interface VersionList {
+        val versions: List<Version>
+    }
     internal interface DocumentUploadResponse {
         var documentId: String
     }

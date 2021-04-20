@@ -23,7 +23,6 @@ import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.network.model.CommonKeyResponse
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
-import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.util.GenericTestDataProvider.DATE_FORMATTER
 import care.data4life.sdk.test.util.GenericTestDataProvider.DATE_TIME_FORMATTER
 import care.data4life.sdk.util.Base64
@@ -38,55 +37,89 @@ import java.security.MessageDigest
 import javax.xml.bind.DatatypeConverter
 
 class RecordServiceModuleTestFlowHelper(
-        private val apiService: ApiService,
-        private val fileService: FileService,
-        private val imageResizer: ImageResizer
+    private val apiService: ApiService,
+    private val fileService: FileService,
+    private val imageResizer: ImageResizer
 ) {
     private val mdHandle = MessageDigest.getInstance("MD5")
 
     fun md5(str: String): String {
         mdHandle.update(str.toByteArray())
         return DatatypeConverter
-                .printHexBinary(mdHandle.digest())
-                .toUpperCase()
-                .also { mdHandle.reset() }
+            .printHexBinary(mdHandle.digest())
+            .toUpperCase()
+            .also { mdHandle.reset() }
     }
 
     fun encode(tag: String): String {
         return URLEncoder.encode(tag, StandardCharsets.UTF_8.displayName())
-                .replace(".", "%2e")
-                .replace("+", "%20")
-                .replace("*", "%2a")
-                .replace("-", "%2d")
-                .replace("_", "%5f")
-                .toLowerCase()
+            .replace(".", "%2e")
+            .replace("+", "%20")
+            .replace("*", "%2a")
+            .replace("-", "%2d")
+            .replace("_", "%5f")
+            .toLowerCase()
     }
 
     fun prepareTags(
-            tags: Tags
-    ) {
+        tags: Map<String, String>
+    ): List<String> {
+        val encodedTags = mutableListOf<String>()
         tags.forEach { (key, value) ->
-            tags[key] = "$key=${encode(value)}"
+            encodedTags.add("$key=${encode(value)}")
         }
+
+        return encodedTags
     }
+
+    private fun prepareLegacyTag(
+        key: String,
+        value: String
+    ): String = "${key.toLowerCase()}=${value.toLowerCase()}"
+
+    fun prepareCompatibilityTags(
+        tags: Map<String, String>
+    ): Pair<List<String>, List<String>> {
+        val encodedTags = prepareTags(tags)
+        val legacyTags = tags.map { (key, value) -> prepareLegacyTag(key, value) }
+
+        return Pair(encodedTags, legacyTags)
+    }
+
+    private fun prepareLegacyAnnotations(
+        annotations: List<String>
+    ): List<String> = annotations.map { "custom=${it.toLowerCase()}" }
 
     fun prepareAnnotations(
-            annotations: List<String>
-    ): List<String> {
-        val mappedAnnotations = mutableListOf<String>()
+        annotations: List<String>
+    ): List<String> = annotations.map { "custom=${encode(it)}" }
 
-        annotations.forEach {
-            mappedAnnotations.add("custom=${encode(it)}")
-        }
+    fun prepareCompatibilityAnnotations(
+        annotations: List<String>
+    ): Pair<List<String>, List<String>> {
+        val encodedAnnotations = prepareAnnotations(annotations)
+        val legacyAnnotations = prepareLegacyAnnotations(annotations)
 
-        return mappedAnnotations
+        return Pair(encodedAnnotations, legacyAnnotations)
     }
 
+    fun mergeTags(
+        set1: List<String>,
+        set2: List<String>
+    ): List<String> = mutableListOf<String>().also {
+        it.addAll(set1)
+        it.addAll(set2)
+    }
+
+    fun hashAndEncodeTagsAndAnnotations(
+        tagsAndAnnotations: List<String>
+    ): List<String> = tagsAndAnnotations.map { Base64.encodeToString(md5(it)) }
+
     fun uploadAttachment(
-            attachmentKey: GCKey,
-            userId: String,
-            payload: Pair<ByteArray, String>,
-            resized: Pair<Pair<ByteArray, String>, Pair<ByteArray, String>?>? = null
+        attachmentKey: GCKey,
+        userId: String,
+        payload: Pair<ByteArray, String>,
+        resized: Pair<Pair<ByteArray, String>, Pair<ByteArray, String>?>? = null
     ) {
         every {
             fileService.uploadFile(attachmentKey, userId, payload.first)
@@ -96,10 +129,10 @@ class RecordServiceModuleTestFlowHelper(
     }
 
     private fun resizing(
-            data: ByteArray,
-            userId: String,
-            attachmentKey: GCKey,
-            resizedImages: Pair<Pair<ByteArray, String>, Pair<ByteArray, String>?>?
+        data: ByteArray,
+        userId: String,
+        attachmentKey: GCKey,
+        resizedImages: Pair<Pair<ByteArray, String>, Pair<ByteArray, String>?>?
     ) {
         if (resizedImages == null) {
             every { imageResizer.isResizable(data) } returns false
@@ -107,49 +140,49 @@ class RecordServiceModuleTestFlowHelper(
             every { imageResizer.isResizable(data) } returns true
 
             resizeImage(
-                    data,
-                    resizedImages.first.first,
-                    resizedImages.first.second,
-                    ImageResizer.DEFAULT_PREVIEW_SIZE_PX,
-                    userId,
-                    attachmentKey
+                data,
+                resizedImages.first.first,
+                resizedImages.first.second,
+                ImageResizer.DEFAULT_PREVIEW_SIZE_PX,
+                userId,
+                attachmentKey
             )
 
             if (resizedImages.second is Pair<*, *>) {
                 resizeImage(
-                        data,
-                        resizedImages.second!!.first,
-                        resizedImages.second!!.second,
-                        ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX,
-                        userId,
-                        attachmentKey
+                    data,
+                    resizedImages.second!!.first,
+                    resizedImages.second!!.second,
+                    ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX,
+                    userId,
+                    attachmentKey
                 )
             } else {
                 resizeImage(
-                        data,
-                        null,
-                        null,
-                        ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX,
-                        userId,
-                        attachmentKey
+                    data,
+                    null,
+                    null,
+                    ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX,
+                    userId,
+                    attachmentKey
                 )
             }
         }
     }
 
     private fun resizeImage(
-            data: ByteArray,
-            resizedImage: ByteArray?,
-            imageId: String?,
-            targetHeight: Int,
-            userId: String,
-            attachmentKey: GCKey
+        data: ByteArray,
+        resizedImage: ByteArray?,
+        imageId: String?,
+        targetHeight: Int,
+        userId: String,
+        attachmentKey: GCKey
     ) {
         every {
             imageResizer.resizeToHeight(
-                    data,
-                    targetHeight,
-                    ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT
+                data,
+                targetHeight,
+                ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT
             )
         } returns resizedImage
 
@@ -161,10 +194,10 @@ class RecordServiceModuleTestFlowHelper(
     }
 
     fun prepareStoredOrUnstoredCommonKeyRun(
-            alias: String,
-            userId: String,
-            commonKeyId: String,
-            useStoredCommonKey: Boolean
+        alias: String,
+        userId: String,
+        commonKeyId: String,
+        useStoredCommonKey: Boolean
     ): EncryptedKey? {
         return if (useStoredCommonKey) {
             null
@@ -174,9 +207,9 @@ class RecordServiceModuleTestFlowHelper(
     }
 
     private fun runWithoutStoredCommonKey(
-            alias: String,
-            userId: String,
-            commonKeyId: String
+        alias: String,
+        userId: String,
+        commonKeyId: String
     ): EncryptedKey {
         val commonKeyResponse: CommonKeyResponse = mockk()
         val encryptedCommonKey: EncryptedKey = mockk()
@@ -190,69 +223,109 @@ class RecordServiceModuleTestFlowHelper(
     }
 
     private fun createEncryptedRecord(
-            id: String?,
-            commonKeyId: String,
-            tags: List<String>,
-            annotations: List<String>,
-            body: String,
-            dates: Pair<String?, String?>,
-            keys: Pair<EncryptedKey, EncryptedKey?>
+        id: String?,
+        commonKeyId: String,
+        tags: List<String>,
+        annotations: List<String>,
+        body: String,
+        dates: Pair<String?, String?>,
+        keys: Pair<EncryptedKey, EncryptedKey?>
     ): EncryptedRecord = EncryptedRecord(
-            commonKeyId,
-            id,
-            tags
-                    .toMutableList()
-                    .also { it.addAll(annotations) }
-                    .map { Base64.encodeToString(md5(it)) },
-            body,
-            dates.first,
-            keys.first,
-            keys.second,
-            CURRENT,
-            dates.second
+        commonKeyId,
+        id,
+        tags
+            .toMutableList()
+            .also { it.addAll(annotations) }
+            .map { Base64.encodeToString(md5(it)) },
+        body,
+        dates.first,
+        keys.first,
+        keys.second,
+        CURRENT,
+        dates.second
     )
 
     fun buildEncryptedRecord(
-            id: String?,
-            commonKeyId: String,
-            tags: List<String>,
-            annotations: List<String>,
-            body: String,
-            dates: Pair<String?, String?>,
-            keys: Pair<EncryptedKey, EncryptedKey?>
+        id: String?,
+        commonKeyId: String,
+        tags: List<String>,
+        annotations: List<String>,
+        body: String,
+        dates: Pair<String?, String?>,
+        keys: Pair<EncryptedKey, EncryptedKey?>
     ): EncryptedRecord = createEncryptedRecord(
-            id,
-            commonKeyId,
-            tags,
-            annotations,
-            md5(body),
-            dates,
-            keys
+        id,
+        commonKeyId,
+        tags,
+        annotations,
+        md5(body),
+        dates,
+        keys
     )
 
     fun buildEncryptedRecordWithEncodedBody(
-            id: String?,
-            commonKeyId: String,
-            tags: List<String>,
-            annotations: List<String>,
-            body: String,
-            dates: Pair<String?, String?>,
-            keys: Pair<EncryptedKey, EncryptedKey?>
+        id: String?,
+        commonKeyId: String,
+        tags: List<String>,
+        annotations: List<String>,
+        body: String,
+        dates: Pair<String?, String?>,
+        keys: Pair<EncryptedKey, EncryptedKey?>
     ): EncryptedRecord = createEncryptedRecord(
-            id,
-            commonKeyId,
-            tags,
-            annotations,
-            Base64.encodeToString(md5(body)),
-            dates,
-            keys
+        id,
+        commonKeyId,
+        tags,
+        annotations,
+        Base64.encodeToString(md5(body)),
+        dates,
+        keys
+    )
+
+    fun prepareEncryptedFhirRecord(
+        recordId: String?,
+        resource: String,
+        tags: List<String>,
+        annotations: List<String>,
+        commonKeyId: String,
+        encryptedDataKey: EncryptedKey,
+        encryptedAttachmentsKey: EncryptedKey?,
+        creationDate: String,
+        updateDate: String?
+    ): EncryptedRecord = buildEncryptedRecord(
+        recordId,
+        commonKeyId,
+        tags,
+        annotations,
+        resource,
+        Pair(creationDate, updateDate),
+        Pair(encryptedDataKey, encryptedAttachmentsKey)
+    )
+
+    fun prepareEncryptedDataRecord(
+        recordId: String?,
+        resource: String,
+        tags: List<String>,
+        annotations: List<String>,
+        commonKeyId: String,
+        encryptedDataKey: EncryptedKey,
+        encryptedAttachmentsKey: EncryptedKey?,
+        creationDate: String,
+        updateDate: String?
+    ): EncryptedRecord = buildEncryptedRecordWithEncodedBody(
+        recordId,
+        commonKeyId,
+        tags,
+        annotations,
+        resource,
+        Pair(creationDate, updateDate),
+        Pair(encryptedDataKey, encryptedAttachmentsKey)
     )
 
     fun buildMeta(
-            customCreationDate: String,
-            updatedDate: String
+        customCreationDate: String,
+        updatedDate: String
     ): Meta = Meta(
-            LocalDate.parse(customCreationDate, DATE_FORMATTER),
-            LocalDateTime.parse(updatedDate, DATE_TIME_FORMATTER)
+        LocalDate.parse(customCreationDate, DATE_FORMATTER),
+        LocalDateTime.parse(updatedDate, DATE_TIME_FORMATTER)
     )
 }

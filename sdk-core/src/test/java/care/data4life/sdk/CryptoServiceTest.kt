@@ -34,8 +34,6 @@ import care.data4life.sdk.crypto.KeyFactory
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.test.util.TestSchedulerRule
 import care.data4life.sdk.util.Base64
-import care.data4life.sdk.util.Base64.decode
-import care.data4life.securestore.toBytes
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import io.mockk.clearAllMocks
@@ -43,14 +41,12 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
+import io.mockk.slot
 import io.mockk.verify
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers
 import java.io.IOException
 import java.security.InvalidAlgorithmParameterException
 import java.security.InvalidKeyException
@@ -224,12 +220,12 @@ class CryptoServiceTest {
                 .onComplete()
     }
 
-    @Ignore
     @Test
     @Throws(NoSuchAlgorithmException::class, InvalidKeySpecException::class)
     fun setGCKeyPairFromPemPrivateKey_shouldStoreCorrectPrivateKey() {
         // given
-        val base64TestKeyWord = """MIIEowIBAAKCAQEArosQh7LO8HhpJxeHBwQpi12uxOKQsYYBzMOUeoerijGOwtQG
+        val base64TestKey =
+                """MIIEowIBAAKCAQEArosQh7LO8HhpJxeHBwQpi12uxOKQsYYBzMOUeoerijGOwtQG
             sz656ZmQJNR62BIK2mHSSjIcpmu3ydE5fJkUxtF+dpTdmPtZ2URGEyt3/dXFe5RR
             i9hiIVwgWzjZAiVrWfIx4MtPEk9fMV2WKMLOa+o2ZEWqDLfiDjU8ixSaUc/Vtd5K
             msSun587+iBPTR33pGAG1u3If3GSkQPKkW3elRNLxL4twSL45+pmSIgkcTIrxo71
@@ -256,29 +252,30 @@ class CryptoServiceTest {
             QyhWfy6A4sU7XdwJfNhQUAoLvvRrECtqMR7Ayn7xoWgeuhqQCHeg
             """.trimIndent()
 
-        val base64TestKey = base64TestKeyWord.toCharArray()
-        base64TestKeyWord.replace("\n", "", false)
+        //base64TestKeyWord.replace("\n", "", false)
         val pemTestKeyString = """
             -----BEGIN RSA PRIVATE KEY-----
-            $base64TestKeyWord-----END RSA PRIVATE KEY-----
+            $base64TestKey
+            -----END RSA PRIVATE KEY-----
             
             """.trimIndent()
 
+        val keyPairArg = slot<GCKeyPair>()
+        every { mockStorage.storeKey(PREFIX + GC_KEYPAIR, capture(keyPairArg)) } just runs
+
         // when
         cryptoService.setGCKeyPairFromPemPrivateKey(pemTestKeyString)
-
         //then
         /* The base64 serialized input and out keys may differ due to irrelevant meta-data
         differences and hence cannot be compared directly. Hence, we convert both the original
         and the stored key to Java key objects before comparing them. */
-        val keyPairArg = ArgumentCaptor.forClass(GCKeyPair::class.java)
-        verify { mockStorage.storeKey(ArgumentMatchers.eq(PREFIX + GC_KEYPAIR), keyPairArg.capture()) }
+        verify { mockStorage.storeKey(PREFIX + GC_KEYPAIR, capture(keyPairArg)) }
         val algorithm = GCRSAKeyAlgorithm()
         val keyFactory = java.security.KeyFactory.getInstance(algorithm.cipher)
-        val storedPrivateKeyBase64 = keyPairArg.value.getPrivateKeyBase64()
-        val storedJavaKey = getPrivateJavaKey(keyFactory, storedPrivateKeyBase64)
-        val testKeyNoLinebreaksBase64 = Arrays.toString(base64TestKey).replace("\n", "").toCharArray()
-        val testJavaKey = getPrivateJavaKey(keyFactory, testKeyNoLinebreaksBase64)
+        val storedPrivateKeyBase64 = keyPairArg.captured.getPrivateKeyBase64()
+        val storedJavaKey = getPrivateJavaKey(keyFactory, storedPrivateKeyBase64.toString())
+        val testKeyNoLinebreaksBase64 = base64TestKey.replace("\n", "").toCharArray()
+        val testJavaKey = getPrivateJavaKey(keyFactory, testKeyNoLinebreaksBase64.toString())
         Assert.assertEquals(testJavaKey, storedJavaKey)
     }
 
@@ -291,8 +288,8 @@ class CryptoServiceTest {
      * @throws InvalidKeySpecException
      */
     @Throws(InvalidKeySpecException::class)
-    private fun getPrivateJavaKey(keyFactory: java.security.KeyFactory, privateKeyBase64: CharArray): PrivateKey {
-        val storedPrivateKey: ByteArray = decode(privateKeyBase64.toBytes())
+    private fun getPrivateJavaKey(keyFactory: java.security.KeyFactory, privateKeyBase64: String): PrivateKey {
+        val storedPrivateKey: ByteArray = Base64.decode(privateKeyBase64)
         val encodedStoredKeySpec = PKCS8EncodedKeySpec(storedPrivateKey)
         return keyFactory.generatePrivate(encodedStoredKeySpec)
     }

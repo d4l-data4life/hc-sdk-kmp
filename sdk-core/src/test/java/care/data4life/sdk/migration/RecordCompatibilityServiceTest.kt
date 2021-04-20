@@ -69,17 +69,17 @@ class RecordCompatibilityServiceTest {
         encodedAndEncryptedTagsAndAnnotations: MutableList<String>,
         encryptedTags: MutableList<String>,
         encryptedAnnotations: MutableList<String>,
-        encryptionKeys: List<GCKey>
+        encryptionKey: GCKey
     ) {
-        every { cryptoService.fetchTagEncryptionKey() } returnsMany encryptionKeys
+        every { cryptoService.fetchTagEncryptionKey() } returns encryptionKey
         every {
-            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations)
+            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations, encryptionKey)
         } returns encodedAndEncryptedTagsAndAnnotations
 
         every {
             tagEncryptionService.encryptList(
                 annotations,
-                encryptionKeys[1],
+                encryptionKey,
                 ANNOTATION_KEY + DELIMITER
             )
         } returns encryptedAnnotations
@@ -88,7 +88,7 @@ class RecordCompatibilityServiceTest {
         every {
             tagEncryptionService.encryptList(
                 eq(listOf("key=value")),
-                encryptionKeys[0]
+                encryptionKey
             )
         } returns encryptedTags
     }
@@ -96,15 +96,17 @@ class RecordCompatibilityServiceTest {
     private fun verifyEncryptTagsAndAnnotationsFlow(
         tags: Tags,
         annotations: Annotations,
-        encryptionKeys: List<GCKey>
+        encryptionKey: GCKey
     ) {
-        verify(exactly = 2) { cryptoService.fetchTagEncryptionKey() }
-        verify(exactly = 1) { tagEncryptionService.encryptTagsAndAnnotations(tags, annotations) }
+        verify(exactly = 1) { cryptoService.fetchTagEncryptionKey() }
+        verify(exactly = 1) {
+            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations, encryptionKey) 
+        }
         verify(exactly = 1) { tagEncryptionHelper.normalize(tags["key"]!!) }
         verify(exactly = 2) {
             tagEncryptionService.encryptList(
                 or(eq(listOf("key=value")), annotations),
-                or(encryptionKeys[0], encryptionKeys[1]),
+                or(encryptionKey, encryptionKey),
                 or("", ANNOTATION_KEY + DELIMITER)
             )
         }
@@ -120,7 +122,7 @@ class RecordCompatibilityServiceTest {
         val encryptedTags = mutableListOf("a", "k")
         val encryptedAnnotations = mutableListOf("d")
         val expected = 42
-        val encryptionKeys = listOf<GCKey>(mockk(), mockk())
+        val encryptionKey: GCKey = mockk()
         val encodedAndEncryptedTagsAndAnnotations = mutableListOf("a", "v")
             .also {
                 it.addAll(listOf("d"))
@@ -133,7 +135,7 @@ class RecordCompatibilityServiceTest {
             encodedAndEncryptedTagsAndAnnotations,
             encryptedTags,
             encryptedAnnotations,
-            encryptionKeys
+            encryptionKey
         )
 
         every {
@@ -167,7 +169,7 @@ class RecordCompatibilityServiceTest {
         verifyEncryptTagsAndAnnotationsFlow(
             tags,
             annotations,
-            encryptionKeys
+            encryptionKey
         )
         verify(exactly = 2) {
             apiService.getCount(
@@ -197,7 +199,7 @@ class RecordCompatibilityServiceTest {
             }
         val encryptedTags: MutableList<String> = mutableListOf("a", "k")
         val encryptedAnnotations: MutableList<String> = mutableListOf("d")
-        val encryptionKeys = listOf<GCKey>(mockk(), mockk())
+        val encryptionKey: GCKey = mockk()
         val encryptedRecord1: EncryptedRecord = mockk()
         val encryptedRecord2: EncryptedRecord = mockk()
         val indicator = slot<String>()
@@ -208,7 +210,7 @@ class RecordCompatibilityServiceTest {
             encodedAndEncryptedTagsAndAnnotations,
             encryptedTags,
             encryptedAnnotations,
-            encryptionKeys
+            encryptionKey
         )
         every {
             apiService.fetchRecords(
@@ -256,7 +258,7 @@ class RecordCompatibilityServiceTest {
         verifyEncryptTagsAndAnnotationsFlow(
             tags,
             annotations,
-            encryptionKeys
+            encryptionKey
         )
         verify(exactly = 2) {
             apiService.fetchRecords(
@@ -287,7 +289,7 @@ class RecordCompatibilityServiceTest {
         val encodedAndEncryptedTagsAndAnnotations: MutableList<String> =
             mutableListOf("a", "b", "c")
         val encryptedTags: MutableList<String> = mutableListOf("c", "b", "a")
-        val encryptionKeys = listOf<GCKey>(mockk(), mockk())
+        val encryptionKey: GCKey = mockk()
         val encryptedAnnotations: MutableList<String> = mutableListOf()
         val encryptedRecord1: EncryptedRecord = mockk()
         val encryptedRecord2: EncryptedRecord = mockk()
@@ -299,7 +301,7 @@ class RecordCompatibilityServiceTest {
             encodedAndEncryptedTagsAndAnnotations,
             encryptedTags,
             encryptedAnnotations,
-            encryptionKeys
+            encryptionKey
         )
         every {
             apiService.fetchRecords(
@@ -348,7 +350,7 @@ class RecordCompatibilityServiceTest {
         verifyEncryptTagsAndAnnotationsFlow(
             tags,
             annotations,
-            encryptionKeys
+            encryptionKey
         )
         verify(exactly = 1) {
             apiService.fetchRecords(

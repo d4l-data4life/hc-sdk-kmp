@@ -55,6 +55,7 @@ plugins {
     id("scripts.dependency-updates")
     id("scripts.download-scripts")
     id("scripts.versioning")
+    id("scripts.quality-spotless")
     id("scripts.publishing")
 }
 
@@ -67,27 +68,27 @@ allprojects {
             url = URI("https://maven.pkg.github.com/d4l-data4life/hc-util-sdk-kmp")
             credentials {
                 username = project.findProperty("gpr.user") as String?
-                        ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
+                    ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
                 password = project.findProperty("gpr.key") as String?
-                        ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+                    ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
             }
         }
         maven {
             url = URI("https://maven.pkg.github.com/d4l-data4life/hc-fhir-sdk-java")
             credentials {
                 username = project.findProperty("gpr.user") as String?
-                        ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
+                    ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
                 password = project.findProperty("gpr.key") as String?
-                        ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+                    ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
             }
         }
         maven {
             url = URI("https://maven.pkg.github.com/d4l-data4life/hc-fhir-helper-sdk-kmp")
             credentials {
                 username = project.findProperty("gpr.user") as String?
-                        ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
+                    ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
                 password = project.findProperty("gpr.key") as String?
-                        ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+                    ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
             }
         }
     }
@@ -108,10 +109,6 @@ allprojects {
         from(dokka)
         dependsOn(dokka)
     }
-}
-
-tasks.register("clean", Delete::class.java) {
-    delete(rootProject.buildDir)
 }
 
 tasks.named<Wrapper>("wrapper") {

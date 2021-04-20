@@ -47,6 +47,8 @@ object GenericTestDataProvider {
 
     const val RECORD_ID = "recordId"
 
+    const val RECORD_ID_COMPATIBILITY = "otherRecordId"
+
     const val USER_ID = "userId"
 
     const val PARTNER_ID = "partnerId"
@@ -76,6 +78,10 @@ object GenericTestDataProvider {
     const val COMMON_KEY_ID = "commonKeyId"
 
     const val ARBITRARY_DATA_KEY = "appdata"
+
+    const val OFFSET = 23
+
+    const val PAGE_SIZE = 42
 
     const val ADDITIONAL_ID = RecordContract.Service.DOWNSCALED_ATTACHMENT_IDS_FMT +
             ThumbnailService.SPLIT_CHAR +

@@ -26,82 +26,83 @@ import care.data4life.sdk.record.RecordContract
 import org.threeten.bp.LocalDate
 
 internal class Fhir4RecordClient(
-        private val userService: AuthContract.UserService,
-        private val recordService: RecordContract.Service,
-        private val handler: CallHandler
+    private val userService: AuthContract.UserService,
+    private val recordService: RecordContract.Service,
+    private val handler: CallHandler
 ) : SdkContract.Fhir4RecordClient {
 
     override fun <T : Fhir4Resource> create(resource: T, annotations: List<String>, callback: Callback<Fhir4Record<T>>): Task {
         val operation = userService.finishLogin(true)
-                .flatMap { userService.userID }
-                .flatMap { uid -> recordService.createRecord(uid, resource, annotations) }
+            .flatMap { userService.userID }
+            .flatMap { uid -> recordService.createRecord(uid, resource, annotations) }
         return handler.executeSingle(operation, callback)
     }
 
     override fun <T : Fhir4Resource> update(
-            recordId: String,
-            resource: T,
-            annotations: List<String>,
-            callback: Callback<Fhir4Record<T>>
+        recordId: String,
+        resource: T,
+        annotations: List<String>,
+        callback: Callback<Fhir4Record<T>>
     ): Task {
         val operation = userService.finishLogin(true)
-                .flatMap { userService.userID }
-                .flatMap { uid -> recordService.updateRecord(uid, recordId, resource, annotations) }
+            .flatMap { userService.userID }
+            .flatMap { uid -> recordService.updateRecord(uid, recordId, resource, annotations) }
         return handler.executeSingle(operation, callback)
     }
 
     override fun delete(recordId: String, callback: Callback<Boolean>): Task {
         val operation = userService.finishLogin(true)
-                .flatMap { userService.userID }
-                .flatMap { uid -> recordService.deleteRecord(uid, recordId).toSingle { true } }
+            .flatMap { userService.userID }
+            .flatMap { uid -> recordService.deleteRecord(uid, recordId).toSingle { true } }
         return handler.executeSingle(operation, callback)
     }
 
     override fun <T : Fhir4Resource> fetch(recordId: String, callback: Callback<Fhir4Record<T>>): Task {
         val operation = userService.finishLogin(true)
-                .flatMap { userService.userID }
-                .flatMap { uid -> recordService.fetchFhir4Record<T>(uid, recordId) }
+            .flatMap { userService.userID }
+            .flatMap { uid -> recordService.fetchFhir4Record<T>(uid, recordId) }
         return handler.executeSingle(operation, callback)
     }
 
     override fun <T : Fhir4Resource> search(
-            resourceType: Class<T>,
-            annotations: List<String>,
-            startDate: LocalDate?, endDate: LocalDate?,
-            pageSize: Int,
-            offset: Int,
-            callback: Callback<List<Fhir4Record<T>>>
+        resourceType: Class<T>,
+        annotations: List<String>,
+        startDate: LocalDate?,
+        endDate: LocalDate?,
+        pageSize: Int,
+        offset: Int,
+        callback: Callback<List<Fhir4Record<T>>>
     ): Task {
         val operation = userService.finishLogin(true)
-                .flatMap { userService.userID }
-                .flatMap { uid ->
-                    recordService.fetchFhir4Records(
-                            uid,
-                            resourceType,
-                            annotations,
-                            startDate,
-                            endDate,
-                            pageSize,
-                            offset
-                    )
-                }
+            .flatMap { userService.userID }
+            .flatMap { uid ->
+                recordService.fetchFhir4Records(
+                    uid,
+                    resourceType,
+                    annotations,
+                    startDate,
+                    endDate,
+                    pageSize,
+                    offset
+                )
+            }
         return handler.executeSingle(operation, callback)
     }
 
     override fun <T : Fhir4Resource> count(
-            resourceType: Class<T>,
-            annotations: List<String>,
-            callback: Callback<Int>
+        resourceType: Class<T>,
+        annotations: List<String>,
+        callback: Callback<Int>
     ): Task {
         val operation = userService.finishLogin(true)
-                .flatMap { userService.userID }
-                .flatMap { uid ->
-                    recordService.countFhir4Records(
-                            resourceType,
-                            uid,
-                            annotations
-                    )
-                }
+            .flatMap { userService.userID }
+            .flatMap { uid ->
+                recordService.countFhir4Records(
+                    resourceType,
+                    uid,
+                    annotations
+                )
+            }
         return handler.executeSingle(operation, callback)
     }
 }

@@ -41,7 +41,6 @@ import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 
-
 class UserServiceTest {
 
     companion object {
@@ -70,7 +69,7 @@ class UserServiceTest {
 
     @Test
     fun `isLoggedIn_shouldReturnTrue`() {
-        //given
+        // given
         every { authService.isAuthorized(USER_ALIAS) } returns true
         every { storage.getSecret(AUTH_STATE) } answers {
             "auth_state".toCharArray()
@@ -81,17 +80,17 @@ class UserServiceTest {
         every { cryptoService.fetchCurrentCommonKey() } returns mockGCKey
         // when
         val testSubscriber = userService.isLoggedIn(USER_ALIAS)
-                .test()
+            .test()
 
         // then
         testSubscriber
-                .assertNoErrors()
-                .assertValue(true)
+            .assertNoErrors()
+            .assertValue(true)
     }
 
     @Test
     fun `isLoggedIn_shouldReturnFalse`() {
-        //given
+        // given
         every { storage.getSecret(AUTH_STATE) } answers {
             "auth_state".toCharArray()
         }
@@ -101,55 +100,55 @@ class UserServiceTest {
         every { cryptoService.fetchCurrentCommonKey() } returns mockGCKey
         // when
         val testSubscriber = userService.isLoggedIn(USER_ALIAS)
-                .test()
+            .test()
 
         // then
         testSubscriber
-                .assertNoErrors()
-                .assertValue(false)
+            .assertNoErrors()
+            .assertValue(false)
     }
 
     @Test
     fun `getSessionToken should Return True`() {
-        //given
+        // given
         every { authService.refreshAccessToken(USER_ALIAS) } returns AUTH_TOKEN
         // when
         val testSubscriber = userService.getSessionToken(USER_ALIAS)
-                .test()
+            .test()
 
         // then
         testSubscriber
-                .assertNoErrors()
-                .assertValue(AUTH_TOKEN)
+            .assertNoErrors()
+            .assertValue(AUTH_TOKEN)
     }
 
     @Ignore
     @Test
     fun `getSessionToken should Throws Error`() {
-        //given
+        // given
         every { authService.refreshAccessToken(USER_ALIAS) } returns mockk<String>()
         // when
         val testSubscriber = userService.getSessionToken(USER_ALIAS)
-                .test()
-                .await()
+            .test()
+            .await()
 
         // then
         testSubscriber
-                .assertNoValues()
+            .assertNoValues()
     }
 
     @Test
     fun `Given VersionList is fetched, when the call fails return true`() {
-        //given
+        // given
         val error = RuntimeException("error")
         val response: Single<VersionList> = Single.fromCallable { throw error }
         mockkObject(Log)
         every { apiService.fetchVersionInfo() } returns response
-        //when
+        // when
         val testSubscriber = userService.getVersionInfo(CURRENT_VERSION)
-                ?.test()
-                ?.await()
-        //then
+            ?.test()
+            ?.await()
+        // then
         testSubscriber?.assertValue(true)
         verify(exactly = 1) { Log.error(error, "Version not supported") }
     }
@@ -161,51 +160,50 @@ class UserServiceTest {
         val currentVersion = "1.9.0"
         every { apiService.fetchVersionInfo() } returns response
         every { versions.isSupported(currentVersion) } returns true
-        //when
+        // when
         val testSubscriber = userService.getVersionInfo(CURRENT_VERSION)
-                ?.test()
-        //then
+            ?.test()
+        // then
         testSubscriber?.assertValue(true)
-                ?.assertNoErrors()
-
+            ?.assertNoErrors()
     }
 
     @Test
     fun `logout should Return Success`() {
-        //given
+        // given
         every { apiService.logout(USER_ALIAS) } returns Completable.complete()
         every { storage.clear() } just Runs
         // when
         val testSubscriber = userService.logout()
-                .test()
-                .await()
+            .test()
+            .await()
 
         // then
         testSubscriber
-                .assertNoErrors()
-                .assertComplete()
+            .assertNoErrors()
+            .assertComplete()
         verify(exactly = 1) { storage.clear() }
     }
 
     @Test
     fun `logout should Return Exception`() {
-        //given
+        // given
         every { apiService.logout(USER_ALIAS) } returns Completable.error(Exception())
         // when
         val testSubscriber = userService.logout()
-                .test()
-                .await()
+            .test()
+            .await()
 
         // then
         testSubscriber
-                .assertError(Exception::class.java)
-                .assertNotComplete()
+            .assertError(Exception::class.java)
+            .assertNotComplete()
         verify { storage wasNot Called }
     }
 
     @Test
     fun `finish Login should Return Boolean Success`() {
-        //given
+        // given
         val userInfo = mockk<UserInfo>()
         val commonKey = mockk<EncryptedKey>()
         val key = mockk<GCKey>()
@@ -231,28 +229,27 @@ class UserServiceTest {
         every { cryptoService.storeTagEncryptionKey(symKey) } just Runs
         // when
         val testSubscriber = userService.finishLogin(true)
-                .test()
-
+            .test()
 
         // then
         testSubscriber
-                .assertValue { it }
-                .assertComplete()
+            .assertValue { it }
+            .assertComplete()
     }
 
     @Test
     fun `getUID should Return String`() {
-        //given
+        // given
         val uid = "mock-uid"
         every { storage.getSecret(USER_ALIAS + "_" + KEY_USER_ID, String::class.java) } answers {
             uid
         }
         // when
-        val testObserver = userService.uID.test()
+        val testObserver = userService.userID.test()
 
         // then
         testObserver
-                .assertNoErrors()
-                .assertValue(uid)
+            .assertNoErrors()
+            .assertValue(uid)
     }
 }

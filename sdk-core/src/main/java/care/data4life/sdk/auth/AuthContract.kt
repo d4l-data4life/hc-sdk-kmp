@@ -32,5 +32,4 @@ interface AuthContract {
         fun logout(): Completable
         fun getSessionToken(alias: String): Single<String>
     }
-
 }

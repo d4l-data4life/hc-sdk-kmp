@@ -30,14 +30,14 @@ import kotlin.test.assertEquals
 
 class BaseClientTest {
     class ShallowClient(
-            alias: String,
-            userService: AuthContract.UserService,
-            recordService: RecordService,
-            handler: CallHandler,
-            authClient: SdkContract.AuthClient,
-            data: SdkContract.DataRecordClient = createDataClient(userService, recordService, handler),
-            fhir4: SdkContract.Fhir4RecordClient = createFhir4Client(userService, recordService, handler),
-            legacyDataClient: SdkContract.LegacyDataClient = createLegacyDataClient(userService, recordService, handler)
+        alias: String,
+        userService: AuthContract.UserService,
+        recordService: RecordService,
+        handler: CallHandler,
+        authClient: SdkContract.AuthClient,
+        data: SdkContract.DataRecordClient = createDataClient(userService, recordService, handler),
+        fhir4: SdkContract.Fhir4RecordClient = createFhir4Client(userService, recordService, handler),
+        legacyDataClient: SdkContract.LegacyDataClient = createLegacyDataClient(userService, recordService, handler)
     ) : BaseClient(alias, userService, recordService, handler, authClient, data, fhir4, legacyDataClient)
 
     private val userService: AuthContract.UserService = mockk()
@@ -55,19 +55,19 @@ class BaseClientTest {
     }
 
     @Test
-    fun `Given a User is not logged in and the userID is fetched, it returns the UserId`()  {
+    fun `Given a User is not logged in and the userID is fetched, it returns the UserId`() {
         // Given
         every { userService.userID } returns Single.just(USER_ID)
 
         client = ShallowClient(
-                ALIAS,
-                userService,
-                recordService,
-                handler,
-                authClient,
-                data,
-                fhir4,
-                legacyDataClient
+            ALIAS,
+            userService,
+            recordService,
+            handler,
+            authClient,
+            data,
+            fhir4,
+            legacyDataClient
         )
 
         // When
@@ -75,8 +75,8 @@ class BaseClientTest {
 
         // Then
         assertEquals(
-                actual = id,
-                expected = USER_ID
+            actual = id,
+            expected = USER_ID
         )
     }
 }

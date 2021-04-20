@@ -24,73 +24,51 @@ import care.data4life.sdk.fhir.Fhir4RecordClient
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.log.Logger
 
-abstract class BaseClient private constructor(
-        protected var alias: String,
-        protected var userService: AuthContract.UserService,
-        protected var recordService: RecordService,
-        protected var handler: CallHandler,
-        private val authClient: SdkContract.AuthClient,
-        override val data: SdkContract.DataRecordClient,
-        override val fhir4: SdkContract.Fhir4RecordClient,
-        private val legacyDataClient: SdkContract.LegacyDataClient,
-        override val userId: String
+abstract class BaseClient constructor(
+    protected var alias: String,
+    protected var userService: AuthContract.UserService,
+    protected var recordService: RecordService,
+    protected var handler: CallHandler,
+    private val authClient: SdkContract.AuthClient = createAuthClient(alias, userService, handler),
+    override val data: SdkContract.DataRecordClient = createDataClient(userService, recordService, handler),
+    override val fhir4: SdkContract.Fhir4RecordClient = createFhir4Client(userService, recordService, handler),
+    private val legacyDataClient: SdkContract.LegacyDataClient = createLegacyDataClient(userService, recordService, handler)
 ) : SdkContract.Client, SdkContract.LegacyDataClient by legacyDataClient, SdkContract.AuthClient by authClient {
-    constructor(
-            alias: String,
-            userService: AuthContract.UserService,
-            recordService: RecordService,
-            handler: CallHandler,
-            authClient: SdkContract.AuthClient = createAuthClient(alias, userService, handler),
-            data: SdkContract.DataRecordClient = createDataClient(userService, recordService, handler),
-            fhir4: SdkContract.Fhir4RecordClient = createFhir4Client(userService, recordService, handler),
-            legacyDataClient: SdkContract.LegacyDataClient = createLegacyDataClient(userService, recordService, handler)
-    ) : this(
-            alias,
-            userService,
-            recordService,
-            handler,
-            authClient,
-            data,
-            fhir4,
-            legacyDataClient,
-            userService.userID.blockingGet()
-    )
+    override val userId: String = userService.userID.blockingGet()
 
     companion object {
 
         fun createAuthClient(
-                alias: String,
-                userService: AuthContract.UserService,
-                handler: CallHandler
+            alias: String,
+            userService: AuthContract.UserService,
+            handler: CallHandler
         ): SdkContract.AuthClient {
             return AuthClient(alias, userService, handler)
         }
 
         fun createDataClient(
-                userService: AuthContract.UserService,
-                recordService: RecordService,
-                handler: CallHandler
+            userService: AuthContract.UserService,
+            recordService: RecordService,
+            handler: CallHandler
         ): SdkContract.DataRecordClient {
             return DataRecordClient(userService, recordService, handler)
         }
 
         fun createFhir4Client(
-                userService: AuthContract.UserService,
-                recordService: RecordService,
-                handler: CallHandler
+            userService: AuthContract.UserService,
+            recordService: RecordService,
+            handler: CallHandler
         ): SdkContract.Fhir4RecordClient {
             return Fhir4RecordClient(userService, recordService, handler)
         }
 
-
         fun createLegacyDataClient(
-                userService: AuthContract.UserService,
-                recordService: RecordService,
-                handler: CallHandler
+            userService: AuthContract.UserService,
+            recordService: RecordService,
+            handler: CallHandler
         ): SdkContract.LegacyDataClient {
             return LegacyDataClient(userService as UserService, recordService, handler)
         }
-
 
         // FIXME refactor into own tool
         const val CLIENT_ID_SPLIT_CHAR = "#"

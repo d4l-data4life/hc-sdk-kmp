@@ -22,9 +22,9 @@ import care.data4life.sdk.listener.Callback
 import care.data4life.sdk.listener.ResultListener
 
 class AuthClient(
-        private val alias: String,
-        private val userService: AuthContract.UserService,
-        private val handler: CallHandler
+    private val alias: String,
+    private val userService: AuthContract.UserService,
+    private val handler: CallHandler
 ) : AuthContract.Client {
 
     override fun getUserSessionToken(listener: ResultListener<String>): Task {

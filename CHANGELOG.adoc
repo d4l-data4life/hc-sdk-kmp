@@ -15,6 +15,7 @@ toc::[]
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.10.0...main[Unreleased]
 
 === Added
+Add Version control for supported/unsupported versions
 
 * The Client now exposes the UserId
 

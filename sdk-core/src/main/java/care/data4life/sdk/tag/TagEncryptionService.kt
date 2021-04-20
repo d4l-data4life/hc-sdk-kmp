@@ -32,8 +32,16 @@ class TagEncryptionService @JvmOverloads constructor(
         private val tagHelper: TaggingContract.Helper = TagEncryptionHelper
 ) : TaggingContract.EncryptionService {
     @Throws(D4LException::class)
-    override fun encryptTagsAndAnnotations(tags: Tags, annotations: Annotations): List<String> {
-        val encryptionKey = cryptoService.fetchTagEncryptionKey()
+    override fun encryptTagsAndAnnotations(
+        tags: Tags,
+        annotations: Annotations,
+        tagEncryptionKey: GCKey?
+    ): List<String> {
+        val encryptionKey = if( tagEncryptionKey is GCKey) {
+            tagEncryptionKey
+        } else {
+            cryptoService.fetchTagEncryptionKey()
+        }
 
         return encryptAndEncodeTags(tags, encryptionKey)
                 .also { encryptedTags ->

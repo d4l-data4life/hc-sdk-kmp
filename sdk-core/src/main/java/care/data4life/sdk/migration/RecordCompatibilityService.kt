@@ -16,6 +16,7 @@
 
 package care.data4life.sdk.migration
 
+import care.data4life.crypto.GCKey
 import care.data4life.sdk.ApiService
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.network.model.NetworkModelContract.EncryptedRecord
@@ -41,38 +42,42 @@ class RecordCompatibilityService internal constructor(
         plainTags: Tags,
         plainAnnotations: Annotations
     ): Pair<List<String>, List<String>> {
+        val tagEncryptionKey = cryptoService.fetchTagEncryptionKey()
         return Pair(
-            tagEncryptionService.encryptTagsAndAnnotations(plainTags, plainAnnotations),
-            encryptTags(plainTags)
+            tagEncryptionService.encryptTagsAndAnnotations(
+                plainTags,
+                plainAnnotations,
+                tagEncryptionKey
+            ),
+            encryptTags(plainTags, tagEncryptionKey)
                 .also { encryptedTags ->
                     encryptedTags.addAll(
-                        encryptAnnotations(plainAnnotations)
+                        encryptAnnotations(plainAnnotations, tagEncryptionKey)
                     )
                 }
         )
     }
 
     @Throws(IOException::class)
-    private fun encryptTags(tags: Tags): MutableList<String> {
-        val encryptionKey = cryptoService.fetchTagEncryptionKey()
+    private fun encryptTags(tags: Tags, tagEncryptionKey: GCKey): MutableList<String> {
         return tags
             .map { entry -> entry.key + TaggingContract.DELIMITER + tagHelper.normalize(entry.value) }
             .let { normalizedTags ->
                 tagEncryptionService.encryptList(
                     normalizedTags,
-                    encryptionKey
+                    tagEncryptionKey
                 )
             }
     }
 
     @Throws(IOException::class)
     private fun encryptAnnotations(
-        annotations: Annotations
+        annotations: Annotations,
+        tagEncryptionKey: GCKey
     ): MutableList<String> {
-        val encryptionKey = cryptoService.fetchTagEncryptionKey()
         return tagEncryptionService.encryptList(
             annotations,
-            encryptionKey,
+            tagEncryptionKey,
             ANNOTATION_KEY + TaggingContract.DELIMITER
         )
     }

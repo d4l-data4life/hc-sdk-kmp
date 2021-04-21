@@ -32,11 +32,11 @@ class UserService(
     private val apiService: ApiService,
     private val secureStore: CryptoContract.SecureStore,
     private val cryptoService: CryptoContract.Service
-) {
-    val uID: Single<String>
+) : AuthContract.UserService {
+    override val userID: Single<String>
         get() = Single.fromCallable { secureStore.getSecret("${alias}_user_id", String::class.java) }
 
-    fun finishLogin(isAuthorized: Boolean): Single<Boolean> {
+    override fun finishLogin(isAuthorized: Boolean): Single<Boolean> {
         return Single.just(isAuthorized)
             .flatMap { apiService.fetchUserInfo(alias) }
             .map { userInfo: UserInfo ->
@@ -59,23 +59,24 @@ class UserService(
             .doOnError { Log.error(it, "Failed to finish login") }
     }
 
-    fun isLoggedIn(alias: String): Single<Boolean> {
+    override fun isLoggedIn(alias: String): Single<Boolean> {
         return Single.fromCallable { authService.isAuthorized(alias) }
             .onErrorReturnItem(false)
     }
 
-    fun logout(): Completable {
+    override fun logout(): Completable {
         return apiService
             .logout(alias)
             .doOnError { throwable: Throwable -> Log.error(throwable, "Failed to logout") }
             .doOnComplete { secureStore.clear() }
     }
 
-    fun getSessionToken(alias: String): Single<String> {
+    override fun getSessionToken(alias: String): Single<String> {
         return Single.fromCallable { authService.refreshAccessToken(alias) }
     }
 
-    fun getVersionInfo(currentVersion: String): Single<Boolean> {
+    // TODO: move this into the resource clients
+    override fun getVersionInfo(currentVersion: String): Single<Boolean> {
         return Single.just(currentVersion)
             .flatMap { apiService.fetchVersionInfo() }
             .map { versionInfo: VersionList -> versionInfo.isSupported(currentVersion) }

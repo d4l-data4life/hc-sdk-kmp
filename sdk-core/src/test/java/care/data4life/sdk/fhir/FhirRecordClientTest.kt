@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.fhir
 
-import care.data4life.sdk.auth.UserService
+import care.data4life.sdk.auth.AuthContract
 import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.call.Callback
 import care.data4life.sdk.call.Task
@@ -33,13 +33,13 @@ class FhirRecordClientTest {
     @Test
     fun `Given count is called, with a resourceType, Annotations and a Callback it returns its Task`() {
         // Given
-        val userService: UserService = mockk()
+        val userService: AuthContract.UserService = mockk()
         val recordService: RecordContract.Service = mockk()
         val callHandler: CallHandler = mockk()
         val client = Fhir4RecordClient(
-                userService,
-                recordService,
-                callHandler
+            userService,
+            recordService,
+            callHandler
         )
 
         val resourceType = Fhir4Resource::class.java
@@ -53,7 +53,7 @@ class FhirRecordClientTest {
         val capturedAmount = slot<Single<Int>>()
 
         every { userService.finishLogin(true) } returns Single.just(true)
-        every { userService.uID } returns Single.just(userId)
+        every { userService.userID } returns Single.just(userId)
         every {
             recordService.countFhir4Records(resourceType, userId, annotations)
         } returns amount
@@ -62,8 +62,8 @@ class FhirRecordClientTest {
         } answers {
             val actualAmount = capturedAmount.captured.blockingGet()
             assertEquals(
-                    expected = expectedAmount,
-                    actual = actualAmount
+                expected = expectedAmount,
+                actual = actualAmount
             )
             expected
         }
@@ -73,8 +73,8 @@ class FhirRecordClientTest {
 
         // Then
         assertSame(
-                expected = expected,
-                actual = actual
+            expected = expected,
+            actual = actual
         )
     }
 }

@@ -28,60 +28,60 @@ import io.reactivex.Single
 
 // TODO internal
 class UserService(
-        private val alias: String,
-        private val authService: AuthorizationService,
-        private val apiService: ApiService,
-        private val secureStore: CryptoSecureStore,
-        private val cryptoService: CryptoService
+    private val alias: String,
+    private val authService: AuthorizationService,
+    private val apiService: ApiService,
+    private val secureStore: CryptoSecureStore,
+    private val cryptoService: CryptoService
 ) : AuthContract.UserService {
     override val uID: Single<String>
         get() = Single.fromCallable { secureStore.getSecret("${alias}_user_id", String::class.java) }
 
     override fun finishLogin(isAuthorized: Boolean): Single<Boolean> {
         return Single.just(isAuthorized)
-                .flatMap { apiService.fetchUserInfo(alias) }
-                .map { userInfo: UserInfo ->
-                    secureStore.storeSecret("${alias}_user_id", userInfo.uid)
-                    val gcKeyPair = cryptoService
-                            .fetchGCKeyPair()
-                            .blockingGet()
-                    val commonKey = cryptoService
-                            .asymDecryptSymetricKey(gcKeyPair, userInfo.commonKey)
-                            .blockingGet()
-                    val commonKeyId = userInfo.commonKeyId
-                    cryptoService.storeCommonKey(commonKeyId, commonKey)
-                    cryptoService.storeCurrentCommonKeyId(commonKeyId)
-                    val tek = cryptoService
-                            .symDecryptSymmetricKey(commonKey, userInfo.tagEncryptionKey)
-                            .blockingGet()
-                    cryptoService.storeTagEncryptionKey(tek)
-                    true
-                }
-                .doOnError { Log.error(it, "Failed to finish login") }
+            .flatMap { apiService.fetchUserInfo(alias) }
+            .map { userInfo: UserInfo ->
+                secureStore.storeSecret("${alias}_user_id", userInfo.uid)
+                val gcKeyPair = cryptoService
+                    .fetchGCKeyPair()
+                    .blockingGet()
+                val commonKey = cryptoService
+                    .asymDecryptSymetricKey(gcKeyPair, userInfo.commonKey)
+                    .blockingGet()
+                val commonKeyId = userInfo.commonKeyId
+                cryptoService.storeCommonKey(commonKeyId, commonKey)
+                cryptoService.storeCurrentCommonKeyId(commonKeyId)
+                val tek = cryptoService
+                    .symDecryptSymmetricKey(commonKey, userInfo.tagEncryptionKey)
+                    .blockingGet()
+                cryptoService.storeTagEncryptionKey(tek)
+                true
+            }
+            .doOnError { Log.error(it, "Failed to finish login") }
     }
 
     override fun isLoggedIn(alias: String): Single<Boolean> {
         return Single.fromCallable { authService.isAuthorized(alias) }
-                .onErrorReturnItem(false)
+            .onErrorReturnItem(false)
     }
 
     override fun logout(): Completable {
         return apiService
-                .logout(alias)
-                .doOnError { throwable: Throwable -> Log.error(throwable, "Failed to logout") }
-                .doOnComplete { secureStore.clear() }
+            .logout(alias)
+            .doOnError { throwable: Throwable -> Log.error(throwable, "Failed to logout") }
+            .doOnComplete { secureStore.clear() }
     }
 
     override fun getSessionToken(alias: String): Single<String> {
         return Single.fromCallable { authService.refreshAccessToken(alias) }
     }
 
-    fun getVersionInfo(currentVersion: String): Single<Boolean> {
+    // TODO: move this into the resource clients
+    override fun getVersionInfo(currentVersion: String): Single<Boolean> {
         return Single.just(currentVersion)
-                .flatMap { apiService.fetchVersionInfo() }
-                .map { versionInfo: VersionList -> versionInfo.isSupported(currentVersion) }
-                .doOnError { throwable: Throwable -> Log.error(throwable, "Version not supported") }
-                .onErrorReturnItem(true)
-
+            .flatMap { apiService.fetchVersionInfo() }
+            .map { versionInfo: VersionList -> versionInfo.isSupported(currentVersion) }
+            .doOnError { throwable: Throwable -> Log.error(throwable, "Version not supported") }
+            .onErrorReturnItem(true)
     }
 }

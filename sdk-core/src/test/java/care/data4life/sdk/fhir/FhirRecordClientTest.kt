@@ -37,9 +37,9 @@ class FhirRecordClientTest {
         val recordService: RecordContract.Service = mockk()
         val callHandler: CallHandler = mockk()
         val client = Fhir4RecordClient(
-                userService,
-                recordService,
-                callHandler
+            userService,
+            recordService,
+            callHandler
         )
 
         val resourceType = Fhir4Resource::class.java
@@ -62,8 +62,8 @@ class FhirRecordClientTest {
         } answers {
             val actualAmount = capturedAmount.captured.blockingGet()
             assertEquals(
-                    expected = expectedAmount,
-                    actual = actualAmount
+                expected = expectedAmount,
+                actual = actualAmount
             )
             expected
         }
@@ -73,8 +73,8 @@ class FhirRecordClientTest {
 
         // Then
         assertSame(
-                expected = expected,
-                actual = actual
+            expected = expected,
+            actual = actual
         )
     }
 }

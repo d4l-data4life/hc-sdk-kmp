@@ -12,10 +12,11 @@ and this project adheres to http://semver.org/spec/v2.0.0.html[Semantic Versioni
 ==== Versions
 toc::[]
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.2...main[Unreleased]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.10.0...main[Unreleased]
 
 === Added
-Add Version control for supported/unsupported versions
+
+* Add Version control for supported/unsupported versions
 
 === Changed
 

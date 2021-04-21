@@ -20,6 +20,7 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.attachment.FileService
+import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.fhir.Fhir3Identifier
 import care.data4life.sdk.fhir.Fhir4Identifier
@@ -428,7 +429,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
     // Records
     // FHIR 3
     @Test
-    fun `Given, downloadRecord is called with its appropriate parameter, it returns a Fhir3Record`() {
+    fun `Given, downloadFhir3Record is called with its appropriate parameter, it returns a Fhir3Record`() {
         // Given
         val resourceType = "DocumentReference"
         val tags = mapOf(
@@ -490,7 +491,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
         )
 
         // When
-        val result = recordService.downloadRecord<Fhir3DocumentReference>(
+        val result = recordService.downloadFhir3Record<Fhir3DocumentReference>(
             RECORD_ID,
             USER_ID
         ).blockingGet()
@@ -523,5 +524,194 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
             actual = result.resource.identifier?.get(1)?.value,
             expected = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
         )
+    }
+
+    @Test
+    fun `Given, downloadFhir3Record is called with its appropriate parameter, it fails if the fetched Record is not Fhir3`() {
+        // Given
+        val resourceType = "DocumentReference"
+        val tags = mapOf(
+            "partner" to PARTNER_ID,
+            "client" to CLIENT_ID,
+            "fhirversion" to "4.0.1",
+            "resourcetype" to resourceType
+        )
+
+        val rawAttachment = TestResourceHelper.getByteResource("attachments", "sample.pdf")
+        val attachment = Base64.encodeToString(String(rawAttachment))
+
+        val template = TestResourceHelper.loadTemplateWithAttachments(
+            "common",
+            "documentReference-with-attachment-template",
+            RECORD_ID,
+            PARTNER_ID,
+            "Sample PDF",
+            "application/pdf",
+            attachment
+        )
+
+        val internalResource = SdkFhirParser.toFhir4(
+            resourceType,
+            template
+        ) as Fhir4DocumentReference
+
+        runAttachmentDownloadFlow(
+            serializedResource = SdkFhirParser.fromResource(internalResource)!!,
+            rawAttachment = rawAttachment,
+            tags = tags,
+            attachmentId = ATTACHMENT_ID
+        )
+
+        // When
+        assertFailsWith<IllegalArgumentException> {
+            recordService.downloadFhir3Record<Fhir3DocumentReference>(
+                RECORD_ID,
+                USER_ID
+            ).blockingGet()
+        }
+    }
+
+    // FHIR 4
+    @Test
+    fun `Given, downloadFhir4Record is called with its appropriate parameter, it returns a Fhir4Record`() {
+        // Given
+        val resourceType = "DocumentReference"
+        val tags = mapOf(
+            "partner" to PARTNER_ID,
+            "client" to CLIENT_ID,
+            "fhirversion" to "4.0.1",
+            "resourcetype" to resourceType
+        )
+
+        val rawAttachment = TestResourceHelper.getByteResource("attachments", "sample.pdf")
+        val attachment = Base64.encodeToString(String(rawAttachment))
+
+        val template = TestResourceHelper.loadTemplateWithAttachments(
+            "common",
+            "documentReference-with-attachment-template",
+            RECORD_ID,
+            PARTNER_ID,
+            "Sample PDF",
+            "application/pdf",
+            attachment
+        )
+
+        val resource = SdkFhirParser.toFhir4(
+            resourceType,
+            template
+        ) as Fhir4DocumentReference
+
+        val internalResource = SdkFhirParser.toFhir4(
+            resourceType,
+            template
+        ) as Fhir4DocumentReference
+
+        resource.identifier!!.add(
+            Fhir4Identifier().also {
+                it.assigner = Fhir4Reference().also { ref -> ref.reference = PARTNER_ID }
+                it.value = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
+            }
+        )
+
+        resource.content[0].attachment.id = ATTACHMENT_ID
+        resource.content[0].attachment.hash = Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
+
+        internalResource.identifier!!.add(
+            Fhir4Identifier().also {
+                it.assigner = Fhir4Reference().also { ref -> ref.reference = PARTNER_ID }
+                it.value = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
+            }
+        )
+
+        internalResource.content[0].attachment.id = ATTACHMENT_ID
+        internalResource.content[0].attachment.data = null
+        internalResource.content[0].attachment.hash = Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
+
+        runAttachmentDownloadFlow(
+            serializedResource = SdkFhirParser.fromResource(internalResource)!!,
+            rawAttachment = rawAttachment,
+            tags = tags,
+            attachmentId = ATTACHMENT_ID
+        )
+
+        // When
+        val result = recordService.downloadFhir4Record<Fhir4DocumentReference>(
+            RECORD_ID,
+            USER_ID
+        ).blockingGet()
+
+        // Then
+        assertTrue(result is Fhir4Record)
+        assertTrue(result.resource.identifier!!.isNotEmpty())
+        assertEquals(
+            expected = flowHelper.buildMeta(CREATION_DATE, UPDATE_DATE),
+            actual = result.meta
+        )
+
+        assertEquals(
+            expected = SdkFhirParser.fromResource(resource),
+            actual = SdkFhirParser.fromResource(result.resource)
+        )
+        assertEquals(
+            actual = result.resource.content.size,
+            expected = 1
+        )
+        assertEquals(
+            actual = result.resource.content[0].attachment.data,
+            expected = attachment
+        )
+        assertEquals(
+            actual = result.resource.content[0].attachment.id,
+            expected = ATTACHMENT_ID
+        )
+        assertEquals(
+            actual = result.resource.identifier?.get(1)?.value,
+            expected = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
+        )
+    }
+
+    @Test
+    fun `Given, downloadFhir4Record is called with its appropriate parameter, it fails if the fetched Record is not Fhir4`() {
+        // Given
+        val resourceType = "DocumentReference"
+        val tags = mapOf(
+            "partner" to PARTNER_ID,
+            "client" to CLIENT_ID,
+            "fhirversion" to "3.0.1",
+            "resourcetype" to resourceType
+        )
+
+        val rawAttachment = TestResourceHelper.getByteResource("attachments", "sample.pdf")
+        val attachment = Base64.encodeToString(String(rawAttachment))
+
+        val template = TestResourceHelper.loadTemplateWithAttachments(
+            "common",
+            "documentReference-with-attachment-template",
+            RECORD_ID,
+            PARTNER_ID,
+            "Sample PDF",
+            "application/pdf",
+            attachment
+        )
+
+        val internalResource = SdkFhirParser.toFhir3(
+            resourceType,
+            template
+        ) as Fhir3DocumentReference
+
+        runAttachmentDownloadFlow(
+            serializedResource = SdkFhirParser.fromResource(internalResource)!!,
+            rawAttachment = rawAttachment,
+            tags = tags,
+            attachmentId = ATTACHMENT_ID
+        )
+
+        // When
+        assertFailsWith<IllegalArgumentException> {
+            recordService.downloadFhir4Record<Fhir4DocumentReference>(
+                RECORD_ID,
+                USER_ID
+            ).blockingGet()
+        }
     }
 }

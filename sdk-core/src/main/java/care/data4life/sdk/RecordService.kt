@@ -131,8 +131,9 @@ class RecordService internal constructor(
     private val identifierFactory: WrapperFactoryContract.IdentifierFactory = SdkIdentifierFactory
     private val dateTimeFormatter: WrapperContract.DateTimeFormatter = SdkDateTimeFormatter
 
-    private fun isFhir(resource: Any?): Boolean =
-        resource is Fhir3Resource || resource is Fhir4Resource
+    private fun isFhir3(resource: Any?): Boolean = resource is Fhir3Resource
+    private fun isFhir4(resource: Any?): Boolean = resource is Fhir4Resource
+    private fun isFhir(resource: Any?): Boolean = isFhir3(resource) || isFhir4(resource)
 
     private fun <T : Any> createRecord(
         userId: String,
@@ -402,43 +403,6 @@ class RecordService internal constructor(
         offset
     ) as Single<List<DataRecord<DataResource>>>
 
-    override fun <T : Fhir3Resource> downloadRecord(
-        recordId: String,
-        userId: String
-    ): Single<Record<T>> = apiService
-        .fetchRecord(alias, userId, recordId)
-        .map { encryptedRecord ->
-            decryptRecord<T>(encryptedRecord, userId) as DecryptedFhir3Record<T>
-        }
-        .map { decryptedRecord -> downloadData(decryptedRecord, userId) }
-        .map { decryptedRecord ->
-            decryptedRecord.also {
-                checkDataRestrictions(decryptedRecord.resource)
-            }
-        }
-        .map { decryptedRecord -> assignResourceId(decryptedRecord) }
-        .map { decryptedRecord ->
-            recordFactory.getInstance(decryptedRecord) as Record<T>
-        }
-
-    fun <T : Fhir3Resource> downloadRecords(
-        recordIds: List<String>,
-        userId: String
-    ): Single<DownloadResult<T>> {
-        val failedDownloads: MutableList<Pair<String, D4LException>> = arrayListOf()
-        return Observable
-            .fromCallable { recordIds }
-            .flatMapIterable { it }
-            .flatMapSingle { recordId ->
-                downloadRecord<T>(recordId, userId)
-                    .ignoreErrors {
-                        failedDownloads.add(Pair(recordId, errorHandler.handleError(it)))
-                    }
-            }
-            .toList()
-            .map { DownloadResult(it, failedDownloads) }
-    }
-
     @Throws(
         DataRestrictionException.UnsupportedFileType::class,
         DataRestrictionException.MaxDataSizeViolation::class
@@ -580,7 +544,144 @@ class RecordService internal constructor(
         annotations: List<String>
     ): Single<Int> = countFhir3Records(Fhir3Resource::class.java, userId, annotations)
 
+    override fun <T : Fhir3Resource> downloadFhir3Record(
+        recordId: String,
+        userId: String
+    ): Single<Record<T>> = downloadRecord<T>(
+        recordId,
+        userId,
+        ::isFhir3
+    ) as Single<Record<T>>
+
+    override fun <T : Fhir4Resource> downloadFhir4Record(
+        recordId: String,
+        userId: String
+    ): Single<Fhir4Record<T>> = downloadRecord<T>(
+        recordId,
+        userId,
+        ::isFhir4
+    ) as Single<Fhir4Record<T>>
+
+    private fun <T : Any> downloadRecord(
+        recordId: String,
+        userId: String,
+        resourceBarrier: (resource: Any) -> Boolean
+    ): Single<BaseRecord<T>> = apiService
+        .fetchRecord(alias, userId, recordId)
+        .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
+        .map { decryptedRecord -> failOnResourceInconsistency(decryptedRecord, resourceBarrier) }
+        .map { decryptedRecord -> downloadData(decryptedRecord, userId) }
+        .map { decryptedRecord ->
+            decryptedRecord.also {
+                checkDataRestrictions(decryptedRecord.resource)
+            }
+        }
+        .map { decryptedRecord -> assignResourceId(decryptedRecord) }
+        .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) }
+
+    fun <T : Fhir3Resource> downloadRecords(
+        recordIds: List<String>,
+        userId: String
+    ): Single<DownloadResult<T>> {
+        val failedDownloads: MutableList<Pair<String, D4LException>> = arrayListOf()
+        return Observable
+            .fromCallable { recordIds }
+            .flatMapIterable { it }
+            .flatMapSingle { recordId ->
+                downloadFhir3Record<T>(recordId, userId)
+                    .ignoreErrors {
+                        failedDownloads.add(Pair(recordId, errorHandler.handleError(it)))
+                    }
+            }
+            .toList()
+            .map { records -> DownloadResult(records as MutableList<Record<T>>?, failedDownloads) }
+    }
+
+    override fun downloadFhir3Attachment(
+        recordId: String,
+        attachmentId: String,
+        userId: String,
+        type: DownloadType
+    ): Single<Fhir3Attachment> = downloadFhir3Attachments(
+        recordId,
+        listOf(attachmentId),
+        userId,
+        type
+    ).map { it[0] }
+
+    override fun downloadFhir4Attachment(
+        recordId: String,
+        attachmentId: String,
+        userId: String,
+        type: DownloadType
+    ): Single<Fhir4Attachment> = downloadFhir4Attachments(
+        recordId,
+        listOf(attachmentId),
+        userId,
+        type
+    ).map { it[0] }
+
+    @Throws(IllegalArgumentException::class)
+    override fun downloadFhir3Attachments(
+        recordId: String,
+        attachmentIds: List<String>,
+        userId: String,
+        type: DownloadType
+    ): Single<List<Fhir3Attachment>> = downloadAttachments<Fhir3Resource, Fhir3Attachment>(
+        recordId,
+        attachmentIds,
+        userId,
+        type,
+        ::isFhir3
+    )
+
+    @Throws(IllegalArgumentException::class)
+    override fun downloadFhir4Attachments(
+        recordId: String,
+        attachmentIds: List<String>,
+        userId: String,
+        type: DownloadType
+    ): Single<List<Fhir4Attachment>> = downloadAttachments<Fhir4Resource, Fhir4Attachment>(
+        recordId,
+        attachmentIds,
+        userId,
+        type,
+        ::isFhir4
+    )
+
+    @Throws(IllegalArgumentException::class)
+    private fun <T : Any, R : Any> downloadAttachments(
+        recordId: String,
+        attachmentIds: List<String>,
+        userId: String,
+        type: DownloadType,
+        resourceBarrier: (resource: Any) -> Boolean
+    ): Single<List<R>> = apiService
+        .fetchRecord(alias, userId, recordId)
+        .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
+        .map { decryptedRecord -> failOnResourceInconsistency(decryptedRecord, resourceBarrier) }
+        .flatMap { decryptedRecord ->
+            downloadAttachmentsFromStorage<T, R>(
+                attachmentIds,
+                userId,
+                type,
+                decryptedRecord
+            )
+        }
+
     //region utility methods
+    @Throws(IllegalArgumentException::class)
+    private fun <T : Any> failOnResourceInconsistency(
+        record: DecryptedBaseRecord<T>,
+        resourceBarrier: (resource: Any) -> Boolean
+    ): DecryptedBaseRecord<T> {
+        return if (resourceBarrier(record.resource)) {
+            record
+        } else {
+            throw IllegalArgumentException("The given Record does not match the expected resource type.")
+        }
+    }
+
     @Throws(IOException::class)
     internal fun <T : Any> encryptRecord(record: DecryptedBaseRecord<T>): NetworkModelContract.EncryptedRecord {
         val encryptedTags = tagEncryptionService.encryptTagsAndAnnotations(record.tags!!, record.annotations)
@@ -688,79 +789,6 @@ class RecordService internal constructor(
             }
         ) as DecryptedBaseRecord<T>
     }
-
-    override fun downloadFhir3Attachment(
-        recordId: String,
-        attachmentId: String,
-        userId: String,
-        type: DownloadType
-    ): Single<Fhir3Attachment> = downloadFhir3Attachments(
-        recordId,
-        listOf(attachmentId),
-        userId,
-        type
-    ).map { it[0] }
-
-    override fun downloadFhir4Attachment(
-        recordId: String,
-        attachmentId: String,
-        userId: String,
-        type: DownloadType
-    ): Single<Fhir4Attachment> = downloadFhir4Attachments(
-        recordId,
-        listOf(attachmentId),
-        userId,
-        type
-    ).map { it[0] }
-
-    @Throws(IllegalArgumentException::class)
-    override fun downloadFhir3Attachments(
-        recordId: String,
-        attachmentIds: List<String>,
-        userId: String,
-        type: DownloadType
-    ): Single<List<Fhir3Attachment>> = downloadAttachments<Fhir3Resource, Fhir3Attachment>(
-        recordId,
-        attachmentIds,
-        userId,
-        type
-    ) { resource -> resource is Fhir3Resource }
-
-    @Throws(IllegalArgumentException::class)
-    override fun downloadFhir4Attachments(
-        recordId: String,
-        attachmentIds: List<String>,
-        userId: String,
-        type: DownloadType
-    ): Single<List<Fhir4Attachment>> = downloadAttachments<Fhir4Resource, Fhir4Attachment>(
-        recordId,
-        attachmentIds,
-        userId,
-        type
-    ) { resource -> resource is Fhir4Resource }
-
-    @Throws(IllegalArgumentException::class)
-    private fun <T : Any, R : Any> downloadAttachments(
-        recordId: String,
-        attachmentIds: List<String>,
-        userId: String,
-        type: DownloadType,
-        resourceBarrier: (resource: Any) -> Boolean
-    ): Single<List<R>> = apiService
-        .fetchRecord(alias, userId, recordId)
-        .map { decryptRecord<T>(it, userId) }
-        .flatMap { record ->
-            if (resourceBarrier(record.resource)) {
-                downloadAttachmentsFromStorage<T, R>(
-                    attachmentIds,
-                    userId,
-                    type,
-                    record
-                )
-            } else {
-                throw IllegalArgumentException("The given Record does not match the expected resource type.")
-            }
-        }
 
     @Throws(
         DataValidationException.IdUsageViolation::class,

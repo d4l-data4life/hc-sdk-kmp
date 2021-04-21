@@ -617,7 +617,10 @@ class RecordServiceTest {
         val resource: Fhir3Resource = mockk()
         val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk()
         val identifiers: List<Fhir3Identifier> = mockk()
-        val wrappedAttachment: WrapperContract.Attachment = mockk()
+        val wrappedAttachments: List<WrapperContract.Attachment> = listOf(
+                mockk(),
+                mockk()
+        )
         val downloadedWrappedAttachments: List<WrapperContract.Attachment> = listOf(
                 mockk(),
                 mockk()
@@ -642,10 +645,10 @@ class RecordServiceTest {
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
         every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
         every { SdkFhirAttachmentHelper.getIdentifier(resource) } returns identifiers
-        every { SdkAttachmentFactory.wrap(or(attachments[0], attachments[1])) } returns wrappedAttachment
+        every { SdkAttachmentFactory.wrap(or(attachments[0], attachments[1])) } returnsMany wrappedAttachments
         every {
             recordService.setAttachmentIdForDownloadType(
-                    attachments,
+                    wrappedAttachments,
                     identifiers,
                     DownloadType.Full
             )
@@ -653,7 +656,7 @@ class RecordServiceTest {
 
         every {
             attachmentService.download(
-                    listOf(wrappedAttachment, wrappedAttachment),
+                    wrappedAttachments,
                     attachmentKey,
                     USER_ID
             )
@@ -684,12 +687,12 @@ class RecordServiceTest {
 
         verifyOrder {
             recordService.setAttachmentIdForDownloadType(
-                    attachments,
+                    wrappedAttachments,
                     identifiers,
                     DownloadType.Full
             )
             attachmentService.download(
-                    listOf(wrappedAttachment, wrappedAttachment),
+                    wrappedAttachments,
                     attachmentKey,
                     USER_ID
             )
@@ -717,7 +720,10 @@ class RecordServiceTest {
         val resource: Fhir3Resource = mockk()
         val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk()
         val identifiers: List<Fhir3Identifier> = mockk()
-        val wrappedAttachment: WrapperContract.Attachment = mockk()
+        val wrappedAttachments: List<WrapperContract.Attachment> = listOf(
+                mockk(),
+                mockk()
+        )
         val downloadedWrappedAttachments: List<WrapperContract.Attachment> = listOf(
                 mockk(),
                 mockk()
@@ -746,10 +752,10 @@ class RecordServiceTest {
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
         every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
         every { SdkFhirAttachmentHelper.getIdentifier(resource) } returns identifiers
-        every { SdkAttachmentFactory.wrap(or(attachments[0], attachments[1])) } returns wrappedAttachment
+        every { SdkAttachmentFactory.wrap(or(attachments[0], attachments[1])) } returnsMany wrappedAttachments
         every {
             recordService.setAttachmentIdForDownloadType(
-                    attachments,
+                    wrappedAttachments,
                     identifiers,
                     DownloadType.Full
             )
@@ -757,7 +763,7 @@ class RecordServiceTest {
 
         every {
             attachmentService.download(
-                    listOf(wrappedAttachment, wrappedAttachment),
+                    wrappedAttachments,
                     attachmentKey,
                     USER_ID
             )
@@ -796,12 +802,12 @@ class RecordServiceTest {
 
         verifyOrder {
             recordService.setAttachmentIdForDownloadType(
-                    attachments,
+                    wrappedAttachments,
                     identifiers,
                     DownloadType.Full
             )
             attachmentService.download(
-                    listOf(wrappedAttachment, wrappedAttachment),
+                    wrappedAttachments,
                     attachmentKey,
                     USER_ID
             )

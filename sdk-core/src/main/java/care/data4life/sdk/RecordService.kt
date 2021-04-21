@@ -745,9 +745,9 @@ class RecordService internal constructor(
                 throw DataValidationException.IdUsageViolation("Please provide correct attachment ids!")
 
             setAttachmentIdForDownloadType(
-                validRawAttachments,
-                fhirAttachmentHelper.getIdentifier(resource) as List<Fhir3Identifier>?,
-                type
+                    validAttachments,
+                    fhirAttachmentHelper.getIdentifier(resource),
+                    type
             )
 
             return attachmentService.download(
@@ -1094,12 +1094,17 @@ class RecordService internal constructor(
     // TODO move to AttachmentService -> Thumbnail handling
     @Throws(DataValidationException.IdUsageViolation::class)
     fun setAttachmentIdForDownloadType(
+<<<<<<< HEAD
         attachments: List<Any>,
         identifiers: List<Any>?,
         type: DownloadType
+=======
+            attachments: List<WrapperContract.Attachment>,
+            identifiers: List<Any>?,
+            type: DownloadType
+>>>>>>> 50700b9... Use AttachmentWrapper in setAttachmentId
     ) {
-        for (rawAttachment in attachments) {
-            val attachment = attachmentFactory.wrap(rawAttachment)
+        for (attachment in attachments) {
             val additionalIds = extractAdditionalAttachmentIds(
                 identifiers,
                 attachment.id

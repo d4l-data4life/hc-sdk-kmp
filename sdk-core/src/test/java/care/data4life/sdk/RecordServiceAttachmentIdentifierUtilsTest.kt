@@ -819,18 +819,17 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     }
 
     @Test
-    fun `Given, setAttachmentIdForDownloadType is called with a list of Fhir3Attachments, a list of Fhir3Identifier and a DownloadType, it does nothing, if the extracted Ids are null`() {
+    fun `Given, setAttachmentIdForDownloadType is called with a list of wrapped Attachments, a list of Fhir3Identifier and a DownloadType, it does nothing, if the extracted Ids are null`() {
         // When
-        val attachments: List<Fhir3Attachment> = listOf(
+        val attachments: List<WrapperContract.Attachment> = listOf(
                 mockk()
         )
         val attachmentId = "id"
-        val wrappedAttachment: WrapperContract.Attachment = mockk()
         val identifiers: List<Fhir3Identifier> = mockk()
 
-        every { wrappedAttachment.id } returns attachmentId
+        every { attachments[0].id } returns attachmentId
 
-        every { SdkAttachmentFactory.wrap(attachments[0]) } returns wrappedAttachment
+        every { SdkAttachmentFactory.wrap(attachments[0]) } returns attachments[0]
         every {
             recordService.extractAdditionalAttachmentIds(
                     identifiers,
@@ -846,23 +845,22 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         )
 
         // Then
-        verify(exactly = 0) { wrappedAttachment.id = any() }
+        verify(exactly = 0) { attachments[0].id = any() }
     }
 
     @Test
-    fun `Given, setAttachmentIdForDownloadType is called with a list of Fhir3Attachments, a list of Fhir3Identifier and a DownloadType, it does nothing, if DownloadType is FULL`() {
+    fun `Given, setAttachmentIdForDownloadType is called with a list of wrapped Attachments, a list of Fhir3Identifier and a DownloadType, it does nothing, if DownloadType is FULL`() {
         // When
         val extracted: List<String> = mockk()
-        val attachments: List<Fhir3Attachment> = listOf(
+        val attachments: List<WrapperContract.Attachment> = listOf(
                 mockk()
         )
         val attachmentId = "id"
-        val wrappedAttachment: WrapperContract.Attachment = mockk()
         val identifiers: List<Fhir3Identifier> = mockk()
 
-        every { wrappedAttachment.id } returns attachmentId
+        every { attachments[0].id } returns attachmentId
 
-        every { SdkAttachmentFactory.wrap(attachments[0]) } returns wrappedAttachment
+        every { SdkAttachmentFactory.wrap(attachments[0]) } returns attachments[0]
         every {
             recordService.extractAdditionalAttachmentIds(
                     identifiers,
@@ -878,11 +876,11 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         )
 
         // Then
-        verify(exactly = 0) { wrappedAttachment.id = any() }
+        verify(exactly = 0) { attachments[0].id = any() }
     }
 
     @Test
-    fun `Given, setAttachmentIdForDownloadType is called with a list of Fhir3Attachments, a list of Fhir3Identifier and a DownloadType, it adds PREVIEW_ID_POS to the AttachmentId, if DownloadType is MEDIUM`() {
+    fun `Given, setAttachmentIdForDownloadType is called with a list of wrapped Attachments, a list of Fhir3Identifier and a DownloadType, it adds PREVIEW_ID_POS to the AttachmentId, if DownloadType is MEDIUM`() {
         // When
         val extracted: List<String> = listOf(
                 "tomato",
@@ -890,19 +888,18 @@ class RecordServiceAttachmentIdentifierUtilsTest {
                 "cucumber",
                 "soup"
         )
-        val attachments: List<Fhir3Attachment> = listOf(
+        val attachments: List<WrapperContract.Attachment> = listOf(
                 mockk()
         )
         val attachmentId = "id"
-        val wrappedAttachment: WrapperContract.Attachment = mockk()
         val identifiers: List<Fhir3Identifier> = mockk()
 
-        every { wrappedAttachment.id } returns attachmentId
+        every { attachments[0].id } returns attachmentId
         every {
-            wrappedAttachment.id = attachmentId + SPLIT_CHAR + extracted[PREVIEW_ID_POS]
+            attachments[0].id = attachmentId + SPLIT_CHAR + extracted[PREVIEW_ID_POS]
         } just Runs
 
-        every { SdkAttachmentFactory.wrap(attachments[0]) } returns wrappedAttachment
+        every { SdkAttachmentFactory.wrap(attachments[0]) } returns attachments[0]
         every {
             recordService.extractAdditionalAttachmentIds(
                     identifiers,
@@ -919,12 +916,12 @@ class RecordServiceAttachmentIdentifierUtilsTest {
 
         // Then
         verify(exactly = 1) {
-            wrappedAttachment.id = attachmentId + SPLIT_CHAR + extracted[PREVIEW_ID_POS]
+            attachments[0].id = attachmentId + SPLIT_CHAR + extracted[PREVIEW_ID_POS]
         }
     }
 
     @Test
-    fun `Given, setAttachmentIdForDownloadType is called with a list of Fhir3Attachments, a list of Fhir3Identifier and a DownloadType, it adds THUMBNAIL_ID_POS to the AttachmentId, if DownloadType is SMALL`() {
+    fun `Given, setAttachmentIdForDownloadType is called with a list of wrapped Attachments, a list of Fhir3Identifier and a DownloadType, it adds THUMBNAIL_ID_POS to the AttachmentId, if DownloadType is SMALL`() {
         // When
         val extracted: List<String> = listOf(
                 "tomato",
@@ -932,19 +929,18 @@ class RecordServiceAttachmentIdentifierUtilsTest {
                 "cucumber",
                 "soup"
         )
-        val attachments: List<Fhir3Attachment> = listOf(
+        val attachments: List<WrapperContract.Attachment> = listOf(
                 mockk()
         )
         val attachmentId = "id"
-        val wrappedAttachment: WrapperContract.Attachment = mockk()
         val identifiers: List<Fhir3Identifier> = mockk()
 
-        every { wrappedAttachment.id } returns attachmentId
+        every { attachments[0].id } returns attachmentId
         every {
-            wrappedAttachment.id = attachmentId + SPLIT_CHAR + extracted[THUMBNAIL_ID_POS]
+            attachments[0].id = attachmentId + SPLIT_CHAR + extracted[THUMBNAIL_ID_POS]
         } just Runs
 
-        every { SdkAttachmentFactory.wrap(attachments[0]) } returns wrappedAttachment
+        every { SdkAttachmentFactory.wrap(attachments[0]) } returns attachments[0]
         every {
             recordService.extractAdditionalAttachmentIds(
                     identifiers,
@@ -961,23 +957,22 @@ class RecordServiceAttachmentIdentifierUtilsTest {
 
         // Then
         verify(exactly = 1) {
-            wrappedAttachment.id = attachmentId + SPLIT_CHAR + extracted[THUMBNAIL_ID_POS]
+            attachments[0].id = attachmentId + SPLIT_CHAR + extracted[THUMBNAIL_ID_POS]
         }
     }
 
     @Test
-    fun `Given, setAttachmentIdForDownloadType is called with a list of Fhir4Attachments, a list of Fhir4Identifier and a DownloadType, it does nothing, if the extracted Ids are null`() {
+    fun `Given, setAttachmentIdForDownloadType is called with a list of wrapped Attachments, a list of Fhir4Identifier and a DownloadType, it does nothing, if the extracted Ids are null`() {
         // When
-        val attachments: List<Fhir4Attachment> = listOf(
+        val attachments: List<WrapperContract.Attachment> = listOf(
                 mockk()
         )
         val attachmentId = "id"
-        val wrappedAttachment: WrapperContract.Attachment = mockk()
         val identifiers: List<Fhir4Identifier> = mockk()
 
-        every { wrappedAttachment.id } returns attachmentId
+        every { attachments[0].id } returns attachmentId
 
-        every { SdkAttachmentFactory.wrap(attachments[0]) } returns wrappedAttachment
+        every { SdkAttachmentFactory.wrap(attachments[0]) } returns attachments[0]
         every {
             recordService.extractAdditionalAttachmentIds(
                     identifiers,
@@ -993,23 +988,22 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         )
 
         // Then
-        verify(exactly = 0) { wrappedAttachment.id = any() }
+        verify(exactly = 0) { attachments[0].id = any() }
     }
 
     @Test
-    fun `Given, setAttachmentIdForDownloadType is called with a list of Fhir4Attachments, a list of Fhir4Identifier and a DownloadType, it does nothing, if DownloadType is FULL`() {
+    fun `Given, setAttachmentIdForDownloadType is called with a list of wrapped Attachments, a list of Fhir4Identifier and a DownloadType, it does nothing, if DownloadType is FULL`() {
         // When
         val extracted: List<String> = mockk()
-        val attachments: List<Fhir4Attachment> = listOf(
+        val attachments: List<WrapperContract.Attachment> = listOf(
                 mockk()
         )
         val attachmentId = "id"
-        val wrappedAttachment: WrapperContract.Attachment = mockk()
         val identifiers: List<Fhir4Identifier> = mockk()
 
-        every { wrappedAttachment.id } returns attachmentId
+        every { attachments[0].id } returns attachmentId
 
-        every { SdkAttachmentFactory.wrap(attachments[0]) } returns wrappedAttachment
+        every { SdkAttachmentFactory.wrap(attachments[0]) } returns attachments[0]
         every {
             recordService.extractAdditionalAttachmentIds(
                     identifiers,
@@ -1025,11 +1019,11 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         )
 
         // Then
-        verify(exactly = 0) { wrappedAttachment.id = any() }
+        verify(exactly = 0) { attachments[0].id = any() }
     }
 
     @Test
-    fun `Given, setAttachmentIdForDownloadType is called with a list of Fhir4Attachments, a list of Fhir4Identifier and a DownloadType, it adds PREVIEW_ID_POS to the AttachmentId, if DownloadType is MEDIUM`() {
+    fun `Given, setAttachmentIdForDownloadType is called with a list of wrapped Attachments, a list of Fhir4Identifier and a DownloadType, it adds PREVIEW_ID_POS to the AttachmentId, if DownloadType is MEDIUM`() {
         // When
         val extracted: List<String> = listOf(
                 "tomato",
@@ -1037,19 +1031,18 @@ class RecordServiceAttachmentIdentifierUtilsTest {
                 "cucumber",
                 "soup"
         )
-        val attachments: List<Fhir4Attachment> = listOf(
+        val attachments: List<WrapperContract.Attachment> = listOf(
                 mockk()
         )
         val attachmentId = "id"
-        val wrappedAttachment: WrapperContract.Attachment = mockk()
         val identifiers: List<Fhir4Identifier> = mockk()
 
-        every { wrappedAttachment.id } returns attachmentId
+        every { attachments[0].id } returns attachmentId
         every {
-            wrappedAttachment.id = attachmentId + SPLIT_CHAR + extracted[PREVIEW_ID_POS]
+            attachments[0].id = attachmentId + SPLIT_CHAR + extracted[PREVIEW_ID_POS]
         } just Runs
 
-        every { SdkAttachmentFactory.wrap(attachments[0]) } returns wrappedAttachment
+        every { SdkAttachmentFactory.wrap(attachments[0]) } returns attachments[0]
         every {
             recordService.extractAdditionalAttachmentIds(
                     identifiers,
@@ -1066,12 +1059,12 @@ class RecordServiceAttachmentIdentifierUtilsTest {
 
         // Then
         verify(exactly = 1) {
-            wrappedAttachment.id = attachmentId + SPLIT_CHAR + extracted[PREVIEW_ID_POS]
+            attachments[0].id = attachmentId + SPLIT_CHAR + extracted[PREVIEW_ID_POS]
         }
     }
 
     @Test
-    fun `Given, setAttachmentIdForDownloadType is called with a list of Fhir4Attachments, a list of Fhir4Identifier and a DownloadType, it adds THUMBNAIL_ID_POS to the AttachmentId, if DownloadType is SMALL`() {
+    fun `Given, setAttachmentIdForDownloadType is called with a list of wrapped Attachments, a list of Fhir4Identifier and a DownloadType, it adds THUMBNAIL_ID_POS to the AttachmentId, if DownloadType is SMALL`() {
         // When
         val extracted: List<String> = listOf(
                 "tomato",
@@ -1079,19 +1072,18 @@ class RecordServiceAttachmentIdentifierUtilsTest {
                 "cucumber",
                 "soup"
         )
-        val attachments: List<Fhir4Attachment> = listOf(
+        val attachments: List<WrapperContract.Attachment> = listOf(
                 mockk()
         )
         val attachmentId = "id"
-        val wrappedAttachment: WrapperContract.Attachment = mockk()
         val identifiers: List<Fhir4Identifier> = mockk()
 
-        every { wrappedAttachment.id } returns attachmentId
+        every { attachments[0].id } returns attachmentId
         every {
-            wrappedAttachment.id = attachmentId + SPLIT_CHAR + extracted[THUMBNAIL_ID_POS]
+            attachments[0].id = attachmentId + SPLIT_CHAR + extracted[THUMBNAIL_ID_POS]
         } just Runs
 
-        every { SdkAttachmentFactory.wrap(attachments[0]) } returns wrappedAttachment
+        every { SdkAttachmentFactory.wrap(attachments[0]) } returns attachments[0]
         every {
             recordService.extractAdditionalAttachmentIds(
                     identifiers,
@@ -1108,7 +1100,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
 
         // Then
         verify(exactly = 1) {
-            wrappedAttachment.id = attachmentId + SPLIT_CHAR + extracted[THUMBNAIL_ID_POS]
+            attachments[0].id = attachmentId + SPLIT_CHAR + extracted[THUMBNAIL_ID_POS]
         }
     }
 }

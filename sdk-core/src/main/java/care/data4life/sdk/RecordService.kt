@@ -27,7 +27,6 @@ import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Attachment
-import care.data4life.sdk.fhir.Fhir3Identifier
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
@@ -710,7 +709,7 @@ class RecordService internal constructor(
         .fetchRecord(alias, userId, recordId)
         .map { decryptRecord<Fhir3Resource>(it, userId) }
         .flatMap {
-            downloadAttachmentsFromStorage(
+            downloadAttachmentsFromStorage<Fhir3Resource, Fhir3Attachment>(
                 attachmentIds,
                 userId,
                 type,
@@ -722,22 +721,23 @@ class RecordService internal constructor(
         DataValidationException.IdUsageViolation::class,
         DataValidationException.InvalidAttachmentPayloadHash::class
     )
-    internal fun downloadAttachmentsFromStorage(
+    internal fun <T : Any, R : Any> downloadAttachmentsFromStorage(
         attachmentIds: List<String>,
         userId: String,
         type: DownloadType,
-        decryptedRecord: DecryptedFhir3Record<Fhir3Resource>
-    ): Single<out List<Fhir3Attachment>> {
+        decryptedRecord: DecryptedBaseRecord<T>
+    ): Single<List<R>> {
         if (fhirAttachmentHelper.hasAttachment(decryptedRecord.resource)) {
             val resource = decryptedRecord.resource
-            val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Fhir3Attachment?>
+            val attachments = fhirAttachmentHelper.getAttachment(resource) ?: emptyList<R?>()
             val validAttachments = mutableListOf<WrapperContract.Attachment>()
-            val validRawAttachments = mutableListOf<Fhir3Attachment>()
 
-            for (attachment in attachments) {
-                if (attachmentIds.contains(attachment?.id)) {
-                    validRawAttachments.add(attachment!!)
-                    validAttachments.add(SdkAttachmentFactory.wrap(attachment))
+            for (rawAttachment in attachments) {
+                if (rawAttachment != null) {
+                    val attachment = SdkAttachmentFactory.wrap(rawAttachment)
+                    if (attachmentIds.contains(attachment.id)) {
+                        validAttachments.add(attachment)
+                    }
                 }
             }
 
@@ -745,9 +745,9 @@ class RecordService internal constructor(
                 throw DataValidationException.IdUsageViolation("Please provide correct attachment ids!")
 
             setAttachmentIdForDownloadType(
-                    validAttachments,
-                    fhirAttachmentHelper.getIdentifier(resource),
-                    type
+                validAttachments,
+                fhirAttachmentHelper.getIdentifier(resource),
+                type
             )
 
             return attachmentService.download(
@@ -756,16 +756,17 @@ class RecordService internal constructor(
                 decryptedRecord.attachmentsKey!!,
                 userId
             )
-                    .flattenAsObservable { attachment -> attachment }
-                    .map {
-                        attachment -> if (attachment.id!!.contains(SPLIT_CHAR)) {
-                            updateAttachmentMeta(attachment)
-                        } else {
-                            attachment
-                        }
+                .flattenAsObservable { attachment -> attachment }
+                .map {
+                    attachment ->
+                    if (attachment.id!!.contains(SPLIT_CHAR)) {
+                        updateAttachmentMeta(attachment)
+                    } else {
+                        attachment
                     }
-                    .map { attachment -> attachment.unwrap<Fhir3Attachment>() }
-                    .toList()
+                }
+                .map { attachment -> attachment.unwrap<R>() }
+                .toList()
         }
 
         throw IllegalArgumentException("Expected a record of a type that has attachment")
@@ -1094,15 +1095,9 @@ class RecordService internal constructor(
     // TODO move to AttachmentService -> Thumbnail handling
     @Throws(DataValidationException.IdUsageViolation::class)
     fun setAttachmentIdForDownloadType(
-<<<<<<< HEAD
-        attachments: List<Any>,
+        attachments: List<WrapperContract.Attachment>,
         identifiers: List<Any>?,
         type: DownloadType
-=======
-            attachments: List<WrapperContract.Attachment>,
-            identifiers: List<Any>?,
-            type: DownloadType
->>>>>>> 50700b9... Use AttachmentWrapper in setAttachmentId
     ) {
         for (attachment in attachments) {
             val additionalIds = extractAdditionalAttachmentIds(

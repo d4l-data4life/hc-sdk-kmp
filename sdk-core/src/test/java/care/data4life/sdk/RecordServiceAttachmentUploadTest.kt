@@ -17,9 +17,6 @@
 package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
-import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
-import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
@@ -31,6 +28,9 @@ import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
+import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.wrapper.SdkAttachmentFactory
 import care.data4life.sdk.wrapper.SdkFhirAttachmentHelper
 import care.data4life.sdk.wrapper.WrapperContract
@@ -66,18 +66,18 @@ class RecordServiceAttachmentUploadTest {
         clearAllMocks()
 
         recordService = spyk(
-                RecordService(
-                        PARTNER_ID,
-                        ALIAS,
-                        apiService,
-                        tagEncryptionService,
-                        taggingService,
-                        fhirService,
-                        attachmentService,
-                        cryptoService,
-                        errorHandler,
-                        mockk()
-                )
+            RecordService(
+                PARTNER_ID,
+                ALIAS,
+                apiService,
+                tagEncryptionService,
+                taggingService,
+                fhirService,
+                attachmentService,
+                cryptoService,
+                errorHandler,
+                mockk()
+            )
         )
 
         mockkObject(SdkFhirAttachmentHelper)
@@ -103,8 +103,8 @@ class RecordServiceAttachmentUploadTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verifyOrder {
@@ -129,8 +129,8 @@ class RecordServiceAttachmentUploadTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verifyOrder {
@@ -155,8 +155,8 @@ class RecordServiceAttachmentUploadTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify { attachmentService.upload(any(), any(), any()) wasNot Called }
@@ -168,7 +168,7 @@ class RecordServiceAttachmentUploadTest {
         val resource: Fhir3Resource = mockk(relaxed = true)
         val decryptedRecord: DecryptedBaseRecord<Fhir3Resource> = mockk()
         val rawAttachments: MutableList<Fhir3Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = spyk()
 
@@ -186,8 +186,8 @@ class RecordServiceAttachmentUploadTest {
         }
 
         assertEquals(
-                actual = exception.message,
-                expected = "Attachment.id should be null"
+            actual = exception.message,
+            expected = "Attachment.id should be null"
         )
     }
 
@@ -197,7 +197,7 @@ class RecordServiceAttachmentUploadTest {
         val resource: Fhir3Resource = mockk(relaxed = true)
         val decryptedRecord: DecryptedBaseRecord<Fhir3Resource> = mockk()
         val rawAttachments: MutableList<Fhir3Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = spyk()
 
@@ -216,8 +216,8 @@ class RecordServiceAttachmentUploadTest {
         }
 
         assertEquals(
-                actual = exception.message,
-                expected = "Attachment.hash and Attachment.size expected"
+            actual = exception.message,
+            expected = "Attachment.hash and Attachment.size expected"
         )
     }
 
@@ -227,7 +227,7 @@ class RecordServiceAttachmentUploadTest {
         val resource: Fhir3Resource = mockk(relaxed = true)
         val decryptedRecord: DecryptedBaseRecord<Fhir3Resource> = mockk()
         val rawAttachments: MutableList<Fhir3Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = spyk()
 
@@ -247,8 +247,8 @@ class RecordServiceAttachmentUploadTest {
         }
 
         assertEquals(
-                actual = exception.message,
-                expected = "Attachment.hash and Attachment.size expected"
+            actual = exception.message,
+            expected = "Attachment.hash and Attachment.size expected"
         )
     }
 
@@ -258,7 +258,7 @@ class RecordServiceAttachmentUploadTest {
         val resource: Fhir3Resource = mockk(relaxed = true)
         val decryptedRecord: DecryptedBaseRecord<Fhir3Resource> = mockk()
         val rawAttachments: MutableList<Fhir3Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = spyk()
 
@@ -280,8 +280,8 @@ class RecordServiceAttachmentUploadTest {
         }
 
         assertEquals(
-                actual = exception.message,
-                expected = "Attachment.hash is not valid"
+            actual = exception.message,
+            expected = "Attachment.hash is not valid"
         )
     }
 
@@ -291,7 +291,7 @@ class RecordServiceAttachmentUploadTest {
         val resource: Fhir3Resource = mockk(relaxed = true)
         val decryptedRecord: DecryptedBaseRecord<Fhir3Resource> = mockk()
         val rawAttachments: MutableList<Fhir3Attachment?> = mutableListOf(
-                null
+            null
         )
 
         every { decryptedRecord.resource } returns resource
@@ -302,8 +302,8 @@ class RecordServiceAttachmentUploadTest {
         val record = recordService.uploadData(decryptedRecord, USER_ID)
         // When
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify { attachmentService.upload(any(), any(), any()) wasNot Called }
@@ -316,12 +316,12 @@ class RecordServiceAttachmentUploadTest {
         val decryptedRecord: DecryptedBaseRecord<Fhir3Resource> = mockk()
         val attachmentKey: GCKey = mockk()
         val rawAttachments: MutableList<Fhir3Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = spyk()
         val hash = "hash"
         val updatedAttachments = listOf<Pair<WrapperContract.Attachment, List<String>>>(
-                mockk()
+            mockk()
         )
 
         every { decryptedRecord.attachmentsKey } returns attachmentKey
@@ -338,15 +338,15 @@ class RecordServiceAttachmentUploadTest {
         every { SdkAttachmentFactory.wrap(rawAttachments[0]) } returns wrappedAttachment
         every {
             attachmentService.upload(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         } returns Single.just(updatedAttachments)
         every {
             recordService.updateFhirResourceIdentifier(
-                    resource,
-                    updatedAttachments
+                resource,
+                updatedAttachments
             )
         } returns Unit
 
@@ -354,16 +354,16 @@ class RecordServiceAttachmentUploadTest {
         val record = recordService.uploadData(decryptedRecord, USER_ID)
         // When
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verifyOrder {
             recordService.getValidHash(wrappedAttachment)
             attachmentService.upload(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
             recordService.updateFhirResourceIdentifier(resource, updatedAttachments)
         }
@@ -376,13 +376,13 @@ class RecordServiceAttachmentUploadTest {
         val decryptedRecord: DecryptedBaseRecord<Fhir3Resource> = mockk()
         val attachmentKey: GCKey = mockk()
         val rawAttachments: MutableList<Fhir3Attachment?> = mutableListOf(
-                null,
-                mockk()
+            null,
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = spyk()
         val hash = "hash"
         val updatedAttachments = listOf<Pair<WrapperContract.Attachment, List<String>>>(
-                mockk()
+            mockk()
         )
 
         every { decryptedRecord.attachmentsKey } returns attachmentKey
@@ -399,15 +399,15 @@ class RecordServiceAttachmentUploadTest {
         every { SdkAttachmentFactory.wrap(rawAttachments[1]!!) } returns wrappedAttachment
         every {
             attachmentService.upload(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         } returns Single.just(updatedAttachments)
         every {
             recordService.updateFhirResourceIdentifier(
-                    resource,
-                    updatedAttachments
+                resource,
+                updatedAttachments
             )
         } returns Unit
 
@@ -415,16 +415,16 @@ class RecordServiceAttachmentUploadTest {
         val record = recordService.uploadData(decryptedRecord, USER_ID)
         // When
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verifyOrder {
             recordService.getValidHash(wrappedAttachment)
             attachmentService.upload(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
             recordService.updateFhirResourceIdentifier(resource, updatedAttachments)
         }
@@ -437,12 +437,12 @@ class RecordServiceAttachmentUploadTest {
         val decryptedRecord: DecryptedBaseRecord<Fhir3Resource> = mockk()
         val attachmentKey: GCKey = mockk()
         val rawAttachments: MutableList<Fhir3Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = spyk()
         val hash = "hash"
         val updatedAttachments = listOf<Pair<WrapperContract.Attachment, List<String>>>(
-                mockk()
+            mockk()
         )
 
         every { decryptedRecord.attachmentsKey } returnsMany listOf(null, attachmentKey)
@@ -461,15 +461,15 @@ class RecordServiceAttachmentUploadTest {
         every { decryptedRecord.attachmentsKey = attachmentKey } returns Unit
         every {
             attachmentService.upload(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         } returns Single.just(updatedAttachments)
         every {
             recordService.updateFhirResourceIdentifier(
-                    resource,
-                    updatedAttachments
+                resource,
+                updatedAttachments
             )
         } returns Unit
 
@@ -477,8 +477,8 @@ class RecordServiceAttachmentUploadTest {
         val record = recordService.uploadData(decryptedRecord, USER_ID)
         // When
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verifyOrder {
@@ -486,9 +486,9 @@ class RecordServiceAttachmentUploadTest {
             cryptoService.generateGCKey()
             decryptedRecord.attachmentsKey = attachmentKey
             attachmentService.upload(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
             recordService.updateFhirResourceIdentifier(resource, updatedAttachments)
         }
@@ -509,8 +509,8 @@ class RecordServiceAttachmentUploadTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verifyOrder {
@@ -536,8 +536,8 @@ class RecordServiceAttachmentUploadTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verifyOrder {
@@ -553,7 +553,7 @@ class RecordServiceAttachmentUploadTest {
         val resource: Fhir4Resource = mockk(relaxed = true)
         val decryptedRecord: DecryptedBaseRecord<Fhir4Resource> = mockk()
         val rawAttachments: MutableList<Fhir4Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = spyk()
 
@@ -571,8 +571,8 @@ class RecordServiceAttachmentUploadTest {
         }
 
         assertEquals(
-                actual = exception.message,
-                expected = "Attachment.id should be null"
+            actual = exception.message,
+            expected = "Attachment.id should be null"
         )
     }
 
@@ -582,7 +582,7 @@ class RecordServiceAttachmentUploadTest {
         val resource: Fhir4Resource = mockk(relaxed = true)
         val decryptedRecord: DecryptedBaseRecord<Fhir4Resource> = mockk()
         val rawAttachments: MutableList<Fhir4Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = spyk()
 
@@ -601,8 +601,8 @@ class RecordServiceAttachmentUploadTest {
         }
 
         assertEquals(
-                actual = exception.message,
-                expected = "Attachment.hash and Attachment.size expected"
+            actual = exception.message,
+            expected = "Attachment.hash and Attachment.size expected"
         )
     }
 
@@ -612,7 +612,7 @@ class RecordServiceAttachmentUploadTest {
         val resource: Fhir4Resource = mockk(relaxed = true)
         val decryptedRecord: DecryptedBaseRecord<Fhir4Resource> = mockk()
         val rawAttachments: MutableList<Fhir4Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = spyk()
 
@@ -632,8 +632,8 @@ class RecordServiceAttachmentUploadTest {
         }
 
         assertEquals(
-                actual = exception.message,
-                expected = "Attachment.hash and Attachment.size expected"
+            actual = exception.message,
+            expected = "Attachment.hash and Attachment.size expected"
         )
     }
 
@@ -643,7 +643,7 @@ class RecordServiceAttachmentUploadTest {
         val resource: Fhir4Resource = mockk(relaxed = true)
         val decryptedRecord: DecryptedBaseRecord<Fhir4Resource> = mockk()
         val rawAttachments: MutableList<Fhir4Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = spyk()
 
@@ -665,8 +665,8 @@ class RecordServiceAttachmentUploadTest {
         }
 
         assertEquals(
-                actual = exception.message,
-                expected = "Attachment.hash is not valid"
+            actual = exception.message,
+            expected = "Attachment.hash is not valid"
         )
     }
 
@@ -676,7 +676,7 @@ class RecordServiceAttachmentUploadTest {
         val resource: Fhir4Resource = mockk(relaxed = true)
         val decryptedRecord: DecryptedBaseRecord<Fhir4Resource> = mockk()
         val rawAttachments: MutableList<Fhir4Attachment?> = mutableListOf(
-                null
+            null
         )
 
         every { decryptedRecord.resource } returns resource
@@ -687,8 +687,8 @@ class RecordServiceAttachmentUploadTest {
         val record = recordService.uploadData(decryptedRecord, USER_ID)
         // When
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify { attachmentService.upload(any(), any(), any()) wasNot Called }
@@ -701,12 +701,12 @@ class RecordServiceAttachmentUploadTest {
         val decryptedRecord: DecryptedBaseRecord<Fhir4Resource> = mockk()
         val attachmentKey: GCKey = mockk()
         val rawAttachments: MutableList<Fhir4Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = spyk()
         val hash = "hash"
         val updatedAttachments = listOf<Pair<WrapperContract.Attachment, List<String>>>(
-                mockk()
+            mockk()
         )
 
         every { decryptedRecord.attachmentsKey } returns attachmentKey
@@ -723,15 +723,15 @@ class RecordServiceAttachmentUploadTest {
         every { SdkAttachmentFactory.wrap(rawAttachments[0]) } returns wrappedAttachment
         every {
             attachmentService.upload(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         } returns Single.just(updatedAttachments)
         every {
             recordService.updateFhirResourceIdentifier(
-                    resource,
-                    updatedAttachments
+                resource,
+                updatedAttachments
             )
         } returns Unit
 
@@ -739,16 +739,16 @@ class RecordServiceAttachmentUploadTest {
         val record = recordService.uploadData(decryptedRecord, USER_ID)
         // When
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verifyOrder {
             recordService.getValidHash(wrappedAttachment)
             attachmentService.upload(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
             recordService.updateFhirResourceIdentifier(resource, updatedAttachments)
         }
@@ -761,13 +761,13 @@ class RecordServiceAttachmentUploadTest {
         val decryptedRecord: DecryptedBaseRecord<Fhir4Resource> = mockk()
         val attachmentKey: GCKey = mockk()
         val rawAttachments: MutableList<Fhir4Attachment?> = mutableListOf(
-                null,
-                mockk()
+            null,
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = spyk()
         val hash = "hash"
         val updatedAttachments = listOf<Pair<WrapperContract.Attachment, List<String>>>(
-                mockk()
+            mockk()
         )
 
         every { decryptedRecord.attachmentsKey } returns attachmentKey
@@ -784,15 +784,15 @@ class RecordServiceAttachmentUploadTest {
         every { SdkAttachmentFactory.wrap(rawAttachments[1]!!) } returns wrappedAttachment
         every {
             attachmentService.upload(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         } returns Single.just(updatedAttachments)
         every {
             recordService.updateFhirResourceIdentifier(
-                    resource,
-                    updatedAttachments
+                resource,
+                updatedAttachments
             )
         } returns Unit
 
@@ -800,16 +800,16 @@ class RecordServiceAttachmentUploadTest {
         val record = recordService.uploadData(decryptedRecord, USER_ID)
         // When
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verifyOrder {
             recordService.getValidHash(wrappedAttachment)
             attachmentService.upload(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
             recordService.updateFhirResourceIdentifier(resource, updatedAttachments)
         }
@@ -822,12 +822,12 @@ class RecordServiceAttachmentUploadTest {
         val decryptedRecord: DecryptedBaseRecord<Fhir4Resource> = mockk()
         val attachmentKey: GCKey = mockk()
         val rawAttachments: MutableList<Fhir4Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = spyk()
         val hash = "hash"
         val updatedAttachments = listOf<Pair<WrapperContract.Attachment, List<String>>>(
-                mockk()
+            mockk()
         )
 
         every { decryptedRecord.attachmentsKey } returnsMany listOf(null, attachmentKey)
@@ -846,15 +846,15 @@ class RecordServiceAttachmentUploadTest {
         every { decryptedRecord.attachmentsKey = attachmentKey } returns Unit
         every {
             attachmentService.upload(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         } returns Single.just(updatedAttachments)
         every {
             recordService.updateFhirResourceIdentifier(
-                    resource,
-                    updatedAttachments
+                resource,
+                updatedAttachments
             )
         } returns Unit
 
@@ -862,8 +862,8 @@ class RecordServiceAttachmentUploadTest {
         val record = recordService.uploadData(decryptedRecord, USER_ID)
         // When
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verifyOrder {
@@ -871,9 +871,9 @@ class RecordServiceAttachmentUploadTest {
             cryptoService.generateGCKey()
             decryptedRecord.attachmentsKey = attachmentKey
             attachmentService.upload(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
             recordService.updateFhirResourceIdentifier(resource, updatedAttachments)
         }

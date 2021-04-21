@@ -16,8 +16,6 @@
 
 package care.data4life.sdk
 
-import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
-import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.ThumbnailService
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
@@ -36,6 +34,8 @@ import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATT
 import care.data4life.sdk.record.RecordContract.Service.Companion.PREVIEW_ID_POS
 import care.data4life.sdk.record.RecordContract.Service.Companion.THUMBNAIL_ID_POS
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
+import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
 import care.data4life.sdk.wrapper.SdkAttachmentFactory
 import care.data4life.sdk.wrapper.SdkFhirAttachmentHelper
 import care.data4life.sdk.wrapper.SdkIdentifierFactory
@@ -73,18 +73,18 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         clearAllMocks()
 
         recordService = spyk(
-                RecordService(
-                        PARTNER_ID,
-                        ALIAS,
-                        apiService,
-                        tagEncryptionService,
-                        taggingService,
-                        fhirService,
-                        attachmentService,
-                        cryptoService,
-                        errorHandler,
-                        mockk()
-                )
+            RecordService(
+                PARTNER_ID,
+                ALIAS,
+                apiService,
+                tagEncryptionService,
+                taggingService,
+                fhirService,
+                attachmentService,
+                cryptoService,
+                errorHandler,
+                mockk()
+            )
         )
 
         mockkObject(SdkFhirAttachmentHelper)
@@ -141,8 +141,8 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         }
 
         assertEquals(
-                actual = error.message,
-                expected = DOWNSCALED_ATTACHMENT_IDS_FMT
+            actual = error.message,
+            expected = DOWNSCALED_ATTACHMENT_IDS_FMT
         )
     }
 
@@ -151,10 +151,10 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         // Given
         val additionalIdentifier: WrapperContract.Identifier = mockk()
         val value = listOf(
-                DOWNSCALED_ATTACHMENT_IDS_FMT,
-                "potato",
-                "tomato",
-                "soup"
+            DOWNSCALED_ATTACHMENT_IDS_FMT,
+            "potato",
+            "tomato",
+            "soup"
         )
 
         every { additionalIdentifier.value } returns value.joinToString(ThumbnailService.SPLIT_CHAR)
@@ -164,8 +164,8 @@ class RecordServiceAttachmentIdentifierUtilsTest {
 
         // Then
         assertEquals(
-                actual = parts,
-                expected = value
+            actual = parts,
+            expected = value
         )
     }
 
@@ -218,7 +218,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         // Given
         val resource: Fhir3Resource = mockk()
         val attachments: MutableList<Fhir3Attachment?> = mutableListOf(
-                mockk()
+            mockk()
         )
 
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
@@ -237,7 +237,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         // Given
         val resource: Fhir3Resource = mockk(relaxed = true)
         val attachments: MutableList<Fhir3Attachment?> = mutableListOf(
-                mockk()
+            mockk()
         )
         val identifiers: MutableList<Fhir3Identifier> = mutableListOf()
 
@@ -265,12 +265,12 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val resource: Fhir3Resource = mockk(relaxed = true)
         val attachmentId = "id"
         val attachments: MutableList<Any> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = mockk()
 
         val identifiers: MutableList<Fhir3Identifier> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedIdentifier: WrapperContract.Identifier = mockk()
 
@@ -307,12 +307,12 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val resource: Fhir3Resource = mockk(relaxed = true)
         val attachmentId = "id"
         val attachments: MutableList<Any> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = mockk()
 
         val identifiers: MutableList<Fhir3Identifier> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedIdentifier: WrapperContract.Identifier = mockk()
         val splittedIdentifier = listOf("any", attachmentId)
@@ -350,12 +350,12 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val resource: Fhir3Resource = mockk(relaxed = true)
         val attachmentId = "id"
         val attachments: MutableList<Any> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = mockk()
 
         val identifiers: MutableList<Fhir3Identifier> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedIdentifier: WrapperContract.Identifier = mockk()
         val splittedIdentifier = listOf("any", "any")
@@ -393,13 +393,13 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val resource: Fhir3Resource = mockk(relaxed = true)
         val attachmentId = "id"
         val attachments: MutableList<Any?> = mutableListOf(
-                null,
-                mockk()
+            null,
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = mockk()
 
         val identifiers: MutableList<Fhir3Identifier> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedIdentifier: WrapperContract.Identifier = mockk()
         val splittedIdentifier = listOf("any", attachmentId)
@@ -468,7 +468,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         // Given
         val resource: Fhir4Resource = mockk()
         val attachments: MutableList<Fhir4Attachment?> = mutableListOf(
-                mockk()
+            mockk()
         )
 
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
@@ -487,7 +487,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         // Given
         val resource: Fhir4Resource = mockk(relaxed = true)
         val attachments: MutableList<Fhir4Attachment?> = mutableListOf(
-                mockk()
+            mockk()
         )
         val identifiers: MutableList<Fhir4Identifier> = mutableListOf()
 
@@ -515,12 +515,12 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val resource: Fhir4Resource = mockk(relaxed = true)
         val attachmentId = "id"
         val attachments: MutableList<Any> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = mockk()
 
         val identifiers: MutableList<Fhir4Identifier> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedIdentifier: WrapperContract.Identifier = mockk()
 
@@ -557,12 +557,12 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val resource: Fhir4Resource = mockk(relaxed = true)
         val attachmentId = "id"
         val attachments: MutableList<Any> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = mockk()
 
         val identifiers: MutableList<Fhir4Identifier> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedIdentifier: WrapperContract.Identifier = mockk()
         val splittedIdentifier = listOf("any", attachmentId)
@@ -600,12 +600,12 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val resource: Fhir4Resource = mockk(relaxed = true)
         val attachmentId = "id"
         val attachments: MutableList<Any> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = mockk()
 
         val identifiers: MutableList<Fhir4Identifier> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedIdentifier: WrapperContract.Identifier = mockk()
         val splittedIdentifier = listOf("any", "any")
@@ -643,13 +643,13 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val resource: Fhir4Resource = mockk(relaxed = true)
         val attachmentId = "id"
         val attachments: MutableList<Any?> = mutableListOf(
-                null,
-                mockk()
+            null,
+            mockk()
         )
         val wrappedAttachment: WrapperContract.Attachment = mockk()
 
         val identifiers: MutableList<Fhir4Identifier> = mutableListOf(
-                mockk()
+            mockk()
         )
         val wrappedIdentifier: WrapperContract.Identifier = mockk()
         val splittedIdentifier = listOf("any", attachmentId)
@@ -684,7 +684,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     @Test
     fun `Given, extractAdditionalAttachmentIds a null and an AttachmentId, it returns null`() {
         assertNull(
-                recordService.extractAdditionalAttachmentIds(null, "any")
+            recordService.extractAdditionalAttachmentIds(null, "any")
         )
     }
 
@@ -692,7 +692,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     fun `Given, extractAdditionalAttachmentIds a list of Fhir3Identifier and an AttachmentId, it returns null, if no part of a Identifier is splittable`() {
         // Given
         val identifiers: List<Fhir3Identifier> = listOf(
-                mockk()
+            mockk()
         )
         val wrappedIdentifier: WrapperContract.Identifier = mockk()
 
@@ -712,7 +712,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     fun `Given, extractAdditionalAttachmentIds a list of Fhir3Identifier and an AttachmentId, it returns null, if no part of a Identifier matches the AttachmentId`() {
         // Given
         val identifiers: List<Fhir3Identifier> = listOf(
-                mockk()
+            mockk()
         )
         val wrappedIdentifier: WrapperContract.Identifier = mockk()
 
@@ -733,7 +733,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     fun `Given, extractAdditionalAttachmentIds a list of Fhir3Identifier and an AttachmentId, it returns the first parts of a Identifier, which match the AttachmentId`() {
         // Given
         val identifiers: List<Fhir3Identifier> = listOf(
-                mockk()
+            mockk()
         )
         val wrappedIdentifier: WrapperContract.Identifier = mockk()
 
@@ -748,8 +748,8 @@ class RecordServiceAttachmentIdentifierUtilsTest {
 
         // Then
         assertSame(
-                actual = extracted,
-                expected = parts
+            actual = extracted,
+            expected = parts
         )
     }
 
@@ -757,7 +757,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     fun `Given, extractAdditionalAttachmentIds a list of Fhir4Identifier and an AttachmentId, it returns null, if no part of a Identifier is splittable`() {
         // Given
         val identifiers: List<Fhir4Identifier> = listOf(
-                mockk()
+            mockk()
         )
         val wrappedIdentifier: WrapperContract.Identifier = mockk()
 
@@ -777,7 +777,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     fun `Given, extractAdditionalAttachmentIds a list of Fhir4Identifier and an AttachmentId, it returns null, if no part of a Identifier matches the AttachmentId`() {
         // Given
         val identifiers: List<Fhir4Identifier> = listOf(
-                mockk()
+            mockk()
         )
         val wrappedIdentifier: WrapperContract.Identifier = mockk()
 
@@ -798,7 +798,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     fun `Given, extractAdditionalAttachmentIds a list of Fhir4Identifier and an AttachmentId, it returns the first parts of a Identifier, which match the AttachmentId`() {
         // Given
         val identifiers: List<Fhir4Identifier> = listOf(
-                mockk()
+            mockk()
         )
         val wrappedIdentifier: WrapperContract.Identifier = mockk()
 
@@ -813,8 +813,8 @@ class RecordServiceAttachmentIdentifierUtilsTest {
 
         // Then
         assertSame(
-                actual = extracted,
-                expected = parts
+            actual = extracted,
+            expected = parts
         )
     }
 
@@ -822,7 +822,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     fun `Given, setAttachmentIdForDownloadType is called with a list of wrapped Attachments, a list of Fhir3Identifier and a DownloadType, it does nothing, if the extracted Ids are null`() {
         // When
         val attachments: List<WrapperContract.Attachment> = listOf(
-                mockk()
+            mockk()
         )
         val attachmentId = "id"
         val identifiers: List<Fhir3Identifier> = mockk()
@@ -832,16 +832,16 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         every { SdkAttachmentFactory.wrap(attachments[0]) } returns attachments[0]
         every {
             recordService.extractAdditionalAttachmentIds(
-                    identifiers,
-                    attachmentId
+                identifiers,
+                attachmentId
             )
         } returns null
 
         // When
         recordService.setAttachmentIdForDownloadType(
-                attachments,
-                identifiers,
-                DownloadType.Small
+            attachments,
+            identifiers,
+            DownloadType.Small
         )
 
         // Then
@@ -853,7 +853,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         // When
         val extracted: List<String> = mockk()
         val attachments: List<WrapperContract.Attachment> = listOf(
-                mockk()
+            mockk()
         )
         val attachmentId = "id"
         val identifiers: List<Fhir3Identifier> = mockk()
@@ -863,16 +863,16 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         every { SdkAttachmentFactory.wrap(attachments[0]) } returns attachments[0]
         every {
             recordService.extractAdditionalAttachmentIds(
-                    identifiers,
-                    attachmentId
+                identifiers,
+                attachmentId
             )
         } returns extracted
 
         // When
         recordService.setAttachmentIdForDownloadType(
-                attachments,
-                identifiers,
-                DownloadType.Full
+            attachments,
+            identifiers,
+            DownloadType.Full
         )
 
         // Then
@@ -883,13 +883,13 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     fun `Given, setAttachmentIdForDownloadType is called with a list of wrapped Attachments, a list of Fhir3Identifier and a DownloadType, it adds PREVIEW_ID_POS to the AttachmentId, if DownloadType is MEDIUM`() {
         // When
         val extracted: List<String> = listOf(
-                "tomato",
-                "potato",
-                "cucumber",
-                "soup"
+            "tomato",
+            "potato",
+            "cucumber",
+            "soup"
         )
         val attachments: List<WrapperContract.Attachment> = listOf(
-                mockk()
+            mockk()
         )
         val attachmentId = "id"
         val identifiers: List<Fhir3Identifier> = mockk()
@@ -902,16 +902,16 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         every { SdkAttachmentFactory.wrap(attachments[0]) } returns attachments[0]
         every {
             recordService.extractAdditionalAttachmentIds(
-                    identifiers,
-                    attachmentId
+                identifiers,
+                attachmentId
             )
         } returns extracted
 
         // When
         recordService.setAttachmentIdForDownloadType(
-                attachments,
-                identifiers,
-                DownloadType.Medium
+            attachments,
+            identifiers,
+            DownloadType.Medium
         )
 
         // Then
@@ -924,13 +924,13 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     fun `Given, setAttachmentIdForDownloadType is called with a list of wrapped Attachments, a list of Fhir3Identifier and a DownloadType, it adds THUMBNAIL_ID_POS to the AttachmentId, if DownloadType is SMALL`() {
         // When
         val extracted: List<String> = listOf(
-                "tomato",
-                "potato",
-                "cucumber",
-                "soup"
+            "tomato",
+            "potato",
+            "cucumber",
+            "soup"
         )
         val attachments: List<WrapperContract.Attachment> = listOf(
-                mockk()
+            mockk()
         )
         val attachmentId = "id"
         val identifiers: List<Fhir3Identifier> = mockk()
@@ -943,16 +943,16 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         every { SdkAttachmentFactory.wrap(attachments[0]) } returns attachments[0]
         every {
             recordService.extractAdditionalAttachmentIds(
-                    identifiers,
-                    attachmentId
+                identifiers,
+                attachmentId
             )
         } returns extracted
 
         // When
         recordService.setAttachmentIdForDownloadType(
-                attachments,
-                identifiers,
-                DownloadType.Small
+            attachments,
+            identifiers,
+            DownloadType.Small
         )
 
         // Then
@@ -965,7 +965,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     fun `Given, setAttachmentIdForDownloadType is called with a list of wrapped Attachments, a list of Fhir4Identifier and a DownloadType, it does nothing, if the extracted Ids are null`() {
         // When
         val attachments: List<WrapperContract.Attachment> = listOf(
-                mockk()
+            mockk()
         )
         val attachmentId = "id"
         val identifiers: List<Fhir4Identifier> = mockk()
@@ -975,16 +975,16 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         every { SdkAttachmentFactory.wrap(attachments[0]) } returns attachments[0]
         every {
             recordService.extractAdditionalAttachmentIds(
-                    identifiers,
-                    attachmentId
+                identifiers,
+                attachmentId
             )
         } returns null
 
         // When
         recordService.setAttachmentIdForDownloadType(
-                attachments,
-                identifiers,
-                DownloadType.Small
+            attachments,
+            identifiers,
+            DownloadType.Small
         )
 
         // Then
@@ -996,7 +996,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         // When
         val extracted: List<String> = mockk()
         val attachments: List<WrapperContract.Attachment> = listOf(
-                mockk()
+            mockk()
         )
         val attachmentId = "id"
         val identifiers: List<Fhir4Identifier> = mockk()
@@ -1006,16 +1006,16 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         every { SdkAttachmentFactory.wrap(attachments[0]) } returns attachments[0]
         every {
             recordService.extractAdditionalAttachmentIds(
-                    identifiers,
-                    attachmentId
+                identifiers,
+                attachmentId
             )
         } returns extracted
 
         // When
         recordService.setAttachmentIdForDownloadType(
-                attachments,
-                identifiers,
-                DownloadType.Full
+            attachments,
+            identifiers,
+            DownloadType.Full
         )
 
         // Then
@@ -1026,13 +1026,13 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     fun `Given, setAttachmentIdForDownloadType is called with a list of wrapped Attachments, a list of Fhir4Identifier and a DownloadType, it adds PREVIEW_ID_POS to the AttachmentId, if DownloadType is MEDIUM`() {
         // When
         val extracted: List<String> = listOf(
-                "tomato",
-                "potato",
-                "cucumber",
-                "soup"
+            "tomato",
+            "potato",
+            "cucumber",
+            "soup"
         )
         val attachments: List<WrapperContract.Attachment> = listOf(
-                mockk()
+            mockk()
         )
         val attachmentId = "id"
         val identifiers: List<Fhir4Identifier> = mockk()
@@ -1045,16 +1045,16 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         every { SdkAttachmentFactory.wrap(attachments[0]) } returns attachments[0]
         every {
             recordService.extractAdditionalAttachmentIds(
-                    identifiers,
-                    attachmentId
+                identifiers,
+                attachmentId
             )
         } returns extracted
 
         // When
         recordService.setAttachmentIdForDownloadType(
-                attachments,
-                identifiers,
-                DownloadType.Medium
+            attachments,
+            identifiers,
+            DownloadType.Medium
         )
 
         // Then
@@ -1067,13 +1067,13 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     fun `Given, setAttachmentIdForDownloadType is called with a list of wrapped Attachments, a list of Fhir4Identifier and a DownloadType, it adds THUMBNAIL_ID_POS to the AttachmentId, if DownloadType is SMALL`() {
         // When
         val extracted: List<String> = listOf(
-                "tomato",
-                "potato",
-                "cucumber",
-                "soup"
+            "tomato",
+            "potato",
+            "cucumber",
+            "soup"
         )
         val attachments: List<WrapperContract.Attachment> = listOf(
-                mockk()
+            mockk()
         )
         val attachmentId = "id"
         val identifiers: List<Fhir4Identifier> = mockk()
@@ -1086,16 +1086,16 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         every { SdkAttachmentFactory.wrap(attachments[0]) } returns attachments[0]
         every {
             recordService.extractAdditionalAttachmentIds(
-                    identifiers,
-                    attachmentId
+                identifiers,
+                attachmentId
             )
         } returns extracted
 
         // When
         recordService.setAttachmentIdForDownloadType(
-                attachments,
-                identifiers,
-                DownloadType.Small
+            attachments,
+            identifiers,
+            DownloadType.Small
         )
 
         // Then

@@ -18,6 +18,7 @@ package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.lang.ImageResizeException
 import care.data4life.sdk.wrapper.WrapperContract
 import io.reactivex.Single
 
@@ -27,24 +28,54 @@ class AttachmentContract {
     interface Service {
 
         fun upload(
-                attachments: List<WrapperContract.Attachment>,
-                attachmentsKey: GCKey,
-                userId: String
+            attachments: List<WrapperContract.Attachment>,
+            attachmentsKey: GCKey,
+            userId: String
         ): Single<List<Pair<WrapperContract.Attachment, List<String>>>>
-
 
         @Throws(DataValidationException.InvalidAttachmentPayloadHash::class)
         fun download(
-                attachments: List<WrapperContract.Attachment>,
-                attachmentsKey: GCKey,
-                userId: String
+            attachments: List<WrapperContract.Attachment>,
+            attachmentsKey: GCKey,
+            userId: String
         ): Single<List<WrapperContract.Attachment>>
-
 
         fun delete(attachmentId: String, userId: String): Single<Boolean>
     }
 
     internal interface CompatibilityValidator {
         fun isHashable(attachment: WrapperContract.Attachment): Boolean
+    }
+
+    interface FileService {
+        fun downloadFile(key: GCKey, userId: String, fileId: String): Single<ByteArray>
+        fun uploadFile(key: GCKey, userId: String, data: ByteArray): Single<String>
+        fun deleteFile(userId: String, fileId: String): Single<Boolean>
+    }
+
+    // FIXME check internal use against Java and Kotlin Clients
+    interface ImageResizer {
+
+        @Throws(ImageResizeException.JpegWriterMissing::class)
+        fun resizeToWidth(
+            originalImage: ByteArray,
+            targetWidth: Int,
+            targetQuality: Int
+        ): ByteArray?
+
+        @Throws(ImageResizeException.JpegWriterMissing::class)
+        fun resizeToHeight(
+            originalImage: ByteArray,
+            targetHeight: Int,
+            targetQuality: Int
+        ): ByteArray?
+
+        fun isResizable(data: ByteArray): Boolean
+
+        companion object {
+            const val DEFAULT_THUMBNAIL_SIZE_PX = 200
+            const val DEFAULT_PREVIEW_SIZE_PX = 1000
+            const val DEFAULT_JPEG_QUALITY_PERCENT = 80
+        }
     }
 }

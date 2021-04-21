@@ -18,8 +18,7 @@ package care.data4life.sdk.auth
 
 import care.data4life.auth.AuthorizationService
 import care.data4life.sdk.ApiService
-import care.data4life.sdk.CryptoSecureStore
-import care.data4life.sdk.CryptoService
+import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.network.model.UserInfo
 import care.data4life.sdk.network.model.VersionList
@@ -31,8 +30,8 @@ class UserService(
     private val alias: String,
     private val authService: AuthorizationService,
     private val apiService: ApiService,
-    private val secureStore: CryptoSecureStore,
-    private val cryptoService: CryptoService
+    private val secureStore: CryptoContract.SecureStore,
+    private val cryptoService: CryptoContract.Service
 ) : AuthContract.UserService {
     override val userID: Single<String>
         get() = Single.fromCallable { secureStore.getSecret("${alias}_user_id", String::class.java) }

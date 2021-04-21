@@ -117,22 +117,18 @@ class RecordServiceTest {
     @Test
     fun `Given, updateAttachmentMeta is called, with a Fhir3Attachment, it updates its meta information`() {
         // Given
-        val attachment: Fhir3Attachment = spyk()
+        val attachment: WrapperContract.Attachment = mockk()
 
-        attachment.data = "dGVzdA==" // == test
+        every { attachment.data } returns "dGVzdA==" // == test
+        every { attachment.size = "test".toByteArray().size } just Runs
+        every { attachment.hash = "qUqP5cyxm6YcTAhz05Hph5gvu9M=" } just Runs
 
         // When
         recordService.updateAttachmentMeta(attachment)
 
         // Then
-        assertEquals(
-                actual = attachment.hash,
-                expected = "qUqP5cyxm6YcTAhz05Hph5gvu9M="
-        )
-        assertEquals(
-                actual = attachment.size,
-                expected = "test".toByteArray().size
-        )
+        verify(exactly = 1) { attachment.size = "test".toByteArray().size }
+        verify(exactly = 1) { attachment.hash = "qUqP5cyxm6YcTAhz05Hph5gvu9M=" }
     }
 
     @Test
@@ -502,6 +498,7 @@ class RecordServiceTest {
         every { decryptedRecord.resource } returns resource
 
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns false
+        every { SdkFhirAttachmentHelper.getAttachment(any()) } returns mockk()
 
         // Then
         val error = assertFailsWith<IllegalArgumentException> {
@@ -519,6 +516,7 @@ class RecordServiceTest {
                 expected = "Expected a record of a type that has attachment"
         )
 
+        verify { SdkFhirAttachmentHelper.getAttachment(resource)!!.wasNot(Called) }
         unmockkObject(SdkFhirAttachmentHelper)
     }
 
@@ -638,8 +636,8 @@ class RecordServiceTest {
         every { downloadedWrappedAttachments[0].unwrap<Fhir3Attachment>() } returns downloadedAttachments[0]
         every { downloadedWrappedAttachments[1].unwrap<Fhir3Attachment>() } returns downloadedAttachments[1]
 
-        downloadedAttachments[0].id = "abc"
-        downloadedAttachments[1].id = "cdf"
+        every { downloadedWrappedAttachments[0].id } returns "abc"
+        every { downloadedWrappedAttachments[1].id } returns "cdf"
 
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
         every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
@@ -742,8 +740,8 @@ class RecordServiceTest {
         every { downloadedWrappedAttachments[0].unwrap<Fhir3Attachment>() } returns downloadedAttachments[0]
         every { downloadedWrappedAttachments[1].unwrap<Fhir3Attachment>() } returns downloadedAttachments[1]
 
-        downloadedAttachments[0].id = downloadedAttachmentsIds[0]
-        downloadedAttachments[1].id = downloadedAttachmentsIds[1]
+        every { downloadedWrappedAttachments[0].id } returns downloadedAttachmentsIds[0]
+        every { downloadedWrappedAttachments[1].id } returns downloadedAttachmentsIds[1]
 
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
         every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
@@ -766,10 +764,12 @@ class RecordServiceTest {
         } returns Single.just(downloadedWrappedAttachments)
 
         every {
-            recordService.updateAttachmentMeta(
-                    or(downloadedAttachments[0], downloadedAttachments[1])
-            )
-        } returns mockk()
+            recordService.updateAttachmentMeta(downloadedWrappedAttachments[0])
+        } returns downloadedWrappedAttachments[0]
+
+        every {
+            recordService.updateAttachmentMeta(downloadedWrappedAttachments[1])
+        } returns downloadedWrappedAttachments[1]
 
         // When
         val subscriber = recordService.downloadAttachmentsFromStorage(
@@ -805,8 +805,8 @@ class RecordServiceTest {
                     attachmentKey,
                     USER_ID
             )
-            recordService.updateAttachmentMeta(downloadedAttachments[0])
-            recordService.updateAttachmentMeta(downloadedAttachments[1])
+            recordService.updateAttachmentMeta(downloadedWrappedAttachments[0])
+            recordService.updateAttachmentMeta(downloadedWrappedAttachments[1])
         }
 
         unmockkObject(SdkFhirAttachmentHelper)

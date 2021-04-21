@@ -187,14 +187,14 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val resource: Fhir3Resource = mockk()
 
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns false
-        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns mockk()
+        every { SdkFhirAttachmentHelper.getAttachment(any()) } returns mockk()
 
         // When
         recordService.cleanObsoleteAdditionalIdentifiers(resource)
 
         // Then
         verify(exactly = 0) { SdkFhirAttachmentHelper.getIdentifier(any()) }
-        verify(exactly = 0) { SdkFhirAttachmentHelper.getAttachment(resource) }
+        verify(exactly = 0) { SdkFhirAttachmentHelper.getAttachment(any()) }
     }
 
     @Test
@@ -437,14 +437,14 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val resource: Fhir4Resource = mockk()
 
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns false
-        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns mockk()
+        every { SdkFhirAttachmentHelper.getAttachment(any()) } returns mockk()
 
         // When
         recordService.cleanObsoleteAdditionalIdentifiers(resource)
 
         // Then
         verify(exactly = 0) { SdkFhirAttachmentHelper.getIdentifier(any()) }
-        verify(exactly = 0) { SdkFhirAttachmentHelper.getAttachment(resource) }
+        verify(exactly = 0) { SdkFhirAttachmentHelper.getAttachment(any()) }
     }
 
     @Test

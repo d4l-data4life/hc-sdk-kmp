@@ -756,13 +756,16 @@ class RecordService internal constructor(
                 decryptedRecord.attachmentsKey!!,
                 userId
             )
-                .flattenAsObservable { attachment -> attachment }
-                .map { attachment ->
-                    attachment.unwrap<Fhir3Attachment>().also {
-                        if (it.id!!.contains(SPLIT_CHAR)) updateAttachmentMeta(it)
+                    .flattenAsObservable { attachment -> attachment }
+                    .map {
+                        attachment -> if (attachment.id!!.contains(SPLIT_CHAR)) {
+                            updateAttachmentMeta(attachment)
+                        } else {
+                            attachment
+                        }
                     }
-                }
-                .toList()
+                    .map { attachment -> attachment.unwrap<Fhir3Attachment>() }
+                    .toList()
         }
 
         throw IllegalArgumentException("Expected a record of a type that has attachment")
@@ -1168,7 +1171,7 @@ class RecordService internal constructor(
     private fun hashAttachmentData(data: ByteArray): String = encodeToString(sha1(data))
 
     // TODO move to AttachmentService
-    fun updateAttachmentMeta(attachment: Fhir3Attachment): Fhir3Attachment {
+    fun updateAttachmentMeta(attachment: WrapperContract.Attachment): WrapperContract.Attachment {
         val data = decode(attachment.data!!)
         attachment.size = data.size
         attachment.hash = hashAttachmentData(data)

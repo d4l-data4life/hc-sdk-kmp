@@ -34,7 +34,7 @@ class UserService(
     private val secureStore: CryptoSecureStore,
     private val cryptoService: CryptoService
 ) : AuthContract.UserService {
-    override val uID: Single<String>
+    override val userID: Single<String>
         get() = Single.fromCallable { secureStore.getSecret("${alias}_user_id", String::class.java) }
 
     override fun finishLogin(isAuthorized: Boolean): Single<Boolean> {

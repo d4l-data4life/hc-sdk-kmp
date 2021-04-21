@@ -16,7 +16,8 @@ toc::[]
 
 === Added
 
-* Add Version control for supported/unsupported versions
+* Version control for supported/unsupported versions
+* The Client now exposes the UserId
 
 === Changed
 

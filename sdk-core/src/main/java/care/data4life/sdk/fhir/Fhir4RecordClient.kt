@@ -33,7 +33,7 @@ internal class Fhir4RecordClient(
 
     override fun <T : Fhir4Resource> create(resource: T, annotations: List<String>, callback: Callback<Fhir4Record<T>>): Task {
         val operation = userService.finishLogin(true)
-            .flatMap { userService.uID }
+            .flatMap { userService.userID }
             .flatMap { uid -> recordService.createRecord(uid, resource, annotations) }
         return handler.executeSingle(operation, callback)
     }
@@ -45,21 +45,21 @@ internal class Fhir4RecordClient(
         callback: Callback<Fhir4Record<T>>
     ): Task {
         val operation = userService.finishLogin(true)
-            .flatMap { userService.uID }
+            .flatMap { userService.userID }
             .flatMap { uid -> recordService.updateRecord(uid, recordId, resource, annotations) }
         return handler.executeSingle(operation, callback)
     }
 
     override fun delete(recordId: String, callback: Callback<Boolean>): Task {
         val operation = userService.finishLogin(true)
-            .flatMap { userService.uID }
+            .flatMap { userService.userID }
             .flatMap { uid -> recordService.deleteRecord(uid, recordId).toSingle { true } }
         return handler.executeSingle(operation, callback)
     }
 
     override fun <T : Fhir4Resource> fetch(recordId: String, callback: Callback<Fhir4Record<T>>): Task {
         val operation = userService.finishLogin(true)
-            .flatMap { userService.uID }
+            .flatMap { userService.userID }
             .flatMap { uid -> recordService.fetchFhir4Record<T>(uid, recordId) }
         return handler.executeSingle(operation, callback)
     }
@@ -74,7 +74,7 @@ internal class Fhir4RecordClient(
         callback: Callback<List<Fhir4Record<T>>>
     ): Task {
         val operation = userService.finishLogin(true)
-            .flatMap { userService.uID }
+            .flatMap { userService.userID }
             .flatMap { uid ->
                 recordService.fetchFhir4Records(
                     uid,
@@ -95,7 +95,7 @@ internal class Fhir4RecordClient(
         callback: Callback<Int>
     ): Task {
         val operation = userService.finishLogin(true)
-            .flatMap { userService.uID }
+            .flatMap { userService.userID }
             .flatMap { uid ->
                 recordService.countFhir4Records(
                     resourceType,

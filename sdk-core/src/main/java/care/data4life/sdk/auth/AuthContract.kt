@@ -25,7 +25,7 @@ interface AuthContract {
     interface Client : SdkContract.AuthClient
 
     interface UserService {
-        val uID: Single<String>
+        val userID: Single<String>
 
         fun finishLogin(isAuthorized: Boolean): Single<Boolean>
         fun isLoggedIn(alias: String): Single<Boolean>

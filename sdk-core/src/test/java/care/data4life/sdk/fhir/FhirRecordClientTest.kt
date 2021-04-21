@@ -53,7 +53,7 @@ class FhirRecordClientTest {
         val capturedAmount = slot<Single<Int>>()
 
         every { userService.finishLogin(true) } returns Single.just(true)
-        every { userService.uID } returns Single.just(userId)
+        every { userService.userID } returns Single.just(userId)
         every {
             recordService.countFhir4Records(resourceType, userId, annotations)
         } returns amount

@@ -1092,7 +1092,6 @@ class RecordServiceCreationRecordModuleTest {
             template
         ) as Fhir4DocumentReference
 
-
         runFhirFlowWithAttachment(
             serializedResource = SdkFhirParser.fromResource(resource)!!,
             attachmentData = rawAttachment,

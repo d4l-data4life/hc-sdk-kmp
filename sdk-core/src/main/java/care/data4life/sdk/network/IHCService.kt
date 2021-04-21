@@ -19,6 +19,7 @@ import care.data4life.sdk.network.model.CommonKeyResponse
 import care.data4life.sdk.network.model.DocumentUploadResponse
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.UserInfo
+import care.data4life.sdk.network.model.VersionList
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -146,6 +147,10 @@ interface IHCService {
             @Header(HEADER_ALIAS) alias: String,
             @Field("token") refresh_token: String
     ): Completable
+
+    @GET("/sdk/v1/android/versions.json")
+    fun getVersionUpdateInfo(
+    ): Single<VersionList>
 
     companion object {
         const val AUTHORIZATION_WITH_ACCESS_TOKEN = "Authorization: access_token"

@@ -28,6 +28,7 @@ import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
@@ -688,33 +689,77 @@ class RecordService internal constructor(
         ) as DecryptedBaseRecord<T>
     }
 
-    override fun downloadAttachment(
+    override fun downloadFhir3Attachment(
         recordId: String,
         attachmentId: String,
         userId: String,
         type: DownloadType
-    ): Single<Fhir3Attachment> = downloadAttachments(
+    ): Single<Fhir3Attachment> = downloadFhir3Attachments(
         recordId,
         listOf(attachmentId),
         userId,
         type
     ).map { it[0] }
 
-    override fun downloadAttachments(
+    override fun downloadFhir4Attachment(
+        recordId: String,
+        attachmentId: String,
+        userId: String,
+        type: DownloadType
+    ): Single<Fhir4Attachment> = downloadFhir4Attachments(
+        recordId,
+        listOf(attachmentId),
+        userId,
+        type
+    ).map { it[0] }
+
+    @Throws(IllegalArgumentException::class)
+    override fun downloadFhir3Attachments(
         recordId: String,
         attachmentIds: List<String>,
         userId: String,
         type: DownloadType
-    ): Single<List<Fhir3Attachment>> = apiService
+    ): Single<List<Fhir3Attachment>> = downloadAttachments<Fhir3Resource, Fhir3Attachment>(
+        recordId,
+        attachmentIds,
+        userId,
+        type
+    ) { resource -> resource is Fhir3Resource }
+
+    @Throws(IllegalArgumentException::class)
+    override fun downloadFhir4Attachments(
+        recordId: String,
+        attachmentIds: List<String>,
+        userId: String,
+        type: DownloadType
+    ): Single<List<Fhir4Attachment>> = downloadAttachments<Fhir4Resource, Fhir4Attachment>(
+        recordId,
+        attachmentIds,
+        userId,
+        type
+    ) { resource -> resource is Fhir4Resource }
+
+    @Throws(IllegalArgumentException::class)
+    private fun <T : Any, R : Any> downloadAttachments(
+        recordId: String,
+        attachmentIds: List<String>,
+        userId: String,
+        type: DownloadType,
+        resourceBarrier: (resource: Any) -> Boolean
+    ): Single<List<R>> = apiService
         .fetchRecord(alias, userId, recordId)
-        .map { decryptRecord<Fhir3Resource>(it, userId) }
-        .flatMap {
-            downloadAttachmentsFromStorage<Fhir3Resource, Fhir3Attachment>(
-                attachmentIds,
-                userId,
-                type,
-                it as DecryptedFhir3Record<Fhir3Resource>
-            )
+        .map { decryptRecord<T>(it, userId) }
+        .flatMap { record ->
+            if (resourceBarrier(record.resource)) {
+                downloadAttachmentsFromStorage<T, R>(
+                    attachmentIds,
+                    userId,
+                    type,
+                    record
+                )
+            } else {
+                throw IllegalArgumentException("The given Record does not match the expected resource type.")
+            }
         }
 
     @Throws(

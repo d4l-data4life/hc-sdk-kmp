@@ -1147,14 +1147,15 @@ class RecordServiceTest {
         unmockkObject(SdkAttachmentFactory)
     }
 
+    // FHIR3 Download Attachments
     @Test
-    fun `Given, downloadAttachment is called, with it  a RecordId, AttachmentIds, UserId and a DownloadType, it delegates the call to downloadAttachments and returns its result`() {
+    fun `Given, downloadFhir3Attachment is called, with it  a RecordId, AttachmentIds, UserId and a DownloadType, it delegates the call to downloadFhir3Attachments and returns its result`() {
         // Given
         val attachmentId = "abc"
         val expected: Fhir3Attachment = mockk()
 
         every {
-            recordService.downloadAttachments(
+            recordService.downloadFhir3Attachments(
                 RECORD_ID,
                 listOf(attachmentId),
                 USER_ID,
@@ -1163,7 +1164,7 @@ class RecordServiceTest {
         } returns Single.just(listOf(expected))
 
         // When
-        val subscriber = recordService.downloadAttachment(
+        val subscriber = recordService.downloadFhir3Attachment(
             RECORD_ID,
             attachmentId,
             USER_ID,
@@ -1182,7 +1183,7 @@ class RecordServiceTest {
         )
 
         verifyOrder {
-            recordService.downloadAttachments(
+            recordService.downloadFhir3Attachments(
                 RECORD_ID,
                 listOf(attachmentId),
                 USER_ID,
@@ -1192,7 +1193,40 @@ class RecordServiceTest {
     }
 
     @Test
-    fun `Given, downloadAttachments is called with a RecordId, AttachmentIds, UserId and a DownloadType, returns encountered Attachments`() {
+    fun `Given, downloadFhir3Attachments is called with a RecordId, AttachmentIds, UserId and a DownloadType, it fails if the fetched Record is not Fhir3`() {
+        // Given
+        val userId = "asd"
+        val recordId = "ads"
+        val attachmentId = "lllll"
+        val attachmentIds = listOf(attachmentId)
+        val type = DownloadType.Medium
+
+        val encryptedRecord = mockk<EncryptedRecord>()
+        val decryptedRecord = mockk<DecryptedFhir4Record<Fhir4Resource>>()
+        val resource: Fhir4Resource = mockk()
+
+        every { decryptedRecord.resource } returns resource
+
+        every { apiService.fetchRecord(ALIAS, userId, recordId) } returns Single.just(encryptedRecord)
+        every { recordService.decryptRecord<Any>(encryptedRecord, userId) } returns decryptedRecord as DecryptedBaseRecord<Any>
+
+        // When
+        val subscriber = recordService.downloadFhir3Attachments(
+            recordId,
+            attachmentIds,
+            userId,
+            type
+        ).test().await()
+
+        // Then
+        subscriber
+            .assertError(IllegalArgumentException::class.java)
+            .assertErrorMessage("The given Record does not match the expected resource type.")
+            .assertNotComplete()
+    }
+
+    @Test
+    fun `Given, downloadFhir3Attachments is called with a RecordId, AttachmentIds, UserId and a DownloadType, returns encountered Attachments`() {
         // Given
         val userId = "asd"
         val recordId = "ads"
@@ -1206,6 +1240,9 @@ class RecordServiceTest {
 
         val encryptedRecord = mockk<EncryptedRecord>()
         val decryptedRecord = mockk<DecryptedFhir3Record<Fhir3Resource>>()
+        val resource: Fhir3Resource = mockk()
+
+        every { decryptedRecord.resource } returns resource
 
         every { apiService.fetchRecord(ALIAS, userId, recordId) } returns Single.just(encryptedRecord)
         every { recordService.decryptRecord<Any>(encryptedRecord, userId) } returns decryptedRecord as DecryptedBaseRecord<Any>
@@ -1219,7 +1256,7 @@ class RecordServiceTest {
         } returns Single.just(response)
 
         // When
-        val subscriber = recordService.downloadAttachments(
+        val subscriber = recordService.downloadFhir3Attachments(
             recordId,
             attachmentIds,
             userId,
@@ -1250,6 +1287,147 @@ class RecordServiceTest {
         }
     }
 
+    // FHIR4 Download Attachments
+    @Test
+    fun `Given, downloadFhir4Attachment is called, with it  a RecordId, AttachmentIds, UserId and a DownloadType, it delegates the call to downloadFhir4Attachments and returns its result`() {
+        // Given
+        val attachmentId = "abc"
+        val expected: Fhir4Attachment = mockk()
+
+        every {
+            recordService.downloadFhir4Attachments(
+                RECORD_ID,
+                listOf(attachmentId),
+                USER_ID,
+                DownloadType.Full
+            )
+        } returns Single.just(listOf(expected))
+
+        // When
+        val subscriber = recordService.downloadFhir4Attachment(
+            RECORD_ID,
+            attachmentId,
+            USER_ID,
+            DownloadType.Full
+        ).test().await()
+
+        // Then
+        val result = subscriber
+            .assertNoErrors()
+            .assertComplete()
+            .values()[0]
+
+        assertSame(
+            actual = result,
+            expected = expected
+        )
+
+        verifyOrder {
+            recordService.downloadFhir4Attachments(
+                RECORD_ID,
+                listOf(attachmentId),
+                USER_ID,
+                DownloadType.Full
+            )
+        }
+    }
+
+    @Test
+    fun `Given, downloadFhir4Attachments is called with a RecordId, AttachmentIds, UserId and a DownloadType, it fails if the fetched Record is not Fhir4`() {
+        // Given
+        val userId = "asd"
+        val recordId = "ads"
+        val attachmentId = "lllll"
+        val attachmentIds = listOf(attachmentId)
+        val type = DownloadType.Medium
+
+        val encryptedRecord = mockk<EncryptedRecord>()
+        val decryptedRecord = mockk<DecryptedFhir3Record<Fhir3Resource>>()
+        val resource: Fhir3Resource = mockk()
+
+        every { decryptedRecord.resource } returns resource
+
+        every { apiService.fetchRecord(ALIAS, userId, recordId) } returns Single.just(encryptedRecord)
+        every { recordService.decryptRecord<Any>(encryptedRecord, userId) } returns decryptedRecord as DecryptedBaseRecord<Any>
+
+        // When
+        val subscriber = recordService.downloadFhir4Attachments(
+            recordId,
+            attachmentIds,
+            userId,
+            type
+        ).test().await()
+
+        // Then
+        subscriber
+            .assertError(IllegalArgumentException::class.java)
+            .assertErrorMessage("The given Record does not match the expected resource type.")
+            .assertNotComplete()
+    }
+
+    @Test
+    fun `Given, downloadFhir4Attachments is called with a RecordId, AttachmentIds, UserId and a DownloadType, returns encountered Attachments`() {
+        // Given
+        val userId = "asd"
+        val recordId = "ads"
+        val attachmentId = "lllll"
+        val attachmentIds = listOf(attachmentId)
+        val type = DownloadType.Medium
+
+        val response1 = mockk<Fhir4Attachment>()
+        val response2 = mockk<Fhir4Attachment>()
+        val response = listOf(response1, response2)
+
+        val encryptedRecord = mockk<EncryptedRecord>()
+        val decryptedRecord = mockk<DecryptedFhir4Record<Fhir4Resource>>()
+        val resource: Fhir4Resource = mockk()
+
+        every { decryptedRecord.resource } returns resource
+
+        every { apiService.fetchRecord(ALIAS, userId, recordId) } returns Single.just(encryptedRecord)
+        every { recordService.decryptRecord<Any>(encryptedRecord, userId) } returns decryptedRecord as DecryptedBaseRecord<Any>
+        every {
+            recordService.downloadAttachmentsFromStorage<Fhir4Resource, Fhir4Attachment>(
+                attachmentIds,
+                userId,
+                type,
+                decryptedRecord
+            )
+        } returns Single.just(response)
+
+        // When
+        val subscriber = recordService.downloadFhir4Attachments(
+            recordId,
+            attachmentIds,
+            userId,
+            type
+        ).test().await()
+
+        // Then
+        val result = subscriber
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
+
+        assertSame(
+            response,
+            result
+        )
+
+        verifyOrder {
+            apiService.fetchRecord(ALIAS, userId, recordId)
+            recordService.decryptRecord<Any>(encryptedRecord, userId)
+            recordService.downloadAttachmentsFromStorage<Fhir4Resource, Fhir4Attachment>(
+                attachmentIds,
+                userId,
+                type,
+                decryptedRecord
+            )
+        }
+    }
+
+    // FHIR3 Download Record
     @Test
     fun `Given, downloadRecord is called, with a RecordId and a UserId, it downloads the associated record`() {
         mockkObject(RecordMapper)

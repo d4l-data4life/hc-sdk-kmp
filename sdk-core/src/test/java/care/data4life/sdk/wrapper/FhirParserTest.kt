@@ -19,15 +19,17 @@ package care.data4life.sdk.wrapper
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 class FhirParserTest {
 
     @Test
-    fun `it is a ResourceParser`() {
-        assertTrue((SdkFhirParser as Any) is WrapperContract.FhirParser)
+    fun `It fulfils ResourceParser`() {
+        val parser: Any = SdkFhirParser
+        assertTrue(parser is WrapperContract.FhirParser)
     }
 
     @Test
@@ -37,7 +39,7 @@ class FhirParserTest {
         val source = "{\"resourceType\":\"DomainResource\"}"
 
         // When
-        val resource = SdkFhirParser.toFhir3(type, source)
+        val resource: Any = SdkFhirParser.toFhir3(type, source)
 
         // Then
         assertTrue(resource is Fhir3Resource)
@@ -57,14 +59,8 @@ class FhirParserTest {
 
     @Test
     fun `Given, fromResource with a non Fhir Resource, it fails`() {
-
-        try {
-            // When
+        assertFailsWith<CoreRuntimeException.InternalFailure> {
             SdkFhirParser.fromResource("resource")
-            assertTrue(false)//Fixme
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is CoreRuntimeException.InternalFailure)
         }
     }
 
@@ -73,8 +69,8 @@ class FhirParserTest {
         val resource = Fhir3Resource()
 
         assertEquals(
-                SdkFhirParser.fromResource(resource),
-                "{\"resourceType\":\"DomainResource\"}"
+            SdkFhirParser.fromResource(resource),
+            "{\"resourceType\":\"DomainResource\"}"
         )
     }
 
@@ -83,8 +79,8 @@ class FhirParserTest {
         val resource = Fhir4Resource()
 
         assertEquals(
-                SdkFhirParser.fromResource(resource),
-                "{\"resourceType\":\"DomainResource\"}"
+            SdkFhirParser.fromResource(resource),
+            "{\"resourceType\":\"DomainResource\"}"
         )
     }
 }

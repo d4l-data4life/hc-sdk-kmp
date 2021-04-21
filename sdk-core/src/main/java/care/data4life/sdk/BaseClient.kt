@@ -24,7 +24,7 @@ import care.data4life.sdk.fhir.Fhir4RecordClient
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.log.Logger
 
-abstract class BaseClient constructor(
+abstract class BaseClient(
     protected var alias: String,
     protected var userService: AuthContract.UserService,
     protected var recordService: RecordService,

@@ -30,5 +30,4 @@ internal object SdkFhirParser : WrapperContract.FhirParser {
             else -> throw CoreRuntimeException.InternalFailure()
         }
     }
-
 }

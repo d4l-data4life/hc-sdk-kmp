@@ -59,7 +59,6 @@ import kotlin.test.assertTrue
 import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
 import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
 
-
 class RecordServiceFetchRecordsModuleTest {
     private val dataKey: GCKey = mockk()
     private val attachmentKey: GCKey = mockk()
@@ -1049,7 +1048,7 @@ class RecordServiceFetchRecordsModuleTest {
         )
     }
 
-    //FHIR 4
+    // FHIR 4
     @Test
     fun `Given, fetchFhir4Records is called, with its appropriate payloads, it returns a List of Records`() {
         // Given

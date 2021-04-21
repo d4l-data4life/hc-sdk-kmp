@@ -36,6 +36,7 @@ class UserService(
     override val userID: Single<String>
         get() = Single.fromCallable { secureStore.getSecret("${alias}_user_id", String::class.java) }
 
+    // TODO: Refactor this, so it calls the API only on demand
     override fun finishLogin(isAuthorized: Boolean): Single<Boolean> {
         return Single.just(isAuthorized)
             .flatMap { apiService.fetchUserInfo(alias) }

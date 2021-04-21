@@ -34,7 +34,8 @@ abstract class BaseClient(
     override val fhir4: SdkContract.Fhir4RecordClient = createFhir4Client(userService, recordService, handler),
     private val legacyDataClient: SdkContract.LegacyDataClient = createLegacyDataClient(userService, recordService, handler)
 ) : SdkContract.Client, SdkContract.LegacyDataClient by legacyDataClient, SdkContract.AuthClient by authClient {
-    override val userId: String = userService.userID.blockingGet()
+    override val userId: String
+        get() = userService.finishLogin(true).flatMap { userService.userID }.blockingGet()
 
     companion object {
 

@@ -33,14 +33,12 @@ class AttachmentContract {
             userId: String
         ): Single<List<Pair<WrapperContract.Attachment, List<String>>>>
 
-
         @Throws(DataValidationException.InvalidAttachmentPayloadHash::class)
         fun download(
             attachments: List<WrapperContract.Attachment>,
             attachmentsKey: GCKey,
             userId: String
         ): Single<List<WrapperContract.Attachment>>
-
 
         fun delete(attachmentId: String, userId: String): Single<Boolean>
     }
@@ -81,4 +79,3 @@ class AttachmentContract {
         }
     }
 }
-

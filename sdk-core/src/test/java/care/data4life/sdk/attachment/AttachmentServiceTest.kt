@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
  *
- * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"), 
+ * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
  *
  * The SDK and its documentation may be accessed and used for viewing/review purposes only.
- * Any usage of the SDK for other purposes, including usage for the development of 
- * applications/third-party applications shall require the conclusion of a license agreement 
+ * Any usage of the SDK for other purposes, including usage for the development of
+ * applications/third-party applications shall require the conclusion of a license agreement
  * between you and D4L.
  *
- * If you are interested in licensing the SDK for your own applications/third-party 
- * applications and/or if you’d like to contribute to the development of the SDK, please 
+ * If you are interested in licensing the SDK for your own applications/third-party
+ * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
 
@@ -32,7 +32,8 @@ import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.mockito.Mockito
-import java.util.*
+import java.util.Arrays
+import java.util.Objects
 
 class AttachmentServiceTest {
     private val ATTACHMENT_ID = "attachmentId"
@@ -64,9 +65,11 @@ class AttachmentServiceTest {
     }
 
     @Test
-    @Throws(InterruptedException::class,
-            DataRestrictionException.UnsupportedFileType::class,
-            DataRestrictionException.MaxDataSizeViolation::class)
+    @Throws(
+        InterruptedException::class,
+        DataRestrictionException.UnsupportedFileType::class,
+        DataRestrictionException.MaxDataSizeViolation::class
+    )
     fun uploadAttachments_shouldReturnListOfAttachments() {
         // given
         attachment.id = "id"
@@ -77,14 +80,14 @@ class AttachmentServiceTest {
 
         // when
         val subscriber = attachmentService
-                .upload(attachments, attachmentKey, USER_ID).test().await()
+            .upload(attachments, attachmentKey, USER_ID).test().await()
 
         // then
         val result = subscriber
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
         Truth.assertThat(result).hasSize(2)
         val a1 = result[0].first.unwrap<Fhir3Attachment>()
         Truth.assertThat(a1.id).isEqualTo(ATTACHMENT_ID)
@@ -106,9 +109,11 @@ class AttachmentServiceTest {
 
     @Ignore("Legacy leftover")
     @Test
-    @Throws(InterruptedException::class,
-            DataRestrictionException.UnsupportedFileType::class,
-            DataRestrictionException.MaxDataSizeViolation::class)
+    @Throws(
+        InterruptedException::class,
+        DataRestrictionException.UnsupportedFileType::class,
+        DataRestrictionException.MaxDataSizeViolation::class
+    )
     fun uploadAttachment_with_20MB_and_1_shouldFail() {
         // given
         attachment.id = "id"
@@ -116,7 +121,7 @@ class AttachmentServiceTest {
         try {
             val newAttachment = SdkAttachmentFactory.wrap(buildWith("newAttachment", creationDate, CONTENT_TYPE, largeFile))
             newAttachment.id = null
-            Assert.fail("Should have thrown an exception");
+            Assert.fail("Should have thrown an exception")
         } catch (e: DataRestrictionException.MaxDataSizeViolation) {
             assert(true)
         }
@@ -136,10 +141,10 @@ class AttachmentServiceTest {
 
         // then
         val result = subscriber
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
         Truth.assertThat(result).hasSize(1)
         val a = result[0].unwrap<Fhir3Attachment>()
         Truth.assertThat(a.id).isEqualTo(ATTACHMENT_ID)
@@ -164,7 +169,7 @@ class AttachmentServiceTest {
         // When
         try {
             attachmentService.download(attachments, attachmentKey, USER_ID)
-            Assert.fail("Exception expected!");
+            Assert.fail("Exception expected!")
         } catch (e: D4LException) {
 
             // Then
@@ -181,10 +186,11 @@ class AttachmentServiceTest {
         attachment.hash = DATA_HASH
         val attachments = Arrays.asList(attachment)
         Mockito.`when`(
-                mockFileService.downloadFile(
-                        attachmentKey,
-                        USER_ID,
-                        THUMBNAIL_ID.split(ThumbnailService.SPLIT_CHAR)[1])
+            mockFileService.downloadFile(
+                attachmentKey,
+                USER_ID,
+                THUMBNAIL_ID.split(ThumbnailService.SPLIT_CHAR)[1]
+            )
         ).thenReturn(Single.just(pdf))
 
         // when
@@ -192,10 +198,10 @@ class AttachmentServiceTest {
 
         // then
         val result = subscriber
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
         Truth.assertThat(result).hasSize(1)
 
         val a = result[0].unwrap<Fhir3Attachment>()
@@ -206,16 +212,18 @@ class AttachmentServiceTest {
         Truth.assertThat(a.data).isEqualTo(dataBase64)
 
         Mockito.verify(mockFileService)!!.downloadFile(
-                attachmentKey,
-                USER_ID,
-                THUMBNAIL_ID.split(ThumbnailService.SPLIT_CHAR)[1]
+            attachmentKey,
+            USER_ID,
+            THUMBNAIL_ID.split(ThumbnailService.SPLIT_CHAR)[1]
         )
         Mockito.verifyNoMoreInteractions(mockFileService)
     }
 
     @Test
-    @Throws(InterruptedException::class, DataRestrictionException.UnsupportedFileType::class,
-            DataRestrictionException.MaxDataSizeViolation::class)
+    @Throws(
+        InterruptedException::class, DataRestrictionException.UnsupportedFileType::class,
+        DataRestrictionException.MaxDataSizeViolation::class
+    )
     fun updatingAttachments_shouldReturnListOfAttachmentsInOrder() {
         // given
         attachment.id = null
@@ -228,10 +236,10 @@ class AttachmentServiceTest {
 
         // then
         val result = subscriber
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
         Truth.assertThat(result).hasSize(2)
         Truth.assertThat(result[0].first).isEqualTo(attachment)
@@ -249,8 +257,8 @@ class AttachmentServiceTest {
 
         // then
         subscriber.assertNoErrors()
-                .assertComplete()
-                .assertValue { it: Boolean? -> it!! }
+            .assertComplete()
+            .assertValue { it: Boolean? -> it!! }
     }
 
     @Test
@@ -264,6 +272,6 @@ class AttachmentServiceTest {
 
         // then
         subscriber.assertError { obj: Throwable? -> Objects.nonNull(obj) }
-                .assertNotComplete()
+            .assertNotComplete()
     }
 }

@@ -152,8 +152,8 @@ class CryptoServiceFakeTest {
         fake.iteration = iteration
 
         val actual = fake.encrypt(
-                attachmentKey,
-                resource.toByteArray()
+            attachmentKey,
+            resource.toByteArray()
         ).blockingGet()
 
         // Then
@@ -250,8 +250,8 @@ class CryptoServiceFakeTest {
         fake.iteration = iteration
 
         val actual = fake.decrypt(
-                attachmentKey,
-                hashedResource.toByteArray()
+            attachmentKey,
+            hashedResource.toByteArray()
         ).blockingGet()
 
         // Then

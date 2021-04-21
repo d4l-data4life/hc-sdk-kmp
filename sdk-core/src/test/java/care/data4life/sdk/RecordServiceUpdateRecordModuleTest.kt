@@ -169,8 +169,8 @@ class RecordServiceUpdateRecordModuleTest {
         val keyOrder = flowHelper.makeKeyOrder(dataKey, attachmentKey)
 
         val resources = flowHelper.packResources(
-                listOf(serializedResourceOld, serializedResourceNew),
-                attachments
+            listOf(serializedResourceOld, serializedResourceNew),
+            attachments
         )
 
         val uploadIteration = CryptoServiceIteration(

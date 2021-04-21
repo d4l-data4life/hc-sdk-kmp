@@ -16,6 +16,7 @@
 package care.data4life.sdk
 
 import care.data4life.sdk.auth.AuthClient
+import care.data4life.sdk.auth.AuthContract
 import care.data4life.sdk.auth.UserService
 import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.data.DataRecordClient
@@ -24,61 +25,58 @@ import care.data4life.sdk.log.Log
 import care.data4life.sdk.log.Logger
 
 abstract class BaseClient(
-        protected var alias: String,
-        protected var userService: UserService,
-        protected var recordService: RecordService,
-        protected var handler: CallHandler,
+    protected var alias: String,
+    protected var userService: AuthContract.UserService,
+    protected var recordService: RecordService,
+    protected var handler: CallHandler,
 
-        private val authClient: SdkContract.AuthClient =
-                createAuthClient(alias, userService, handler),
+    private val authClient: SdkContract.AuthClient =
+        createAuthClient(alias, userService, handler),
 
-        override val data: SdkContract.DataRecordClient =
-                createDataClient(userService, recordService, handler),
+    override val data: SdkContract.DataRecordClient =
+        createDataClient(userService, recordService, handler),
 
-        override val fhir4: SdkContract.Fhir4RecordClient =
-                createFhir4Client(userService, recordService, handler),
+    override val fhir4: SdkContract.Fhir4RecordClient =
+        createFhir4Client(userService, recordService, handler),
 
-        private val legacyDataClient: SdkContract.LegacyDataClient =
-                createLegacyDataClient(userService, recordService, handler)
+    private val legacyDataClient: SdkContract.LegacyDataClient =
+        createLegacyDataClient(userService, recordService, handler)
 
 ) : SdkContract.Client, SdkContract.LegacyDataClient by legacyDataClient, SdkContract.AuthClient by authClient {
-
 
     companion object {
 
         fun createAuthClient(
-                alias: String,
-                userService: UserService,
-                handler: CallHandler
+            alias: String,
+            userService: AuthContract.UserService,
+            handler: CallHandler
         ): SdkContract.AuthClient {
             return AuthClient(alias, userService, handler)
         }
 
         fun createDataClient(
-                userService: UserService,
-                recordService: RecordService,
-                handler: CallHandler
+            userService: AuthContract.UserService,
+            recordService: RecordService,
+            handler: CallHandler
         ): SdkContract.DataRecordClient {
             return DataRecordClient(userService, recordService, handler)
         }
 
         fun createFhir4Client(
-                userService: UserService,
-                recordService: RecordService,
-                handler: CallHandler
+            userService: AuthContract.UserService,
+            recordService: RecordService,
+            handler: CallHandler
         ): SdkContract.Fhir4RecordClient {
             return Fhir4RecordClient(userService, recordService, handler)
         }
 
-
         fun createLegacyDataClient(
-                userService: UserService,
-                recordService: RecordService,
-                handler: CallHandler
+            userService: AuthContract.UserService,
+            recordService: RecordService,
+            handler: CallHandler
         ): SdkContract.LegacyDataClient {
-            return LegacyDataClient(userService, recordService, handler)
+            return LegacyDataClient(userService as UserService, recordService, handler)
         }
-
 
         // FIXME refactor into own tool
         const val CLIENT_ID_SPLIT_CHAR = "#"

@@ -17,8 +17,8 @@
 package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
+import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.AttachmentService
-import care.data4life.sdk.attachment.FileService
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.crypto.CryptoContract
@@ -59,7 +59,6 @@ import kotlin.test.assertTrue
 import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
 import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
 
-
 class RecordServiceFetchRecordsModuleTest {
     private val dataKey: GCKey = mockk()
     private val attachmentKey: GCKey = mockk()
@@ -72,8 +71,8 @@ class RecordServiceFetchRecordsModuleTest {
     private lateinit var flowHelper: RecordServiceModuleTestFlowHelper
     private val apiService: ApiService = mockk()
     private lateinit var cryptoService: CryptoContract.Service
-    private val fileService: FileService = mockk()
-    private val imageResizer: ImageResizer = mockk()
+    private val fileService: AttachmentContract.FileService = mockk()
+    private val imageResizer: AttachmentContract.ImageResizer = mockk()
     private val errorHandler: D4LErrorHandler = mockk()
 
     @Before
@@ -1049,7 +1048,7 @@ class RecordServiceFetchRecordsModuleTest {
         )
     }
 
-    //FHIR 4
+    // FHIR 4
     @Test
     fun `Given, fetchFhir4Records is called, with its appropriate payloads, it returns a List of Records`() {
         // Given

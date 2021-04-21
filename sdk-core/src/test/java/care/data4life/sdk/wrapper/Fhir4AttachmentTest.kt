@@ -17,14 +17,14 @@
 package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.fhir.Fhir4Attachment
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertSame
-import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
 
 class Fhir4AttachmentTest {
     @Test
-    fun `it is a Attachment`() {
+    fun `It fulfils Attachment`() {
         val wrapper: Any = SdkFhir4Attachment(Fhir4Attachment())
         assertTrue(wrapper is WrapperContract.Attachment)
     }
@@ -41,8 +41,8 @@ class Fhir4AttachmentTest {
 
         // Then
         assertEquals(
-                id,
-                result
+            id,
+            result
         )
     }
 
@@ -57,8 +57,8 @@ class Fhir4AttachmentTest {
 
         // Then
         assertEquals(
-                id,
-                fhir4Attachment.id
+            id,
+            fhir4Attachment.id
         )
     }
 
@@ -74,8 +74,8 @@ class Fhir4AttachmentTest {
 
         // Then
         assertEquals(
-                data,
-                result
+            data,
+            result
         )
     }
 
@@ -90,8 +90,8 @@ class Fhir4AttachmentTest {
 
         // Then
         assertEquals(
-                data,
-                fhir4Attachment.data
+            data,
+            fhir4Attachment.data
         )
     }
 
@@ -107,8 +107,8 @@ class Fhir4AttachmentTest {
 
         // Then
         assertEquals(
-                hash,
-                result
+            hash,
+            result
         )
     }
 
@@ -123,8 +123,8 @@ class Fhir4AttachmentTest {
 
         // Then
         assertEquals(
-                hash,
-                fhir4Attachment.hash
+            hash,
+            fhir4Attachment.hash
         )
     }
 
@@ -140,8 +140,8 @@ class Fhir4AttachmentTest {
 
         // Then
         assertEquals(
-                size,
-                result
+            size,
+            result
         )
     }
 
@@ -156,8 +156,8 @@ class Fhir4AttachmentTest {
 
         // Then
         assertEquals(
-                size,
-                fhir4Attachment.size
+            size,
+            fhir4Attachment.size
         )
     }
 
@@ -168,8 +168,8 @@ class Fhir4AttachmentTest {
 
         // When
         assertSame(
-                fhir4Attachment,
-                SdkFhir4Attachment(fhir4Attachment).unwrap()
+            fhir4Attachment,
+            SdkFhir4Attachment(fhir4Attachment).unwrap()
         )
     }
 
@@ -180,8 +180,8 @@ class Fhir4AttachmentTest {
 
         // When
         assertEquals(
-                SdkFhir4Attachment(fhir4Attachment),
-                SdkFhir4Attachment(fhir4Attachment)
+            SdkFhir4Attachment(fhir4Attachment),
+            SdkFhir4Attachment(fhir4Attachment)
         )
     }
 
@@ -192,8 +192,8 @@ class Fhir4AttachmentTest {
 
         // When
         assertEquals(
-                fhir4Attachment.hashCode(),
-                SdkFhir4Attachment(fhir4Attachment).hashCode()
+            fhir4Attachment.hashCode(),
+            SdkFhir4Attachment(fhir4Attachment).hashCode()
         )
     }
 }

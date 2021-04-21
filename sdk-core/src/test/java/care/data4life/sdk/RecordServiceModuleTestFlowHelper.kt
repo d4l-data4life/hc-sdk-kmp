@@ -1,23 +1,26 @@
 /*
  * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
  *
- * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"), 
+ * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
  *
  * The SDK and its documentation may be accessed and used for viewing/review purposes only.
- * Any usage of the SDK for other purposes, including usage for the development of 
- * applications/third-party applications shall require the conclusion of a license agreement 
+ * Any usage of the SDK for other purposes, including usage for the development of
+ * applications/third-party applications shall require the conclusion of a license agreement
  * between you and D4L.
  *
- * If you are interested in licensing the SDK for your own applications/third-party 
- * applications and/or if you’d like to contribute to the development of the SDK, please 
+ * If you are interested in licensing the SDK for your own applications/third-party
+ * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
 
 package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.attachment.FileService
+import care.data4life.sdk.attachment.AttachmentContract
+import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_JPEG_QUALITY_PERCENT
+import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_PREVIEW_SIZE_PX
+import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_THUMBNAIL_SIZE_PX
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.network.model.CommonKeyResponse
@@ -38,8 +41,8 @@ import javax.xml.bind.DatatypeConverter
 
 class RecordServiceModuleTestFlowHelper(
     private val apiService: ApiService,
-    private val fileService: FileService,
-    private val imageResizer: ImageResizer
+    private val fileService: AttachmentContract.FileService,
+    private val imageResizer: AttachmentContract.ImageResizer
 ) {
     private val mdHandle = MessageDigest.getInstance("MD5")
 
@@ -143,7 +146,7 @@ class RecordServiceModuleTestFlowHelper(
                 data,
                 resizedImages.first.first,
                 resizedImages.first.second,
-                ImageResizer.DEFAULT_PREVIEW_SIZE_PX,
+                DEFAULT_PREVIEW_SIZE_PX,
                 userId,
                 attachmentKey
             )
@@ -153,7 +156,7 @@ class RecordServiceModuleTestFlowHelper(
                     data,
                     resizedImages.second!!.first,
                     resizedImages.second!!.second,
-                    ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX,
+                    DEFAULT_THUMBNAIL_SIZE_PX,
                     userId,
                     attachmentKey
                 )
@@ -162,7 +165,7 @@ class RecordServiceModuleTestFlowHelper(
                     data,
                     null,
                     null,
-                    ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX,
+                    DEFAULT_THUMBNAIL_SIZE_PX,
                     userId,
                     attachmentKey
                 )
@@ -182,7 +185,7 @@ class RecordServiceModuleTestFlowHelper(
             imageResizer.resizeToHeight(
                 data,
                 targetHeight,
-                ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT
+                DEFAULT_JPEG_QUALITY_PERCENT
             )
         } returns resizedImage
 

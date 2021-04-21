@@ -16,7 +16,9 @@
 package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.ImageResizer
+import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_JPEG_QUALITY_PERCENT
+import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_PREVIEW_SIZE_PX
+import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_THUMBNAIL_SIZE_PX
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.lang.ImageResizeException
@@ -27,70 +29,69 @@ import care.data4life.sdk.util.HashUtil.sha1
 import care.data4life.sdk.wrapper.WrapperContract
 import io.reactivex.Observable
 import io.reactivex.Single
-import java.util.*
 
 // TODO add internal
 class AttachmentService internal constructor(
-        private val fileService: FileService,
-        // TODO move imageResizer to thumbnail service
-        private val imageResizer: ImageResizer
+    private val fileService: AttachmentContract.FileService,
+    // TODO move imageResizer to thumbnail service
+    private val imageResizer: AttachmentContract.ImageResizer
 ) : AttachmentContract.Service {
     override fun upload(
-            attachments: List<WrapperContract.Attachment>,
-            attachmentsKey: GCKey,
-            userId: String
+        attachments: List<WrapperContract.Attachment>,
+        attachmentsKey: GCKey,
+        userId: String
     ): Single<List<Pair<WrapperContract.Attachment, List<String>>>> {
         return Observable.fromIterable(attachments)
-                .filter { it.data != null }
-                .map { attachment ->
-                    val originalData = decode(attachment.data!!)
-                    attachment.id = fileService.uploadFile(attachmentsKey, userId, originalData).blockingGet()
-                    val additionalIds = uploadDownscaledImages(
-                            attachmentsKey,
-                            userId,
-                            attachment,
-                            originalData
-                    )
-                    Pair(attachment, additionalIds)
-                }
-                .filter { (first) -> first.id != null }
-                .toList()
+            .filter { it.data != null }
+            .map { attachment ->
+                val originalData = decode(attachment.data!!)
+                attachment.id = fileService.uploadFile(attachmentsKey, userId, originalData).blockingGet()
+                val additionalIds = uploadDownscaledImages(
+                    attachmentsKey,
+                    userId,
+                    attachment,
+                    originalData
+                )
+                Pair(attachment, additionalIds)
+            }
+            .filter { (first) -> first.id != null }
+            .toList()
     }
 
     @Throws(DataValidationException.InvalidAttachmentPayloadHash::class)
     override fun download(
-            attachments: List<WrapperContract.Attachment>,
-            attachmentsKey: GCKey,
-            userId: String
+        attachments: List<WrapperContract.Attachment>,
+        attachmentsKey: GCKey,
+        userId: String
     ): Single<List<WrapperContract.Attachment>> {
         return Observable
-                .fromCallable { attachments }
-                .flatMapIterable { it }
-                .filter { it.id != null }
-                .map { attachment ->
-                    var attachmentId = attachment.id!!
-                    var isPreview = false
-                    if (attachmentId.contains(SPLIT_CHAR)) {
-                        attachmentId = attachmentId.split(SPLIT_CHAR)[DOWNSCALED_ATTACHMENT_ID_POS]
-                        isPreview = true
-                    }
+            .fromCallable { attachments }
+            .flatMapIterable { it }
+            .filter { it.id != null }
+            .map { attachment ->
+                var attachmentId = attachment.id!!
+                var isPreview = false
+                if (attachmentId.contains(SPLIT_CHAR)) {
+                    attachmentId = attachmentId.split(SPLIT_CHAR)[DOWNSCALED_ATTACHMENT_ID_POS]
+                    isPreview = true
+                }
 
-                    val data = fileService.downloadFile(attachmentsKey, userId, attachmentId).blockingGet()
-                    val newHash = encodeToString(sha1(data))
+                val data = fileService.downloadFile(attachmentsKey, userId, attachmentId).blockingGet()
+                val newHash = encodeToString(sha1(data))
 
-                    if (!isPreview &&
-                            CompatibilityValidator.isHashable(attachment) &&
-                            attachment.hash != newHash
-                    ) {
-                        throw DataValidationException.InvalidAttachmentPayloadHash()
-                    } else {
-                        attachment.also {
-                            it.data = encodeToString(data)
-                            it.hash = newHash
-                        }
+                if (!isPreview &&
+                    CompatibilityValidator.isHashable(attachment) &&
+                    attachment.hash != newHash
+                ) {
+                    throw DataValidationException.InvalidAttachmentPayloadHash()
+                } else {
+                    attachment.also {
+                        it.data = encodeToString(data)
+                        it.hash = newHash
                     }
                 }
-                .toList()
+            }
+            .toList()
     }
 
     override fun delete(attachmentId: String, userId: String): Single<Boolean> {
@@ -99,22 +100,22 @@ class AttachmentService internal constructor(
 
     // TODO -> thumbnail service
     private fun uploadDownscaledImages(
-            attachmentsKey: GCKey,
-            userId: String,
-            attachment: WrapperContract.Attachment,
-            originalData: ByteArray
+        attachmentsKey: GCKey,
+        userId: String,
+        attachment: WrapperContract.Attachment,
+        originalData: ByteArray
     ): List<String> {
         var additionalIds = mutableListOf<String>()
         if (imageResizer.isResizable(originalData)) {
             additionalIds = ArrayList()
             var downscaledId: String?
-            for (position in 0..1) {// TODO: Remove the loop
+            for (position in 0..1) { // TODO: Remove the loop
                 downscaledId = resizeAndUpload(
-                        attachmentsKey,
-                        userId,
-                        attachment,
-                        originalData,
-                        if (position == POSITION_PREVIEW) ImageResizer.DEFAULT_PREVIEW_SIZE_PX else ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX
+                    attachmentsKey,
+                    userId,
+                    attachment,
+                    originalData,
+                    if (position == POSITION_PREVIEW) DEFAULT_PREVIEW_SIZE_PX else DEFAULT_THUMBNAIL_SIZE_PX
                 )
                 if (downscaledId != null)
                     additionalIds.add(downscaledId)
@@ -125,20 +126,24 @@ class AttachmentService internal constructor(
 
     // TODO -> thumbnail service
     private fun resizeAndUpload(
-            attachmentsKey: GCKey,
-            userId: String,
-            attachment: WrapperContract.Attachment,
-            originalData: ByteArray,
-            targetHeight: Int
+        attachmentsKey: GCKey,
+        userId: String,
+        attachment: WrapperContract.Attachment,
+        originalData: ByteArray,
+        targetHeight: Int
     ): String? {
         val downscaledImage = try {
-            imageResizer.resizeToHeight(originalData, targetHeight, ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT)
+            imageResizer.resizeToHeight(
+                originalData,
+                targetHeight,
+                DEFAULT_JPEG_QUALITY_PERCENT
+            )
         } catch (exception: ImageResizeException.JpegWriterMissing) {
             Log.error(exception, exception.message)
             return null
         }
-        return if (downscaledImage == null) { //currentSizePx <= targetSizePx
-            attachment.id //nothing to upload
+        return if (downscaledImage == null) { // currentSizePx <= targetSizePx
+            attachment.id // nothing to upload
         } else fileService.uploadFile(attachmentsKey, userId, downscaledImage).blockingGet()
     }
 

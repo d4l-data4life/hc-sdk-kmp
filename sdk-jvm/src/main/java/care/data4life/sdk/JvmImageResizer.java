@@ -32,11 +32,12 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 
+import care.data4life.sdk.attachment.AttachmentContract;
 import care.data4life.sdk.lang.ImageResizeException;
 import care.data4life.sdk.log.Log;
 import care.data4life.sdk.util.MimeType;
 
-public class JvmImageResizer implements ImageResizer {
+public class JvmImageResizer implements AttachmentContract.ImageResizer {
     private static final String JPEG_WRITER = "jpeg";
     private static final String JPEG_WRITER_MISSING_MSG = "Jpeg writer missing!";
 

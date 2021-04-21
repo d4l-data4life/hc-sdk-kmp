@@ -16,15 +16,10 @@
 
 package care.data4life.sdk.wrapper
 
-
-import care.data4life.sdk.fhir.Fhir3Attachment
-import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.test.util.GenericTestDataProvider.DATA_HASH
-import care.data4life.sdk.test.util.GenericTestDataProvider.DATA_PAYLOAD
-import care.data4life.sdk.test.util.GenericTestDataProvider.DATA_SIZE
-import care.data4life.sdk.test.util.TestAttachmentHelper
+import care.data4life.sdk.test.util.TestResourceHelper.buildDocumentReferenceFhir3
+import care.data4life.sdk.test.util.TestResourceHelper.buildDocumentReferenceFhir4
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -37,7 +32,7 @@ import care.data4life.fhir.stu3.model.DocumentReference as DocumentReferenceFhir
 class FhirElementFactoryTest {
 
     @Test
-    fun `it is a FhirElementFactory`() {
+    fun `It fulfils FhirElementFactory`() {
         val factory: Any = SdkFhirElementFactory
         assertTrue(factory is WrapperContract.FhirElementFactory)
     }
@@ -52,8 +47,8 @@ class FhirElementFactoryTest {
 
         // Then
         assertEquals(
-                expected = "DocumentReference",
-                actual = name
+            expected = "DocumentReference",
+            actual = name
         )
     }
 
@@ -67,8 +62,8 @@ class FhirElementFactoryTest {
 
         // Then
         assertEquals(
-                expected = "DocumentReference",
-                actual = name
+            expected = "DocumentReference",
+            actual = name
         )
     }
 
@@ -79,8 +74,8 @@ class FhirElementFactoryTest {
         }
 
         assertEquals(
-                actual = actual.message,
-                expected = "Internal failure"
+            actual = actual.message,
+            expected = "Internal failure"
         )
     }
 
@@ -93,8 +88,8 @@ class FhirElementFactoryTest {
         val type = SdkFhirElementFactory.resolveFhirVersion(resource::class.java)
 
         assertEquals(
-                actual = type,
-                expected = FhirContract.FhirVersion.FHIR_3
+            actual = type,
+            expected = FhirContract.FhirVersion.FHIR_3
         )
     }
 
@@ -107,8 +102,8 @@ class FhirElementFactoryTest {
         val type = SdkFhirElementFactory.resolveFhirVersion(resource::class.java)
 
         assertEquals(
-                actual = type,
-                expected = FhirContract.FhirVersion.FHIR_4
+            actual = type,
+            expected = FhirContract.FhirVersion.FHIR_4
         )
     }
 
@@ -121,8 +116,8 @@ class FhirElementFactoryTest {
         val type = SdkFhirElementFactory.resolveFhirVersion(resource::class.java)
 
         assertEquals(
-                actual = type,
-                expected = FhirContract.FhirVersion.UNKNOWN
+            actual = type,
+            expected = FhirContract.FhirVersion.UNKNOWN
         )
     }
 
@@ -131,8 +126,8 @@ class FhirElementFactoryTest {
         val klass = SdkFhirElementFactory.getFhir3ClassForType("DocumentReference")
 
         assertEquals(
-                actual = klass,
-                expected = DocumentReferenceFhir3::class.java
+            actual = klass,
+            expected = DocumentReferenceFhir3::class.java
         )
     }
 
@@ -141,8 +136,8 @@ class FhirElementFactoryTest {
         val klass = SdkFhirElementFactory.getFhir3ClassForType("documentreference")
 
         assertEquals(
-                actual = klass,
-                expected = DocumentReferenceFhir3::class.java
+            actual = klass,
+            expected = DocumentReferenceFhir3::class.java
         )
     }
 
@@ -154,28 +149,28 @@ class FhirElementFactoryTest {
     @Test
     fun `Given, getFhir3ClassForType is called, with any valid Fhir3Resource in string representation, it returns its resource class`() {
         val resources = listOf(
-                "specimen",
-                "substance",
-                "valueSet",
-                "referralRequest",
-                "documentReference",
-                "diagnosticReport",
-                "medication",
-                "questionnaire",
-                "goal",
-                "carePlan",
-                "careTeam",
-                "questionnaireResponse",
-                "procedureRequest",
-                "practitioner",
-                "patient",
-                "procedure",
-                "condition",
-                "familyMemberHistory",
-                "organization",
-                "medicationRequest",
-                "observation",
-                "provenance"
+            "specimen",
+            "substance",
+            "valueSet",
+            "referralRequest",
+            "documentReference",
+            "diagnosticReport",
+            "medication",
+            "questionnaire",
+            "goal",
+            "carePlan",
+            "careTeam",
+            "questionnaireResponse",
+            "procedureRequest",
+            "practitioner",
+            "patient",
+            "procedure",
+            "condition",
+            "familyMemberHistory",
+            "organization",
+            "medicationRequest",
+            "observation",
+            "provenance"
         )
 
         for (type in resources) {
@@ -183,14 +178,13 @@ class FhirElementFactoryTest {
         }
     }
 
-
     @Test
     fun `Given, getFhir4ClassForType is called with a Fhir4Resource String, it returns a Fhir4 resource class`() {
         val klass = SdkFhirElementFactory.getFhir4ClassForType("DocumentReference")
 
         assertEquals(
-                actual = klass,
-                expected = DocumentReferenceFhir4::class.java
+            actual = klass,
+            expected = DocumentReferenceFhir4::class.java
         )
     }
 
@@ -199,8 +193,8 @@ class FhirElementFactoryTest {
         val klass = SdkFhirElementFactory.getFhir4ClassForType("documentreference")
 
         assertEquals(
-                actual = klass,
-                expected = DocumentReferenceFhir4::class.java
+            actual = klass,
+            expected = DocumentReferenceFhir4::class.java
         )
     }
 
@@ -212,80 +206,35 @@ class FhirElementFactoryTest {
     @Test
     fun `Given, getFhir4ClassForType is called, with any valid Fhir4Resource in string representation, it returns its resource class`() {
         val resources = listOf(
-                "Specimen",
-                "ServiceRequest",
-                "Substance",
-                "ValueSet",
-                "DocumentReference",
-                "DiagnosticReport",
-                "Encounter",
-                "Medication",
-                "Questionnaire",
-                "Goal",
-                "CarePlan",
-                "CareTeam",
-                "QuestionnaireResponse",
-                "Practitioner",
-                "Patient",
-                "Procedure",
-                "Condition",
-                "FamilyMemberHistory",
-                "Organization",
-                "MedicationRequest",
-                "Observation",
-                "Location",
-                "Provenance"
+            "Specimen",
+            "ServiceRequest",
+            "Substance",
+            "ValueSet",
+            "DocumentReference",
+            "DiagnosticReport",
+            "Encounter",
+            "Medication",
+            "Questionnaire",
+            "Goal",
+            "CarePlan",
+            "CareTeam",
+            "QuestionnaireResponse",
+            "MedicationStatement",
+            "PractitionerRole",
+            "Practitioner",
+            "Patient",
+            "Procedure",
+            "Condition",
+            "FamilyMemberHistory",
+            "Organization",
+            "MedicationRequest",
+            "Observation",
+            "Location",
+            "Provenance"
         )
 
         for (type in resources) {
             assertNotNull(SdkFhirElementFactory.getFhir4ClassForType(type))
-        }
-
-    }
-
-    companion object {
-        private fun buildDocRefContentFhir3(attachment: Fhir3Attachment): DocumentReferenceFhir3.DocumentReferenceContent {
-            return DocumentReferenceFhir3.DocumentReferenceContent(attachment)
-        }
-
-        private fun buildDocumentReferenceFhir3(): DocumentReferenceFhir3 {
-            val content = buildDocRefContentFhir3(
-                    TestAttachmentHelper.buildFhir3Attachment(
-                            null,
-                            DATA_PAYLOAD,
-                            DATA_SIZE,
-                            DATA_HASH
-                    )
-            )
-            val contents: MutableList<DocumentReferenceFhir3.DocumentReferenceContent> = mutableListOf()
-            contents.add(content)
-            return DocumentReferenceFhir3(
-                    null,
-                    null,
-                    null,
-                    contents
-            )
-        }
-
-        private fun buildDocRefContentFhir4(attachment: Fhir4Attachment): DocumentReferenceFhir4.DocumentReferenceContent {
-            return DocumentReferenceFhir4.DocumentReferenceContent(attachment)
-        }
-
-        private fun buildDocumentReferenceFhir4(): DocumentReferenceFhir4 {
-            val content = buildDocRefContentFhir4(
-                    TestAttachmentHelper.buildFhir4Attachment(
-                            null,
-                            DATA_PAYLOAD,
-                            DATA_SIZE,
-                            DATA_HASH
-                    )
-            )
-            val contents: MutableList<DocumentReferenceFhir4.DocumentReferenceContent> = ArrayList()
-            contents.add(content)
-            return DocumentReferenceFhir4(
-                    null,
-                    contents
-            )
         }
     }
 }

@@ -180,7 +180,6 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
                 attachmentId
             )
         } returns Single.just(rawAttachment)
-
     }
 
     // Attachments
@@ -217,7 +216,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
         internalResource.identifier!!.add(
             Fhir3Identifier().also {
                 it.assigner = Fhir3Reference().also { ref -> ref.reference = PARTNER_ID }
-                it.value = "d4l_f_p_t#${ATTACHMENT_ID}#${PREVIEW_ID}#${THUMBNAIL_ID}"
+                it.value = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
             }
         )
 
@@ -279,7 +278,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
         internalResource.identifier!!.add(
             Fhir3Identifier().also {
                 it.assigner = Fhir3Reference().also { ref -> ref.reference = PARTNER_ID }
-                it.value = "d4l_f_p_t#${ATTACHMENT_ID}#${PREVIEW_ID}#${THUMBNAIL_ID}"
+                it.value = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
             }
         )
 
@@ -344,7 +343,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
         resource.identifier!!.add(
             Fhir3Identifier().also {
                 it.assigner = Fhir3Reference().also { ref -> ref.reference = PARTNER_ID }
-                it.value = "d4l_f_p_t#${ATTACHMENT_ID}#${PREVIEW_ID}#${THUMBNAIL_ID}"
+                it.value = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
             }
         )
 
@@ -353,7 +352,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
         internalResource.identifier!!.add(
             Fhir3Identifier().also {
                 it.assigner = Fhir3Reference().also { ref -> ref.reference = PARTNER_ID }
-                it.value = "d4l_f_p_t#${ATTACHMENT_ID}#${PREVIEW_ID}#${THUMBNAIL_ID}"
+                it.value = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
             }
         )
 
@@ -399,7 +398,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
         )
         assertEquals(
             actual = result.resource.identifier?.get(1)?.value,
-            expected = "d4l_f_p_t#${ATTACHMENT_ID}#${PREVIEW_ID}#${THUMBNAIL_ID}"
+            expected = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
         )
     }
 }

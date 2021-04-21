@@ -73,7 +73,7 @@ interface RecordContract {
 
         companion object {
             const val EMPTY_RECORD_ID = ""
-            //d4l -> namespace, f-> full, p -> preview, t -> thumbnail
+            // d4l -> namespace, f-> full, p -> preview, t -> thumbnail
             const val DOWNSCALED_ATTACHMENT_IDS_FMT = "d4l_f_p_t"
             const val DOWNSCALED_ATTACHMENT_IDS_SIZE = 4
             const val FULL_ATTACHMENT_ID_POS = 1

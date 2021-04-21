@@ -58,9 +58,14 @@ public class Data4LifeClientTest {
         recordService = mock(RecordService.class);
         callHandler = mock(CallHandler.class);
 
-        when(userService.getUID()).thenReturn(Single.just("uid"));
+        when(userService.getUserID()).thenReturn(Single.just("uid"));
 
         instance = spy(new Data4LifeClient(ALIAS, cryptoService, authorizationService, userService, recordService, callHandler));
+    }
+
+    @Test
+    public void hasUserId() {
+        assertThat(instance.getUserId()).isEqualTo("uid");
     }
 
     @Test

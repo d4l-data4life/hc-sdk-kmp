@@ -36,26 +36,26 @@ class CommonKeyResponseTest {
     @Test
     fun `Given a CommonKeyResponse is serialized it transforms it into valid JSON`() {
         val moshi = Moshi.Builder()
-                .add(EncryptedKeyTypeAdapter())
-                .build()
+            .add(EncryptedKeyTypeAdapter())
+            .build()
         val adapter = moshi.adapter<CommonKeyResponse>(CommonKeyResponse::class.java)
 
         assertEquals(
-                actual = adapter.toJson(COMMON_KEY_RESPONSE),
-                expected = COMMON_KEY_RESPONSE_JSON
+            actual = adapter.toJson(COMMON_KEY_RESPONSE),
+            expected = COMMON_KEY_RESPONSE_JSON
         )
     }
 
     @Test
     fun `Given a CommonKeyResponse in JSON format is deserialized it transforms it into CommonKeyResponse`() {
         val moshi = Moshi.Builder()
-                .add(EncryptedKeyTypeAdapter())
-                .build()
+            .add(EncryptedKeyTypeAdapter())
+            .build()
         val adapter = moshi.adapter<CommonKeyResponse>(CommonKeyResponse::class.java)
 
         assertEquals(
-                actual = adapter.fromJson(COMMON_KEY_RESPONSE_JSON),
-                expected = COMMON_KEY_RESPONSE
+            actual = adapter.fromJson(COMMON_KEY_RESPONSE_JSON),
+            expected = COMMON_KEY_RESPONSE
         )
     }
 

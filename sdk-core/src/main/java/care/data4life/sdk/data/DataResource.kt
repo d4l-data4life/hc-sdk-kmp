@@ -17,7 +17,7 @@
 package care.data4life.sdk.data
 
 data class DataResource(
-        val value: ByteArray
+    val value: ByteArray
 ) : DataContract.Resource {
 
     override fun asByteArray(): ByteArray = value

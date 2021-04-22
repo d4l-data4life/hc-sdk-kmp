@@ -19,6 +19,6 @@ package care.data4life.crypto
 import kotlin.jvm.JvmOverloads
 
 data class KeyOptions @JvmOverloads constructor(
-        val keySize: Int = 0,
-        val keystoreAlias: String? = null
+    val keySize: Int = 0,
+    val keystoreAlias: String? = null
 )

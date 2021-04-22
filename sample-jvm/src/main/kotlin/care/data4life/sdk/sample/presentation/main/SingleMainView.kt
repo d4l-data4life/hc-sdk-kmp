@@ -35,20 +35,22 @@ import org.koin.core.parameter.parametersOf
 
 class SingleMainView(private val alias: String) : BaseView(), KoinComponent {
 
-
     private val client: Data4LifeClient by inject { parametersOf(alias) }
-    private val menuLoggedOut = Menu(listOf(
+    private val menuLoggedOut = Menu(
+        listOf(
             MenuEntry(LOGIN),
             MenuEntry(START),
             MenuEntry(EXIT)
-    ))
-    private val menuLoggedIn = Menu(listOf(
+        )
+    )
+    private val menuLoggedIn = Menu(
+        listOf(
             MenuEntry(LOGOUT),
             MenuEntry(UPLOAD),
             MenuEntry(START),
             MenuEntry(EXIT)
-    ))
-
+        )
+    )
 
     override val type: String = "singleMain"
 
@@ -141,7 +143,6 @@ class SingleMainView(private val alias: String) : BaseView(), KoinComponent {
         }
     }
 
-
     companion object {
         private const val LOGIN = "login"
         private const val LOGOUT = "logout"
@@ -149,5 +150,4 @@ class SingleMainView(private val alias: String) : BaseView(), KoinComponent {
         private const val EXIT = "exit"
         private const val START = "start"
     }
-
 }

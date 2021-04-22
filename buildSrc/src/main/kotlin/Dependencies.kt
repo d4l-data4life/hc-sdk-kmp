@@ -49,7 +49,7 @@ object Dependencies {
                 const val testCommon = "org.jetbrains.kotlin:kotlin-test-common:${Versions.kotlin}"
 
                 const val testAnnotationsCommon =
-                        "org.jetbrains.kotlin:kotlin-test-annotations-common:${Versions.kotlin}"
+                    "org.jetbrains.kotlin:kotlin-test-annotations-common:${Versions.kotlin}"
                 const val testJvm = "org.jetbrains.kotlin:kotlin-test:${Versions.kotlin}"
 
                 const val testJvmJunit = "org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin}"
@@ -63,12 +63,10 @@ object Dependencies {
         }
     }
 
-
     object Android {
         // Kotlin
         const val kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}"
         const val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"
-
 
         // Android
         const val androidDesugar = "com.android.tools:desugar_jdk_libs:${Versions.androidDesugar}"
@@ -122,8 +120,6 @@ object Dependencies {
         const val retrofitAdapterRxJava = "com.squareup.retrofit2:adapter-rxjava2:${Versions.retrofit}"
         const val gson = "com.squareup.retrofit2:converter-gson:${Versions.gson}"
 
-
-
         // Test
         object Test {
             const val core = "androidx.test:core:${Versions.androidXTestCore}"
@@ -138,7 +134,6 @@ object Dependencies {
 
             const val okHttpMockWebServer = "com.squareup.okhttp3:mockwebserver:${Versions.okHttp}"
         }
-
 
         // AndroidTest
         object AndroidTest {
@@ -163,7 +158,6 @@ object Dependencies {
         }
     }
 
-
     val java = Java
 
     object Java {
@@ -171,7 +165,6 @@ object Dependencies {
 
         // Kotlin
         const val kotlinStdlibJdk8 = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}"
-
 
         // Crypto
         const val bouncyCastleJdk15 = "org.bouncycastle:bcprov-jdk15on:${Versions.bouncyCastle}"
@@ -202,7 +195,6 @@ object Dependencies {
         const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
         const val retrofitConverterMoshi = "com.squareup.retrofit2:converter-moshi:${Versions.retrofit}"
         const val retrofitAdapterRxJava = "com.squareup.retrofit2:adapter-rxjava2:${Versions.retrofit}"
-
 
         object Test {
             const val junit = "junit:junit:${Versions.testJUnit}"

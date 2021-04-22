@@ -23,7 +23,7 @@
 :phdp-plat: Personal Health Data Platform
 :sw-name: {compname} {prod-name}
 :sw-version: 1.7.0
-:pub-type: Internal 
+:pub-type: Internal
 :pub-version: 1.00
 :pub-status: draft
 :pub-title: {software-name} {pub-type}
@@ -33,7 +33,6 @@
 
 :description: PHDP SDK documentation
 :keywords: SDK Android Java Kotlin FHIR
-
 
 = {phdp-plat} SDK documentation
 
@@ -71,4 +70,3 @@ include::../../../../securestore-common/src/docs/asciidoc/index.adoc[]
 ----
 include::../../../../LICENSE[]
 ----
-

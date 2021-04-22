@@ -30,10 +30,25 @@ abstract class BaseClient(
     protected var recordService: RecordService,
     protected var handler: CallHandler,
     private val authClient: SdkContract.AuthClient = createAuthClient(alias, userService, handler),
-    override val data: SdkContract.DataRecordClient = createDataClient(userService, recordService, handler),
-    override val fhir4: SdkContract.Fhir4RecordClient = createFhir4Client(userService, recordService, handler),
-    private val legacyDataClient: SdkContract.LegacyDataClient = createLegacyDataClient(userService, recordService, handler)
-) : SdkContract.Client, SdkContract.LegacyDataClient by legacyDataClient, SdkContract.AuthClient by authClient {
+    override val data: SdkContract.DataRecordClient = createDataClient(
+        userService,
+        recordService,
+        handler
+    ),
+    override val fhir4: SdkContract.Fhir4RecordClient = createFhir4Client(
+        userService,
+        recordService,
+        handler
+    ),
+    private val legacyDataClient: SdkContract.LegacyDataClient = createLegacyDataClient(
+        userService,
+        recordService,
+        handler
+    )
+) : SdkContract.Client,
+    SdkContract.LegacyDataClient by legacyDataClient,
+    SdkContract.AuthClient by authClient {
+
     override val userId: String = userService.userID.blockingGet()
 
     companion object {

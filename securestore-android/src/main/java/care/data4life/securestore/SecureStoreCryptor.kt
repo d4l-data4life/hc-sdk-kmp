@@ -20,8 +20,8 @@ import android.content.Context
 import care.data4life.securestore.cryptor.CryptorFactory
 
 actual class SecureStoreCryptor @JvmOverloads constructor(
-        context: Context,
-        private val cryptor: SecureStoreContract.Cryptor = CryptorFactory.create(context)
+    context: Context,
+    private val cryptor: SecureStoreContract.Cryptor = CryptorFactory.create(context)
 ) : SecureStoreContract.Cryptor {
 
     override fun encrypt(data: CharArray): CharArray {

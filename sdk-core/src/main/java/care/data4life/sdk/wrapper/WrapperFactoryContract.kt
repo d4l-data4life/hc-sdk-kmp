@@ -31,5 +31,4 @@ class WrapperFactoryContract {
         @Throws(DataValidationException.CustomDataLimitViolation::class)
         fun wrap(identifier: Any): WrapperContract.Identifier
     }
-
 }

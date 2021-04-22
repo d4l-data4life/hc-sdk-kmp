@@ -37,6 +37,5 @@ object NetworkUtil {
         } catch (e: IOException) {
             false
         }
-
     }
 }

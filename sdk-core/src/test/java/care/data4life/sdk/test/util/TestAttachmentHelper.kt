@@ -22,10 +22,10 @@ import care.data4life.sdk.fhir.Fhir4Attachment
 object TestAttachmentHelper {
     @JvmStatic
     fun buildFhir3Attachment(
-            id: String?,
-            data: String?,
-            size: Int?,
-            hash: String?
+        id: String?,
+        data: String?,
+        size: Int?,
+        hash: String?
     ): Fhir3Attachment {
         val attachment = Fhir3Attachment()
         attachment.id = id
@@ -36,10 +36,10 @@ object TestAttachmentHelper {
     }
 
     fun buildFhir4Attachment(
-            id: String?,
-            data: String?,
-            size: Int?,
-            hash: String?
+        id: String?,
+        data: String?,
+        size: Int?,
+        hash: String?
     ): Fhir4Attachment {
         val attachment = Fhir4Attachment()
         attachment.id = id
@@ -50,16 +50,16 @@ object TestAttachmentHelper {
     }
 
     fun makeAttachmentData(
-            type: ByteArray,
-            size: Int
+        type: ByteArray,
+        size: Int
     ): ByteArray {
         val payload = ByteArray(size)
         System.arraycopy(
-                type,
-                0,
-                payload,
-                0,
-                type.size
+            type,
+            0,
+            payload,
+            0,
+            type.size
         )
 
         return payload

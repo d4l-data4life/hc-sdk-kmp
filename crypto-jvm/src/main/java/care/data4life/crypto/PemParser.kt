@@ -40,14 +40,13 @@ import java.security.interfaces.RSAPrivateCrtKey
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.RSAPublicKeySpec
 
-
 /**
  * Convert a string encoding a private key in PEM format to a GCKeyPair.
  *
  * @param privateKeyAsPem   Private key encoded in PEM format
  * @param algorithm         Encryption algorithm to use
  * @param keySize           Encryption key size
- * @return                  GCKeyPair
+ * @return GCKeyPair
  * @throws Exception        Covers the variety of possible errors during parsing
  */
 @Throws(Exception::class)

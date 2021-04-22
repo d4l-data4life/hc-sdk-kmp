@@ -25,6 +25,7 @@ object LibraryConfig {
     const val referenceSdkVersion = "1.8.0"
 
     val publish = PublishConfig
+
     object PublishConfig {
         const val name = LibraryConfig.name
         const val groupId = LibraryConfig.group
@@ -55,6 +56,7 @@ object LibraryConfig {
     }
 
     val android = AndroidLibraryConfig
+
     object AndroidLibraryConfig {
         const val minSdkVersion = 21
         const val compileSdkVersion = 30

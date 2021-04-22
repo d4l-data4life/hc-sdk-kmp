@@ -38,26 +38,26 @@ class DecryptedRecordMapperOptionalSettersTest : DecryptedRecordMapperTestBase()
     fun `Given, build is called with a DomainResource, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedFhirRecord`() {
         // When
         val record = DecryptedRecordMapper().build(
-                fhirResource,
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
+            fhirResource,
+            tags,
+            creationDate,
+            dataKey,
+            modelVersion
         )
 
         assertEquals(
-                record,
-                DecryptedRecord(
-                        null,
-                        fhirResource,
-                        tags,
-                        listOf(),
-                        creationDate,
-                        null,
-                        dataKey,
-                        null,
-                        modelVersion
-                )
+            record,
+            DecryptedRecord(
+                null,
+                fhirResource,
+                tags,
+                listOf(),
+                creationDate,
+                null,
+                dataKey,
+                null,
+                modelVersion
+            )
         )
     }
 
@@ -65,30 +65,30 @@ class DecryptedRecordMapperOptionalSettersTest : DecryptedRecordMapperTestBase()
     fun `Given, setIdentifier is called with a String, it sets the Identifier on build for a FhirResource`() {
         // When
         val builder = DecryptedRecordMapper()
-                .setIdentifier(identifier)
+            .setIdentifier(identifier)
 
         // Then
         val record = builder.build(
-                fhirResource,
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
+            fhirResource,
+            tags,
+            creationDate,
+            dataKey,
+            modelVersion
         )
 
         assertEquals(
-                record,
-                DecryptedRecord(
-                        identifier,
-                        fhirResource,
-                        tags,
-                        listOf(),
-                        creationDate,
-                        null,
-                        dataKey,
-                        null,
-                        modelVersion
-                )
+            record,
+            DecryptedRecord(
+                identifier,
+                fhirResource,
+                tags,
+                listOf(),
+                creationDate,
+                null,
+                dataKey,
+                null,
+                modelVersion
+            )
         )
     }
 
@@ -96,31 +96,31 @@ class DecryptedRecordMapperOptionalSettersTest : DecryptedRecordMapperTestBase()
     fun `Given, setIdentifier is called with null, it resets the Identifier on build for a FhirResource`() {
         // When
         val builder = DecryptedRecordMapper()
-                .setIdentifier(identifier)
-                .setIdentifier(null)
+            .setIdentifier(identifier)
+            .setIdentifier(null)
 
         // Then
         val record = builder.build(
-                fhirResource,
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
+            fhirResource,
+            tags,
+            creationDate,
+            dataKey,
+            modelVersion
         )
 
         assertEquals(
-                record,
-                DecryptedRecord(
-                        null,
-                        fhirResource,
-                        tags,
-                        listOf(),
-                        creationDate,
-                        null,
-                        dataKey,
-                        null,
-                        modelVersion
-                )
+            record,
+            DecryptedRecord(
+                null,
+                fhirResource,
+                tags,
+                listOf(),
+                creationDate,
+                null,
+                dataKey,
+                null,
+                modelVersion
+            )
         )
     }
 
@@ -128,63 +128,62 @@ class DecryptedRecordMapperOptionalSettersTest : DecryptedRecordMapperTestBase()
     fun `Given, setAnnotations is called with a List of Strings, it sets the Annotations on build for a FhirResource`() {
         // When
         val builder = DecryptedRecordMapper()
-                .setAnnotations(annotations)
+            .setAnnotations(annotations)
 
         // Then
         val record1 = builder.build(
-                fhirResource,
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
+            fhirResource,
+            tags,
+            creationDate,
+            dataKey,
+            modelVersion
         )
 
         assertEquals(
-                record1,
-                DecryptedRecord(
-                        null,
-                        fhirResource,
-                        tags,
-                        annotations,
-                        creationDate,
-                        null,
-                        dataKey,
-                        null,
-                        modelVersion
-                )
+            record1,
+            DecryptedRecord(
+                null,
+                fhirResource,
+                tags,
+                annotations,
+                creationDate,
+                null,
+                dataKey,
+                null,
+                modelVersion
+            )
         )
     }
-
 
     @Test
     fun `Given, setAnnotations is called with null, it resets the Annotations on build for a FhirResource`() {
         // When
         val builder = DecryptedRecordMapper()
-                .setAnnotations(annotations)
-                .setAnnotations(null)
+            .setAnnotations(annotations)
+            .setAnnotations(null)
 
         // Then
         val record = builder.build(
-                fhirResource,
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
+            fhirResource,
+            tags,
+            creationDate,
+            dataKey,
+            modelVersion
         )
 
         assertEquals(
-                record,
-                DecryptedRecord(
-                        null,
-                        fhirResource,
-                        tags,
-                        listOf(),
-                        creationDate,
-                        null,
-                        dataKey,
-                        null,
-                        modelVersion
-                )
+            record,
+            DecryptedRecord(
+                null,
+                fhirResource,
+                tags,
+                listOf(),
+                creationDate,
+                null,
+                dataKey,
+                null,
+                modelVersion
+            )
         )
     }
 
@@ -192,30 +191,30 @@ class DecryptedRecordMapperOptionalSettersTest : DecryptedRecordMapperTestBase()
     fun `Given, setUpdateDate is called with a Strings, it sets the UpdateDate on build for a FhirResource`() {
         // When
         val builder = DecryptedRecordMapper()
-                .setUpdateDate(updateDate)
+            .setUpdateDate(updateDate)
 
         // Then
         val record = builder.build(
-                fhirResource,
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
+            fhirResource,
+            tags,
+            creationDate,
+            dataKey,
+            modelVersion
         )
 
         assertEquals(
-                record,
-                DecryptedRecord(
-                        null,
-                        fhirResource,
-                        tags,
-                        listOf(),
-                        creationDate,
-                        updateDate,
-                        dataKey,
-                        null,
-                        modelVersion
-                )
+            record,
+            DecryptedRecord(
+                null,
+                fhirResource,
+                tags,
+                listOf(),
+                creationDate,
+                updateDate,
+                dataKey,
+                null,
+                modelVersion
+            )
         )
     }
 
@@ -223,31 +222,31 @@ class DecryptedRecordMapperOptionalSettersTest : DecryptedRecordMapperTestBase()
     fun `Given, setUpdateDate is called with null, it resets the UpdateDate on build for a FhirResource`() {
         // When
         val builder = DecryptedRecordMapper()
-                .setUpdateDate(updateDate)
-                .setUpdateDate(null)
+            .setUpdateDate(updateDate)
+            .setUpdateDate(null)
 
         // Then
         val record = builder.build(
-                fhirResource,
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
+            fhirResource,
+            tags,
+            creationDate,
+            dataKey,
+            modelVersion
         )
 
         assertEquals(
-                record,
-                DecryptedRecord(
-                        null,
-                        fhirResource,
-                        tags,
-                        listOf(),
-                        creationDate,
-                        null,
-                        dataKey,
-                        null,
-                        modelVersion
-                )
+            record,
+            DecryptedRecord(
+                null,
+                fhirResource,
+                tags,
+                listOf(),
+                creationDate,
+                null,
+                dataKey,
+                null,
+                modelVersion
+            )
         )
     }
 
@@ -255,30 +254,30 @@ class DecryptedRecordMapperOptionalSettersTest : DecryptedRecordMapperTestBase()
     fun `Given, setAttachmentKey is called with a GCKey, it sets the AttachmentKey on build for a FhirResource`() {
         // When
         val builder = DecryptedRecordMapper()
-                .setAttachmentKey(attachmentKey)
+            .setAttachmentKey(attachmentKey)
 
         // Then
         val record = builder.build(
-                fhirResource,
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
+            fhirResource,
+            tags,
+            creationDate,
+            dataKey,
+            modelVersion
         )
 
         assertEquals(
-                record,
-                DecryptedRecord(
-                        null,
-                        fhirResource,
-                        tags,
-                        listOf(),
-                        creationDate,
-                        null,
-                        dataKey,
-                        attachmentKey,
-                        modelVersion
-                )
+            record,
+            DecryptedRecord(
+                null,
+                fhirResource,
+                tags,
+                listOf(),
+                creationDate,
+                null,
+                dataKey,
+                attachmentKey,
+                modelVersion
+            )
         )
     }
 
@@ -286,31 +285,31 @@ class DecryptedRecordMapperOptionalSettersTest : DecryptedRecordMapperTestBase()
     fun `Given, setAttachmentKey is called with null, it resets the AttachmentKey on build for a FhirResource`() {
         // When
         val builder = DecryptedRecordMapper()
-                .setAttachmentKey(attachmentKey)
-                .setAttachmentKey(null)
+            .setAttachmentKey(attachmentKey)
+            .setAttachmentKey(null)
 
         // Then
         val record = builder.build(
-                fhirResource,
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
+            fhirResource,
+            tags,
+            creationDate,
+            dataKey,
+            modelVersion
         )
 
         assertEquals(
-                record,
-                DecryptedRecord(
-                        null,
-                        fhirResource,
-                        tags,
-                        listOf(),
-                        creationDate,
-                        null,
-                        dataKey,
-                        null,
-                        modelVersion
-                )
+            record,
+            DecryptedRecord(
+                null,
+                fhirResource,
+                tags,
+                listOf(),
+                creationDate,
+                null,
+                dataKey,
+                null,
+                modelVersion
+            )
         )
     }
 
@@ -318,33 +317,33 @@ class DecryptedRecordMapperOptionalSettersTest : DecryptedRecordMapperTestBase()
     fun `Given, arbitrary are called, it uses the combination on build for a FhirResource`() {
         // When
         val builder = DecryptedRecordMapper()
-                .setIdentifier(identifier)
-                .setAnnotations(annotations)
-                .setUpdateDate(updateDate)
-                .setAttachmentKey(attachmentKey)
+            .setIdentifier(identifier)
+            .setAnnotations(annotations)
+            .setUpdateDate(updateDate)
+            .setAttachmentKey(attachmentKey)
 
         // Then
         val record = builder.build(
-                fhirResource,
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
+            fhirResource,
+            tags,
+            creationDate,
+            dataKey,
+            modelVersion
         )
 
         assertEquals(
-                record,
-                DecryptedRecord(
-                        identifier,
-                        fhirResource,
-                        tags,
-                        annotations,
-                        creationDate,
-                        updateDate,
-                        dataKey,
-                        attachmentKey,
-                        modelVersion
-                )
+            record,
+            DecryptedRecord(
+                identifier,
+                fhirResource,
+                tags,
+                annotations,
+                creationDate,
+                updateDate,
+                dataKey,
+                attachmentKey,
+                modelVersion
+            )
         )
     }
 
@@ -352,34 +351,34 @@ class DecryptedRecordMapperOptionalSettersTest : DecryptedRecordMapperTestBase()
     fun `Given, clear is called, it resets all optional setters for a FhirResource`() {
         // When
         val builder = DecryptedRecordMapper()
-                .setIdentifier(identifier)
-                .setAnnotations(annotations)
-                .setUpdateDate(updateDate)
-                .setAttachmentKey(attachmentKey)
-                .clear()
+            .setIdentifier(identifier)
+            .setAnnotations(annotations)
+            .setUpdateDate(updateDate)
+            .setAttachmentKey(attachmentKey)
+            .clear()
 
         // Then
         val record = builder.build(
-                fhirResource,
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
+            fhirResource,
+            tags,
+            creationDate,
+            dataKey,
+            modelVersion
         )
 
         assertEquals(
-                record,
-                DecryptedRecord(
-                        null,
-                        fhirResource,
-                        tags,
-                        listOf(),
-                        creationDate,
-                        null,
-                        dataKey,
-                        null,
-                        modelVersion
-                )
+            record,
+            DecryptedRecord(
+                null,
+                fhirResource,
+                tags,
+                listOf(),
+                creationDate,
+                null,
+                dataKey,
+                null,
+                modelVersion
+            )
         )
     }
 }

@@ -81,7 +81,7 @@ class CompatibilityValidatorTest {
         // Given
         val fhirAttachment = Fhir3Attachment()
         val fhirDateTime = Fhir3DateTimeParser.parseDateTime(
-                "2011-11-11"
+            "2011-11-11"
         )
 
         fhirAttachment.creation = fhirDateTime
@@ -95,7 +95,7 @@ class CompatibilityValidatorTest {
         // Given
         val fhirAttachment = Fhir3Attachment()
         val fhirDateTime = Fhir3DateTimeParser.parseDateTime(
-                "2021-12-21"
+            "2021-12-21"
         )
 
         fhirAttachment.creation = fhirDateTime

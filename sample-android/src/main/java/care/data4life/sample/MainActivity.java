@@ -21,12 +21,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.security.ProviderInstaller;
 import com.google.android.material.snackbar.Snackbar;
 
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import care.data4life.sdk.Data4LifeClient;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.ResultListener;

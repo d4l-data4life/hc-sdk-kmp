@@ -18,17 +18,16 @@ package care.data4life.sdk.network.model
 import com.squareup.moshi.Json
 
 data class VersionList(
-        @field:Json(name = "versions")
-        override val versions: List<Version>
+    @field:Json(name = "versions")
+    override val versions: List<Version>
 ) : NetworkModelContract.VersionList {
-
 
     fun isSupported(currentVersion: String): Boolean {
         var isSupported = true
         val regex = Regex("^(\\d+\\.)(\\d+\\.)(\\d)")
         val matchVersion = regex.find(currentVersion)?.groups?.first()?.value
         for (version in versions) {
-            if ( version.name == matchVersion && version.status == NetworkModelContract.Version.KEY_UNSUPPORTED) {
+            if (version.name == matchVersion && version.status == NetworkModelContract.Version.KEY_UNSUPPORTED) {
                 isSupported = false
                 break
             }

@@ -16,14 +16,6 @@
 
 package care.data4life.sdk
 
-
-import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
-import care.data4life.sdk.test.util.GenericTestDataProvider.ATTACHMENT_ID
-import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
-import care.data4life.sdk.test.util.GenericTestDataProvider.PDF
-import care.data4life.sdk.test.util.GenericTestDataProvider.PDF_OVERSIZED
-import care.data4life.sdk.test.util.GenericTestDataProvider.UNKNOWN
-import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.crypto.CryptoContract
@@ -35,6 +27,13 @@ import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
+import care.data4life.sdk.test.util.GenericTestDataProvider.ATTACHMENT_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.PDF
+import care.data4life.sdk.test.util.GenericTestDataProvider.PDF_OVERSIZED
+import care.data4life.sdk.test.util.GenericTestDataProvider.UNKNOWN
+import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.test.util.TestResourceHelper.getJSONResource
 import care.data4life.sdk.util.Base64
 import care.data4life.sdk.wrapper.SdkAttachmentFactory
@@ -76,18 +75,18 @@ class RecordServiceAttachmentUtilsTest {
         clearAllMocks()
 
         recordService = spyk(
-                RecordService(
-                        PARTNER_ID,
-                        ALIAS,
-                        apiService,
-                        tagEncryptionService,
-                        taggingService,
-                        fhirService,
-                        attachmentService,
-                        cryptoService,
-                        errorHandler,
-                        mockk()
-                )
+            RecordService(
+                PARTNER_ID,
+                ALIAS,
+                apiService,
+                tagEncryptionService,
+                taggingService,
+                fhirService,
+                attachmentService,
+                cryptoService,
+                errorHandler,
+                mockk()
+            )
         )
 
         mockkObject(SdkFhirAttachmentHelper)
@@ -111,8 +110,8 @@ class RecordServiceAttachmentUtilsTest {
         val actual = recordService.deleteAttachment(ATTACHMENT_ID, USER_ID).blockingGet()
 
         assertSame(
-                actual = actual,
-                expected = expected
+            actual = actual,
+            expected = expected
         )
 
         verify(exactly = 1) { attachmentService.delete(ATTACHMENT_ID, USER_ID) }
@@ -169,7 +168,7 @@ class RecordServiceAttachmentUtilsTest {
         val resource: Fhir3Resource = mockk()
 
         val attachments: MutableList<Fhir3Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
         val encodedPayload = "test"
         val decodedPayload = UNKNOWN
@@ -199,7 +198,7 @@ class RecordServiceAttachmentUtilsTest {
         val resource: Fhir3Resource = mockk()
 
         val attachments: MutableList<Fhir3Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
         val encodedPayload = "test"
         val decodedPayload = PDF_OVERSIZED
@@ -229,7 +228,7 @@ class RecordServiceAttachmentUtilsTest {
         val resource: Fhir3Resource = mockk()
 
         val attachments: MutableList<Fhir3Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
         val encodedPayload = "test"
         val decodedPayload = PDF
@@ -245,7 +244,7 @@ class RecordServiceAttachmentUtilsTest {
         // When
         recordService.checkDataRestrictions(resource)
 
-        //Then
+        // Then
         assertTrue(true)
 
         unmockkObject(Base64)
@@ -259,8 +258,8 @@ class RecordServiceAttachmentUtilsTest {
         val resource: Fhir3Resource = mockk()
 
         val attachments: MutableList<Fhir3Attachment?> = mutableListOf(
-                null,
-                mockk()
+            null,
+            mockk()
         )
         val encodedPayload = "test"
         val decodedPayload = PDF
@@ -276,7 +275,7 @@ class RecordServiceAttachmentUtilsTest {
         // When
         recordService.checkDataRestrictions(resource)
 
-        //Then
+        // Then
         assertTrue(true)
 
         verify(exactly = 1) { Base64.decode(any<String>()) }
@@ -292,8 +291,8 @@ class RecordServiceAttachmentUtilsTest {
         val resource: Fhir3Resource = mockk()
 
         val attachments: MutableList<Fhir3Attachment> = mutableListOf(
-                mockk(),
-                mockk()
+            mockk(),
+            mockk()
         )
         val encodedPayload = "test"
         val decodedPayload = PDF
@@ -313,7 +312,7 @@ class RecordServiceAttachmentUtilsTest {
         // When
         recordService.checkDataRestrictions(resource)
 
-        //Then
+        // Then
         assertTrue(true)
 
         verify(exactly = 1) { Base64.decode(any<String>()) }
@@ -360,7 +359,7 @@ class RecordServiceAttachmentUtilsTest {
         val resource: Fhir4Resource = mockk()
 
         val attachments: MutableList<Fhir4Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
         val encodedPayload = "test"
         val decodedPayload = UNKNOWN
@@ -390,7 +389,7 @@ class RecordServiceAttachmentUtilsTest {
         val resource: Fhir4Resource = mockk()
 
         val attachments: MutableList<Fhir4Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
         val encodedPayload = "test"
         val decodedPayload = PDF_OVERSIZED
@@ -420,7 +419,7 @@ class RecordServiceAttachmentUtilsTest {
         val resource: Fhir4Resource = mockk()
 
         val attachments: MutableList<Fhir4Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
         val encodedPayload = "test"
         val decodedPayload = PDF
@@ -436,7 +435,7 @@ class RecordServiceAttachmentUtilsTest {
         // When
         recordService.checkDataRestrictions(resource)
 
-        //Then
+        // Then
         assertTrue(true)
 
         unmockkObject(Base64)
@@ -450,8 +449,8 @@ class RecordServiceAttachmentUtilsTest {
         val resource: Fhir4Resource = mockk()
 
         val attachments: MutableList<Fhir4Attachment?> = mutableListOf(
-                null,
-                mockk()
+            null,
+            mockk()
         )
         val encodedPayload = "test"
         val decodedPayload = PDF
@@ -467,7 +466,7 @@ class RecordServiceAttachmentUtilsTest {
         // When
         recordService.checkDataRestrictions(resource)
 
-        //Then
+        // Then
         assertTrue(true)
 
         verify(exactly = 1) { Base64.decode(any<String>()) }
@@ -483,8 +482,8 @@ class RecordServiceAttachmentUtilsTest {
         val resource: Fhir4Resource = mockk()
 
         val attachments: MutableList<Fhir4Attachment> = mutableListOf(
-                mockk(),
-                mockk()
+            mockk(),
+            mockk()
         )
         val encodedPayload = "test"
         val decodedPayload = PDF
@@ -504,7 +503,7 @@ class RecordServiceAttachmentUtilsTest {
         // When
         recordService.checkDataRestrictions(resource)
 
-        //Then
+        // Then
         assertTrue(true)
 
         verify(exactly = 1) { Base64.decode(any<String>()) }
@@ -516,8 +515,8 @@ class RecordServiceAttachmentUtilsTest {
     fun `Given, checkDataRestrictions is called, with a Resource, which has non extractable Attachments, it returns without a failure`() {
         // Given
         val resourceStr = getJSONResource(
-                "fhir4",
-                "s4h-patient-example.patient"
+            "fhir4",
+            "s4h-patient-example.patient"
         )
 
         val doc = SdkFhirParser.toFhir4("Patient", resourceStr)
@@ -573,7 +572,7 @@ class RecordServiceAttachmentUtilsTest {
         // Given
         val resource: Fhir3Resource = mockk()
         val attachments: MutableList<Any> = mutableListOf(
-                mockk()
+            mockk()
         )
         val payload = "data"
 
@@ -591,8 +590,8 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertEquals(
-                actual = data,
-                expected = hashMapOf(attachments[0] to payload)
+            actual = data,
+            expected = hashMapOf(attachments[0] to payload)
         )
     }
 
@@ -601,8 +600,8 @@ class RecordServiceAttachmentUtilsTest {
         // Given
         val resource: Fhir3Resource = mockk()
         val attachments: MutableList<Fhir3Attachment?> = mutableListOf(
-                null,
-                mockk()
+            null,
+            mockk()
         )
         val payload = "data"
 
@@ -620,8 +619,8 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertEquals(
-                actual = data,
-                expected = hashMapOf(attachments[1] to payload) as HashMap<Any, String?>
+            actual = data,
+            expected = hashMapOf(attachments[1] to payload) as HashMap<Any, String?>
         )
     }
 
@@ -630,8 +629,8 @@ class RecordServiceAttachmentUtilsTest {
         // Given
         val resource: Fhir3Resource = mockk()
         val attachments: MutableList<Fhir3Attachment> = mutableListOf(
-                mockk(),
-                mockk()
+            mockk(),
+            mockk()
         )
         val payload = "data"
 
@@ -652,8 +651,8 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertEquals(
-                actual = data,
-                expected = hashMapOf(attachments[1] to payload) as HashMap<Any, String?>
+            actual = data,
+            expected = hashMapOf(attachments[1] to payload) as HashMap<Any, String?>
         )
     }
 
@@ -693,7 +692,7 @@ class RecordServiceAttachmentUtilsTest {
         // Given
         val resource: Fhir4Resource = mockk()
         val attachments: MutableList<Any> = mutableListOf(
-                mockk()
+            mockk()
         )
         val payload = "data"
 
@@ -711,8 +710,8 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertEquals(
-                actual = data,
-                expected = hashMapOf(attachments[0] to payload)
+            actual = data,
+            expected = hashMapOf(attachments[0] to payload)
         )
     }
 
@@ -721,8 +720,8 @@ class RecordServiceAttachmentUtilsTest {
         // Given
         val resource: Fhir4Resource = mockk()
         val attachments: MutableList<Fhir4Attachment?> = mutableListOf(
-                null,
-                mockk()
+            null,
+            mockk()
         )
         val payload = "data"
 
@@ -740,8 +739,8 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertEquals(
-                actual = data,
-                expected = hashMapOf(attachments[1] to payload) as HashMap<Any, String?>
+            actual = data,
+            expected = hashMapOf(attachments[1] to payload) as HashMap<Any, String?>
         )
     }
 
@@ -750,8 +749,8 @@ class RecordServiceAttachmentUtilsTest {
         // Given
         val resource: Fhir4Resource = mockk()
         val attachments: MutableList<Fhir4Attachment> = mutableListOf(
-                mockk(),
-                mockk()
+            mockk(),
+            mockk()
         )
         val payload = "data"
 
@@ -772,8 +771,8 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertEquals(
-                actual = data,
-                expected = hashMapOf(attachments[1] to payload) as HashMap<Any, String?>
+            actual = data,
+            expected = hashMapOf(attachments[1] to payload) as HashMap<Any, String?>
         )
     }
 
@@ -790,8 +789,8 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 0) { SdkFhirAttachmentHelper.updateAttachmentData(any(), any()) }
@@ -813,8 +812,8 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 0) { SdkFhirAttachmentHelper.updateAttachmentData(any(), any()) }
@@ -837,8 +836,8 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 0) { SdkFhirAttachmentHelper.updateAttachmentData(any(), any()) }
@@ -860,8 +859,8 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 0) { SdkFhirAttachmentHelper.updateAttachmentData(any(), any()) }
@@ -873,7 +872,7 @@ class RecordServiceAttachmentUtilsTest {
         val resource: Fhir3Resource = mockk()
         val decryptedRecord: DecryptedBaseRecord<Fhir3Resource> = mockk()
         val attachments: MutableList<Fhir3Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
 
         every { decryptedRecord.resource } returns resource
@@ -887,8 +886,8 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 1) { SdkFhirAttachmentHelper.updateAttachmentData(resource, null) }
@@ -910,8 +909,8 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 0) { SdkFhirAttachmentHelper.updateAttachmentData(any(), any()) }
@@ -934,8 +933,8 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 0) { SdkFhirAttachmentHelper.updateAttachmentData(any(), any()) }
@@ -957,8 +956,8 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 0) { SdkFhirAttachmentHelper.updateAttachmentData(any(), any()) }
@@ -970,7 +969,7 @@ class RecordServiceAttachmentUtilsTest {
         val resource: Fhir4Resource = mockk()
         val decryptedRecord: DecryptedBaseRecord<Fhir4Resource> = mockk()
         val attachments: MutableList<Fhir4Attachment> = mutableListOf(
-                mockk()
+            mockk()
         )
 
         every { decryptedRecord.resource } returns resource
@@ -984,8 +983,8 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 1) { SdkFhirAttachmentHelper.updateAttachmentData(resource, null) }
@@ -1003,15 +1002,15 @@ class RecordServiceAttachmentUtilsTest {
 
         // When
         val record = recordService.restoreUploadData(
-                decryptedRecord,
-                originalResource,
-                attachmentPayload
+            decryptedRecord,
+            originalResource,
+            attachmentPayload
         )
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 0) { SdkFhirAttachmentHelper.updateAttachmentData(any(), any()) }
@@ -1031,15 +1030,15 @@ class RecordServiceAttachmentUtilsTest {
 
         // When
         val record = recordService.restoreUploadData(
-                decryptedRecord,
-                originalResource as Any,
-                attachmentPayload
+            decryptedRecord,
+            originalResource as Any,
+            attachmentPayload
         )
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 0) { SdkFhirAttachmentHelper.updateAttachmentData(any(), any()) }
@@ -1060,15 +1059,15 @@ class RecordServiceAttachmentUtilsTest {
 
         // When
         val record = recordService.restoreUploadData(
-                decryptedRecord,
-                originalResource,
-                attachmentPayload
+            decryptedRecord,
+            originalResource,
+            attachmentPayload
         )
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 1) { decryptedRecord.resource = originalResource }
@@ -1089,15 +1088,15 @@ class RecordServiceAttachmentUtilsTest {
 
         // When
         val record = recordService.restoreUploadData(
-                decryptedRecord,
-                originalResource,
-                null
+            decryptedRecord,
+            originalResource,
+            null
         )
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 1) { decryptedRecord.resource = originalResource }
@@ -1120,15 +1119,15 @@ class RecordServiceAttachmentUtilsTest {
 
         // When
         val record = recordService.restoreUploadData(
-                decryptedRecord,
-                originalResource,
-                attachmentPayload
+            decryptedRecord,
+            originalResource,
+            attachmentPayload
         )
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 1) { decryptedRecord.resource = originalResource }
@@ -1148,27 +1147,27 @@ class RecordServiceAttachmentUtilsTest {
 
         every { SdkFhirAttachmentHelper.hasAttachment(originalResource) } returns true
         every { SdkFhirAttachmentHelper.getAttachment(originalResource) } returns mutableListOf(
-                mockk()
+            mockk()
         )
 
         // When
         val record = recordService.restoreUploadData(
-                decryptedRecord,
-                originalResource,
-                attachmentPayload
+            decryptedRecord,
+            originalResource,
+            attachmentPayload
         )
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 1) { decryptedRecord.resource = originalResource }
         verify(exactly = 1) {
             SdkFhirAttachmentHelper.updateAttachmentData(
-                    originalResource,
-                    attachmentPayload
+                originalResource,
+                attachmentPayload
             )
         }
     }
@@ -1188,15 +1187,15 @@ class RecordServiceAttachmentUtilsTest {
 
         // When
         val record = recordService.restoreUploadData(
-                decryptedRecord,
-                originalResource,
-                attachmentPayload
+            decryptedRecord,
+            originalResource,
+            attachmentPayload
         )
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 1) { decryptedRecord.resource = originalResource }
@@ -1217,15 +1216,15 @@ class RecordServiceAttachmentUtilsTest {
 
         // When
         val record = recordService.restoreUploadData(
-                decryptedRecord,
-                originalResource,
-                null
+            decryptedRecord,
+            originalResource,
+            null
         )
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 1) { decryptedRecord.resource = originalResource }
@@ -1248,15 +1247,15 @@ class RecordServiceAttachmentUtilsTest {
 
         // When
         val record = recordService.restoreUploadData(
-                decryptedRecord,
-                originalResource,
-                attachmentPayload
+            decryptedRecord,
+            originalResource,
+            attachmentPayload
         )
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 1) { decryptedRecord.resource = originalResource }
@@ -1276,27 +1275,27 @@ class RecordServiceAttachmentUtilsTest {
 
         every { SdkFhirAttachmentHelper.hasAttachment(originalResource) } returns true
         every { SdkFhirAttachmentHelper.getAttachment(originalResource) } returns mutableListOf(
-                mockk()
+            mockk()
         )
 
         // When
         val record = recordService.restoreUploadData(
-                decryptedRecord,
-                originalResource,
-                attachmentPayload
+            decryptedRecord,
+            originalResource,
+            attachmentPayload
         )
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify(exactly = 1) { decryptedRecord.resource = originalResource }
         verify(exactly = 1) {
             SdkFhirAttachmentHelper.updateAttachmentData(
-                    originalResource,
-                    attachmentPayload
+                originalResource,
+                attachmentPayload
             )
         }
     }

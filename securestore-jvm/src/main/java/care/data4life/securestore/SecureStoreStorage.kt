@@ -19,9 +19,8 @@ package care.data4life.securestore
 import care.data4life.securestore.storage.InMemoryStorage
 
 actual class SecureStoreStorage @JvmOverloads constructor(
-        private val storage: SecureStoreContract.Storage = InMemoryStorage()
+    private val storage: SecureStoreContract.Storage = InMemoryStorage()
 ) : SecureStoreContract.Storage {
-
 
     override fun addData(alias: String, data: CharArray) {
         storage.addData(alias, data)

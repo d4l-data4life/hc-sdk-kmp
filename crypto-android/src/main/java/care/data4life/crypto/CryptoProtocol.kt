@@ -33,8 +33,15 @@ import javax.crypto.spec.IvParameterSpec
 
 actual abstract class CryptoProtocol {
 
-
-    @Throws(BadPaddingException::class, IllegalBlockSizeException::class, NoSuchPaddingException::class, NoSuchAlgorithmException::class, InvalidAlgorithmParameterException::class, InvalidKeyException::class, NoSuchProviderException::class)
+    @Throws(
+        BadPaddingException::class,
+        IllegalBlockSizeException::class,
+        NoSuchPaddingException::class,
+        NoSuchAlgorithmException::class,
+        InvalidAlgorithmParameterException::class,
+        InvalidKeyException::class,
+        NoSuchProviderException::class
+    )
     actual fun symEncrypt(key: GCKey, data: ByteArray, iv: ByteArray): ByteArray {
         val cipher = createCypher(key.algorithm.transformation)
         val spec = IvParameterSpec(iv)
@@ -42,7 +49,15 @@ actual abstract class CryptoProtocol {
         return cipher.doFinal(data)
     }
 
-    @Throws(InvalidAlgorithmParameterException::class, InvalidKeyException::class, NoSuchPaddingException::class, NoSuchAlgorithmException::class, BadPaddingException::class, IllegalBlockSizeException::class, NoSuchProviderException::class)
+    @Throws(
+        InvalidAlgorithmParameterException::class,
+        InvalidKeyException::class,
+        NoSuchPaddingException::class,
+        NoSuchAlgorithmException::class,
+        BadPaddingException::class,
+        IllegalBlockSizeException::class,
+        NoSuchProviderException::class
+    )
     actual fun symDecrypt(key: GCKey, data: ByteArray, iv: ByteArray): ByteArray {
         val cipher = createCypher(key.algorithm.transformation)
         val spec = IvParameterSpec(iv)
@@ -50,14 +65,28 @@ actual abstract class CryptoProtocol {
         return cipher.doFinal(data)
     }
 
-    @Throws(NoSuchPaddingException::class, NoSuchAlgorithmException::class, BadPaddingException::class, IllegalBlockSizeException::class, InvalidKeyException::class, NoSuchProviderException::class)
+    @Throws(
+        NoSuchPaddingException::class,
+        NoSuchAlgorithmException::class,
+        BadPaddingException::class,
+        IllegalBlockSizeException::class,
+        InvalidKeyException::class,
+        NoSuchProviderException::class
+    )
     actual fun asymEncrypt(key: GCKeyPair, data: ByteArray): ByteArray {
         val cipher = createCypher(key.algorithm.transformation)
         cipher.init(Cipher.ENCRYPT_MODE, key.publicKey!!.value)
         return cipher.doFinal(data)
     }
 
-    @Throws(NoSuchPaddingException::class, NoSuchAlgorithmException::class, InvalidKeyException::class, BadPaddingException::class, IllegalBlockSizeException::class, NoSuchProviderException::class)
+    @Throws(
+        NoSuchPaddingException::class,
+        NoSuchAlgorithmException::class,
+        InvalidKeyException::class,
+        BadPaddingException::class,
+        IllegalBlockSizeException::class,
+        NoSuchProviderException::class
+    )
     actual fun asymDecrypt(key: GCKeyPair, data: ByteArray): ByteArray {
         val cipher = createCypher(key.algorithm.transformation)
         cipher.init(Cipher.DECRYPT_MODE, key.privateKey!!.value)
@@ -70,10 +99,10 @@ actual abstract class CryptoProtocol {
         keyPairGenerator.initialize(options.keySize, SecureRandom())
         val keyPair = keyPairGenerator.generateKeyPair()
         return GCKeyPair(
-                algorithm,
-                GCAsymmetricKey(keyPair.private, GCAsymmetricKey.Type.Private),
-                GCAsymmetricKey(keyPair.public, GCAsymmetricKey.Type.Public),
-                options.keySize
+            algorithm,
+            GCAsymmetricKey(keyPair.private, GCAsymmetricKey.Type.Private),
+            GCAsymmetricKey(keyPair.public, GCAsymmetricKey.Type.Public),
+            options.keySize
         )
     }
 
@@ -85,7 +114,11 @@ actual abstract class CryptoProtocol {
         return GCKey(algorithm, GCSymmetricKey(key), options.keySize)
     }
 
-    @Throws(NoSuchPaddingException::class, NoSuchAlgorithmException::class, NoSuchProviderException::class)
+    @Throws(
+        NoSuchPaddingException::class,
+        NoSuchAlgorithmException::class,
+        NoSuchProviderException::class
+    )
     open fun createCypher(transformation: String): Cipher {
         return Cipher.getInstance(transformation, BouncyCastleProvider.PROVIDER_NAME)
     }
@@ -101,7 +134,5 @@ actual abstract class CryptoProtocol {
             Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME)
             Security.addProvider(BouncyCastleProvider())
         }
-
     }
-
 }

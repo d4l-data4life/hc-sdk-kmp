@@ -23,9 +23,7 @@ import kotlin.test.assertTrue
 
 class InMemoryAuthStorageTest {
 
-
     private val sut = InMemoryAuthStorage()
-
 
     @Test
     fun fullInMemoryStorageTestCase() {
@@ -54,11 +52,8 @@ class InMemoryAuthStorageTest {
         assertFalse { sut.containsAuthState(ALIAS) }
     }
 
-
     companion object {
         private const val ALIAS = "ALIAS"
         private const val AUTH_STATE = "expected_authState"
     }
-
-
 }

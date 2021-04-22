@@ -28,6 +28,6 @@ import org.threeten.bp.LocalDateTime
  */
 // TODO add model number
 data class Meta(
-        override val createdDate: LocalDate,
-        override val updatedDate: LocalDateTime
+    override val createdDate: LocalDate,
+    override val updatedDate: LocalDateTime
 ) : ModelContract.Meta

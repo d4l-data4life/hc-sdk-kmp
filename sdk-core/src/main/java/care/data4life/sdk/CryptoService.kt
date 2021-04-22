@@ -46,8 +46,8 @@ import io.reactivex.Single
 import java.io.IOException
 import java.security.SecureRandom
 
-//TODO internal
-//TODO remove open (only needed for Test)
+// TODO internal
+// TODO remove open (only needed for Test)
 open class CryptoService : CryptoProtocol, CryptoContract.Service {
 
     private val moshi: Moshi
@@ -60,13 +60,13 @@ open class CryptoService : CryptoProtocol, CryptoContract.Service {
 
     // for testing only
     constructor(
-            alias: String,
-            storage: CryptoSecureStore,
-            moshi: Moshi,
-            rng: SecureRandom,
-            base64: Base64,
-            keyFactory: KeyFactory,
-            commonKeyService: CommonKeyService
+        alias: String,
+        storage: CryptoSecureStore,
+        moshi: Moshi,
+        rng: SecureRandom,
+        base64: Base64,
+        keyFactory: KeyFactory,
+        commonKeyService: CommonKeyService
     ) {
         this.alias = alias
         this.storage = storage
@@ -78,8 +78,8 @@ open class CryptoService : CryptoProtocol, CryptoContract.Service {
     }
 
     constructor(
-            alias: String,
-            storage: CryptoSecureStore
+        alias: String,
+        storage: CryptoSecureStore
     ) {
         this.alias = alias
         this.storage = storage
@@ -92,135 +92,142 @@ open class CryptoService : CryptoProtocol, CryptoContract.Service {
 
     override fun encrypt(key: GCKey, data: ByteArray): Single<ByteArray> {
         return Single
-                .fromCallable { data }
-                .map { dataArray ->
-                    val iv = ByteArray(IV_SIZE)
-                    rng.nextBytes(iv)
-                    val ciphertext = symEncrypt(key, dataArray, iv)
-                    val result = ByteArray(iv.size + ciphertext.size)
-                    System.arraycopy(iv, 0, result, 0, iv.size)
-                    System.arraycopy(ciphertext, 0, result, iv.size, ciphertext.size)
-                    result
-                }
-                .onErrorResumeNext { error ->
-                    Log.error(error, "Failed to encrypt data")
-                    Single.error(CryptoException.EncryptionFailed("Failed to encrypt data") as D4LException)
-                }
+            .fromCallable { data }
+            .map { dataArray ->
+                val iv = ByteArray(IV_SIZE)
+                rng.nextBytes(iv)
+                val ciphertext = symEncrypt(key, dataArray, iv)
+                val result = ByteArray(iv.size + ciphertext.size)
+                System.arraycopy(iv, 0, result, 0, iv.size)
+                System.arraycopy(ciphertext, 0, result, iv.size, ciphertext.size)
+                result
+            }
+            .onErrorResumeNext { error ->
+                Log.error(error, "Failed to encrypt data")
+                Single.error(CryptoException.EncryptionFailed("Failed to encrypt data") as D4LException)
+            }
     }
 
     override fun decrypt(key: GCKey, data: ByteArray): Single<ByteArray> {
         return Single
-                .fromCallable { data }
-                .map { dataArray ->
-                    val iv = dataArray.copyOfRange(0, IV_SIZE)
-                    val cipher = dataArray.copyOfRange(IV_SIZE, data.size)
-                    symDecrypt(key, cipher, iv)
-                }
-                .onErrorResumeNext { error ->
-                    Log.error(error, "Failed to decrypt data")
-                    Single.error(CryptoException.DecryptionFailed("Failed to decrypt data") as D4LException)
-                }
+            .fromCallable { data }
+            .map { dataArray ->
+                val iv = dataArray.copyOfRange(0, IV_SIZE)
+                val cipher = dataArray.copyOfRange(IV_SIZE, data.size)
+                symDecrypt(key, cipher, iv)
+            }
+            .onErrorResumeNext { error ->
+                Log.error(error, "Failed to decrypt data")
+                Single.error(CryptoException.DecryptionFailed("Failed to decrypt data") as D4LException)
+            }
     }
 
     override fun encryptAndEncodeString(key: GCKey, data: String): Single<String> {
         return encrypt(key, data.toByteArray())
-                .map { dataArray -> base64.encodeToString(dataArray) }
-                .onErrorResumeNext { error ->
-                    Log.error(error, "Failed to encrypt string")
-                    Single.error(CryptoException.EncryptionFailed("Failed to encrypt string") as D4LException)
-                }
+            .map { dataArray -> base64.encodeToString(dataArray) }
+            .onErrorResumeNext { error ->
+                Log.error(error, "Failed to encrypt string")
+                Single.error(CryptoException.EncryptionFailed("Failed to encrypt string") as D4LException)
+            }
     }
 
     override fun decodeAndDecryptString(key: GCKey, dataBase64: String): Single<String> {
         return Single
-                .fromCallable { base64.decode(dataBase64) }
-                .flatMap { decoded -> decrypt(key, decoded) }
-                .map { decrypted -> String(decrypted, Charsets.UTF_8) }
-                .onErrorResumeNext { error ->
-                    Log.error(error, "Failed to decrypt string")
-                    Single.error(CryptoException.DecryptionFailed("Failed to decrypt string") as D4LException)
-                }
+            .fromCallable { base64.decode(dataBase64) }
+            .flatMap { decoded -> decrypt(key, decoded) }
+            .map { decrypted -> String(decrypted, Charsets.UTF_8) }
+            .onErrorResumeNext { error ->
+                Log.error(error, "Failed to decrypt string")
+                Single.error(CryptoException.DecryptionFailed("Failed to decrypt string") as D4LException)
+            }
     }
 
-    override fun encryptSymmetricKey(key: GCKey, keyType: KeyType, gckey: GCKey): Single<NetworkModelContract.EncryptedKey> {
+    override fun encryptSymmetricKey(
+        key: GCKey,
+        keyType: KeyType,
+        gckey: GCKey
+    ): Single<NetworkModelContract.EncryptedKey> {
         return Single.fromCallable { createKey(KEY_VERSION, keyType, gckey.getKeyBase64()) }
-                .map { exchangeKey -> moshi.adapter(ExchangeKey::class.java).toJson(exchangeKey) }
-                .flatMap { jsonKey -> encrypt(key, jsonKey.toByteArray()) }
-                .map { encryptedKeyBase64 -> EncryptedKey.create(encryptedKeyBase64) }
-                .onErrorResumeNext { error ->
-                    Log.error(error, "Failed to encrypt GcKey")
-                    Single.error(CryptoException.KeyEncryptionFailed("Failed to encrypt GcKey") as D4LException)
-                }
+            .map { exchangeKey -> moshi.adapter(ExchangeKey::class.java).toJson(exchangeKey) }
+            .flatMap { jsonKey -> encrypt(key, jsonKey.toByteArray()) }
+            .map { encryptedKeyBase64 -> EncryptedKey.create(encryptedKeyBase64) }
+            .onErrorResumeNext { error ->
+                Log.error(error, "Failed to encrypt GcKey")
+                Single.error(CryptoException.KeyEncryptionFailed("Failed to encrypt GcKey") as D4LException)
+            }
     }
 
     private fun decryptKey(generator: () -> Single<ByteArray>): Single<GCKey> {
         return generator()
-                .map { keyJson -> moshi.adapter(ExchangeKey::class.java).fromJson(String(keyJson, Charsets.UTF_8)) }
-                .flatMap { exchangeKey -> convertExchangeKeyToGCKey(exchangeKey) }
+            .map { keyJson ->
+                moshi.adapter(ExchangeKey::class.java).fromJson(String(keyJson, Charsets.UTF_8))
+            }
+            .flatMap { exchangeKey -> convertExchangeKeyToGCKey(exchangeKey) }
     }
 
     override fun symDecryptSymmetricKey(
-            key: GCKey,
-            encryptedKey: NetworkModelContract.EncryptedKey
+        key: GCKey,
+        encryptedKey: NetworkModelContract.EncryptedKey
     ): Single<GCKey> = decryptKey { decrypt(key, encryptedKey.decode()) }
 
     override fun asymDecryptSymetricKey(
-            keyPair: GCKeyPair,
-            encryptedKey: NetworkModelContract.EncryptedKey
-    ): Single<GCKey> = decryptKey { Single.fromCallable { asymDecrypt(keyPair, encryptedKey.decode()) } }
+        keyPair: GCKeyPair,
+        encryptedKey: NetworkModelContract.EncryptedKey
+    ): Single<GCKey> =
+        decryptKey { Single.fromCallable { asymDecrypt(keyPair, encryptedKey.decode()) } }
 
     private fun convertExchangeKeyToGCKey(exchangeKey: ExchangeKey): Single<GCKey> {
         return Single.fromCallable { exchangeKey }
-                .map { exchKey ->
-                    if (exchKey.getVersion() !== KeyVersion.VERSION_1) {
-                        throw (CryptoException.InvalidKeyVersion(exchKey.getVersion().value))
-                    } else if (exchKey.type === KeyType.APP_PUBLIC_KEY || exchKey.type === KeyType.APP_PRIVATE_KEY) {
-                        throw (CryptoException.KeyDecryptionFailed("can't decrypt asymmetric to symmetric key"))
-                    }
-                    keyFactory.createGCKey(exchKey)
+            .map { exchKey ->
+                if (exchKey.getVersion() !== KeyVersion.VERSION_1) {
+                    throw (CryptoException.InvalidKeyVersion(exchKey.getVersion().value))
+                } else if (exchKey.type === KeyType.APP_PUBLIC_KEY || exchKey.type === KeyType.APP_PRIVATE_KEY) {
+                    throw (CryptoException.KeyDecryptionFailed("can't decrypt asymmetric to symmetric key"))
                 }
-                .onErrorResumeNext { error ->
-                    Log.error(error, "Failed to decrypt exchangeKey")
-                    if (error is D4LException) {
-                        return@onErrorResumeNext Single.error<GCKey>(error)
-                    }
-                    Single.error(CryptoException.KeyDecryptionFailed("Failed to decrypt exchange key") as D4LException)
+                keyFactory.createGCKey(exchKey)
+            }
+            .onErrorResumeNext { error ->
+                Log.error(error, "Failed to decrypt exchangeKey")
+                if (error is D4LException) {
+                    return@onErrorResumeNext Single.error<GCKey>(error)
                 }
+                Single.error(CryptoException.KeyDecryptionFailed("Failed to decrypt exchange key") as D4LException)
+            }
     }
 
     override fun convertAsymmetricKeyToBase64ExchangeKey(gcAsymmetricKey: GCAsymmetricKey): Single<String> {
-        return Single.fromCallable { gcAsymmetricKey.value.encoded } //SPKI
-                .map(base64::encodeToString)
-                .map { encodedKey -> createKey(KEY_VERSION, KeyType.APP_PUBLIC_KEY, encodedKey) }
-                .map { exchangeKey -> moshi.adapter(ExchangeKey::class.java).toJson(exchangeKey) }
-                .map { data -> base64.encodeToString(data) }
+        return Single.fromCallable { gcAsymmetricKey.value.encoded } // SPKI
+            .map(base64::encodeToString)
+            .map { encodedKey -> createKey(KEY_VERSION, KeyType.APP_PUBLIC_KEY, encodedKey) }
+            .map { exchangeKey -> moshi.adapter(ExchangeKey::class.java).toJson(exchangeKey) }
+            .map { data -> base64.encodeToString(data) }
     }
 
     override fun generateGCKey(): Single<GCKey> {
         return Single
-                .fromCallable { GCAESKeyAlgorithm.createDataAlgorithm() }
-                .map { algorithm ->
-                    val options = KeyOptions(KEY_VERSION.symmetricKeySize)
-                    generateSymKey(algorithm, options)
-                }
-                .onErrorResumeNext { error ->
-                    Log.error(error, "Failed to generate encryption key")
-                    Single.error(CryptoException.KeyGenerationFailed("Failed to generate encryption key") as D4LException)
-                }
+            .fromCallable { GCAESKeyAlgorithm.createDataAlgorithm() }
+            .map { algorithm ->
+                val options = KeyOptions(KEY_VERSION.symmetricKeySize)
+                generateSymKey(algorithm, options)
+            }
+            .onErrorResumeNext { error ->
+                Log.error(error, "Failed to generate encryption key")
+                Single.error(CryptoException.KeyGenerationFailed("Failed to generate encryption key") as D4LException)
+            }
     }
 
     override fun generateGCKeyPair(): Single<GCKeyPair> {
         return Single
-                .fromCallable { GCRSAKeyAlgorithm() }
-                .map { algorithm ->
-                    deleteGCKeyPair()
-                    val options = KeyOptions(KEY_VERSION.asymmetricKeySize, GC_KEYPAIR)
-                    generateAsymKeyPair(algorithm, options)
-                }
-                .map { gcKeyPair ->
-                    saveGCKeyPair(gcKeyPair)
-                    gcKeyPair
-                }
+            .fromCallable { GCRSAKeyAlgorithm() }
+            .map { algorithm ->
+                deleteGCKeyPair()
+                val options = KeyOptions(KEY_VERSION.asymmetricKeySize, GC_KEYPAIR)
+                generateAsymKeyPair(algorithm, options)
+            }
+            .map { gcKeyPair ->
+                saveGCKeyPair(gcKeyPair)
+                gcKeyPair
+            }
     }
 
     /**
@@ -263,12 +270,12 @@ open class CryptoService : CryptoProtocol, CryptoContract.Service {
 
     override fun fetchGCKeyPair(): Single<GCKeyPair> {
         return Single
-                .fromCallable { getExchangeKey(GC_KEYPAIR) }
-                .map { exchangeKey -> keyFactory.createGCKeyPair(exchangeKey) }
-                .onErrorResumeNext { error ->
-                    Log.error(error, "Failed to fetch encryption key")
-                    Single.error(CryptoException.KeyFetchingFailed("Failed to fetch encryption key") as D4LException)
-                }
+            .fromCallable { getExchangeKey(GC_KEYPAIR) }
+            .map { exchangeKey -> keyFactory.createGCKeyPair(exchangeKey) }
+            .onErrorResumeNext { error ->
+                Log.error(error, "Failed to fetch encryption key")
+                Single.error(CryptoException.KeyFetchingFailed("Failed to fetch encryption key") as D4LException)
+            }
     }
 
     override fun storeTagEncryptionKey(tek: GCKey) {
@@ -299,7 +306,8 @@ open class CryptoService : CryptoProtocol, CryptoContract.Service {
     override fun fetchCurrentCommonKey(): GCKey = commonKeyService.fetchCurrentCommonKey()
 
     @Throws(IOException::class)
-    override fun getCommonKeyById(commonKeyId: String): GCKey = commonKeyService.fetchCommonKey(commonKeyId)
+    override fun getCommonKeyById(commonKeyId: String): GCKey =
+        commonKeyService.fetchCommonKey(commonKeyId)
 
     override val currentCommonKeyId: String
         get() = commonKeyService.fetchCurrentCommonKeyId()
@@ -312,5 +320,6 @@ open class CryptoService : CryptoProtocol, CryptoContract.Service {
         commonKeyService.storeCommonKey(commonKeyId, commonKey)
     }
 
-    override fun hasCommonKey(commonKeyId: String): Boolean = commonKeyService.hasCommonKey(commonKeyId)
+    override fun hasCommonKey(commonKeyId: String): Boolean =
+        commonKeyService.hasCommonKey(commonKeyId)
 }

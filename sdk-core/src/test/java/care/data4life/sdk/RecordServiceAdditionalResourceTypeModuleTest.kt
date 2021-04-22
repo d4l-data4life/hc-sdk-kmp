@@ -15,9 +15,22 @@
  */
 package care.data4life.sdk
 
-
 import care.data4life.crypto.GCKey
 import care.data4life.fhir.r4.model.Extension
+import care.data4life.sdk.attachment.AttachmentContract
+import care.data4life.sdk.config.DataRestrictionException
+import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.fhir.Fhir3Attachment
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Attachment
+import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.fhir.FhirContract
+import care.data4life.sdk.model.DownloadType
+import care.data4life.sdk.network.model.DecryptedR4Record
+import care.data4life.sdk.network.model.DecryptedRecord
+import care.data4life.sdk.network.model.EncryptedRecord
+import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ADDITIONAL_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.ASSIGNER
@@ -34,20 +47,6 @@ import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.VALUE_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.VALUE_INDICATOR
-import care.data4life.sdk.attachment.AttachmentContract
-import care.data4life.sdk.config.DataRestrictionException
-import care.data4life.sdk.crypto.CryptoContract
-import care.data4life.sdk.fhir.Fhir3Attachment
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir4Attachment
-import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.FhirContract
-import care.data4life.sdk.model.DownloadType
-import care.data4life.sdk.network.model.DecryptedR4Record
-import care.data4life.sdk.network.model.DecryptedRecord
-import care.data4life.sdk.network.model.EncryptedRecord
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
-import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.TestAttachmentHelper
 import care.data4life.sdk.test.util.TestResourceHelper
 import care.data4life.sdk.util.Base64
@@ -82,7 +81,6 @@ import care.data4life.fhir.stu3.model.Questionnaire as Fhir3Questionnaire
 import care.data4life.fhir.stu3.model.QuestionnaireResponse as Fhir3QuestionnaireResponse
 import care.data4life.fhir.stu3.util.FhirAttachmentHelper as Fhir3AttachmentHelper
 
-
 @RunWith(Parameterized::class)
 class RecordServiceAdditionalResourceTypeModuleTest {
     private lateinit var recordService: RecordService
@@ -102,17 +100,17 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         clearAllMocks()
 
         recordService = spyk(
-                RecordService(
-                        PARTNER_ID,
-                        ALIAS,
-                        apiService,
-                        tagEncryptionService,
-                        taggingService,
-                        fhirService,
-                        attachmentService,
-                        cryptoService,
-                        errorHandler
-                )
+            RecordService(
+                PARTNER_ID,
+                ALIAS,
+                apiService,
+                tagEncryptionService,
+                taggingService,
+                fhirService,
+                attachmentService,
+                cryptoService,
+                errorHandler
+            )
         )
     }
 
@@ -120,42 +118,42 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         @JvmStatic
         @Parameterized.Parameters(name = "applied on {1}")
         fun parameter() = listOf(
-                arrayOf(
-                        "Patient",
-                        "patient",
-                        listOf("common"),
-                        "1"
-                ),
-                arrayOf(
-                        "QuestionnaireResponse",
-                        "questionnaireResponse",
-                        listOf("common"),
-                        "1"
-                ),
-                arrayOf(
-                        "Medication",
-                        "medication",
-                        listOf("fhir3"),
-                        "1"
-                ),
-                arrayOf(
-                        "Observation",
-                        "observation",
-                        listOf("fhir3"),
-                        "1"
-                ),
-                arrayOf(
-                        "Observation",
-                        "observation-with-component",
-                        listOf("fhir3"),
-                        "2"
-                ),
-                arrayOf(
-                        "Questionnaire",
-                        "questionnaire",
-                        listOf("fhir3", "fhir4"),
-                        "1"
-                )
+            arrayOf(
+                "Patient",
+                "patient",
+                listOf("common"),
+                "1"
+            ),
+            arrayOf(
+                "QuestionnaireResponse",
+                "questionnaireResponse",
+                listOf("common"),
+                "1"
+            ),
+            arrayOf(
+                "Medication",
+                "medication",
+                listOf("fhir3"),
+                "1"
+            ),
+            arrayOf(
+                "Observation",
+                "observation",
+                listOf("fhir3"),
+                "1"
+            ),
+            arrayOf(
+                "Observation",
+                "observation-with-component",
+                listOf("fhir3"),
+                "2"
+            ),
+            arrayOf(
+                "Questionnaire",
+                "questionnaire",
+                listOf("fhir3", "fhir4"),
+                "1"
+            )
         )
     }
 
@@ -172,7 +170,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
     lateinit var expectedSize: String
 
     private fun determineFhir3Folder(
-            resourcePrefixes: List<String>
+        resourcePrefixes: List<String>
     ): String {
         return if (resourcePrefixes.contains("common")) {
             "common"
@@ -182,7 +180,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
     }
 
     private fun determineFhir4Folder(
-            resourcePrefixes: List<String>
+        resourcePrefixes: List<String>
     ): String {
         return if (resourcePrefixes.contains("common")) {
             "common"
@@ -221,8 +219,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
     }
 
     private fun setFhir3Id(
-            resource: Fhir3Resource,
-            identifiers: List<Fhir3Identifier>
+        resource: Fhir3Resource,
+        identifiers: List<Fhir3Identifier>
     ) {
         when (resource) {
             is Fhir3Medication -> return
@@ -235,8 +233,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
     }
 
     private fun setFhir4Id(
-            resource: Fhir4Resource,
-            identifiers: List<Fhir4Identifier>
+        resource: Fhir4Resource,
+        identifiers: List<Fhir4Identifier>
     ) {
         when (resource) {
             is Fhir4Observation -> resource.identifier = identifiers
@@ -252,8 +250,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             is Fhir3Medication -> resource.image = attachments
             is Fhir3Observation -> {
                 resource.component = mutableListOf(
-                        Fhir3Observation.ObservationComponent(null),
-                        Fhir3Observation.ObservationComponent(null)
+                    Fhir3Observation.ObservationComponent(null),
+                    Fhir3Observation.ObservationComponent(null)
                 )
                 resource.component!![0].valueAttachment = attachments[0]
                 resource.component!![1].valueAttachment = attachments[1]
@@ -261,8 +259,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             is Fhir3Patient -> resource.photo = attachments
             is Fhir3Questionnaire -> {
                 resource.item = mutableListOf(
-                        Fhir3Questionnaire.QuestionnaireItem("", null),
-                        Fhir3Questionnaire.QuestionnaireItem("", null)
+                    Fhir3Questionnaire.QuestionnaireItem("", null),
+                    Fhir3Questionnaire.QuestionnaireItem("", null)
                 )
                 resource.item!![0].initialAttachment = attachments[0]
                 resource.item!![1].initialAttachment = attachments[1]
@@ -280,10 +278,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         return when (resource) {
             is Fhir4Observation -> {
                 resource.component!![0].extension = mutableListOf(
-                        Extension("a"),
-                        Extension("b")
+                    Extension("a"),
+                    Extension("b")
                 )
-
 
                 resource.component!![0].extension!![0].valueAttachment = attachments[0]
                 resource.component!![0].extension!![1].valueAttachment = attachments[1]
@@ -291,12 +288,14 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             is Fhir4Patient -> resource.photo = attachments
             is Fhir4Questionnaire -> {
                 resource.item = mutableListOf(
-                        Fhir4Questionnaire.QuestionnaireItem("", null),
-                        Fhir4Questionnaire.QuestionnaireItem("", null)
+                    Fhir4Questionnaire.QuestionnaireItem("", null),
+                    Fhir4Questionnaire.QuestionnaireItem("", null)
                 )
-                resource.item!![0].initial = mutableListOf(Fhir4Questionnaire.QuestionnaireItemInitial(null))
+                resource.item!![0].initial =
+                    mutableListOf(Fhir4Questionnaire.QuestionnaireItemInitial(null))
                 resource.item!![0].initial!![0].valueAttachment = attachments[0]
-                resource.item!![1].initial = mutableListOf(Fhir4Questionnaire.QuestionnaireItemInitial(null))
+                resource.item!![1].initial =
+                    mutableListOf(Fhir4Questionnaire.QuestionnaireItemInitial(null))
                 resource.item!![1].initial!![0].valueAttachment = attachments[1]
             }
             is Fhir4QuestionnaireResponse -> {
@@ -314,8 +313,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         // Given
         val resource = SdkFhirParser.toFhir3(
-                resourceType,
-                TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         // When
@@ -323,12 +322,12 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         // Then
         assertEquals(
-                actual = data?.size,
-                expected = expectedSize.toInt()
+            actual = data?.size,
+            expected = expectedSize.toInt()
         )
         assertEquals(
-                actual = data!![selectFhir3Attachment(resource)],
-                expected = DATA_PAYLOAD
+            actual = data!![selectFhir3Attachment(resource)],
+            expected = DATA_PAYLOAD
         )
     }
 
@@ -338,8 +337,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         // Given
         val resource = SdkFhirParser.toFhir4(
-                resourceType,
-                TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
         // When
         val data = recordService.extractUploadData(resource)
@@ -347,13 +346,13 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Then
         if (resource !is Fhir4Observation) {
             assertEquals(
-                    actual = data!!.size,
-                    expected = expectedSize.toInt()
+                actual = data!!.size,
+                expected = expectedSize.toInt()
             )
         }
         assertEquals(
-                actual = data!![selectFhir4Attachment(resource)]!!,
-                expected = DATA_PAYLOAD
+            actual = data!![selectFhir4Attachment(resource)]!!,
+            expected = DATA_PAYLOAD
         )
     }
 
@@ -363,8 +362,11 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         // Given
         val resource = SdkFhirParser.toFhir3(
-                resourceType,
-                TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), "$resourceName-nulled-attachment")
+            resourceType,
+            TestResourceHelper.getJSONResource(
+                determineFhir3Folder(resourcePrefixes),
+                "$resourceName-nulled-attachment"
+            )
         )
 
         // When
@@ -373,8 +375,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Then
         if (resource is Fhir3Observation && resource.component != null) {
             assertEquals(
-                    actual = data!!.size,
-                    expected = 1
+                actual = data!!.size,
+                expected = 1
             )
         } else {
             assertNull(data)
@@ -387,8 +389,11 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         // Given
         val resource = SdkFhirParser.toFhir4(
-                resourceType,
-                TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), "$resourceName-nulled-attachment")
+            resourceType,
+            TestResourceHelper.getJSONResource(
+                determineFhir4Folder(resourcePrefixes),
+                "$resourceName-nulled-attachment"
+            )
         )
 
         // When
@@ -404,20 +409,20 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         // Given
         val resource = SdkFhirParser.toFhir3(
-                resourceType,
-                TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         val decryptedRecord = DecryptedRecord(
-                null,
-                resource,
-                null,
-                defaultAnnotations,
-                null,
-                null,
-                null,
-                null,
-                modelVersion
+            null,
+            resource,
+            null,
+            defaultAnnotations,
+            null,
+            null,
+            null,
+            null,
+            modelVersion
         )
 
         // When
@@ -425,12 +430,12 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         // Then
         assertEquals(
-                actual = stripedRecord,
-                expected = decryptedRecord
+            actual = stripedRecord,
+            expected = decryptedRecord
         )
         assertEquals(
-                actual = stripedRecord.resource,
-                expected = decryptedRecord.resource
+            actual = stripedRecord.resource,
+            expected = decryptedRecord.resource
         )
         assertNull(selectFhir3Attachment(stripedRecord.resource).data)
         if (stripedRecord.resource is Fhir3Observation) {
@@ -444,20 +449,20 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         // Given
         val resource = SdkFhirParser.toFhir4(
-                resourceType,
-                TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
         val decryptedRecord = DecryptedR4Record(
-                null,
-                resource,
-                null,
-                defaultAnnotations,
-                null,
-                null,
-                null,
-                null,
-                modelVersion
+            null,
+            resource,
+            null,
+            defaultAnnotations,
+            null,
+            null,
+            null,
+            null,
+            modelVersion
         )
 
         // When
@@ -465,12 +470,12 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         // Then
         assertEquals(
-                actual = stripedRecord,
-                expected = decryptedRecord
+            actual = stripedRecord,
+            expected = decryptedRecord
         )
         assertEquals(
-                actual = stripedRecord.resource,
-                expected = decryptedRecord.resource
+            actual = stripedRecord.resource,
+            expected = decryptedRecord.resource
         )
         assertNull(selectFhir4Attachment(stripedRecord.resource).data)
     }
@@ -481,45 +486,46 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         // Given
         val originalResource = SdkFhirParser.toFhir3(
-                resourceType,
-                TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
-        val originalPayload: HashMap<Any, String?> = hashMapOf(selectFhir3Attachment(originalResource) to DATA_PAYLOAD)
+        val originalPayload: HashMap<Any, String?> =
+            hashMapOf(selectFhir3Attachment(originalResource) to DATA_PAYLOAD)
 
         val decryptedRecord = DecryptedRecord(
-                null,
-                originalResource,
-                null,
-                defaultAnnotations,
-                null,
-                null,
-                null,
-                null,
-                modelVersion
+            null,
+            originalResource,
+            null,
+            defaultAnnotations,
+            null,
+            null,
+            null,
+            null,
+            modelVersion
         )
 
         val stripedRecord = recordService.removeUploadData(decryptedRecord)
 
         // When
         val record = recordService.restoreUploadData(
-                stripedRecord,
-                stripedRecord.resource,
-                originalPayload
+            stripedRecord,
+            stripedRecord.resource,
+            originalPayload
         )
 
         // Then
         assertEquals(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
         assertEquals(
-                actual = record.resource,
-                expected = decryptedRecord.resource
+            actual = record.resource,
+            expected = decryptedRecord.resource
         )
         assertEquals(
-                actual = selectFhir3Attachment(record.resource).data,
-                expected = DATA_PAYLOAD
+            actual = selectFhir3Attachment(record.resource).data,
+            expected = DATA_PAYLOAD
         )
     }
 
@@ -529,58 +535,59 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         // Given
         val originalResource = SdkFhirParser.toFhir4(
-                resourceType,
-                TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
-        val originalPayload: HashMap<Any, String?> = hashMapOf(selectFhir4Attachment(originalResource) to DATA_PAYLOAD)
+        val originalPayload: HashMap<Any, String?> =
+            hashMapOf(selectFhir4Attachment(originalResource) to DATA_PAYLOAD)
 
         val decryptedRecord = DecryptedR4Record(
-                null,
-                originalResource,
-                null,
-                defaultAnnotations,
-                null,
-                null,
-                null,
-                null,
-                modelVersion
+            null,
+            originalResource,
+            null,
+            defaultAnnotations,
+            null,
+            null,
+            null,
+            null,
+            modelVersion
         )
 
         val stripedRecord = recordService.removeUploadData(decryptedRecord)
 
         // When
         val record = recordService.restoreUploadData(
-                stripedRecord,
-                stripedRecord.resource,
-                originalPayload
+            stripedRecord,
+            stripedRecord.resource,
+            originalPayload
         )
 
         // Then
         assertEquals(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
         assertEquals(
-                actual = record.resource,
-                expected = decryptedRecord.resource
+            actual = record.resource,
+            expected = decryptedRecord.resource
         )
         assertEquals(
-                actual = selectFhir4Attachment(record.resource).data,
-                expected = DATA_PAYLOAD
+            actual = selectFhir4Attachment(record.resource).data,
+            expected = DATA_PAYLOAD
         )
     }
 
     private fun validateFhir3CleanedIdentifiers(
-            resource: Fhir3Resource,
-            identifiers: MutableList<Fhir3Identifier>
+        resource: Fhir3Resource,
+        identifiers: MutableList<Fhir3Identifier>
     ) {
         identifiers.removeAt(1)
         when (resource) {
             is Fhir3Medication ->
                 assertEquals(
-                        actual = selectFhir3Attachment(resource).id,
-                        expected = ATTACHMENT_ID
+                    actual = selectFhir3Attachment(resource).id,
+                    expected = ATTACHMENT_ID
                 )
             is Fhir3Observation -> {
                 val expected = if (resource.component == null) {
@@ -591,40 +598,40 @@ class RecordServiceAdditionalResourceTypeModuleTest {
                 }
 
                 assertEquals(
-                        actual = resource.identifier!!.size,
-                        expected = expected
+                    actual = resource.identifier!!.size,
+                    expected = expected
                 )
                 assertEquals(
-                        actual = resource.identifier,
-                        expected = identifiers
+                    actual = resource.identifier,
+                    expected = identifiers
                 )
             }
             is Fhir3Patient -> {
                 identifiers.removeAt(2)
                 assertEquals(
-                        actual = resource.identifier!!.size,
-                        expected = 2
+                    actual = resource.identifier!!.size,
+                    expected = 2
                 )
                 assertEquals(
-                        actual = resource.identifier,
-                        expected = identifiers
+                    actual = resource.identifier,
+                    expected = identifiers
                 )
             }
             is Fhir3Questionnaire -> {
                 identifiers.removeAt(2)
                 assertEquals(
-                        actual = resource.identifier!!.size,
-                        expected = 2
+                    actual = resource.identifier!!.size,
+                    expected = 2
                 )
                 assertEquals(
-                        actual = resource.identifier,
-                        expected = identifiers
+                    actual = resource.identifier,
+                    expected = identifiers
                 )
             }
             is Fhir3QuestionnaireResponse -> {
                 assertEquals(
-                        actual = resource.identifier,
-                        expected = identifiers[0]
+                    actual = resource.identifier,
+                    expected = identifiers[0]
                 )
             }
             else -> throw RuntimeException("Unexpected resource")
@@ -637,8 +644,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         // Given
         val resource = SdkFhirParser.toFhir3(
-                resourceType,
-                TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         val currentIdentifier = Fhir3AttachmentHelper.buildIdentifier(ADDITIONAL_ID, ASSIGNER)
@@ -646,7 +653,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val otherIdentifier = Fhir3AttachmentHelper.buildIdentifier(OTHER_ID, ASSIGNER)
         val valueIdentifier = Fhir3AttachmentHelper.buildIdentifier(VALUE_ID, ASSIGNER)
 
-        val identifiers = mutableListOf(currentIdentifier, obsoleteIdentifier, otherIdentifier, valueIdentifier)
+        val identifiers =
+            mutableListOf(currentIdentifier, obsoleteIdentifier, otherIdentifier, valueIdentifier)
 
         selectFhir3Attachment(resource).id = ATTACHMENT_ID
         if (resource is Fhir3Observation) {
@@ -660,47 +668,47 @@ class RecordServiceAdditionalResourceTypeModuleTest {
     }
 
     private fun validateFhir4CleanedIdentifiers(
-            resource: Fhir4Resource,
-            identifiers: MutableList<Fhir4Identifier>
+        resource: Fhir4Resource,
+        identifiers: MutableList<Fhir4Identifier>
     ) {
         identifiers.removeAt(1)
         when (resource) {
             is Fhir4Observation -> {
                 assertEquals(
-                        actual = resource.identifier!!.size,
-                        expected = 3
+                    actual = resource.identifier!!.size,
+                    expected = 3
                 )
                 assertEquals(
-                        actual = resource.identifier,
-                        expected = identifiers
+                    actual = resource.identifier,
+                    expected = identifiers
                 )
             }
             is Fhir4Patient -> {
                 identifiers.removeAt(2)
                 assertEquals(
-                        actual = resource.identifier!!.size,
-                        expected = 2
+                    actual = resource.identifier!!.size,
+                    expected = 2
                 )
                 assertEquals(
-                        actual = resource.identifier,
-                        expected = identifiers
+                    actual = resource.identifier,
+                    expected = identifiers
                 )
             }
             is Fhir4Questionnaire -> {
                 identifiers.removeAt(2)
                 assertEquals(
-                        actual = resource.identifier!!.size,
-                        expected = 2
+                    actual = resource.identifier!!.size,
+                    expected = 2
                 )
                 assertEquals(
-                        actual = resource.identifier,
-                        expected = identifiers
+                    actual = resource.identifier,
+                    expected = identifiers
                 )
             }
             is Fhir4QuestionnaireResponse -> {
                 assertEquals(
-                        actual = resource.identifier,
-                        expected = identifiers[0]
+                    actual = resource.identifier,
+                    expected = identifiers[0]
                 )
             }
             else -> throw RuntimeException("Unexpected resource")
@@ -713,8 +721,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         // Given
         val resource = SdkFhirParser.toFhir4(
-                resourceType,
-                TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
         val currentIdentifier = Fhir4AttachmentHelper.buildIdentifier(ADDITIONAL_ID, ASSIGNER)
@@ -722,7 +730,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val otherIdentifier = Fhir4AttachmentHelper.buildIdentifier(OTHER_ID, ASSIGNER)
         val valueIdentifier = Fhir4AttachmentHelper.buildIdentifier(VALUE_ID, ASSIGNER)
 
-        val identifiers = mutableListOf(currentIdentifier, obsoleteIdentifier, otherIdentifier, valueIdentifier)
+        val identifiers =
+            mutableListOf(currentIdentifier, obsoleteIdentifier, otherIdentifier, valueIdentifier)
 
         selectFhir4Attachment(resource).id = ATTACHMENT_ID
         setFhir4Id(resource, identifiers)
@@ -738,8 +747,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         // Given
         val resource = SdkFhirParser.toFhir3(
-                resourceType,
-                TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         val payload = PDF_ENCODED
@@ -762,8 +771,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         // Given
         val resource = SdkFhirParser.toFhir4(
-                resourceType,
-                TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
         selectFhir4Attachment(resource).data = PDF_ENCODED
@@ -780,8 +789,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir3") || resourcePrefixes.contains("common"))
 
         val resource = SdkFhirParser.toFhir3(
-                resourceType,
-                TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         val payload = Base64.encodeToString(byteArrayOf(0))
@@ -801,8 +810,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir4") || resourcePrefixes.contains("common"))
 
         val resource = SdkFhirParser.toFhir4(
-                resourceType,
-                TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
         selectFhir4Attachment(resource).data = Base64.encodeToString(byteArrayOf(0))
@@ -817,8 +826,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir3") || resourcePrefixes.contains("common"))
 
         val resource = SdkFhirParser.toFhir3(
-                resourceType,
-                TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         val payload = PDF_OVERSIZED_ENCODED
@@ -838,8 +847,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir4") || resourcePrefixes.contains("common"))
 
         val resource = SdkFhirParser.toFhir4(
-                resourceType,
-                TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
         selectFhir4Attachment(resource).data = PDF_OVERSIZED_ENCODED
@@ -855,8 +864,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         // Given
         val resource = SdkFhirParser.toFhir3(
-                resourceType,
-                TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
         val fetchedRecord: EncryptedRecord = mockk()
@@ -868,16 +877,16 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val attachmentIds = listOf(firstAttachmentId, secondAttachmentId)
 
         val firstAttachment = TestAttachmentHelper.buildFhir3Attachment(
-                firstAttachmentId,
-                DATA_PAYLOAD,
-                DATA_SIZE,
-                DATA_HASH
+            firstAttachmentId,
+            DATA_PAYLOAD,
+            DATA_SIZE,
+            DATA_HASH
         )
         val secondAttachment = TestAttachmentHelper.buildFhir3Attachment(
-                secondAttachmentId,
-                DATA_PAYLOAD,
-                DATA_SIZE,
-                DATA_HASH
+            secondAttachmentId,
+            DATA_PAYLOAD,
+            DATA_SIZE,
+            DATA_HASH
         )
 
         val attachments = listOf(firstAttachment, secondAttachment)
@@ -888,23 +897,28 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         setFhir3Id(resource, listOf(currentIdentifier))
 
         val wrappedAttachments = listOf(
-                SdkAttachmentFactory.wrap(firstAttachment),
-                SdkAttachmentFactory.wrap(secondAttachment)
+            SdkAttachmentFactory.wrap(firstAttachment),
+            SdkAttachmentFactory.wrap(secondAttachment)
         )
 
         val decryptedRecord = DecryptedRecord(
-                null,
-                resource,
-                null,
-                defaultAnnotations,
-                null,
-                null,
-                null,
-                attachmentKey,
-                modelVersion
+            null,
+            resource,
+            null,
+            defaultAnnotations,
+            null,
+            null,
+            null,
+            attachmentKey,
+            modelVersion
         )
 
-        every { recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID) } returns decryptedRecord
+        every {
+            recordService.decryptRecord<Fhir3Resource>(
+                fetchedRecord,
+                USER_ID
+            )
+        } returns decryptedRecord
         every {
             apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
         } returns Single.just(fetchedRecord)
@@ -915,37 +929,37 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         every {
             attachmentService.download(
-                    listOf(
-                            SdkAttachmentFactory.wrap(firstAttachment),
-                            SdkAttachmentFactory.wrap(secondAttachment)
-                    ),
-                    attachmentKey,
-                    USER_ID
+                listOf(
+                    SdkAttachmentFactory.wrap(firstAttachment),
+                    SdkAttachmentFactory.wrap(secondAttachment)
+                ),
+                attachmentKey,
+                USER_ID
             )
         } returns Single.just(wrappedAttachments)
 
         // When
         val test = recordService.downloadAttachments(
-                RECORD_ID,
-                attachmentIds,
-                USER_ID,
-                DownloadType.Full
+            RECORD_ID,
+            attachmentIds,
+            USER_ID,
+            DownloadType.Full
         ).test().await()
 
         // Then
         val result = test
-                .assertNoErrors()
-                .assertComplete()
-                .assertValue(listOf(wrappedAttachments[0].unwrap(), wrappedAttachments[1].unwrap()))
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValue(listOf(wrappedAttachments[0].unwrap(), wrappedAttachments[1].unwrap()))
+            .values()[0]
 
         assertEquals(
-                actual = result[0].id,
-                expected = firstAttachmentId
+            actual = result[0].id,
+            expected = firstAttachmentId
         )
         assertEquals(
-                actual = result[1].id,
-                expected = secondAttachmentId
+            actual = result[1].id,
+            expected = secondAttachmentId
         )
     }
 
@@ -956,8 +970,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         // Given
         val resource = SdkFhirParser.toFhir4(
-                resourceType,
-                TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
         val fetchedRecord: EncryptedRecord = mockk()
@@ -969,16 +983,16 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val attachmentIds = listOf(firstAttachmentId, secondAttachmentId)
 
         val firstAttachment = TestAttachmentHelper.buildFhir4Attachment(
-                firstAttachmentId,
-                DATA_PAYLOAD,
-                DATA_SIZE,
-                DATA_HASH
+            firstAttachmentId,
+            DATA_PAYLOAD,
+            DATA_SIZE,
+            DATA_HASH
         )
         val secondAttachment = TestAttachmentHelper.buildFhir4Attachment(
-                secondAttachmentId,
-                DATA_PAYLOAD,
-                DATA_SIZE,
-                DATA_HASH
+            secondAttachmentId,
+            DATA_PAYLOAD,
+            DATA_SIZE,
+            DATA_HASH
         )
 
         val attachments = listOf(firstAttachment, secondAttachment)
@@ -989,23 +1003,28 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         setFhir4Id(resource, listOf(currentIdentifier))
 
         val wrappedAttachments = listOf(
-                SdkAttachmentFactory.wrap(firstAttachment),
-                SdkAttachmentFactory.wrap(secondAttachment)
+            SdkAttachmentFactory.wrap(firstAttachment),
+            SdkAttachmentFactory.wrap(secondAttachment)
         )
 
         val decryptedRecord = DecryptedR4Record(
-                null,
-                resource,
-                null,
-                defaultAnnotations,
-                null,
-                null,
-                null,
-                attachmentKey,
-                modelVersion
+            null,
+            resource,
+            null,
+            defaultAnnotations,
+            null,
+            null,
+            null,
+            attachmentKey,
+            modelVersion
         )
 
-        every { recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID) } returns decryptedRecord
+        every {
+            recordService.decryptRecord<Fhir4Resource>(
+                fetchedRecord,
+                USER_ID
+            )
+        } returns decryptedRecord
         every {
             apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
         } returns Single.just(fetchedRecord)
@@ -1016,37 +1035,37 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         every {
             attachmentService.download(
-                    listOf(
-                            SdkAttachmentFactory.wrap(firstAttachment),
-                            SdkAttachmentFactory.wrap(secondAttachment)
-                    ),
-                    attachmentKey,
-                    USER_ID
+                listOf(
+                    SdkAttachmentFactory.wrap(firstAttachment),
+                    SdkAttachmentFactory.wrap(secondAttachment)
+                ),
+                attachmentKey,
+                USER_ID
             )
         } returns Single.just(wrappedAttachments)
 
         // When
         val test = recordService.downloadAttachments(
-                RECORD_ID,
-                attachmentIds,
-                USER_ID,
-                DownloadType.Full
+            RECORD_ID,
+            attachmentIds,
+            USER_ID,
+            DownloadType.Full
         ).test().await()
 
         // Then
         val result = test
-                .assertNoErrors()
-                .assertComplete()
-                .assertValue(listOf(wrappedAttachments[0].unwrap(), wrappedAttachments[1].unwrap()))
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValue(listOf(wrappedAttachments[0].unwrap(), wrappedAttachments[1].unwrap()))
+            .values()[0]
 
         assertEquals(
-                actual = result[0].id,
-                expected = firstAttachmentId
+            actual = result[0].id,
+            expected = firstAttachmentId
         )
         assertEquals(
-                actual = result[1].id,
-                expected = secondAttachmentId
+            actual = result[1].id,
+            expected = secondAttachmentId
         )
     }
 }

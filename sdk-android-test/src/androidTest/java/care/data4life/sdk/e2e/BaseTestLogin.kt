@@ -43,7 +43,7 @@ open class BaseTestLogin {
         private lateinit var loginLogoutPage: HomePage
 
         @JvmStatic
-        protected lateinit var client: Data4LifeClient  //SUT
+        protected lateinit var client: Data4LifeClient // SUT
 
         @BeforeClass
         @JvmStatic
@@ -60,21 +60,23 @@ open class BaseTestLogin {
             client = Data4LifeClient.getInstance()
 
             loginLogoutPage = HomePage()
-                    .isVisible()
-                    .openLoginPage()
-                    .doLogin(user)
-                    .isVisible()
+                .isVisible()
+                .openLoginPage()
+                .doLogin(user)
+                .isVisible()
         }
 
         private fun getPartnerId(ctx: Context): String {
             val applicationInfo: ApplicationInfo
             try {
-                applicationInfo = ctx.getPackageManager().getApplicationInfo(ctx.getPackageName(), PackageManager.GET_META_DATA)
+                applicationInfo = ctx.getPackageManager()
+                    .getApplicationInfo(ctx.getPackageName(), PackageManager.GET_META_DATA)
             } catch (e: PackageManager.NameNotFoundException) {
                 throw IllegalStateException("Unable to retrieve clientId!")
             }
 
-            return applicationInfo.metaData.get(CLIENT_ID).toString().split(DELIMTIER_CHAR)[PARTNER_ID_POS]
+            return applicationInfo.metaData.get(CLIENT_ID).toString()
+                .split(DELIMTIER_CHAR)[PARTNER_ID_POS]
         }
 
         @AfterClass
@@ -83,11 +85,10 @@ open class BaseTestLogin {
             if (!isNetConnected) return
 
             loginLogoutPage
-                    .doLogout()
-                    .isVisible()
+                .doLogout()
+                .isVisible()
 
             activity.explicitFinish()
         }
     }
-
 }

@@ -24,11 +24,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import care.data4life.fhir.stu3.model.Attachment;
+import care.data4life.fhir.stu3.model.CarePlan;
 import care.data4life.fhir.stu3.model.CodeSystemDiagnosticReportStatus;
 import care.data4life.fhir.stu3.model.CodeSystemDocumentReferenceStatus;
 import care.data4life.fhir.stu3.model.CodeSystemObservationStatus;
-import care.data4life.fhir.stu3.model.Attachment;
-import care.data4life.fhir.stu3.model.CarePlan;
 import care.data4life.fhir.stu3.model.CodeableConcept;
 import care.data4life.fhir.stu3.model.Coding;
 import care.data4life.fhir.stu3.model.DiagnosticReport;

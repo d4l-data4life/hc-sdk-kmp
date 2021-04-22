@@ -25,6 +25,8 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
+
 import org.threeten.bp.LocalDate;
 
 import java.io.File;
@@ -34,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import androidx.core.content.ContextCompat;
 import care.data4life.fhir.stu3.model.CarePlan;
 import care.data4life.fhir.stu3.model.DiagnosticReport;
 import care.data4life.fhir.stu3.model.DocumentReference;

@@ -15,7 +15,6 @@
  */
 package care.data4life.sdk.tag
 
-
 import care.data4life.fhir.stu3.model.Patient
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
@@ -44,7 +43,7 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, appendDefaultTags is called with a Fhir3Resource and null, it returns the default tags`() { //tag_shouldReturnMapWithResourceAndClientTag
+    fun `Given, appendDefaultTags is called with a Fhir3Resource and null, it returns the default tags`() { // tag_shouldReturnMapWithResourceAndClientTag
         // Given
         val resource = Fhir3Resource()
 
@@ -66,7 +65,7 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, appendDefaultTags is called with a Fhir4Resource and null, it returns the default tags`() { //tag_shouldReturnMapWithResourceAndClientTag
+    fun `Given, appendDefaultTags is called with a Fhir4Resource and null, it returns the default tags`() { // tag_shouldReturnMapWithResourceAndClientTag
         // Given
         val resource = Fhir4Resource()
 
@@ -107,7 +106,7 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, appendDefaultTags is called with a Resource and old Tags, it preserves the existing Tag and updates the Type`() { //annotatedTag_shouldPreserveExistingTagsAndUpdate
+    fun `Given, appendDefaultTags is called with a Resource and old Tags, it preserves the existing Tag and updates the Type`() { // annotatedTag_shouldPreserveExistingTagsAndUpdate
         // Given
         val type = Fhir3Resource()
         val existingTags = HashMap<String, String>()
@@ -134,7 +133,7 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, appendDefaultTags is called with a Resource and old Tags, sets UpdatedByClient Tag, if the TAG_CLIENT Tag is present`() { //annotatedTag_shouldSetUpdatedByClientTag_whenClientAlreadySet
+    fun `Given, appendDefaultTags is called with a Resource and old Tags, sets UpdatedByClient Tag, if the TAG_CLIENT Tag is present`() { // annotatedTag_shouldSetUpdatedByClientTag_whenClientAlreadySet
         // Given
         val type = Fhir3Resource()
         val existingTags = HashMap<String, String>()

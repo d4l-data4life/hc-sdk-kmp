@@ -15,8 +15,8 @@
  */
 
 data class D4LClientConfig(
-        val platform: String,
-        val configs: Map<Environment, ClientConfig>
+    val platform: String,
+    val configs: Map<Environment, ClientConfig>
 ) {
     operator fun get(environment: Environment): ClientConfig {
         return configs.getValue(environment)
@@ -24,9 +24,9 @@ data class D4LClientConfig(
 }
 
 data class ClientConfig(
-        val id: String,
-        val secret: String,
-        val redirectScheme: String
+    val id: String,
+    val secret: String,
+    val redirectScheme: String
 )
 
 enum class Environment {

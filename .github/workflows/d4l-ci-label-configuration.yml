@@ -1,12 +1,12 @@
 name: D4L CI - Label configuration
 
-on: 
- pull_request:
-   branches: 
-     - main
-     - feature/**
-   paths:
-     - '.github/labels.yml'
+on:
+  pull_request:
+    branches:
+      - main
+      - feature/**
+    paths:
+      - '.github/labels.yml'
 
 jobs:
   configure-labels:

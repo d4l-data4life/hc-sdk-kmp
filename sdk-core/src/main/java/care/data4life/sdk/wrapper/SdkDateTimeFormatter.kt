@@ -16,7 +16,6 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.sdk.RecordService
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
@@ -27,7 +26,7 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.DateTimeFormatterBuilder
-import java.util.*
+import java.util.Locale
 
 internal object SdkDateTimeFormatter : WrapperContract.DateTimeFormatter {
     val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.US)

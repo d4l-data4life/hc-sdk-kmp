@@ -22,5 +22,5 @@
         android:icon="@drawable/ic_action_add"
         android:title="Add"
         android:visible="true"
-        app:showAsAction="always" />
+        app:showAsAction="always"/>
 </menu>

@@ -26,16 +26,15 @@ import care.data4life.sdk.sample.presentation.main.SingleMainView
 
 class MenuView : BaseView() {
 
-
     override val type: String = "menu"
 
-
-    private val menu = Menu(listOf(
+    private val menu = Menu(
+        listOf(
             MenuEntry(SINGLE_USER),
             MenuEntry(MULTI_USER),
             MenuEntry(EXIT)
-    ))
-
+        )
+    )
 
     override fun renderContent(): View {
         renderMenu(menu)
@@ -54,13 +53,11 @@ class MenuView : BaseView() {
         return MenuView()
     }
 
-
     companion object {
         const val SINGLE_USER = "single"
         const val MULTI_USER = "multi"
         const val EXIT = "exit"
 
         const val SINGLE_USER_ALIAS = "singleUserAlias"
-
     }
 }

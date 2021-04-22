@@ -18,12 +18,11 @@ package care.data4life.crypto
 
 import care.data4life.sdk.util.Serializable
 
-
 expect class GCKeyPair(
-        algorithm: GCRSAKeyAlgorithm,
-        privateKey: GCAsymmetricKey,
-        publicKey: GCAsymmetricKey,
-        keyVersion: Int
+    algorithm: GCRSAKeyAlgorithm,
+    privateKey: GCAsymmetricKey,
+    publicKey: GCAsymmetricKey,
+    keyVersion: Int
 ) : Serializable {
 
     fun getPublicKeyBase64(): String

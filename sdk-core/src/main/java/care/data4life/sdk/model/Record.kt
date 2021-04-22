@@ -50,8 +50,8 @@ open class Record<T : DomainResource>(
             this === other -> true
             other !is Record<*> -> false
             resource != other.resource ||
-                    meta != other.meta ||
-                    annotations != other.annotations -> false
+                meta != other.meta ||
+                annotations != other.annotations -> false
             else -> true
         }
     }

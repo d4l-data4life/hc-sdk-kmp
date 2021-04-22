@@ -18,5 +18,4 @@ package care.data4life.sdk.sample.presentation.data
 
 data class Menu(val entries: List<MenuEntry>)
 
-
 data class MenuEntry(val title: String)

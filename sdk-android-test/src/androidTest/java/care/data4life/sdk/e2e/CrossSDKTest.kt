@@ -29,10 +29,6 @@ import care.data4life.fhir.stu3.util.FhirDateTimeParser
 import care.data4life.sdk.helpers.stu3.AttachmentBuilder
 import care.data4life.sdk.helpers.stu3.DocumentReferenceBuilder
 import care.data4life.sdk.helpers.stu3.PractitionerBuilder
-import care.data4life.sdk.helpers.stu3.addAdditionalId
-import care.data4life.sdk.helpers.stu3.getAdditionalIds
-import care.data4life.sdk.helpers.stu3.getAttachments
-import care.data4life.sdk.helpers.stu3.getPractitioner
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.listener.Callback
 import care.data4life.sdk.listener.ResultListener
@@ -49,7 +45,6 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-
 
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -72,7 +67,8 @@ class CrossSDKTest : BaseTestLogin() {
     private val documentSystem = "http://loinc.org"
     private val practiceSpecialityCode = "General Medicine"
     private val practiceSpecialityDisplay = "General Medicine"
-    private val practiceSpecialitySystem = "http://www.ihe.net/xds/connectathon/practiceSettingCodes"
+    private val practiceSpecialitySystem =
+        "http://www.ihe.net/xds/connectathon/practiceSettingCodes"
     //endregion
 
     //region practitioner properties
@@ -104,7 +100,6 @@ class CrossSDKTest : BaseTestLogin() {
 
     var expectedClientIds = mutableSetOf(ANDROID_ID, "ios", "web")
 
-
     @Test
     fun t01_fetchRecords_shouldFetchRecords() {
         clientCallSuccessful = true
@@ -112,21 +107,22 @@ class CrossSDKTest : BaseTestLogin() {
         lateinit var fetchedRecords: List<Record<DocumentReference>>
 
         client.fetchRecords(
-                DocumentReference::class.java,
-                null,
-                LocalDate.now(),
-                MAX_PAGE_SIZE, 0,
-                object : ResultListener<List<Record<DocumentReference>>> {
-                    override fun onSuccess(records: List<Record<DocumentReference>>) {
-                        fetchedRecords = records
-                        latch.countDown()
-                    }
+            DocumentReference::class.java,
+            null,
+            LocalDate.now(),
+            MAX_PAGE_SIZE, 0,
+            object : ResultListener<List<Record<DocumentReference>>> {
+                override fun onSuccess(records: List<Record<DocumentReference>>) {
+                    fetchedRecords = records
+                    latch.countDown()
+                }
 
-                    override fun onError(exception: D4LException) {
-                        clientCallSuccessful = false
-                        latch.countDown()
-                    }
-                })
+                override fun onError(exception: D4LException) {
+                    clientCallSuccessful = false
+                    latch.countDown()
+                }
+            }
+        )
         latch.await(TIMEOUT, TimeUnit.SECONDS)
         assertTrue("Fetch records failed", clientCallSuccessful)
         assertEquals(3, fetchedRecords.size)
@@ -145,17 +141,20 @@ class CrossSDKTest : BaseTestLogin() {
         latch = CountDownLatch(1)
         lateinit var downloadResult: DownloadResult<DocumentReference>
 
-        client.downloadRecords(recordIds, object : ResultListener<DownloadResult<DocumentReference>> {
-            override fun onSuccess(result: DownloadResult<DocumentReference>) {
-                downloadResult = result
-                latch.countDown()
-            }
+        client.downloadRecords(
+            recordIds,
+            object : ResultListener<DownloadResult<DocumentReference>> {
+                override fun onSuccess(result: DownloadResult<DocumentReference>) {
+                    downloadResult = result
+                    latch.countDown()
+                }
 
-            override fun onError(exception: D4LException) {
-                clientCallSuccessful = false
-                latch.countDown()
+                override fun onError(exception: D4LException) {
+                    clientCallSuccessful = false
+                    latch.countDown()
+                }
             }
-        })
+        )
         latch.await(TIMEOUT, TimeUnit.SECONDS)
 
         assertTrue("Download records failed", clientCallSuccessful)
@@ -183,17 +182,20 @@ class CrossSDKTest : BaseTestLogin() {
             addAdditionalId(ANDROID_ID)
         }
 
-        client.createRecord(doc, object : ResultListener<Record<DocumentReference>> {
-            override fun onSuccess(record: Record<DocumentReference>) {
-                latch.countDown()
-            }
+        client.createRecord(
+            doc,
+            object : ResultListener<Record<DocumentReference>> {
+                override fun onSuccess(record: Record<DocumentReference>) {
+                    latch.countDown()
+                }
 
-            override fun onError(exception: D4LException) {
-                exception.printStackTrace()
-                clientCallSuccessful = false
-                latch.countDown()
+                override fun onError(exception: D4LException) {
+                    exception.printStackTrace()
+                    clientCallSuccessful = false
+                    latch.countDown()
+                }
             }
-        })
+        )
         latch.await(TIMEOUT, TimeUnit.SECONDS)
         assertTrue("Create record failed", clientCallSuccessful)
     }
@@ -202,18 +204,20 @@ class CrossSDKTest : BaseTestLogin() {
         clientCallSuccessful = true
         latch = CountDownLatch(1)
 
-        client.deleteRecord(recordId, object : Callback {
-            override fun onSuccess() {
-                latch.countDown()
-            }
+        client.deleteRecord(
+            recordId,
+            object : Callback {
+                override fun onSuccess() {
+                    latch.countDown()
+                }
 
-            override fun onError(exception: D4LException) {
-                exception.printStackTrace()
-                clientCallSuccessful = false
-                latch.countDown()
+                override fun onError(exception: D4LException) {
+                    exception.printStackTrace()
+                    clientCallSuccessful = false
+                    latch.countDown()
+                }
             }
-
-        })
+        )
         latch.await(TIMEOUT, TimeUnit.SECONDS)
         assertTrue("Delete record failed", clientCallSuccessful)
     }
@@ -229,8 +233,14 @@ class CrossSDKTest : BaseTestLogin() {
         assertEquals(documentSystem, doc.type.coding?.first()?.system)
         assertEquals(1, doc.context?.practiceSetting?.coding?.size)
         assertEquals(practiceSpecialityCode, doc.context?.practiceSetting?.coding?.first()?.code)
-        assertEquals(practiceSpecialityDisplay, doc.context?.practiceSetting?.coding?.first()?.display)
-        assertEquals(practiceSpecialitySystem, doc.context?.practiceSetting?.coding?.first()?.system)
+        assertEquals(
+            practiceSpecialityDisplay,
+            doc.context?.practiceSetting?.coding?.first()?.display
+        )
+        assertEquals(
+            practiceSpecialitySystem,
+            doc.context?.practiceSetting?.coding?.first()?.system
+        )
         assertEquals(1, doc.getAttachments()?.size)
         assertAttachmentExpectations(doc.getAttachments()?.first()!!)
         assertAuthorExpectations(doc.getPractitioner()!!)
@@ -269,21 +279,23 @@ class CrossSDKTest : BaseTestLogin() {
 
     private fun buildTestDocument(): DocumentReference {
         val attachment = AttachmentBuilder.buildWith(
-                attachmentTitle,
-                createdDate,
-                contentType,
-                data)
+            attachmentTitle,
+            createdDate,
+            contentType,
+            data
+        )
 
         val author = PractitionerBuilder.buildWith(
-                NAME,
-                SURNAME,
-                PREFIX,
-                SUFFIX,
-                STREET,
-                POSTAL_CODE,
-                CITY,
-                TELEPHONE,
-                WEBSITE)
+            NAME,
+            SURNAME,
+            PREFIX,
+            SUFFIX,
+            STREET,
+            POSTAL_CODE,
+            CITY,
+            TELEPHONE,
+            WEBSITE
+        )
 
         val docTypeCoding = Coding().apply {
             code = documentCode
@@ -302,12 +314,13 @@ class CrossSDKTest : BaseTestLogin() {
         practiceSpeciality.coding = listOf(practiceSpecialityCoding)
 
         return DocumentReferenceBuilder.buildWith(
-                title,
-                indexed,
-                status,
-                listOf(attachment),
-                docType,
-                author,
-                practiceSpeciality)
+            title,
+            indexed,
+            status,
+            listOf(attachment),
+            docType,
+            author,
+            practiceSpeciality
+        )
     }
 }

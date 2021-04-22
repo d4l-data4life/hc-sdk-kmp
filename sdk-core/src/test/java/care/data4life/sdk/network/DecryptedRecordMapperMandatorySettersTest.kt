@@ -115,9 +115,9 @@ class DecryptedRecordMapperMandatorySettersTest : DecryptedRecordMapperTestBase(
         // When
         try {
             builder
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .build(DataResource(customResource))
+                .setTags(tags)
+                .setCreationDate(creationDate)
+                .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -132,9 +132,9 @@ class DecryptedRecordMapperMandatorySettersTest : DecryptedRecordMapperTestBase(
         // When
         try {
             builder
-                    .setTags(tags)
-                    .setDataKey(dataKey)
-                    .build(DataResource(customResource))
+                .setTags(tags)
+                .setDataKey(dataKey)
+                .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -149,9 +149,9 @@ class DecryptedRecordMapperMandatorySettersTest : DecryptedRecordMapperTestBase(
         // When
         try {
             builder
-                    .setTags(tags)
-                    .setModelVersion(modelVersion)
-                    .build(DataResource(customResource))
+                .setTags(tags)
+                .setModelVersion(modelVersion)
+                .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -166,9 +166,9 @@ class DecryptedRecordMapperMandatorySettersTest : DecryptedRecordMapperTestBase(
         // When
         try {
             builder
-                    .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .build(DataResource(customResource))
+                .setCreationDate(creationDate)
+                .setDataKey(dataKey)
+                .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -183,9 +183,9 @@ class DecryptedRecordMapperMandatorySettersTest : DecryptedRecordMapperTestBase(
         // When
         try {
             builder
-                    .setCreationDate(creationDate)
-                    .setModelVersion(modelVersion)
-                    .build(DataResource(customResource))
+                .setCreationDate(creationDate)
+                .setModelVersion(modelVersion)
+                .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -200,9 +200,9 @@ class DecryptedRecordMapperMandatorySettersTest : DecryptedRecordMapperTestBase(
         // When
         try {
             builder
-                    .setDataKey(dataKey)
-                    .setModelVersion(modelVersion)
-                    .build(DataResource(customResource))
+                .setDataKey(dataKey)
+                .setModelVersion(modelVersion)
+                .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -217,10 +217,10 @@ class DecryptedRecordMapperMandatorySettersTest : DecryptedRecordMapperTestBase(
         // When
         try {
             builder
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .build(DataResource(customResource))
+                .setTags(tags)
+                .setCreationDate(creationDate)
+                .setDataKey(dataKey)
+                .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -235,10 +235,10 @@ class DecryptedRecordMapperMandatorySettersTest : DecryptedRecordMapperTestBase(
         // When
         try {
             builder
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .setModelVersion(modelVersion)
-                    .build(DataResource(customResource))
+                .setTags(tags)
+                .setCreationDate(creationDate)
+                .setModelVersion(modelVersion)
+                .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -253,10 +253,10 @@ class DecryptedRecordMapperMandatorySettersTest : DecryptedRecordMapperTestBase(
         // When
         try {
             builder
-                    .setTags(tags)
-                    .setDataKey(dataKey)
-                    .setModelVersion(modelVersion)
-                    .build(DataResource(customResource))
+                .setTags(tags)
+                .setDataKey(dataKey)
+                .setModelVersion(modelVersion)
+                .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -271,10 +271,10 @@ class DecryptedRecordMapperMandatorySettersTest : DecryptedRecordMapperTestBase(
         // When
         try {
             builder
-                    .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .setModelVersion(modelVersion)
-                    .build(DataResource(customResource))
+                .setCreationDate(creationDate)
+                .setDataKey(dataKey)
+                .setModelVersion(modelVersion)
+                .build(DataResource(customResource))
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -288,25 +288,25 @@ class DecryptedRecordMapperMandatorySettersTest : DecryptedRecordMapperTestBase(
 
         // When
         val record = builder
-                .setTags(tags)
-                .setCreationDate(creationDate)
-                .setDataKey(dataKey)
-                .setModelVersion(modelVersion)
-                .build(DataResource(customResource))
+            .setTags(tags)
+            .setCreationDate(creationDate)
+            .setDataKey(dataKey)
+            .setModelVersion(modelVersion)
+            .build(DataResource(customResource))
 
         // Then
         assertEquals(
-                record,
-                DecryptedDataRecord(
-                        null,
-                        DataResource(customResource),
-                        tags,
-                        listOf(),
-                        creationDate,
-                        null,
-                        dataKey,
-                        modelVersion
-                )
+            record,
+            DecryptedDataRecord(
+                null,
+                DataResource(customResource),
+                tags,
+                listOf(),
+                creationDate,
+                null,
+                dataKey,
+                modelVersion
+            )
         )
     }
 
@@ -318,13 +318,13 @@ class DecryptedRecordMapperMandatorySettersTest : DecryptedRecordMapperTestBase(
         // When
         try {
             builder
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .setModelVersion(modelVersion)
-                    .setTags(null)
-                    .build(DataResource(customResource))
-            assertTrue(false)// FIXME: This is stupid
+                .setTags(tags)
+                .setCreationDate(creationDate)
+                .setDataKey(dataKey)
+                .setModelVersion(modelVersion)
+                .setTags(null)
+                .build(DataResource(customResource))
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -339,13 +339,13 @@ class DecryptedRecordMapperMandatorySettersTest : DecryptedRecordMapperTestBase(
         // When
         try {
             builder
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .setModelVersion(modelVersion)
-                    .setCreationDate(null)
-                    .build(DataResource(customResource))
-            assertTrue(false)// FIXME: This is stupid
+                .setTags(tags)
+                .setCreationDate(creationDate)
+                .setDataKey(dataKey)
+                .setModelVersion(modelVersion)
+                .setCreationDate(null)
+                .build(DataResource(customResource))
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -360,13 +360,13 @@ class DecryptedRecordMapperMandatorySettersTest : DecryptedRecordMapperTestBase(
         // When
         try {
             builder
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .setModelVersion(modelVersion)
-                    .setDataKey(null)
-                    .build(DataResource(customResource))
-            assertTrue(false)// FIXME: This is stupid
+                .setTags(tags)
+                .setCreationDate(creationDate)
+                .setDataKey(dataKey)
+                .setModelVersion(modelVersion)
+                .setDataKey(null)
+                .build(DataResource(customResource))
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -381,13 +381,13 @@ class DecryptedRecordMapperMandatorySettersTest : DecryptedRecordMapperTestBase(
         // When
         try {
             builder
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .setModelVersion(modelVersion)
-                    .setModelVersion(null)
-                    .build(DataResource(customResource))
-            assertTrue(false)// FIXME: This is stupid
+                .setTags(tags)
+                .setCreationDate(creationDate)
+                .setDataKey(dataKey)
+                .setModelVersion(modelVersion)
+                .setModelVersion(null)
+                .build(DataResource(customResource))
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -401,63 +401,48 @@ class DecryptedRecordMapperMandatorySettersTest : DecryptedRecordMapperTestBase(
         // When
         try {
             builder
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .setModelVersion(modelVersion)
-                    .clear()
-                    .build(DataResource(customResource))
-            assertTrue(false)// FIXME: This is stupid
+                .setTags(tags)
+                .setCreationDate(creationDate)
+                .setDataKey(dataKey)
+                .setModelVersion(modelVersion)
+                .clear()
+                .build(DataResource(customResource))
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             assertTrue(e is CoreRuntimeException.InternalFailure)
         }
 
         try {
             builder
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .setModelVersion(modelVersion)
-                    .clear()
-                    .setTags(tags)
-                    .build(DataResource(customResource))
-            assertTrue(false)// FIXME: This is stupid
+                .setTags(tags)
+                .setCreationDate(creationDate)
+                .setDataKey(dataKey)
+                .setModelVersion(modelVersion)
+                .clear()
+                .setTags(tags)
+                .build(DataResource(customResource))
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             assertTrue(e is CoreRuntimeException.InternalFailure)
         }
 
         try {
             builder
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .setModelVersion(modelVersion)
-                    .clear()
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .build(DataResource(customResource))
-            assertTrue(false)// FIXME: This is stupid
+                .setTags(tags)
+                .setCreationDate(creationDate)
+                .setDataKey(dataKey)
+                .setModelVersion(modelVersion)
+                .clear()
+                .setTags(tags)
+                .setCreationDate(creationDate)
+                .build(DataResource(customResource))
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             assertTrue(e is CoreRuntimeException.InternalFailure)
         }
 
         try {
             builder
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .setModelVersion(modelVersion)
-                    .clear()
-                    .setTags(tags)
-                    .setCreationDate(creationDate)
-                    .setDataKey(dataKey)
-                    .build(DataResource(customResource))
-            assertTrue(false)// FIXME: This is stupid
-        } catch (e: Exception) {
-            assertTrue(e is CoreRuntimeException.InternalFailure)
-        }
-
-        val record = builder
                 .setTags(tags)
                 .setCreationDate(creationDate)
                 .setDataKey(dataKey)
@@ -466,22 +451,37 @@ class DecryptedRecordMapperMandatorySettersTest : DecryptedRecordMapperTestBase(
                 .setTags(tags)
                 .setCreationDate(creationDate)
                 .setDataKey(dataKey)
-                .setModelVersion(modelVersion)
                 .build(DataResource(customResource))
+            assertTrue(false) // FIXME: This is stupid
+        } catch (e: Exception) {
+            assertTrue(e is CoreRuntimeException.InternalFailure)
+        }
+
+        val record = builder
+            .setTags(tags)
+            .setCreationDate(creationDate)
+            .setDataKey(dataKey)
+            .setModelVersion(modelVersion)
+            .clear()
+            .setTags(tags)
+            .setCreationDate(creationDate)
+            .setDataKey(dataKey)
+            .setModelVersion(modelVersion)
+            .build(DataResource(customResource))
 
         // Then
         assertEquals(
-                record,
-                DecryptedDataRecord(
-                        null,
-                        DataResource(customResource),
-                        tags,
-                        listOf(),
-                        creationDate,
-                        null,
-                        dataKey,
-                        modelVersion
-                )
+            record,
+            DecryptedDataRecord(
+                null,
+                DataResource(customResource),
+                tags,
+                listOf(),
+                creationDate,
+                null,
+                dataKey,
+                modelVersion
+            )
         )
     }
 }

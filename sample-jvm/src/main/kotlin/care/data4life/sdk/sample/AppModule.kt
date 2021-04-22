@@ -31,7 +31,10 @@ import org.koin.dsl.module
 import java.util.concurrent.ConcurrentHashMap
 
 val storage: AuthorizationContract.Storage = InMemoryAuthStorage()
-val secureStorage: SecureStoreContract.SecureStore = SecureStore(SecureStoreCryptor(), SecureStoreStorage())
+val secureStorage: SecureStoreContract.SecureStore = SecureStore(
+    SecureStoreCryptor(),
+    SecureStoreStorage()
+)
 
 val map = ConcurrentHashMap<String, Data4LifeClient>(2)
 
@@ -58,20 +61,18 @@ val appModule = module {
     }
 }
 
-
 private fun createSDK(alias: String): Data4LifeClient {
     val config = ClientConfigLoader.load()
 
-    return Data4LifeClient.init(alias,
-            config[care.data4life.sdk.sample.util.Environment.DEVELOPMENT].id,
-            config[care.data4life.sdk.sample.util.Environment.DEVELOPMENT].secret,
-            Environment.DEVELOPMENT,
-            config[care.data4life.sdk.sample.util.Environment.DEVELOPMENT].redirectScheme,
-            config.platform,
-            Authorization.defaultScopes,
-            secureStorage,
-            storage
+    return Data4LifeClient.init(
+        alias,
+        config[care.data4life.sdk.sample.util.Environment.DEVELOPMENT].id,
+        config[care.data4life.sdk.sample.util.Environment.DEVELOPMENT].secret,
+        Environment.DEVELOPMENT,
+        config[care.data4life.sdk.sample.util.Environment.DEVELOPMENT].redirectScheme,
+        config.platform,
+        Authorization.defaultScopes,
+        secureStorage,
+        storage
     )
 }
-
-

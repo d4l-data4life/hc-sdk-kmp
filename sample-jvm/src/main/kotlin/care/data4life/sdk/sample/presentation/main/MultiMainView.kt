@@ -34,7 +34,6 @@ import org.koin.core.parameter.parametersOf
 
 class MultiMainView : BaseView(), KoinComponent {
 
-
     override fun renderContent(): View {
         renderMessage(Message("Please enter the user alias for the next action"))
         val alias = renderPrompt() ?: return MultiMainView()
@@ -72,14 +71,16 @@ class MultiMainView : BaseView(), KoinComponent {
 
     override val type: String = "Multi User Main"
 
-    private val menu = Menu(listOf(
+    private val menu = Menu(
+        listOf(
             MenuEntry(LOGIN),
             MenuEntry(FINISH_LOGIN),
             MenuEntry(LOGOUT),
             MenuEntry(UPLOAD),
             MenuEntry(START),
             MenuEntry(EXIT)
-    ))
+        )
+    )
 
     companion object {
         private const val LOGIN = "login"
@@ -90,5 +91,4 @@ class MultiMainView : BaseView(), KoinComponent {
         private const val START = "back to start menu (start)"
         private const val ENTRY_START = "start"
     }
-
 }

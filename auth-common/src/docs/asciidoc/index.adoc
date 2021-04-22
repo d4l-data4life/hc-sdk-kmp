@@ -24,7 +24,7 @@
 :phdp-plat: Personal Health Data Platform
 :sw-name: {compname} {prod-name}
 :sw-version: 1.7.0
-:pub-type: Internal 
+:pub-type: Internal
 :pub-version: 1.00
 :pub-status: draft
 :pub-title: {software-name} {pub-type}
@@ -53,7 +53,7 @@ You can pass along optional `scopes`, otherwise the SDK uses the default scopes 
 request.
 
 == Ending authorization requests
-Once the user is logged in, canceled the authorization request, or if an exception occured during the authentication process, the SDK sends the response to the integrator application  in the `onActivityResult(…)` method. The authorization results can be the following: 
+Once the user is logged in, canceled the authorization request, or if an exception occured during the authentication process, the SDK sends the response to the integrator application  in the `onActivityResult(…)` method. The authorization results can be the following:
 
 - `Activity.RESULT_OK` – when the login is successful.
 - `Activity.RESULT_CANCELED` – when the login fails, with additional payload in `data`, as shown in the example.
@@ -79,4 +79,3 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 
 include::authorization_code_grant.adoc[]
-

@@ -62,7 +62,8 @@ class TinkAndroidCryptor(private val context: Context) : SecureStoreContract.Cry
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             appContext.deleteSharedPreferences(PREFERENCE_NAME)
         } else {
-            appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE).edit().clear().commit()
+            appContext.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE).edit().clear()
+                .commit()
             cryptor = null
         }
     }
@@ -78,10 +79,10 @@ class TinkAndroidCryptor(private val context: Context) : SecureStoreContract.Cry
 
         fun initKeysetManager(context: Context): AndroidKeysetManager {
             return AndroidKeysetManager.Builder()
-                    .withSharedPref(context, KEYSET_NAME, PREFERENCE_NAME)
-                    .withKeyTemplate(AeadKeyTemplates.AES256_GCM)
-                    .withMasterKeyUri(MASTER_KEY_URI)
-                    .build()
+                .withSharedPref(context, KEYSET_NAME, PREFERENCE_NAME)
+                .withKeyTemplate(AeadKeyTemplates.AES256_GCM)
+                .withMasterKeyUri(MASTER_KEY_URI)
+                .build()
         }
     }
 }

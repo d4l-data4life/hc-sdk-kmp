@@ -30,11 +30,11 @@ import java.net.URLDecoder
 import java.security.SecureRandom
 
 actual class AuthorizationService @JvmOverloads constructor(
-        alias: String,
-        val configuration: AuthorizationConfiguration,
-        private val storage: AuthorizationContract.Storage = InMemoryAuthStorage(),
-        val base64: Base64 = Base64,
-        private val service: OAuth20Service? = null
+    alias: String,
+    val configuration: AuthorizationConfiguration,
+    private val storage: AuthorizationContract.Storage = InMemoryAuthStorage(),
+    val base64: Base64 = Base64,
+    private val service: OAuth20Service? = null
 ) : AuthorizationContract.Service {
 
     private val userId = alias
@@ -44,11 +44,11 @@ actual class AuthorizationService @JvmOverloads constructor(
     private var oAuthService = createService(alias)
 
     private fun createService(alias: String) = service ?: ServiceBuilder(configuration.clientId)
-            .apiSecret(configuration.clientSecret)
-            .state(getState(alias))
-            .scope(configuration.scopes.joinToString(separator = " ") { it })
-            .callback(configuration.callbackUrl)
-            .build(AuthorizationApi(configuration))
+        .apiSecret(configuration.clientSecret)
+        .state(getState(alias))
+        .scope(configuration.scopes.joinToString(separator = " ") { it })
+        .callback(configuration.callbackUrl)
+        .build(AuthorizationApi(configuration))
 
     @Throws(D4LException::class)
     actual override fun getAccessToken(alias: String): String {
@@ -77,7 +77,7 @@ actual class AuthorizationService @JvmOverloads constructor(
         val state = readTokenState(alias)
 
         val token = state?.refreshToken?.let { oAuthService.refreshAccessToken(it) }
-                ?: throw AuthorizationException.FailedToRestoreRefreshToken()
+            ?: throw AuthorizationException.FailedToRestoreRefreshToken()
 
         val tokenState = TokenState(token.accessToken, token.refreshToken)
         writeTokenState(alias, tokenState)
@@ -95,7 +95,9 @@ actual class AuthorizationService @JvmOverloads constructor(
     }
 
     private fun getState(alias: String): String {
-        val state = if (storage.containsAuthState(authKey(alias))) storage.readAuthState(authKey(alias))!! else {
+        val state = if (storage.containsAuthState(authKey(alias))) {
+            storage.readAuthState(authKey(alias))!!
+        } else {
             val state = generateState()
             writeAuthState(alias, state)
             state
@@ -114,7 +116,10 @@ actual class AuthorizationService @JvmOverloads constructor(
         val state = URLDecoder.decode(auth.state, "UTF-8")
 
         val authState = readAuthState(alias)
-        val stateString = base64.encodeToString(moshi.adapter(AuthState::class.java).toJson(authState))
+        val stateString = base64.encodeToString(
+            moshi.adapter(AuthState::class.java)
+                .toJson(authState)
+        )
 
         if (oAuthService.state == state && state == stateString) {
             val authToken = oAuthService.getAccessToken(auth.code)
@@ -142,7 +147,6 @@ actual class AuthorizationService @JvmOverloads constructor(
         storage.writeAuthState(tokenKey(alias), json)
     }
 
-
     private fun readAuthState(alias: String): AuthState? {
         val authStateJson = storage.readAuthState(authKey(alias))
 
@@ -158,8 +162,8 @@ actual class AuthorizationService @JvmOverloads constructor(
     }
 
     actual override fun isAuthorized(alias: String) =
-            storage.readAuthState(authKey(alias)) != null
-                    && storage.readAuthState(tokenKey(alias)) != null
+        storage.readAuthState(authKey(alias)) != null &&
+            storage.readAuthState(tokenKey(alias)) != null
 
     private fun authKey(alias: String): String = authPrefix + alias
 
@@ -181,7 +185,6 @@ actual class AuthorizationService @JvmOverloads constructor(
         private const val ERROR_FAILED_TO_LOAD_TOKEN_STATE = "Failed to load token state"
         private const val ERROR_FAILED_TO_LOAD_AUTH_STATE = "Failed to load auth state"
     }
-
 }
 
 class AuthorizationApi(private val configuration: AuthorizationConfiguration) : DefaultApi20() {
@@ -197,5 +200,4 @@ class AuthorizationApi(private val configuration: AuthorizationConfiguration) : 
     override fun getAccessTokenEndpoint(): String {
         return configuration.tokenEndpoint + Authorization.OAUTH_PATH_TOKEN
     }
-
 }

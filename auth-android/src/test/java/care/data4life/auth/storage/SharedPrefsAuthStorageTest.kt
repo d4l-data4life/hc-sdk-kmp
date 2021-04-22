@@ -69,7 +69,6 @@ class SharedPrefsAuthStorageTest {
         val expected = true
         every { mockSecureStore.containsData(KEY) } returns expected
 
-
         // when
         val actual = sut.containsAuthState(ALIAS)
 
@@ -81,7 +80,6 @@ class SharedPrefsAuthStorageTest {
     fun removeAuthState() {
         // given
         every { mockSecureStore.removeData(KEY) } returns Unit
-
 
         // when
         sut.removeAuthState(ALIAS)
@@ -101,7 +99,6 @@ class SharedPrefsAuthStorageTest {
         // then
         verify { mockSecureStore.clear() }
     }
-
 
     companion object {
         const val ALIAS = "testAlias"

@@ -71,32 +71,35 @@ afterEvaluate {
 task<Exec>("publishFeature") {
     group = "publishing"
 
-    commandLine("./gradlew",
-            "gitPublishReset",
-            "publishAllPublicationsToFeaturePackagesRepository",
-            "gitPublishCommit",
-            "gitPublishPush"
+    commandLine(
+        "./gradlew",
+        "gitPublishReset",
+        "publishAllPublicationsToFeaturePackagesRepository",
+        "gitPublishCommit",
+        "gitPublishPush"
     )
 }
 
 task<Exec>("publishSnapshot") {
     group = "publishing"
 
-    commandLine("./gradlew",
-            "gitPublishReset",
-            "publishAllPublicationsToSnapshotPackagesRepository",
-            "gitPublishCommit",
-            "gitPublishPush"
+    commandLine(
+        "./gradlew",
+        "gitPublishReset",
+        "publishAllPublicationsToSnapshotPackagesRepository",
+        "gitPublishCommit",
+        "gitPublishPush"
     )
 }
 
 task<Exec>("publishRelease") {
     group = "publishing"
 
-    commandLine("./gradlew",
-            "gitPublishReset",
-            "publishAllPublicationsToReleasePackagesRepository",
-            "gitPublishCommit",
-            "gitPublishPush"
+    commandLine(
+        "./gradlew",
+        "gitPublishReset",
+        "publishAllPublicationsToReleasePackagesRepository",
+        "gitPublishCommit",
+        "gitPublishPush"
     )
 }

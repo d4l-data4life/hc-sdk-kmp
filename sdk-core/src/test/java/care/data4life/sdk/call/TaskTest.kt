@@ -22,41 +22,40 @@ import org.mockito.Mockito
 
 class TaskTest {
 
-
     @Test
     fun newTask_shouldBeIn_activeState() {
-        //given
+        // given
         val task = Task()
 
-        //then
+        // then
         Truth.assertThat(task.isActive).isTrue()
         Truth.assertThat(task.isCanceled).isFalse()
     }
 
     @Test
     fun finish_shouldMakeTask_inactive() {
-        //given
+        // given
         val task = Task()
 
-        //when
+        // when
         task.finish()
 
-        //then
+        // then
         Truth.assertThat(task.isActive).isFalse()
         Truth.assertThat(task.isCanceled).isFalse()
     }
 
     @Test
     fun cancel_shouldCancel_activeTask() {
-        //given
+        // given
         val operationHandle = Mockito.mock(Disposable::class.java)
         val task = Task()
         task.operationHandle = operationHandle
 
-        //when
+        // when
         val result = task.cancel()
 
-        //then
+        // then
         Truth.assertThat(result).isTrue()
         Truth.assertThat(task.isCanceled).isTrue()
         Truth.assertThat(task.isActive).isFalse()
@@ -65,14 +64,14 @@ class TaskTest {
 
     @Test
     fun cancel_shouldFailToCancel_alreadyCanceledTask() {
-        //given
+        // given
         val task = Task()
         task.cancel()
 
-        //when
+        // when
         val result = task.cancel()
 
-        //then
+        // then
         Truth.assertThat(result).isFalse()
     }
 }

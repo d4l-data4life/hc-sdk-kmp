@@ -35,7 +35,6 @@ open class Algorithm : Serializable {
     open val transformation: String
         get() = "$cipher/$blockMode/$padding"
 
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Algorithm) return false
@@ -51,7 +50,6 @@ open class Algorithm : Serializable {
         result = 31 * result + blockMode.hashCode()
         return result
     }
-
 
     enum class Cipher {
         AES, RSA
@@ -70,6 +68,4 @@ open class Algorithm : Serializable {
         private const val OAEP = "OAEP"
         private const val PKCS7 = "PKCS7"
     }
-
 }
-

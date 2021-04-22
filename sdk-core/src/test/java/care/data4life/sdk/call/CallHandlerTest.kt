@@ -22,26 +22,21 @@ import io.reactivex.Single
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-
 import care.data4life.sdk.listener.Callback as LegacyCallback
 import care.data4life.sdk.listener.ResultListener as LegacyListener
 
 class CallHandlerTest {
 
-
     private lateinit var errorHandler: SdkContract.ErrorHandler
-
 
     // SUT
     private lateinit var callHandler: CallHandler
-
 
     @Before
     fun setup() {
         errorHandler = mockk()
         callHandler = CallHandler(errorHandler)
     }
-
 
     @Test
     fun `Given, executeSingle is called with a Callback, it returns a task`() {
@@ -68,7 +63,6 @@ class CallHandlerTest {
         // Then
         assertTrue(result is Task)
     }
-
 
     @Test
     fun `Given, executeCompletable is called with LegacyCallback, it returns a task`() {

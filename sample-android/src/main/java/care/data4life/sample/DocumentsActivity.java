@@ -31,15 +31,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
-import org.jetbrains.annotations.NotNull;
-import org.threeten.bp.LocalDate;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -49,6 +40,16 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
+import org.jetbrains.annotations.NotNull;
+import org.threeten.bp.LocalDate;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.DocumentReference;
 import care.data4life.fhir.stu3.model.DomainResource;
@@ -274,25 +275,25 @@ public class DocumentsActivity extends AppCompatActivity {
                 20,
                 offset,
                 new ResultListener<List<Record<DomainResource>>>() {
-            @Override
-            public void onSuccess(List<Record<DomainResource>> records) {
-                runOnUiThread(() -> {
-                    DocumentsActivity.this.records.addAll(records);
-                    if (records.size() == 0) {
-                        isLastPage = true;
+                    @Override
+                    public void onSuccess(List<Record<DomainResource>> records) {
+                        runOnUiThread(() -> {
+                            DocumentsActivity.this.records.addAll(records);
+                            if (records.size() == 0) {
+                                isLastPage = true;
+                            }
+                            isLoading = false;
+                            documentAdapter.bindDocuments(records);
+                            mDocumentsSRL.setRefreshing(false);
+                        });
                     }
-                    isLoading = false;
-                    documentAdapter.bindDocuments(records);
-                    mDocumentsSRL.setRefreshing(false);
-                });
-            }
 
-            @Override
-            public void onError(D4LException exception) {
-                Log.e(TAG, exception.getMessage());
-                runOnUiThread(() -> mDocumentsSRL.setRefreshing(false));
-            }
-        });
+                    @Override
+                    public void onError(D4LException exception) {
+                        Log.e(TAG, exception.getMessage());
+                        runOnUiThread(() -> mDocumentsSRL.setRefreshing(false));
+                    }
+                });
     }
 
     class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.DocumentViewHolder> {

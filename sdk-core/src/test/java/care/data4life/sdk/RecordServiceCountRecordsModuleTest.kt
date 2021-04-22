@@ -75,7 +75,6 @@ class RecordServiceCountRecordsModuleTest {
 
         flowHelper = RecordServiceModuleTestFlowHelper(
             apiService,
-            fileService,
             imageResizer
         )
     }

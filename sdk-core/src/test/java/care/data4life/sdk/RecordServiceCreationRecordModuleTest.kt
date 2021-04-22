@@ -19,6 +19,7 @@ package care.data4life.sdk
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.AttachmentService
+import care.data4life.sdk.attachment.FileService
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.config.DataRestrictionException
@@ -44,8 +45,10 @@ import care.data4life.sdk.test.util.GenericTestDataProvider.CREATION_DATE
 import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.PDF_OVERSIZED
 import care.data4life.sdk.test.util.GenericTestDataProvider.PDF_OVERSIZED_ENCODED
+import care.data4life.sdk.test.util.GenericTestDataProvider.PREVIEW
 import care.data4life.sdk.test.util.GenericTestDataProvider.PREVIEW_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.THUMBNAIL
 import care.data4life.sdk.test.util.GenericTestDataProvider.THUMBNAIL_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.UPDATE_DATE
 import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
@@ -79,10 +82,9 @@ class RecordServiceCreationRecordModuleTest {
     private val encryptedAttachmentKey: EncryptedKey = mockk()
 
     private lateinit var recordService: RecordContract.Service
-    private lateinit var flowHelper: RecordServiceModuleTestFlowHelper
     private val apiService: ApiService = mockk()
+    private lateinit var flowHelper: RecordServiceModuleTestFlowHelper
     private lateinit var cryptoService: CryptoContract.Service
-    private val fileService: AttachmentContract.FileService = mockk()
     private val imageResizer: AttachmentContract.ImageResizer = mockk()
     private val errorHandler: D4LErrorHandler = mockk()
 
@@ -100,7 +102,7 @@ class RecordServiceCreationRecordModuleTest {
             TaggingService(CLIENT_ID),
             FhirService(cryptoService),
             AttachmentService(
-                fileService,
+                FileService(ALIAS, apiService, cryptoService),
                 imageResizer
             ),
             cryptoService,
@@ -109,7 +111,6 @@ class RecordServiceCreationRecordModuleTest {
 
         flowHelper = RecordServiceModuleTestFlowHelper(
             apiService,
-            fileService,
             imageResizer
         )
     }
@@ -156,7 +157,8 @@ class RecordServiceCreationRecordModuleTest {
         tagEncryptionKey: GCKey,
         userId: String = USER_ID,
         alias: String = ALIAS,
-        recordId: String = RECORD_ID
+        recordId: String = RECORD_ID,
+        attachments: List<String>? = null
     ) {
         val encryptedCommonKey = flowHelper.prepareStoredOrUnstoredCommonKeyRun(
             alias,
@@ -165,11 +167,9 @@ class RecordServiceCreationRecordModuleTest {
             useStoredCommonKey
         )
 
-        val keyOrder = if (attachmentKey is Pair<*, *>) {
-            listOf(dataKey.first, attachmentKey.first)
-        } else {
-            listOf(dataKey.first)
-        }
+        val keyOrder = flowHelper.makeKeyOrder(dataKey, attachmentKey)
+
+        val resources = flowHelper.packResources(listOf(serializedResource), attachments)
 
         val uploadIteration = CryptoServiceIteration(
             gcKeyOrder = keyOrder,
@@ -184,7 +184,7 @@ class RecordServiceCreationRecordModuleTest {
             encryptedAttachmentKey = attachmentKey?.second,
             tagEncryptionKey = tagEncryptionKey,
             tagEncryptionKeyCalls = 1,
-            resources = listOf(serializedResource),
+            resources = resources,
             tags = tags,
             annotations = annotations,
             hashFunction = { value -> flowHelper.md5(value) }
@@ -294,6 +294,8 @@ class RecordServiceCreationRecordModuleTest {
             null
         )
 
+        val mappedAttachments = flowHelper.mapAttachments(attachmentData, resizedImages)
+
         runFlow(
             encryptedUploadRecord,
             serializedResource,
@@ -306,11 +308,12 @@ class RecordServiceCreationRecordModuleTest {
             tagEncryptionKey,
             userId,
             alias,
-            recordId
+            recordId,
+            mappedAttachments
         )
 
         flowHelper.uploadAttachment(
-            attachmentKey = attachmentKey.first,
+            alias = alias,
             payload = Pair(attachmentData, attachmentId),
             userId = userId,
             resized = resizedImages
@@ -624,8 +627,8 @@ class RecordServiceCreationRecordModuleTest {
         internalResource.content[0].attachment.id = ATTACHMENT_ID
         internalResource.content[0].attachment.data = null
 
-        val preview = Pair(ByteArray(2), PREVIEW_ID)
-        val thumbnail = Pair(ByteArray(1), THUMBNAIL_ID)
+        val preview = Pair(PREVIEW, PREVIEW_ID)
+        val thumbnail = Pair(THUMBNAIL, THUMBNAIL_ID)
 
         runFhirFlowWithAttachment(
             serializedResource = SdkFhirParser.fromResource(internalResource)!!,

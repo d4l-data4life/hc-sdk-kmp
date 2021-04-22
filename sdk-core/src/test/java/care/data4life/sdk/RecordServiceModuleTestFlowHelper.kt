@@ -31,6 +31,7 @@ import care.data4life.sdk.test.util.GenericTestDataProvider.DATE_TIME_FORMATTER
 import care.data4life.sdk.util.Base64
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import io.reactivex.Single
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
@@ -41,7 +42,6 @@ import javax.xml.bind.DatatypeConverter
 
 class RecordServiceModuleTestFlowHelper(
     private val apiService: ApiService,
-    private val fileService: AttachmentContract.FileService,
     private val imageResizer: AttachmentContract.ImageResizer
 ) {
     private val mdHandle = MessageDigest.getInstance("MD5")
@@ -54,7 +54,7 @@ class RecordServiceModuleTestFlowHelper(
             .also { mdHandle.reset() }
     }
 
-    fun encode(tag: String): String {
+    private fun encode(tag: String): String {
         return URLEncoder.encode(tag, StandardCharsets.UTF_8.displayName())
             .replace(".", "%2e")
             .replace("+", "%20")
@@ -118,23 +118,83 @@ class RecordServiceModuleTestFlowHelper(
         tagsAndAnnotations: List<String>
     ): List<String> = tagsAndAnnotations.map { Base64.encodeToString(md5(it)) }
 
+    fun mapAttachments(
+        payload: ByteArray,
+        resized: Pair<Pair<ByteArray, String>, Pair<ByteArray, String>?>? = null
+    ): List<String> {
+        val attachments = mutableListOf(String(payload))
+
+        if (resized is Pair<*, *>) {
+            attachments.add(String(resized.first.first))
+
+            if (resized.second is Pair<*, *>) {
+                attachments.add(String(resized.second!!.first))
+            }
+        }
+
+        return attachments
+    }
+
     fun uploadAttachment(
-        attachmentKey: GCKey,
+        alias: String,
         userId: String,
         payload: Pair<ByteArray, String>,
         resized: Pair<Pair<ByteArray, String>, Pair<ByteArray, String>?>? = null
     ) {
-        every {
-            fileService.uploadFile(attachmentKey, userId, payload.first)
-        } returns Single.just(payload.second)
+        resizing(payload.first, resized)
 
-        resizing(payload.first, userId, attachmentKey, resized)
+        fakeUpload(
+            userId,
+            alias,
+            payload,
+            resized
+        )
+    }
+
+    private fun fakeUpload(
+        userId: String,
+        alias: String,
+        payload: Pair<ByteArray, String>,
+        resized: Pair<Pair<ByteArray, String>, Pair<ByteArray, String>?>?
+    ) {
+        val sendAttachment = slot<ByteArray>()
+        val (data, ids) = resolveUploadData(payload, resized)
+
+        every {
+            apiService.uploadDocument(alias, userId, capture(sendAttachment))
+        } answers {
+            val idx = data.indexOf(String(sendAttachment.captured))
+
+            if (idx >= 0) {
+                Single.just(ids[idx])
+            } else {
+                throw RuntimeException("Unexpected Attachment.")
+            }
+        }
+    }
+
+    private fun resolveUploadData(
+        payload: Pair<ByteArray, String>,
+        resized: Pair<Pair<ByteArray, String>, Pair<ByteArray, String>?>?
+    ): Pair<List<String>, List<String>> {
+        val ids = mutableListOf(payload.second)
+        val data = mutableListOf(md5(String(payload.first)))
+
+        if (resized is Pair<*, *>) {
+            ids.add(resized.first.second)
+            data.add(md5(String(resized.first.first)))
+
+            if (resized.second is Pair<*, *>) {
+                ids.add(resized.second!!.second)
+                data.add(md5(String(resized.second!!.first)))
+            }
+        }
+
+        return Pair(data, ids)
     }
 
     private fun resizing(
         data: ByteArray,
-        userId: String,
-        attachmentKey: GCKey,
         resizedImages: Pair<Pair<ByteArray, String>, Pair<ByteArray, String>?>?
     ) {
         if (resizedImages == null) {
@@ -145,29 +205,20 @@ class RecordServiceModuleTestFlowHelper(
             resizeImage(
                 data,
                 resizedImages.first.first,
-                resizedImages.first.second,
-                DEFAULT_PREVIEW_SIZE_PX,
-                userId,
-                attachmentKey
+                DEFAULT_PREVIEW_SIZE_PX
             )
 
             if (resizedImages.second is Pair<*, *>) {
                 resizeImage(
                     data,
                     resizedImages.second!!.first,
-                    resizedImages.second!!.second,
-                    DEFAULT_THUMBNAIL_SIZE_PX,
-                    userId,
-                    attachmentKey
+                    DEFAULT_THUMBNAIL_SIZE_PX
                 )
             } else {
                 resizeImage(
                     data,
                     null,
-                    null,
-                    DEFAULT_THUMBNAIL_SIZE_PX,
-                    userId,
-                    attachmentKey
+                    DEFAULT_THUMBNAIL_SIZE_PX
                 )
             }
         }
@@ -176,10 +227,7 @@ class RecordServiceModuleTestFlowHelper(
     private fun resizeImage(
         data: ByteArray,
         resizedImage: ByteArray?,
-        imageId: String?,
-        targetHeight: Int,
-        userId: String,
-        attachmentKey: GCKey
+        targetHeight: Int
     ) {
         every {
             imageResizer.resizeToHeight(
@@ -188,12 +236,16 @@ class RecordServiceModuleTestFlowHelper(
                 DEFAULT_JPEG_QUALITY_PERCENT
             )
         } returns resizedImage
+    }
 
-        if (resizedImage is ByteArray) {
-            every {
-                fileService.uploadFile(attachmentKey, userId, resizedImage)
-            } returns Single.just(imageId)
-        }
+    fun downloadAttachment(
+        userId: String,
+        alias: String,
+        payload: Pair<ByteArray, String>
+    ) {
+        every {
+            apiService.downloadDocument(alias, userId, payload.second)
+        } returns Single.just(md5(String(payload.first)).toByteArray())
     }
 
     fun prepareStoredOrUnstoredCommonKeyRun(
@@ -248,7 +300,7 @@ class RecordServiceModuleTestFlowHelper(
         dates.second
     )
 
-    fun buildEncryptedRecord(
+    private fun buildEncryptedRecord(
         id: String?,
         commonKeyId: String,
         tags: List<String>,
@@ -266,7 +318,7 @@ class RecordServiceModuleTestFlowHelper(
         keys
     )
 
-    fun buildEncryptedRecordWithEncodedBody(
+    private fun buildEncryptedRecordWithEncodedBody(
         id: String?,
         commonKeyId: String,
         tags: List<String>,
@@ -331,4 +383,28 @@ class RecordServiceModuleTestFlowHelper(
         LocalDate.parse(customCreationDate, DATE_FORMATTER),
         LocalDateTime.parse(updatedDate, DATE_TIME_FORMATTER)
     )
+
+    fun packResources(
+        serializedResources: List<String>,
+        attachments: List<String>?
+    ): List<String> {
+        return if (attachments is List) {
+            mutableListOf<String>()
+                .also { it.addAll(serializedResources) }
+                .also { it.addAll(attachments) }
+        } else {
+            serializedResources
+        }
+    }
+
+    fun makeKeyOrder(
+        dataKey: Pair<GCKey, EncryptedKey>,
+        attachmentKey: Pair<GCKey, EncryptedKey>?
+    ): List<GCKey> {
+        return if (attachmentKey is Pair<*, *>) {
+            listOf(dataKey.first, attachmentKey.first)
+        } else {
+            listOf(dataKey.first)
+        }
+    }
 }

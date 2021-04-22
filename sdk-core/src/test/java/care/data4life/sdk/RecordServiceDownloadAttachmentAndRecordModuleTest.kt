@@ -220,7 +220,8 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
 
         internalResource.content[0].attachment.id = ATTACHMENT_ID
         internalResource.content[0].attachment.data = null
-        internalResource.content[0].attachment.hash = Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
+        internalResource.content[0].attachment.hash =
+            Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
 
         runAttachmentDownloadFlow(
             serializedResource = SdkFhirParser.fromResource(internalResource)!!,
@@ -404,7 +405,8 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
 
         internalResource.content[0].attachment.id = ATTACHMENT_ID
         internalResource.content[0].attachment.data = null
-        internalResource.content[0].attachment.hash = Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
+        internalResource.content[0].attachment.hash =
+            Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
 
         runAttachmentDownloadFlow(
             serializedResource = SdkFhirParser.fromResource(internalResource)!!,
@@ -469,7 +471,8 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
         )
 
         resource.content[0].attachment.id = ATTACHMENT_ID
-        resource.content[0].attachment.hash = Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
+        resource.content[0].attachment.hash =
+            Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
 
         internalResource.identifier!!.add(
             Fhir3Identifier().also {
@@ -480,7 +483,8 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
 
         internalResource.content[0].attachment.id = ATTACHMENT_ID
         internalResource.content[0].attachment.data = null
-        internalResource.content[0].attachment.hash = Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
+        internalResource.content[0].attachment.hash =
+            Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
 
         runAttachmentDownloadFlow(
             serializedResource = SdkFhirParser.fromResource(internalResource)!!,

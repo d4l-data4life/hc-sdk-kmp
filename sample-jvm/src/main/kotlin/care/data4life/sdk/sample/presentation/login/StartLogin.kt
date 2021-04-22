@@ -27,9 +27,7 @@ import org.koin.core.parameter.parametersOf
 
 class StartLogin(private val alias: String) : BaseView(), KoinComponent {
 
-
     private val client: Data4LifeClient by inject { parametersOf(alias) }
-
 
     override val type: String = "Start login"
 

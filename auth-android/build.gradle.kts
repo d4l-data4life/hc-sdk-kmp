@@ -33,14 +33,16 @@ android {
         versionName = "${project.version}"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments(mapOf(
+        testInstrumentationRunnerArguments(
+            mapOf(
                 "clearPackageData" to "true"
-        ))
+            )
+        )
 
         buildTypes {
             buildTypes {
-                getByName("debug"){
-                    setMatchingFallbacks("debug","release")
+                getByName("debug") {
+                    setMatchingFallbacks("debug", "release")
                 }
             }
         }

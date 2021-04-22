@@ -375,5 +375,3 @@ Every project module has a `{module-name}/src/docs/asciidoc` folder where all do
 
 ==== Generating the documentation
 To generate the latest documentation just call `./gradlew asciidoctor` this will build the `sdk-doc` module and replace the documentation for the current SDK version in the `docs` folder.
-
-

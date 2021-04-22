@@ -30,7 +30,6 @@ abstract class BaseView : View {
 
     abstract fun renderContent(): View
 
-
     fun renderMenu(menu: Menu) {
         renderEmptyLine()
         TermUi.echo("Options:")
@@ -38,8 +37,6 @@ abstract class BaseView : View {
         menu.entries.forEach {
             TermUi.echo("- ${it.title}")
         }
-
-
     }
 
     fun renderTitle() {
@@ -59,7 +56,6 @@ abstract class BaseView : View {
 
         return TermUi.prompt(text = "")
     }
-
 
     fun renderEmptyLine() {
         TermUi.echo("")

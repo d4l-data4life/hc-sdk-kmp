@@ -81,7 +81,6 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import org.threeten.bp.LocalDate
 import java.io.IOException
-import kotlin.collections.HashMap
 
 // TODO internal
 // TODO add Factory
@@ -454,7 +453,12 @@ class RecordService internal constructor(
 
         return apiService
             .fetchRecord(alias, userId, recordId)
-            .map { fetchedRecord -> decryptRecord<T>(fetchedRecord, userId) } // Fixme: Resource clash
+            .map { fetchedRecord ->
+                decryptRecord<T>(
+                    fetchedRecord,
+                    userId
+                )
+            } // Fixme: Resource clash
             .map { decryptedRecord -> updateData(decryptedRecord, resource, userId) }
             .map { decryptedRecord ->
                 cleanObsoleteAdditionalIdentifiers(resource)
@@ -466,7 +470,14 @@ class RecordService internal constructor(
             }
             .map { decryptedRecord -> removeUploadData(decryptedRecord) }
             .map { decryptedRecord -> encryptRecord(decryptedRecord) }
-            .flatMap { encryptedRecord -> apiService.updateRecord(alias, userId, recordId, encryptedRecord) }
+            .flatMap { encryptedRecord ->
+                apiService.updateRecord(
+                    alias,
+                    userId,
+                    recordId,
+                    encryptedRecord
+                )
+            }
             .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
             .map { decryptedRecord -> restoreUploadData(decryptedRecord, resource, data) }
             .map { decryptedRecord -> assignResourceId(decryptedRecord) }
@@ -583,7 +594,8 @@ class RecordService internal constructor(
     //region utility methods
     @Throws(IOException::class)
     internal fun <T : Any> encryptRecord(record: DecryptedBaseRecord<T>): NetworkModelContract.EncryptedRecord {
-        val encryptedTags = tagEncryptionService.encryptTagsAndAnnotations(record.tags!!, record.annotations)
+        val encryptedTags =
+            tagEncryptionService.encryptTagsAndAnnotations(record.tags!!, record.annotations)
 
         val commonKey = cryptoService.fetchCurrentCommonKey()
         val currentCommonKeyId = cryptoService.currentCommonKeyId
@@ -1151,7 +1163,8 @@ class RecordService internal constructor(
             )
             if (additionalIds is List<*>) {
                 when (type) {
-                    DownloadType.Full -> { /* do nothing */ }
+                    DownloadType.Full -> { /* do nothing */
+                    }
                     DownloadType.Medium -> attachment.id += ThumbnailService.SPLIT_CHAR + additionalIds[PREVIEW_ID_POS]
                     DownloadType.Small -> attachment.id += ThumbnailService.SPLIT_CHAR + additionalIds[THUMBNAIL_ID_POS]
                 }

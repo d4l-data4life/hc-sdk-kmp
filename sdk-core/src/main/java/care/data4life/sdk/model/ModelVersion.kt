@@ -17,7 +17,7 @@ package care.data4life.sdk.model
 
 import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 
-object ModelVersion: ModelContract.ModelVersion {
+object ModelVersion : ModelContract.ModelVersion {
     override fun isModelVersionSupported(version: Int): Boolean {
         return version <= CURRENT
     }

@@ -23,13 +23,13 @@ import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 
 class NetworkModelContract {
     internal interface DecryptedRecordBuilder {
-        //mandatory
+        // mandatory
         fun setTags(tags: HashMap<String, String>?): DecryptedRecordBuilder
         fun setCreationDate(creationDate: String?): DecryptedRecordBuilder
         fun setDataKey(dataKey: GCKey?): DecryptedRecordBuilder
         fun setModelVersion(modelVersion: Int?): DecryptedRecordBuilder
 
-        //Optional
+        // Optional
         fun setIdentifier(identifier: String?): DecryptedRecordBuilder
         fun setAnnotations(annotations: List<String>?): DecryptedRecordBuilder
         fun setUpdateDate(updatedDate: String?): DecryptedRecordBuilder
@@ -37,11 +37,11 @@ class NetworkModelContract {
 
         @Throws(CoreRuntimeException.InternalFailure::class)
         fun <T : Any?> build(
-                resource: T,
-                tags: HashMap<String, String>? = null,
-                creationDate: String? = null,
-                dataKey: GCKey? = null,
-                modelVersion: Int? = null
+            resource: T,
+            tags: HashMap<String, String>? = null,
+            creationDate: String? = null,
+            dataKey: GCKey? = null,
+            modelVersion: Int? = null
         ): DecryptedBaseRecord<T>
 
         fun clear(): DecryptedRecordBuilder
@@ -60,13 +60,12 @@ class NetworkModelContract {
         }
     }
 
-
     internal interface Version {
         val code: Int
         val name: String
         val status: String
 
-        companion object{
+        companion object {
             var KEY_DEPRECATED = "deprecated"
             var KEY_UNSUPPORTED = "unsupported"
         }
@@ -75,6 +74,7 @@ class NetworkModelContract {
     internal interface VersionList {
         val versions: List<Version>
     }
+
     internal interface DocumentUploadResponse {
         var documentId: String
     }
@@ -111,8 +111,6 @@ class NetworkModelContract {
         val modelVersion: Int
         val updatedDate: String?
         val version: Int
-
-
     }
 
     companion object {

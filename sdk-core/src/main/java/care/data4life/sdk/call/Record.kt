@@ -18,28 +18,27 @@ package care.data4life.sdk.call
 import care.data4life.sdk.data.DataContract
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelContract
 
 sealed class Record
 
 data class Fhir3Record<T : Fhir3Resource>(
-        override val identifier: String,
-        override val resource: T,
-        override val meta: ModelContract.Meta,
-        override val annotations: List<String>
+    override val identifier: String,
+    override val resource: T,
+    override val meta: ModelContract.Meta,
+    override val annotations: List<String>
 ) : CallContract.Record<T>, Record()
 
 class Fhir4Record<T : Fhir4Resource>(
-        override val identifier: String,
-        override val resource: T,
-        override val meta: ModelContract.Meta,
-        override val annotations: List<String>
+    override val identifier: String,
+    override val resource: T,
+    override val meta: ModelContract.Meta,
+    override val annotations: List<String>
 ) : CallContract.Record<T>, Record()
 
 data class DataRecord<T : DataContract.Resource>(
-        override val identifier: String,
-        override val resource: T,
-        override val meta: ModelContract.Meta,
-        override val annotations: List<String>
+    override val identifier: String,
+    override val resource: T,
+    override val meta: ModelContract.Meta,
+    override val annotations: List<String>
 ) : CallContract.Record<T>, Record()

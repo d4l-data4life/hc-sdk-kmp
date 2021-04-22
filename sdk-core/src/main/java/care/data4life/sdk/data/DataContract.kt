@@ -25,5 +25,4 @@ interface DataContract {
     interface Resource {
         fun asByteArray(): ByteArray
     }
-
 }

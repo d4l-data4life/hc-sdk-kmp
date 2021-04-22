@@ -30,14 +30,23 @@ internal class DataRecordClient(
     private val handler: CallHandler
 ) : DataContract.Client {
 
-    override fun create(resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>): Task {
+    override fun create(
+        resource: DataResource,
+        annotations: List<String>,
+        callback: Callback<DataRecord<DataResource>>
+    ): Task {
         val operation = userService.finishLogin(true)
             .flatMap { userService.userID }
             .flatMap { uid -> recordService.createRecord(uid, resource, annotations) }
         return handler.executeSingle(operation, callback)
     }
 
-    override fun update(recordId: String, resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>): Task {
+    override fun update(
+        recordId: String,
+        resource: DataResource,
+        annotations: List<String>,
+        callback: Callback<DataRecord<DataResource>>
+    ): Task {
         val operation = userService.finishLogin(true)
             .flatMap { userService.userID }
             .flatMap { uid -> recordService.updateRecord(uid, recordId, resource, annotations) }
@@ -58,7 +67,14 @@ internal class DataRecordClient(
         return handler.executeSingle(operation, callback)
     }
 
-    override fun search(annotations: List<String>, startDate: LocalDate?, endDate: LocalDate?, pageSize: Int, offset: Int, callback: Callback<List<DataRecord<DataResource>>>): Task {
+    override fun search(
+        annotations: List<String>,
+        startDate: LocalDate?,
+        endDate: LocalDate?,
+        pageSize: Int,
+        offset: Int,
+        callback: Callback<List<DataRecord<DataResource>>>
+    ): Task {
         val operation = userService.finishLogin(true)
             .flatMap { userService.userID }
             .flatMap { uid ->

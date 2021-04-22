@@ -42,10 +42,8 @@ class AuthorizationServiceTest {
     private lateinit var storage: AuthorizationContract.Storage
     private lateinit var appAuthService: AppAuthService
 
-
     // SUT
     private lateinit var sut: AuthorizationService
-
 
     @Before
     fun setUp() {
@@ -54,21 +52,24 @@ class AuthorizationServiceTest {
         appAuthService = mockk()
         authService = mockk()
         storage = mockk()
-        serviceConfig = AuthorizationServiceConfiguration(Uri.parse("https://test.com"), Uri.parse("https://test.com"))
+        serviceConfig = AuthorizationServiceConfiguration(
+            Uri.parse("https://test.com"),
+            Uri.parse("https://test.com")
+        )
 
         val configuration = AuthorizationConfiguration(
-                "clientId",
-                "clientSecret",
-                BASE_URL,
-                BASE_URL,
-                "redirectUrl",
-                Authorization.defaultScopes
+            "clientId",
+            "clientSecret",
+            BASE_URL,
+            BASE_URL,
+            "redirectUrl",
+            Authorization.defaultScopes
         )
 
         sut = AuthorizationService(
-                appAuthService,
-                configuration,
-                storage
+            appAuthService,
+            configuration,
+            storage
         )
     }
 
@@ -80,22 +81,25 @@ class AuthorizationServiceTest {
 
         every { appAuthService.performTokenRequest(any(), any(), any()) } answers {
             thirdArg<net.openid.appauth.AuthorizationService.TokenResponseCallback>()
-                    .onTokenRequestCompleted(response, null)
+                .onTokenRequestCompleted(response, null)
         }
 
         val dataIntent = Intent()
         dataIntent.putExtra(APP_AUTH_INTENT_KEY, INTENT_PAYLOAD)
 
         // When
-        sut.finishLogin(dataIntent, object : AuthorizationService.Callback {
-            override fun onSuccess() {
-                assertTrue { true }
-            }
+        sut.finishLogin(
+            dataIntent,
+            object : AuthorizationService.Callback {
+                override fun onSuccess() {
+                    assertTrue { true }
+                }
 
-            override fun onError(error: Throwable) {
-                assertTrue(false, "Failed to finish login")
+                override fun onError(error: Throwable) {
+                    assertTrue(false, "Failed to finish login")
+                }
             }
-        })
+        )
         verify { storage.writeAuthState(eq(AUTH_PACKAGE), eq(AUTH_STORE_STRING)) }
     }
 
@@ -103,15 +107,18 @@ class AuthorizationServiceTest {
     fun finishLogin_shouldThrowException() {
 
         val dataIntent = Intent()
-        sut.finishLogin(dataIntent, object : AuthorizationService.Callback {
-            override fun onSuccess() {
-                assertFalse { true }
-            }
+        sut.finishLogin(
+            dataIntent,
+            object : AuthorizationService.Callback {
+                override fun onSuccess() {
+                    assertFalse { true }
+                }
 
-            override fun onError(error: Throwable) {
-                assertFalse { false }
+                override fun onError(error: Throwable) {
+                    assertFalse { false }
+                }
             }
-        })
+        )
     }
 
     @Test
@@ -198,21 +205,23 @@ class AuthorizationServiceTest {
         assertEquals(LoginActivity.authorizationListener, listener)
     }
 
-
     companion object {
         private const val USER_ALIAS = "alias"
         private const val KEY_AUTH_STATE = "care.data4life.auth.auth_state"
         private const val BASE_URL = "https://test.com"
         private const val IGNORE = "ignore"
 
-        private const val INTENT_PAYLOAD = """{"request":{"configuration":{"authorizationEndpoint":"http:\/\/192.168.10.142:8080\/authorize","tokenEndpoint":"http:\/\/192.168.10.142:8080\/token"},"clientId":"android","responseType":"code","redirectUri":"data4life:\/\/","state":"pvh0eYcyno3PycYD40V7Hw","codeVerifier":"jQ0-3_485kOHjCdX_PC8rChb99AvmYxcC4YuMc9YaVSIj3x76u8jZkmsOdcT8qR58I0a87k8seOhhBHflF6y8g","codeVerifierChallenge":"QpwewXdsKSNJipXyhDEtbJj3lAytSaxxUAqcSxGBezQ","codeVerifierChallengeMethod":"S256","additionalParameters":{},"grantType":"refresh_token","refreshToken":"mockRefreshToken"},"state":"pvh0eYcyno3PycYD40V7Hw","code":"dehvgDJnTlOrdfVj3ohvMQ","additional_parameters":{},"access_token":"mockAccessToken","refresh_token":"mockRefreshToken"}"""
+        private const val INTENT_PAYLOAD =
+            """{"request":{"configuration":{"authorizationEndpoint":"http:\/\/192.168.10.142:8080\/authorize","tokenEndpoint":"http:\/\/192.168.10.142:8080\/token"},"clientId":"android","responseType":"code","redirectUri":"data4life:\/\/","state":"pvh0eYcyno3PycYD40V7Hw","codeVerifier":"jQ0-3_485kOHjCdX_PC8rChb99AvmYxcC4YuMc9YaVSIj3x76u8jZkmsOdcT8qR58I0a87k8seOhhBHflF6y8g","codeVerifierChallenge":"QpwewXdsKSNJipXyhDEtbJj3lAytSaxxUAqcSxGBezQ","codeVerifierChallengeMethod":"S256","additionalParameters":{},"grantType":"refresh_token","refreshToken":"mockRefreshToken"},"state":"pvh0eYcyno3PycYD40V7Hw","code":"dehvgDJnTlOrdfVj3ohvMQ","additional_parameters":{},"access_token":"mockAccessToken","refresh_token":"mockRefreshToken"}"""
 
         private const val EXPECTED_ACCESS_TOKEN = "mockAccessToken"
         private const val EXPECTED_REFRESH_TOKEN = "mockRefreshToken"
         private const val APP_AUTH_INTENT_KEY = "net.openid.appauth.AuthorizationResponse"
         private const val AUTH_PACKAGE = "care.data4life.auth.auth_state"
-        private const val AUTH_STORE_STRING = """{"lastAuthorizationResponse":{"access_token":"mockAccessToken","request":{"redirectUri":"data4life:\/\/","codeVerifierChallengeMethod":"S256","responseType":"code","clientId":"android","configuration":{"tokenEndpoint":"http:\/\/192.168.10.142:8080\/token","authorizationEndpoint":"http:\/\/192.168.10.142:8080\/authorize"},"codeVerifier":"jQ0-3_485kOHjCdX_PC8rChb99AvmYxcC4YuMc9YaVSIj3x76u8jZkmsOdcT8qR58I0a87k8seOhhBHflF6y8g","codeVerifierChallenge":"QpwewXdsKSNJipXyhDEtbJj3lAytSaxxUAqcSxGBezQ","additionalParameters":{},"state":"pvh0eYcyno3PycYD40V7Hw"},"code":"dehvgDJnTlOrdfVj3ohvMQ","additional_parameters":{},"state":"pvh0eYcyno3PycYD40V7Hw"},"mLastTokenResponse":{"access_token":"mockAccessToken","request":{"redirectUri":"data4life:\/\/","clientId":"android","configuration":{"tokenEndpoint":"http:\/\/192.168.10.142:8080\/token","authorizationEndpoint":"http:\/\/192.168.10.142:8080\/authorize"},"additionalParameters":{},"grantType":"refresh_token","refreshToken":"mockRefreshToken"},"refresh_token":"mockRefreshToken","additionalParameters":{}},"refreshToken":"mockRefreshToken"}"""
-        private const val AUTH_STORE_MISSING_TOKEN = """{"lastAuthorizationResponse":{"request":{"redirectUri":"data4life:\/\/","codeVerifierChallengeMethod":"S256","responseType":"code","clientId":"android","configuration":{"tokenEndpoint":"http:\/\/192.168.10.142:8080\/token","authorizationEndpoint":"http:\/\/192.168.10.142:8080\/authorize"},"codeVerifier":"jQ0-3_485kOHjCdX_PC8rChb99AvmYxcC4YuMc9YaVSIj3x76u8jZkmsOdcT8qR58I0a87k8seOhhBHflF6y8g","codeVerifierChallenge":"QpwewXdsKSNJipXyhDEtbJj3lAytSaxxUAqcSxGBezQ","additionalParameters":{},"state":"pvh0eYcyno3PycYD40V7Hw"},"code":"dehvgDJnTlOrdfVj3ohvMQ","additional_parameters":{},"state":"pvh0eYcyno3PycYD40V7Hw"},"mLastTokenResponse":{"request":{"redirectUri":"data4life:\/\/","clientId":"android","configuration":{"tokenEndpoint":"http:\/\/192.168.10.142:8080\/token","authorizationEndpoint":"http:\/\/192.168.10.142:8080\/authorize"},"additionalParameters":{},"grantType":"refresh_token","refreshToken":"mockRefreshToken"},"additionalParameters":{}}}"""
+        private const val AUTH_STORE_STRING =
+            """{"lastAuthorizationResponse":{"access_token":"mockAccessToken","request":{"redirectUri":"data4life:\/\/","codeVerifierChallengeMethod":"S256","responseType":"code","clientId":"android","configuration":{"tokenEndpoint":"http:\/\/192.168.10.142:8080\/token","authorizationEndpoint":"http:\/\/192.168.10.142:8080\/authorize"},"codeVerifier":"jQ0-3_485kOHjCdX_PC8rChb99AvmYxcC4YuMc9YaVSIj3x76u8jZkmsOdcT8qR58I0a87k8seOhhBHflF6y8g","codeVerifierChallenge":"QpwewXdsKSNJipXyhDEtbJj3lAytSaxxUAqcSxGBezQ","additionalParameters":{},"state":"pvh0eYcyno3PycYD40V7Hw"},"code":"dehvgDJnTlOrdfVj3ohvMQ","additional_parameters":{},"state":"pvh0eYcyno3PycYD40V7Hw"},"mLastTokenResponse":{"access_token":"mockAccessToken","request":{"redirectUri":"data4life:\/\/","clientId":"android","configuration":{"tokenEndpoint":"http:\/\/192.168.10.142:8080\/token","authorizationEndpoint":"http:\/\/192.168.10.142:8080\/authorize"},"additionalParameters":{},"grantType":"refresh_token","refreshToken":"mockRefreshToken"},"refresh_token":"mockRefreshToken","additionalParameters":{}},"refreshToken":"mockRefreshToken"}"""
+        private const val AUTH_STORE_MISSING_TOKEN =
+            """{"lastAuthorizationResponse":{"request":{"redirectUri":"data4life:\/\/","codeVerifierChallengeMethod":"S256","responseType":"code","clientId":"android","configuration":{"tokenEndpoint":"http:\/\/192.168.10.142:8080\/token","authorizationEndpoint":"http:\/\/192.168.10.142:8080\/authorize"},"codeVerifier":"jQ0-3_485kOHjCdX_PC8rChb99AvmYxcC4YuMc9YaVSIj3x76u8jZkmsOdcT8qR58I0a87k8seOhhBHflF6y8g","codeVerifierChallenge":"QpwewXdsKSNJipXyhDEtbJj3lAytSaxxUAqcSxGBezQ","additionalParameters":{},"state":"pvh0eYcyno3PycYD40V7Hw"},"code":"dehvgDJnTlOrdfVj3ohvMQ","additional_parameters":{},"state":"pvh0eYcyno3PycYD40V7Hw"},"mLastTokenResponse":{"request":{"redirectUri":"data4life:\/\/","clientId":"android","configuration":{"tokenEndpoint":"http:\/\/192.168.10.142:8080\/token","authorizationEndpoint":"http:\/\/192.168.10.142:8080\/authorize"},"additionalParameters":{},"grantType":"refresh_token","refreshToken":"mockRefreshToken"},"additionalParameters":{}}}"""
         private const val AUTH_STORE_BROKEN_JSON = """{"lastAuthorizationResponse";"invalid""""
     }
 }

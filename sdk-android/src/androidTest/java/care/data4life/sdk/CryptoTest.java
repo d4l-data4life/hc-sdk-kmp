@@ -17,6 +17,8 @@
 package care.data4life.sdk;
 
 
+import androidx.test.InstrumentationRegistry;
+
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.security.ProviderInstaller;
@@ -42,7 +44,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import androidx.test.InstrumentationRegistry;
 import care.data4life.crypto.GCAESKeyAlgorithm;
 import care.data4life.crypto.GCKey;
 import care.data4life.crypto.GCSymmetricKey;

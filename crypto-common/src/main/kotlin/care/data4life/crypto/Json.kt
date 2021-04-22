@@ -17,4 +17,3 @@
 package care.data4life.crypto
 
 expect annotation class Json(val name: String)
-

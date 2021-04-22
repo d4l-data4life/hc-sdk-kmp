@@ -27,10 +27,8 @@ import org.koin.core.parameter.parametersOf
 
 class LoginView(private val alias: String) : BaseView(), KoinComponent {
 
-
     private val client: Data4LifeClient by inject { parametersOf(alias) }
     override val type: String = "login"
-
 
     override fun renderContent(): View {
         renderMessage(Message("Fetching the Authorization URL..."))
@@ -58,5 +56,4 @@ class LoginView(private val alias: String) : BaseView(), KoinComponent {
 
         return SingleMainView(alias)
     }
-
 }

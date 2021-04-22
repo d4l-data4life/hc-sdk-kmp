@@ -36,21 +36,21 @@ internal object RecordMapper : RecordFactory {
         @Suppress("UNCHECKED_CAST")
         return when (record) {
             is DecryptedFhir3Record -> Record(
-                    record.resource as Fhir3Resource,
-                    SdkDateTimeFormatter.buildMeta(record),
-                    record.annotations
+                record.resource as Fhir3Resource,
+                SdkDateTimeFormatter.buildMeta(record),
+                record.annotations
             )
             is DecryptedFhir4Record -> Fhir4Record(
-                    record.identifier ?: "",//FIXME
-                    record.resource as Fhir4Resource,
-                    SdkDateTimeFormatter.buildMeta(record),
-                    record.annotations
+                record.identifier ?: "", // FIXME
+                record.resource as Fhir4Resource,
+                SdkDateTimeFormatter.buildMeta(record),
+                record.annotations
             )
             is DecryptedCustomDataRecord -> DataRecord(
-                    record.identifier ?: "",//FIXME
-                    record.resource,
-                    SdkDateTimeFormatter.buildMeta(record),
-                    record.annotations
+                record.identifier ?: "", // FIXME
+                record.resource,
+                SdkDateTimeFormatter.buildMeta(record),
+                record.annotations
             )
             else -> throw CoreRuntimeException.InternalFailure()
         } as BaseRecord<T>

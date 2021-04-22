@@ -38,10 +38,14 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
-import java.util.*
+import java.util.Locale
 
 class FhirServiceTest {
-    private val parseException = FhirException(FhirException.ErrorType.DECODE, FhirException.ErrorCode.FAILED_TO_PARSE_JSON, "")
+    private val parseException = FhirException(
+        FhirException.ErrorType.DECODE,
+        FhirException.ErrorCode.FAILED_TO_PARSE_JSON,
+        ""
+    )
     private val unkwnownException = RuntimeException()
     private val fhirClass: Class<*> = DocumentReference::class.java
     private val fhirType = DocumentReference.resourceType
@@ -77,12 +81,14 @@ class FhirServiceTest {
 
     @Test
     @Throws(FhirException::class)
-    fun `Given encryptResource is called with a Fhir3Resource, it encrypts it`() {//encryptResource_shouldReturnEncryptedResource
+    fun `Given encryptResource is called with a Fhir3Resource, it encrypts it`() { // encryptResource_shouldReturnEncryptedResource
         // given
         val resource = Fhir3Resource()
 
         every { SdkFhirParser.fromResource(resource) } returns JSON_RESOURCE
-        every { cryptoService.encryptAndEncodeString(dataKey, JSON_RESOURCE) } returns Single.just(ENCRYPTED_RESOURCE)
+        every { cryptoService.encryptAndEncodeString(dataKey, JSON_RESOURCE) } returns Single.just(
+            ENCRYPTED_RESOURCE
+        )
 
         // when
         val result = _fhirService._encryptResource(dataKey, resource)
@@ -93,12 +99,14 @@ class FhirServiceTest {
 
     @Test
     @Throws(FhirException::class)
-    fun `Given encryptResource is called with a Fhir4Resource, it encrypts it`() {//encryptResource_shouldReturnEncryptedResource
+    fun `Given encryptResource is called with a Fhir4Resource, it encrypts it`() { // encryptResource_shouldReturnEncryptedResource
         // given
         val resource = Fhir4Resource()
 
         every { SdkFhirParser.fromResource(resource) } returns JSON_RESOURCE
-        every { cryptoService.encryptAndEncodeString(dataKey, JSON_RESOURCE) } returns Single.just(ENCRYPTED_RESOURCE)
+        every { cryptoService.encryptAndEncodeString(dataKey, JSON_RESOURCE) } returns Single.just(
+            ENCRYPTED_RESOURCE
+        )
 
         // when
         val result = _fhirService._encryptResource(dataKey, resource)
@@ -109,7 +117,7 @@ class FhirServiceTest {
 
     @Test
     @Throws(FhirException::class)
-    fun `Given encryptResource is called with a DataResource, it encrypts it`() {//encryptResource_shouldReturnEncryptedResource
+    fun `Given encryptResource is called with a DataResource, it encrypts it`() { // encryptResource_shouldReturnEncryptedResource
         // Given
         val raw = ByteArray(1)
         val resource = DataResource(raw)
@@ -119,8 +127,8 @@ class FhirServiceTest {
 
         every {
             cryptoService.encrypt(
-                    dataKey,
-                    raw
+                dataKey,
+                raw
             )
         } returns Single.just(encrypted)
         every { Base64.encodeToString(encrypted) } returns encoded
@@ -134,7 +142,7 @@ class FhirServiceTest {
 
     @Test
     @Throws(FhirException::class)
-    fun `Given, encryptResource is called with a FhirResource, it fails on a Parser Error`() {//encryptResource_shouldThrowException_whenParseErrorHappens() {
+    fun `Given, encryptResource is called with a FhirResource, it fails on a Parser Error`() { // encryptResource_shouldThrowException_whenParseErrorHappens() {
         // given
         val resource = Fhir3Resource()
 
@@ -156,12 +164,17 @@ class FhirServiceTest {
 
     @Test
     @Throws(FhirException::class)
-    fun `Given, encryptResource is called with a FhirResource, it fails on a Encryption Error`() {//encryptResource_shouldThrowException_whenEncryptErrorHappens() {
+    fun `Given, encryptResource is called with a FhirResource, it fails on a Encryption Error`() { // encryptResource_shouldThrowException_whenEncryptErrorHappens() {
         // given
         val resource = Fhir3Resource()
 
         every { SdkFhirParser.fromResource(resource) } returns JSON_RESOURCE
-        every { cryptoService.encryptAndEncodeString(dataKey, JSON_RESOURCE) } throws unkwnownException
+        every {
+            cryptoService.encryptAndEncodeString(
+                dataKey,
+                JSON_RESOURCE
+            )
+        } throws unkwnownException
 
         try {
             // when
@@ -181,17 +194,22 @@ class FhirServiceTest {
     @Throws(FhirException::class)
     fun `Given, decryptResource is called with a DataKey, a Type, Tags and a encrypted Fhir3Resource, it decrypts it`() { // decryptResource_shouldReturnResource() {
         // Given
-        every { cryptoService.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE) } returns Single.just(JSON_RESOURCE)
+        every {
+            cryptoService.decodeAndDecryptString(
+                dataKey,
+                ENCRYPTED_RESOURCE
+            )
+        } returns Single.just(JSON_RESOURCE)
         every { SdkFhirParser.toFhir3(fhirType, JSON_RESOURCE) } returns mockDocumentReference
 
         // When
         val resource = _fhirService.decryptResource<Fhir3Resource>(
-                dataKey,
-                hashMapOf(
-                        TAG_FHIR_VERSION to FhirContract.FhirVersion.FHIR_3.version,
-                        TAG_RESOURCE_TYPE to fhirType
-                ),
-                ENCRYPTED_RESOURCE
+            dataKey,
+            hashMapOf(
+                TAG_FHIR_VERSION to FhirContract.FhirVersion.FHIR_3.version,
+                TAG_RESOURCE_TYPE to fhirType
+            ),
+            ENCRYPTED_RESOURCE
         )
 
         // Then
@@ -204,17 +222,22 @@ class FhirServiceTest {
         val decrypted = mockk<Fhir4Resource>()
 
         // Given
-        every { cryptoService.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE) } returns Single.just(JSON_RESOURCE)
+        every {
+            cryptoService.decodeAndDecryptString(
+                dataKey,
+                ENCRYPTED_RESOURCE
+            )
+        } returns Single.just(JSON_RESOURCE)
         every { SdkFhirParser.toFhir4(fhirType, JSON_RESOURCE) } returns decrypted
 
         // When
         val resource = _fhirService.decryptResource<Fhir4Resource>(
-                dataKey,
-                hashMapOf(
-                        TAG_FHIR_VERSION to FhirContract.FhirVersion.FHIR_4.version,
-                        TAG_RESOURCE_TYPE to fhirType
-                ),
-                ENCRYPTED_RESOURCE
+            dataKey,
+            hashMapOf(
+                TAG_FHIR_VERSION to FhirContract.FhirVersion.FHIR_4.version,
+                TAG_RESOURCE_TYPE to fhirType
+            ),
+            ENCRYPTED_RESOURCE
         )
 
         // Then
@@ -233,9 +256,9 @@ class FhirServiceTest {
 
         // When
         val resource = _fhirService.decryptResource<DataResource>(
-                dataKey,
-                hashMapOf(TAG_APPDATA_KEY to TAG_APPDATA_VALUE),
-                ENCRYPTED_RESOURCE
+            dataKey,
+            hashMapOf(TAG_APPDATA_KEY to TAG_APPDATA_VALUE),
+            ENCRYPTED_RESOURCE
         )
 
         // Then
@@ -243,24 +266,29 @@ class FhirServiceTest {
     }
 
     @Test
-    fun `Given, decryptResource is called with a DataKey, a Type, Tags and a encrypted FhirResource, it fails on a CryptoError`() { //decryptResource_shouldThrowException_whenDecryptErrorHappens() {
+    fun `Given, decryptResource is called with a DataKey, a Type, Tags and a encrypted FhirResource, it fails on a CryptoError`() { // decryptResource_shouldThrowException_whenDecryptErrorHappens() {
         // given
-        every { cryptoService.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE) } throws unkwnownException
+        every {
+            cryptoService.decodeAndDecryptString(
+                dataKey,
+                ENCRYPTED_RESOURCE
+            )
+        } throws unkwnownException
 
         try {
             // when
             _fhirService.decryptResource<DataResource>(
-                    dataKey,
-                    hashMapOf(
-                            TAG_FHIR_VERSION to FhirContract.FhirVersion.FHIR_4.version,
-                            TAG_RESOURCE_TYPE to fhirType
-                    ),
-                    ENCRYPTED_RESOURCE
+                dataKey,
+                hashMapOf(
+                    TAG_FHIR_VERSION to FhirContract.FhirVersion.FHIR_4.version,
+                    TAG_RESOURCE_TYPE to fhirType
+                ),
+                ENCRYPTED_RESOURCE
             )
             Assert.fail("Exception expected")
         } catch (e: RuntimeException) {
 
-            //Then
+            // Then
             val firstException = e.cause!!.cause as RuntimeException?
             Truth.assertThat(firstException).isEqualTo(unkwnownException)
             Truth.assertThat(e.cause).isInstanceOf(DecryptionFailed::class.java)
@@ -270,25 +298,30 @@ class FhirServiceTest {
 
     @Test
     @Throws(FhirException::class)
-    fun `Given, decryptResource is called with a DataKey, a Type, Tags and a encrypted FhirResource, it fails on a ParserError`() {//decryptResource_shouldThrowException_whenParseErrorHappens() {
+    fun `Given, decryptResource is called with a DataKey, a Type, Tags and a encrypted FhirResource, it fails on a ParserError`() { // decryptResource_shouldThrowException_whenParseErrorHappens() {
         // given
-        every { cryptoService.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE) } returns Single.just(JSON_RESOURCE)
+        every {
+            cryptoService.decodeAndDecryptString(
+                dataKey,
+                ENCRYPTED_RESOURCE
+            )
+        } returns Single.just(JSON_RESOURCE)
         every { SdkFhirParser.fromResource(JSON_RESOURCE) } throws parseException
 
         try {
             // when
             _fhirService.decryptResource<DataResource>(
-                    dataKey,
-                    hashMapOf(
-                            TAG_FHIR_VERSION to FhirContract.FhirVersion.FHIR_4.version,
-                            TAG_RESOURCE_TYPE to fhirType
-                    ),
-                    ENCRYPTED_RESOURCE
+                dataKey,
+                hashMapOf(
+                    TAG_FHIR_VERSION to FhirContract.FhirVersion.FHIR_4.version,
+                    TAG_RESOURCE_TYPE to fhirType
+                ),
+                ENCRYPTED_RESOURCE
             )
             Assert.fail("Exception expected")
         } catch (e: RuntimeException) {
 
-            //Then
+            // Then
             val firstExc = e.cause!!.cause as FhirException?
             Truth.assertThat(firstExc).isEqualTo(parseException)
             Truth.assertThat(e.cause).isInstanceOf(DecryptionFailed::class.java)
@@ -312,11 +345,14 @@ class FhirServiceTest {
     @Throws(FhirException::class)
     fun legacy_decryptResource_shouldReturnResource() {
         // Given
-        Mockito.`when`(mockCryptoService.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE)).thenReturn(Single.just(JSON_RESOURCE))
-        Mockito.`when`<Any>(mockFhirParser.toFhir(fhirClass, JSON_RESOURCE)).thenReturn(mockDocumentReference)
+        Mockito.`when`(mockCryptoService.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE))
+            .thenReturn(Single.just(JSON_RESOURCE))
+        Mockito.`when`<Any>(mockFhirParser.toFhir(fhirClass, JSON_RESOURCE))
+            .thenReturn(mockDocumentReference)
 
         // When
-        val resource = fhirService.decryptResource<Fhir3Resource>(dataKey, fhirType, ENCRYPTED_RESOURCE)
+        val resource =
+            fhirService.decryptResource<Fhir3Resource>(dataKey, fhirType, ENCRYPTED_RESOURCE)
 
         // Then
         Truth.assertThat(resource).isEqualTo(mockDocumentReference)
@@ -329,14 +365,19 @@ class FhirServiceTest {
     @Test
     fun legacy_decryptResource_shouldThrowException_whenDecryptErrorHappens() {
         // given
-        Mockito.`when`(mockCryptoService.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE)).thenThrow(unkwnownException)
+        Mockito.`when`(mockCryptoService.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE))
+            .thenThrow(unkwnownException)
         try {
             // when
-            fhirService.decryptResource<Fhir3Resource>(dataKey, DocumentReference.resourceType, ENCRYPTED_RESOURCE)
+            fhirService.decryptResource<Fhir3Resource>(
+                dataKey,
+                DocumentReference.resourceType,
+                ENCRYPTED_RESOURCE
+            )
             Assert.fail("Exception expected")
         } catch (e: RuntimeException) {
 
-            //Then
+            // Then
             val firstException = e.cause!!.cause as RuntimeException?
             Truth.assertThat(firstException).isEqualTo(unkwnownException)
             Truth.assertThat(e.cause).isInstanceOf(DecryptionFailed::class.java)
@@ -351,15 +392,21 @@ class FhirServiceTest {
     @Throws(FhirException::class)
     fun legacy_decryptResource_shouldThrowException_whenParseErrorHappens() {
         // given
-        Mockito.`when`(mockCryptoService.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE)).thenReturn(Single.just(JSON_RESOURCE))
-        Mockito.`when`<Any>(mockFhirParser.toFhir(DocumentReference::class.java, JSON_RESOURCE)).thenThrow(parseException)
+        Mockito.`when`(mockCryptoService.decodeAndDecryptString(dataKey, ENCRYPTED_RESOURCE))
+            .thenReturn(Single.just(JSON_RESOURCE))
+        Mockito.`when`<Any>(mockFhirParser.toFhir(DocumentReference::class.java, JSON_RESOURCE))
+            .thenThrow(parseException)
         try {
             // when
-            fhirService.decryptResource<Fhir3Resource>(dataKey, DocumentReference.resourceType, ENCRYPTED_RESOURCE)
+            fhirService.decryptResource<Fhir3Resource>(
+                dataKey,
+                DocumentReference.resourceType,
+                ENCRYPTED_RESOURCE
+            )
             Assert.fail("Exception expected")
         } catch (e: RuntimeException) {
 
-            //Then
+            // Then
             val firstExc = e.cause!!.cause as FhirException?
             Truth.assertThat(firstExc).isEqualTo(parseException)
             Truth.assertThat(e.cause).isInstanceOf(DecryptionFailed::class.java)

@@ -31,7 +31,11 @@ internal class Fhir4RecordClient(
     private val handler: CallHandler
 ) : SdkContract.Fhir4RecordClient {
 
-    override fun <T : Fhir4Resource> create(resource: T, annotations: List<String>, callback: Callback<Fhir4Record<T>>): Task {
+    override fun <T : Fhir4Resource> create(
+        resource: T,
+        annotations: List<String>,
+        callback: Callback<Fhir4Record<T>>
+    ): Task {
         val operation = userService.finishLogin(true)
             .flatMap { userService.userID }
             .flatMap { uid -> recordService.createRecord(uid, resource, annotations) }
@@ -57,7 +61,10 @@ internal class Fhir4RecordClient(
         return handler.executeSingle(operation, callback)
     }
 
-    override fun <T : Fhir4Resource> fetch(recordId: String, callback: Callback<Fhir4Record<T>>): Task {
+    override fun <T : Fhir4Resource> fetch(
+        recordId: String,
+        callback: Callback<Fhir4Record<T>>
+    ): Task {
         val operation = userService.finishLogin(true)
             .flatMap { userService.userID }
             .flatMap { uid -> recordService.fetchFhir4Record<T>(uid, recordId) }

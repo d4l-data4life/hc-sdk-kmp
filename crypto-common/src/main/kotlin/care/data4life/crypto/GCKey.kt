@@ -19,23 +19,27 @@ package care.data4life.crypto
 import care.data4life.crypto.security.SecretKeySpec
 import care.data4life.sdk.util.Base64
 
-class GCKey(val algorithm: GCAESKeyAlgorithm,
-            private var symmetricKey: GCSymmetricKey?,
-            val keyVersion: Int) {
-
+class GCKey(
+    val algorithm: GCAESKeyAlgorithm,
+    private var symmetricKey: GCSymmetricKey?,
+    val keyVersion: Int
+) {
 
     @Json("key")
     private var keyBase64: String? = null
 
-
     fun getSymmetricKey(): GCSymmetricKey {
         return symmetricKey
-                ?: GCSymmetricKey(SecretKeySpec(Base64.decode(keyBase64!!), algorithm.transformation)).also { symmetricKey = it }
+            ?: GCSymmetricKey(
+                SecretKeySpec(
+                    Base64.decode(keyBase64!!),
+                    algorithm.transformation
+                )
+            ).also { symmetricKey = it }
     }
 
     fun getKeyBase64(): String = keyBase64
-            ?: Base64.encodeToString(symmetricKey!!.value.getEncoded()).also { keyBase64 = it }
-
+        ?: Base64.encodeToString(symmetricKey!!.value.getEncoded()).also { keyBase64 = it }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -54,5 +58,4 @@ class GCKey(val algorithm: GCAESKeyAlgorithm,
         result = 31 * result + (keyVersion)
         return result
     }
-
 }

@@ -17,7 +17,6 @@
 package care.data4life.sdk;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 

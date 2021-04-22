@@ -27,12 +27,12 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.format.DateTimeFormatter;
 
 import java.util.Locale;
-
-import androidx.annotation.Nullable;
 
 public class FilterDialog extends DialogFragment {
 

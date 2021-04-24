@@ -21,6 +21,7 @@ import care.data4life.sdk.ApiService
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.network.model.NetworkModelContract.EncryptedRecord
 import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
 import care.data4life.sdk.tag.TagEncryptionHelper
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.TaggingContract.Companion.ANNOTATION_KEY
@@ -41,7 +42,7 @@ class RecordCompatibilityService internal constructor(
     private fun encrypt(
         plainTags: Tags,
         plainAnnotations: Annotations
-    ): Pair<List<String>, List<String>> {
+    ): Pair<EncryptedTagsAndAnnotations, EncryptedTagsAndAnnotations> {
         val tagEncryptionKey = cryptoService.fetchTagEncryptionKey()
         return Pair(
             tagEncryptionService.encryptTagsAndAnnotations(

@@ -51,7 +51,7 @@ class RecordServiceCountRecordsTest {
     private val errorHandler: SdkContract.ErrorHandler = mockk()
 
     private val tags: Tags = mockk()
-    private val defaultAnnotations: List<String> = emptyList()
+    private val defaultAnnotations: Annotations = emptyList()
     private val compatibilityService: MigrationContract.CompatibilityService = mockk()
 
     @Before

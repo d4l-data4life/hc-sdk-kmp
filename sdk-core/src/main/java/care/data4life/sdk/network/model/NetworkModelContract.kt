@@ -21,6 +21,7 @@ import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
 import care.data4life.sdk.tag.Tags
 
 class NetworkModelContract {
@@ -105,7 +106,7 @@ class NetworkModelContract {
     interface EncryptedRecord {
         val commonKeyId: String
         val identifier: String?
-        val encryptedTags: List<String>
+        val encryptedTags: EncryptedTagsAndAnnotations
         val encryptedBody: String?
         val customCreationDate: String?
         val encryptedDataKey: EncryptedKey

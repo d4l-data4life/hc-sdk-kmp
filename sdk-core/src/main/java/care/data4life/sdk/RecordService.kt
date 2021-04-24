@@ -695,8 +695,10 @@ class RecordService internal constructor(
 
     @Throws(IOException::class)
     internal fun <T : Any> encryptRecord(record: DecryptedBaseRecord<T>): NetworkModelContract.EncryptedRecord {
-        val encryptedTags =
-            tagEncryptionService.encryptTagsAndAnnotations(record.tags!!, record.annotations)
+        val encryptedTags = tagEncryptionService.encryptTagsAndAnnotations(
+            record.tags!!,
+            record.annotations
+        )
 
         val commonKey = cryptoService.fetchCurrentCommonKey()
         val currentCommonKeyId = cryptoService.currentCommonKeyId

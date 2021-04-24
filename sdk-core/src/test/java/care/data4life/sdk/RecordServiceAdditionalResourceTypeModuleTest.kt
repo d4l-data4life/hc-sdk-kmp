@@ -30,6 +30,7 @@ import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ADDITIONAL_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
@@ -90,7 +91,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
     private val taggingService: TaggingContract.Service = mockk()
     private val attachmentService: AttachmentContract.Service = mockk()
     private val errorHandler: SdkContract.ErrorHandler = mockk()
-    private val defaultAnnotations: List<String> = emptyList()
+    private val defaultAnnotations: Annotations = emptyList()
 
     private val modelVersion = -1
 

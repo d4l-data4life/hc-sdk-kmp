@@ -36,6 +36,7 @@ import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.fake.CryptoServiceFake
 import care.data4life.sdk.test.fake.CryptoServiceIteration
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
@@ -234,7 +235,7 @@ class RecordServiceUpdateRecordModuleTest {
     }
 
     private fun mergeTags(
-        tags: Map<String, String>,
+        tags: Tags,
         oldTags: Map<String, String>?
     ): Pair<List<String>, List<String>> {
         val allTags = mutableListOf<String>()
@@ -256,7 +257,7 @@ class RecordServiceUpdateRecordModuleTest {
     private fun runFhirFlow(
         serializedResourceOld: String,
         serializedResourceNew: String,
-        tags: Map<String, String>,
+        tags: Tags,
         annotations: Annotations = emptyList(),
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,
@@ -318,7 +319,7 @@ class RecordServiceUpdateRecordModuleTest {
         serializedResourceOld: String,
         serializedResourceNew: String,
         attachmentData: ByteArray,
-        tags: Map<String, String>,
+        tags: Tags,
         annotations: Annotations = emptyList(),
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,
@@ -391,7 +392,7 @@ class RecordServiceUpdateRecordModuleTest {
     private fun runDataFlow(
         serializedResourceOld: String,
         serializedResourceNew: String,
-        tags: Map<String, String>,
+        tags: Tags,
         annotations: Annotations = emptyList(),
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,

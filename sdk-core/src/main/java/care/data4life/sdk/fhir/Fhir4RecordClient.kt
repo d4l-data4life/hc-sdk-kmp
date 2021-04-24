@@ -24,8 +24,8 @@ import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.call.Task
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.record.RecordContract
-import io.reactivex.Single
 import care.data4life.sdk.tag.Annotations
+import io.reactivex.Single
 import org.threeten.bp.LocalDate
 
 internal class Fhir4RecordClient(

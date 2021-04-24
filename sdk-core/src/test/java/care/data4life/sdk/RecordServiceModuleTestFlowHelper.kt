@@ -28,6 +28,7 @@ import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.util.GenericTestDataProvider.DATE_FORMATTER
 import care.data4life.sdk.test.util.GenericTestDataProvider.DATE_TIME_FORMATTER
 import care.data4life.sdk.util.Base64
@@ -66,9 +67,7 @@ class RecordServiceModuleTestFlowHelper(
             .toLowerCase()
     }
 
-    fun prepareTags(
-        tags: Map<String, String>
-    ): List<String> {
+    fun prepareTags(tags: Tags): List<String> {
         val encodedTags = mutableListOf<String>()
         tags.forEach { (key, value) ->
             encodedTags.add("$key=${encode(value)}")
@@ -83,7 +82,7 @@ class RecordServiceModuleTestFlowHelper(
     ): String = "${key.toLowerCase()}=${value.toLowerCase()}"
 
     fun prepareCompatibilityTags(
-        tags: Map<String, String>
+        tags: Tags
     ): Pair<List<String>, List<String>> {
         val encodedTags = prepareTags(tags)
         val legacyTags = tags.map { (key, value) -> prepareLegacyTag(key, value) }

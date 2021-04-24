@@ -40,8 +40,8 @@ class TaggingService(
     private fun appendCommonDefaultTags(
         resourceType: String?,
         oldTags: Tags?
-    ): Tags {
-        val tags = hashMapOf<String, String>()
+    ): MutableMap<String, String> {
+        val tags = mutableMapOf<String, String>()
         if (oldTags != null && oldTags.isNotEmpty()) {
             tags.putAll(oldTags)
         }
@@ -82,7 +82,7 @@ class TaggingService(
     }
 
     private fun tagVersion(
-        tags: Tags,
+        tags: MutableMap<String, String>,
         version: FhirContract.FhirVersion
     ) {
         if (version == FhirContract.FhirVersion.UNKNOWN) {
@@ -95,7 +95,7 @@ class TaggingService(
     override fun getTagsFromType(
         resourceType: Class<out Any>
     ): Tags {
-        return hashMapOf<String, String>().also { tags ->
+        return mutableMapOf<String, String>().also { tags ->
             val version = fhirElementFactory.resolveFhirVersion(resourceType)
             tagVersion(tags, version)
 

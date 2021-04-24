@@ -62,7 +62,7 @@ class RecordServiceCryptoTest {
     private val taggingService: TaggingContract.Service = mockk()
     private val attachmentService: AttachmentContract.Service = mockk()
     private val errorHandler: SdkContract.ErrorHandler = mockk()
-    private val tags: Tags = hashMapOf(
+    private val tags: Tags = mapOf(
         "potato" to "soup",
         "resourcetype" to "pumpkin"
     )

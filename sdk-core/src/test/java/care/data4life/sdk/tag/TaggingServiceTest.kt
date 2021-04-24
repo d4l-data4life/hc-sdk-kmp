@@ -109,7 +109,7 @@ class TaggingServiceTest {
     fun `Given, appendDefaultTags is called with a Resource and old Tags, it preserves the existing Tag and updates the Type`() { // annotatedTag_shouldPreserveExistingTagsAndUpdate
         // Given
         val type = Fhir3Resource()
-        val existingTags = HashMap<String, String>()
+        val existingTags = mutableMapOf<String, String>()
         existingTags["tag_1_key"] = "tag_1_value"
         existingTags["tag_2_key"] = "tag_2_value"
         existingTags[TAG_RESOURCE_TYPE] = "old_typ"
@@ -136,7 +136,7 @@ class TaggingServiceTest {
     fun `Given, appendDefaultTags is called with a Resource and old Tags, sets UpdatedByClient Tag, if the TAG_CLIENT Tag is present`() { // annotatedTag_shouldSetUpdatedByClientTag_whenClientAlreadySet
         // Given
         val type = Fhir3Resource()
-        val existingTags = HashMap<String, String>()
+        val existingTags = mutableMapOf<String, String>()
         existingTags[TAG_CLIENT] = OTHER_CLIENT_ID
 
         // When

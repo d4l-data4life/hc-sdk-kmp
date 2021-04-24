@@ -21,7 +21,7 @@ import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.migration.Migration
 import java.io.IOException
 
-typealias Tags = HashMap<String, String>
+typealias Tags = Map<String, String>
 typealias Annotations = List<String>
 typealias EncryptedTagsAndAnnotations = List<String>
 

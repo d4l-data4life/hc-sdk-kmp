@@ -18,7 +18,7 @@ package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelContract
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.wrapper.WrapperContract.DateTimeFormatter.Companion.DATE_FORMAT
 import care.data4life.sdk.wrapper.WrapperContract.DateTimeFormatter.Companion.DATE_TIME_FORMAT
 import org.threeten.bp.LocalDate

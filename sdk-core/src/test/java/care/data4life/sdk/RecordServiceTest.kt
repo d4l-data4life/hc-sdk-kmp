@@ -32,9 +32,9 @@ import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.network.model.EncryptedRecord
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
-import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS

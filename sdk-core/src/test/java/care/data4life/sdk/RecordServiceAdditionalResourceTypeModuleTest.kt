@@ -29,7 +29,7 @@ import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.EncryptedRecord
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ADDITIONAL_ID

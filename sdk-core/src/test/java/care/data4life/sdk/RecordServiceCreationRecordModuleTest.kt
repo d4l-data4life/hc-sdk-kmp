@@ -31,6 +31,7 @@ import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
+import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
@@ -61,6 +62,7 @@ import care.data4life.sdk.wrapper.SdkFhirParser
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Ignore
@@ -134,13 +136,18 @@ class RecordServiceCreationRecordModuleTest {
         encryptedReceivedRecord: EncryptedRecord,
         receivedIteration: CryptoServiceIteration
     ) {
+        val actualRecord = slot<NetworkModelContract.EncryptedRecord>()
         (cryptoService as CryptoServiceFake).iteration = uploadIteration
 
         every {
-            apiService.createRecord(alias, userId, eq(encryptedUploadRecord))
+            apiService.createRecord(alias, userId, capture(actualRecord))
         } answers {
-            Single.just(encryptedReceivedRecord).also {
-                (cryptoService as CryptoServiceFake).iteration = receivedIteration
+            if (flowHelper.compareEncryptedRecords(actualRecord.captured, encryptedUploadRecord)) {
+                Single.just(encryptedReceivedRecord).also {
+                    (cryptoService as CryptoServiceFake).iteration = receivedIteration
+                }
+            } else {
+                throw RuntimeException("Unexpected encrypted record\n${actualRecord.captured}")
             }
         }
     }

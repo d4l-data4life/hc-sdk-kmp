@@ -31,6 +31,7 @@ import care.data4life.sdk.network.model.DecryptedDataRecord
 import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.EncryptedRecord
+import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
@@ -364,7 +365,7 @@ class RecordServiceUpdateRecordTest {
         val receivedRecord: EncryptedRecord = mockk()
         val receivedDecryptedRecord: DecryptedRecord<Fhir3Resource> = mockk(relaxed = true)
         val record: Record<Fhir3Resource> = mockk()
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
         val identifier = "id"
 
         every { receivedDecryptedRecord.identifier } returns identifier
@@ -454,7 +455,7 @@ class RecordServiceUpdateRecordTest {
         val receivedRecord: EncryptedRecord = mockk()
         val receivedDecryptedRecord: DecryptedR4Record<Fhir4Resource> = mockk(relaxed = true)
         val record: Fhir4Record<Fhir4Resource> = mockk()
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
         val identifier = "id"
 
         every { receivedDecryptedRecord.identifier } returns identifier
@@ -544,7 +545,7 @@ class RecordServiceUpdateRecordTest {
         val receivedRecord: EncryptedRecord = mockk()
         val receivedDecryptedRecord: DecryptedDataRecord = mockk(relaxed = true)
         val record: DataRecord<DataResource> = mockk()
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
 
         every {
             apiService.fetchRecord(

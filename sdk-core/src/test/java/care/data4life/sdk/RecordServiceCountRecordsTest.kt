@@ -23,7 +23,9 @@ import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.migration.MigrationContract
+import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
@@ -48,7 +50,7 @@ class RecordServiceCountRecordsTest {
     private val attachmentService: AttachmentContract.Service = mockk()
     private val errorHandler: SdkContract.ErrorHandler = mockk()
 
-    private val tags: HashMap<String, String> = mockk()
+    private val tags: Tags = mockk()
     private val defaultAnnotations: List<String> = emptyList()
     private val compatibilityService: MigrationContract.CompatibilityService = mockk()
 
@@ -77,7 +79,7 @@ class RecordServiceCountRecordsTest {
     fun `Given, countFhir3Records is called with a Fhir3Resource, a UserId and Annotations, it returns amount of occurrences`() {
         // Given
         val expected = 42
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
 
         every { taggingService.getTagsFromType(Fhir3Resource::class.java as Class<Any>) } returns tags
         every {
@@ -116,7 +118,7 @@ class RecordServiceCountRecordsTest {
     fun `Given, countFhir4Records is called with a Fhir4Resource, a UserId and Annotations, it returns amount of occurrences`() {
         // Given
         val expected = 42
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
 
         every { taggingService.getTagsFromType(Fhir4Resource::class.java as Class<Any>) } returns tags
         every {
@@ -155,7 +157,7 @@ class RecordServiceCountRecordsTest {
     fun `Given, countAllFhir3Records is called, with a UserId and Annotations, it delegates to the call to countFhir3Records with a Fhir3Resource as typeResource`() {
         // Given
         val expected = 42
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
 
         every {
             recordService.countFhir3Records(Fhir3Resource::class.java, USER_ID, annotations)
@@ -233,7 +235,7 @@ class RecordServiceCountRecordsTest {
         // Given
         val resourceType = Patient::class.java
         val expected = 23
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
 
         every {
             recordService.countFhir3Records(
@@ -311,7 +313,7 @@ class RecordServiceCountRecordsTest {
     fun `Given, countRecords is called, with a null as resourceType, a UserId and Annotations, it delegate its call to countAllFhir3Records`() {
         // Given
         val expected = 23
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
 
         every {
             recordService.countAllFhir3Records(

@@ -21,6 +21,7 @@ import care.data4life.crypto.GCKeyPair
 import care.data4life.crypto.KeyType
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.network.model.EncryptedKey
+import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.test.util.GenericTestDataProvider.COMMON_KEY_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.IV
 import io.mockk.clearAllMocks
@@ -627,7 +628,7 @@ class CryptoServiceFakeTest {
     fun `Given, a CryptoServiceIteration is set and symEncrypt is called, it fails, if tag or annotation is unknown`() {
         // Given
         val tags: List<String> = emptyList()
-        val annotations: List<String> = emptyList()
+        val annotations: Annotations = emptyList()
         val tagEncryptionKey: GCKey = mockk()
 
         every { iteration.tags } returns tags
@@ -656,7 +657,7 @@ class CryptoServiceFakeTest {
         // Given
         val tag = "a"
         val tags: List<String> = listOf(tag)
-        val annotations: List<String> = emptyList()
+        val annotations: Annotations = emptyList()
         val tagEncryptionKey: GCKey = mockk()
 
         every { iteration.tags } returns tags
@@ -685,7 +686,7 @@ class CryptoServiceFakeTest {
         // Given
         val tag = "a"
         val tags: List<String> = listOf(tag)
-        val annotations: List<String> = emptyList()
+        val annotations: Annotations = emptyList()
         val tagEncryptionKey: GCKey = mockk()
 
         every { iteration.tags } returns tags
@@ -714,7 +715,7 @@ class CryptoServiceFakeTest {
         // Given
         val tag = "a"
         val tags: List<String> = listOf(tag)
-        val annotations: List<String> = emptyList()
+        val annotations: Annotations = emptyList()
         val tagEncryptionKey: GCKey = mockk()
         val hashed = "Jo"
         var hashParameter = ""
@@ -747,7 +748,7 @@ class CryptoServiceFakeTest {
         // Given
         val annotation = "a"
         val tags: List<String> = emptyList()
-        val annotations: List<String> = listOf(annotation)
+        val annotations: Annotations = listOf(annotation)
         val tagEncryptionKey: GCKey = mockk()
         val hashed = "Jo"
         var hashParameter = ""
@@ -779,7 +780,7 @@ class CryptoServiceFakeTest {
     fun `Given, a CryptoServiceIteration is set and symDecrypt is called, it fails, if tag or annotation is unknown`() {
         // Given
         val tags: List<String> = emptyList()
-        val annotations: List<String> = emptyList()
+        val annotations: Annotations = emptyList()
         val tagEncryptionKey: GCKey = mockk()
 
         every { iteration.tags } returns tags
@@ -808,7 +809,7 @@ class CryptoServiceFakeTest {
         // Given
         val tag = "a"
         val tags: List<String> = listOf(tag)
-        val annotations: List<String> = emptyList()
+        val annotations: Annotations = emptyList()
         val tagEncryptionKey: GCKey = mockk()
 
         every { iteration.tags } returns tags
@@ -837,7 +838,7 @@ class CryptoServiceFakeTest {
         // Given
         val tag = "a"
         val tags: List<String> = listOf(tag)
-        val annotations: List<String> = emptyList()
+        val annotations: Annotations = emptyList()
         val tagEncryptionKey: GCKey = mockk()
 
         every { iteration.tags } returns tags
@@ -866,7 +867,7 @@ class CryptoServiceFakeTest {
         // Given
         val tag = "a"
         val tags: List<String> = listOf(tag)
-        val annotations: List<String> = emptyList()
+        val annotations: Annotations = emptyList()
         val tagEncryptionKey: GCKey = mockk()
         val hashed = "Jo"
         val hashFunction = { _: String -> hashed }
@@ -894,7 +895,7 @@ class CryptoServiceFakeTest {
         // Given
         val annotation = "a"
         val tags: List<String> = emptyList()
-        val annotations: List<String> = listOf(annotation)
+        val annotations: Annotations = listOf(annotation)
         val tagEncryptionKey: GCKey = mockk()
         val hashed = "Jo"
         val hashFunction = { _: String -> hashed }

@@ -94,7 +94,7 @@ class TaggingService(
 
     override fun getTagsFromType(
         resourceType: Class<out Any>
-    ): HashMap<String, String> {
+    ): Tags {
         return hashMapOf<String, String>().also { tags ->
             val version = fhirElementFactory.resolveFhirVersion(resourceType)
             tagVersion(tags, version)

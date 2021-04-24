@@ -33,6 +33,7 @@ import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
 import care.data4life.sdk.test.fake.CryptoServiceFake
@@ -158,7 +159,7 @@ class RecordServiceUpdateRecordModuleTest {
         serializedResourceOld: String,
         serializedResourceNew: String,
         tags: List<String>,
-        annotations: List<String>,
+        annotations: Annotations,
         useStoredCommonKey: Boolean,
         commonKey: Pair<String, GCKey>,
         dataKey: Pair<GCKey, EncryptedKey>,
@@ -256,7 +257,7 @@ class RecordServiceUpdateRecordModuleTest {
         serializedResourceOld: String,
         serializedResourceNew: String,
         tags: Map<String, String>,
-        annotations: List<String> = emptyList(),
+        annotations: Annotations = emptyList(),
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,
         dataKey: Pair<GCKey, EncryptedKey> = this.dataKey to encryptedDataKey,
@@ -318,7 +319,7 @@ class RecordServiceUpdateRecordModuleTest {
         serializedResourceNew: String,
         attachmentData: ByteArray,
         tags: Map<String, String>,
-        annotations: List<String> = emptyList(),
+        annotations: Annotations = emptyList(),
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,
         dataKey: Pair<GCKey, EncryptedKey> = this.dataKey to encryptedDataKey,
@@ -391,7 +392,7 @@ class RecordServiceUpdateRecordModuleTest {
         serializedResourceOld: String,
         serializedResourceNew: String,
         tags: Map<String, String>,
-        annotations: List<String> = emptyList(),
+        annotations: Annotations = emptyList(),
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,
         dataKey: Pair<GCKey, EncryptedKey> = this.dataKey to encryptedDataKey,

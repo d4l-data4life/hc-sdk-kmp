@@ -20,13 +20,15 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.Tags
 
 // ToDo -> to contract
 interface DecryptedBaseRecord<T> {
     var identifier: String?
     var resource: T
-    var tags: HashMap<String, String>?
-    var annotations: List<String>
+    var tags: Tags?
+    var annotations: Annotations
     var customCreationDate: String?
     var updatedDate: String? // FIXME: This should never be null
     var dataKey: GCKey?

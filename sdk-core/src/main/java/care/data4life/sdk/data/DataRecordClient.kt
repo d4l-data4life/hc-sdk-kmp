@@ -22,6 +22,7 @@ import care.data4life.sdk.call.Callback
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Task
 import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.tag.Annotations
 import org.threeten.bp.LocalDate
 
 internal class DataRecordClient(
@@ -32,7 +33,7 @@ internal class DataRecordClient(
 
     override fun create(
         resource: DataResource,
-        annotations: List<String>,
+        annotations: Annotations,
         callback: Callback<DataRecord<DataResource>>
     ): Task {
         val operation = userService.finishLogin(true)
@@ -44,7 +45,7 @@ internal class DataRecordClient(
     override fun update(
         recordId: String,
         resource: DataResource,
-        annotations: List<String>,
+        annotations: Annotations,
         callback: Callback<DataRecord<DataResource>>
     ): Task {
         val operation = userService.finishLogin(true)
@@ -68,7 +69,7 @@ internal class DataRecordClient(
     }
 
     override fun search(
-        annotations: List<String>,
+        annotations: Annotations,
         startDate: LocalDate?,
         endDate: LocalDate?,
         pageSize: Int,

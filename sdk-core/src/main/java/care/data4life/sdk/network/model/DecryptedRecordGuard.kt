@@ -19,11 +19,13 @@ package care.data4life.sdk.network.model
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.NetworkModelContract.LimitGuard.Companion.MAX_LENGTH_TAGS_AND_ANNOTATIONS
 import care.data4life.sdk.network.model.NetworkModelContract.LimitGuard.Companion.MAX_SIZE_CUSTOM_DATA
+import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.Tags
 
 internal object DecryptedRecordGuard : NetworkModelContract.LimitGuard {
     override fun checkTagsAndAnnotationsLimits(
-        tags: HashMap<String, String>,
-        annotations: List<String>
+        tags: Tags,
+        annotations: Annotations
     ) {
         var acutal = 0
         tags.forEach { entry ->

@@ -18,13 +18,15 @@ package care.data4life.sdk.network.model
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
+import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.Tags
 import java.io.Serializable
 
 internal data class DecryptedRecord<T : Fhir3Resource?>(
     override var identifier: String?,
     override var resource: T,
-    override var tags: HashMap<String, String>?,
-    override var annotations: List<String>,
+    override var tags: Tags?,
+    override var annotations: Annotations,
     override var customCreationDate: String?,
     override var updatedDate: String?,
     override var dataKey: GCKey?,

@@ -173,7 +173,7 @@ class RecordService internal constructor(
     override fun <T : Fhir3Resource> createRecord(
         userId: String,
         resource: T,
-        annotations: List<String>
+        annotations: Annotations
     ): Single<Record<T>> = createRecord(
         userId,
         resource as Any,
@@ -184,7 +184,7 @@ class RecordService internal constructor(
     override fun createRecord(
         userId: String,
         resource: DataResource,
-        annotations: List<String>
+        annotations: Annotations
     ): Single<DataRecord<DataResource>> = createRecord(
         userId,
         resource as Any,
@@ -195,7 +195,7 @@ class RecordService internal constructor(
     override fun <T : Fhir4Resource> createRecord(
         userId: String,
         resource: T,
-        annotations: List<String>
+        annotations: Annotations
     ): Single<Fhir4Record<T>> = createRecord(
         userId,
         resource as Any,
@@ -350,7 +350,7 @@ class RecordService internal constructor(
     override fun <T : Fhir3Resource> fetchFhir3Records(
         userId: String,
         resourceType: Class<T>,
-        annotations: List<String>,
+        annotations: Annotations,
         startDate: LocalDate?,
         endDate: LocalDate?,
         pageSize: Int,
@@ -369,7 +369,7 @@ class RecordService internal constructor(
     override fun <T : Fhir4Resource> fetchFhir4Records(
         userId: String,
         resourceType: Class<T>,
-        annotations: List<String>,
+        annotations: Annotations,
         startDate: LocalDate?,
         endDate: LocalDate?,
         pageSize: Int,
@@ -387,7 +387,7 @@ class RecordService internal constructor(
     @Suppress("UNCHECKED_CAST")
     override fun fetchDataRecords(
         userId: String,
-        annotations: List<String>,
+        annotations: Annotations,
         startDate: LocalDate?,
         endDate: LocalDate?,
         pageSize: Int,
@@ -457,7 +457,7 @@ class RecordService internal constructor(
         userId: String,
         recordId: String,
         resource: T,
-        annotations: List<String>
+        annotations: Annotations
     ): Single<Record<T>> = updateRecord(
         userId,
         recordId,
@@ -474,7 +474,7 @@ class RecordService internal constructor(
         userId: String,
         recordId: String,
         resource: T,
-        annotations: List<String>
+        annotations: Annotations
     ): Single<Fhir4Record<T>> = updateRecord(
         userId,
         recordId,
@@ -487,7 +487,7 @@ class RecordService internal constructor(
         userId: String,
         recordId: String,
         resource: DataResource,
-        annotations: List<String>
+        annotations: Annotations
     ): Single<DataRecord<DataResource>> = updateRecord(
         userId,
         recordId,
@@ -529,7 +529,7 @@ class RecordService internal constructor(
     fun countRecords(
         type: Class<out Fhir3Resource>?,
         userId: String,
-        annotations: List<String> = listOf()
+        annotations: Annotations = listOf()
     ): Single<Int> {
         return if (type == null) {
             countAllFhir3Records(userId, annotations)
@@ -541,18 +541,18 @@ class RecordService internal constructor(
     override fun countFhir3Records(
         type: Class<out Fhir3Resource>,
         userId: String,
-        annotations: List<String>
+        annotations: Annotations
     ): Single<Int> = _countRecords(type, userId, annotations)
 
     override fun countFhir4Records(
         type: Class<out Fhir4Resource>,
         userId: String,
-        annotations: List<String>
+        annotations: Annotations
     ): Single<Int> = _countRecords(type, userId, annotations)
 
     override fun countAllFhir3Records(
         userId: String,
-        annotations: List<String>
+        annotations: Annotations
     ): Single<Int> = countFhir3Records(Fhir3Resource::class.java, userId, annotations)
 
     override fun <T : Fhir3Resource> downloadFhir3Record(
@@ -1271,7 +1271,7 @@ class RecordService internal constructor(
     }
 
     // TODO: make it private
-    internal fun <T : Any> assignResourceId(
+    private fun <T : Any> assignResourceId(
         record: DecryptedBaseRecord<T>
     ): DecryptedBaseRecord<T> {
         return record.also {

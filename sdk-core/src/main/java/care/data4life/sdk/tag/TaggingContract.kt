@@ -51,7 +51,7 @@ class TaggingContract {
     }
 
     interface Helper {
-        fun convertToTagMap(tagList: List<String>): HashMap<String, String>
+        fun convertToTagMap(tagList: List<String>): Tags
 
         @Throws(D4LException::class)
         fun encode(tag: String): String

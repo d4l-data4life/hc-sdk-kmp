@@ -33,7 +33,9 @@ import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
+import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID
@@ -59,9 +61,9 @@ class RecordServiceCryptoTest {
     private val taggingService: TaggingContract.Service = mockk()
     private val attachmentService: AttachmentContract.Service = mockk()
     private val errorHandler: SdkContract.ErrorHandler = mockk()
-    private val tags: HashMap<String, String> =
+    private val tags: Tags =
         hashMapOf("potato" to "soup", "resourcetype" to "pumpkin")
-    private val annotations: List<String> = listOf("tomato", "soup")
+    private val annotations: Annotations = listOf("tomato", "soup")
 
     private val encryptedTagsAndAnnotations: List<String> = mockk()
     private val dataKey: GCKey = mockk()

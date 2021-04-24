@@ -35,6 +35,7 @@ import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID
@@ -70,7 +71,7 @@ class RecordServiceFetchRecordsTest {
     private val attachmentService: AttachmentContract.Service = mockk()
     private val errorHandler: SdkContract.ErrorHandler = mockk()
 
-    private val tags: HashMap<String, String> = mockk()
+    private val tags: Tags = mockk()
     private val defaultAnnotation: List<String> = emptyList()
 
     private val compatibilityService: MigrationContract.CompatibilityService = mockk()

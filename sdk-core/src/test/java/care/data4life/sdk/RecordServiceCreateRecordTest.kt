@@ -34,7 +34,9 @@ import care.data4life.sdk.network.model.DecryptedDataRecord
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
+import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
@@ -67,7 +69,7 @@ class RecordServiceCreateRecordTest {
     private val attachmentService: AttachmentContract.Service = mockk()
     private val errorHandler: SdkContract.ErrorHandler = mockk()
 
-    private val tags: HashMap<String, String> = mockk()
+    private val tags: Tags = mockk()
     private val defaultAnnotation: List<String> = emptyList()
 
     private val compatibilityService: MigrationContract.CompatibilityService = mockk()
@@ -603,7 +605,7 @@ class RecordServiceCreateRecordTest {
         val record: Record<Fhir3Resource> = mockk()
         val date = "now"
         val identifier = "id"
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
 
         every { SdkDateTimeFormatter.now() } returns date
         every { createdRecord.resource } returns resource
@@ -700,7 +702,7 @@ class RecordServiceCreateRecordTest {
         val record: Fhir4Record<Fhir4Resource> = mockk()
         val date = "now"
         val identifier = "id"
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
 
         every { SdkDateTimeFormatter.now() } returns date
         every { createdRecord.resource } returns resource
@@ -796,7 +798,7 @@ class RecordServiceCreateRecordTest {
         val receivedRecord: DecryptedDataRecord = mockk(relaxed = true)
         val record: DataRecord<DataResource> = mockk()
         val date = "now"
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
 
         every { SdkDateTimeFormatter.now() } returns date
         every { createdRecord.resource } returns resource

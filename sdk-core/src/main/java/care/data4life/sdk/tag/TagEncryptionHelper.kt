@@ -25,7 +25,7 @@ import java.nio.charset.StandardCharsets
 import java.util.Locale
 
 object TagEncryptionHelper : TaggingContract.Helper {
-    override fun convertToTagMap(tagList: List<String>): HashMap<String, String> {
+    override fun convertToTagMap(tagList: List<String>): Tags {
         val tags = HashMap<String, String>()
         for (entry in tagList) {
             val split = entry.split(DELIMITER)

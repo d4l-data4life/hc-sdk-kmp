@@ -17,6 +17,7 @@
 package care.data4life.sdk.fhir
 
 import care.data4life.crypto.GCKey
+import care.data4life.sdk.tag.Tags
 
 // TODO: make internal
 interface FhirContract {
@@ -26,7 +27,7 @@ interface FhirContract {
 
         fun <T : Any> decryptResource(
             dataKey: GCKey,
-            tags: HashMap<String, String>,
+            tags: Tags,
             encryptedResource: String
         ): T
     }

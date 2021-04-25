@@ -228,7 +228,7 @@ public final class ApiService {
 
     }
 
-    Single<CommonKeyResponse> fetchCommonKey(String alias, String userId, String commonKeyId) {
+    public Single<CommonKeyResponse> fetchCommonKey(String alias, String userId, String commonKeyId) {
         return service.fetchCommonKey(alias, userId, commonKeyId);
     }
 

@@ -18,12 +18,15 @@ package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
 import care.data4life.crypto.KeyType
+import care.data4life.sdk.ApiService
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
+import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
@@ -31,75 +34,136 @@ import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.wrapper.WrapperContract
 
 class RecordEncryptionService(
+    private val alias: String,
+    private val apiService: ApiService,
     private val taggingService: TaggingContract.Service,
     private val tagEncryptionService: TaggingContract.EncryptionService,
     private val guard: NetworkModelContract.LimitGuard,
     private val cryptoService: CryptoContract.Service,
     private val fhirService: FhirContract.Service,
-    private val dateTimeFormatter: WrapperContract.DateTimeFormatter
+    private val dateTimeFormatter: WrapperContract.DateTimeFormatter,
+    private val modelVersion: ModelContract.ModelVersion
 ) : NetworkModelContract.EncryptionService {
     private fun <T : Fhir3Resource> buildFhir3Record(
+        identifier: String?,
         resource: T,
         tags: Tags,
         annotations: Annotations,
-        creationDate: String,
+        creationDate: String?,
+        updateDate: String?,
         dataKey: GCKey,
+        attachmentKey: GCKey?,
         modelVersion: Int
     ): NetworkModelContract.DecryptedFhir3Record<T> {
         return DecryptedRecord(
-            null,
+            identifier,
             resource,
             tags,
             annotations,
             creationDate,
-            null,
+            updateDate,
             dataKey,
-            null,
+            attachmentKey,
             modelVersion
         )
     }
 
     private fun <T : Fhir4Resource> buildFhir4Record(
+        identifier: String?,
         resource: T,
         tags: Tags,
         annotations: Annotations,
-        creationDate: String,
+        creationDate: String?,
+        updateDate: String?,
         dataKey: GCKey,
+        attachmentKey: GCKey?,
         modelVersion: Int
     ): NetworkModelContract.DecryptedFhir4Record<T> {
         return DecryptedR4Record(
-            null,
+            identifier,
             resource,
             tags,
             annotations,
             creationDate,
-            null,
+            updateDate,
             dataKey,
-            null,
+            attachmentKey,
             modelVersion
         )
     }
 
     private fun buildCustomRecord(
+        identifier: String?,
         resource: DataResource,
         tags: Tags,
         annotations: Annotations,
-        creationDate: String,
+        creationDate: String?,
+        updateDate: String?,
         dataKey: GCKey,
         modelVersion: Int
     ): NetworkModelContract.DecryptedCustomDataRecord {
         guard.checkDataLimit(resource.value)
 
         return DecryptedDataRecord(
-            null,
+            identifier,
             resource,
             tags,
             annotations,
             creationDate,
-            null,
+            updateDate,
             dataKey,
             modelVersion
         )
+    }
+
+    private fun <T : Any> buildRecord(
+        identifier: String? = null,
+        resource: T,
+        tags: Tags,
+        annotations: Annotations,
+        creationDate: String?,
+        updateDate: String? = null,
+        dataKey: GCKey,
+        attachmentKey: GCKey? = null,
+        modelVersion: Int = CURRENT
+    ): NetworkModelContract.DecryptedBaseRecord<T> {
+        val record = when (resource) {
+            is Fhir3Resource -> this.buildFhir3Record(
+                identifier,
+                resource,
+                tags,
+                annotations,
+                creationDate,
+                updateDate,
+                dataKey,
+                attachmentKey,
+                modelVersion
+            )
+            is Fhir4Resource -> this.buildFhir4Record(
+                identifier,
+                resource,
+                tags,
+                annotations,
+                creationDate,
+                updateDate,
+                dataKey,
+                attachmentKey,
+                modelVersion
+            )
+            is DataResource -> this.buildCustomRecord(
+                identifier,
+                resource,
+                tags,
+                annotations,
+                creationDate,
+                updateDate,
+                dataKey,
+                modelVersion
+            )
+            else -> throw CoreRuntimeException.UnsupportedOperation()
+        }
+
+        return record as NetworkModelContract.DecryptedBaseRecord<T>
     }
 
     override fun <T : Any> fromResource(
@@ -110,35 +174,13 @@ class RecordEncryptionService(
 
         guard.checkTagsAndAnnotationsLimits(tags, annotations)
 
-        val record = when (resource) {
-            is Fhir3Resource -> this.buildFhir3Record(
-                resource,
-                tags,
-                annotations,
-                dateTimeFormatter.now(),
-                cryptoService.generateGCKey().blockingGet(),
-                CURRENT
-            )
-            is Fhir4Resource -> this.buildFhir4Record(
-                resource,
-                tags,
-                annotations,
-                dateTimeFormatter.now(),
-                cryptoService.generateGCKey().blockingGet(),
-                CURRENT
-            )
-            is DataResource -> this.buildCustomRecord(
-                resource,
-                tags,
-                annotations,
-                dateTimeFormatter.now(),
-                cryptoService.generateGCKey().blockingGet(),
-                CURRENT
-            )
-            else -> throw CoreRuntimeException.UnsupportedOperation()
-        }
-
-        return record as NetworkModelContract.DecryptedBaseRecord<T>
+        return buildRecord(
+            resource = resource,
+            tags = tags,
+            annotations = annotations,
+            creationDate = dateTimeFormatter.now(),
+            dataKey = cryptoService.generateGCKey().blockingGet()
+        )
     }
 
     private fun fetchCommonKey(): Pair<GCKey, String> {
@@ -203,10 +245,87 @@ class RecordEncryptionService(
         )
     }
 
+    private fun validateRecord(encryptedResource: String, version: Int) {
+        if (encryptedResource.isEmpty()) {
+            throw CoreRuntimeException.InternalFailure()
+        }
+
+        if (!modelVersion.isModelVersionSupported(version)) {
+            throw DataValidationException.ModelVersionNotSupported("Please update SDK to latest version!")
+        }
+    }
+
+    private fun getCommonKey(commonKeyId: String, userId: String): GCKey {
+        val commonKeyStored = cryptoService.hasCommonKey(commonKeyId)
+        return if (commonKeyStored) {
+            cryptoService.getCommonKeyById(commonKeyId)
+        } else {
+            // TODO: This should be in a different Service
+            val commonKeyResponse = apiService.fetchCommonKey(
+                alias,
+                userId,
+                commonKeyId
+            ).blockingGet()
+
+            cryptoService.asymDecryptSymetricKey(
+                cryptoService.fetchGCKeyPair().blockingGet(),
+                commonKeyResponse.commonKey
+            ).blockingGet().also {
+                cryptoService.storeCommonKey(commonKeyId, it)
+            }
+        }
+    }
+
+    private fun decryptKey(
+        commonKey: GCKey,
+        key: NetworkModelContract.EncryptedKey
+    ): GCKey {
+        return cryptoService.symDecryptSymmetricKey(
+            commonKey,
+            key
+        ).blockingGet()
+    }
+
+    private fun decryptKeys(
+        commonKey: GCKey,
+        encryptedDataKey: NetworkModelContract.EncryptedKey,
+        encryptedAttachmentKey: NetworkModelContract.EncryptedKey?
+    ): Pair<GCKey, GCKey?> {
+        val dataKey = decryptKey(commonKey, encryptedDataKey)
+
+        return if (encryptedAttachmentKey is NetworkModelContract.EncryptedKey) {
+            Pair(dataKey, decryptKey(commonKey, encryptedAttachmentKey))
+        } else {
+            Pair(dataKey, null)
+        }
+    }
+
     override fun <T : Any> decrypt(
         encryptedRecord: NetworkModelContract.EncryptedRecord,
         userId: String
     ): NetworkModelContract.DecryptedBaseRecord<T> {
-        TODO("Not yet implemented")
+        validateRecord(encryptedRecord.encryptedBody, encryptedRecord.modelVersion)
+
+        val (tags, annotations) = tagEncryptionService.decryptTagsAndAnnotations(
+            encryptedRecord.encryptedTags
+        )
+        val commonKey = getCommonKey(encryptedRecord.commonKeyId, userId)
+        val (dataKey, attachmentKey) = decryptKeys(
+            commonKey,
+            encryptedRecord.encryptedDataKey,
+            encryptedRecord.encryptedAttachmentsKey
+        )
+
+        return buildRecord(
+            encryptedRecord.identifier,
+            fhirService.decryptResource(dataKey, tags, encryptedRecord.encryptedBody),
+            tags,
+            annotations,
+            encryptedRecord.customCreationDate,
+            encryptedRecord.updatedDate,
+            dataKey,
+            attachmentKey,
+            encryptedRecord.modelVersion
+        )
     }
 }

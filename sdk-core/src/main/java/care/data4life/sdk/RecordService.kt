@@ -124,12 +124,15 @@ class RecordService internal constructor(
     )
 
     private val recordEncryptionService: NetworkModelContract.EncryptionService = RecordEncryptionService(
+        alias,
+        apiService,
         taggingService,
         tagEncryptionService,
         DecryptedRecordGuard,
         cryptoService,
         fhirService,
-        SdkDateTimeFormatter
+        SdkDateTimeFormatter,
+        ModelVersion
     )
     private val recordFactory: RecordFactory = RecordMapper
     private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper = SdkFhirAttachmentHelper

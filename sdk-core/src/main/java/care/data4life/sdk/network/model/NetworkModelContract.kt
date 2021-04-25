@@ -98,7 +98,7 @@ class NetworkModelContract {
         val commonKeyId: String
         val identifier: String?
         val encryptedTags: EncryptedTagsAndAnnotations
-        val encryptedBody: String?
+        val encryptedBody: String
         val customCreationDate: String?
         val encryptedDataKey: EncryptedKey
         val encryptedAttachmentsKey: EncryptedKey?
@@ -110,11 +110,11 @@ class NetworkModelContract {
     interface DecryptedBaseRecord<T> {
         var identifier: String?
         var resource: T
-        var tags: Tags?
+        var tags: Tags
         var annotations: Annotations
         var customCreationDate: String?
         var updatedDate: String? // FIXME: This should never be null
-        var dataKey: GCKey?
+        var dataKey: GCKey
         var attachmentsKey: GCKey?
         var modelVersion: Int
     }
@@ -130,8 +130,8 @@ class NetworkModelContract {
 
     internal interface EncryptionService {
         fun <T : Any> fromResource(resource: T, annotations: Annotations): DecryptedBaseRecord<T>
-        fun <T : Any> encrypt(record: DecryptedBaseRecord<T>, userId: String): EncryptedRecord
-        fun <T : Any> decrypt(record: EncryptedRecord, userId: String): DecryptedBaseRecord<T>
+        fun <T : Any> encrypt(decryptedRecord: DecryptedBaseRecord<T>): EncryptedRecord
+        fun <T : Any> decrypt(encryptedRecord: EncryptedRecord, userId: String): DecryptedBaseRecord<T>
     }
 
     interface LimitGuard {

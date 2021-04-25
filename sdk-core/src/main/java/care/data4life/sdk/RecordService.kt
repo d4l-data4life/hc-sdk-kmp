@@ -127,8 +127,10 @@ class RecordService internal constructor(
 
     private val recordEncryptionService: NetworkModelContract.EncryptionService = RecordEncryptionService(
         taggingService,
+        tagEncryptionService,
         DecryptedRecordGuard,
         cryptoService,
+        fhirService,
         SdkDateTimeFormatter
     )
     private val recordFactory: RecordFactory = RecordMapper
@@ -699,7 +701,7 @@ class RecordService internal constructor(
     @Throws(IOException::class)
     internal fun <T : Any> encryptRecord(record: DecryptedBaseRecord<T>): NetworkModelContract.EncryptedRecord {
         val encryptedTags = tagEncryptionService.encryptTagsAndAnnotations(
-            record.tags!!,
+            record.tags,
             record.annotations
         )
 
@@ -708,10 +710,10 @@ class RecordService internal constructor(
         val encryptedDataKey = cryptoService.encryptSymmetricKey(
             commonKey,
             KeyType.DATA_KEY,
-            record.dataKey!!
+            record.dataKey
         ).blockingGet() as EncryptedKey
 
-        val encryptedResource = fhirService._encryptResource(record.dataKey!!, record.resource)
+        val encryptedResource = fhirService._encryptResource(record.dataKey, record.resource)
 
         val encryptedAttachmentsKey = if (record.attachmentsKey == null) {
             null
@@ -795,7 +797,7 @@ class RecordService internal constructor(
 
         val body = record.encryptedBody
         return builder.build(
-            if (body is String && body.isNotEmpty()) {
+            if (body.isNotEmpty()) {
                 fhirService.decryptResource<T>(
                     dataKey,
                     tags,

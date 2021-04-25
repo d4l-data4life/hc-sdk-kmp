@@ -17,10 +17,12 @@
 package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
+import care.data4life.crypto.KeyType
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.tag.Annotations
@@ -30,8 +32,10 @@ import care.data4life.sdk.wrapper.WrapperContract
 
 class RecordEncryptionService(
     private val taggingService: TaggingContract.Service,
+    private val tagEncryptionService: TaggingContract.EncryptionService,
     private val guard: NetworkModelContract.LimitGuard,
     private val cryptoService: CryptoContract.Service,
+    private val fhirService: FhirContract.Service,
     private val dateTimeFormatter: WrapperContract.DateTimeFormatter
 ) : NetworkModelContract.EncryptionService {
     private fun <T : Fhir3Resource> buildFhir3Record(
@@ -137,15 +141,70 @@ class RecordEncryptionService(
         return record as NetworkModelContract.DecryptedBaseRecord<T>
     }
 
+    private fun fetchCommonKey(): Pair<GCKey, String> {
+        return Pair(
+            cryptoService.fetchCurrentCommonKey(),
+            cryptoService.currentCommonKeyId
+        )
+    }
+
+    private fun encryptKey(
+        commonKey: GCKey,
+        mode: KeyType,
+        key: GCKey
+    ): EncryptedKey {
+        return cryptoService.encryptSymmetricKey(
+            commonKey,
+            mode,
+            key
+        ).blockingGet() as EncryptedKey
+    }
+
+    private fun encryptKeys(
+        commonKey: GCKey,
+        dataKey: GCKey,
+        attachmentKey: GCKey?
+    ): Pair<EncryptedKey, EncryptedKey?> {
+        val encryptedDataKey = encryptKey(commonKey, KeyType.DATA_KEY, dataKey)
+
+        return if (attachmentKey is GCKey) {
+            Pair(
+                encryptedDataKey,
+                encryptKey(commonKey, KeyType.ATTACHMENT_KEY, attachmentKey)
+            )
+        } else {
+            Pair(encryptedDataKey, null)
+        }
+    }
+
     override fun <T : Any> encrypt(
-        record: NetworkModelContract.DecryptedBaseRecord<T>,
-        userId: String
+        decryptedRecord: NetworkModelContract.DecryptedBaseRecord<T>
     ): NetworkModelContract.EncryptedRecord {
-        TODO("Not yet implemented")
+        val dataKey = decryptedRecord.dataKey
+        val (commonKey, commonKeyId) = fetchCommonKey()
+        val (encryptedDataKey, encryptedAttachmentKey) = encryptKeys(
+            commonKey,
+            dataKey,
+            decryptedRecord.attachmentsKey
+        )
+
+        return EncryptedRecord(
+            commonKeyId,
+            decryptedRecord.identifier,
+            tagEncryptionService.encryptTagsAndAnnotations(
+                decryptedRecord.tags,
+                decryptedRecord.annotations
+            ),
+            fhirService._encryptResource(dataKey, decryptedRecord.resource),
+            decryptedRecord.customCreationDate,
+            encryptedDataKey,
+            encryptedAttachmentKey,
+            decryptedRecord.modelVersion
+        )
     }
 
     override fun <T : Any> decrypt(
-        record: NetworkModelContract.EncryptedRecord,
+        encryptedRecord: NetworkModelContract.EncryptedRecord,
         userId: String
     ): NetworkModelContract.DecryptedBaseRecord<T> {
         TODO("Not yet implemented")

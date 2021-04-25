@@ -21,6 +21,7 @@ import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.tag.Annotations
@@ -45,6 +46,8 @@ class RecordEncryptionServiceTest {
     private lateinit var service: NetworkModelContract.EncryptionService
     private val cryptoService: CryptoContract.Service = mockk()
     private val taggingService: TaggingContract.Service = mockk()
+    private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
+    private val fhirService: FhirContract.Service = mockk()
     private val dateTimeFormatter: WrapperContract.DateTimeFormatter = mockk()
     private val limitGuard: NetworkModelContract.LimitGuard = mockk()
 
@@ -54,8 +57,10 @@ class RecordEncryptionServiceTest {
 
         service = RecordEncryptionService(
             taggingService,
+            tagEncryptionService,
             limitGuard,
             cryptoService,
+            fhirService,
             dateTimeFormatter
         )
     }
@@ -108,7 +113,7 @@ class RecordEncryptionServiceTest {
         }
     }
 
-    // FHIR3 - fromResource
+    // FHIR3
     @Test
     fun `Given, fromResource is called with a Fhir3 resource and Annotations, it returns a DecryptedFhir3Record`() {
         // Given

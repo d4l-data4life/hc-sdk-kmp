@@ -30,7 +30,7 @@ data class EncryptedRecord(
     @field:Json(name = "encrypted_tags")
     override val encryptedTags: EncryptedTagsAndAnnotations,
     @field:Json(name = "encrypted_body")
-    override val encryptedBody: String?,
+    override val encryptedBody: String,
     @field:Json(name = "date")
     override val customCreationDate: String?,
     @field:Json(name = "encrypted_key")

@@ -25,11 +25,11 @@ import care.data4life.sdk.tag.Tags
 data class DecryptedR4Record<T : Fhir4Resource>(
     override var identifier: String?,
     override var resource: T,
-    override var tags: Tags?,
+    override var tags: Tags,
     override var annotations: Annotations,
     override var customCreationDate: String?,
     override var updatedDate: String?,
-    override var dataKey: GCKey?,
+    override var dataKey: GCKey,
     override var attachmentsKey: GCKey?,
     override var modelVersion: Int
 ) : DecryptedFhir4Record<T>

@@ -20,38 +20,12 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
 import care.data4life.sdk.tag.Tags
 
 class NetworkModelContract {
-    internal interface DecryptedRecordBuilder {
-        // mandatory
-        fun setTags(tags: Tags?): DecryptedRecordBuilder
-        fun setCreationDate(creationDate: String?): DecryptedRecordBuilder
-        fun setDataKey(dataKey: GCKey?): DecryptedRecordBuilder
-        fun setModelVersion(modelVersion: Int?): DecryptedRecordBuilder
-
-        // Optional
-        fun setIdentifier(identifier: String?): DecryptedRecordBuilder
-        fun setAnnotations(annotations: Annotations?): DecryptedRecordBuilder
-        fun setUpdateDate(updatedDate: String?): DecryptedRecordBuilder
-        fun setAttachmentKey(attachmentKey: GCKey?): DecryptedRecordBuilder
-
-        @Throws(CoreRuntimeException.InternalFailure::class)
-        fun <T : Any?> build(
-            resource: T,
-            tags: Tags? = null,
-            creationDate: String? = null,
-            dataKey: GCKey? = null,
-            modelVersion: Int? = null
-        ): DecryptedBaseRecord<T>
-
-        fun clear(): DecryptedRecordBuilder
-    }
-
     internal interface Version {
         val code: Int
         val name: String

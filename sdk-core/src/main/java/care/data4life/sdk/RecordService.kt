@@ -42,19 +42,20 @@ import care.data4life.sdk.model.DownloadResult
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.FetchResult
 import care.data4life.sdk.model.ModelContract.BaseRecord
-import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.model.ModelContract.RecordFactory
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.network.DecryptedRecordMapper
+import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
+import care.data4life.sdk.network.model.RecordEncryptionService
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_FMT
 import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_SIZE
@@ -124,6 +125,12 @@ class RecordService internal constructor(
         )
     )
 
+    private val recordEncryptionService: NetworkModelContract.EncryptionService = RecordEncryptionService(
+        taggingService,
+        DecryptedRecordGuard,
+        cryptoService,
+        SdkDateTimeFormatter
+    )
     private val recordFactory: RecordFactory = RecordMapper
     private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper = SdkFhirAttachmentHelper
     private val attachmentFactory: WrapperFactoryContract.AttachmentFactory = SdkAttachmentFactory
@@ -142,19 +149,8 @@ class RecordService internal constructor(
         checkDataRestrictions(resource)
 
         val data = extractUploadData(resource)
-        val record = Single.just(
-            DecryptedRecordMapper()
-                .setAnnotations(annotations)
-                .build(
-                    resource,
-                    taggingService.appendDefaultTags(resource, null),
-                    dateTimeFormatter.now(),
-                    cryptoService.generateGCKey().blockingGet(),
-                    CURRENT
-                )
-        )
 
-        return record
+        return fromResource(resource, annotations)
             .map { createdRecord -> uploadData(createdRecord, userId) }
             .map { createdRecord -> removeUploadData(createdRecord) }
             .map { createdRecord -> encryptRecord(createdRecord) }
@@ -692,6 +688,13 @@ class RecordService internal constructor(
             throw IllegalArgumentException("The given Record does not match the expected resource type.")
         }
     }
+    @Deprecated("This is a test concern and should be removed once a proper DI/SL is in place.")
+    internal fun <T : Any> fromResource(
+        resource: T,
+        annotations: Annotations
+    ): Single<DecryptedBaseRecord<T>> = Single.just(
+        recordEncryptionService.fromResource(resource, annotations)
+    )
 
     @Throws(IOException::class)
     internal fun <T : Any> encryptRecord(record: DecryptedBaseRecord<T>): NetworkModelContract.EncryptedRecord {

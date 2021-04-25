@@ -33,6 +33,7 @@ import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
+import care.data4life.sdk.network.model.RecordEncryptionService
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
 import care.data4life.sdk.tag.TaggingContract
@@ -44,14 +45,19 @@ import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkConstructor
 import io.mockk.spyk
+import io.mockk.unmockkConstructor
+import io.mockk.verify
 import io.mockk.verifyOrder
 import io.reactivex.Single
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
+import kotlin.test.assertSame
 
 class RecordServiceCryptoTest {
     private lateinit var recordService: RecordService
@@ -81,6 +87,7 @@ class RecordServiceCryptoTest {
     @Before
     fun setUp() {
         clearAllMocks()
+        mockkConstructor(RecordEncryptionService::class)
 
         recordService = spyk(
             RecordService(
@@ -96,6 +103,11 @@ class RecordServiceCryptoTest {
                 mockk()
             )
         )
+    }
+
+    @After
+    fun tearDown() {
+        unmockkConstructor(RecordEncryptionService::class)
     }
 
     private fun <T : Any> encryptRecordFlow(
@@ -166,6 +178,37 @@ class RecordServiceCryptoTest {
                 commonKey,
                 KeyType.ATTACHMENT_KEY,
                 attachmentKey
+            )
+        }
+    }
+
+    @Test
+    fun `Given, fromResource is called with a Resource and Annotations it delegates it to the ResourceEncryptionService`() {
+        // Given
+        val resource: Any = mockk()
+        val annotations: Annotations = mockk()
+        val expected: DecryptedBaseRecord<Any> = mockk()
+
+        every {
+            anyConstructed<RecordEncryptionService>().fromResource(
+                resource,
+                annotations
+            )
+        } returns expected
+
+        // When
+        val actual = recordService.fromResource(resource, annotations).blockingGet()
+
+        // Then
+        assertSame(
+            actual = actual,
+            expected = expected
+        )
+
+        verify(exactly = 1) {
+            anyConstructed<RecordEncryptionService>().fromResource(
+                resource,
+                annotations
             )
         }
     }

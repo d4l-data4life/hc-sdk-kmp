@@ -52,19 +52,6 @@ class NetworkModelContract {
         fun clear(): DecryptedRecordBuilder
     }
 
-    internal interface LimitGuard {
-        @Throws(DataValidationException.TagsAndAnnotationsLimitViolation::class)
-        fun checkTagsAndAnnotationsLimits(tags: Tags, annotations: Annotations)
-
-        @Throws(DataValidationException.CustomDataLimitViolation::class)
-        fun checkDataLimit(data: ByteArray)
-
-        companion object {
-            const val MAX_LENGTH_TAGS_AND_ANNOTATIONS = 1000
-            const val MAX_SIZE_CUSTOM_DATA = 10485760 // = 10 MiB in Bytes
-        }
-    }
-
     internal interface Version {
         val code: Int
         val name: String
@@ -140,6 +127,26 @@ class NetworkModelContract {
             get() = null
             set(_) {}
     }
+
+    internal interface EncryptionService {
+        fun <T : Any> fromResource(resource: T, annotations: Annotations): DecryptedBaseRecord<T>
+        fun <T : Any> encrypt(record: DecryptedBaseRecord<T>, userId: String): EncryptedRecord
+        fun <T : Any> decrypt(record: EncryptedRecord, userId: String): DecryptedBaseRecord<T>
+    }
+
+    interface LimitGuard {
+        @Throws(DataValidationException.TagsAndAnnotationsLimitViolation::class)
+        fun checkTagsAndAnnotationsLimits(tags: Tags, annotations: Annotations)
+
+        @Throws(DataValidationException.CustomDataLimitViolation::class)
+        fun checkDataLimit(data: ByteArray)
+
+        companion object {
+            const val MAX_LENGTH_TAGS_AND_ANNOTATIONS = 1000
+            const val MAX_SIZE_CUSTOM_DATA = 10485760 // = 10 MiB in Bytes
+        }
+    }
+
     companion object {
         const val DEFAULT_COMMON_KEY_ID: String = "00000000-0000-0000-0000-000000000000"
     }

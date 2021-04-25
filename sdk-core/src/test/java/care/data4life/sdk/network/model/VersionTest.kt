@@ -39,7 +39,7 @@ class VersionTest {
     fun `Version is serializable, it transforms into a valid JSON`() {
         assertEquals(
             expected = SERIALIZED_VERSION,
-            actual = moshi.adapter<Version>(Version::class.java).toJson(VERSION)
+            actual = moshi.adapter(Version::class.java).toJson(VERSION)
         )
     }
 
@@ -47,7 +47,7 @@ class VersionTest {
     fun `Given a Version is deserialized it transforms into Version`() {
         assertEquals(
             expected = VERSION,
-            actual = moshi.adapter<Version>(Version::class.java).fromJson(SERIALIZED_VERSION)
+            actual = moshi.adapter(Version::class.java).fromJson(SERIALIZED_VERSION)
         )
     }
 

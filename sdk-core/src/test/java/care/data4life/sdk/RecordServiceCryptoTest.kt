@@ -17,7 +17,6 @@
 package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
-import care.data4life.crypto.KeyType
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
@@ -31,8 +30,6 @@ import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
-import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
-import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
 import care.data4life.sdk.network.model.RecordEncryptionService
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
@@ -56,7 +53,6 @@ import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertNull
 import kotlin.test.assertSame
 
 class RecordServiceCryptoTest {
@@ -110,78 +106,6 @@ class RecordServiceCryptoTest {
         unmockkConstructor(RecordEncryptionService::class)
     }
 
-    private fun <T : Any> encryptRecordFlow(
-        decryptedRecord: DecryptedBaseRecord<T>,
-        currentCommonKeyId: String,
-        resource: T,
-        attachmentKey: GCKey? = null
-    ) {
-        every { decryptedRecord.tags } returns tags
-        every { decryptedRecord.annotations } returns annotations
-        every { decryptedRecord.dataKey } returns dataKey
-        every { decryptedRecord.resource } returns resource
-        every { decryptedRecord.attachmentsKey } returns attachmentKey
-
-        every {
-            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations)
-        } returns encryptedTagsAndAnnotations
-        every { fhirService._encryptResource(dataKey, resource) } returns encryptedResource
-        every { cryptoService.fetchCurrentCommonKey() } returns commonKey
-        every { cryptoService.currentCommonKeyId } returns currentCommonKeyId
-        every {
-            cryptoService.encryptSymmetricKey(
-                commonKey,
-                KeyType.DATA_KEY,
-                dataKey
-            )
-        } returns Single.just(encryptedDataKey)
-        if (attachmentKey is GCKey) {
-            every {
-                cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.ATTACHMENT_KEY,
-                    attachmentKey
-                )
-            } returns Single.just(encryptedAttachmentKey)
-        }
-    }
-
-    private fun <T : Any> verifyEncryptRecordFlow(resource: T) {
-        verifyOrder {
-            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations)
-            cryptoService.fetchCurrentCommonKey()
-            cryptoService.currentCommonKeyId
-            cryptoService.encryptSymmetricKey(
-                commonKey,
-                KeyType.DATA_KEY,
-                dataKey
-            )
-            fhirService._encryptResource(dataKey, resource)
-        }
-    }
-
-    private fun <T : Any> verifyEncryptRecordWithFetchingKeyFlow(
-        resource: T,
-        attachmentKey: GCKey
-    ) {
-        verifyOrder {
-            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations)
-            cryptoService.fetchCurrentCommonKey()
-            cryptoService.currentCommonKeyId
-            cryptoService.encryptSymmetricKey(
-                commonKey,
-                KeyType.DATA_KEY,
-                dataKey
-            )
-            fhirService._encryptResource(dataKey, resource)
-            cryptoService.encryptSymmetricKey(
-                commonKey,
-                KeyType.ATTACHMENT_KEY,
-                attachmentKey
-            )
-        }
-    }
-
     @Test
     fun `Given, fromResource is called with a Resource and Annotations it delegates it to the ResourceEncryptionService`() {
         // Given
@@ -214,170 +138,28 @@ class RecordServiceCryptoTest {
     }
 
     @Test
-    fun `Given, encryptRecord is called with a DecryptedRecord for Fhir3, it returns a EncryptedRecord`() {
+    fun `Given, encryptRecord is called with a DecryptedRecord it delegates it to the ResourceEncryptionService`() {
         // Given
-        val currentCommonKeyId = "currentCommonKeyId"
-        val resource: Fhir3Resource = mockk()
-        val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk(relaxed = true)
+        val record: DecryptedBaseRecord<Any> = mockk()
+        val annotations: Annotations = mockk()
+        val expected: NetworkModelContract.EncryptedRecord = mockk()
 
-        encryptRecordFlow(
-            decryptedRecord,
-            currentCommonKeyId,
-            resource
-        )
+        every {
+            anyConstructed<RecordEncryptionService>().encrypt(record)
+        } returns expected
 
         // When
-        val encryptedRecord = recordService.encryptRecord(decryptedRecord)
+        val actual = recordService.encryptRecord(record)
 
         // Then
-        assertEquals(
-            expected = currentCommonKeyId,
-            actual = encryptedRecord.commonKeyId
-        )
-        assertNull(encryptedRecord.encryptedAttachmentsKey)
-        verifyEncryptRecordFlow(resource)
-    }
-
-    @Test
-    fun `Given, encryptRecord is called with a DecryptedRecord for Fhir4, it returns a EncryptedRecord`() {
-        // Given
-        val currentCommonKeyId = "currentCommonKeyId"
-        val resource: Fhir4Resource = mockk()
-        val decryptedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
-
-        encryptRecordFlow(
-            decryptedRecord,
-            currentCommonKeyId,
-            resource
+        assertSame(
+            actual = actual,
+            expected = expected
         )
 
-        // When
-        val encryptedRecord = recordService.encryptRecord(decryptedRecord)
-
-        // Then
-        assertEquals(
-            expected = currentCommonKeyId,
-            actual = encryptedRecord.commonKeyId
-        )
-        assertNull(encryptedRecord.encryptedAttachmentsKey)
-
-        verifyEncryptRecordFlow(resource)
-    }
-
-    @Test
-    fun `Given, encryptRecord is called with a DecryptedRecord for arbitrary data, it returns a EncryptedRecord`() {
-        // Given
-        val currentCommonKeyId = "currentCommonKeyId"
-        val resource: DataResource = mockk()
-        val decryptedRecord: DecryptedDataRecord = mockk(relaxed = true)
-
-        encryptRecordFlow(
-            decryptedRecord,
-            currentCommonKeyId,
-            resource
-        )
-
-        // When
-        val encryptedRecord = recordService.encryptRecord(decryptedRecord)
-
-        // Then
-        assertEquals(
-            expected = currentCommonKeyId,
-            actual = encryptedRecord.commonKeyId
-        )
-        assertNull(encryptedRecord.encryptedAttachmentsKey)
-
-        verifyEncryptRecordFlow(resource)
-    }
-
-    @Test
-    fun `Given, encryptRecord is called with a DecryptedRecord for Fhir3, it adds a encrypted AttachmentKey, if the DecryptedRecord contains a AttachmentKey`() {
-        // Given
-        val currentCommonKeyId = "currentCommonKeyId"
-        val resource: Fhir3Resource = mockk()
-        val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk(relaxed = true)
-
-        encryptRecordFlow(
-            decryptedRecord,
-            currentCommonKeyId,
-            resource,
-            attachmentKey
-        )
-
-        // When
-        val encryptedRecord = recordService.encryptRecord(decryptedRecord)
-
-        // Then
-        assertEquals(
-            expected = currentCommonKeyId,
-            actual = encryptedRecord.commonKeyId
-        )
-        assertEquals(
-            expected = encryptedAttachmentKey,
-            actual = encryptedRecord.encryptedAttachmentsKey
-        )
-
-        verifyEncryptRecordWithFetchingKeyFlow(resource, attachmentKey)
-    }
-
-    @Test
-    fun `Given, encryptRecord is called with a DecryptedRecord for Fhir4, it adds a encrypted AttachmentKey, if the DecryptedRecord contains a AttachmentKey`() {
-        // Given
-        val currentCommonKeyId = "currentCommonKeyId"
-        val resource: Fhir4Resource = mockk()
-        val decryptedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
-
-        encryptRecordFlow(
-            decryptedRecord,
-            currentCommonKeyId,
-            resource,
-            attachmentKey
-        )
-
-        // When
-        val encryptedRecord = recordService.encryptRecord(decryptedRecord)
-
-        // Then
-        assertEquals(
-            expected = currentCommonKeyId,
-            actual = encryptedRecord.commonKeyId
-        )
-        assertEquals(
-            expected = encryptedAttachmentKey,
-            actual = encryptedRecord.encryptedAttachmentsKey
-        )
-
-        verifyEncryptRecordWithFetchingKeyFlow(resource, attachmentKey)
-    }
-
-    @Test
-    fun `Given, encryptRecord is called with a DecryptedRecord for arbitrary data, it adds a encrypted AttachmentKey, if the DecryptedRecord contains a AttachmentKey`() {
-        // Given
-        val currentCommonKeyId = "currentCommonKeyId"
-        val resource: Fhir4Resource = mockk()
-        val decryptedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
-
-        encryptRecordFlow(
-            decryptedRecord,
-            currentCommonKeyId,
-            resource,
-            attachmentKey
-        )
-
-        // When
-        val encryptedRecord = recordService.encryptRecord(decryptedRecord)
-
-        // Then
-        assertEquals(
-            expected = currentCommonKeyId,
-            actual = encryptedRecord.commonKeyId
-        )
-        assertEquals(
-            expected = encryptedAttachmentKey,
-            actual = encryptedRecord.encryptedAttachmentsKey
-        )
-
-        verifyEncryptRecordWithFetchingKeyFlow(resource, attachmentKey)
+        verify(exactly = 1) {
+            anyConstructed<RecordEncryptionService>().encrypt(record)
+        }
     }
 
     private fun <T : Any> decryptRecordFlow(

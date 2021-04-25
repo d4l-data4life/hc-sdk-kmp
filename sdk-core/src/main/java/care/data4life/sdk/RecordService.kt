@@ -16,7 +16,6 @@
 package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
-import care.data4life.crypto.KeyType
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.ThumbnailService
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
@@ -50,7 +49,6 @@ import care.data4life.sdk.model.UpdateResult
 import care.data4life.sdk.network.DecryptedRecordMapper
 import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.EncryptedKey
-import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
@@ -698,44 +696,10 @@ class RecordService internal constructor(
         recordEncryptionService.fromResource(resource, annotations)
     )
 
-    @Throws(IOException::class)
-    internal fun <T : Any> encryptRecord(record: DecryptedBaseRecord<T>): NetworkModelContract.EncryptedRecord {
-        val encryptedTags = tagEncryptionService.encryptTagsAndAnnotations(
-            record.tags,
-            record.annotations
-        )
-
-        val commonKey = cryptoService.fetchCurrentCommonKey()
-        val currentCommonKeyId = cryptoService.currentCommonKeyId
-        val encryptedDataKey = cryptoService.encryptSymmetricKey(
-            commonKey,
-            KeyType.DATA_KEY,
-            record.dataKey
-        ).blockingGet() as EncryptedKey
-
-        val encryptedResource = fhirService._encryptResource(record.dataKey, record.resource)
-
-        val encryptedAttachmentsKey = if (record.attachmentsKey == null) {
-            null
-        } else {
-            cryptoService.encryptSymmetricKey(
-                commonKey,
-                KeyType.ATTACHMENT_KEY,
-                record.attachmentsKey!!
-            ).blockingGet() as EncryptedKey
-        }
-
-        return EncryptedRecord(
-            currentCommonKeyId,
-            record.identifier,
-            encryptedTags,
-            encryptedResource,
-            record.customCreationDate,
-            encryptedDataKey,
-            encryptedAttachmentsKey,
-            record.modelVersion
-        )
-    }
+    @Deprecated("This is a test concern and should be removed once a proper DI/SL is in place.")
+    internal fun <T : Any> encryptRecord(
+        record: DecryptedBaseRecord<T>
+    ): NetworkModelContract.EncryptedRecord = recordEncryptionService.encrypt(record)
 
     private fun getCommonKey(commonKeyId: String, userId: String): GCKey {
         val commonKeyStored = cryptoService.hasCommonKey(commonKeyId)

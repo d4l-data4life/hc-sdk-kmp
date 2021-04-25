@@ -159,26 +159,4 @@ class VersionListTest {
         private const val SERIALIZED_VERSION_LIST =
             "{\"versions\":[{\"version_code\":25,\"version_name\":\"1.9.0\",\"status\":\"supported\"}]}"
     }
-
-    companion object {
-        private val VERSION = Version(
-            25,
-            "1.9.0",
-            "supported"
-        )
-        private val VERSION_LIST = VersionList(listOf(VERSION))
-        private const val SERIALIZED_VERSION_LIST =
-            "{\"versions\":[{\"status\":\"supported\",\"version_code\":25,\"version_name\":\"1.9.0\"}]}"
-    }
-
-    companion object {
-        private val VERSION = Version(
-            25,
-            "1.9.0",
-            "supported"
-        )
-        private val VERSION_LIST = VersionList(listOf(VERSION))
-        private const val SERIALIZED_VERSION_LIST =
-            "{\"versions\":[{\"status\":\"supported\",\"version_code\":25,\"version_name\":\"1.9.0\"}]}"
-    }
 }

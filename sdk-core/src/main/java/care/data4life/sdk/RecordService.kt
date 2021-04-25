@@ -46,9 +46,7 @@ import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.model.UpdateResult
-import care.data4life.sdk.network.DecryptedRecordMapper
 import care.data4life.sdk.network.model.DecryptedRecordGuard
-import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
@@ -79,7 +77,6 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.threeten.bp.LocalDate
-import java.io.IOException
 
 // TODO internal
 // TODO add Factory
@@ -87,9 +84,9 @@ class RecordService internal constructor(
     private val partnerId: String,
     private val alias: String,
     private val apiService: ApiService,
-    private val tagEncryptionService: TaggingContract.EncryptionService,
+    tagEncryptionService: TaggingContract.EncryptionService,
     private val taggingService: TaggingContract.Service,
-    private val fhirService: FhirContract.Service,
+    fhirService: FhirContract.Service,
     private val attachmentService: AttachmentContract.Service,
     private val cryptoService: CryptoContract.Service,
     private val errorHandler: SdkContract.ErrorHandler,
@@ -704,77 +701,11 @@ class RecordService internal constructor(
         record: DecryptedBaseRecord<T>
     ): NetworkModelContract.EncryptedRecord = recordEncryptionService.encrypt(record)
 
-    private fun getCommonKey(commonKeyId: String, userId: String): GCKey {
-        val commonKeyStored = cryptoService.hasCommonKey(commonKeyId)
-        return if (commonKeyStored) {
-            cryptoService.getCommonKeyById(commonKeyId)
-        } else {
-            val commonKeyResponse = apiService.fetchCommonKey(
-                alias,
-                userId,
-                commonKeyId
-            ).blockingGet()
-
-            cryptoService.asymDecryptSymetricKey(
-                cryptoService.fetchGCKeyPair().blockingGet(),
-                commonKeyResponse.commonKey
-            ).blockingGet().also {
-                cryptoService.storeCommonKey(commonKeyId, it)
-            }
-        }
-    }
-
-    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
+    @Deprecated("This is a test concern and should be removed once a proper DI/SL is in place.")
     internal fun <T : Any> decryptRecord(
         record: NetworkModelContract.EncryptedRecord,
         userId: String
-    ): DecryptedBaseRecord<T> {
-        if (!ModelVersion.isModelVersionSupported(record.modelVersion)) {
-            throw DataValidationException.ModelVersionNotSupported("Please update SDK to latest version!")
-        }
-
-        val (tags, annotations) = tagEncryptionService.decryptTagsAndAnnotations(record.encryptedTags)
-
-        val builder = DecryptedRecordMapper()
-            .setIdentifier(record.identifier)
-            .setTags(tags)
-            .setAnnotations(annotations)
-            .setCreationDate(record.customCreationDate)
-            .setUpdateDate(record.updatedDate)
-            .setModelVersion(record.modelVersion)
-
-        val commonKeyId = record.commonKeyId
-        val commonKey: GCKey = getCommonKey(commonKeyId, userId)
-        val dataKey = cryptoService.symDecryptSymmetricKey(
-            commonKey,
-            record.encryptedDataKey
-        ).blockingGet()
-
-        builder.setDataKey(dataKey)
-
-        val attachmentKey = record.encryptedAttachmentsKey
-        if (attachmentKey is EncryptedKey) {
-            builder.setAttachmentKey(
-                cryptoService.symDecryptSymmetricKey(
-                    commonKey,
-                    attachmentKey
-                ).blockingGet()
-            )
-        }
-
-        val body = record.encryptedBody
-        return builder.build(
-            if (body.isNotEmpty()) {
-                fhirService.decryptResource<T>(
-                    dataKey,
-                    tags,
-                    body
-                )
-            } else {
-                null // Fixme: This is a potential bug
-            }
-        ) as DecryptedBaseRecord<T>
-    }
+    ): DecryptedBaseRecord<T> = recordEncryptionService.decrypt(record, userId)
 
     @Throws(
         DataValidationException.IdUsageViolation::class,

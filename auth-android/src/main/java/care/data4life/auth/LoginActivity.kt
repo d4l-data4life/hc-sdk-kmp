@@ -27,7 +27,6 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.d4l_auth_login_activity)
-
     }
 
     override fun onResume() {
@@ -47,14 +46,20 @@ class LoginActivity : AppCompatActivity() {
                 if (authorizationListener == null) return
 
                 val authException = net.openid.appauth.AuthorizationException.fromIntent(data)
-                authorizationListener = if (authException != null && net.openid.appauth.AuthorizationException.GeneralErrors.USER_CANCELED_AUTH_FLOW == authException) {
-                    authorizationListener?.onError(AuthorizationException.Canceled(), loginFinishedCbk)
-                    null
-                } else {
-                    authorizationListener?.onError(AuthorizationException.FailedToLogin(), loginFinishedCbk)
-                    null
-                }
-
+                authorizationListener =
+                    if (authException != null && net.openid.appauth.AuthorizationException.GeneralErrors.USER_CANCELED_AUTH_FLOW == authException) {
+                        authorizationListener?.onError(
+                            AuthorizationException.Canceled(),
+                            loginFinishedCbk
+                        )
+                        null
+                    } else {
+                        authorizationListener?.onError(
+                            AuthorizationException.FailedToLogin(),
+                            loginFinishedCbk
+                        )
+                        null
+                    }
             } else if (resultCode == Activity.RESULT_OK) {
                 if (authorizationListener == null) throw RuntimeException("authorizationListener not set!")
 

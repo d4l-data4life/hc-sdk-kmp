@@ -34,7 +34,12 @@ class UserService(
     private val cryptoService: CryptoContract.Service
 ) : AuthContract.UserService {
     override val userID: Single<String>
-        get() = Single.fromCallable { secureStore.getSecret("${alias}_user_id", String::class.java) }
+        get() = Single.fromCallable {
+            secureStore.getSecret(
+                "${alias}_user_id",
+                String::class.java
+            )
+        }
 
     // TODO: Refactor this, so it calls the API only on demand
     override fun finishLogin(isAuthorized: Boolean): Single<Boolean> {

@@ -44,16 +44,16 @@ import care.data4life.crypto.Json
  * fill in the "iss" claim in instances since it has a fixed value).
  */
 data class D4LJwtPayload(
-        /* Standard (registered) claims */
-        val iss: String = "urn:ghc",                        // "Issuer" claim
-        val sub: String? = null,                            // "Subject" claim
-        val exp: Double? = null,                            // "Expiration Time" claim
-        val nbf: Double? = null,                            // "Not Before" claim
-        val iat: Double? = null,                            // "Issued At" claim
-        val jti: String? = null,                            // "JWT ID" claim
-        /* Private D4L claims */
-        @field:Json("ghc:scope") val ghc_scope: String? = null,      // Scopes - could consider adding a type adapter for the scopes that parses them in to a list
-        @field:Json("ghc:uid") val ghc_uid: String? = null,          // The source User ID which requested the JWT (not always the subject)
-        @field:Json("ghc:cid") val ghc_cid: String? = null,          // The client ID which requested the JWT
-        @field:Json("ghc:aid") val ghc_aid: String? = null           // The app ID which requested the JWT
+    /* Standard (registered) claims */
+    val iss: String = "urn:ghc", // "Issuer" claim
+    val sub: String? = null, // "Subject" claim
+    val exp: Double? = null, // "Expiration Time" claim
+    val nbf: Double? = null, // "Not Before" claim
+    val iat: Double? = null, // "Issued At" claim
+    val jti: String? = null, // "JWT ID" claim
+    /* Private D4L claims */
+    @field:Json("ghc:scope") val ghc_scope: String? = null, // Scopes - could consider adding a type adapter for the scopes that parses them in to a list
+    @field:Json("ghc:uid") val ghc_uid: String? = null, // The source User ID which requested the JWT (not always the subject)
+    @field:Json("ghc:cid") val ghc_cid: String? = null, // The client ID which requested the JWT
+    @field:Json("ghc:aid") val ghc_aid: String? = null // The app ID which requested the JWT
 )

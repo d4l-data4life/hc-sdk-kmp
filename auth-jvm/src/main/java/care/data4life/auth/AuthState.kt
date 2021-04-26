@@ -17,6 +17,6 @@
 package care.data4life.auth
 
 data class AuthState(
-        val alias: String,
-        val secret: String
+    val alias: String,
+    val secret: String
 )

@@ -21,7 +21,6 @@ import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import org.threeten.bp.LocalDate

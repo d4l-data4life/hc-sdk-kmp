@@ -16,6 +16,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Danger
-        uses: danger/kotlin@1.0.0-beta
+        uses: docker://ghcr.io/danger/danger-kotlin:1.0.0-beta
+        with:
+          args: --failOnErrors --no-publish-check
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

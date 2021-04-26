@@ -30,7 +30,7 @@ import java.security.spec.X509EncodedKeySpec
 import javax.crypto.spec.SecretKeySpec
 
 class KeyFactory(
-        private val base64: Base64
+    private val base64: Base64
 ) : CryptoContract.KeyFactory {
 
     override fun createGCKey(exchangeKey: ExchangeKey): GCKey {
@@ -41,13 +41,14 @@ class KeyFactory(
         }
 
         val symmetricKey = GCSymmetricKey(
-                SecretKeySpec(base64.decode(exchangeKey.symmetricKey!!),
-                        algorithm.transformation
-                ))
+            SecretKeySpec(
+                base64.decode(exchangeKey.symmetricKey!!),
+                algorithm.transformation
+            )
+        )
 
         return GCKey(algorithm, symmetricKey, exchangeKey.getVersion().symmetricKeySize)
     }
-
 
     override fun createGCKeyPair(exchangeKey: ExchangeKey): GCKeyPair {
         val algorithm = GCRSAKeyAlgorithm()

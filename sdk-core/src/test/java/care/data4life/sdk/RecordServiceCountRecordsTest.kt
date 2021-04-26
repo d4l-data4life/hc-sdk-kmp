@@ -17,9 +17,6 @@
 package care.data4life.sdk
 
 import care.data4life.fhir.stu3.model.Patient
-import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
-import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
-import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.fhir.Fhir3Resource
@@ -27,6 +24,9 @@ import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.migration.MigrationContract
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
+import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
@@ -57,18 +57,18 @@ class RecordServiceCountRecordsTest {
         clearAllMocks()
 
         recordService = spyk(
-                RecordService(
-                        PARTNER_ID,
-                        ALIAS,
-                        apiService,
-                        tagEncryptionService,
-                        taggingService,
-                        fhirService,
-                        attachmentService,
-                        cryptoService,
-                        errorHandler,
-                        compatibilityService
-                )
+            RecordService(
+                PARTNER_ID,
+                ALIAS,
+                apiService,
+                tagEncryptionService,
+                taggingService,
+                fhirService,
+                attachmentService,
+                cryptoService,
+                errorHandler,
+                compatibilityService
+            )
         )
     }
 
@@ -82,30 +82,30 @@ class RecordServiceCountRecordsTest {
         every { taggingService.getTagsFromType(Fhir3Resource::class.java as Class<Any>) } returns tags
         every {
             compatibilityService.countRecords(
-                    ALIAS,
-                    USER_ID,
-                    tags,
-                    annotations
+                ALIAS,
+                USER_ID,
+                tags,
+                annotations
             )
         } returns Single.just(expected)
 
         // When
         val observer = recordService.countFhir3Records(
-                Fhir3Resource::class.java,
-                USER_ID,
-                annotations
+            Fhir3Resource::class.java,
+            USER_ID,
+            annotations
         ).test().await()
 
         // Then
         val result = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
         assertEquals(
-                expected = expected,
-                actual = result
+            expected = expected,
+            actual = result
         )
         verify(exactly = 1) { taggingService.getTagsFromType(Fhir3Resource::class.java as Class<Any>) }
         verify(exactly = 1) { compatibilityService.countRecords(ALIAS, USER_ID, tags, annotations) }
@@ -121,30 +121,30 @@ class RecordServiceCountRecordsTest {
         every { taggingService.getTagsFromType(Fhir4Resource::class.java as Class<Any>) } returns tags
         every {
             compatibilityService.countRecords(
-                    ALIAS,
-                    USER_ID,
-                    tags,
-                    annotations
+                ALIAS,
+                USER_ID,
+                tags,
+                annotations
             )
         } returns Single.just(expected)
 
         // When
         val observer = recordService.countFhir4Records(
-                Fhir4Resource::class.java,
-                USER_ID,
-                annotations
+            Fhir4Resource::class.java,
+            USER_ID,
+            annotations
         ).test().await()
 
         // Then
         val result = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
         assertEquals(
-                expected = expected,
-                actual = result
+            expected = expected,
+            actual = result
         )
         verify(exactly = 1) { taggingService.getTagsFromType(Fhir4Resource::class.java as Class<Any>) }
         verify(exactly = 1) { compatibilityService.countRecords(ALIAS, USER_ID, tags, annotations) }
@@ -163,26 +163,26 @@ class RecordServiceCountRecordsTest {
 
         // When
         val observer = recordService.countAllFhir3Records(
-                USER_ID,
-                annotations
+            USER_ID,
+            annotations
         ).test().await()
 
         // Then
         val result = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
         assertEquals(
-                expected = expected,
-                actual = result
+            expected = expected,
+            actual = result
         )
         verify(exactly = 1) {
             recordService.countFhir3Records(
-                    Fhir3Resource::class.java,
-                    USER_ID,
-                    annotations
+                Fhir3Resource::class.java,
+                USER_ID,
+                annotations
             )
         }
     }
@@ -196,33 +196,33 @@ class RecordServiceCountRecordsTest {
 
         every {
             recordService.countFhir3Records(
-                    resourceType,
-                    USER_ID,
-                    defaultAnnotations
+                resourceType,
+                USER_ID,
+                defaultAnnotations
             )
         } returns Single.just(expected)
 
         val observer = recordService.countRecords(
-                resourceType,
-                USER_ID
+            resourceType,
+            USER_ID
         ).test().await()
 
         // Then
         val result = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
         assertEquals(
-                expected = expected,
-                actual = result
+            expected = expected,
+            actual = result
         )
         verify(exactly = 1) {
             recordService.countFhir3Records(
-                    resourceType,
-                    USER_ID,
-                    defaultAnnotations
+                resourceType,
+                USER_ID,
+                defaultAnnotations
             )
         }
     }
@@ -237,34 +237,34 @@ class RecordServiceCountRecordsTest {
 
         every {
             recordService.countFhir3Records(
-                    resourceType,
-                    USER_ID,
-                    annotations
+                resourceType,
+                USER_ID,
+                annotations
             )
         } returns Single.just(expected)
 
         val observer = recordService.countRecords(
-                resourceType,
-                USER_ID,
-                annotations
+            resourceType,
+            USER_ID,
+            annotations
         ).test().await()
 
         // Then
         val result = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
         assertEquals(
-                expected = expected,
-                actual = result
+            expected = expected,
+            actual = result
         )
         verify(exactly = 1) {
             recordService.countFhir3Records(
-                    resourceType,
-                    USER_ID,
-                    annotations
+                resourceType,
+                USER_ID,
+                annotations
             )
         }
     }
@@ -277,31 +277,31 @@ class RecordServiceCountRecordsTest {
 
         every {
             recordService.countAllFhir3Records(
-                    USER_ID,
-                    defaultAnnotations
+                USER_ID,
+                defaultAnnotations
             )
         } returns Single.just(expected)
 
         val observer = recordService.countRecords(
-                null,
-                USER_ID
+            null,
+            USER_ID
         ).test().await()
 
         // Then
         val result = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
         assertEquals(
-                expected = expected,
-                actual = result
+            expected = expected,
+            actual = result
         )
         verify(exactly = 1) {
             recordService.countAllFhir3Records(
-                    USER_ID,
-                    defaultAnnotations
+                USER_ID,
+                defaultAnnotations
             )
         }
     }
@@ -315,32 +315,32 @@ class RecordServiceCountRecordsTest {
 
         every {
             recordService.countAllFhir3Records(
-                    USER_ID,
-                    annotations
+                USER_ID,
+                annotations
             )
         } returns Single.just(expected)
 
         val observer = recordService.countRecords(
-                null,
-                USER_ID,
-                annotations
+            null,
+            USER_ID,
+            annotations
         ).test().await()
 
         // Then
         val result = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
         assertEquals(
-                expected = expected,
-                actual = result
+            expected = expected,
+            actual = result
         )
         verify(exactly = 1) {
             recordService.countAllFhir3Records(
-                    USER_ID,
-                    annotations
+                USER_ID,
+                annotations
             )
         }
     }

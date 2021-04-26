@@ -27,8 +27,8 @@ import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Attachment
-import care.data4life.sdk.fhir.Fhir3Identifier
 import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
@@ -81,7 +81,6 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import org.threeten.bp.LocalDate
 import java.io.IOException
-import kotlin.collections.HashMap
 
 // TODO internal
 // TODO add Factory
@@ -131,8 +130,9 @@ class RecordService internal constructor(
     private val identifierFactory: WrapperFactoryContract.IdentifierFactory = SdkIdentifierFactory
     private val dateTimeFormatter: WrapperContract.DateTimeFormatter = SdkDateTimeFormatter
 
-    private fun isFhir(resource: Any?): Boolean =
-        resource is Fhir3Resource || resource is Fhir4Resource
+    private fun isFhir3(resource: Any?): Boolean = resource is Fhir3Resource
+    private fun isFhir4(resource: Any?): Boolean = resource is Fhir4Resource
+    private fun isFhir(resource: Any?): Boolean = isFhir3(resource) || isFhir4(resource)
 
     private fun <T : Any> createRecord(
         userId: String,
@@ -402,43 +402,6 @@ class RecordService internal constructor(
         offset
     ) as Single<List<DataRecord<DataResource>>>
 
-    override fun <T : Fhir3Resource> downloadRecord(
-        recordId: String,
-        userId: String
-    ): Single<Record<T>> = apiService
-        .fetchRecord(alias, userId, recordId)
-        .map { encryptedRecord ->
-            decryptRecord<T>(encryptedRecord, userId) as DecryptedFhir3Record<T>
-        }
-        .map { decryptedRecord -> downloadData(decryptedRecord, userId) }
-        .map { decryptedRecord ->
-            decryptedRecord.also {
-                checkDataRestrictions(decryptedRecord.resource)
-            }
-        }
-        .map { decryptedRecord -> assignResourceId(decryptedRecord) }
-        .map { decryptedRecord ->
-            recordFactory.getInstance(decryptedRecord) as Record<T>
-        }
-
-    fun <T : Fhir3Resource> downloadRecords(
-        recordIds: List<String>,
-        userId: String
-    ): Single<DownloadResult<T>> {
-        val failedDownloads: MutableList<Pair<String, D4LException>> = arrayListOf()
-        return Observable
-            .fromCallable { recordIds }
-            .flatMapIterable { it }
-            .flatMapSingle { recordId ->
-                downloadRecord<T>(recordId, userId)
-                    .ignoreErrors {
-                        failedDownloads.add(Pair(recordId, errorHandler.handleError(it)))
-                    }
-            }
-            .toList()
-            .map { DownloadResult(it, failedDownloads) }
-    }
-
     @Throws(
         DataRestrictionException.UnsupportedFileType::class,
         DataRestrictionException.MaxDataSizeViolation::class
@@ -454,7 +417,12 @@ class RecordService internal constructor(
 
         return apiService
             .fetchRecord(alias, userId, recordId)
-            .map { fetchedRecord -> decryptRecord<T>(fetchedRecord, userId) } // Fixme: Resource clash
+            .map { fetchedRecord ->
+                decryptRecord<T>(
+                    fetchedRecord,
+                    userId
+                )
+            } // Fixme: Resource clash
             .map { decryptedRecord -> updateData(decryptedRecord, resource, userId) }
             .map { decryptedRecord ->
                 cleanObsoleteAdditionalIdentifiers(resource)
@@ -466,7 +434,14 @@ class RecordService internal constructor(
             }
             .map { decryptedRecord -> removeUploadData(decryptedRecord) }
             .map { decryptedRecord -> encryptRecord(decryptedRecord) }
-            .flatMap { encryptedRecord -> apiService.updateRecord(alias, userId, recordId, encryptedRecord) }
+            .flatMap { encryptedRecord ->
+                apiService.updateRecord(
+                    alias,
+                    userId,
+                    recordId,
+                    encryptedRecord
+                )
+            }
             .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
             .map { decryptedRecord -> restoreUploadData(decryptedRecord, resource, data) }
             .map { decryptedRecord -> assignResourceId(decryptedRecord) }
@@ -580,10 +555,148 @@ class RecordService internal constructor(
         annotations: List<String>
     ): Single<Int> = countFhir3Records(Fhir3Resource::class.java, userId, annotations)
 
+    override fun <T : Fhir3Resource> downloadFhir3Record(
+        recordId: String,
+        userId: String
+    ): Single<Record<T>> = downloadRecord<T>(
+        recordId,
+        userId,
+        ::isFhir3
+    ) as Single<Record<T>>
+
+    override fun <T : Fhir4Resource> downloadFhir4Record(
+        recordId: String,
+        userId: String
+    ): Single<Fhir4Record<T>> = downloadRecord<T>(
+        recordId,
+        userId,
+        ::isFhir4
+    ) as Single<Fhir4Record<T>>
+
+    private fun <T : Any> downloadRecord(
+        recordId: String,
+        userId: String,
+        resourceBarrier: (resource: Any) -> Boolean
+    ): Single<BaseRecord<T>> = apiService
+        .fetchRecord(alias, userId, recordId)
+        .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
+        .map { decryptedRecord -> failOnResourceInconsistency(decryptedRecord, resourceBarrier) }
+        .map { decryptedRecord -> downloadData(decryptedRecord, userId) }
+        .map { decryptedRecord ->
+            decryptedRecord.also {
+                checkDataRestrictions(decryptedRecord.resource)
+            }
+        }
+        .map { decryptedRecord -> assignResourceId(decryptedRecord) }
+        .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) }
+
+    fun <T : Fhir3Resource> downloadRecords(
+        recordIds: List<String>,
+        userId: String
+    ): Single<DownloadResult<T>> {
+        val failedDownloads: MutableList<Pair<String, D4LException>> = arrayListOf()
+        return Observable
+            .fromCallable { recordIds }
+            .flatMapIterable { it }
+            .flatMapSingle { recordId ->
+                downloadFhir3Record<T>(recordId, userId)
+                    .ignoreErrors {
+                        failedDownloads.add(Pair(recordId, errorHandler.handleError(it)))
+                    }
+            }
+            .toList()
+            .map { records -> DownloadResult(records as MutableList<Record<T>>?, failedDownloads) }
+    }
+
+    override fun downloadFhir3Attachment(
+        recordId: String,
+        attachmentId: String,
+        userId: String,
+        type: DownloadType
+    ): Single<Fhir3Attachment> = downloadFhir3Attachments(
+        recordId,
+        listOf(attachmentId),
+        userId,
+        type
+    ).map { it[0] }
+
+    override fun downloadFhir4Attachment(
+        recordId: String,
+        attachmentId: String,
+        userId: String,
+        type: DownloadType
+    ): Single<Fhir4Attachment> = downloadFhir4Attachments(
+        recordId,
+        listOf(attachmentId),
+        userId,
+        type
+    ).map { it[0] }
+
+    @Throws(IllegalArgumentException::class)
+    override fun downloadFhir3Attachments(
+        recordId: String,
+        attachmentIds: List<String>,
+        userId: String,
+        type: DownloadType
+    ): Single<List<Fhir3Attachment>> = downloadAttachments<Fhir3Resource, Fhir3Attachment>(
+        recordId,
+        attachmentIds,
+        userId,
+        type,
+        ::isFhir3
+    )
+
+    @Throws(IllegalArgumentException::class)
+    override fun downloadFhir4Attachments(
+        recordId: String,
+        attachmentIds: List<String>,
+        userId: String,
+        type: DownloadType
+    ): Single<List<Fhir4Attachment>> = downloadAttachments<Fhir4Resource, Fhir4Attachment>(
+        recordId,
+        attachmentIds,
+        userId,
+        type,
+        ::isFhir4
+    )
+
+    @Throws(IllegalArgumentException::class)
+    private fun <T : Any, R : Any> downloadAttachments(
+        recordId: String,
+        attachmentIds: List<String>,
+        userId: String,
+        type: DownloadType,
+        resourceBarrier: (resource: Any) -> Boolean
+    ): Single<List<R>> = apiService
+        .fetchRecord(alias, userId, recordId)
+        .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
+        .map { decryptedRecord -> failOnResourceInconsistency(decryptedRecord, resourceBarrier) }
+        .flatMap { decryptedRecord ->
+            downloadAttachmentsFromStorage<T, R>(
+                attachmentIds,
+                userId,
+                type,
+                decryptedRecord
+            )
+        }
+
     //region utility methods
+    @Throws(IllegalArgumentException::class)
+    private fun <T : Any> failOnResourceInconsistency(
+        record: DecryptedBaseRecord<T>,
+        resourceBarrier: (resource: Any) -> Boolean
+    ): DecryptedBaseRecord<T> {
+        return if (resourceBarrier(record.resource)) {
+            record
+        } else {
+            throw IllegalArgumentException("The given Record does not match the expected resource type.")
+        }
+    }
+
     @Throws(IOException::class)
     internal fun <T : Any> encryptRecord(record: DecryptedBaseRecord<T>): NetworkModelContract.EncryptedRecord {
-        val encryptedTags = tagEncryptionService.encryptTagsAndAnnotations(record.tags!!, record.annotations)
+        val encryptedTags =
+            tagEncryptionService.encryptTagsAndAnnotations(record.tags!!, record.annotations)
 
         val commonKey = cryptoService.fetchCurrentCommonKey()
         val currentCommonKeyId = cryptoService.currentCommonKeyId
@@ -689,55 +802,27 @@ class RecordService internal constructor(
         ) as DecryptedBaseRecord<T>
     }
 
-    override fun downloadAttachment(
-        recordId: String,
-        attachmentId: String,
-        userId: String,
-        type: DownloadType
-    ): Single<Fhir3Attachment> = downloadAttachments(
-        recordId,
-        listOf(attachmentId),
-        userId,
-        type
-    ).map { it[0] }
-
-    override fun downloadAttachments(
-        recordId: String,
-        attachmentIds: List<String>,
-        userId: String,
-        type: DownloadType
-    ): Single<List<Fhir3Attachment>> = apiService
-        .fetchRecord(alias, userId, recordId)
-        .map { decryptRecord<Fhir3Resource>(it, userId) }
-        .flatMap {
-            downloadAttachmentsFromStorage(
-                attachmentIds,
-                userId,
-                type,
-                it as DecryptedFhir3Record<Fhir3Resource>
-            )
-        }
-
     @Throws(
         DataValidationException.IdUsageViolation::class,
         DataValidationException.InvalidAttachmentPayloadHash::class
     )
-    internal fun downloadAttachmentsFromStorage(
+    internal fun <T : Any, R : Any> downloadAttachmentsFromStorage(
         attachmentIds: List<String>,
         userId: String,
         type: DownloadType,
-        decryptedRecord: DecryptedFhir3Record<Fhir3Resource>
-    ): Single<out List<Fhir3Attachment>> {
+        decryptedRecord: DecryptedBaseRecord<T>
+    ): Single<List<R>> {
         if (fhirAttachmentHelper.hasAttachment(decryptedRecord.resource)) {
             val resource = decryptedRecord.resource
-            val attachments = fhirAttachmentHelper.getAttachment(resource) as List<Fhir3Attachment?>
+            val attachments = fhirAttachmentHelper.getAttachment(resource) ?: emptyList<R?>()
             val validAttachments = mutableListOf<WrapperContract.Attachment>()
-            val validRawAttachments = mutableListOf<Fhir3Attachment>()
 
-            for (attachment in attachments) {
-                if (attachmentIds.contains(attachment?.id)) {
-                    validRawAttachments.add(attachment!!)
-                    validAttachments.add(SdkAttachmentFactory.wrap(attachment))
+            for (rawAttachment in attachments) {
+                if (rawAttachment != null) {
+                    val attachment = SdkAttachmentFactory.wrap(rawAttachment)
+                    if (attachmentIds.contains(attachment.id)) {
+                        validAttachments.add(attachment)
+                    }
                 }
             }
 
@@ -745,8 +830,8 @@ class RecordService internal constructor(
                 throw DataValidationException.IdUsageViolation("Please provide correct attachment ids!")
 
             setAttachmentIdForDownloadType(
-                validRawAttachments,
-                fhirAttachmentHelper.getIdentifier(resource) as List<Fhir3Identifier>?,
+                validAttachments,
+                fhirAttachmentHelper.getIdentifier(resource),
                 type
             )
 
@@ -757,11 +842,15 @@ class RecordService internal constructor(
                 userId
             )
                 .flattenAsObservable { attachment -> attachment }
-                .map { attachment ->
-                    attachment.unwrap<Fhir3Attachment>().also {
-                        if (it.id!!.contains(SPLIT_CHAR)) updateAttachmentMeta(it)
+                .map {
+                    attachment ->
+                    if (attachment.id!!.contains(SPLIT_CHAR)) {
+                        updateAttachmentMeta(attachment)
+                    } else {
+                        attachment
                     }
                 }
+                .map { attachment -> attachment.unwrap<R>() }
                 .toList()
         }
 
@@ -1091,19 +1180,19 @@ class RecordService internal constructor(
     // TODO move to AttachmentService -> Thumbnail handling
     @Throws(DataValidationException.IdUsageViolation::class)
     fun setAttachmentIdForDownloadType(
-        attachments: List<Any>,
+        attachments: List<WrapperContract.Attachment>,
         identifiers: List<Any>?,
         type: DownloadType
     ) {
-        for (rawAttachment in attachments) {
-            val attachment = attachmentFactory.wrap(rawAttachment)
+        for (attachment in attachments) {
             val additionalIds = extractAdditionalAttachmentIds(
                 identifiers,
                 attachment.id
             )
             if (additionalIds is List<*>) {
                 when (type) {
-                    DownloadType.Full -> { /* do nothing */ }
+                    DownloadType.Full -> { /* do nothing */
+                    }
                     DownloadType.Medium -> attachment.id += ThumbnailService.SPLIT_CHAR + additionalIds[PREVIEW_ID_POS]
                     DownloadType.Small -> attachment.id += ThumbnailService.SPLIT_CHAR + additionalIds[THUMBNAIL_ID_POS]
                 }
@@ -1168,7 +1257,7 @@ class RecordService internal constructor(
     private fun hashAttachmentData(data: ByteArray): String = encodeToString(sha1(data))
 
     // TODO move to AttachmentService
-    fun updateAttachmentMeta(attachment: Fhir3Attachment): Fhir3Attachment {
+    fun updateAttachmentMeta(attachment: WrapperContract.Attachment): WrapperContract.Attachment {
         val data = decode(attachment.data!!)
         attachment.size = data.size
         attachment.hash = hashAttachmentData(data)

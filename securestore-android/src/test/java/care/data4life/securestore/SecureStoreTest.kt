@@ -30,20 +30,16 @@ class SecureStoreTest {
     val encryptedData = "encryptedData".toCharArray()
     val dataAlias = "data_alias"
 
-
     val mockCryptor = mockk<SecureStoreCryptor>()
     val mockStorage = mockk<SecureStoreStorage>(relaxed = true)
 
-
     // SUT
     lateinit var secureStore: SecureStore
-
 
     @Before
     fun setUp() {
         secureStore = SecureStore(mockCryptor, mockStorage)
     }
-
 
     @Test
     fun `addData() should add encrypted data to storage`() {

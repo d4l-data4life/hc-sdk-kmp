@@ -20,8 +20,10 @@ import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.call.Task
 import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.D4LException
+import care.data4life.sdk.model.DownloadType
 import org.threeten.bp.LocalDate
 import care.data4life.sdk.listener.Callback as LegacyCallback
 import care.data4life.sdk.listener.ResultListener as LegacyListener
@@ -71,7 +73,11 @@ interface SdkContract {
          * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun <T : Fhir4Resource> create(resource: T, annotations: List<String>, callback: Callback<Fhir4Record<T>>): Task
+        fun <T : Fhir4Resource> create(
+            resource: T,
+            annotations: List<String>,
+            callback: Callback<Fhir4Record<T>>
+        ): Task
 
         /**
          * Update an {@link Fhir4Record}
@@ -82,7 +88,23 @@ interface SdkContract {
          * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun <T : Fhir4Resource> update(recordId: String, resource: T, annotations: List<String>, callback: Callback<Fhir4Record<T>>): Task
+        fun <T : Fhir4Resource> update(
+            recordId: String,
+            resource: T,
+            annotations: List<String>,
+            callback: Callback<Fhir4Record<T>>
+        ): Task
+
+        /**
+         * Download an {@link Fhir4Record}
+         *
+         * @param recordId the id of the record that shall be downloaded
+         * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
+         * @return [Task] which can be used to cancel ongoing operation or to query operation status
+         * @throws IllegalArgumentException if {@param recordId} is not FHIR4
+         * @throws care.data4life.sdk.config.DataRestrictionException if {@param resource} is DocumentReference and {@link Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
+         </T> */
+        fun <T : Fhir4Resource> download(recordId: String, callback: Callback<Fhir4Record<T>>): Task
 
         /**
          * Delete an {@link Fhir4Record}
@@ -132,7 +154,47 @@ interface SdkContract {
          * @param callback    either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun <T : Fhir4Resource> count(resourceType: Class<T>, annotations: List<String>, callback: Callback<Int>): Task
+        fun <T : Fhir4Resource> count(
+            resourceType: Class<T>,
+            annotations: List<String>,
+            callback: Callback<Int>
+        ): Task
+
+        /**
+         * Download a specific {@link Fhir4Attachment} from a {@link Fhir4Record}.
+         *
+         * @param recordId     the id of the record the attachment belongs to
+         * @param attachmentId the id of the attachment that shall be downloaded
+         * @param type         the size of attachment that shall be downloaded(Full, Medium, Small).
+         * @param callback     either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
+         *                     This property has effect only for image type attachments.
+         * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
+         * @throws IllegalArgumentException if {@param recordId} is not FHIR4
+         */
+        fun downloadAttachment(
+            recordId: String,
+            attachmentId: String,
+            type: DownloadType,
+            callback: Callback<Fhir4Attachment>
+        ): Task
+
+        /**
+         * Download a list of {@link Fhir4Attachment} from a {@link Fhir4Record}.
+         *
+         * @param recordId      the id of the record the attachments belong to
+         * @param attachmentIds the list of attachment ids that shall be downloaded
+         * @param type          the size of attachment that shall be downloaded(Full, Medium, Small).
+         * @param callback      either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
+         *                      This property has effect only for image type attachments.
+         * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
+         * @throws IllegalArgumentException if {@param recordId} is not FHIR4
+         */
+        fun downloadAttachments(
+            recordId: String,
+            attachmentIds: List<String>,
+            type: DownloadType,
+            callback: Callback<List<Fhir4Attachment>>
+        ): Task
     }
 
     interface DataRecordClient {
@@ -144,7 +206,11 @@ interface SdkContract {
          * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun create(resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>): Task
+        fun create(
+            resource: DataResource,
+            annotations: List<String>,
+            callback: Callback<DataRecord<DataResource>>
+        ): Task
 
         /**
          * Update an {@link DataRecord}
@@ -155,7 +221,12 @@ interface SdkContract {
          * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun update(recordId: String, resource: DataResource, annotations: List<String>, callback: Callback<DataRecord<DataResource>>): Task
+        fun update(
+            recordId: String,
+            resource: DataResource,
+            annotations: List<String>,
+            callback: Callback<DataRecord<DataResource>>
+        ): Task
 
         /**
          * Delete an {@link DataRecord}

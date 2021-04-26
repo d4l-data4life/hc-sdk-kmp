@@ -27,20 +27,25 @@ plugins {
     id("com.diffplug.spotless")
 }
 
-spotless {
-    ratchetFrom("origin/main")
+val ktlintVersion = "0.40.0"
 
+spotless {
     kotlin {
         target("**/*.kt")
         targetExclude("buildSrc/build/")
-        ktlint("0.40.0")
+        ktlint(ktlintVersion).userData(
+            mapOf(
+                "disabled_rules" to "no-wildcard-imports",
+                "ij_kotlin_imports_layout" to "*"
+            )
+        )
         trimTrailingWhitespace()
         indentWithSpaces()
         endWithNewline()
     }
     kotlinGradle {
         target("*.gradle.kts")
-        ktlint("0.40.0")
+        ktlint(ktlintVersion)
         trimTrailingWhitespace()
         indentWithSpaces()
         endWithNewline()

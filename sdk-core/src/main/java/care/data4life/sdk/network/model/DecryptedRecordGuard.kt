@@ -21,7 +21,10 @@ import care.data4life.sdk.network.model.NetworkModelContract.LimitGuard.Companio
 import care.data4life.sdk.network.model.NetworkModelContract.LimitGuard.Companion.MAX_SIZE_CUSTOM_DATA
 
 internal object DecryptedRecordGuard : NetworkModelContract.LimitGuard {
-    override fun checkTagsAndAnnotationsLimits(tags: HashMap<String, String>, annotations: List<String>) {
+    override fun checkTagsAndAnnotationsLimits(
+        tags: HashMap<String, String>,
+        annotations: List<String>
+    ) {
         var acutal = 0
         tags.forEach { entry ->
             acutal += entry.key.length

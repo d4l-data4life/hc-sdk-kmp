@@ -18,16 +18,16 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import java.io.IOException
-import java.util.*
+import java.util.Locale
 
 interface TwillioService {
 
     @GET("2010-04-01/Accounts/{account_sid}/Messages.json")
     fun get2FACode(
-            @Path("account_sid") accountSid: String,
-            @Query("dateSent") dateSent: String,
-            @Query("to") phoneNumber: String,
-            @Query("pageSize") page: Int
+        @Path("account_sid") accountSid: String,
+        @Query("dateSent") dateSent: String,
+        @Query("to") phoneNumber: String,
+        @Query("pageSize") page: Int
     ): Call<ListMessage>
 
     companion object {
@@ -50,7 +50,6 @@ class Message {
     var to: String? = null
 }
 
-
 class ListMessage {
     @SerializedName("messages")
     var messages: List<Message>? = null
@@ -70,7 +69,7 @@ private class BasicAuthInterceptor(user: String, password: String) : Interceptor
     override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
         val request = chain.request()
         val authenticatedRequest = request.newBuilder()
-                .header("Authorization", credentials).build()
+            .header("Authorization", credentials).build()
         return chain.proceed(authenticatedRequest)
     }
 }
@@ -80,24 +79,24 @@ object Auth2FAHelper {
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.US)
     private val config = TestConfigLoader.load().twillio
 
-
     private fun initTwillioService(): TwillioService {
 
         val okHttpClient = OkHttpClient.Builder()
-                .addInterceptor(BasicAuthInterceptor(config.authSid, config.authToken))
-                .build()
+            .addInterceptor(BasicAuthInterceptor(config.authSid, config.authToken))
+            .build()
 
         val retrofit = Retrofit.Builder()
-                .baseUrl(TwillioService.BASE_URL)
-                .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
+            .baseUrl(TwillioService.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
         return retrofit.create(TwillioService::class.java)
     }
 
     private fun fetchLatest2FACode(phoneNumber: String, date: String): ListMessage? {
-        val call: Call<ListMessage> = initTwillioService().get2FACode(config.accountSid, date, phoneNumber, 1)
+        val call: Call<ListMessage> =
+            initTwillioService().get2FACode(config.accountSid, date, phoneNumber, 1)
         return call.execute().body()
     }
 
@@ -105,10 +104,8 @@ object Auth2FAHelper {
         val date = dateFormatter.format(LocalDate.now())
         val message = fetchLatest2FACode(phoneNumber, date)?.messages?.get(0)?.body
         return message?.substring(
-                startIndex = message.length - 6,
-                endIndex = message.length
+            startIndex = message.length - 6,
+            endIndex = message.length
         ) ?: WRONG_PIN
     }
-
 }
-

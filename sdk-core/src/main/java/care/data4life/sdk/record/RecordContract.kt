@@ -21,6 +21,7 @@ import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.Record
@@ -32,47 +33,139 @@ interface RecordContract {
 
     interface Service {
 
-        fun createRecord(userId: String, resource: DataResource, annotations: List<String>): Single<DataRecord<DataResource>>
-        fun <T : Fhir3Resource> createRecord(userId: String, resource: T, annotations: List<String>): Single<Record<T>>
-        fun <T : Fhir4Resource> createRecord(userId: String, resource: T, annotations: List<String>): Single<Fhir4Record<T>>
+        fun createRecord(
+            userId: String,
+            resource: DataResource,
+            annotations: List<String>
+        ): Single<DataRecord<DataResource>>
 
-        fun updateRecord(userId: String, recordId: String, resource: DataResource, annotations: List<String>): Single<DataRecord<DataResource>>
-        fun <T : Fhir3Resource> updateRecord(userId: String, recordId: String, resource: T, annotations: List<String>): Single<Record<T>>
-        fun <T : Fhir4Resource> updateRecord(userId: String, recordId: String, resource: T, annotations: List<String>): Single<Fhir4Record<T>>
+        fun <T : Fhir3Resource> createRecord(
+            userId: String,
+            resource: T,
+            annotations: List<String>
+        ): Single<Record<T>>
+
+        fun <T : Fhir4Resource> createRecord(
+            userId: String,
+            resource: T,
+            annotations: List<String>
+        ): Single<Fhir4Record<T>>
+
+        fun updateRecord(
+            userId: String,
+            recordId: String,
+            resource: DataResource,
+            annotations: List<String>
+        ): Single<DataRecord<DataResource>>
+
+        fun <T : Fhir3Resource> updateRecord(
+            userId: String,
+            recordId: String,
+            resource: T,
+            annotations: List<String>
+        ): Single<Record<T>>
+
+        fun <T : Fhir4Resource> updateRecord(
+            userId: String,
+            recordId: String,
+            resource: T,
+            annotations: List<String>
+        ): Single<Fhir4Record<T>>
 
         fun deleteRecord(userId: String, recordId: String): Completable
 
         fun fetchDataRecord(userId: String, recordId: String): Single<DataRecord<DataResource>>
-        fun <T : Fhir3Resource> fetchFhir3Record(userId: String, recordId: String): Single<Record<T>>
-        fun <T : Fhir4Resource> fetchFhir4Record(userId: String, recordId: String): Single<Fhir4Record<T>>
+        fun <T : Fhir3Resource> fetchFhir3Record(
+            userId: String,
+            recordId: String
+        ): Single<Record<T>>
 
-        fun fetchDataRecords(userId: String, annotations: List<String>, startDate: LocalDate?, endDate: LocalDate?, pageSize: Int, offset: Int): Single<List<DataRecord<DataResource>>>
-        fun <T : Fhir3Resource> fetchFhir3Records(userId: String, resourceType: Class<T>, annotations: List<String>, startDate: LocalDate?, endDate: LocalDate?, pageSize: Int, offset: Int): Single<List<Record<T>>>
-        fun <T : Fhir4Resource> fetchFhir4Records(userId: String, resourceType: Class<T>, annotations: List<String>, startDate: LocalDate?, endDate: LocalDate?, pageSize: Int, offset: Int): Single<List<Fhir4Record<T>>>
+        fun <T : Fhir4Resource> fetchFhir4Record(
+            userId: String,
+            recordId: String
+        ): Single<Fhir4Record<T>>
 
-        fun countFhir3Records(type: Class<out Fhir3Resource>, userId: String, annotations: List<String>): Single<Int>
-        fun countFhir4Records(type: Class<out Fhir4Resource>, userId: String, annotations: List<String>): Single<Int>
+        fun fetchDataRecords(
+            userId: String,
+            annotations: List<String>,
+            startDate: LocalDate?,
+            endDate: LocalDate?,
+            pageSize: Int,
+            offset: Int
+        ): Single<List<DataRecord<DataResource>>>
+
+        fun <T : Fhir3Resource> fetchFhir3Records(
+            userId: String,
+            resourceType: Class<T>,
+            annotations: List<String>,
+            startDate: LocalDate?,
+            endDate: LocalDate?,
+            pageSize: Int,
+            offset: Int
+        ): Single<List<Record<T>>>
+
+        fun <T : Fhir4Resource> fetchFhir4Records(
+            userId: String,
+            resourceType: Class<T>,
+            annotations: List<String>,
+            startDate: LocalDate?,
+            endDate: LocalDate?,
+            pageSize: Int,
+            offset: Int
+        ): Single<List<Fhir4Record<T>>>
+
+        fun countFhir3Records(
+            type: Class<out Fhir3Resource>,
+            userId: String,
+            annotations: List<String>
+        ): Single<Int>
+
+        fun countFhir4Records(
+            type: Class<out Fhir4Resource>,
+            userId: String,
+            annotations: List<String>
+        ): Single<Int>
 
         fun countAllFhir3Records(userId: String, annotations: List<String>): Single<Int>
 
-        fun <T : Fhir3Resource> downloadRecord(recordId: String, userId: String): Single<Record<T>>
+        fun <T : Fhir3Resource> downloadFhir3Record(recordId: String, userId: String): Single<Record<T>>
+        fun <T : Fhir4Resource> downloadFhir4Record(recordId: String, userId: String): Single<Fhir4Record<T>>
 
-        fun downloadAttachment(
+        @Throws(IllegalArgumentException::class)
+        fun downloadFhir3Attachment(
             recordId: String,
             attachmentId: String,
             userId: String,
             type: DownloadType
         ): Single<Fhir3Attachment>
 
-        fun downloadAttachments(
+        @Throws(IllegalArgumentException::class)
+        fun downloadFhir3Attachments(
             recordId: String,
             attachmentIds: List<String>,
             userId: String,
             type: DownloadType
         ): Single<List<Fhir3Attachment>>
 
+        @Throws(IllegalArgumentException::class)
+        fun downloadFhir4Attachment(
+            recordId: String,
+            attachmentId: String,
+            userId: String,
+            type: DownloadType
+        ): Single<Fhir4Attachment>
+
+        @Throws(IllegalArgumentException::class)
+        fun downloadFhir4Attachments(
+            recordId: String,
+            attachmentIds: List<String>,
+            userId: String,
+            type: DownloadType
+        ): Single<List<Fhir4Attachment>>
+
         companion object {
             const val EMPTY_RECORD_ID = ""
+
             // d4l -> namespace, f-> full, p -> preview, t -> thumbnail
             const val DOWNSCALED_ATTACHMENT_IDS_FMT = "d4l_f_p_t"
             const val DOWNSCALED_ATTACHMENT_IDS_SIZE = 4

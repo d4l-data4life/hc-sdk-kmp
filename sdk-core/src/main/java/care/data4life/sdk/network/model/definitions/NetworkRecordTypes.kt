@@ -28,7 +28,7 @@ interface DecryptedBaseRecord<T> {
     var tags: HashMap<String, String>?
     var annotations: List<String>
     var customCreationDate: String?
-    var updatedDate: String? //FIXME: This should never be null
+    var updatedDate: String? // FIXME: This should never be null
     var dataKey: GCKey?
     var attachmentsKey: GCKey?
     var modelVersion: Int

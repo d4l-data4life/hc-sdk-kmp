@@ -33,7 +33,7 @@ class AttachmentFactoryTest {
 
     @Test
     fun `Given, wrap is called with a non FhirAttachment, it fails with a CoreRuntimeExceptionInternalFailure`() {
-        assertFailsWith< CoreRuntimeException.InternalFailure> {
+        assertFailsWith<CoreRuntimeException.InternalFailure> {
             SdkAttachmentFactory.wrap("fail me!")
         }
     }

@@ -45,7 +45,11 @@ class AttachmentService internal constructor(
             .filter { it.data != null }
             .map { attachment ->
                 val originalData = decode(attachment.data!!)
-                attachment.id = fileService.uploadFile(attachmentsKey, userId, originalData).blockingGet()
+                attachment.id = fileService.uploadFile(
+                    attachmentsKey,
+                    userId,
+                    originalData
+                ).blockingGet()
                 val additionalIds = uploadDownscaledImages(
                     attachmentsKey,
                     userId,
@@ -76,7 +80,11 @@ class AttachmentService internal constructor(
                     isPreview = true
                 }
 
-                val data = fileService.downloadFile(attachmentsKey, userId, attachmentId).blockingGet()
+                val data = fileService.downloadFile(
+                    attachmentsKey,
+                    userId,
+                    attachmentId
+                ).blockingGet()
                 val newHash = encodeToString(sha1(data))
 
                 if (!isPreview &&

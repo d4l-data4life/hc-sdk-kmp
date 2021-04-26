@@ -27,7 +27,6 @@ class TestRxSchedulerRule : TestRule {
     var testScheduler = TestScheduler()
         private set
 
-
     override fun apply(base: Statement, description: Description): Statement {
         return object : Statement() {
             override fun evaluate() {
@@ -43,7 +42,6 @@ class TestRxSchedulerRule : TestRule {
                     testScheduler = TestScheduler()
                 }
             }
-
         }
     }
 }

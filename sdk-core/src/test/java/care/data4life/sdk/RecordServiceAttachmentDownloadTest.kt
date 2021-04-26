@@ -17,9 +17,6 @@
 package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
-import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
-import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
@@ -31,6 +28,9 @@ import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
+import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.wrapper.SdkAttachmentFactory
 import care.data4life.sdk.wrapper.SdkFhirAttachmentHelper
 import care.data4life.sdk.wrapper.WrapperContract
@@ -66,18 +66,18 @@ class RecordServiceAttachmentDownloadTest {
         clearAllMocks()
 
         recordService = spyk(
-                RecordService(
-                        PARTNER_ID,
-                        ALIAS,
-                        apiService,
-                        tagEncryptionService,
-                        taggingService,
-                        fhirService,
-                        attachmentService,
-                        cryptoService,
-                        errorHandler,
-                        mockk()
-                )
+            RecordService(
+                PARTNER_ID,
+                ALIAS,
+                apiService,
+                tagEncryptionService,
+                taggingService,
+                fhirService,
+                attachmentService,
+                cryptoService,
+                errorHandler,
+                mockk()
+            )
         )
 
         mockkObject(SdkFhirAttachmentHelper)
@@ -103,8 +103,8 @@ class RecordServiceAttachmentDownloadTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify { attachmentService.download(any(), any(), any()) wasNot Called }
@@ -119,17 +119,19 @@ class RecordServiceAttachmentDownloadTest {
         every { decryptedRecord.resource } returns resource
 
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns false
+        every { SdkFhirAttachmentHelper.getAttachment(any()) } returns mockk()
 
         // When
         val record = recordService.downloadData(decryptedRecord, USER_ID)
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify { attachmentService.download(any(), any(), any()) wasNot Called }
+        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
     }
 
     @Test
@@ -148,8 +150,8 @@ class RecordServiceAttachmentDownloadTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify { attachmentService.download(any(), any(), any()) wasNot Called }
@@ -163,7 +165,7 @@ class RecordServiceAttachmentDownloadTest {
         val decryptedRecord: DecryptedBaseRecord<Fhir3Resource> = mockk()
 
         val attachments: MutableList<Any> = mutableListOf(
-                mockk()
+            mockk()
         )
 
         val wrappedAttachment: WrapperContract.Attachment = spyk()
@@ -184,8 +186,8 @@ class RecordServiceAttachmentDownloadTest {
         }
 
         assertEquals(
-                actual = error.message,
-                expected = "Attachment.id expected"
+            actual = error.message,
+            expected = "Attachment.id expected"
         )
     }
 
@@ -197,7 +199,7 @@ class RecordServiceAttachmentDownloadTest {
         val decryptedRecord: DecryptedBaseRecord<Fhir3Resource> = mockk()
 
         val attachments: MutableList<Any> = mutableListOf(
-                mockk()
+            mockk()
         )
 
         val wrappedAttachment: WrapperContract.Attachment = spyk()
@@ -213,9 +215,9 @@ class RecordServiceAttachmentDownloadTest {
 
         every {
             attachmentService.download(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         } returns Single.just(mockk())
 
@@ -224,15 +226,15 @@ class RecordServiceAttachmentDownloadTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verifyOrder {
             attachmentService.download(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         }
     }
@@ -245,7 +247,7 @@ class RecordServiceAttachmentDownloadTest {
         val decryptedRecord: DecryptedBaseRecord<Fhir3Resource> = mockk()
 
         val attachments: MutableList<Any> = mutableListOf(
-                mockk()
+            mockk()
         )
 
         val wrappedAttachment: WrapperContract.Attachment = spyk()
@@ -264,9 +266,9 @@ class RecordServiceAttachmentDownloadTest {
 
         every {
             attachmentService.download(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         } returns Single.just(mockk())
 
@@ -275,17 +277,17 @@ class RecordServiceAttachmentDownloadTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verifyOrder {
             cryptoService.generateGCKey()
             decryptedRecord.attachmentsKey
             attachmentService.download(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         }
     }
@@ -315,9 +317,9 @@ class RecordServiceAttachmentDownloadTest {
 
         every {
             attachmentService.download(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         } returns Single.just(mockk())
 
@@ -326,25 +328,25 @@ class RecordServiceAttachmentDownloadTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verifyOrder {
             cryptoService.generateGCKey()
             decryptedRecord.attachmentsKey
             attachmentService.download(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         }
 
         verify(exactly = 1) {
             attachmentService.download(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         }
     }
@@ -358,17 +360,19 @@ class RecordServiceAttachmentDownloadTest {
         every { decryptedRecord.resource } returns resource
 
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns false
+        every { SdkFhirAttachmentHelper.getAttachment(any()) } returns mockk()
 
         // When
         val record = recordService.downloadData(decryptedRecord, USER_ID)
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify { attachmentService.download(any(), any(), any()) wasNot Called }
+        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
     }
 
     @Test
@@ -387,8 +391,8 @@ class RecordServiceAttachmentDownloadTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verify { attachmentService.download(any(), any(), any()) wasNot Called }
@@ -402,7 +406,7 @@ class RecordServiceAttachmentDownloadTest {
         val decryptedRecord: DecryptedBaseRecord<Fhir4Resource> = mockk()
 
         val attachments: MutableList<Any> = mutableListOf(
-                mockk()
+            mockk()
         )
 
         val wrappedAttachment: WrapperContract.Attachment = spyk()
@@ -423,8 +427,8 @@ class RecordServiceAttachmentDownloadTest {
         }
 
         assertEquals(
-                actual = error.message,
-                expected = "Attachment.id expected"
+            actual = error.message,
+            expected = "Attachment.id expected"
         )
     }
 
@@ -436,7 +440,7 @@ class RecordServiceAttachmentDownloadTest {
         val decryptedRecord: DecryptedBaseRecord<Fhir4Resource> = mockk()
 
         val attachments: MutableList<Any> = mutableListOf(
-                mockk()
+            mockk()
         )
 
         val wrappedAttachment: WrapperContract.Attachment = spyk()
@@ -452,9 +456,9 @@ class RecordServiceAttachmentDownloadTest {
 
         every {
             attachmentService.download(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         } returns Single.just(mockk())
 
@@ -463,15 +467,15 @@ class RecordServiceAttachmentDownloadTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verifyOrder {
             attachmentService.download(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         }
     }
@@ -501,9 +505,9 @@ class RecordServiceAttachmentDownloadTest {
 
         every {
             attachmentService.download(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         } returns Single.just(mockk())
 
@@ -512,25 +516,25 @@ class RecordServiceAttachmentDownloadTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verifyOrder {
             cryptoService.generateGCKey()
             decryptedRecord.attachmentsKey
             attachmentService.download(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         }
 
         verify(exactly = 1) {
             attachmentService.download(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         }
     }
@@ -543,7 +547,7 @@ class RecordServiceAttachmentDownloadTest {
         val decryptedRecord: DecryptedBaseRecord<Fhir4Resource> = mockk()
 
         val attachments: MutableList<Any> = mutableListOf(
-                mockk()
+            mockk()
         )
 
         val wrappedAttachment: WrapperContract.Attachment = spyk()
@@ -562,9 +566,9 @@ class RecordServiceAttachmentDownloadTest {
 
         every {
             attachmentService.download(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         } returns Single.just(mockk())
 
@@ -573,17 +577,17 @@ class RecordServiceAttachmentDownloadTest {
 
         // Then
         assertSame(
-                actual = record,
-                expected = decryptedRecord
+            actual = record,
+            expected = decryptedRecord
         )
 
         verifyOrder {
             cryptoService.generateGCKey()
             decryptedRecord.attachmentsKey
             attachmentService.download(
-                    listOf(wrappedAttachment),
-                    attachmentKey,
-                    USER_ID
+                listOf(wrappedAttachment),
+                attachmentKey,
+                USER_ID
             )
         }
     }

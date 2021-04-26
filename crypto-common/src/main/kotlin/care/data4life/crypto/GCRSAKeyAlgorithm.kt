@@ -51,5 +51,4 @@ class GCRSAKeyAlgorithm : Algorithm() {
         private const val OAEP_PADDING = "OAEPWithSHA-256AndMGF1Padding"
         private const val SHA_256 = "SHA-256"
     }
-
 }

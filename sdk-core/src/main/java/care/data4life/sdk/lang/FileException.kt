@@ -20,5 +20,4 @@ sealed class FileException(throwable: Throwable) : D4LException(throwable) {
 
     class DownloadFailed(throwable: Throwable) : FileException(throwable)
     class UploadFailed(throwable: Throwable) : FileException(throwable)
-
 }

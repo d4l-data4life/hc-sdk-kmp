@@ -16,21 +16,21 @@
 
 package care.data4life.crypto
 
-class ExchangeKey constructor(@field:Json("t") val type: KeyType,
-                              @field:Json("priv") val privateKey: String?,
-                              @field:Json("pub") val publicKey: String?,
-                              @field:Json("sym") val symmetricKey: String?,
-                              @field:Json("v") private val version: Int?) {
-
+class ExchangeKey constructor(
+    @field:Json("t") val type: KeyType,
+    @field:Json("priv") val privateKey: String?,
+    @field:Json("pub") val publicKey: String?,
+    @field:Json("sym") val symmetricKey: String?,
+    @field:Json("v") private val version: Int?
+) {
 
     constructor(
-            type: KeyType,
-            privateKey: String?,
-            publicKey: String?,
-            symmetricKey: String?,
-            version: KeyVersion
+        type: KeyType,
+        privateKey: String?,
+        publicKey: String?,
+        symmetricKey: String?,
+        version: KeyVersion
     ) : this(type, privateKey, publicKey, symmetricKey, version.value)
-
 
     fun getVersion(): KeyVersion = when (version) {
         0 -> KeyVersion.VERSION_0
@@ -59,5 +59,4 @@ class ExchangeKey constructor(@field:Json("t") val type: KeyType,
         result = 31 * result + (version ?: 0)
         return result
     }
-
 }

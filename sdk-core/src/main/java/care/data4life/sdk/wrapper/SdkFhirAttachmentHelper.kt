@@ -56,7 +56,10 @@ internal object SdkFhirAttachmentHelper : HelperContract.FhirAttachmentHelper {
         }
     }
 
-    private fun updateFhir3AttachmentData(resource: Fhir3Resource, attachmentData: HashMap<Any, String?>?) {
+    private fun updateFhir3AttachmentData(
+        resource: Fhir3Resource,
+        attachmentData: HashMap<Any, String?>?
+    ) {
         val attachment = if (attachmentData == null) {
             null
         } else {
@@ -64,12 +67,15 @@ internal object SdkFhirAttachmentHelper : HelperContract.FhirAttachmentHelper {
         }
 
         Fhir3AttachmentHelper.updateAttachmentData(
-                resource,
-                attachment
+            resource,
+            attachment
         )
     }
 
-    private fun updateFhir4AttachmentData(resource: Fhir4Resource, attachmentData: HashMap<Any, String?>?) {
+    private fun updateFhir4AttachmentData(
+        resource: Fhir4Resource,
+        attachmentData: HashMap<Any, String?>?
+    ) {
         val attachment = if (attachmentData == null) {
             null
         } else {
@@ -77,8 +83,8 @@ internal object SdkFhirAttachmentHelper : HelperContract.FhirAttachmentHelper {
         }
 
         Fhir4AttachmentHelper.updateAttachmentData(
-                resource,
-                attachment
+            resource,
+            attachment
         )
     }
 
@@ -95,12 +101,12 @@ internal object SdkFhirAttachmentHelper : HelperContract.FhirAttachmentHelper {
     override fun setIdentifier(resource: Any, updatedIdentifiers: List<Any>) {
         return when (resource) {
             is Fhir4Resource -> Fhir4AttachmentHelper.setIdentifier(
-                    resource,
-                    updatedIdentifiers as List<Fhir4Identifier>
+                resource,
+                updatedIdentifiers as List<Fhir4Identifier>
             )
             is Fhir3Resource -> Fhir3AttachmentHelper.setIdentifier(
-                    resource,
-                    updatedIdentifiers as List<Fhir3Identifier>
+                resource,
+                updatedIdentifiers as List<Fhir3Identifier>
             )
             else -> throw CoreRuntimeException.InternalFailure()
         }
@@ -110,17 +116,16 @@ internal object SdkFhirAttachmentHelper : HelperContract.FhirAttachmentHelper {
     override fun appendIdentifier(resource: Any, identifier: String, assigner: String) {
         return when (resource) {
             is Fhir4Resource -> Fhir4AttachmentHelper.appendIdentifier(
-                    resource,
-                    identifier,
-                    assigner
+                resource,
+                identifier,
+                assigner
             )
             is Fhir3Resource -> Fhir3AttachmentHelper.appendIdentifier(
-                    resource,
-                    identifier,
-                    assigner
+                resource,
+                identifier,
+                assigner
             )
             else -> throw CoreRuntimeException.InternalFailure()
         }
     }
-
 }

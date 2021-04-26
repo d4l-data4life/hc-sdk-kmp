@@ -92,6 +92,22 @@ interface NetworkingContract {
         fun getInstance(baseUrl: String, pin: String): CertificatePinner
     }
 
+    enum class Data4LifeURI(val uri: String) {
+        SANDBOX("https://api-phdp-sandbox.hpsgc.de"),
+        DEVELOPMENT("https://api-phdp-dev.hpsgc.de"),
+        STAGING("https://api-staging.data4life.care"),
+        LOCAL("https://api.data4life.local"),
+        PRODUCTION("https://api.data4life.care")
+    }
+
+    enum class Smart4HealthURI(val uri: String) {
+        SANDBOX("https://api-sandbox.smart4health.eu"),
+        DEVELOPMENT("https://api-dev.smart4health.eu"),
+        STAGING("https://api-staging.smart4health.eu"),
+        LOCAL("https://api.smart4health.local"),
+        PRODUCTION("https://api.smart4health.eu")
+    }
+
     interface Environment {
         fun getApiBaseURL(platform: String): String
         fun getCertificatePin(platform: String): String
@@ -102,6 +118,11 @@ interface NetworkingContract {
     }
 
     companion object {
+        const val PLATFORM_D4L = "d4l"
+        const val PLATFORM_S4H = "s4h"
+        const val D4L_SP_CERT = "sha256/AJvjswWs1n4m1KDmFNnTqBit2RHFvXsrVU3Uhxcoe4Y="
+        const val D4L_SDL_CERT = "sha256/3f81qEv2rjHvcrwof2egbKo5MjjSHaN/4DOl7R+pH0E="
+        const val S4H_CERT = "sha256/yPBKbgJMVnMeovGKbAtuz65sfy/gpDu0WTiuB8bE5G0="
         const val REQUEST_TIMEOUT = 2
         const val HEADER_ALIAS = "gc_alias"
         const val HEADER_ACCESS_TOKEN = "access_token"

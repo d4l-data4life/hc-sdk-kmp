@@ -59,7 +59,6 @@ import io.mockk.spyk
 import io.reactivex.Single
 import org.junit.Assume
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -363,10 +362,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir3(
             resourceType,
-            TestResourceHelper.getJSONResource(
-                determineFhir3Folder(resourcePrefixes),
-                "$resourceName-nulled-attachment"
-            )
+            TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), "$resourceName-nulled-attachment")
         )
 
         // When
@@ -390,10 +386,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir4(
             resourceType,
-            TestResourceHelper.getJSONResource(
-                determineFhir4Folder(resourcePrefixes),
-                "$resourceName-nulled-attachment"
-            )
+            TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), "$resourceName-nulled-attachment")
         )
 
         // When
@@ -858,8 +851,109 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         }
     }
 
+    // FHIR3 download Attachment
     @Test
-    fun `Given, downloadAttachment is called, with a Fhir3Resource, it downloads the attachment`() {
+    fun `Given, downloadFhir3Attachment is called, with a Fhir3Resource, it downloads the Attachment`() {
+        Assume.assumeTrue(resourcePrefixes.contains("fhir3") || resourcePrefixes.contains("common"))
+
+        // Given
+        val resource = SdkFhirParser.toFhir3(
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
+        )
+
+        val fetchedRecord: EncryptedRecord = mockk()
+        val attachmentKey: GCKey = mockk()
+
+        val firstAttachmentId = "1"
+        val secondAttachmentId = "2"
+
+        val attachmentIds = listOf(firstAttachmentId, secondAttachmentId)
+
+        val firstAttachment = TestAttachmentHelper.buildFhir3Attachment(
+            firstAttachmentId,
+            DATA_PAYLOAD,
+            DATA_SIZE,
+            DATA_HASH
+        )
+        val secondAttachment = TestAttachmentHelper.buildFhir3Attachment(
+            secondAttachmentId,
+            DATA_PAYLOAD,
+            DATA_SIZE,
+            DATA_HASH
+        )
+
+        val attachments = listOf(firstAttachment, secondAttachment)
+
+        val currentIdentifier = Fhir3AttachmentHelper.buildIdentifier(ADDITIONAL_ID, ASSIGNER)
+
+        setFhir3Attachment(resource, attachments)
+        setFhir3Id(resource, listOf(currentIdentifier))
+
+        val wrappedAttachments = listOf(
+            SdkAttachmentFactory.wrap(firstAttachment),
+            SdkAttachmentFactory.wrap(secondAttachment)
+        )
+
+        val decryptedRecord = DecryptedRecord(
+            null,
+            resource,
+            null,
+            defaultAnnotations,
+            null,
+            null,
+            null,
+            attachmentKey,
+            modelVersion
+        )
+
+        every { recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID) } returns decryptedRecord
+        every {
+            apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
+        } returns Single.just(fetchedRecord)
+
+        every {
+            recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID)
+        } returns decryptedRecord as DecryptedBaseRecord<Fhir3Resource>
+
+        every {
+            attachmentService.download(
+                listOf(
+                    SdkAttachmentFactory.wrap(firstAttachment),
+                    SdkAttachmentFactory.wrap(secondAttachment)
+                ),
+                attachmentKey,
+                USER_ID
+            )
+        } returns Single.just(wrappedAttachments)
+
+        // When
+        val test = recordService.downloadFhir3Attachments(
+            RECORD_ID,
+            attachmentIds,
+            USER_ID,
+            DownloadType.Full
+        ).test().await()
+
+        // Then
+        val result = test
+            .assertNoErrors()
+            .assertComplete()
+            .assertValue(listOf(wrappedAttachments[0].unwrap(), wrappedAttachments[1].unwrap()))
+            .values()[0]
+
+        assertEquals(
+            actual = result[0].id,
+            expected = firstAttachmentId
+        )
+        assertEquals(
+            actual = result[1].id,
+            expected = secondAttachmentId
+        )
+    }
+
+    @Test
+    fun `Given, downloadFhir3Attachments is called, with a Fhir3Resource, it downloads the Attachments`() {
         Assume.assumeTrue(resourcePrefixes.contains("fhir3") || resourcePrefixes.contains("common"))
 
         // Given
@@ -939,7 +1033,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         } returns Single.just(wrappedAttachments)
 
         // When
-        val test = recordService.downloadAttachments(
+        val test = recordService.downloadFhir3Attachments(
             RECORD_ID,
             attachmentIds,
             USER_ID,
@@ -964,8 +1058,197 @@ class RecordServiceAdditionalResourceTypeModuleTest {
     }
 
     @Test
-    @Ignore("Not implemented yet")
-    fun `Given, downloadAttachment is called, with a Fhir4Resource, it downloads the attachment`() {
+    fun `Given, downloadFhir3Attachments is called, with a non Fhir3Resource, it fails`() {
+        Assume.assumeTrue(resourcePrefixes.contains("fhir4") || resourcePrefixes.contains("common"))
+
+        // Given
+        val resource = SdkFhirParser.toFhir4(
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
+        )
+
+        val fetchedRecord: EncryptedRecord = mockk()
+        val attachmentKey: GCKey = mockk()
+
+        val firstAttachmentId = "1"
+        val secondAttachmentId = "2"
+
+        val attachmentIds = listOf(firstAttachmentId, secondAttachmentId)
+
+        val firstAttachment = TestAttachmentHelper.buildFhir4Attachment(
+            firstAttachmentId,
+            DATA_PAYLOAD,
+            DATA_SIZE,
+            DATA_HASH
+        )
+        val secondAttachment = TestAttachmentHelper.buildFhir4Attachment(
+            secondAttachmentId,
+            DATA_PAYLOAD,
+            DATA_SIZE,
+            DATA_HASH
+        )
+
+        val attachments = listOf(firstAttachment, secondAttachment)
+
+        val currentIdentifier = Fhir4AttachmentHelper.buildIdentifier(ADDITIONAL_ID, ASSIGNER)
+
+        setFhir4Attachment(resource, attachments)
+        setFhir4Id(resource, listOf(currentIdentifier))
+
+        val wrappedAttachments = listOf(
+            SdkAttachmentFactory.wrap(firstAttachment),
+            SdkAttachmentFactory.wrap(secondAttachment)
+        )
+
+        val decryptedRecord = DecryptedR4Record(
+            null,
+            resource,
+            null,
+            defaultAnnotations,
+            null,
+            null,
+            null,
+            attachmentKey,
+            modelVersion
+        )
+
+        every { recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID) } returns decryptedRecord
+        every {
+            apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
+        } returns Single.just(fetchedRecord)
+
+        every {
+            recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID)
+        } returns decryptedRecord as DecryptedBaseRecord<Fhir4Resource>
+
+        every {
+            attachmentService.download(
+                listOf(
+                    SdkAttachmentFactory.wrap(firstAttachment),
+                    SdkAttachmentFactory.wrap(secondAttachment)
+                ),
+                attachmentKey,
+                USER_ID
+            )
+        } returns Single.just(wrappedAttachments)
+
+        // When
+        val test = recordService.downloadFhir3Attachments(
+            RECORD_ID,
+            attachmentIds,
+            USER_ID,
+            DownloadType.Full
+        ).test().await()
+
+        // Then
+        test
+            .assertError(IllegalArgumentException::class.java)
+            .assertNotComplete()
+    }
+
+    // FHIR4 download Attachment
+    @Test
+    fun `Given, downloadFhir4Attachment is called, with a Fhir4Resource, it downloads the Attachment`() {
+        Assume.assumeTrue(resourcePrefixes.contains("fhir4") || resourcePrefixes.contains("common"))
+
+        // Given
+        val resource = SdkFhirParser.toFhir4(
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
+        )
+
+        val fetchedRecord: EncryptedRecord = mockk()
+        val attachmentKey: GCKey = mockk()
+
+        val firstAttachmentId = "1"
+        val secondAttachmentId = "2"
+
+        val attachmentIds = listOf(firstAttachmentId, secondAttachmentId)
+
+        val firstAttachment = TestAttachmentHelper.buildFhir4Attachment(
+            firstAttachmentId,
+            DATA_PAYLOAD,
+            DATA_SIZE,
+            DATA_HASH
+        )
+        val secondAttachment = TestAttachmentHelper.buildFhir4Attachment(
+            secondAttachmentId,
+            DATA_PAYLOAD,
+            DATA_SIZE,
+            DATA_HASH
+        )
+
+        val attachments = listOf(firstAttachment, secondAttachment)
+
+        val currentIdentifier = Fhir4AttachmentHelper.buildIdentifier(ADDITIONAL_ID, ASSIGNER)
+
+        setFhir4Attachment(resource, attachments)
+        setFhir4Id(resource, listOf(currentIdentifier))
+
+        val wrappedAttachments = listOf(
+            SdkAttachmentFactory.wrap(firstAttachment),
+            SdkAttachmentFactory.wrap(secondAttachment)
+        )
+
+        val decryptedRecord = DecryptedR4Record(
+            null,
+            resource,
+            null,
+            defaultAnnotations,
+            null,
+            null,
+            null,
+            attachmentKey,
+            modelVersion
+        )
+
+        every { recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID) } returns decryptedRecord
+        every {
+            apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
+        } returns Single.just(fetchedRecord)
+
+        every {
+            recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID)
+        } returns decryptedRecord as DecryptedBaseRecord<Fhir4Resource>
+
+        every {
+            attachmentService.download(
+                listOf(
+                    SdkAttachmentFactory.wrap(firstAttachment),
+                    SdkAttachmentFactory.wrap(secondAttachment)
+                ),
+                attachmentKey,
+                USER_ID
+            )
+        } returns Single.just(wrappedAttachments)
+
+        // When
+        val test = recordService.downloadFhir4Attachments(
+            RECORD_ID,
+            attachmentIds,
+            USER_ID,
+            DownloadType.Full
+        ).test().await()
+
+        // Then
+        val result = test
+            .assertNoErrors()
+            .assertComplete()
+            .assertValue(listOf(wrappedAttachments[0].unwrap(), wrappedAttachments[1].unwrap()))
+            .values()[0]
+
+        assertEquals(
+            actual = result[0].id,
+            expected = firstAttachmentId
+        )
+        assertEquals(
+            actual = result[1].id,
+            expected = secondAttachmentId
+        )
+    }
+
+    @Test
+    fun `Given, downloadFhir4Attachments is called, with a Fhir4Resource, it downloads the Attachments`() {
         Assume.assumeTrue(resourcePrefixes.contains("fhir4") || resourcePrefixes.contains("common"))
 
         // Given
@@ -1045,7 +1328,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         } returns Single.just(wrappedAttachments)
 
         // When
-        val test = recordService.downloadAttachments(
+        val test = recordService.downloadFhir4Attachments(
             RECORD_ID,
             attachmentIds,
             USER_ID,
@@ -1067,5 +1350,94 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             actual = result[1].id,
             expected = secondAttachmentId
         )
+    }
+
+    @Test
+    fun `Given, downloadFhir4Attachments is called, with a non Fhir4Resource, it fails`() {
+        Assume.assumeTrue(resourcePrefixes.contains("fhir3") || resourcePrefixes.contains("common"))
+
+        // Given
+        val resource = SdkFhirParser.toFhir3(
+            resourceType,
+            TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
+        )
+
+        val fetchedRecord: EncryptedRecord = mockk()
+        val attachmentKey: GCKey = mockk()
+
+        val firstAttachmentId = "1"
+        val secondAttachmentId = "2"
+
+        val attachmentIds = listOf(firstAttachmentId, secondAttachmentId)
+
+        val firstAttachment = TestAttachmentHelper.buildFhir3Attachment(
+            firstAttachmentId,
+            DATA_PAYLOAD,
+            DATA_SIZE,
+            DATA_HASH
+        )
+        val secondAttachment = TestAttachmentHelper.buildFhir3Attachment(
+            secondAttachmentId,
+            DATA_PAYLOAD,
+            DATA_SIZE,
+            DATA_HASH
+        )
+
+        val attachments = listOf(firstAttachment, secondAttachment)
+
+        val currentIdentifier = Fhir3AttachmentHelper.buildIdentifier(ADDITIONAL_ID, ASSIGNER)
+
+        setFhir3Attachment(resource, attachments)
+        setFhir3Id(resource, listOf(currentIdentifier))
+
+        val wrappedAttachments = listOf(
+            SdkAttachmentFactory.wrap(firstAttachment),
+            SdkAttachmentFactory.wrap(secondAttachment)
+        )
+
+        val decryptedRecord = DecryptedRecord(
+            null,
+            resource,
+            null,
+            defaultAnnotations,
+            null,
+            null,
+            null,
+            attachmentKey,
+            modelVersion
+        )
+
+        every { recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID) } returns decryptedRecord
+        every {
+            apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
+        } returns Single.just(fetchedRecord)
+
+        every {
+            recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID)
+        } returns decryptedRecord as DecryptedBaseRecord<Fhir3Resource>
+
+        every {
+            attachmentService.download(
+                listOf(
+                    SdkAttachmentFactory.wrap(firstAttachment),
+                    SdkAttachmentFactory.wrap(secondAttachment)
+                ),
+                attachmentKey,
+                USER_ID
+            )
+        } returns Single.just(wrappedAttachments)
+
+        // When
+        val test = recordService.downloadFhir4Attachments(
+            RECORD_ID,
+            attachmentIds,
+            USER_ID,
+            DownloadType.Full
+        ).test().await()
+
+        // Then
+        test
+            .assertError(IllegalArgumentException::class.java)
+            .assertNotComplete()
     }
 }

@@ -122,6 +122,7 @@ class RecordServiceAttachmentUploadTest {
 
         every { decryptedRecord.resource } returns resource
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns false
+        every { SdkFhirAttachmentHelper.getAttachment(any()) } returns mockk()
 
         // When
         val record = recordService.uploadData(decryptedRecord, USER_ID)
@@ -501,6 +502,7 @@ class RecordServiceAttachmentUploadTest {
 
         every { decryptedRecord.resource } returns resource
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns false
+        every { SdkFhirAttachmentHelper.getAttachment(any()) } returns mockk()
 
         // When
         val record = recordService.uploadData(decryptedRecord, USER_ID)
@@ -516,6 +518,7 @@ class RecordServiceAttachmentUploadTest {
         }
 
         verify { attachmentService.upload(any(), any(), any()) wasNot Called }
+        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
     }
 
     @Test

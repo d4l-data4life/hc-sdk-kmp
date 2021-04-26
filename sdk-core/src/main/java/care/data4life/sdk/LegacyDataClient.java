@@ -215,14 +215,14 @@ public class LegacyDataClient implements SdkContract.LegacyDataClient {
     @Override
     public Task downloadAttachment(String recordId, String attachmentId, DownloadType type, ResultListener<Attachment> listener) {
         Single<Attachment> operation = userService.getUserID()
-                .flatMap(uid -> recordService.downloadAttachment(recordId, attachmentId, uid, type));
+                .flatMap(uid -> recordService.downloadFhir3Attachment(recordId, attachmentId, uid, type));
         return handler.executeSingle(operation, listener);
     }
 
     @Override
     public Task downloadAttachments(String recordId, List<String> attachmentIds, DownloadType type, ResultListener<List<Attachment>> listener) {
         Single<List<Attachment>> operation = userService.getUserID()
-                .flatMap(uid -> recordService.downloadAttachments(recordId, attachmentIds, uid, type));
+                .flatMap(uid -> recordService.downloadFhir3Attachments(recordId, attachmentIds, uid, type));
         return handler.executeSingle(operation, listener);
     }
 

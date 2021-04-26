@@ -22,6 +22,8 @@ import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3Identifier
 import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Attachment
+import care.data4life.sdk.fhir.Fhir4Identifier
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.DataValidationException
@@ -31,6 +33,7 @@ import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
+import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
@@ -117,22 +120,18 @@ class RecordServiceTest {
     @Test
     fun `Given, updateAttachmentMeta is called, with a Fhir3Attachment, it updates its meta information`() {
         // Given
-        val attachment: Fhir3Attachment = spyk()
+        val attachment: WrapperContract.Attachment = mockk()
 
-        attachment.data = "dGVzdA==" // == test
+        every { attachment.data } returns "dGVzdA==" // == test
+        every { attachment.size = "test".toByteArray().size } just Runs
+        every { attachment.hash = "qUqP5cyxm6YcTAhz05Hph5gvu9M=" } just Runs
 
         // When
         recordService.updateAttachmentMeta(attachment)
 
         // Then
-        assertEquals(
-            actual = attachment.hash,
-            expected = "qUqP5cyxm6YcTAhz05Hph5gvu9M="
-        )
-        assertEquals(
-            actual = attachment.size,
-            expected = "test".toByteArray().size
-        )
+        verify(exactly = 1) { attachment.size = "test".toByteArray().size }
+        verify(exactly = 1) { attachment.hash = "qUqP5cyxm6YcTAhz05Hph5gvu9M=" }
     }
 
     @Test
@@ -389,6 +388,1047 @@ class RecordServiceTest {
     }
 
     @Test
+    fun `Given, deleteAttachment is called, with an AttachmentId and a UserId, it delegates it to the AttachmentService and returns its result`() {
+        // Given
+        val expected: Single<Boolean> = mockk()
+
+        every { attachmentService.delete(ATTACHMENT_ID, USER_ID) } returns expected
+        // When
+        val actual = recordService.deleteAttachment(ATTACHMENT_ID, USER_ID)
+
+        // Then
+        assertSame(
+            actual = actual,
+            expected = expected
+        )
+    }
+
+    // FHIR3 - downloadAttachmentsFromStorage
+    @Test
+    fun `Given, downloadAttachmentsFromStorage is called, with a list of AttachmentsIds, a DecryptedRecord, which contains a Fhir3Resource, it fails, if it not capable of having Attachments`() {
+        mockkObject(SdkFhirAttachmentHelper)
+        // Given
+        val attachmentIds: List<String> = mockk()
+        val resource: Fhir3Resource = mockk()
+        val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk()
+
+        every { decryptedRecord.resource } returns resource
+
+        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns false
+        every { SdkFhirAttachmentHelper.getAttachment(any()) } returns mockk()
+
+        // Then
+        val error = assertFailsWith<IllegalArgumentException> {
+            // When
+            recordService.downloadAttachmentsFromStorage<Fhir3Resource, Fhir3Attachment>(
+                attachmentIds,
+                USER_ID,
+                DownloadType.Full,
+                decryptedRecord
+            )
+        }
+
+        assertEquals(
+            actual = error.message,
+            expected = "Expected a record of a type that has attachment"
+        )
+
+        verify { SdkFhirAttachmentHelper.getAttachment(resource)!!.wasNot(Called) }
+        unmockkObject(SdkFhirAttachmentHelper)
+    }
+
+    @Test
+    fun `Given, downloadAttachmentsFromStorage is called, with a list of AttachmentsIds, a DecryptedRecord, which contains a Fhir3Resource, it fails, if there are no actual Attachments`() {
+        mockkObject(SdkFhirAttachmentHelper)
+        // Given
+        val attachmentIds: List<String> = listOf(
+            "abc",
+            "bcd"
+        )
+        val resource: Fhir3Resource = mockk()
+        val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk()
+
+        every { decryptedRecord.resource } returns resource
+
+        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
+        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns null
+
+        // Then
+        val error = assertFailsWith<DataValidationException.IdUsageViolation> {
+            // When
+            recordService.downloadAttachmentsFromStorage<Fhir3Resource, Fhir3Attachment>(
+                attachmentIds,
+                USER_ID,
+                DownloadType.Full,
+                decryptedRecord
+            )
+        }
+
+        assertEquals(
+            actual = error.message,
+            expected = "Please provide correct attachment ids!"
+        )
+
+        unmockkObject(SdkFhirAttachmentHelper)
+    }
+
+    @Test
+    fun `Given, downloadAttachmentsFromStorage is called, with a list of AttachmentsIds, a DecryptedRecord, which contains a Fhir3Resource, it fails, if the AttachmentIDs does not match the attachments of the record`() {
+        mockkObject(SdkFhirAttachmentHelper)
+        // Given
+        val attachmentIds: List<String> = listOf(
+            "abc",
+            "bcd"
+        )
+        val attachments: MutableList<Fhir3Attachment> = mutableListOf(
+            mockk(relaxed = true)
+        )
+        val resource: Fhir3Resource = mockk()
+        val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk()
+
+        every { decryptedRecord.resource } returns resource
+
+        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
+        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
+
+        // Then
+        val error = assertFailsWith<DataValidationException.IdUsageViolation> {
+            // When
+            recordService.downloadAttachmentsFromStorage<Fhir3Resource, Fhir3Attachment>(
+                attachmentIds,
+                USER_ID,
+                DownloadType.Full,
+                decryptedRecord
+            )
+        }
+
+        assertEquals(
+            actual = error.message,
+            expected = "Please provide correct attachment ids!"
+        )
+
+        unmockkObject(SdkFhirAttachmentHelper)
+    }
+
+    @Test
+    fun `Given, downloadAttachmentsFromStorage is called, with a list of AttachmentsIds, a DecryptedRecord, which contains a Fhir3Resource, it fails, while filter the Attachments by their id`() {
+        mockkObject(SdkFhirAttachmentHelper)
+        // Given
+        val attachmentIds: List<String> = listOf(
+            "abc",
+            "bcd"
+        )
+        val attachments: MutableList<Fhir3Attachment> = mutableListOf(
+            mockk(),
+            mockk()
+        )
+        val resource: Fhir3Resource = mockk()
+        val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk()
+        val wrappedAttachments: List<WrapperContract.Attachment> = listOf(
+            mockk(),
+            mockk()
+        )
+
+        every { wrappedAttachments[0].id } returns attachmentIds[0]
+        every { wrappedAttachments[1].id } returns attachmentIds[1]
+
+        every { decryptedRecord.resource } returns resource
+
+        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
+        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
+
+        // Then
+        val error = assertFailsWith<DataValidationException.IdUsageViolation> {
+            // When
+            recordService.downloadAttachmentsFromStorage<Fhir3Resource, Fhir3Attachment>(
+                attachmentIds,
+                USER_ID,
+                DownloadType.Full,
+                decryptedRecord
+            )
+        }
+
+        assertEquals(
+            actual = error.message,
+            expected = "Please provide correct attachment ids!"
+        )
+
+        unmockkObject(SdkFhirAttachmentHelper)
+    }
+
+    @Test
+    fun `Given, downloadAttachmentsFromStorage is called, with a list of AttachmentsIds, a DecryptedRecord, which contains a Fhir3Resource, it downloads the requested Attachments`() {
+        mockkObject(SdkFhirAttachmentHelper)
+        mockkObject(SdkAttachmentFactory)
+        // Given
+        val attachmentKey: GCKey = mockk()
+        val attachmentIds: List<String> = listOf(
+            "abc",
+            "bcd"
+        )
+        val attachments: MutableList<Fhir3Attachment> = mutableListOf(
+            mockk(),
+            mockk()
+        )
+        val resource: Fhir3Resource = mockk()
+        val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk()
+        val identifiers: List<Fhir3Identifier> = mockk()
+        val wrappedAttachments: List<WrapperContract.Attachment> = listOf(
+            mockk(),
+            mockk()
+        )
+        val downloadedWrappedAttachments: List<WrapperContract.Attachment> = listOf(
+            mockk(),
+            mockk()
+        )
+        val downloadedAttachments: List<Fhir3Attachment> = listOf(
+            spyk(),
+            spyk()
+        )
+
+        every { wrappedAttachments[0].id } returns attachmentIds[0]
+        every { wrappedAttachments[1].id } returns attachmentIds[1]
+
+        every { decryptedRecord.resource } returns resource
+        every { decryptedRecord.attachmentsKey } returns attachmentKey
+
+        every { downloadedWrappedAttachments[0].unwrap<Fhir3Attachment>() } returns downloadedAttachments[0]
+        every { downloadedWrappedAttachments[1].unwrap<Fhir3Attachment>() } returns downloadedAttachments[1]
+
+        every { downloadedWrappedAttachments[0].id } returns "abc"
+        every { downloadedWrappedAttachments[1].id } returns "cdf"
+
+        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
+        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
+        every { SdkFhirAttachmentHelper.getIdentifier(resource) } returns identifiers
+        every { SdkAttachmentFactory.wrap(or(attachments[0], attachments[1])) } returnsMany wrappedAttachments
+        every {
+            recordService.setAttachmentIdForDownloadType(
+                wrappedAttachments,
+                identifiers,
+                DownloadType.Full
+            )
+        } just Runs
+
+        every {
+            attachmentService.download(
+                wrappedAttachments,
+                attachmentKey,
+                USER_ID
+            )
+        } returns Single.just(downloadedWrappedAttachments)
+
+        // When
+        val subscriber = recordService.downloadAttachmentsFromStorage<Fhir3Resource, Fhir3Attachment>(
+            attachmentIds,
+            USER_ID,
+            DownloadType.Full,
+            decryptedRecord
+        ).test().await()
+
+        // Then
+        val result = subscriber
+            .assertNoErrors()
+            .assertComplete()
+            .values()[0]
+
+        assertEquals(
+            actual = result.size,
+            expected = 2
+        )
+        assertEquals(
+            actual = result,
+            expected = downloadedAttachments
+        )
+
+        verifyOrder {
+            recordService.setAttachmentIdForDownloadType(
+                wrappedAttachments,
+                identifiers,
+                DownloadType.Full
+            )
+            attachmentService.download(
+                wrappedAttachments,
+                attachmentKey,
+                USER_ID
+            )
+        }
+        verify { recordService.updateAttachmentMeta(any()) wasNot Called }
+
+        unmockkObject(SdkFhirAttachmentHelper)
+        unmockkObject(SdkAttachmentFactory)
+    }
+
+    @Test
+    fun `Given, downloadAttachmentsFromStorage is called, with a list of AttachmentsIds, a DecryptedRecord, which contains a Fhir3Resource, it downloads the requested Attachments, while updating their metas`() {
+        mockkObject(SdkFhirAttachmentHelper)
+        mockkObject(SdkAttachmentFactory)
+        // Given
+        val attachmentKey: GCKey = mockk()
+        val attachmentIds: List<String> = listOf(
+            "abc",
+            "bcd"
+        )
+        val attachments: MutableList<Fhir3Attachment> = mutableListOf(
+            mockk(),
+            mockk()
+        )
+        val resource: Fhir3Resource = mockk()
+        val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk()
+        val identifiers: List<Fhir3Identifier> = mockk()
+        val wrappedAttachments: List<WrapperContract.Attachment> = listOf(
+            mockk(),
+            mockk()
+        )
+        val downloadedWrappedAttachments: List<WrapperContract.Attachment> = listOf(
+            mockk(),
+            mockk()
+        )
+        val downloadedAttachments: List<Fhir3Attachment> = listOf(
+            spyk(),
+            spyk()
+        )
+        val downloadedAttachmentsIds = listOf(
+            "tomato${SPLIT_CHAR}soup",
+            "potato${SPLIT_CHAR}soup"
+        )
+
+        every { wrappedAttachments[0].id } returns attachmentIds[0]
+        every { wrappedAttachments[1].id } returns attachmentIds[1]
+
+        every { decryptedRecord.resource } returns resource
+        every { decryptedRecord.attachmentsKey } returns attachmentKey
+
+        every { downloadedWrappedAttachments[0].unwrap<Fhir3Attachment>() } returns downloadedAttachments[0]
+        every { downloadedWrappedAttachments[1].unwrap<Fhir3Attachment>() } returns downloadedAttachments[1]
+
+        every { downloadedWrappedAttachments[0].id } returns downloadedAttachmentsIds[0]
+        every { downloadedWrappedAttachments[1].id } returns downloadedAttachmentsIds[1]
+
+        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
+        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
+        every { SdkFhirAttachmentHelper.getIdentifier(resource) } returns identifiers
+        every { SdkAttachmentFactory.wrap(or(attachments[0], attachments[1])) } returnsMany wrappedAttachments
+        every {
+            recordService.setAttachmentIdForDownloadType(
+                wrappedAttachments,
+                identifiers,
+                DownloadType.Full
+            )
+        } just Runs
+
+        every {
+            attachmentService.download(
+                wrappedAttachments,
+                attachmentKey,
+                USER_ID
+            )
+        } returns Single.just(downloadedWrappedAttachments)
+
+        every {
+            recordService.updateAttachmentMeta(downloadedWrappedAttachments[0])
+        } returns downloadedWrappedAttachments[0]
+
+        every {
+            recordService.updateAttachmentMeta(downloadedWrappedAttachments[1])
+        } returns downloadedWrappedAttachments[1]
+
+        // When
+        val subscriber = recordService.downloadAttachmentsFromStorage<Fhir3Resource, Fhir3Attachment>(
+            attachmentIds,
+            USER_ID,
+            DownloadType.Full,
+            decryptedRecord
+        ).test().await()
+
+        // Then
+        val result = subscriber
+            .assertNoErrors()
+            .assertComplete()
+            .values()[0]
+
+        assertEquals(
+            actual = result.size,
+            expected = 2
+        )
+        assertEquals(
+            actual = result,
+            expected = downloadedAttachments
+        )
+
+        verifyOrder {
+            recordService.setAttachmentIdForDownloadType(
+                wrappedAttachments,
+                identifiers,
+                DownloadType.Full
+            )
+            attachmentService.download(
+                wrappedAttachments,
+                attachmentKey,
+                USER_ID
+            )
+            recordService.updateAttachmentMeta(downloadedWrappedAttachments[0])
+            recordService.updateAttachmentMeta(downloadedWrappedAttachments[1])
+        }
+
+        unmockkObject(SdkFhirAttachmentHelper)
+        unmockkObject(SdkAttachmentFactory)
+    }
+
+    // FHIR4 - downloadAttachmentsFromStorage
+    @Test
+    fun `Given, downloadAttachmentsFromStorage is called, with a list of AttachmentsIds, a DecryptedRecord, which contains a Fhir4Resource, it fails, if it not capable of having Attachments`() {
+        mockkObject(SdkFhirAttachmentHelper)
+        // Given
+        val attachmentIds: List<String> = mockk()
+        val resource: Fhir4Resource = mockk()
+        val decryptedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk()
+
+        every { decryptedRecord.resource } returns resource
+
+        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns false
+        every { SdkFhirAttachmentHelper.getAttachment(any()) } returns mockk()
+
+        // Then
+        val error = assertFailsWith<IllegalArgumentException> {
+            // When
+            recordService.downloadAttachmentsFromStorage<Fhir4Resource, Fhir4Attachment>(
+                attachmentIds,
+                USER_ID,
+                DownloadType.Full,
+                decryptedRecord
+            )
+        }
+
+        assertEquals(
+            actual = error.message,
+            expected = "Expected a record of a type that has attachment"
+        )
+
+        verify { SdkFhirAttachmentHelper.getAttachment(resource)!!.wasNot(Called) }
+        unmockkObject(SdkFhirAttachmentHelper)
+    }
+
+    @Test
+    fun `Given, downloadAttachmentsFromStorage is called, with a list of AttachmentsIds, a DecryptedRecord, which contains a Fhir4Resource, it fails, if there are no actual Attachments`() {
+        mockkObject(SdkFhirAttachmentHelper)
+        // Given
+        val attachmentIds: List<String> = listOf(
+            "abc",
+            "bcd"
+        )
+        val resource: Fhir4Resource = mockk()
+        val decryptedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk()
+
+        every { decryptedRecord.resource } returns resource
+
+        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
+        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns null
+
+        // Then
+        val error = assertFailsWith<DataValidationException.IdUsageViolation> {
+            // When
+            recordService.downloadAttachmentsFromStorage<Fhir4Resource, Fhir4Attachment>(
+                attachmentIds,
+                USER_ID,
+                DownloadType.Full,
+                decryptedRecord
+            )
+        }
+
+        assertEquals(
+            actual = error.message,
+            expected = "Please provide correct attachment ids!"
+        )
+
+        unmockkObject(SdkFhirAttachmentHelper)
+    }
+
+    @Test
+    fun `Given, downloadAttachmentsFromStorage is called, with a list of AttachmentsIds, a DecryptedRecord, which contains a Fhir4Resource, it fails, if the AttachmentIDs does not match the attachments of the record`() {
+        mockkObject(SdkFhirAttachmentHelper)
+        // Given
+        val attachmentIds: List<String> = listOf(
+            "abc",
+            "bcd"
+        )
+        val attachments: MutableList<Fhir4Attachment> = mutableListOf(
+            mockk(relaxed = true)
+        )
+        val resource: Fhir4Resource = mockk()
+        val decryptedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk()
+
+        every { decryptedRecord.resource } returns resource
+
+        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
+        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
+
+        // Then
+        val error = assertFailsWith<DataValidationException.IdUsageViolation> {
+            // When
+            recordService.downloadAttachmentsFromStorage<Fhir4Resource, Fhir4Attachment>(
+                attachmentIds,
+                USER_ID,
+                DownloadType.Full,
+                decryptedRecord
+            )
+        }
+
+        assertEquals(
+            actual = error.message,
+            expected = "Please provide correct attachment ids!"
+        )
+
+        unmockkObject(SdkFhirAttachmentHelper)
+    }
+
+    @Test
+    fun `Given, downloadAttachmentsFromStorage is called, with a list of AttachmentsIds, a DecryptedRecord, which contains a Fhir4Resource, it fails, while filter the Attachments by their id`() {
+        mockkObject(SdkFhirAttachmentHelper)
+        // Given
+        val attachmentIds: List<String> = listOf(
+            "abc",
+            "bcd"
+        )
+        val attachments: MutableList<Fhir4Attachment> = mutableListOf(
+            mockk(),
+            mockk()
+        )
+        val resource: Fhir4Resource = mockk()
+        val decryptedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk()
+        val wrappedAttachments: List<WrapperContract.Attachment> = listOf(
+            mockk(),
+            mockk()
+        )
+
+        every { wrappedAttachments[0].id } returns attachmentIds[0]
+        every { wrappedAttachments[1].id } returns attachmentIds[1]
+
+        every { decryptedRecord.resource } returns resource
+
+        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
+        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
+
+        // Then
+        val error = assertFailsWith<DataValidationException.IdUsageViolation> {
+            // When
+            recordService.downloadAttachmentsFromStorage<Fhir4Resource, Fhir4Attachment>(
+                attachmentIds,
+                USER_ID,
+                DownloadType.Full,
+                decryptedRecord
+            )
+        }
+
+        assertEquals(
+            actual = error.message,
+            expected = "Please provide correct attachment ids!"
+        )
+
+        unmockkObject(SdkFhirAttachmentHelper)
+    }
+
+    @Test
+    fun `Given, downloadAttachmentsFromStorage is called, with a list of AttachmentsIds, a DecryptedRecord, which contains a Fhir4Resource, it downloads the requested Attachments`() {
+        mockkObject(SdkFhirAttachmentHelper)
+        mockkObject(SdkAttachmentFactory)
+        // Given
+        val attachmentKey: GCKey = mockk()
+        val attachmentIds: List<String> = listOf(
+            "abc",
+            "bcd"
+        )
+        val attachments: MutableList<Fhir4Attachment> = mutableListOf(
+            mockk(),
+            mockk()
+        )
+        val resource: Fhir4Resource = mockk()
+        val decryptedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk()
+        val identifiers: List<Fhir4Identifier> = mockk()
+        val wrappedAttachments: List<WrapperContract.Attachment> = listOf(
+            mockk(),
+            mockk()
+        )
+        val downloadedWrappedAttachments: List<WrapperContract.Attachment> = listOf(
+            mockk(),
+            mockk()
+        )
+        val downloadedAttachments: List<Fhir4Attachment> = listOf(
+            spyk(),
+            spyk()
+        )
+
+        every { wrappedAttachments[0].id } returns attachmentIds[0]
+        every { wrappedAttachments[1].id } returns attachmentIds[1]
+
+        every { decryptedRecord.resource } returns resource
+        every { decryptedRecord.attachmentsKey } returns attachmentKey
+
+        every { downloadedWrappedAttachments[0].unwrap<Fhir4Attachment>() } returns downloadedAttachments[0]
+        every { downloadedWrappedAttachments[1].unwrap<Fhir4Attachment>() } returns downloadedAttachments[1]
+
+        every { downloadedWrappedAttachments[0].id } returns "abc"
+        every { downloadedWrappedAttachments[1].id } returns "cdf"
+
+        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
+        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
+        every { SdkFhirAttachmentHelper.getIdentifier(resource) } returns identifiers
+        every { SdkAttachmentFactory.wrap(or(attachments[0], attachments[1])) } returnsMany wrappedAttachments
+        every {
+            recordService.setAttachmentIdForDownloadType(
+                wrappedAttachments,
+                identifiers,
+                DownloadType.Full
+            )
+        } just Runs
+
+        every {
+            attachmentService.download(
+                wrappedAttachments,
+                attachmentKey,
+                USER_ID
+            )
+        } returns Single.just(downloadedWrappedAttachments)
+
+        // When
+        val subscriber = recordService.downloadAttachmentsFromStorage<Fhir4Resource, Fhir4Attachment>(
+            attachmentIds,
+            USER_ID,
+            DownloadType.Full,
+            decryptedRecord
+        ).test().await()
+
+        // Then
+        val result = subscriber
+            .assertNoErrors()
+            .assertComplete()
+            .values()[0]
+
+        assertEquals(
+            actual = result.size,
+            expected = 2
+        )
+        assertEquals(
+            actual = result,
+            expected = downloadedAttachments
+        )
+
+        verifyOrder {
+            recordService.setAttachmentIdForDownloadType(
+                wrappedAttachments,
+                identifiers,
+                DownloadType.Full
+            )
+            attachmentService.download(
+                wrappedAttachments,
+                attachmentKey,
+                USER_ID
+            )
+        }
+        verify { recordService.updateAttachmentMeta(any()) wasNot Called }
+
+        unmockkObject(SdkFhirAttachmentHelper)
+        unmockkObject(SdkAttachmentFactory)
+    }
+
+    @Test
+    fun `Given, downloadAttachmentsFromStorage is called, with a list of AttachmentsIds, a DecryptedRecord, which contains a Fhir4Resource, it downloads the requested Attachments, while updating their metas`() {
+        mockkObject(SdkFhirAttachmentHelper)
+        mockkObject(SdkAttachmentFactory)
+        // Given
+        val attachmentKey: GCKey = mockk()
+        val attachmentIds: List<String> = listOf(
+            "abc",
+            "bcd"
+        )
+        val attachments: MutableList<Fhir4Attachment> = mutableListOf(
+            mockk(),
+            mockk()
+        )
+        val resource: Fhir4Resource = mockk()
+        val decryptedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk()
+        val identifiers: List<Fhir4Identifier> = mockk()
+        val wrappedAttachments: List<WrapperContract.Attachment> = listOf(
+            mockk(),
+            mockk()
+        )
+        val downloadedWrappedAttachments: List<WrapperContract.Attachment> = listOf(
+            mockk(),
+            mockk()
+        )
+        val downloadedAttachments: List<Fhir4Attachment> = listOf(
+            spyk(),
+            spyk()
+        )
+        val downloadedAttachmentsIds = listOf(
+            "tomato${SPLIT_CHAR}soup",
+            "potato${SPLIT_CHAR}soup"
+        )
+
+        every { wrappedAttachments[0].id } returns attachmentIds[0]
+        every { wrappedAttachments[1].id } returns attachmentIds[1]
+
+        every { decryptedRecord.resource } returns resource
+        every { decryptedRecord.attachmentsKey } returns attachmentKey
+
+        every { downloadedWrappedAttachments[0].unwrap<Fhir4Attachment>() } returns downloadedAttachments[0]
+        every { downloadedWrappedAttachments[1].unwrap<Fhir4Attachment>() } returns downloadedAttachments[1]
+
+        every { downloadedWrappedAttachments[0].id } returns downloadedAttachmentsIds[0]
+        every { downloadedWrappedAttachments[1].id } returns downloadedAttachmentsIds[1]
+
+        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
+        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
+        every { SdkFhirAttachmentHelper.getIdentifier(resource) } returns identifiers
+        every { SdkAttachmentFactory.wrap(or(attachments[0], attachments[1])) } returnsMany wrappedAttachments
+        every {
+            recordService.setAttachmentIdForDownloadType(
+                wrappedAttachments,
+                identifiers,
+                DownloadType.Full
+            )
+        } just Runs
+
+        every {
+            attachmentService.download(
+                wrappedAttachments,
+                attachmentKey,
+                USER_ID
+            )
+        } returns Single.just(downloadedWrappedAttachments)
+
+        every {
+            recordService.updateAttachmentMeta(downloadedWrappedAttachments[0])
+        } returns downloadedWrappedAttachments[0]
+
+        every {
+            recordService.updateAttachmentMeta(downloadedWrappedAttachments[1])
+        } returns downloadedWrappedAttachments[1]
+
+        // When
+        val subscriber = recordService.downloadAttachmentsFromStorage<Fhir4Resource, Fhir4Attachment>(
+            attachmentIds,
+            USER_ID,
+            DownloadType.Full,
+            decryptedRecord
+        ).test().await()
+
+        // Then
+        val result = subscriber
+            .assertNoErrors()
+            .assertComplete()
+            .values()[0]
+
+        assertEquals(
+            actual = result.size,
+            expected = 2
+        )
+        assertEquals(
+            actual = result,
+            expected = downloadedAttachments
+        )
+
+        verifyOrder {
+            recordService.setAttachmentIdForDownloadType(
+                wrappedAttachments,
+                identifiers,
+                DownloadType.Full
+            )
+            attachmentService.download(
+                wrappedAttachments,
+                attachmentKey,
+                USER_ID
+            )
+            recordService.updateAttachmentMeta(downloadedWrappedAttachments[0])
+            recordService.updateAttachmentMeta(downloadedWrappedAttachments[1])
+        }
+
+        unmockkObject(SdkFhirAttachmentHelper)
+        unmockkObject(SdkAttachmentFactory)
+    }
+
+    // FHIR3 Download Attachments
+    @Test
+    fun `Given, downloadFhir3Attachment is called, with it  a RecordId, AttachmentIds, UserId and a DownloadType, it delegates the call to downloadFhir3Attachments and returns its result`() {
+        // Given
+        val attachmentId = "abc"
+        val expected: Fhir3Attachment = mockk()
+
+        every {
+            recordService.downloadFhir3Attachments(
+                RECORD_ID,
+                listOf(attachmentId),
+                USER_ID,
+                DownloadType.Full
+            )
+        } returns Single.just(listOf(expected))
+
+        // When
+        val subscriber = recordService.downloadFhir3Attachment(
+            RECORD_ID,
+            attachmentId,
+            USER_ID,
+            DownloadType.Full
+        ).test().await()
+
+        // Then
+        val result = subscriber
+            .assertNoErrors()
+            .assertComplete()
+            .values()[0]
+
+        assertSame(
+            actual = result,
+            expected = expected
+        )
+
+        verifyOrder {
+            recordService.downloadFhir3Attachments(
+                RECORD_ID,
+                listOf(attachmentId),
+                USER_ID,
+                DownloadType.Full
+            )
+        }
+    }
+
+    @Test
+    fun `Given, downloadFhir3Attachments is called with a RecordId, AttachmentIds, UserId and a DownloadType, it fails if the fetched Record is not Fhir3`() {
+        // Given
+        val userId = "asd"
+        val recordId = "ads"
+        val attachmentId = "lllll"
+        val attachmentIds = listOf(attachmentId)
+        val type = DownloadType.Medium
+
+        val encryptedRecord = mockk<EncryptedRecord>()
+        val decryptedRecord = mockk<DecryptedFhir4Record<Fhir4Resource>>()
+        val resource: Fhir4Resource = mockk()
+
+        every { decryptedRecord.resource } returns resource
+
+        every { apiService.fetchRecord(ALIAS, userId, recordId) } returns Single.just(encryptedRecord)
+        every { recordService.decryptRecord<Any>(encryptedRecord, userId) } returns decryptedRecord as DecryptedBaseRecord<Any>
+
+        // When
+        val subscriber = recordService.downloadFhir3Attachments(
+            recordId,
+            attachmentIds,
+            userId,
+            type
+        ).test().await()
+
+        // Then
+        subscriber
+            .assertError(IllegalArgumentException::class.java)
+            .assertErrorMessage("The given Record does not match the expected resource type.")
+            .assertNotComplete()
+    }
+
+    @Test
+    fun `Given, downloadFhir3Attachments is called with a RecordId, AttachmentIds, UserId and a DownloadType, returns encountered Attachments`() {
+        // Given
+        val userId = "asd"
+        val recordId = "ads"
+        val attachmentId = "lllll"
+        val attachmentIds = listOf(attachmentId)
+        val type = DownloadType.Medium
+
+        val response1 = mockk<Fhir3Attachment>()
+        val response2 = mockk<Fhir3Attachment>()
+        val response = listOf(response1, response2)
+
+        val encryptedRecord = mockk<EncryptedRecord>()
+        val decryptedRecord = mockk<DecryptedFhir3Record<Fhir3Resource>>()
+        val resource: Fhir3Resource = mockk()
+
+        every { decryptedRecord.resource } returns resource
+
+        every { apiService.fetchRecord(ALIAS, userId, recordId) } returns Single.just(encryptedRecord)
+        every { recordService.decryptRecord<Any>(encryptedRecord, userId) } returns decryptedRecord as DecryptedBaseRecord<Any>
+        every {
+            recordService.downloadAttachmentsFromStorage<Fhir3Resource, Fhir3Attachment>(
+                attachmentIds,
+                userId,
+                type,
+                decryptedRecord
+            )
+        } returns Single.just(response)
+
+        // When
+        val subscriber = recordService.downloadFhir3Attachments(
+            recordId,
+            attachmentIds,
+            userId,
+            type
+        ).test().await()
+
+        // Then
+        val result = subscriber
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
+
+        assertSame(
+            response,
+            result
+        )
+
+        verifyOrder {
+            apiService.fetchRecord(ALIAS, userId, recordId)
+            recordService.decryptRecord<Any>(encryptedRecord, userId)
+            recordService.downloadAttachmentsFromStorage<Fhir3Resource, Fhir3Attachment>(
+                attachmentIds,
+                userId,
+                type,
+                decryptedRecord
+            )
+        }
+    }
+
+    // FHIR4 Download Attachments
+    @Test
+    fun `Given, downloadFhir4Attachment is called, with it  a RecordId, AttachmentIds, UserId and a DownloadType, it delegates the call to downloadFhir4Attachments and returns its result`() {
+        // Given
+        val attachmentId = "abc"
+        val expected: Fhir4Attachment = mockk()
+
+        every {
+            recordService.downloadFhir4Attachments(
+                RECORD_ID,
+                listOf(attachmentId),
+                USER_ID,
+                DownloadType.Full
+            )
+        } returns Single.just(listOf(expected))
+
+        // When
+        val subscriber = recordService.downloadFhir4Attachment(
+            RECORD_ID,
+            attachmentId,
+            USER_ID,
+            DownloadType.Full
+        ).test().await()
+
+        // Then
+        val result = subscriber
+            .assertNoErrors()
+            .assertComplete()
+            .values()[0]
+
+        assertSame(
+            actual = result,
+            expected = expected
+        )
+
+        verifyOrder {
+            recordService.downloadFhir4Attachments(
+                RECORD_ID,
+                listOf(attachmentId),
+                USER_ID,
+                DownloadType.Full
+            )
+        }
+    }
+
+    @Test
+    fun `Given, downloadFhir4Attachments is called with a RecordId, AttachmentIds, UserId and a DownloadType, it fails if the fetched Record is not Fhir4`() {
+        // Given
+        val userId = "asd"
+        val recordId = "ads"
+        val attachmentId = "lllll"
+        val attachmentIds = listOf(attachmentId)
+        val type = DownloadType.Medium
+
+        val encryptedRecord = mockk<EncryptedRecord>()
+        val decryptedRecord = mockk<DecryptedFhir3Record<Fhir3Resource>>()
+        val resource: Fhir3Resource = mockk()
+
+        every { decryptedRecord.resource } returns resource
+
+        every { apiService.fetchRecord(ALIAS, userId, recordId) } returns Single.just(encryptedRecord)
+        every { recordService.decryptRecord<Any>(encryptedRecord, userId) } returns decryptedRecord as DecryptedBaseRecord<Any>
+
+        // When
+        val subscriber = recordService.downloadFhir4Attachments(
+            recordId,
+            attachmentIds,
+            userId,
+            type
+        ).test().await()
+
+        // Then
+        subscriber
+            .assertError(IllegalArgumentException::class.java)
+            .assertErrorMessage("The given Record does not match the expected resource type.")
+            .assertNotComplete()
+    }
+
+    @Test
+    fun `Given, downloadFhir4Attachments is called with a RecordId, AttachmentIds, UserId and a DownloadType, returns encountered Attachments`() {
+        // Given
+        val userId = "asd"
+        val recordId = "ads"
+        val attachmentId = "lllll"
+        val attachmentIds = listOf(attachmentId)
+        val type = DownloadType.Medium
+
+        val response1 = mockk<Fhir4Attachment>()
+        val response2 = mockk<Fhir4Attachment>()
+        val response = listOf(response1, response2)
+
+        val encryptedRecord = mockk<EncryptedRecord>()
+        val decryptedRecord = mockk<DecryptedFhir4Record<Fhir4Resource>>()
+        val resource: Fhir4Resource = mockk()
+
+        every { decryptedRecord.resource } returns resource
+
+        every { apiService.fetchRecord(ALIAS, userId, recordId) } returns Single.just(encryptedRecord)
+        every { recordService.decryptRecord<Any>(encryptedRecord, userId) } returns decryptedRecord as DecryptedBaseRecord<Any>
+        every {
+            recordService.downloadAttachmentsFromStorage<Fhir4Resource, Fhir4Attachment>(
+                attachmentIds,
+                userId,
+                type,
+                decryptedRecord
+            )
+        } returns Single.just(response)
+
+        // When
+        val subscriber = recordService.downloadFhir4Attachments(
+            recordId,
+            attachmentIds,
+            userId,
+            type
+        ).test().await()
+
+        // Then
+        val result = subscriber
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
+
+        assertSame(
+            response,
+            result
+        )
+
+        verifyOrder {
+            apiService.fetchRecord(ALIAS, userId, recordId)
+            recordService.decryptRecord<Any>(encryptedRecord, userId)
+            recordService.downloadAttachmentsFromStorage<Fhir4Resource, Fhir4Attachment>(
+                attachmentIds,
+                userId,
+                type,
+                decryptedRecord
+            )
+        }
+    }
+
+    // FHIR3 Download Record
+    @Test
     fun `Given, downloadRecord is called, with a RecordId and a UserId, it downloads the associated record`() {
         mockkObject(RecordMapper)
 
@@ -402,9 +1442,7 @@ class RecordServiceTest {
         every { decryptedRecord.resource } returns resource
         every { decryptedRecord.identifier } returns identifier
 
-        every { apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID) } returns Single.just(
-            encryptedRecord
-        )
+        every { apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID) } returns Single.just(encryptedRecord)
         every {
             recordService.decryptRecord<Fhir3Resource>(encryptedRecord, USER_ID)
         } returns decryptedRecord
@@ -413,8 +1451,7 @@ class RecordServiceTest {
         every { RecordMapper.getInstance(decryptedRecord) } returns createdRecord
 
         // When
-        val subscriber =
-            recordService.downloadRecord<Fhir3Resource>(RECORD_ID, USER_ID).test().await()
+        val subscriber = recordService.downloadRecord<Fhir3Resource>(RECORD_ID, USER_ID).test().await()
 
         // Then
         val record = subscriber
@@ -458,8 +1495,7 @@ class RecordServiceTest {
         } returnsMany listOf(Single.just(records[0]), Single.just(records[1]))
 
         // When
-        val subscriber =
-            recordService.downloadRecords<Fhir3Resource>(recordIds, USER_ID).test().await()
+        val subscriber = recordService.downloadRecords<Fhir3Resource>(recordIds, USER_ID).test().await()
 
         // Then
         val actual = subscriber
@@ -477,467 +1513,5 @@ class RecordServiceTest {
             actual = actual.failedDownloads,
             expected = listOf()
         )
-    }
-
-    @Test
-    fun `Given, deleteAttachment is called, with an AttachmentId and a UserId, it delegates it to the AttachmentService and returns its result`() {
-        // Given
-        val expected: Single<Boolean> = mockk()
-
-        every { attachmentService.delete(ATTACHMENT_ID, USER_ID) } returns expected
-        // When
-        val actual = recordService.deleteAttachment(ATTACHMENT_ID, USER_ID)
-
-        // Then
-        assertSame(
-            actual = actual,
-            expected = expected
-        )
-    }
-
-    @Test
-    fun `Given, downloadAttachmentsFromStorage is called, with a list of AttachmentsIds, a DecryptedRecord, which contains a Fhir3Resource, it fails, if it not capable of having Attachments`() {
-        mockkObject(SdkFhirAttachmentHelper)
-        // Given
-        val attachmentIds: List<String> = mockk()
-        val resource: Fhir3Resource = mockk()
-        val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk()
-
-        every { decryptedRecord.resource } returns resource
-
-        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns false
-
-        // Then
-        val error = assertFailsWith<IllegalArgumentException> {
-            // When
-            recordService.downloadAttachmentsFromStorage(
-                attachmentIds,
-                USER_ID,
-                DownloadType.Full,
-                decryptedRecord
-            )
-        }
-
-        assertEquals(
-            actual = error.message,
-            expected = "Expected a record of a type that has attachment"
-        )
-
-        unmockkObject(SdkFhirAttachmentHelper)
-    }
-
-    @Test
-    fun `Given, downloadAttachmentsFromStorage is called, with a list of AttachmentsIds, a DecryptedRecord, which contains a Fhir3Resource, it fails, if the AttachmentIDs does not match the attachments of the record`() {
-        mockkObject(SdkFhirAttachmentHelper)
-        // Given
-        val attachmentIds: List<String> = listOf(
-            "abc",
-            "bcd"
-        )
-        val attachments: MutableList<Fhir3Attachment> = mutableListOf(
-            mockk(relaxed = true)
-        )
-        val resource: Fhir3Resource = mockk()
-        val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk()
-
-        every { decryptedRecord.resource } returns resource
-
-        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
-        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
-
-        // Then
-        val error = assertFailsWith<DataValidationException.IdUsageViolation> {
-            // When
-            recordService.downloadAttachmentsFromStorage(
-                attachmentIds,
-                USER_ID,
-                DownloadType.Full,
-                decryptedRecord
-            )
-        }
-
-        assertEquals(
-            actual = error.message,
-            expected = "Please provide correct attachment ids!"
-        )
-
-        unmockkObject(SdkFhirAttachmentHelper)
-    }
-
-    @Test
-    fun `Given, downloadAttachmentsFromStorage is called, with a list of AttachmentsIds, a DecryptedRecord, which contains a Fhir3Resource, it fails, while filter the Attachments by their id`() {
-        mockkObject(SdkFhirAttachmentHelper)
-        // Given
-        val attachmentIds: List<String> = listOf(
-            "abc",
-            "bcd"
-        )
-        val attachments: MutableList<Fhir3Attachment> = mutableListOf(
-            spyk(),
-            spyk()
-        )
-        val resource: Fhir3Resource = mockk()
-        val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk()
-
-        attachments[0].id = attachmentIds[0]
-        attachments[1].id = "efg"
-
-        every { decryptedRecord.resource } returns resource
-
-        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
-        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
-
-        // Then
-        val error = assertFailsWith<DataValidationException.IdUsageViolation> {
-            // When
-            recordService.downloadAttachmentsFromStorage(
-                attachmentIds,
-                USER_ID,
-                DownloadType.Full,
-                decryptedRecord
-            )
-        }
-
-        assertEquals(
-            actual = error.message,
-            expected = "Please provide correct attachment ids!"
-        )
-
-        unmockkObject(SdkFhirAttachmentHelper)
-    }
-
-    @Test
-    fun `Given, downloadAttachmentsFromStorage is called, with a list of AttachmentsIds, a DecryptedRecord, it downloads the requested Attachments`() {
-        mockkObject(SdkFhirAttachmentHelper)
-        mockkObject(SdkAttachmentFactory)
-        // Given
-        val attachmentKey: GCKey = mockk()
-        val attachmentIds: List<String> = listOf(
-            "abc",
-            "bcd"
-        )
-        val attachments: MutableList<Fhir3Attachment> = mutableListOf(
-            spyk(),
-            spyk()
-        )
-        val resource: Fhir3Resource = mockk()
-        val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk()
-        val identifiers: List<Fhir3Identifier> = mockk()
-        val wrappedAttachment: WrapperContract.Attachment = mockk()
-        val downloadedWrappedAttachments: List<WrapperContract.Attachment> = listOf(
-            mockk(),
-            mockk()
-        )
-        val downloadedAttachments: List<Fhir3Attachment> = listOf(
-            spyk(),
-            spyk()
-        )
-
-        attachments[0].id = attachmentIds[0]
-        attachments[1].id = attachmentIds[0]
-
-        every { decryptedRecord.resource } returns resource
-        every { decryptedRecord.attachmentsKey } returns attachmentKey
-
-        every { downloadedWrappedAttachments[0].unwrap<Fhir3Attachment>() } returns downloadedAttachments[0]
-        every { downloadedWrappedAttachments[1].unwrap<Fhir3Attachment>() } returns downloadedAttachments[1]
-
-        downloadedAttachments[0].id = "abc"
-        downloadedAttachments[1].id = "cdf"
-
-        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
-        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
-        every { SdkFhirAttachmentHelper.getIdentifier(resource) } returns identifiers
-        every {
-            SdkAttachmentFactory.wrap(
-                or(
-                    attachments[0],
-                    attachments[1]
-                )
-            )
-        } returns wrappedAttachment
-        every {
-            recordService.setAttachmentIdForDownloadType(
-                attachments,
-                identifiers,
-                DownloadType.Full
-            )
-        } just Runs
-
-        every {
-            attachmentService.download(
-                listOf(wrappedAttachment, wrappedAttachment),
-                attachmentKey,
-                USER_ID
-            )
-        } returns Single.just(downloadedWrappedAttachments)
-
-        // When
-        val subscriber = recordService.downloadAttachmentsFromStorage(
-            attachmentIds,
-            USER_ID,
-            DownloadType.Full,
-            decryptedRecord
-        ).test().await()
-
-        // Then
-        val result = subscriber
-            .assertNoErrors()
-            .assertComplete()
-            .values()[0]
-
-        assertEquals(
-            actual = result.size,
-            expected = 2
-        )
-        assertEquals(
-            actual = result,
-            expected = downloadedAttachments
-        )
-
-        verifyOrder {
-            recordService.setAttachmentIdForDownloadType(
-                attachments,
-                identifiers,
-                DownloadType.Full
-            )
-            attachmentService.download(
-                listOf(wrappedAttachment, wrappedAttachment),
-                attachmentKey,
-                USER_ID
-            )
-        }
-        verify { recordService.updateAttachmentMeta(any()) wasNot Called }
-
-        unmockkObject(SdkFhirAttachmentHelper)
-        unmockkObject(SdkAttachmentFactory)
-    }
-
-    @Test
-    fun `Given, downloadAttachmentsFromStorage is called, with a list of AttachmentsIds, a DecryptedRecord, it downloads the requested Attachments, while updating their metas`() {
-        mockkObject(SdkFhirAttachmentHelper)
-        mockkObject(SdkAttachmentFactory)
-        // Given
-        val attachmentKey: GCKey = mockk()
-        val attachmentIds: List<String> = listOf(
-            "abc",
-            "bcd"
-        )
-        val attachments: MutableList<Fhir3Attachment> = mutableListOf(
-            spyk(),
-            spyk()
-        )
-        val resource: Fhir3Resource = mockk()
-        val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk()
-        val identifiers: List<Fhir3Identifier> = mockk()
-        val wrappedAttachment: WrapperContract.Attachment = mockk()
-        val downloadedWrappedAttachments: List<WrapperContract.Attachment> = listOf(
-            mockk(),
-            mockk()
-        )
-        val downloadedAttachments: List<Fhir3Attachment> = listOf(
-            spyk(),
-            spyk()
-        )
-        val downloadedAttachmentsIds = listOf(
-            "tomato${SPLIT_CHAR}soup",
-            "potato${SPLIT_CHAR}soup"
-        )
-
-        attachments[0].id = attachmentIds[0]
-        attachments[1].id = attachmentIds[0]
-
-        every { decryptedRecord.resource } returns resource
-        every { decryptedRecord.attachmentsKey } returns attachmentKey
-
-        every { downloadedWrappedAttachments[0].unwrap<Fhir3Attachment>() } returns downloadedAttachments[0]
-        every { downloadedWrappedAttachments[1].unwrap<Fhir3Attachment>() } returns downloadedAttachments[1]
-
-        downloadedAttachments[0].id = downloadedAttachmentsIds[0]
-        downloadedAttachments[1].id = downloadedAttachmentsIds[1]
-
-        every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns true
-        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
-        every { SdkFhirAttachmentHelper.getIdentifier(resource) } returns identifiers
-        every {
-            SdkAttachmentFactory.wrap(
-                or(
-                    attachments[0],
-                    attachments[1]
-                )
-            )
-        } returns wrappedAttachment
-        every {
-            recordService.setAttachmentIdForDownloadType(
-                attachments,
-                identifiers,
-                DownloadType.Full
-            )
-        } just Runs
-
-        every {
-            attachmentService.download(
-                listOf(wrappedAttachment, wrappedAttachment),
-                attachmentKey,
-                USER_ID
-            )
-        } returns Single.just(downloadedWrappedAttachments)
-
-        every {
-            recordService.updateAttachmentMeta(
-                or(downloadedAttachments[0], downloadedAttachments[1])
-            )
-        } returns mockk()
-
-        // When
-        val subscriber = recordService.downloadAttachmentsFromStorage(
-            attachmentIds,
-            USER_ID,
-            DownloadType.Full,
-            decryptedRecord
-        ).test().await()
-
-        // Then
-        val result = subscriber
-            .assertNoErrors()
-            .assertComplete()
-            .values()[0]
-
-        assertEquals(
-            actual = result.size,
-            expected = 2
-        )
-        assertEquals(
-            actual = result,
-            expected = downloadedAttachments
-        )
-
-        verifyOrder {
-            recordService.setAttachmentIdForDownloadType(
-                attachments,
-                identifiers,
-                DownloadType.Full
-            )
-            attachmentService.download(
-                listOf(wrappedAttachment, wrappedAttachment),
-                attachmentKey,
-                USER_ID
-            )
-            recordService.updateAttachmentMeta(downloadedAttachments[0])
-            recordService.updateAttachmentMeta(downloadedAttachments[1])
-        }
-
-        unmockkObject(SdkFhirAttachmentHelper)
-        unmockkObject(SdkAttachmentFactory)
-    }
-
-    @Test
-    fun `Given, downloadAttachment is called, with it  a RecordId, AttachmentIds, UserId and a DownloadType, it delegates the call to downloadAttachments and returns its result`() {
-        // Given
-        val attachmentId = "abc"
-        val expected: Fhir3Attachment = mockk()
-
-        every {
-            recordService.downloadAttachments(
-                RECORD_ID,
-                listOf(attachmentId),
-                USER_ID,
-                DownloadType.Full
-            )
-        } returns Single.just(listOf(expected))
-
-        // When
-        val subscriber = recordService.downloadAttachment(
-            RECORD_ID,
-            attachmentId,
-            USER_ID,
-            DownloadType.Full
-        ).test().await()
-
-        // Then
-        val result = subscriber
-            .assertNoErrors()
-            .assertComplete()
-            .values()[0]
-
-        assertSame(
-            actual = result,
-            expected = expected
-        )
-
-        verifyOrder {
-            recordService.downloadAttachments(
-                RECORD_ID,
-                listOf(attachmentId),
-                USER_ID,
-                DownloadType.Full
-            )
-        }
-    }
-
-    @Test
-    fun `Given, downloadAttachments is called with a RecordId, AttachmentIds, UserId and a DownloadType, returns encountered Attachments`() {
-        // Given
-        val userId = "asd"
-        val recordId = "ads"
-        val attachmentId = "lllll"
-        val attachmentIds = listOf(attachmentId)
-        val type = DownloadType.Medium
-
-        val response1 = mockk<Fhir3Attachment>()
-        val response2 = mockk<Fhir3Attachment>()
-        val response = listOf(response1, response2)
-
-        val encryptedRecord = mockk<EncryptedRecord>()
-        val decryptedRecord = mockk<DecryptedFhir3Record<Fhir3Resource>>()
-
-        every { apiService.fetchRecord(ALIAS, userId, recordId) } returns Single.just(
-            encryptedRecord
-        )
-        every {
-            recordService.decryptRecord<Any>(
-                encryptedRecord,
-                userId
-            )
-        } returns decryptedRecord as DecryptedBaseRecord<Any>
-        every {
-            recordService.downloadAttachmentsFromStorage(
-                attachmentIds,
-                userId,
-                type,
-                decryptedRecord
-            )
-        } returns Single.just(response)
-
-        // When
-        val subscriber = recordService.downloadAttachments(
-            recordId,
-            attachmentIds,
-            userId,
-            type
-        ).test().await()
-
-        // Then
-        val result = subscriber
-            .assertNoErrors()
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
-
-        assertSame(
-            response,
-            result
-        )
-
-        verifyOrder {
-            apiService.fetchRecord(ALIAS, userId, recordId)
-            recordService.decryptRecord<Any>(encryptedRecord, userId)
-            recordService.downloadAttachmentsFromStorage(
-                attachmentIds,
-                userId,
-                type,
-                decryptedRecord
-            )
-        }
     }
 }

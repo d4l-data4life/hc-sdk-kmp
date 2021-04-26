@@ -135,14 +135,14 @@ class RecordServiceAttachmentUtilsTest {
         val resource: Fhir3Resource = mockk()
 
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns false
-        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns mockk()
+        every { SdkFhirAttachmentHelper.getAttachment(any()) } returns mockk()
 
         // When
         recordService.checkDataRestrictions(resource)
 
         // Then
         assertTrue(true)
-        verify { SdkFhirAttachmentHelper.getAttachment(resource)!!.wasNot(Called) }
+        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
     }
 
     @Test
@@ -326,14 +326,14 @@ class RecordServiceAttachmentUtilsTest {
         val resource: Fhir4Resource = mockk()
 
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns false
-        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns mockk()
+        every { SdkFhirAttachmentHelper.getAttachment(any()) } returns mockk()
 
         // When
         recordService.checkDataRestrictions(resource)
 
         // Then
         assertTrue(true)
-        verify { SdkFhirAttachmentHelper.getAttachment(resource)!!.wasNot(Called) }
+        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
     }
 
     @Test
@@ -542,14 +542,14 @@ class RecordServiceAttachmentUtilsTest {
         val resource: Fhir3Resource = mockk()
 
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns false
-        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns mockk()
+        every { SdkFhirAttachmentHelper.getAttachment(any()) } returns mockk()
 
         // When
         val data = recordService.extractUploadData(resource)
 
         // Then
         assertNull(data)
-        verify { SdkFhirAttachmentHelper.getAttachment(resource)!!.wasNot(Called) }
+        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
     }
 
     @Test
@@ -662,14 +662,14 @@ class RecordServiceAttachmentUtilsTest {
         val resource: Fhir4Resource = mockk()
 
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns false
-        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns mockk()
+        every { SdkFhirAttachmentHelper.getAttachment(any()) } returns mockk()
 
         // When
         val data = recordService.extractUploadData(resource)
 
         // Then
         assertNull(data)
-        verify { SdkFhirAttachmentHelper.getAttachment(resource)!!.wasNot(Called) }
+        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
     }
 
     @Test
@@ -805,7 +805,7 @@ class RecordServiceAttachmentUtilsTest {
         every { decryptedRecord.resource } returns resource
 
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns false
-        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns mockk()
+        every { SdkFhirAttachmentHelper.getAttachment(any()) } returns mockk()
 
         // When
         val record = recordService.removeUploadData(decryptedRecord)
@@ -817,7 +817,7 @@ class RecordServiceAttachmentUtilsTest {
         )
 
         verify(exactly = 0) { SdkFhirAttachmentHelper.updateAttachmentData(any(), any()) }
-        verify { SdkFhirAttachmentHelper.getAttachment(resource)!!.wasNot(Called) }
+        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
     }
 
     @Test
@@ -902,7 +902,7 @@ class RecordServiceAttachmentUtilsTest {
         every { decryptedRecord.resource } returns resource
 
         every { SdkFhirAttachmentHelper.hasAttachment(resource) } returns false
-        every { SdkFhirAttachmentHelper.getAttachment(resource) } returns mockk()
+        every { SdkFhirAttachmentHelper.getAttachment(any()) } returns mockk()
 
         // When
         val record = recordService.removeUploadData(decryptedRecord)
@@ -914,7 +914,7 @@ class RecordServiceAttachmentUtilsTest {
         )
 
         verify(exactly = 0) { SdkFhirAttachmentHelper.updateAttachmentData(any(), any()) }
-        verify { SdkFhirAttachmentHelper.getAttachment(resource)!!.wasNot(Called) }
+        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
     }
 
     @Test
@@ -1184,6 +1184,7 @@ class RecordServiceAttachmentUtilsTest {
         every { decryptedRecord.resource = originalResource } just Runs
 
         every { SdkFhirAttachmentHelper.hasAttachment(originalResource) } returns false
+        every { SdkFhirAttachmentHelper.getAttachment(any()) } returns mockk()
 
         // When
         val record = recordService.restoreUploadData(
@@ -1200,6 +1201,7 @@ class RecordServiceAttachmentUtilsTest {
 
         verify(exactly = 1) { decryptedRecord.resource = originalResource }
         verify(exactly = 0) { SdkFhirAttachmentHelper.updateAttachmentData(any(), any()) }
+        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
     }
 
     @Test

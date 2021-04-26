@@ -21,6 +21,7 @@ import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.Record
@@ -129,19 +130,37 @@ interface RecordContract {
 
         fun <T : Fhir3Resource> downloadRecord(recordId: String, userId: String): Single<Record<T>>
 
-        fun downloadAttachment(
+        @Throws(IllegalArgumentException::class)
+        fun downloadFhir3Attachment(
             recordId: String,
             attachmentId: String,
             userId: String,
             type: DownloadType
         ): Single<Fhir3Attachment>
 
-        fun downloadAttachments(
+        @Throws(IllegalArgumentException::class)
+        fun downloadFhir3Attachments(
             recordId: String,
             attachmentIds: List<String>,
             userId: String,
             type: DownloadType
         ): Single<List<Fhir3Attachment>>
+
+        @Throws(IllegalArgumentException::class)
+        fun downloadFhir4Attachment(
+            recordId: String,
+            attachmentId: String,
+            userId: String,
+            type: DownloadType
+        ): Single<Fhir4Attachment>
+
+        @Throws(IllegalArgumentException::class)
+        fun downloadFhir4Attachments(
+            recordId: String,
+            attachmentIds: List<String>,
+            userId: String,
+            type: DownloadType
+        ): Single<List<Fhir4Attachment>>
 
         companion object {
             const val EMPTY_RECORD_ID = ""

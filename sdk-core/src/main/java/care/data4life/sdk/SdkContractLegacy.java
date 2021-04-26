@@ -174,6 +174,7 @@ public interface SdkContractLegacy {
          * @param <T>      the type of {@link Record} as a subclass of {@link DomainResource}
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          * @throws care.data4life.sdk.config.DataRestrictionException if {@param resource} is DocumentReference and {@link Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
+         * @throws IllegalArgumentException if {@param recordId} is not FHIR3
          */
         <T extends DomainResource> Task downloadRecord(String recordId, ResultListener<Record<T>> listener);
 

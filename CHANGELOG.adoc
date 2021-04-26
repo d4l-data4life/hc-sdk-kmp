@@ -18,6 +18,7 @@ toc::[]
 
 * Version control for supported/unsupported versions.
 * The Client now exposes the UserId.
+* Add Fhir4 support for download Record and Attachment(s).
 
 === Changed
 

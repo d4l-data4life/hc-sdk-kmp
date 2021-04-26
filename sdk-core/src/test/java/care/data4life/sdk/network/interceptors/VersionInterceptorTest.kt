@@ -99,6 +99,8 @@ class VersionInterceptorTest {
                 version
             )
         }
+
+        verify(exactly = 1) { chain.proceed(modifiedRequest) }
     }
 
     @Test
@@ -147,6 +149,7 @@ class VersionInterceptorTest {
                 version
             )
         }
+        verify(exactly = 1) { chain.proceed(modifiedRequest) }
     }
 
     @Test
@@ -195,5 +198,6 @@ class VersionInterceptorTest {
                 version
             )
         }
+        verify(exactly = 1) { chain.proceed(modifiedRequest) }
     }
 }

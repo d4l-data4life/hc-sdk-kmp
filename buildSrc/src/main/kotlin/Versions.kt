@@ -144,7 +144,6 @@ object Versions {
     const val gson = "2.9.0"
 
     // Date
-
     /**
      * [ThreeTen Backport](https://www.threeten.org/threetenbp)
      */

@@ -17,6 +17,6 @@
 package care.data4life.auth
 
 internal data class TokenState(
-        var accessToken: String? = null,
-        var refreshToken: String? = null
+    var accessToken: String? = null,
+    var refreshToken: String? = null
 )

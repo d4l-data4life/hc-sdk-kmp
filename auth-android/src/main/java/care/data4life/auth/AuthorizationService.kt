@@ -29,28 +29,32 @@ import net.openid.appauth.ClientAuthentication
 import net.openid.appauth.ClientSecretBasic
 import net.openid.appauth.ResponseTypeValues
 import org.json.JSONException
-import java.util.*
-
 
 actual class AuthorizationService internal constructor(
-        private val appAuthService: AppAuthService,
-        private val configuration: AuthorizationConfiguration,
-        private val storage: AuthorizationContract.Storage
+    private val appAuthService: AppAuthService,
+    private val configuration: AuthorizationConfiguration,
+    private val storage: AuthorizationContract.Storage
 ) : AuthorizationContract.Service {
 
     @JvmOverloads
     constructor(
-            context: Context,
-            configuration: AuthorizationConfiguration,
-            storage: AuthorizationContract.Storage = InMemoryAuthStorage()
+        context: Context,
+        configuration: AuthorizationConfiguration,
+        storage: AuthorizationContract.Storage = InMemoryAuthStorage()
     ) : this(AppAuthService(context), configuration, storage)
 
-    private val appAuthServiceConfig: AuthorizationServiceConfiguration = AuthorizationServiceConfiguration(
+    private val appAuthServiceConfig: AuthorizationServiceConfiguration =
+        AuthorizationServiceConfiguration(
             Uri.parse(configuration.authorizationEndpoint + Authorization.OAUTH_PATH_AUTHORIZE),
             Uri.parse(configuration.tokenEndpoint + Authorization.OAUTH_PATH_TOKEN)
-    )
+        )
 
-    fun loginIntent(context: Context, scopes: Set<String>?, publicKey: String, authListener: AuthorizationListener): Intent {
+    fun loginIntent(
+        context: Context,
+        scopes: Set<String>?,
+        publicKey: String,
+        authListener: AuthorizationListener
+    ): Intent {
         val loginIntent = Intent(context, LoginActivity::class.java)
         val authIntent = authorizationIntent(context, scopes?.toTypedArray(), publicKey)
         loginIntent.putExtra(LoginActivity.AUTHORIZATION_INTENT, authIntent)
@@ -58,15 +62,24 @@ actual class AuthorizationService internal constructor(
         return loginIntent
     }
 
-    private fun authorizationIntent(context: Context, scopes: Array<String>?, publicKey: String): Intent {
+    private fun authorizationIntent(
+        context: Context,
+        scopes: Array<String>?,
+        publicKey: String
+    ): Intent {
         val s = scopes ?: Authorization.defaultScopesArray
 
         val additionalParameters = HashMap<String, String>()
         additionalParameters[PARAMETER_PUBLIC_KEY] = publicKey
-        val authRequest = AuthorizationRequest.Builder(appAuthServiceConfig, configuration.clientId, ResponseTypeValues.CODE, Uri.parse(configuration.callbackUrl))
-                .setAdditionalParameters(additionalParameters)
-                .setScopes(s.asList())
-                .build()
+        val authRequest = AuthorizationRequest.Builder(
+            appAuthServiceConfig,
+            configuration.clientId,
+            ResponseTypeValues.CODE,
+            Uri.parse(configuration.callbackUrl)
+        )
+            .setAdditionalParameters(additionalParameters)
+            .setScopes(s.asList())
+            .build()
         return appAuthService.getAuthorizationRequestIntent(authRequest)
     }
 
@@ -91,7 +104,6 @@ actual class AuthorizationService internal constructor(
             callback.onError(Throwable(authException))
         }
     }
-
 
     actual override fun getAccessToken(alias: String): String {
         val state = readAuthState()
@@ -151,7 +163,8 @@ actual class AuthorizationService internal constructor(
         }
     }
 
-    actual override fun isAuthorized(alias: String): Boolean = storage.readAuthState(USER_ALIAS) != null
+    actual override fun isAuthorized(alias: String): Boolean =
+        storage.readAuthState(USER_ALIAS) != null
 
     private fun writeAuthState(state: AuthState) {
         storage.writeAuthState(USER_ALIAS, state.jsonSerializeString())

@@ -19,14 +19,19 @@ package care.data4life.crypto
 enum class KeyType {
     @Json("apriv")
     APP_PRIVATE_KEY,
+
     @Json("apub")
     APP_PUBLIC_KEY,
+
     @Json("ck")
     COMMON_KEY,
+
     @Json("dk")
     DATA_KEY,
+
     @Json("ak")
     ATTACHMENT_KEY,
+
     @Json("tek")
     TAG_KEY
 }

@@ -32,9 +32,7 @@ class CryptorFactoryTest {
 
     private val mockContext = mockk<Context>(relaxed = true)
 
-
     private val originalSdkVersion = Build.VERSION.SDK_INT
-
 
     @Test
     fun `create() should return AndroidCompatCryptor when SDK version less than 23`() {
@@ -49,7 +47,6 @@ class CryptorFactoryTest {
         // Then
         kotlin.test.assertEquals(AndroidCompatCryptor::class.java, result::class.java)
     }
-
 
     @Test
     fun `create() should return TinkAndroidCryptor when SDK version min 23`() {
@@ -66,7 +63,6 @@ class CryptorFactoryTest {
         // Then
         kotlin.test.assertEquals(TinkAndroidCryptor::class.java, result::class.java)
     }
-
 
     @After
     fun cleanUp() {

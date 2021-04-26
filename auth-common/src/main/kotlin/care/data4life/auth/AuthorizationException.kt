@@ -22,8 +22,10 @@ import care.data4life.sdk.lang.D4LException
  * Exceptions that are thrown during the authorization process and on any given operation where an
  * network request is made
  */
-sealed class AuthorizationException(message: String? = null, cause: Throwable? = null)
-    : D4LException(message, cause) {
+sealed class AuthorizationException(
+    message: String? = null,
+    cause: Throwable? = null
+) : D4LException(message, cause) {
 
     constructor(message: String?) : this(message, null)
 
@@ -37,5 +39,4 @@ sealed class AuthorizationException(message: String? = null, cause: Throwable? =
     class FailedToRestoreTokenState : AuthorizationException("Failed to load token state")
     class FailedToRestoreAuthState : AuthorizationException("Failed to load auth state")
     class FailedToLogin : AuthorizationException("Failed to authorize user")
-
 }

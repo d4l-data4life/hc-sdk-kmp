@@ -16,10 +16,6 @@
 
 package care.data4life.sdk
 
-import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
-import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
-import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID
-import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
@@ -39,6 +35,10 @@ import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
+import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.wrapper.SdkDateTimeFormatter
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -81,18 +81,18 @@ class RecordServiceFetchRecordsTest {
         clearAllMocks()
 
         recordService = spyk(
-                RecordService(
-                        PARTNER_ID,
-                        ALIAS,
-                        apiService,
-                        tagEncryptionService,
-                        taggingService,
-                        fhirService,
-                        attachmentService,
-                        cryptoService,
-                        errorHandler,
-                        compatibilityService
-                )
+            RecordService(
+                PARTNER_ID,
+                ALIAS,
+                apiService,
+                tagEncryptionService,
+                taggingService,
+                fhirService,
+                attachmentService,
+                cryptoService,
+                errorHandler,
+                compatibilityService
+            )
         )
 
         mockkObject(RecordMapper)
@@ -119,26 +119,26 @@ class RecordServiceFetchRecordsTest {
         } returns Single.just(encryptedRecord)
         every {
             recordService.decryptRecord<Fhir3Resource>(
-                    encryptedRecord,
-                    USER_ID
+                encryptedRecord,
+                USER_ID
             )
         } returns decrypted
         every { RecordMapper.getInstance(decrypted) } returns expected as BaseRecord<Fhir3Resource>
 
         // When
         val observer =
-                recordService.fetchFhir3Record<Fhir3CarePlan>(USER_ID, RECORD_ID).test().await()
+            recordService.fetchFhir3Record<Fhir3CarePlan>(USER_ID, RECORD_ID).test().await()
 
         // Then
         val record = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
         assertSame<Record<Fhir3CarePlan>>(
-                expected = expected as Record<Fhir3CarePlan>,
-                actual = record
+            expected = expected as Record<Fhir3CarePlan>,
+            actual = record
         )
         verifyOrder {
             apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
@@ -164,26 +164,26 @@ class RecordServiceFetchRecordsTest {
         } returns Single.just(encryptedRecord)
         every {
             recordService.decryptRecord<Fhir4Resource>(
-                    encryptedRecord,
-                    USER_ID
+                encryptedRecord,
+                USER_ID
             )
         } returns decrypted
         every { RecordMapper.getInstance(decrypted) } returns expected as BaseRecord<Fhir4Resource>
 
         // When
         val observer =
-                recordService.fetchFhir4Record<Fhir4CarePlan>(USER_ID, RECORD_ID).test().await()
+            recordService.fetchFhir4Record<Fhir4CarePlan>(USER_ID, RECORD_ID).test().await()
 
         // Then
         val record = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
         assertSame<Fhir4Record<Fhir4CarePlan>>(
-                expected = expected as Fhir4Record<Fhir4CarePlan>,
-                actual = record
+            expected = expected as Fhir4Record<Fhir4CarePlan>,
+            actual = record
         )
         verifyOrder {
             apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
@@ -203,7 +203,7 @@ class RecordServiceFetchRecordsTest {
         every { decrypted.resource } returns resource
 
         every { apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID) } returns Single.just(
-                encryptedRecord
+            encryptedRecord
         )
         every {
             recordService.decryptRecord<DataResource>(encryptedRecord, USER_ID)
@@ -215,14 +215,14 @@ class RecordServiceFetchRecordsTest {
 
         // Then
         val record = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
         assertSame<DataRecord<DataResource>>(
-                expected = expected,
-                actual = record
+            expected = expected,
+            actual = record
         )
         verifyOrder {
             apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
@@ -233,7 +233,7 @@ class RecordServiceFetchRecordsTest {
 
     @Test
     fun `Given, fetchFhir3Records is called with multiple RecordIds and a UserId, it returns a List of Records`() {
-        //Given
+        // Given
         val ids = listOf("1", "2", "3")
         val record1: Record<Fhir3CarePlan> = mockk()
         val record2: Record<Fhir3CarePlan> = mockk()
@@ -254,21 +254,21 @@ class RecordServiceFetchRecordsTest {
 
         // Then
         val result = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
         assertEquals<List<Record<Fhir3CarePlan>>>(
-                expected = listOf(record1, record2, record3),
-                actual = result.successfulFetches
+            expected = listOf(record1, record2, record3),
+            actual = result.successfulFetches
         )
     }
 
     @Test
     @Ignore(value = "Timeout")
     fun `Given, fetchFhir3Records is called with multiple RecordIds and a UserId, it ignores errors`() {
-        //Given
+        // Given
         val ids = listOf("1", "2", "3")
         val record1: Record<Fhir3CarePlan> = mockk()
         val record3: Record<Fhir3CarePlan> = mockk()
@@ -283,9 +283,9 @@ class RecordServiceFetchRecordsTest {
 
         every {
             apiService.fetchRecord(
-                    ALIAS,
-                    USER_ID,
-                    ids[1]
+                ALIAS,
+                USER_ID,
+                ids[1]
             )
         } returns Single.just(encryptedRecord)
         every {
@@ -302,13 +302,13 @@ class RecordServiceFetchRecordsTest {
 
         // Then
         val result = observer
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
         assertEquals<List<Record<Fhir3CarePlan>>>(
-                expected = listOf(record1, record3),
-                actual = result.successfulFetches
+            expected = listOf(record1, record3),
+            actual = result.successfulFetches
         )
     }
 
@@ -347,14 +347,14 @@ class RecordServiceFetchRecordsTest {
         every { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
         every {
             compatibilityService.searchRecords(
-                    ALIAS,
-                    USER_ID,
-                    null,
-                    null,
-                    pageSize,
-                    offset,
-                    tags,
-                    defaultAnnotation
+                ALIAS,
+                USER_ID,
+                null,
+                null,
+                pageSize,
+                offset,
+                tags,
+                defaultAnnotation
             )
         } returns Observable.fromArray(encryptedRecords)
         every {
@@ -368,64 +368,64 @@ class RecordServiceFetchRecordsTest {
 
         // When
         val observer = recordService.fetchFhir3Records(
-                USER_ID,
-                Fhir3CarePlan::class.java,
-                null,
-                null,
-                pageSize,
-                offset
+            USER_ID,
+            Fhir3CarePlan::class.java,
+            null,
+            null,
+            pageSize,
+            offset
         ).test().await()
 
         // Then
         val fetched = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
         assertEquals(
-                expected = 2,
-                actual = fetched.size
+            expected = 2,
+            actual = fetched.size
         )
         assertSame(
-                expected = record1,
-                actual = fetched[0]
+            expected = record1,
+            actual = fetched[0]
         )
         assertSame(
-                expected = record2,
-                actual = fetched[1]
+            expected = record2,
+            actual = fetched[1]
         )
 
         verifyOrder {
             recordService.fetchFhir3Records(
-                    USER_ID,
-                    Fhir3CarePlan::class.java,
-                    emptyList(),
-                    null,
-                    null,
-                    pageSize,
-                    offset
+                USER_ID,
+                Fhir3CarePlan::class.java,
+                emptyList(),
+                null,
+                null,
+                pageSize,
+                offset
             )
             taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>)
             compatibilityService.searchRecords(
-                    ALIAS,
-                    USER_ID,
-                    null,
-                    null,
-                    pageSize,
-                    offset,
-                    tags,
-                    defaultAnnotation
+                ALIAS,
+                USER_ID,
+                null,
+                null,
+                pageSize,
+                offset,
+                tags,
+                defaultAnnotation
             )
             recordService.decryptRecord<Fhir3CarePlan>(
-                    encryptedRecord1,
-                    USER_ID
+                encryptedRecord1,
+                USER_ID
             )
             resource1.id = id1
             RecordMapper.getInstance(decryptedRecord1)
             recordService.decryptRecord<Fhir3CarePlan>(
-                    encryptedRecord2,
-                    USER_ID
+                encryptedRecord2,
+                USER_ID
             )
             resource2.id = id2
             RecordMapper.getInstance(decryptedRecord2)
@@ -477,14 +477,14 @@ class RecordServiceFetchRecordsTest {
         every { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
         every {
             compatibilityService.searchRecords(
-                    ALIAS,
-                    USER_ID,
-                    start,
-                    end,
-                    pageSize,
-                    offset,
-                    tags,
-                    defaultAnnotation
+                ALIAS,
+                USER_ID,
+                start,
+                end,
+                pageSize,
+                offset,
+                tags,
+                defaultAnnotation
             )
         } returns Observable.fromArray(encryptedRecords)
 
@@ -499,66 +499,66 @@ class RecordServiceFetchRecordsTest {
 
         // When
         val observer = recordService.fetchFhir3Records(
-                USER_ID,
-                Fhir3CarePlan::class.java,
-                startDate,
-                endDate,
-                pageSize,
-                offset
+            USER_ID,
+            Fhir3CarePlan::class.java,
+            startDate,
+            endDate,
+            pageSize,
+            offset
         ).test().await()
 
         // Then
         val fetched = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
         assertEquals(
-                expected = 2,
-                actual = fetched.size
+            expected = 2,
+            actual = fetched.size
         )
         assertSame(
-                expected = record1,
-                actual = fetched[0]
+            expected = record1,
+            actual = fetched[0]
         )
         assertSame(
-                expected = record2,
-                actual = fetched[1]
+            expected = record2,
+            actual = fetched[1]
         )
 
         verifyOrder {
             recordService.fetchFhir3Records(
-                    USER_ID,
-                    Fhir3CarePlan::class.java,
-                    emptyList(),
-                    startDate,
-                    endDate,
-                    pageSize,
-                    offset
+                USER_ID,
+                Fhir3CarePlan::class.java,
+                emptyList(),
+                startDate,
+                endDate,
+                pageSize,
+                offset
             )
             SdkDateTimeFormatter.formatDate(startDate)
             SdkDateTimeFormatter.formatDate(endDate)
             taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>)
             compatibilityService.searchRecords(
-                    ALIAS,
-                    USER_ID,
-                    start,
-                    end,
-                    pageSize,
-                    offset,
-                    tags,
-                    defaultAnnotation
+                ALIAS,
+                USER_ID,
+                start,
+                end,
+                pageSize,
+                offset,
+                tags,
+                defaultAnnotation
             )
             recordService.decryptRecord<Fhir3CarePlan>(
-                    encryptedRecord1,
-                    USER_ID
+                encryptedRecord1,
+                USER_ID
             )
             resource1.id = id1
             RecordMapper.getInstance(decryptedRecord1)
             recordService.decryptRecord<Fhir3CarePlan>(
-                    encryptedRecord2,
-                    USER_ID
+                encryptedRecord2,
+                USER_ID
             )
             resource2.id = id2
             RecordMapper.getInstance(decryptedRecord2)
@@ -600,14 +600,14 @@ class RecordServiceFetchRecordsTest {
         every { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
         every {
             compatibilityService.searchRecords(
-                    ALIAS,
-                    USER_ID,
-                    null,
-                    null,
-                    pageSize,
-                    offset,
-                    tags,
-                    defaultAnnotation
+                ALIAS,
+                USER_ID,
+                null,
+                null,
+                pageSize,
+                offset,
+                tags,
+                defaultAnnotation
             )
         } returns Observable.fromArray(encryptedRecords)
         every { decryptedRecord1.annotations } returns defaultAnnotation
@@ -623,56 +623,56 @@ class RecordServiceFetchRecordsTest {
 
         // When
         val observer = recordService.fetchFhir4Records(
-                USER_ID,
-                Fhir4CarePlan::class.java,
-                emptyList(),
-                null,
-                null,
-                pageSize,
-                offset
+            USER_ID,
+            Fhir4CarePlan::class.java,
+            emptyList(),
+            null,
+            null,
+            pageSize,
+            offset
         ).test().await()
 
         // Then
         val fetched = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
         assertEquals(
-                expected = 2,
-                actual = fetched.size
+            expected = 2,
+            actual = fetched.size
         )
         assertSame(
-                expected = record1,
-                actual = fetched[0]
+            expected = record1,
+            actual = fetched[0]
         )
         assertSame(
-                expected = record2,
-                actual = fetched[1]
+            expected = record2,
+            actual = fetched[1]
         )
 
         verifyOrder {
             taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>)
             compatibilityService.searchRecords(
-                    ALIAS,
-                    USER_ID,
-                    null,
-                    null,
-                    pageSize,
-                    offset,
-                    tags,
-                    defaultAnnotation
+                ALIAS,
+                USER_ID,
+                null,
+                null,
+                pageSize,
+                offset,
+                tags,
+                defaultAnnotation
             )
             recordService.decryptRecord<Fhir4CarePlan>(
-                    encryptedRecord1,
-                    USER_ID
+                encryptedRecord1,
+                USER_ID
             )
             resource1.id = id1
             RecordMapper.getInstance(decryptedRecord1)
             recordService.decryptRecord<Fhir4CarePlan>(
-                    encryptedRecord2,
-                    USER_ID
+                encryptedRecord2,
+                USER_ID
             )
             resource2.id = id2
             RecordMapper.getInstance(decryptedRecord2)
@@ -724,14 +724,14 @@ class RecordServiceFetchRecordsTest {
         every { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
         every {
             compatibilityService.searchRecords(
-                    ALIAS,
-                    USER_ID,
-                    start,
-                    end,
-                    pageSize,
-                    offset,
-                    tags,
-                    defaultAnnotation
+                ALIAS,
+                USER_ID,
+                start,
+                end,
+                pageSize,
+                offset,
+                tags,
+                defaultAnnotation
             )
         } returns Observable.fromArray(encryptedRecords)
 
@@ -746,67 +746,67 @@ class RecordServiceFetchRecordsTest {
 
         // When
         val observer = recordService.fetchFhir4Records(
-                USER_ID,
-                Fhir4CarePlan::class.java,
-                defaultAnnotation,
-                startDate,
-                endDate,
-                pageSize,
-                offset
+            USER_ID,
+            Fhir4CarePlan::class.java,
+            defaultAnnotation,
+            startDate,
+            endDate,
+            pageSize,
+            offset
         ).test().await()
 
         // Then
         val fetched = observer
-                .assertNoErrors()
-                .assertComplete()
-                .assertValueCount(1)
-                .values()[0]
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
 
         assertEquals(
-                expected = 2,
-                actual = fetched.size
+            expected = 2,
+            actual = fetched.size
         )
         assertSame(
-                expected = record1,
-                actual = fetched[0]
+            expected = record1,
+            actual = fetched[0]
         )
         assertSame(
-                expected = record2,
-                actual = fetched[1]
+            expected = record2,
+            actual = fetched[1]
         )
 
         verifyOrder {
             recordService.fetchFhir4Records(
-                    USER_ID,
-                    Fhir4CarePlan::class.java,
-                    emptyList(),
-                    startDate,
-                    endDate,
-                    pageSize,
-                    offset
+                USER_ID,
+                Fhir4CarePlan::class.java,
+                emptyList(),
+                startDate,
+                endDate,
+                pageSize,
+                offset
             )
             SdkDateTimeFormatter.formatDate(startDate)
             SdkDateTimeFormatter.formatDate(endDate)
             taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>)
             compatibilityService.searchRecords(
-                    ALIAS,
-                    USER_ID,
-                    start,
-                    end,
-                    pageSize,
-                    offset,
-                    tags,
-                    defaultAnnotation
+                ALIAS,
+                USER_ID,
+                start,
+                end,
+                pageSize,
+                offset,
+                tags,
+                defaultAnnotation
             )
             recordService.decryptRecord<Fhir4CarePlan>(
-                    encryptedRecord1,
-                    USER_ID
+                encryptedRecord1,
+                USER_ID
             )
             resource1.id = id1
             RecordMapper.getInstance(decryptedRecord1)
             recordService.decryptRecord<Fhir4CarePlan>(
-                    encryptedRecord2,
-                    USER_ID
+                encryptedRecord2,
+                USER_ID
             )
             resource2.id = id2
             RecordMapper.getInstance(decryptedRecord2)

@@ -18,10 +18,6 @@ package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
 import care.data4life.crypto.KeyType
-import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
-import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
-import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID
-import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
@@ -38,6 +34,10 @@ import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
+import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
@@ -50,7 +50,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 
-
 class RecordServiceCryptoTest {
     private lateinit var recordService: RecordService
     private val apiService: ApiService = mockk()
@@ -60,7 +59,8 @@ class RecordServiceCryptoTest {
     private val taggingService: TaggingContract.Service = mockk()
     private val attachmentService: AttachmentContract.Service = mockk()
     private val errorHandler: SdkContract.ErrorHandler = mockk()
-    private val tags: HashMap<String, String> = hashMapOf("potato" to "soup", "resourcetype" to "pumpkin")
+    private val tags: HashMap<String, String> =
+        hashMapOf("potato" to "soup", "resourcetype" to "pumpkin")
     private val annotations: List<String> = listOf("tomato", "soup")
 
     private val encryptedTagsAndAnnotations: List<String> = mockk()
@@ -78,26 +78,26 @@ class RecordServiceCryptoTest {
         clearAllMocks()
 
         recordService = spyk(
-                RecordService(
-                        PARTNER_ID,
-                        ALIAS,
-                        apiService,
-                        tagEncryptionService,
-                        taggingService,
-                        fhirService,
-                        attachmentService,
-                        cryptoService,
-                        errorHandler,
-                        mockk()
-                )
+            RecordService(
+                PARTNER_ID,
+                ALIAS,
+                apiService,
+                tagEncryptionService,
+                taggingService,
+                fhirService,
+                attachmentService,
+                cryptoService,
+                errorHandler,
+                mockk()
+            )
         )
     }
 
     private fun <T : Any> encryptRecordFlow(
-            decryptedRecord: DecryptedBaseRecord<T>,
-            currentCommonKeyId: String,
-            resource: T,
-            attachmentKey: GCKey? = null
+        decryptedRecord: DecryptedBaseRecord<T>,
+        currentCommonKeyId: String,
+        resource: T,
+        attachmentKey: GCKey? = null
     ) {
         every { decryptedRecord.tags } returns tags
         every { decryptedRecord.annotations } returns annotations
@@ -113,17 +113,17 @@ class RecordServiceCryptoTest {
         every { cryptoService.currentCommonKeyId } returns currentCommonKeyId
         every {
             cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.DATA_KEY,
-                    dataKey
+                commonKey,
+                KeyType.DATA_KEY,
+                dataKey
             )
         } returns Single.just(encryptedDataKey)
         if (attachmentKey is GCKey) {
             every {
                 cryptoService.encryptSymmetricKey(
-                        commonKey,
-                        KeyType.ATTACHMENT_KEY,
-                        attachmentKey
+                    commonKey,
+                    KeyType.ATTACHMENT_KEY,
+                    attachmentKey
                 )
             } returns Single.just(encryptedAttachmentKey)
         }
@@ -135,32 +135,32 @@ class RecordServiceCryptoTest {
             cryptoService.fetchCurrentCommonKey()
             cryptoService.currentCommonKeyId
             cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.DATA_KEY,
-                    dataKey
+                commonKey,
+                KeyType.DATA_KEY,
+                dataKey
             )
             fhirService._encryptResource(dataKey, resource)
         }
     }
 
     private fun <T : Any> verifyEncryptRecordWithFetchingKeyFlow(
-            resource: T,
-            attachmentKey: GCKey
+        resource: T,
+        attachmentKey: GCKey
     ) {
         verifyOrder {
             tagEncryptionService.encryptTagsAndAnnotations(tags, annotations)
             cryptoService.fetchCurrentCommonKey()
             cryptoService.currentCommonKeyId
             cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.DATA_KEY,
-                    dataKey
+                commonKey,
+                KeyType.DATA_KEY,
+                dataKey
             )
             fhirService._encryptResource(dataKey, resource)
             cryptoService.encryptSymmetricKey(
-                    commonKey,
-                    KeyType.ATTACHMENT_KEY,
-                    attachmentKey
+                commonKey,
+                KeyType.ATTACHMENT_KEY,
+                attachmentKey
             )
         }
     }
@@ -173,9 +173,9 @@ class RecordServiceCryptoTest {
         val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk(relaxed = true)
 
         encryptRecordFlow(
-                decryptedRecord,
-                currentCommonKeyId,
-                resource
+            decryptedRecord,
+            currentCommonKeyId,
+            resource
         )
 
         // When
@@ -183,8 +183,8 @@ class RecordServiceCryptoTest {
 
         // Then
         assertEquals(
-                expected = currentCommonKeyId,
-                actual = encryptedRecord.commonKeyId
+            expected = currentCommonKeyId,
+            actual = encryptedRecord.commonKeyId
         )
         assertNull(encryptedRecord.encryptedAttachmentsKey)
         verifyEncryptRecordFlow(resource)
@@ -198,9 +198,9 @@ class RecordServiceCryptoTest {
         val decryptedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
 
         encryptRecordFlow(
-                decryptedRecord,
-                currentCommonKeyId,
-                resource
+            decryptedRecord,
+            currentCommonKeyId,
+            resource
         )
 
         // When
@@ -208,8 +208,8 @@ class RecordServiceCryptoTest {
 
         // Then
         assertEquals(
-                expected = currentCommonKeyId,
-                actual = encryptedRecord.commonKeyId
+            expected = currentCommonKeyId,
+            actual = encryptedRecord.commonKeyId
         )
         assertNull(encryptedRecord.encryptedAttachmentsKey)
 
@@ -224,9 +224,9 @@ class RecordServiceCryptoTest {
         val decryptedRecord: DecryptedDataRecord = mockk(relaxed = true)
 
         encryptRecordFlow(
-                decryptedRecord,
-                currentCommonKeyId,
-                resource
+            decryptedRecord,
+            currentCommonKeyId,
+            resource
         )
 
         // When
@@ -234,8 +234,8 @@ class RecordServiceCryptoTest {
 
         // Then
         assertEquals(
-                expected = currentCommonKeyId,
-                actual = encryptedRecord.commonKeyId
+            expected = currentCommonKeyId,
+            actual = encryptedRecord.commonKeyId
         )
         assertNull(encryptedRecord.encryptedAttachmentsKey)
 
@@ -250,10 +250,10 @@ class RecordServiceCryptoTest {
         val decryptedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk(relaxed = true)
 
         encryptRecordFlow(
-                decryptedRecord,
-                currentCommonKeyId,
-                resource,
-                attachmentKey
+            decryptedRecord,
+            currentCommonKeyId,
+            resource,
+            attachmentKey
         )
 
         // When
@@ -261,12 +261,12 @@ class RecordServiceCryptoTest {
 
         // Then
         assertEquals(
-                expected = currentCommonKeyId,
-                actual = encryptedRecord.commonKeyId
+            expected = currentCommonKeyId,
+            actual = encryptedRecord.commonKeyId
         )
         assertEquals(
-                expected = encryptedAttachmentKey,
-                actual = encryptedRecord.encryptedAttachmentsKey
+            expected = encryptedAttachmentKey,
+            actual = encryptedRecord.encryptedAttachmentsKey
         )
 
         verifyEncryptRecordWithFetchingKeyFlow(resource, attachmentKey)
@@ -280,10 +280,10 @@ class RecordServiceCryptoTest {
         val decryptedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
 
         encryptRecordFlow(
-                decryptedRecord,
-                currentCommonKeyId,
-                resource,
-                attachmentKey
+            decryptedRecord,
+            currentCommonKeyId,
+            resource,
+            attachmentKey
         )
 
         // When
@@ -291,12 +291,12 @@ class RecordServiceCryptoTest {
 
         // Then
         assertEquals(
-                expected = currentCommonKeyId,
-                actual = encryptedRecord.commonKeyId
+            expected = currentCommonKeyId,
+            actual = encryptedRecord.commonKeyId
         )
         assertEquals(
-                expected = encryptedAttachmentKey,
-                actual = encryptedRecord.encryptedAttachmentsKey
+            expected = encryptedAttachmentKey,
+            actual = encryptedRecord.encryptedAttachmentsKey
         )
 
         verifyEncryptRecordWithFetchingKeyFlow(resource, attachmentKey)
@@ -310,10 +310,10 @@ class RecordServiceCryptoTest {
         val decryptedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
 
         encryptRecordFlow(
-                decryptedRecord,
-                currentCommonKeyId,
-                resource,
-                attachmentKey
+            decryptedRecord,
+            currentCommonKeyId,
+            resource,
+            attachmentKey
         )
 
         // When
@@ -321,24 +321,24 @@ class RecordServiceCryptoTest {
 
         // Then
         assertEquals(
-                expected = currentCommonKeyId,
-                actual = encryptedRecord.commonKeyId
+            expected = currentCommonKeyId,
+            actual = encryptedRecord.commonKeyId
         )
         assertEquals(
-                expected = encryptedAttachmentKey,
-                actual = encryptedRecord.encryptedAttachmentsKey
+            expected = encryptedAttachmentKey,
+            actual = encryptedRecord.encryptedAttachmentsKey
         )
 
         verifyEncryptRecordWithFetchingKeyFlow(resource, attachmentKey)
     }
 
     private fun <T : Any> decryptRecordFlow(
-            encryptedRecord: NetworkModelContract.EncryptedRecord,
-            modelVersion: Int,
-            commonKeyId: String,
-            resource: T,
-            updateDate: String? = null,
-            encryptedAttachmentKey: NetworkModelContract.EncryptedKey? = null
+        encryptedRecord: NetworkModelContract.EncryptedRecord,
+        modelVersion: Int,
+        commonKeyId: String,
+        resource: T,
+        updateDate: String? = null,
+        encryptedAttachmentKey: NetworkModelContract.EncryptedKey? = null
     ) {
         every { encryptedRecord.modelVersion } returns modelVersion
         every { encryptedRecord.commonKeyId } returns commonKeyId
@@ -367,9 +367,9 @@ class RecordServiceCryptoTest {
 
         every {
             fhirService.decryptResource<T>(
-                    dataKey,
-                    tags,
-                    encryptedResource
+                dataKey,
+                tags,
+                encryptedResource
             )
         } returns resource
     }
@@ -381,16 +381,16 @@ class RecordServiceCryptoTest {
             cryptoService.getCommonKeyById(commonKeyId)
             cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey)
             fhirService.decryptResource<T>(
-                    dataKey,
-                    tags,
-                    encryptedResource
+                dataKey,
+                tags,
+                encryptedResource
             )
         }
     }
 
     private fun <T : Any> verfiyDecryptRecordWithFetchingKeyFlow(
-            commonKeyId: String,
-            encryptedAttachmentKey: NetworkModelContract.EncryptedKey
+        commonKeyId: String,
+        encryptedAttachmentKey: NetworkModelContract.EncryptedKey
     ) {
         verifyOrder {
             tagEncryptionService.decryptTagsAndAnnotations(encryptedTagsAndAnnotations)
@@ -399,9 +399,9 @@ class RecordServiceCryptoTest {
             cryptoService.symDecryptSymmetricKey(commonKey, encryptedDataKey)
             cryptoService.symDecryptSymmetricKey(commonKey, encryptedAttachmentKey)
             fhirService.decryptResource<T>(
-                    dataKey,
-                    tags,
-                    encryptedResource
+                dataKey,
+                tags,
+                encryptedResource
             )
         }
     }
@@ -415,32 +415,32 @@ class RecordServiceCryptoTest {
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
 
         decryptRecordFlow(
-                encryptedRecord,
-                modelVersion,
-                commonKeyId,
-                resource
+            encryptedRecord,
+            modelVersion,
+            commonKeyId,
+            resource
         )
 
         // When
         val decrypted = recordService.decryptRecord<Fhir3Resource>(
-                encryptedRecord,
-                USER_ID
+            encryptedRecord,
+            USER_ID
         )
 
         // Then
         assertEquals(
-                actual = decrypted,
-                expected = DecryptedRecord(
-                        RECORD_ID,
-                        resource,
-                        tags,
-                        annotations,
-                        creationDate,
-                        null,
-                        dataKey,
-                        null,
-                        modelVersion
-                )
+            actual = decrypted,
+            expected = DecryptedRecord(
+                RECORD_ID,
+                resource,
+                tags,
+                annotations,
+                creationDate,
+                null,
+                dataKey,
+                null,
+                modelVersion
+            )
         )
 
         verfiyDecryptRecordFlow<Fhir3Resource>(commonKeyId)
@@ -455,32 +455,32 @@ class RecordServiceCryptoTest {
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
 
         decryptRecordFlow(
-                encryptedRecord,
-                modelVersion,
-                commonKeyId,
-                resource
+            encryptedRecord,
+            modelVersion,
+            commonKeyId,
+            resource
         )
 
         // When
         val decrypted = recordService.decryptRecord<Fhir4Resource>(
-                encryptedRecord,
-                USER_ID
+            encryptedRecord,
+            USER_ID
         )
 
         // Then
         assertEquals(
-                actual = decrypted,
-                expected = DecryptedR4Record(
-                        RECORD_ID,
-                        resource,
-                        tags,
-                        annotations,
-                        creationDate,
-                        null,
-                        dataKey,
-                        null,
-                        modelVersion
-                )
+            actual = decrypted,
+            expected = DecryptedR4Record(
+                RECORD_ID,
+                resource,
+                tags,
+                annotations,
+                creationDate,
+                null,
+                dataKey,
+                null,
+                modelVersion
+            )
         )
 
         verfiyDecryptRecordFlow<Fhir3Resource>(commonKeyId)
@@ -498,31 +498,31 @@ class RecordServiceCryptoTest {
         every { resource.asByteArray() } returns plainResource
 
         decryptRecordFlow(
-                encryptedRecord,
-                modelVersion,
-                commonKeyId,
-                resource
+            encryptedRecord,
+            modelVersion,
+            commonKeyId,
+            resource
         )
 
         // When
         val decrypted = recordService.decryptRecord<DataResource>(
-                encryptedRecord,
-                USER_ID
+            encryptedRecord,
+            USER_ID
         )
 
         // Then
         assertEquals(
-                actual = decrypted,
-                expected = DecryptedDataRecord(
-                        RECORD_ID,
-                        resource,
-                        tags,
-                        annotations,
-                        creationDate,
-                        null,
-                        dataKey,
-                        modelVersion
-                )
+            actual = decrypted,
+            expected = DecryptedDataRecord(
+                RECORD_ID,
+                resource,
+                tags,
+                annotations,
+                creationDate,
+                null,
+                dataKey,
+                modelVersion
+            )
         )
 
         verfiyDecryptRecordFlow<Fhir3Resource>(commonKeyId)
@@ -538,33 +538,33 @@ class RecordServiceCryptoTest {
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
 
         decryptRecordFlow(
-                encryptedRecord,
-                modelVersion,
-                commonKeyId,
-                resource,
-                updateDate = updateDate
+            encryptedRecord,
+            modelVersion,
+            commonKeyId,
+            resource,
+            updateDate = updateDate
         )
 
         // When
         val decrypted = recordService.decryptRecord<Fhir3Resource>(
-                encryptedRecord,
-                USER_ID
+            encryptedRecord,
+            USER_ID
         )
 
         // Then
         assertEquals(
-                actual = decrypted,
-                expected = DecryptedRecord(
-                        RECORD_ID,
-                        resource,
-                        tags,
-                        annotations,
-                        creationDate,
-                        updateDate,
-                        dataKey,
-                        null,
-                        modelVersion
-                )
+            actual = decrypted,
+            expected = DecryptedRecord(
+                RECORD_ID,
+                resource,
+                tags,
+                annotations,
+                creationDate,
+                updateDate,
+                dataKey,
+                null,
+                modelVersion
+            )
         )
 
         verfiyDecryptRecordFlow<Fhir3Resource>(commonKeyId)
@@ -580,33 +580,33 @@ class RecordServiceCryptoTest {
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
 
         decryptRecordFlow(
-                encryptedRecord,
-                modelVersion,
-                commonKeyId,
-                resource,
-                updateDate = updateDate
+            encryptedRecord,
+            modelVersion,
+            commonKeyId,
+            resource,
+            updateDate = updateDate
         )
 
         // When
         val decrypted = recordService.decryptRecord<Fhir4Resource>(
-                encryptedRecord,
-                USER_ID
+            encryptedRecord,
+            USER_ID
         )
 
         // Then
         assertEquals(
-                actual = decrypted,
-                expected = DecryptedR4Record(
-                        RECORD_ID,
-                        resource,
-                        tags,
-                        annotations,
-                        creationDate,
-                        updateDate,
-                        dataKey,
-                        null,
-                        modelVersion
-                )
+            actual = decrypted,
+            expected = DecryptedR4Record(
+                RECORD_ID,
+                resource,
+                tags,
+                annotations,
+                creationDate,
+                updateDate,
+                dataKey,
+                null,
+                modelVersion
+            )
         )
 
         verfiyDecryptRecordFlow<Fhir4Resource>(commonKeyId)
@@ -625,32 +625,32 @@ class RecordServiceCryptoTest {
         every { resource.asByteArray() } returns plainResource
 
         decryptRecordFlow(
-                encryptedRecord,
-                modelVersion,
-                commonKeyId,
-                resource,
-                updateDate = updateDate
+            encryptedRecord,
+            modelVersion,
+            commonKeyId,
+            resource,
+            updateDate = updateDate
         )
 
         // When
         val decrypted = recordService.decryptRecord<DataResource>(
-                encryptedRecord,
-                USER_ID
+            encryptedRecord,
+            USER_ID
         )
 
         // Then
         assertEquals(
-                actual = decrypted,
-                expected = DecryptedDataRecord(
-                        RECORD_ID,
-                        resource,
-                        tags,
-                        annotations,
-                        creationDate,
-                        updateDate,
-                        dataKey,
-                        modelVersion
-                )
+            actual = decrypted,
+            expected = DecryptedDataRecord(
+                RECORD_ID,
+                resource,
+                tags,
+                annotations,
+                creationDate,
+                updateDate,
+                dataKey,
+                modelVersion
+            )
         )
 
         verfiyDecryptRecordFlow<DataResource>(commonKeyId)
@@ -667,13 +667,13 @@ class RecordServiceCryptoTest {
         // When
         val exception = assertFailsWith<DataValidationException.ModelVersionNotSupported> {
             recordService.decryptRecord<Fhir3Resource>(
-                    encryptedRecord,
-                    USER_ID
+                encryptedRecord,
+                USER_ID
             )
         }
         assertEquals(
-                actual = exception.message,
-                expected = "Please update SDK to latest version!"
+            actual = exception.message,
+            expected = "Please update SDK to latest version!"
         )
     }
 
@@ -688,13 +688,13 @@ class RecordServiceCryptoTest {
         // When
         val exception = assertFailsWith<DataValidationException.ModelVersionNotSupported> {
             recordService.decryptRecord<Fhir4Resource>(
-                    encryptedRecord,
-                    USER_ID
+                encryptedRecord,
+                USER_ID
             )
         }
         assertEquals(
-                actual = exception.message,
-                expected = "Please update SDK to latest version!"
+            actual = exception.message,
+            expected = "Please update SDK to latest version!"
         )
     }
 
@@ -709,13 +709,13 @@ class RecordServiceCryptoTest {
         // When
         val exception = assertFailsWith<DataValidationException.ModelVersionNotSupported> {
             recordService.decryptRecord<Fhir4Resource>(
-                    encryptedRecord,
-                    USER_ID
+                encryptedRecord,
+                USER_ID
             )
         }
         assertEquals(
-                actual = exception.message,
-                expected = "Please update SDK to latest version!"
+            actual = exception.message,
+            expected = "Please update SDK to latest version!"
         )
     }
 
@@ -728,38 +728,38 @@ class RecordServiceCryptoTest {
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
 
         decryptRecordFlow(
-                encryptedRecord,
-                modelVersion,
-                commonKeyId,
-                resource,
-                encryptedAttachmentKey = encryptedAttachmentKey
+            encryptedRecord,
+            modelVersion,
+            commonKeyId,
+            resource,
+            encryptedAttachmentKey = encryptedAttachmentKey
         )
 
         // When
         val decrypted = recordService.decryptRecord<Fhir3Resource>(
-                encryptedRecord,
-                USER_ID
+            encryptedRecord,
+            USER_ID
         )
 
         // Then
         assertEquals(
-                actual = decrypted,
-                expected = DecryptedRecord(
-                        RECORD_ID,
-                        resource,
-                        tags,
-                        annotations,
-                        creationDate,
-                        null,
-                        dataKey,
-                        attachmentKey,
-                        modelVersion
-                )
+            actual = decrypted,
+            expected = DecryptedRecord(
+                RECORD_ID,
+                resource,
+                tags,
+                annotations,
+                creationDate,
+                null,
+                dataKey,
+                attachmentKey,
+                modelVersion
+            )
         )
 
         verfiyDecryptRecordWithFetchingKeyFlow<Fhir3Resource>(
-                commonKeyId,
-                encryptedAttachmentKey
+            commonKeyId,
+            encryptedAttachmentKey
         )
     }
 
@@ -772,38 +772,38 @@ class RecordServiceCryptoTest {
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
 
         decryptRecordFlow(
-                encryptedRecord,
-                modelVersion,
-                commonKeyId,
-                resource,
-                encryptedAttachmentKey = encryptedAttachmentKey
+            encryptedRecord,
+            modelVersion,
+            commonKeyId,
+            resource,
+            encryptedAttachmentKey = encryptedAttachmentKey
         )
 
         // When
         val decrypted = recordService.decryptRecord<Fhir4Resource>(
-                encryptedRecord,
-                USER_ID
+            encryptedRecord,
+            USER_ID
         )
 
         // Then
         assertEquals(
-                actual = decrypted,
-                expected = DecryptedR4Record(
-                        RECORD_ID,
-                        resource,
-                        tags,
-                        annotations,
-                        creationDate,
-                        null,
-                        dataKey,
-                        attachmentKey,
-                        modelVersion
-                )
+            actual = decrypted,
+            expected = DecryptedR4Record(
+                RECORD_ID,
+                resource,
+                tags,
+                annotations,
+                creationDate,
+                null,
+                dataKey,
+                attachmentKey,
+                modelVersion
+            )
         )
 
         verfiyDecryptRecordWithFetchingKeyFlow<Fhir4Resource>(
-                commonKeyId,
-                encryptedAttachmentKey
+            commonKeyId,
+            encryptedAttachmentKey
         )
     }
 }

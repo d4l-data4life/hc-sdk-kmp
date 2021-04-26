@@ -23,28 +23,29 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 class AndroidSharedPreferenceStorage(
-        context: Context,
-        name: String
+    context: Context,
+    name: String
 ) : SecureStoreContract.Storage {
 
-    private val preferences: SharedPreferences = context.getSharedPreferences(name, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences =
+        context.getSharedPreferences(name, Context.MODE_PRIVATE)
     private val lock: ReentrantLock = ReentrantLock()
 
     override fun addData(alias: String, data: CharArray) {
         lock.withLock {
             preferences
-                    .edit()
-                    .putString(alias, String(data))//TODO save without using string?
-                    .apply()
+                .edit()
+                .putString(alias, String(data)) // TODO save without using string?
+                .apply()
         }
     }
 
     override fun removeData(alias: String) {
         lock.withLock {
             preferences
-                    .edit()
-                    .remove(alias)
-                    .apply()
+                .edit()
+                .remove(alias)
+                .apply()
         }
     }
 
@@ -57,16 +58,16 @@ class AndroidSharedPreferenceStorage(
     override fun getData(alias: String): CharArray? {
         lock.withLock {
             return preferences
-                    .getString(alias, null)?.toCharArray()
+                .getString(alias, null)?.toCharArray()
         }
     }
 
     override fun clear() {
         lock.withLock {
             preferences
-                    .edit()
-                    .clear()
-                    .apply()
+                .edit()
+                .clear()
+                .apply()
         }
     }
 }

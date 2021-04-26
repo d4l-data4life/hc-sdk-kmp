@@ -25,7 +25,6 @@ class HomePage : BasePage() {
 
     private val screen = LoginLogoutScreen()
 
-
     override fun waitForPage() {
         waitByResource("care.data4life.sdk.test:id/rootCL")
     }
@@ -53,5 +52,4 @@ class HomePage : BasePage() {
 
         val loginLogoutBtn = KButton { withId(R.id.loginLogoutBtn) }
     }
-
 }

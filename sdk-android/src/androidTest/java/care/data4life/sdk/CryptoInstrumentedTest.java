@@ -18,6 +18,9 @@ package care.data4life.sdk;
 
 import android.content.Context;
 
+import androidx.test.InstrumentationRegistry;
+import androidx.test.runner.AndroidJUnit4;
+
 import com.squareup.moshi.Moshi;
 
 import org.junit.Before;
@@ -29,8 +32,6 @@ import java.util.List;
 
 import javax.crypto.spec.SecretKeySpec;
 
-import androidx.test.InstrumentationRegistry;
-import androidx.test.runner.AndroidJUnit4;
 import care.data4life.crypto.ExchangeKey;
 import care.data4life.crypto.GCAESKeyAlgorithm;
 import care.data4life.crypto.GCKey;

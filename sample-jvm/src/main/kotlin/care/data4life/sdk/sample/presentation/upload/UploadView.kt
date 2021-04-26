@@ -39,16 +39,16 @@ import java.net.URLConnection
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.time.Instant
-import java.util.*
+import java.util.Date
 
-class UploadView(private val alias: String, private val isMulti: Boolean = false) : BaseView(), KoinComponent {
-
+class UploadView(
+    private val alias: String,
+    private val isMulti: Boolean = false
+) : BaseView(), KoinComponent {
 
     private val client: Data4LifeClient by inject { parametersOf(alias) }
 
-
     override val type: String = "upload"
-
 
     override fun renderContent(): View {
         renderMessage(Message("Enter the title of the document"))
@@ -66,10 +66,11 @@ class UploadView(private val alias: String, private val isMulti: Boolean = false
             val data = Files.readAllBytes(path)
             val contentType = URLConnection.guessContentTypeFromName(path.fileName.toString())
             val creationTime = FhirDateTimeConverter.toFhirDateTime(now)
-            val attachment = AttachmentBuilder.buildWith("Title",
-                    creationTime,
-                    contentType,
-                    data
+            val attachment = AttachmentBuilder.buildWith(
+                "Title",
+                creationTime,
+                contentType,
+                data
             )
             listOf(attachment)
         } else {
@@ -78,26 +79,27 @@ class UploadView(private val alias: String, private val isMulti: Boolean = false
 
         val indexed = FhirDateTimeConverter.toFhirInstant(now)
         val record = DocumentReferenceBuilder.buildWith(
-                titleInput,
-                indexed,
-                CodeSystemDocumentReferenceStatus.CURRENT,
-                attachments,
-                CodeableConcept(),
-                Organization()
+            titleInput,
+            indexed,
+            CodeSystemDocumentReferenceStatus.CURRENT,
+            attachments,
+            CodeableConcept(),
+            Organization()
         )
 
-        client.createRecord(record, object : ResultListener<Record<DocumentReference>> {
-            override fun onSuccess(t: Record<DocumentReference>) {
-                renderMessage(Message("Document created."))
+        client.createRecord(
+            record,
+            object : ResultListener<Record<DocumentReference>> {
+                override fun onSuccess(t: Record<DocumentReference>) {
+                    renderMessage(Message("Document created."))
+                }
+
+                override fun onError(exception: D4LException) {
+                    renderMessage(Message("Failed to create document"))
+                    exception.printStackTrace()
+                }
             }
-
-            override fun onError(exception: D4LException) {
-                renderMessage(Message("Failed to create document"))
-                exception.printStackTrace()
-            }
-
-        })
-
+        )
 
         return if (isMulti) {
             MultiMainView()
@@ -105,5 +107,4 @@ class UploadView(private val alias: String, private val isMulti: Boolean = false
             SingleMainView(alias)
         }
     }
-
 }

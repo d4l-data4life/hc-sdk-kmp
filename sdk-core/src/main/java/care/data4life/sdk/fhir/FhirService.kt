@@ -44,26 +44,36 @@ class FhirService @JvmOverloads constructor(
 
     @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     @Suppress("UNCHECKED_CAST")
-    fun <T : Fhir3Resource> decryptResource(dataKey: GCKey, resourceType: String, encryptedResource: String): T {
+    fun <T : Fhir3Resource> decryptResource(
+        dataKey: GCKey,
+        resourceType: String,
+        encryptedResource: String
+    ): T {
         return Single
-                .just(encryptedResource)
-                .filter { encResource: String -> encResource.isNotBlank() }
-                .map { encResource: String -> cryptoService.decodeAndDecryptString(dataKey, encResource).blockingGet() }
-                .map<Any> { decryptedResourceJson: String ->
-                    parserFhir3.toFhir(FhirElementFactory.getClassForFhirType(resourceType), decryptedResourceJson)
-                }
-                .toSingle()
-                .onErrorResumeNext { error ->
-                    Single.error(
-                            DecryptionFailed("Failed to decrypt resource", error) as D4LException)
-                }
-                .blockingGet() as T
+            .just(encryptedResource)
+            .filter { encResource: String -> encResource.isNotBlank() }
+            .map { encResource: String ->
+                cryptoService.decodeAndDecryptString(dataKey, encResource).blockingGet()
+            }
+            .map<Any> { decryptedResourceJson: String ->
+                parserFhir3.toFhir(
+                    FhirElementFactory.getClassForFhirType(resourceType),
+                    decryptedResourceJson
+                )
+            }
+            .toSingle()
+            .onErrorResumeNext { error ->
+                Single.error(
+                    DecryptionFailed("Failed to decrypt resource", error) as D4LException
+                )
+            }
+            .blockingGet() as T
     }
 
     @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
     fun <T : Fhir3Resource> encryptResource(
-            dataKey: GCKey,
-            resource: T
+        dataKey: GCKey,
+        resource: T
     ): String = _encryptResource(dataKey, resource)
 
     override fun _encryptResource(dataKey: GCKey, resource: Any): String {
@@ -76,29 +86,30 @@ class FhirService @JvmOverloads constructor(
 
     private fun encryptFhirResource(dataKey: GCKey, resource: Any): String {
         return Single
-                .just(resource)
-                .map { parser.fromResource(it) }
-                .flatMap { cryptoService.encryptAndEncodeString(dataKey, it) }
-                .onErrorResumeNext { error ->
-                    Single.error(
-                            EncryptionFailed("Failed to encrypt resource", error) as D4LException)
-                }
-                .blockingGet()
+            .just(resource)
+            .map { parser.fromResource(it) }
+            .flatMap { cryptoService.encryptAndEncodeString(dataKey, it) }
+            .onErrorResumeNext { error ->
+                Single.error(
+                    EncryptionFailed("Failed to encrypt resource", error) as D4LException
+                )
+            }
+            .blockingGet()
     }
 
     private fun encryptDataResource(dataKey: GCKey, resource: DataResource): String {
         return Base64.encodeToString(
-                cryptoService.encrypt(
-                        dataKey,
-                        resource.asByteArray()
-                ).blockingGet()
+            cryptoService.encrypt(
+                dataKey,
+                resource.asByteArray()
+            ).blockingGet()
         )
     }
 
     override fun <T : Any> decryptResource(
-            dataKey: GCKey,
-            tags: HashMap<String, String>,
-            encryptedResource: String
+        dataKey: GCKey,
+        tags: HashMap<String, String>,
+        encryptedResource: String
     ): T {
         return if (tags.containsKey(TAG_APPDATA_KEY)) {
             decryptData(dataKey, encryptedResource) as T
@@ -108,9 +119,9 @@ class FhirService @JvmOverloads constructor(
     }
 
     private fun <T : Any> parseFhir(
-            decryptedResourceJson: String,
-            tags: HashMap<String, String>,
-            resourceType: String
+        decryptedResourceJson: String,
+        tags: HashMap<String, String>,
+        resourceType: String
     ): T {
         return if (tags[TAG_FHIR_VERSION] == FhirContract.FhirVersion.FHIR_4.version) {
             parser.toFhir4(resourceType, decryptedResourceJson)
@@ -120,31 +131,32 @@ class FhirService @JvmOverloads constructor(
     }
 
     private fun <T : Any> decryptFhir(
-            dataKey: GCKey,
-            resourceType: String,
-            tags: HashMap<String, String>,
-            encryptedResource: String
+        dataKey: GCKey,
+        resourceType: String,
+        tags: HashMap<String, String>,
+        encryptedResource: String
     ): T {
         return Single
-                .just(encryptedResource)
-                .filter { it.isNotBlank() }
-                .map { cryptoService.decodeAndDecryptString(dataKey, it).blockingGet() }
-                .map { parseFhir<T>(it, tags, resourceType) }
-                .toSingle()
-                .onErrorResumeNext { error ->
-                    Single.error(
-                            DecryptionFailed("Failed to decrypt resource", error) as D4LException)
-                }
-                .blockingGet()
+            .just(encryptedResource)
+            .filter { it.isNotBlank() }
+            .map { cryptoService.decodeAndDecryptString(dataKey, it).blockingGet() }
+            .map { parseFhir<T>(it, tags, resourceType) }
+            .toSingle()
+            .onErrorResumeNext { error ->
+                Single.error(
+                    DecryptionFailed("Failed to decrypt resource", error) as D4LException
+                )
+            }
+            .blockingGet()
     }
 
     private fun decryptData(
-            dataKey: GCKey,
-            encryptedResource: String
+        dataKey: GCKey,
+        encryptedResource: String
     ): DataResource = DataResource(
-            cryptoService.decrypt(
-                    dataKey,
-                    Base64.decode(encryptedResource)
-            ).blockingGet()
+        cryptoService.decrypt(
+            dataKey,
+            Base64.decode(encryptedResource)
+        ).blockingGet()
     )
 }

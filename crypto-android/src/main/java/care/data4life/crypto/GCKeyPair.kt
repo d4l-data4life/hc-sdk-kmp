@@ -24,12 +24,11 @@ import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.RSAPublicKeySpec
 
 actual class GCKeyPair actual constructor(
-        val algorithm: GCRSAKeyAlgorithm,
-        privateKey: GCAsymmetricKey,
-        publicKey: GCAsymmetricKey,
-        val keyVersion: Int
+    val algorithm: GCRSAKeyAlgorithm,
+    privateKey: GCAsymmetricKey,
+    publicKey: GCAsymmetricKey,
+    val keyVersion: Int
 ) : Serializable {
-
 
     private var privateKeyBase64: String? = null
 
@@ -45,7 +44,6 @@ actual class GCKeyPair actual constructor(
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-
             }
             return field
         }
@@ -67,7 +65,6 @@ actual class GCKeyPair actual constructor(
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-
             }
             return field
         }
@@ -78,9 +75,8 @@ actual class GCKeyPair actual constructor(
     }
 
     actual fun getPublicKeyBase64(): String = publicKeyBase64
-            ?: Base64.encodeToString(publicKey!!.value.encoded).also { publicKeyBase64 = it }
+        ?: Base64.encodeToString(publicKey!!.value.encoded).also { publicKeyBase64 = it }
 
     actual fun getPrivateKeyBase64(): String = privateKeyBase64
-            ?: Base64.encodeToString(privateKey!!.value.encoded).also { privateKeyBase64 = it }
-
+        ?: Base64.encodeToString(privateKey!!.value.encoded).also { privateKeyBase64 = it }
 }

@@ -41,14 +41,16 @@ android {
         buildConfigField("String", "VERSION_NAME", "\"${project.version}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments(mapOf(
+        testInstrumentationRunnerArguments(
+            mapOf(
                 "clearPackageData" to "true"
-        ))
+            )
+        )
     }
 
     buildTypes {
-        getByName("debug"){
-            setMatchingFallbacks("debug","release")
+        getByName("debug") {
+            setMatchingFallbacks("debug", "release")
         }
         getByName("release") {
             isMinifyEnabled = false
@@ -83,7 +85,8 @@ android {
 }
 
 val compatibilityBase by configurations.creating {
-    description = "Configuration for the base version of the SDK we want to verify compatibility against"
+    description =
+        "Configuration for the base version of the SDK we want to verify compatibility against"
 }
 
 dependencies {
@@ -211,10 +214,10 @@ val generateSdkCompatibilityReport by tasks.creating(me.champeau.gradle.japicmp.
     isIgnoreMissingClasses = true
     packageIncludes = listOf("care.data4life.*")
     classExcludes = listOf(
-            "care.data4life.crypto.R",
-            "care.data4life.auth.R",
-            "care.data4life.securestore.R",
-            "care.data4life.sdk.R"
+        "care.data4life.crypto.R",
+        "care.data4life.auth.R",
+        "care.data4life.securestore.R",
+        "care.data4life.sdk.R"
     )
 }
 
@@ -227,10 +230,17 @@ val provideTestConfig: Task by tasks.creating {
     doLast {
         val androidTestAsset = File(androidTestAssetsPath)
         if (!androidTestAsset.exists()) androidTestAsset.mkdirs()
-        File(androidTestAssetsPath, "test_config.json").writeText(D4LConfigHelper.toJson(d4LTestConfig))
+        File(androidTestAssetsPath, "test_config.json").writeText(
+            D4LConfigHelper.toJson(
+                d4LTestConfig
+            )
+        )
         val unitTestAsset = File(unitTestAssetsPath)
         if (!unitTestAsset.exists()) unitTestAsset.mkdirs()
-        File(unitTestAssetsPath, "test_config.json").writeText(D4LConfigHelper.toJson(d4LTestConfig))
+        File(
+            unitTestAssetsPath,
+            "test_config.json"
+        ).writeText(D4LConfigHelper.toJson(d4LTestConfig))
     }
 }
 

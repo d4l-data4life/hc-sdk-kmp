@@ -57,7 +57,6 @@ interface AuthorizationContract {
          */
         fun containsAuthState(alias: String): Boolean
 
-
         /**
          * Removes the auth state for the given alias
          *

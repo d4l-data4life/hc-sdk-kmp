@@ -28,12 +28,17 @@ plugins {
 }
 
 spotless {
-    ratchetFrom("origin/main")
+    // ratchetFrom("origin/main")
 
     kotlin {
         target("**/*.kt")
         targetExclude("buildSrc/build/")
-        ktlint("0.40.0")
+        ktlint("0.40.0").userData(
+            mapOf(
+                "disabled_rules" to "no-wildcard-imports",
+                "ij_kotlin_imports_layout" to "*"
+            )
+        )
         trimTrailingWhitespace()
         indentWithSpaces()
         endWithNewline()

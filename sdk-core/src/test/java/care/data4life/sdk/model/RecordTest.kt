@@ -32,8 +32,8 @@ class RecordTest {
         val record = Record(DomainResource(), null)
 
         assertEquals(
-                "",
-                record.identifier
+            "",
+            record.identifier
         )
     }
 
@@ -43,8 +43,8 @@ class RecordTest {
         val record = Record(resource, null)
 
         assertSame(
-                record.resource,
-                resource
+            record.resource,
+            resource
         )
     }
 
@@ -54,12 +54,12 @@ class RecordTest {
         val record1 = Record(resource, null)
 
         assertSame(
-                record1.resource,
-                resource
+            record1.resource,
+            resource
         )
         assertSame(
-                record1.fhirResource,
-                resource
+            record1.fhirResource,
+            resource
         )
     }
 
@@ -76,8 +76,8 @@ class RecordTest {
         val record = Record(DomainResource(), meta)
 
         assertSame(
-                record.meta,
-                meta
+            record.meta,
+            meta
         )
     }
 
@@ -94,8 +94,8 @@ class RecordTest {
         val record = Record(DomainResource(), null, annotations)
 
         assertSame(
-                record.annotations,
-                annotations
+            record.annotations,
+            annotations
         )
     }
 
@@ -106,15 +106,15 @@ class RecordTest {
         val annotations = listOf("a", "b", "c")
 
         val record1 = Record(
-                resource,
-                meta,
-                annotations
+            resource,
+            meta,
+            annotations
         )
 
         val record2 = Record(
-                resource,
-                meta,
-                annotations
+            resource,
+            meta,
+            annotations
         )
 
         assertTrue(record1 == record2)
@@ -126,15 +126,15 @@ class RecordTest {
         val annotations = listOf("a", "b", "c")
 
         val record1 = Record(
-                mockkClass(DomainResource::class),
-                meta,
-                annotations
+            mockkClass(DomainResource::class),
+            meta,
+            annotations
         )
 
         val record2 = Record(
-                mockkClass(DomainResource::class),
-                meta,
-                annotations
+            mockkClass(DomainResource::class),
+            meta,
+            annotations
         )
 
         assertFalse(record1 == record2)
@@ -146,15 +146,15 @@ class RecordTest {
         val annotations = listOf("a", "b", "c")
 
         val record1 = Record(
-                resource,
-                mockk(),
-                annotations
+            resource,
+            mockk(),
+            annotations
         )
 
         val record2 = Record(
-                resource,
-                mockk(),
-                annotations
+            resource,
+            mockk(),
+            annotations
         )
 
         assertFalse(record1 == record2)
@@ -166,15 +166,15 @@ class RecordTest {
         val meta = mockkClass(Meta::class)
 
         val record1 = Record(
-                resource,
-                meta,
-                listOf("a", "b", "c")
+            resource,
+            meta,
+            listOf("a", "b", "c")
         )
 
         val record2 = Record(
-                resource,
-                meta,
-                listOf("d", "e", "f")
+            resource,
+            meta,
+            listOf("d", "e", "f")
         )
 
         assertFalse(record1 == record2)
@@ -187,33 +187,33 @@ class RecordTest {
         val annotations = listOf("a", "b", "c")
 
         val record1 = Record(
-                resource,
-                meta,
-                annotations
+            resource,
+            meta,
+            annotations
         )
 
         val record2 = Record(
-                resource,
-                meta,
-                annotations
+            resource,
+            meta,
+            annotations
         )
 
         val record3 = Record(
-                mockkClass(DomainResource::class),
-                meta,
-                annotations
+            mockkClass(DomainResource::class),
+            meta,
+            annotations
         )
 
         val record4 = Record(
-                resource,
-                mockk(),
-                annotations
+            resource,
+            mockk(),
+            annotations
         )
 
         val record5 = Record(
-                resource,
-                meta,
-                listOf("d", "e", "f")
+            resource,
+            meta,
+            listOf("d", "e", "f")
         )
 
         assertTrue(record1.hashCode() == record2.hashCode())

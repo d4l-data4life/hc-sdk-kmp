@@ -16,12 +16,16 @@
 
 package care.data4life.crypto
 
-enum class KeyVersion constructor(value: String, val symmetricKeySize: Int, val asymmetricKeySize: Int) {
+enum class KeyVersion constructor(
+    value: String,
+    val symmetricKeySize: Int,
+    val asymmetricKeySize: Int
+) {
     @Json("0")
     VERSION_0("0", 256, 2048),
+
     @Json("1")
     VERSION_1("1", 256, 2048);
 
     val value: Int = value.toInt()
-
 }

@@ -25,7 +25,6 @@ import androidx.test.uiautomator.Until
 import care.data4life.sdk.e2e.util.Auth2FAHelper
 import care.data4life.sdk.e2e.util.User
 import java.lang.Thread.sleep
-import java.util.regex.Pattern
 
 class LoginPage : BasePage() {
 
@@ -81,12 +80,16 @@ class LoginPage : BasePage() {
     // Chrome
     private fun dismissChromeWelcomeScreen() {
         // dismiss Chrome welcome screen
-        val accept = device.findObject(UiSelector().resourceId("com.android.chrome:id/terms_accept"))
+        val accept = device.findObject(
+            UiSelector().resourceId("com.android.chrome:id/terms_accept")
+        )
         if (accept.exists()) {
             accept.click()
             device.waitForIdle()
         }
-        val noThanks = device.findObject(UiSelector().resourceId("com.android.chrome:id/negative_button"))
+        val noThanks = device.findObject(
+            UiSelector().resourceId("com.android.chrome:id/negative_button")
+        )
         if (noThanks.exists()) {
             noThanks.click()
             device.waitForIdle()
@@ -98,7 +101,9 @@ class LoginPage : BasePage() {
     }
 
     private fun dismissChromeInfobar() {
-        val closeNotifyPopup = device.findObject(UiSelector().resourceId("com.android.chrome:id/infobar_close_button"))
+        val closeNotifyPopup = device.findObject(
+            UiSelector().resourceId("com.android.chrome:id/infobar_close_button")
+        )
         closeNotifyPopup.waitForExists(TIMEOUT_SHORT)
         if (closeNotifyPopup.exists()) {
             closeNotifyPopup.click()
@@ -111,9 +116,9 @@ class LoginPage : BasePage() {
     // FIXME cookie consent needs a stable ID
     private fun dismissAuthAppCookie() {
         val acceptCookies = device.findObject(
-                UiSelector().instance(0)
-                        .className(Button::class.java)
-                        .descriptionMatches("(Accept|Akzeptieren)")
+            UiSelector().instance(0)
+                .className(Button::class.java)
+                .descriptionMatches("(Accept|Akzeptieren)")
         )
         acceptCookies.waitForExists(TIMEOUT_SHORT)
         if (acceptCookies.exists()) {
@@ -123,7 +128,9 @@ class LoginPage : BasePage() {
     }
 
     private fun unselectRememberDeviceCheckbox() {
-        val rememberCheckBox = device.findObject(UiSelector().resourceId("d4l-checkbox-remember"))
+        val rememberCheckBox = device.findObject(
+            UiSelector().resourceId("d4l-checkbox-remember")
+        )
         rememberCheckBox.waitForExists(TIMEOUT_SHORT)
         if (rememberCheckBox.exists() && rememberCheckBox.isChecked) {
             rememberCheckBox.click()
@@ -131,21 +138,23 @@ class LoginPage : BasePage() {
     }
 
     private fun resendCode(phoneNumber: String) {
-        val dismissButton = device.findObject(UiSelector().className("android.widget.Button").textMatches("(DISMISS)"))
+        val dismissButton = device.findObject(
+            UiSelector().className("android.widget.Button").textMatches("(DISMISS)")
+        )
         dismissButton.waitForExists(TIMEOUT_SHORT)
         if (dismissButton.exists()) {
             dismissButton.click()
 
-            val resend = device.findObject(UiSelector().resourceId("d4l-button-resend-sms-code"))
+            val resend = device.findObject(
+                UiSelector().resourceId("d4l-button-resend-sms-code")
+            )
             resend.click()
 
             sleep(TIMEOUT_SHORT)
             val code = Auth2FAHelper.fetchCurrent2faCode(phoneNumber)
             enterText(authAppInputPinV2, code, true)
         }
-
     }
-
 
     // Helper
 
@@ -156,12 +165,12 @@ class LoginPage : BasePage() {
 
     private fun scrollToBottom(maxSwipes: Int) {
         UiScrollable(UiSelector().className(WebView::class.java))
-                .scrollToEnd(maxSwipes)
+            .scrollToEnd(maxSwipes)
     }
 
     private fun scrollToTop(maxSwipes: Int) {
         UiScrollable(UiSelector().className(WebView::class.java))
-                .scrollToBeginning(maxSwipes)
+            .scrollToBeginning(maxSwipes)
     }
 
     private fun clickButton(resourceId: String, required: Boolean?) {
@@ -204,5 +213,4 @@ class LoginPage : BasePage() {
         const val authAppInputPinV2 = "d4l-pin"
         const val authAppButtonSmsCodeSubmit = "d4l-button-submit-sms-code"
     }
-
 }

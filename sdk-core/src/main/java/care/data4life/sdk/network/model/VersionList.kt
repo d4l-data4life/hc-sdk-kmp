@@ -16,7 +16,9 @@
 package care.data4life.sdk.network.model
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class VersionList(
     @field:Json(name = "versions")
     override val versions: List<Version>

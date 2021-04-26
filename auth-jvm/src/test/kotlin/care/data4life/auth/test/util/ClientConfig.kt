@@ -16,10 +16,12 @@
 
 package care.data4life.auth.test.util
 
+import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import java.io.BufferedReader
 import java.io.FileNotFoundException
 
+@JsonClass(generateAdapter = true)
 data class D4LClientConfig(
     val configs: Map<Environment, ClientConfig>
 ) {
@@ -28,6 +30,7 @@ data class D4LClientConfig(
     }
 }
 
+@JsonClass(generateAdapter = true)
 data class ClientConfig(
     val id: String,
     val secret: String,

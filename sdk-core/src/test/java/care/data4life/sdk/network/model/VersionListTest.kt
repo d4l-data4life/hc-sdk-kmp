@@ -53,7 +53,7 @@ class VersionListTest {
         val actual = moshi.adapter<VersionList>(VersionList::class.java).toJson(versions)
         // Then
         assertEquals(
-            "{\"versions\":[{\"status\":\"supported\",\"version_code\":25,\"version_name\":\"1.9.0\"}]}",
+            "{\"versions\":[{\"version_code\":25,\"version_name\":\"1.9.0\",\"status\":\"supported\"}]}",
             actual
         )
     }

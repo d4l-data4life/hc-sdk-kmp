@@ -14,12 +14,33 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.auth
+package care.data4life.crypto
 
+import care.data4life.crypto.security.SecretKeySpec
+import care.data4life.sdk.util.Base64
+import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class AuthState(
-    val alias: String,
-    val secret: String
-)
+actual data class GCKey(
+    val algorithm: GCAESKeyAlgorithm,
+    internal var symmetricKey: GCSymmetricKey?,
+    val keyVersion: Int
+) {
+
+    @field:Json(name = "key")
+    internal var keyBase64: String? = null
+
+    fun getSymmetricKey(): GCSymmetricKey {
+        return symmetricKey
+            ?: GCSymmetricKey(
+                SecretKeySpec(
+                    Base64.decode(keyBase64!!),
+                    algorithm.transformation
+                )
+            ).also { symmetricKey = it }
+    }
+
+    fun getKeyBase64(): String = keyBase64
+        ?: Base64.encodeToString(symmetricKey!!.value.encoded).also { keyBase64 = it }
+}

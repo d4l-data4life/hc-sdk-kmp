@@ -50,7 +50,7 @@ dependencies {
     implementation(Dependencies.Java.rxJava)
     implementation(Dependencies.Java.moshi)
 
-    compileOnly(Dependencies.java.javaXAnnotation)
+    compileOnly(Dependencies.Java.javaXAnnotation)
 
     testImplementation(Dependencies.Java.Test.junit)
     testImplementation(Dependencies.Java.Test.mockitoCore)

@@ -16,4 +16,8 @@
 
 package care.data4life.crypto
 
-expect class GCSymmetricKey
+import care.data4life.crypto.security.SecretKey
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
+actual data class GCSymmetricKey(val value: SecretKey)

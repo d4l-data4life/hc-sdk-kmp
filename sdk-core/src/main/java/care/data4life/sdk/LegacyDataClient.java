@@ -201,7 +201,7 @@ public class LegacyDataClient implements SdkContract.LegacyDataClient {
     @Override
     public <T extends DomainResource> Task downloadRecord(String recordId, ResultListener<Record<T>> listener) {
         Single<Record<T>> operation = userService.getUserID()
-                .flatMap(uid -> recordService.downloadRecord(recordId, uid));
+                .flatMap(uid -> recordService.downloadFhir3Record(recordId, uid));
         return handler.executeSingle(operation, listener);
     }
 

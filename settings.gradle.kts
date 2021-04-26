@@ -1,17 +1,17 @@
 rootProject.name = "hc-sdk-kmp"
 
 include(
-        ":sample-android", ":sample-jvm",
+    ":sample-android", ":sample-jvm",
 
-        ":sdk-core", ":sdk-android", "sdk-jvm", "sdk-ingestion",
+    ":sdk-core", ":sdk-android", "sdk-jvm", "sdk-ingestion",
 
-        ":sdk-android-test",
+    ":sdk-android-test",
 
-        ":sdk-doc",
+    ":sdk-doc",
 
-        ":securestore-common", ":securestore-android", ":securestore-jvm",
+    ":securestore-common", ":securestore-android", ":securestore-jvm",
 
-        ":crypto-common", ":crypto-android", ":crypto-jvm",
+    ":crypto-common", ":crypto-android", ":crypto-jvm",
 
-        ":auth-common", ":auth-android", ":auth-jvm"
+    ":auth-common", ":auth-android", ":auth-jvm"
 )

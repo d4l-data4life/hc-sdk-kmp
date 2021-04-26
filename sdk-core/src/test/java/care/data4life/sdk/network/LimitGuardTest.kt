@@ -58,13 +58,13 @@ class LimitGuardTest {
         // When
         try {
             DecryptedRecordGuard.checkTagsAndAnnotationsLimits(tags, listOf())
-            assertTrue(false)// FIXME: This is stupid
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             // Then
             assertTrue(e is DataValidationException.TagsAndAnnotationsLimitViolation)
             assertEquals(
-                    e.message,
-                    "Annotations and Tags are exceeding maximum length"
+                e.message,
+                "Annotations and Tags are exceeding maximum length"
             )
         }
     }
@@ -88,13 +88,13 @@ class LimitGuardTest {
         // When
         try {
             DecryptedRecordGuard.checkTagsAndAnnotationsLimits(hashMapOf(), annotations)
-            assertTrue(false)// FIXME: This is stupid
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             // Then
             assertTrue(e is DataValidationException.TagsAndAnnotationsLimitViolation)
             assertEquals(
-                    e.message,
-                    "Annotations and Tags are exceeding maximum length"
+                e.message,
+                "Annotations and Tags are exceeding maximum length"
             )
         }
     }
@@ -119,13 +119,13 @@ class LimitGuardTest {
         // When
         try {
             DecryptedRecordGuard.checkTagsAndAnnotationsLimits(tags, annotations)
-            assertTrue(false)// FIXME: This is stupid
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             // Then
             assertTrue(e is DataValidationException.TagsAndAnnotationsLimitViolation)
             assertEquals(
-                    e.message,
-                    "Annotations and Tags are exceeding maximum length"
+                e.message,
+                "Annotations and Tags are exceeding maximum length"
             )
         }
     }
@@ -151,13 +151,13 @@ class LimitGuardTest {
         // When
         try {
             DecryptedRecordGuard.checkDataLimit(data)
-            assertTrue(false)// FIXME: This is stupid
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             // Then
             assertTrue(e is DataValidationException.CustomDataLimitViolation)
             assertEquals(
-                    e.message,
-                    "The given record data exceeds the maximum size"
+                e.message,
+                "The given record data exceeds the maximum size"
             )
         }
     }

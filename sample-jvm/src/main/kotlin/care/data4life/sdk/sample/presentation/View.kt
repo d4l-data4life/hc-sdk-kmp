@@ -21,5 +21,4 @@ interface View {
     val type: String
 
     fun render(): View
-
 }

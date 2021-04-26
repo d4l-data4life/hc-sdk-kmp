@@ -17,8 +17,8 @@
 package care.data4life.securestore
 
 class SecureStore(
-        private val cryptor: SecureStoreCryptor,
-        private val storage: SecureStoreStorage
+    private val cryptor: SecureStoreCryptor,
+    private val storage: SecureStoreStorage
 ) : SecureStoreContract.SecureStore {
 
     override fun addData(alias: String, data: CharArray) {
@@ -34,7 +34,7 @@ class SecureStore(
     }
 
     override fun getData(alias: String): CharArray? =
-            storage.getData(alias)?.let { cryptor.decrypt(it) }
+        storage.getData(alias)?.let { cryptor.decrypt(it) }
 
     override fun clear() {
         cryptor.clear()

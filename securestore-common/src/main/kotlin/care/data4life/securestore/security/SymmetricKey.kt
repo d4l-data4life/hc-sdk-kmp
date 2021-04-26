@@ -17,14 +17,13 @@
 package care.data4life.securestore.security
 
 class SymmetricKey(
-        private val key: SecretKey
+    private val key: SecretKey
 ) {
 
     fun getKey() = key
 
-
     companion object {
-        //TODO they should be platform specific
+        // TODO they should be platform specific
 
         const val KEY_ALGORITHM = "AES"
         const val KEY_BLOCK_MODE = "GCM"

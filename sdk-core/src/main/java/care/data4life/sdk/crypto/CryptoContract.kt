@@ -166,4 +166,3 @@ class CryptoContract {
         fun createGCKeyPair(exchangeKey: ExchangeKey): GCKeyPair
     }
 }
-

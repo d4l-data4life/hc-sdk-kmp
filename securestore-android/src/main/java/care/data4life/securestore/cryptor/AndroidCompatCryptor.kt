@@ -33,11 +33,10 @@ import javax.crypto.spec.GCMParameterSpec
 
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 class AndroidCompatCryptor(
-        val context: Context,
-        private val keystore: CompatKeystore = AndroidCompatKeystore(context),
-        private val base64: Base64 = Base64
+    val context: Context,
+    private val keystore: CompatKeystore = AndroidCompatKeystore(context),
+    private val base64: Base64 = Base64
 ) : SecureStoreContract.Cryptor {
-
 
     override fun encrypt(data: CharArray): CharArray {
         val symmetricKey = keystore.loadKey()
@@ -46,14 +45,20 @@ class AndroidCompatCryptor(
         SecureRandom().nextBytes(iv)
 
         val cipher = Cipher.getInstance(SymmetricKey.KEY_TRANSFORMATION)
-        cipher.init(Cipher.ENCRYPT_MODE, symmetricKey.getKey(), GCMParameterSpec(SymmetricKey.KEY_IV_TAG_LENGTH, iv))
+        cipher.init(
+            Cipher.ENCRYPT_MODE,
+            symmetricKey.getKey(),
+            GCMParameterSpec(SymmetricKey.KEY_IV_TAG_LENGTH, iv)
+        )
 
         val encrypted = cipher.doFinal(data.toBytes())
 
-        return base64.encode(ByteBuffer.allocate(iv.size + encrypted.size)
+        return base64.encode(
+            ByteBuffer.allocate(iv.size + encrypted.size)
                 .put(iv)
                 .put(encrypted)
-                .array()).toChars()
+                .array()
+        ).toChars()
     }
 
     override fun decrypt(data: CharArray): CharArray {
@@ -69,7 +74,11 @@ class AndroidCompatCryptor(
         buffer.get(encrypted)
 
         val cipher = Cipher.getInstance(SymmetricKey.KEY_TRANSFORMATION)
-        cipher.init(Cipher.DECRYPT_MODE, symmetricKey.getKey(), GCMParameterSpec(SymmetricKey.KEY_IV_TAG_LENGTH, iv))
+        cipher.init(
+            Cipher.DECRYPT_MODE,
+            symmetricKey.getKey(),
+            GCMParameterSpec(SymmetricKey.KEY_IV_TAG_LENGTH, iv)
+        )
 
         return cipher.doFinal(encrypted).toChars()
     }
@@ -78,9 +87,7 @@ class AndroidCompatCryptor(
         keystore.clear()
     }
 
-
     companion object {
         private const val DEFAULT_CHARSET = "UTF-8"
     }
-
 }

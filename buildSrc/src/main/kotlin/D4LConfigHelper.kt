@@ -36,11 +36,14 @@ object D4LConfigHelper {
             } catch (e: Exception) {
                 null
             }
-        } ?: throw IllegalStateException("Config file not found here: $path/$fileName nor environment variable $envVarName was set")
+        } ?: throw IllegalStateException(
+            "Config file not found here: $path/$fileName nor environment variable $envVarName was set"
+        )
     }
 
     fun loadClientConfigAndroid(path: String): D4LClientConfig {
-        val configJson = loadConfig(path, FILE_NAME_CLIENT_CONFIG_ANDROID, ENV_CLIENT_CONFIG_ANDROID)
+        val configJson =
+            loadConfig(path, FILE_NAME_CLIENT_CONFIG_ANDROID, ENV_CLIENT_CONFIG_ANDROID)
         return gson().fromJson(configJson, D4LClientConfig::class.java)
     }
 
@@ -56,6 +59,4 @@ object D4LConfigHelper {
     fun toJson(d4lTestConfig: D4LTestConfig): String {
         return gson().toJson(d4lTestConfig)
     }
-
 }
-

@@ -281,7 +281,10 @@ class FhirAttachmentHelperTest {
         // Then
         verify(exactly = 1) {
             @Suppress("UNCHECKED_CAST")
-            Fhir4AttachmentHelper.updateAttachmentData(resource, attachments as HashMap<Fhir4Attachment, String>)
+            Fhir4AttachmentHelper.updateAttachmentData(
+                resource,
+                attachments as HashMap<Fhir4Attachment, String>
+            )
         }
     }
 
@@ -450,7 +453,13 @@ class FhirAttachmentHelperTest {
         SdkFhirAttachmentHelper.appendIdentifier(resource, identifier, assigner)
 
         // Then
-        verify(exactly = 1) { Fhir3AttachmentHelper.appendIdentifier(resource, identifier, assigner) }
+        verify(exactly = 1) {
+            Fhir3AttachmentHelper.appendIdentifier(
+                resource,
+                identifier,
+                assigner
+            )
+        }
     }
 
     @Test
@@ -466,7 +475,13 @@ class FhirAttachmentHelperTest {
         SdkFhirAttachmentHelper.appendIdentifier(resource, identifier, assigner)
 
         // Then
-        verify(exactly = 1) { Fhir4AttachmentHelper.appendIdentifier(resource, identifier, assigner) }
+        verify(exactly = 1) {
+            Fhir4AttachmentHelper.appendIdentifier(
+                resource,
+                identifier,
+                assigner
+            )
+        }
     }
 
     @Test

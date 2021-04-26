@@ -32,5 +32,4 @@ class GCSymmetricKey(val value: SecretKey) {
     override fun hashCode(): Int {
         return value.hashCode()
     }
-
 }

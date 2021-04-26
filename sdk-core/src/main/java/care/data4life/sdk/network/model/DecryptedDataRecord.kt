@@ -25,12 +25,12 @@ import care.data4life.sdk.network.model.definitions.DecryptedCustomDataRecord
  * @see care.data4life.sdk.network.model.DecryptedRecord
  */
 internal data class DecryptedDataRecord(
-        override var identifier: String?,
-        override var resource: DataResource,
-        override var tags: HashMap<String, String>?,
-        override var annotations: List<String>,
-        override var customCreationDate: String?,
-        override var updatedDate: String?,
-        override var dataKey: GCKey?,
-        override var modelVersion: Int
+    override var identifier: String?,
+    override var resource: DataResource,
+    override var tags: HashMap<String, String>?,
+    override var annotations: List<String>,
+    override var customCreationDate: String?,
+    override var updatedDate: String?,
+    override var dataKey: GCKey?,
+    override var modelVersion: Int
 ) : DecryptedCustomDataRecord

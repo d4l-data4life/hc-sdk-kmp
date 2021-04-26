@@ -31,9 +31,11 @@ android {
         versionName = "${project.version}"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments(mapOf(
+        testInstrumentationRunnerArguments(
+            mapOf(
                 "clearPackageData" to "true"
-        ))
+            )
+        )
     }
 
     resourcePrefix("d4l_securestore_")

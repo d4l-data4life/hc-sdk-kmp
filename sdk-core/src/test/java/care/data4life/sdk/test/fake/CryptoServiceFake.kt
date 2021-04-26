@@ -94,7 +94,13 @@ class CryptoServiceFake : CryptoContract.Service {
         return if (idx > -1) {
             Single.just(hashedResources[idx].toByteArray())
         } else {
-            throw RuntimeException("Unable to fake resource encryption: \nKey: $key \nData: ${String(data)}")
+            throw RuntimeException(
+                "Unable to fake resource encryption: \nKey: $key \nData: ${
+                String(
+                    data
+                )
+                }"
+            )
         }
     }
 
@@ -115,7 +121,13 @@ class CryptoServiceFake : CryptoContract.Service {
         return if (idx > -1) {
             Single.just(currentIteration.resources[idx].toByteArray())
         } else {
-            throw RuntimeException("Unable to fake resource decryption: \nKey: $key \nData: ${String(data)}")
+            throw RuntimeException(
+                "Unable to fake resource decryption: \nKey: $key \nData: ${
+                String(
+                    data
+                )
+                }"
+            )
         }
     }
 

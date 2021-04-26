@@ -32,23 +32,22 @@ class TagEncryptionHelperTest {
     fun `Given, convertToTagMap is called with a List of Strings, it converts them into a list and deserializes the key and string`() {
         // Given
         val serializesTags = listOf(
-                "potato=bread",
-                "tomato=soup"
+            "potato=bread",
+            "tomato=soup"
         )
 
         val expected = hashMapOf(
-                "potato" to "bread",
-                "tomato" to "soup"
+            "potato" to "bread",
+            "tomato" to "soup"
         )
-
 
         // When
         val tags = TagEncryptionHelper.convertToTagMap(serializesTags)
 
         // Then
         assertEquals(
-                expected,
-                tags
+            expected,
+            tags
         )
     }
 
@@ -74,8 +73,8 @@ class TagEncryptionHelperTest {
 
         assertTrue(exception is DataValidationException.AnnotationViolation)
         assertEquals(
-                "Annotation is empty.",
-                exception.message
+            "Annotation is empty.",
+            exception.message
         )
     }
 
@@ -89,8 +88,8 @@ class TagEncryptionHelperTest {
 
         // Then
         assertEquals(
-                tag,
-                result
+            tag,
+            result
         )
     }
 
@@ -104,8 +103,8 @@ class TagEncryptionHelperTest {
 
         // Then
         assertEquals(
-                expected,
-                result
+            expected,
+            result
         )
     }
 
@@ -119,8 +118,8 @@ class TagEncryptionHelperTest {
 
         // Then
         assertEquals(
-                "tag",
-                result
+            "tag",
+            result
         )
     }
 
@@ -134,8 +133,8 @@ class TagEncryptionHelperTest {
 
         // Then
         assertEquals(
-                "%e4%bd%a0%e5%a5%bd%ef%bc%8c%e4%b8%96%e7%95%8c",
-                result
+            "%e4%bd%a0%e5%a5%bd%ef%bc%8c%e4%b8%96%e7%95%8c",
+            result
         )
     }
 
@@ -149,8 +148,8 @@ class TagEncryptionHelperTest {
 
         // Then
         assertEquals(
-                "%21%20%27%28%29%2a%2d%5f%2e%7e",
-                result
+            "%21%20%27%28%29%2a%2d%5f%2e%7e",
+            result
         )
     }
 
@@ -164,8 +163,8 @@ class TagEncryptionHelperTest {
 
         // Then
         assertEquals(
-                "%e4%bd%a0%e5%a5%bd%21%20world%2e",
-                result
+            "%e4%bd%a0%e5%a5%bd%21%20world%2e",
+            result
         )
     }
 
@@ -179,8 +178,8 @@ class TagEncryptionHelperTest {
 
         // Then
         assertEquals(
-                "你好，世界",
-                result
+            "你好，世界",
+            result
         )
     }
 
@@ -195,8 +194,8 @@ class TagEncryptionHelperTest {
         // Then
         assertTrue(exception is DataValidationException.AnnotationViolation)
         assertEquals(
-                exception.message,
-                "Annotation is empty."
+            exception.message,
+            "Annotation is empty."
         )
     }
 
@@ -210,8 +209,8 @@ class TagEncryptionHelperTest {
 
         // Then
         assertEquals(
-                tag,
-                result
+            tag,
+            result
         )
     }
 
@@ -225,8 +224,8 @@ class TagEncryptionHelperTest {
 
         // Then
         assertEquals(
-                expected,
-                result
+            expected,
+            result
         )
     }
 
@@ -240,8 +239,8 @@ class TagEncryptionHelperTest {
 
         // Then
         assertEquals(
-                "tag",
-                result
+            "tag",
+            result
         )
     }
 
@@ -255,8 +254,8 @@ class TagEncryptionHelperTest {
 
         // Then
         assertEquals(
-                "!'()*-_.~ ",
-                result
+            "!'()*-_.~ ",
+            result
         )
     }
 
@@ -270,8 +269,8 @@ class TagEncryptionHelperTest {
 
         // Then
         assertEquals(
-                "你好! world.",
-                result
+            "你好! world.",
+            result
         )
     }
 }

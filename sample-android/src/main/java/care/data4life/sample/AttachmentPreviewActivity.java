@@ -26,11 +26,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.chrisbanes.photoview.PhotoView;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.sdk.Data4LifeClient;
 import care.data4life.sdk.call.Task;

@@ -143,7 +143,6 @@ object Versions {
      */
     const val gson = "2.9.0"
 
-
     // Date
 
     /**
@@ -189,7 +188,6 @@ object Versions {
      */
     const val pdfView = "3.1.0-beta.1"
 
-
     // Junit Test
     const val testJUnit = "4.12"
 
@@ -221,5 +219,4 @@ object Versions {
     const val androidXTestExtJUnit = "1.1.2"
 
     const val androidXKakao = "1.4.0-androidx"
-
 }

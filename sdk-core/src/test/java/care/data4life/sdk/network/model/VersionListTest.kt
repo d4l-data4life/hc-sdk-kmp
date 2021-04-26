@@ -25,117 +25,116 @@ import kotlin.test.assertTrue
 class VersionListTest {
     @Test
     fun `Given a VersionList it fulfills the VersionList interface`() {
-        //Given
+        // Given
         val versions: Any = VersionList(
-                listOf(
-                        Version(
-                                25,
-                                "1.9.0",
-                                "supported"
-                        )
+            listOf(
+                Version(
+                    25,
+                    "1.9.0",
+                    "supported"
                 )
+            )
         )
         assertTrue(versions is NetworkModelContract.VersionList)
     }
 
     @Test
     fun `Given VersionList is serializable, it gives`() {
-        //Given
+        // Given
         val version = Version(
-                25,
-                "1.9.0",
-                "supported"
+            25,
+            "1.9.0",
+            "supported"
         )
         val versions = VersionList(listOf<Version>(version))
         val moshi = Moshi.Builder().build()
 
-        //When
+        // When
         val actual = moshi.adapter<VersionList>(VersionList::class.java).toJson(versions)
-        //Then
+        // Then
         assertEquals(
-                "{\"versions\":[{\"status\":\"supported\",\"version_code\":25,\"version_name\":\"1.9.0\"}]}",
-                actual
+            "{\"versions\":[{\"status\":\"supported\",\"version_code\":25,\"version_name\":\"1.9.0\"}]}",
+            actual
         )
     }
 
     @Test
     fun `Given a VersionList is deserialized it transforms into VersionList`() {
-        //Given
+        // Given
         val moshi = Moshi.Builder()
-                .build()
+            .build()
         val versionListJson =
-                "{\"versions\":[{\"status\":\"supported\",\"version_code\":25,\"version_name\":\"1.9.0\"}]}"
+            "{\"versions\":[{\"status\":\"supported\",\"version_code\":25,\"version_name\":\"1.9.0\"}]}"
 
-        //When
+        // When
         val versionList =
-                moshi.adapter<VersionList>(VersionList::class.java).fromJson(versionListJson)
+            moshi.adapter<VersionList>(VersionList::class.java).fromJson(versionListJson)
 
-        //Then
+        // Then
         assertEquals(
-                versionList,
-                VersionList(
-                        listOf(
-                                Version(
-                                        25,
-                                        "1.9.0",
-                                        "supported"
-                                )
-                        )
+            versionList,
+            VersionList(
+                listOf(
+                    Version(
+                        25,
+                        "1.9.0",
+                        "supported"
+                    )
                 )
+            )
         )
     }
 
-
     @Test
     fun `isSupported returns true when version is supported`() {
-        //Given
+        // Given
         val version = Version(
-                25,
-                "1.10.0-config.debug",
-                "supported"
+            25,
+            "1.10.0-config.debug",
+            "supported"
         )
         val versions = VersionList(listOf<Version>(version))
 
-        //When
+        // When
         val isSupported = versions.isSupported(version.name)
-        //Then
+        // Then
         assertTrue(isSupported)
     }
 
     @Test
     fun `isSupported returns true when version is not in versionList`() {
-        //Given
+        // Given
         val version = Version(
-                25,
-                "1.9.0",
-                "supported"
+            25,
+            "1.9.0",
+            "supported"
         )
         val currentVersion = Version(
-                25,
-                "1.9.3",
-                "supported"
+            25,
+            "1.9.3",
+            "supported"
         )
         val versions = VersionList(listOf<Version>(version))
 
-        //When
+        // When
         val isSupported = versions.isSupported(currentVersion.name)
-        //Then
+        // Then
         assertTrue(isSupported)
     }
 
     @Test
     fun `isSupported returns false when version is unsupported`() {
-        //Given
+        // Given
         val version = Version(
-                25,
-                "1.9.0",
-                "unsupported"
+            25,
+            "1.9.0",
+            "unsupported"
         )
         val versions = VersionList(listOf<Version>(version))
 
-        //When
+        // When
         val isSupported = versions.isSupported(version.name)
-        //Then
+        // Then
         assertFalse(isSupported)
     }
 }

@@ -34,7 +34,7 @@ package care.data4life.sdk
 import care.data4life.sdk.lang.D4LRuntimeException
 import com.squareup.moshi.Moshi
 import java.nio.charset.StandardCharsets
-import java.util.*
+import java.util.Base64
 
 internal class AccessTokenDecoder {
     private val moshi: Moshi = Moshi.Builder().build()
@@ -57,7 +57,10 @@ internal class AccessTokenDecoder {
             val accessTokenString = String(accessToken!!, StandardCharsets.UTF_8)
             val tokenParts = accessTokenString.split(".").toTypedArray()
             val payloadBase64 = tokenParts[1]
-            val payloadString = String(Base64.getDecoder().decode(payloadBase64), StandardCharsets.UTF_8)
+            val payloadString = String(
+                Base64.getDecoder().decode(payloadBase64),
+                StandardCharsets.UTF_8
+            )
             val payload = moshi.adapter(D4LJwtPayload::class.java).fromJson(payloadString)
             clientId = payload!!.ghc_cid
             if (null == clientId) {
@@ -68,5 +71,4 @@ internal class AccessTokenDecoder {
         }
         return clientId
     }
-
 }

@@ -21,7 +21,7 @@ import java.io.BufferedReader
 import java.io.FileNotFoundException
 
 data class D4LClientConfig(
-        val configs: Map<Environment, ClientConfig>
+    val configs: Map<Environment, ClientConfig>
 ) {
     operator fun get(environment: Environment): ClientConfig {
         return configs.getValue(environment)
@@ -29,9 +29,9 @@ data class D4LClientConfig(
 }
 
 data class ClientConfig(
-        val id: String,
-        val secret: String,
-        val redirectScheme: String
+    val id: String,
+    val secret: String,
+    val redirectScheme: String
 )
 
 enum class Environment {
@@ -54,10 +54,16 @@ object ClientConfigLoader {
             val input = this.javaClass.classLoader.getResourceAsStream(FILE_NAME)
             val json = input.bufferedReader().use(BufferedReader::readText)
             return Moshi.Builder().build().adapter(D4LClientConfig::class.java).fromJson(json)!!
-        } catch (e: FileNotFoundException) {
-            throw IllegalStateException("Please run '/gradlew provideTestConfig' before running the tests", e)
-        } catch (e: IllegalStateException) {
-            throw IllegalStateException("Please run '/gradlew provideTestConfig' before running the tests", e)
+        } catch (exception: FileNotFoundException) {
+            throw IllegalStateException(
+                "Please run '/gradlew provideTestConfig' before running the tests",
+                exception
+            )
+        } catch (exception: IllegalStateException) {
+            throw IllegalStateException(
+                "Please run '/gradlew provideTestConfig' before running the tests",
+                exception
+            )
         }
     }
 }

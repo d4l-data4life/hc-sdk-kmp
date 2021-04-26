@@ -31,5 +31,4 @@ class TerminalApp {
             currentView = currentView.render()
         }
     }
-
 }

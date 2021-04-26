@@ -19,5 +19,4 @@ package care.data4life.crypto.security
 expect class SecretKeySpec constructor(key: ByteArray, algorithm: String) : KeySpec, SecretKey {
 
     constructor(key: ByteArray, offset: Int, len: Int, algorithm: String)
-
 }

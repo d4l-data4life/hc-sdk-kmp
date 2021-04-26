@@ -27,10 +27,8 @@ import org.koin.core.parameter.parametersOf
 
 class FinishLoginView(private val alias: String) : BaseView(), KoinComponent {
 
-
     private val client: Data4LifeClient by inject { parametersOf(alias) }
     override val type: String = "finish Login"
-
 
     override fun renderContent(): View {
         renderMessage(Message("Paste the OAuth callbackUrl here"))

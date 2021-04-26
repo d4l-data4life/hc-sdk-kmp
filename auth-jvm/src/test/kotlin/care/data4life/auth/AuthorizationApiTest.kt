@@ -26,7 +26,6 @@ class AuthorizationApiTest {
 
     private lateinit var sut: AuthorizationApi
 
-
     @Before
     fun setUp() {
     }
@@ -53,16 +52,14 @@ class AuthorizationApiTest {
         assertEquals(EXPECTED_TOKEN_URL, actual)
     }
 
-
     companion object {
         private const val IGNORE = ""
 
-        private const val EXPECTED_AUTH_URL = "expected_authorization_endpoint/oauth/authorize?response_type=&client_id=&redirect_uri=&scope=&state="
+        private const val EXPECTED_AUTH_URL =
+            "expected_authorization_endpoint/oauth/authorize?response_type=&client_id=&redirect_uri=&scope=&state="
         private const val EXPECTED_TOKEN_URL = "expected_token_endpoint/oauth/token"
 
         private const val AUTHORIZATION_ENDPOINT = "expected_authorization_endpoint"
         private const val TOKEN_ENDPOINT = "expected_token_endpoint"
-
     }
-
 }

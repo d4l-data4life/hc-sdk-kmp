@@ -27,9 +27,9 @@ import java.nio.charset.StandardCharsets
 
 // TODO internal
 class TagEncryptionService @JvmOverloads constructor(
-        private val cryptoService: CryptoContract.Service,
-        private val base64: Base64 = Base64,
-        private val tagHelper: TaggingContract.Helper = TagEncryptionHelper
+    private val cryptoService: CryptoContract.Service,
+    private val base64: Base64 = Base64,
+    private val tagHelper: TaggingContract.Helper = TagEncryptionHelper
 ) : TaggingContract.EncryptionService {
     @Throws(D4LException::class)
     override fun encryptTagsAndAnnotations(
@@ -37,32 +37,32 @@ class TagEncryptionService @JvmOverloads constructor(
         annotations: Annotations,
         tagEncryptionKey: GCKey?
     ): List<String> {
-        val encryptionKey = if( tagEncryptionKey is GCKey) {
+        val encryptionKey = if (tagEncryptionKey is GCKey) {
             tagEncryptionKey
         } else {
             cryptoService.fetchTagEncryptionKey()
         }
 
         return encryptAndEncodeTags(tags, encryptionKey)
-                .also { encryptedTags ->
-                    encryptedTags.addAll(encryptAndEncodeAnnotations(annotations, encryptionKey))
-                }
+            .also { encryptedTags ->
+                encryptedTags.addAll(encryptAndEncodeAnnotations(annotations, encryptionKey))
+            }
     }
 
     @Throws(IOException::class)
     private fun encryptAndEncodeTags(
-            tags: Tags,
-            encryptionKey: GCKey
+        tags: Tags,
+        encryptionKey: GCKey
     ): MutableList<String> {
         return tags
-                .map { entry -> entry.key + DELIMITER + tagHelper.encode(entry.value) }
-                .let { encodedTags -> encryptList(encodedTags, encryptionKey) }
+            .map { entry -> entry.key + DELIMITER + tagHelper.encode(entry.value) }
+            .let { encodedTags -> encryptList(encodedTags, encryptionKey) }
     }
 
     @Throws(IOException::class)
     private fun encryptAndEncodeAnnotations(
-            annotations: Annotations,
-            encryptionKey: GCKey
+        annotations: Annotations,
+        encryptionKey: GCKey
     ): MutableList<String> {
         return annotations
             .map { annotation -> tagHelper.encode(annotation) }
@@ -77,7 +77,7 @@ class TagEncryptionService @JvmOverloads constructor(
 
     @Throws(D4LException::class)
     override fun decryptTagsAndAnnotations(
-            encryptedTagsAndAnnotations: List<String>
+        encryptedTagsAndAnnotations: List<String>
     ): Pair<Tags, Annotations> {
         val encryptionKey = cryptoService.fetchTagEncryptionKey()
 
@@ -89,36 +89,36 @@ class TagEncryptionService @JvmOverloads constructor(
 
     @Throws(IOException::class)
     private fun decryptTags(
-            encryptedTags: List<String>,
-            encryptionKey: GCKey
+        encryptedTags: List<String>,
+        encryptionKey: GCKey
     ): Tags = decryptList(
-            encryptedTags,
-            encryptionKey,
-            { decrypted -> !decrypted.startsWith(ANNOTATION_KEY) && decrypted.contains(DELIMITER) },
-            { tagList: List<String> -> tagHelper.convertToTagMap(tagList) }
+        encryptedTags,
+        encryptionKey,
+        { decrypted -> !decrypted.startsWith(ANNOTATION_KEY) && decrypted.contains(DELIMITER) },
+        { tagList: List<String> -> tagHelper.convertToTagMap(tagList) }
     )
 
     @Throws(IOException::class)
     private fun decryptAnnotations(
-            encryptedAnnotations: List<String>,
-            encryptionKey: GCKey
+        encryptedAnnotations: List<String>,
+        encryptionKey: GCKey
     ): Annotations = decryptList(
-            encryptedAnnotations,
-            encryptionKey,
-            { decrypted -> decrypted.startsWith(ANNOTATION_KEY) && decrypted.contains(DELIMITER) },
-            { list -> removeAnnotationKey(list) }
+        encryptedAnnotations,
+        encryptionKey,
+        { decrypted -> decrypted.startsWith(ANNOTATION_KEY) && decrypted.contains(DELIMITER) },
+        { list -> removeAnnotationKey(list) }
     )
 
     @Throws(IOException::class)
     override fun encryptList(
-            plainList: List<String>,
-            encryptionKey: GCKey,
-            prefix: String
+        plainList: List<String>,
+        encryptionKey: GCKey,
+        prefix: String
     ): MutableList<String> {
         return plainList.map { tag ->
             encryptItem(
-                    encryptionKey,
-                    prefix + tag
+                encryptionKey,
+                prefix + tag
             )
         }.toMutableList()
     }
@@ -127,7 +127,7 @@ class TagEncryptionService @JvmOverloads constructor(
     private fun encryptItem(key: GCKey, tag: String): String {
         return try {
             cryptoService.symEncrypt(key, tag.toByteArray(), IV)
-                    .let { data -> base64.encodeToString(data) }
+                .let { data -> base64.encodeToString(data) }
         } catch (e: Exception) {
             throw CryptoException.EncryptionFailed("Failed to encrypt tag")
         }
@@ -135,24 +135,24 @@ class TagEncryptionService @JvmOverloads constructor(
 
     @Throws(IOException::class)
     private fun <T> decryptList(
-            encryptedList: List<String>,
-            encryptionKey: GCKey,
-            condition: (decryptedItem: String) -> Boolean,
-            transform: (decryptedList: MutableList<String>) -> T
+        encryptedList: List<String>,
+        encryptionKey: GCKey,
+        condition: (decryptedItem: String) -> Boolean,
+        transform: (decryptedList: MutableList<String>) -> T
     ): T {
         return encryptedList
-                .map { encryptedTag -> decryptItem(encryptionKey, encryptedTag) }
-                .map { encodedTag -> tagHelper.decode(encodedTag) }
-                .filter { decryptedItem -> condition(decryptedItem) }
-                .let { decryptedList -> transform(decryptedList.toMutableList()) }
+            .map { encryptedTag -> decryptItem(encryptionKey, encryptedTag) }
+            .map { encodedTag -> tagHelper.decode(encodedTag) }
+            .filter { decryptedItem -> condition(decryptedItem) }
+            .let { decryptedList -> transform(decryptedList.toMutableList()) }
     }
 
     @Throws(D4LException::class)
     private fun decryptItem(key: GCKey, base64tag: String): String {
         return try {
             base64.decode(base64tag)
-                    .let { encrypted -> cryptoService.symDecrypt(key, encrypted, IV) }
-                    .let { decrypted -> String(decrypted, StandardCharsets.UTF_8) }
+                .let { encrypted -> cryptoService.symDecrypt(key, encrypted, IV) }
+                .let { decrypted -> String(decrypted, StandardCharsets.UTF_8) }
         } catch (e: Exception) {
             throw CryptoException.DecryptionFailed("Failed to decrypt tag")
         }
@@ -163,7 +163,7 @@ class TagEncryptionService @JvmOverloads constructor(
 
         @JvmStatic
         private fun removeAnnotationKey(
-                list: MutableList<String>
+            list: MutableList<String>
         ): List<String> = list.also {
             for (idx in it.indices) {
                 it[idx] = it[idx].replaceFirst(ANNOTATION_KEY + DELIMITER, "")

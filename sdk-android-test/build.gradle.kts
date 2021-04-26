@@ -36,18 +36,22 @@ android {
         multiDexEnabled = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments(mapOf(
+        testInstrumentationRunnerArguments(
+            mapOf(
                 "clearPackageData" to "true"
-        ))
+            )
+        )
 
-        manifestPlaceholders(mapOf<String, Any>(
+        manifestPlaceholders(
+            mapOf<String, Any>(
                 "clientId" to d4lClientConfig[Environment.DEVELOPMENT].id,
                 "clientSecret" to d4lClientConfig[Environment.DEVELOPMENT].secret,
                 "redirectScheme" to d4lClientConfig[Environment.DEVELOPMENT].redirectScheme,
                 "environment" to "${Environment.DEVELOPMENT}",
                 "platform" to d4lClientConfig.platform,
                 "debug" to "true"
-        ))
+            )
+        )
     }
 
     buildTypes {
@@ -87,7 +91,7 @@ android {
             }
         }
 
-         execution = "ANDROID_TEST_ORCHESTRATOR"
+        execution = "ANDROID_TEST_ORCHESTRATOR"
     }
 }
 
@@ -154,10 +158,17 @@ val provideTestConfig: Task by tasks.creating {
     doLast {
         val androidTestAsset = File(androidTestAssetsPath)
         if (!androidTestAsset.exists()) androidTestAsset.mkdirs()
-        File(androidTestAssetsPath, "test_config.json").writeText(D4LConfigHelper.toJson(d4LTestConfig))
+        File(androidTestAssetsPath, "test_config.json").writeText(
+            D4LConfigHelper.toJson(
+                d4LTestConfig
+            )
+        )
         val unitTestAsset = File(unitTestAssetsPath)
         if (!unitTestAsset.exists()) unitTestAsset.mkdirs()
-        File(unitTestAssetsPath, "test_config.json").writeText(D4LConfigHelper.toJson(d4LTestConfig))
+        File(
+            unitTestAssetsPath,
+            "test_config.json"
+        ).writeText(D4LConfigHelper.toJson(d4LTestConfig))
     }
 }
 

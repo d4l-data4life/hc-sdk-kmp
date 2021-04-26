@@ -18,7 +18,10 @@ package care.data4life.crypto.error
 
 import care.data4life.sdk.lang.D4LException
 
-sealed class CryptoException(message: String? = null, cause: Throwable? = null) : D4LException(message = message, cause = cause) {
+sealed class CryptoException(
+    message: String? = null,
+    cause: Throwable? = null
+) : D4LException(message = message, cause = cause) {
 
     constructor(message: String?) : this(message, null)
 
@@ -27,12 +30,17 @@ sealed class CryptoException(message: String? = null, cause: Throwable? = null) 
     constructor() : this(null, null)
 
     class InvalidKeyType(val name: String) : CryptoException("Key type '$name' is not supported")
-    class InvalidKeyVersion(val version: Int) : CryptoException("Key version '$version' is not supported")
-    class EncryptionFailed(message: String? = null, cause: Throwable? = null) : CryptoException(message, cause) {
+    class InvalidKeyVersion(val version: Int) : CryptoException(
+        "Key version '$version' is not supported"
+    )
+
+    class EncryptionFailed(message: String? = null, cause: Throwable? = null) :
+        CryptoException(message, cause) {
         constructor(message: String? = null) : this(message, null)
     }
 
-    class DecryptionFailed(message: String? = null, cause: Throwable? = null) : CryptoException(message, cause) {
+    class DecryptionFailed(message: String? = null, cause: Throwable? = null) :
+        CryptoException(message, cause) {
         constructor(message: String? = null) : this(message, null)
     }
 
@@ -40,5 +48,4 @@ sealed class CryptoException(message: String? = null, cause: Throwable? = null) 
     class KeyDecryptionFailed(message: String?) : CryptoException(message)
     class KeyGenerationFailed(message: String?) : CryptoException(message)
     class KeyFetchingFailed(message: String?) : CryptoException(message)
-
 }

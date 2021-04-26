@@ -25,7 +25,7 @@
     <item
         android:id="@+id/logoutBTN"
         android:title="Logout"
-        app:showAsAction="never" />
+        app:showAsAction="never"/>
 
     <!--<item-->
     <!--android:id="@+id/startBenchmarkBTN"-->

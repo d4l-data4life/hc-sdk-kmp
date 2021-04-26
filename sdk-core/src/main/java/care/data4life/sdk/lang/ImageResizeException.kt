@@ -16,12 +16,14 @@
 
 package care.data4life.sdk.lang
 
-sealed class ImageResizeException(message: String? = null, cause: Throwable? = null) : D4LException(message, cause) {
+sealed class ImageResizeException(
+    message: String? = null,
+    cause: Throwable? = null
+) : D4LException(message, cause) {
 
     constructor() : this(null, null)
     constructor(message: String?) : this(message, null)
     constructor(cause: Throwable?) : this(cause?.toString(), cause)
 
     class JpegWriterMissing : ImageResizeException(message = "Jpeg writer missing!")
-
 }

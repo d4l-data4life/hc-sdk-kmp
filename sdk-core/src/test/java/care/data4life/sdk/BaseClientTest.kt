@@ -36,9 +36,26 @@ class BaseClientTest {
         handler: CallHandler,
         authClient: SdkContract.AuthClient,
         data: SdkContract.DataRecordClient = createDataClient(userService, recordService, handler),
-        fhir4: SdkContract.Fhir4RecordClient = createFhir4Client(userService, recordService, handler),
-        legacyDataClient: SdkContract.LegacyDataClient = createLegacyDataClient(userService, recordService, handler)
-    ) : BaseClient(alias, userService, recordService, handler, authClient, data, fhir4, legacyDataClient)
+        fhir4: SdkContract.Fhir4RecordClient = createFhir4Client(
+            userService,
+            recordService,
+            handler
+        ),
+        legacyDataClient: SdkContract.LegacyDataClient = createLegacyDataClient(
+            userService,
+            recordService,
+            handler
+        )
+    ) : BaseClient(
+        alias,
+        userService,
+        recordService,
+        handler,
+        authClient,
+        data,
+        fhir4,
+        legacyDataClient
+    )
 
     private val userService: AuthContract.UserService = mockk()
     private val recordService: RecordService = mockk()

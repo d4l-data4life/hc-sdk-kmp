@@ -17,7 +17,7 @@
 package care.data4life.securestore.security
 
 class AsymmetricKey(
-        private val keyPair: KeyPair
+    private val keyPair: KeyPair
 ) {
 
     fun getPublicKey() = keyPair.getPublic()

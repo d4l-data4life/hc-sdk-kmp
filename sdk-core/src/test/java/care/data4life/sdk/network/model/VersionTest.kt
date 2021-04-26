@@ -25,53 +25,52 @@ class VersionTest {
 
     @Test
     fun `Given a Version it  the Version interface`() {
-        //Given
+        // Given
         val version: Any = Version(
-                25,
-                "1.9.0",
-                "supported"
+            25,
+            "1.9.0",
+            "supported"
         )
         assertTrue(version is NetworkModelContract.Version)
     }
 
     @Test
     fun `Version is serializable, it builds the valid json format`() {
-        //Given
+        // Given
         val version = Version(
-                25,
-                "1.9.0",
-                "supported"
+            25,
+            "1.9.0",
+            "supported"
         )
         val moshi = Moshi.Builder().build()
 
-        //When
+        // When
         val actual = moshi.adapter<Version>(Version::class.java).toJson(version)
         assertEquals(
-                "{\"status\":\"supported\",\"version_code\":25,\"version_name\":\"1.9.0\"}",
-                actual
+            "{\"status\":\"supported\",\"version_code\":25,\"version_name\":\"1.9.0\"}",
+            actual
         )
     }
 
     @Test
     fun `Given a Version is deserialized it transforms into Version`() {
-        //Given
+        // Given
         val moshi = Moshi.Builder()
-                .build()
+            .build()
         val versionJson =
-                "{\"status\":\"supported\",\"version_code\":25,\"version_name\":\"1.9.0\"}"
+            "{\"status\":\"supported\",\"version_code\":25,\"version_name\":\"1.9.0\"}"
 
-        //When
+        // When
         val version = moshi.adapter<Version>(Version::class.java).fromJson(versionJson)
 
-        //Then
+        // Then
         assertEquals(
-                version,
-                Version(
-                        25,
-                        "1.9.0",
-                        "supported"
-                )
+            version,
+            Version(
+                25,
+                "1.9.0",
+                "supported"
+            )
         )
     }
-
 }

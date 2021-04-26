@@ -290,9 +290,11 @@ class RecordServiceAdditionalResourceTypeModuleTest {
                     Fhir4Questionnaire.QuestionnaireItem("", null),
                     Fhir4Questionnaire.QuestionnaireItem("", null)
                 )
-                resource.item!![0].initial = mutableListOf(Fhir4Questionnaire.QuestionnaireItemInitial(null))
+                resource.item!![0].initial =
+                    mutableListOf(Fhir4Questionnaire.QuestionnaireItemInitial(null))
                 resource.item!![0].initial!![0].valueAttachment = attachments[0]
-                resource.item!![1].initial = mutableListOf(Fhir4Questionnaire.QuestionnaireItemInitial(null))
+                resource.item!![1].initial =
+                    mutableListOf(Fhir4Questionnaire.QuestionnaireItemInitial(null))
                 resource.item!![1].initial!![0].valueAttachment = attachments[1]
             }
             is Fhir4QuestionnaireResponse -> {
@@ -481,7 +483,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
-        val originalPayload: HashMap<Any, String?> = hashMapOf(selectFhir3Attachment(originalResource) to DATA_PAYLOAD)
+        val originalPayload: HashMap<Any, String?> =
+            hashMapOf(selectFhir3Attachment(originalResource) to DATA_PAYLOAD)
 
         val decryptedRecord = DecryptedRecord(
             null,
@@ -529,7 +532,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
-        val originalPayload: HashMap<Any, String?> = hashMapOf(selectFhir4Attachment(originalResource) to DATA_PAYLOAD)
+        val originalPayload: HashMap<Any, String?> =
+            hashMapOf(selectFhir4Attachment(originalResource) to DATA_PAYLOAD)
 
         val decryptedRecord = DecryptedR4Record(
             null,
@@ -642,7 +646,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val otherIdentifier = Fhir3AttachmentHelper.buildIdentifier(OTHER_ID, ASSIGNER)
         val valueIdentifier = Fhir3AttachmentHelper.buildIdentifier(VALUE_ID, ASSIGNER)
 
-        val identifiers = mutableListOf(currentIdentifier, obsoleteIdentifier, otherIdentifier, valueIdentifier)
+        val identifiers =
+            mutableListOf(currentIdentifier, obsoleteIdentifier, otherIdentifier, valueIdentifier)
 
         selectFhir3Attachment(resource).id = ATTACHMENT_ID
         if (resource is Fhir3Observation) {
@@ -718,7 +723,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val otherIdentifier = Fhir4AttachmentHelper.buildIdentifier(OTHER_ID, ASSIGNER)
         val valueIdentifier = Fhir4AttachmentHelper.buildIdentifier(VALUE_ID, ASSIGNER)
 
-        val identifiers = mutableListOf(currentIdentifier, obsoleteIdentifier, otherIdentifier, valueIdentifier)
+        val identifiers =
+            mutableListOf(currentIdentifier, obsoleteIdentifier, otherIdentifier, valueIdentifier)
 
         selectFhir4Attachment(resource).id = ATTACHMENT_ID
         setFhir4Id(resource, identifiers)
@@ -1001,7 +1007,12 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             modelVersion
         )
 
-        every { recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID) } returns decryptedRecord
+        every {
+            recordService.decryptRecord<Fhir3Resource>(
+                fetchedRecord,
+                USER_ID
+            )
+        } returns decryptedRecord
         every {
             apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
         } returns Single.just(fetchedRecord)
@@ -1291,7 +1302,12 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             modelVersion
         )
 
-        every { recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID) } returns decryptedRecord
+        every {
+            recordService.decryptRecord<Fhir4Resource>(
+                fetchedRecord,
+                USER_ID
+            )
+        } returns decryptedRecord
         every {
             apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
         } returns Single.just(fetchedRecord)

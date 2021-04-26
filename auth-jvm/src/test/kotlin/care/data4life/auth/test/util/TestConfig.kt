@@ -21,24 +21,24 @@ import java.io.BufferedReader
 import java.io.FileNotFoundException
 
 data class TestConfig(
-        val user: User,
-        val twillio: TwillioConfig
+    val user: User,
+    val twillio: TwillioConfig
 )
 
 data class User(
-        val email: String,
-        val password: String,
-        val phoneCountryCode: String,
-        val phoneLocalNumber: String
+    val email: String,
+    val password: String,
+    val phoneCountryCode: String,
+    val phoneLocalNumber: String
 ) {
     val phoneNumber: String
         get() = phoneCountryCode + phoneLocalNumber
 }
 
 data class TwillioConfig(
-        val accountSid: String,
-        val authSid: String,
-        val authToken: String
+    val accountSid: String,
+    val authSid: String,
+    val authToken: String
 )
 
 object TestConfigLoader {
@@ -49,10 +49,16 @@ object TestConfigLoader {
             val input = this.javaClass.classLoader.getResourceAsStream(FILE_NAME)
             val json = input.bufferedReader().use(BufferedReader::readText)
             return Moshi.Builder().build().adapter(TestConfig::class.java).fromJson(json)!!
-        } catch (e: FileNotFoundException) {
-            throw IllegalStateException("Please run '/gradlew provideTestConfig' before running the tests", e)
-        } catch (e: IllegalStateException) {
-            throw IllegalStateException("Please run '/gradlew provideTestConfig' before running the tests", e)
+        } catch (exception: FileNotFoundException) {
+            throw IllegalStateException(
+                "Please run '/gradlew provideTestConfig' before running the tests",
+                exception
+            )
+        } catch (exception: IllegalStateException) {
+            throw IllegalStateException(
+                "Please run '/gradlew provideTestConfig' before running the tests",
+                exception
+            )
         }
     }
 }

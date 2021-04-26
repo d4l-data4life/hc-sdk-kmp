@@ -22,7 +22,6 @@ import care.data4life.sdk.fhir.Fhir4ElementFactory
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
-import java.util.*
 
 internal object SdkFhirElementFactory : WrapperContract.FhirElementFactory {
     private val fhir3Indicator = Fhir3Resource::class.java.`package`

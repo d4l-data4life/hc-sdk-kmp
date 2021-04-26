@@ -31,11 +31,10 @@ import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.KeyStore
 import java.security.PrivateKey
-import java.util.*
+import java.util.Calendar
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.security.auth.x500.X500Principal
-
 
 interface CompatKeystore {
     fun loadKey(): SymmetricKey
@@ -44,9 +43,12 @@ interface CompatKeystore {
 }
 
 class AndroidCompatKeystore(
-        private val context: Context,
-        private val keyStore: KeyStore = KeyStore.getInstance(KEYSTORE_PROVIDER),
-        private val storage: AndroidSharedPreferenceStorage = AndroidSharedPreferenceStorage(context, PREFERENCE_NAME)
+    private val context: Context,
+    private val keyStore: KeyStore = KeyStore.getInstance(KEYSTORE_PROVIDER),
+    private val storage: AndroidSharedPreferenceStorage = AndroidSharedPreferenceStorage(
+        context,
+        PREFERENCE_NAME
+    )
 ) : CompatKeystore {
 
     init {
@@ -92,7 +94,6 @@ class AndroidCompatKeystore(
         return SymmetricKey(keyGenerator.generateKey())
     }
 
-
     private fun loadSymmetricKey(asymmetricKey: AsymmetricKey): SymmetricKey? {
         val encryptedSymmetricKey = storage.getData(SYMMETRIC_KEY_ALIAS)
 
@@ -133,7 +134,10 @@ class AndroidCompatKeystore(
     }
 
     private fun createAsymmetricKey(): KeyPair {
-        val keyGenerator = KeyPairGenerator.getInstance(AsymmetricKey.KEY_ALGORITHM, KEYSTORE_PROVIDER)
+        val keyGenerator = KeyPairGenerator.getInstance(
+            AsymmetricKey.KEY_ALGORITHM,
+            KEYSTORE_PROVIDER
+        )
 
         initGeneratorForAsymmetricKeySpec(keyGenerator, ASYMMETRIC_KEY_ALIAS)
 
@@ -147,16 +151,15 @@ class AndroidCompatKeystore(
 
         @Suppress("DEPRECATION")
         val builder = KeyPairGeneratorSpec.Builder(context)
-                .setAlias(alias)
-                .setSerialNumber(BigInteger.ONE)
-                .setSubject(X500Principal(ENCRYPTION_KEY_SUBJECT))
-                .setKeySize(AsymmetricKey.KEY_SIZE)
-                .setStartDate(startDate.time)
-                .setEndDate(endDate.time)
+            .setAlias(alias)
+            .setSerialNumber(BigInteger.ONE)
+            .setSubject(X500Principal(ENCRYPTION_KEY_SUBJECT))
+            .setKeySize(AsymmetricKey.KEY_SIZE)
+            .setStartDate(startDate.time)
+            .setEndDate(endDate.time)
 
         generator.initialize(builder.build())
     }
-
 
     // #################################### WRAP
 
@@ -173,7 +176,11 @@ class AndroidCompatKeystore(
 
         val decodedKey = Base64.decode(symmetricKeyData.toBytes())
 
-        val key = cipher.unwrap(decodedKey, SymmetricKey.KEY_ALGORITHM, Cipher.SECRET_KEY) as SecretKey
+        val key = cipher.unwrap(
+            decodedKey,
+            SymmetricKey.KEY_ALGORITHM,
+            Cipher.SECRET_KEY
+        ) as SecretKey
 
         return SymmetricKey(key)
     }
@@ -181,8 +188,8 @@ class AndroidCompatKeystore(
     companion object {
         internal const val PREFERENCE_NAME = BuildConfig.LIBRARY_PACKAGE_NAME + ".storage.keystore"
 
-        internal const val ENCRYPTION_KEY_SUBJECT = "CN=${BuildConfig.LIBRARY_PACKAGE_NAME} asymmetric"
-
+        internal const val ENCRYPTION_KEY_SUBJECT =
+            "CN=${BuildConfig.LIBRARY_PACKAGE_NAME} asymmetric"
 
         const val KEYSTORE_PROVIDER = "AndroidKeyStore"
 

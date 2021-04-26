@@ -56,7 +56,10 @@ class AttachmentServiceTest {
     private lateinit var attachmentService: AttachmentService
 
     @Before
-    @Throws(DataRestrictionException.UnsupportedFileType::class, DataRestrictionException.MaxDataSizeViolation::class)
+    @Throws(
+        DataRestrictionException.UnsupportedFileType::class,
+        DataRestrictionException.MaxDataSizeViolation::class
+    )
     fun setUp() {
         attachment = SdkAttachmentFactory.wrap(buildWith(TITLE, creationDate, CONTENT_TYPE, pdf))
         mockFileService = Mockito.mock(FileService::class.java)
@@ -73,10 +76,12 @@ class AttachmentServiceTest {
     fun uploadAttachments_shouldReturnListOfAttachments() {
         // given
         attachment.id = "id"
-        val newAttachment = SdkAttachmentFactory.wrap(buildWith("newAttachment", creationDate, CONTENT_TYPE, pdf))
+        val newAttachment =
+            SdkAttachmentFactory.wrap(buildWith("newAttachment", creationDate, CONTENT_TYPE, pdf))
         newAttachment.id = null
         val attachments = listOf(attachment, newAttachment)
-        Mockito.`when`(mockFileService.uploadFile(attachmentKey, USER_ID, pdf)).thenReturn(Single.just(ATTACHMENT_ID))
+        Mockito.`when`(mockFileService.uploadFile(attachmentKey, USER_ID, pdf))
+            .thenReturn(Single.just(ATTACHMENT_ID))
 
         // when
         val subscriber = attachmentService
@@ -119,7 +124,14 @@ class AttachmentServiceTest {
         attachment.id = "id"
         System.arraycopy(pdf, 0, largeFile, 0, pdf.size)
         try {
-            val newAttachment = SdkAttachmentFactory.wrap(buildWith("newAttachment", creationDate, CONTENT_TYPE, largeFile))
+            val newAttachment = SdkAttachmentFactory.wrap(
+                buildWith(
+                    "newAttachment",
+                    creationDate,
+                    CONTENT_TYPE,
+                    largeFile
+                )
+            )
             newAttachment.id = null
             Assert.fail("Should have thrown an exception")
         } catch (e: DataRestrictionException.MaxDataSizeViolation) {
@@ -134,10 +146,12 @@ class AttachmentServiceTest {
         attachment.id = ATTACHMENT_ID
         attachment.data = null
         val attachments = listOf(attachment)
-        Mockito.`when`(mockFileService.downloadFile(attachmentKey, USER_ID, ATTACHMENT_ID)).thenReturn(Single.just(pdf))
+        Mockito.`when`(mockFileService.downloadFile(attachmentKey, USER_ID, ATTACHMENT_ID))
+            .thenReturn(Single.just(pdf))
 
         // when
-        val subscriber = attachmentService.download(attachments, attachmentKey, USER_ID).test().await()
+        val subscriber =
+            attachmentService.download(attachments, attachmentKey, USER_ID).test().await()
 
         // then
         val result = subscriber
@@ -194,7 +208,8 @@ class AttachmentServiceTest {
         ).thenReturn(Single.just(pdf))
 
         // when
-        val subscriber = attachmentService.download(attachments, attachmentKey, USER_ID).test().await()
+        val subscriber =
+            attachmentService.download(attachments, attachmentKey, USER_ID).test().await()
 
         // then
         val result = subscriber
@@ -227,12 +242,15 @@ class AttachmentServiceTest {
     fun updatingAttachments_shouldReturnListOfAttachmentsInOrder() {
         // given
         attachment.id = null
-        val newAttachment = SdkAttachmentFactory.wrap(buildWith("newAttachment", creationDate, CONTENT_TYPE, pdf))
+        val newAttachment =
+            SdkAttachmentFactory.wrap(buildWith("newAttachment", creationDate, CONTENT_TYPE, pdf))
         val attachments = listOf(attachment, newAttachment)
-        Mockito.`when`(mockFileService.uploadFile(attachmentKey, USER_ID, pdf)).thenReturn(Single.just(ATTACHMENT_ID))
+        Mockito.`when`(mockFileService.uploadFile(attachmentKey, USER_ID, pdf))
+            .thenReturn(Single.just(ATTACHMENT_ID))
 
         // when
-        val subscriber = attachmentService.upload(attachments, attachmentKey, USER_ID).test().await()
+        val subscriber =
+            attachmentService.upload(attachments, attachmentKey, USER_ID).test().await()
 
         // then
         val result = subscriber
@@ -250,7 +268,8 @@ class AttachmentServiceTest {
     @Throws(InterruptedException::class)
     fun deleteAttachment() {
         // given
-        Mockito.`when`(mockFileService.deleteFile(USER_ID, ATTACHMENT_ID)).thenReturn(Single.just(true))
+        Mockito.`when`(mockFileService.deleteFile(USER_ID, ATTACHMENT_ID))
+            .thenReturn(Single.just(true))
 
         // when
         val subscriber = attachmentService.delete(ATTACHMENT_ID, USER_ID).test().await()
@@ -265,7 +284,8 @@ class AttachmentServiceTest {
     @Throws(InterruptedException::class)
     fun deleteAttachment_shouldFail() {
         // given
-        Mockito.`when`(mockFileService.deleteFile(USER_ID, ATTACHMENT_ID)).thenReturn(Single.error(Throwable()))
+        Mockito.`when`(mockFileService.deleteFile(USER_ID, ATTACHMENT_ID))
+            .thenReturn(Single.error(Throwable()))
 
         // when
         val subscriber = attachmentService.delete(ATTACHMENT_ID, USER_ID).test().await()

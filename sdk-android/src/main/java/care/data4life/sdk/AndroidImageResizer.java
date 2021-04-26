@@ -23,9 +23,9 @@ import java.io.ByteArrayOutputStream;
 
 import javax.annotation.Nullable;
 
+import care.data4life.sdk.attachment.AttachmentContract.ImageResizer;
 import care.data4life.sdk.lang.CoreRuntimeException;
 import care.data4life.sdk.util.MimeType;
-import care.data4life.sdk.attachment.AttachmentContract.ImageResizer;
 
 public class AndroidImageResizer implements ImageResizer {
     private static final int OFFSET_ZERO = 0;

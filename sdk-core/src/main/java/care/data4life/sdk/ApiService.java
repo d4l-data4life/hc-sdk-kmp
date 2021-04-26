@@ -30,6 +30,7 @@ import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.lang.D4LRuntimeException;
 import care.data4life.sdk.network.Environment;
 import care.data4life.sdk.network.IHCService;
+import care.data4life.sdk.network.NetworkingContract;
 import care.data4life.sdk.network.model.CommonKeyResponse;
 import care.data4life.sdk.network.model.DocumentUploadResponse;
 import care.data4life.sdk.network.model.EncryptedRecord;
@@ -55,22 +56,22 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
-// TODO Kotlin and internal
-public final class ApiService {
+import static care.data4life.sdk.network.NetworkingContract.FORMAT_ANDROID_CLIENT_NAME;
+import static care.data4life.sdk.network.NetworkingContract.FORMAT_BASIC_AUTH;
+import static care.data4life.sdk.network.NetworkingContract.FORMAT_BEARER_TOKEN;
+import static care.data4life.sdk.network.NetworkingContract.HEADER_ACCESS_TOKEN;
+import static care.data4life.sdk.network.NetworkingContract.HEADER_ALIAS;
+import static care.data4life.sdk.network.NetworkingContract.HEADER_AUTHORIZATION;
+import static care.data4life.sdk.network.NetworkingContract.HEADER_BASIC_AUTH;
+import static care.data4life.sdk.network.NetworkingContract.HEADER_GC_SDK_VERSION;
+import static care.data4life.sdk.network.NetworkingContract.HEADER_TOTAL_COUNT;
+import static care.data4life.sdk.network.NetworkingContract.HTTP_401_UNAUTHORIZED;
+import static care.data4life.sdk.network.NetworkingContract.MEDIA_TYPE_OCTET_STREAM;
+import static care.data4life.sdk.network.NetworkingContract.PARAM_TEK;
+import static care.data4life.sdk.network.NetworkingContract.REQUEST_TIMEOUT;
 
-    private static final String HEADER_ALIAS = "gc_alias";
-    private static final String HEADER_ACCESS_TOKEN = "access_token";
-    private static final String HEADER_AUTHORIZATION = "Authorization";
-    private static final String HEADER_BASIC_AUTH = "basic_auth";
-    private static final String HEADER_GC_SDK_VERSION = "GC-SDK-Version";
-    private static final String HEADER_TOTAL_COUNT = "x-total-count";
-    private static final String PARAM_FILE_NUMBER = "file_number";
-    private static final String PARAM_TEK = "tek";
-    private static final String FORMAT_BEARER_TOKEN = "Bearer %s";
-    private static final String FORMAT_BASIC_AUTH = "Basic %s";
-    private static final String FORMAT_ANDROID_CLIENT_NAME = "Android %s";
-    private static final String MEDIA_TYPE_OCTET_STREAM = "application/octet-stream";
-    private static final int HTTP_401_UNAUTHORIZED = 401;
+// TODO Kotlin and internal
+public final class ApiService implements NetworkingContract.Service {
 
     private IHCService service;
 
@@ -195,10 +196,10 @@ public final class ApiService {
                 .addInterceptor(authorizationInterceptor)
                 .addInterceptor(loggingInterceptor)
                 .addInterceptor(retryInterceptor)
-                .connectTimeout(2, TimeUnit.MINUTES)
-                .readTimeout(2, TimeUnit.MINUTES)
-                .writeTimeout(2, TimeUnit.MINUTES)
-                .callTimeout(2, TimeUnit.MINUTES)
+                .connectTimeout(REQUEST_TIMEOUT, TimeUnit.MINUTES)
+                .readTimeout(REQUEST_TIMEOUT, TimeUnit.MINUTES)
+                .writeTimeout(REQUEST_TIMEOUT, TimeUnit.MINUTES)
+                .callTimeout(REQUEST_TIMEOUT, TimeUnit.MINUTES)
                 .build();
 
         createService(environment.getApiBaseURL(platform));

@@ -28,7 +28,7 @@ toc::[]
 
 === Fixed
 
-* `DocumentUploadResponse` was not correctly serialized.
+* `DocumentUploadResponse`, `CommonKeyResponse` had been not correctly serialized.
 
 === Bumped
 

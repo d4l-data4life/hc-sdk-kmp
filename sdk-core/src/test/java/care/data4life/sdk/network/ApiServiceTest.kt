@@ -94,6 +94,7 @@ class ApiServiceTest {
             "something",
             "you should not care",
             mockk(relaxed = true),
+            NetworkingContract.Clients.JAVA,
             "what so ever",
             false
         )
@@ -116,6 +117,7 @@ class ApiServiceTest {
             "something",
             "you should not care",
             mockk(relaxed = true),
+            NetworkingContract.Clients.JAVA,
             "what so ever",
             false
         )
@@ -484,6 +486,7 @@ class ApiServiceTest {
             "something",
             "you should not care",
             mockk(relaxed = true),
+            NetworkingContract.Clients.JAVA,
             "what so ever",
             "token".toByteArray(),
             false

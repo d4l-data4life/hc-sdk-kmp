@@ -19,6 +19,7 @@ import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.NetworkConnectivityService
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.D4LRuntimeException
+import care.data4life.sdk.network.interceptors.VersionInterceptor
 import care.data4life.sdk.network.model.CommonKeyResponse
 import care.data4life.sdk.network.model.DocumentUploadResponse
 import care.data4life.sdk.network.model.EncryptedRecord
@@ -57,7 +58,8 @@ class ApiService constructor(
     private val clientSecret: String,
     private val platform: String?,
     private val connectivityService: NetworkConnectivityService,
-    private val clientName: String?,
+    private val clientName: NetworkingContract.Clients,
+    private val clientVersion: String,
     staticAccessToken: ByteArray?,
     private val debug: Boolean
 ) : NetworkingContract.Service {
@@ -76,6 +78,7 @@ class ApiService constructor(
      * @param platform            Usage platform (D4L, S4H)
      * @param connectivityService Connectivity service
      * @param clientName          Client name
+     * @param clientName          Client version
      * @param debug               Debug flag
      */
     constructor(
@@ -85,7 +88,8 @@ class ApiService constructor(
         clientSecret: String,
         platform: String?,
         connectivityService: NetworkConnectivityService,
-        clientName: String?,
+        clientName: NetworkingContract.Clients,
+        clientVersion: String,
         debug: Boolean
     ) : this(
         authService,
@@ -95,6 +99,7 @@ class ApiService constructor(
         platform,
         connectivityService,
         clientName,
+        clientVersion,
         null,
         debug
     )
@@ -110,16 +115,6 @@ class ApiService constructor(
             .build()
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.setLevel(if (debug) HttpLoggingInterceptor.Level.HEADERS else HttpLoggingInterceptor.Level.NONE)
-        val versionInterceptor = { chain: Interceptor.Chain ->
-            var request = chain.request()
-            request = request.newBuilder()
-                .addHeader(
-                    NetworkingContract.HEADER_GC_SDK_VERSION,
-                    String.format(NetworkingContract.FORMAT_ANDROID_CLIENT_NAME, clientName)
-                )
-                .build()
-            chain.proceed(request)
-        }
 
         // Pick authentication interceptor based on whether a static access token is used or not
         val authorizationInterceptor = if (staticAccessToken != null) ::staticTokenIntercept else ::intercept
@@ -137,7 +132,11 @@ class ApiService constructor(
         }
         client = OkHttpClient.Builder()
             .certificatePinner(certificatePinner)
-            .addInterceptor(versionInterceptor)
+            .addInterceptor(
+                VersionInterceptor.getInstance(
+                    Pair(clientName, clientVersion)
+                )
+            )
             .addInterceptor(authorizationInterceptor)
             .addInterceptor(loggingInterceptor)
             .addInterceptor(retryInterceptor)
@@ -406,6 +405,7 @@ class ApiService constructor(
      * @param platform            Usage platform (D4L, S4H)
      * @param connectivityService Connectivity service
      * @param clientName          Client name
+     * @param clientVersion         Client version
      * @param staticAccessToken   Prefetched OAuth token - if not null, it will be used directly (no token renewal).
      * @param debug               Debug flag
      */

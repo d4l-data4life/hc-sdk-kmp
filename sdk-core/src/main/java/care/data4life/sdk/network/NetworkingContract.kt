@@ -88,7 +88,7 @@ interface NetworkingContract {
         override fun intercept(chain: okhttp3.Interceptor.Chain): Response
     }
 
-    internal interface InterceptorFactory<T : Any> {
+    interface InterceptorFactory<T : Any> {
         fun getInstance(payload: T): Interceptor
     }
 
@@ -98,7 +98,7 @@ interface NetworkingContract {
         INGESTION("ingestion")
     }
 
-    internal interface CertificatePinnerFactory {
+    interface CertificatePinnerFactory {
         fun getInstance(baseUrl: String, pin: String): CertificatePinner
     }
 
@@ -138,9 +138,7 @@ interface NetworkingContract {
         const val HEADER_ACCESS_TOKEN = "access_token"
         const val HEADER_AUTHORIZATION = "Authorization"
         const val HEADER_BASIC_AUTH = "basic_auth"
-        const val HEADER_GC_SDK_VERSION = "GC-SDK-Version"
-        const val _HEADER_GC_SDK_VERSION = "gc-sdk-version"
-        const val FORMAT_ANDROID_CLIENT_NAME = "Android %s"
+        const val HEADER_GC_SDK_VERSION = "gc-sdk-version"
         const val FORMAT_CLIENT_VERSION = "%s-%s"
         const val HEADER_TOTAL_COUNT = "x-total-count"
         const val PARAM_FILE_NUMBER = "file_number"

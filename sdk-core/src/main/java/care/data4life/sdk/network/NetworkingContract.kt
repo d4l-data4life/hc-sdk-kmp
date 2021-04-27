@@ -84,6 +84,10 @@ interface NetworkingContract {
         fun fetchVersionInfo(): Single<VersionList>
     }
 
+    internal interface CertificatePinnerFactory {
+        fun getInstance(baseUrl: String, pin: String): CertificatePinner
+    }
+
     interface Interceptor : okhttp3.Interceptor {
         override fun intercept(chain: okhttp3.Interceptor.Chain): Response
     }
@@ -100,6 +104,10 @@ interface NetworkingContract {
 
     interface CertificatePinnerFactory {
         fun getInstance(baseUrl: String, pin: String): CertificatePinner
+	}
+
+    interface NetworkConnectivityService {
+        val isConnected: Boolean
     }
 
     enum class Data4LifeURI(val uri: String) {

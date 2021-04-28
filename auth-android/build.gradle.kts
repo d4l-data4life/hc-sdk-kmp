@@ -42,7 +42,7 @@ android {
         buildTypes {
             buildTypes {
                 getByName("debug") {
-                    setMatchingFallbacks("debug", "release")
+                    setMatchingFallbacks("release", "debug")
                 }
             }
         }
@@ -94,9 +94,7 @@ dependencies {
 
     api(Dependencies.Multiplatform.D4L.utilAndroid)
 
-    implementation(project(":securestore-android")) {
-        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
-    }
+    implementation(Dependencies.Multiplatform.D4L.securestoreAndroid)
     implementation(Dependencies.Multiplatform.Kotlin.stdlibAndroid)
     implementation(Dependencies.Multiplatform.Coroutines.android)
     implementation(Dependencies.Android.AndroidX.appCompat)

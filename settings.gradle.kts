@@ -9,8 +9,6 @@ include(
 
     ":sdk-doc",
 
-    ":securestore-common", ":securestore-android", ":securestore-jvm",
-
     ":crypto-common", ":crypto-android", ":crypto-jvm",
 
     ":auth-common", ":auth-android", ":auth-jvm"

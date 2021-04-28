@@ -99,10 +99,10 @@ dependencies {
         exclude(module = "auth-jvm")
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
     }
-    implementation(project(":securestore-android"))
     implementation(project(":crypto-android"))
     implementation(project(":auth-android"))
 
+    implementation(Dependencies.Multiplatform.D4L.securestoreAndroid)
     api(Dependencies.Multiplatform.D4L.utilAndroid)
 
     implementation(Dependencies.Multiplatform.D4L.fhirSdk)

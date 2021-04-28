@@ -33,9 +33,10 @@ dependencies {
     api(Dependencies.Multiplatform.D4L.utilJvm)
     implementation(Dependencies.Multiplatform.Kotlin.stdlib)
 
-    implementation(project(":securestore-jvm"))
     implementation(project(":crypto-jvm"))
     implementation(project(":auth-jvm"))
+
+    implementation(Dependencies.Multiplatform.D4L.securestoreJvm)
     implementation(Dependencies.Multiplatform.D4L.fhirSdk)
     implementation(Dependencies.Java.threeTenBP)
 

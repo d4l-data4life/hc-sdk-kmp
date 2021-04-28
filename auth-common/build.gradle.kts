@@ -24,9 +24,9 @@ apply(from = "${project.rootDir}/gradle/deploy-java.gradle")
 group = LibraryConfig.group
 
 dependencies {
-    implementation(project(":securestore-common"))
-
     api(Dependencies.Multiplatform.D4L.utilCommon)
+
+    implementation(Dependencies.Multiplatform.D4L.securestore)
 
     implementation(Dependencies.Multiplatform.Kotlin.stdlibCommon)
 

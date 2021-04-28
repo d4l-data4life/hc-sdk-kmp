@@ -43,9 +43,10 @@ dependencies {
     }
     implementation(Dependencies.Multiplatform.Kotlin.stdlib)
 
-    implementation(project(":securestore-jvm"))
     implementation(project(":crypto-jvm"))
     implementation(project(":auth-jvm"))
+
+    implementation(Dependencies.Multiplatform.D4L.securestoreJvm)
     implementation(Dependencies.Multiplatform.D4L.utilJvm)
     implementation(Dependencies.Multiplatform.D4L.fhirHelperJvm) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")

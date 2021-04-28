@@ -28,6 +28,12 @@ object Versions {
      */
     const val fhirHelper = "1.4.1"
 
+    /**
+     * [hc-securestore-kmp](https://github.com/d4l-data4life/hc-securestore-kmp)
+     */
+    // const val securestore = "1.11.0"
+    const val securestore = "0.0.1-add-securestore-implementation-SNAPSHOT"
+
     // kotlin
     const val kotlin = "1.3.72"
 
@@ -38,7 +44,7 @@ object Versions {
 
     object GradlePlugins {
         const val kotlin = Versions.kotlin
-        const val android = "4.1.1"
+        const val android = "4.1.3"
 
         /**
          * [Dexcount](https://github.com/KeepSafe/dexcount-gradle-plugin)

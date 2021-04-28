@@ -135,7 +135,7 @@ object Versions {
     /**
      * [moshi](https://github.com/square/moshi)
      */
-    const val moshi = "1.9.3"
+    const val moshi = "1.12.0"
 
     /**
      *

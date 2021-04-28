@@ -17,6 +17,8 @@
 package care.data4life.sdk.network.interceptors
 
 import care.data4life.sdk.network.NetworkingContract
+import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS
+import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
@@ -41,9 +43,8 @@ class StaticAuthorizationInterceptor internal constructor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
             .newBuilder()
-            .removeHeader(NetworkingContract.HEADER_ALIAS)
-            .removeHeader(NetworkingContract.HEADER_AUTHORIZATION)
-            .addHeader(NetworkingContract.HEADER_AUTHORIZATION, authHeader)
+            .removeHeader(HEADER_ALIAS)
+            .replaceHeader(HEADER_AUTHORIZATION, authHeader)
             .build()
         return chain.proceed(request)
     }

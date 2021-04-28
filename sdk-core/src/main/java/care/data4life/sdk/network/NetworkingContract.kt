@@ -143,9 +143,9 @@ interface NetworkingContract {
         const val SMART4HEALTH_EU = "sha256/yPBKbgJMVnMeovGKbAtuz65sfy/gpDu0WTiuB8bE5G0="
         const val REQUEST_TIMEOUT: Long = 2
         const val HEADER_ALIAS = "gc_alias"
-        const val HEADER_ACCESS_TOKEN = "access_token"
         const val HEADER_AUTHORIZATION = "Authorization"
-        const val HEADER_BASIC_AUTH = "basic_auth"
+        const val ACCESS_TOKEN_MARKER = "access_token"
+        const val BASIC_AUTH_MARKER = "basic_auth"
         const val HEADER_GC_SDK_VERSION = "gc-sdk-version"
         const val FORMAT_CLIENT_VERSION = "%s-%s"
         const val HEADER_TOTAL_COUNT = "x-total-count"
@@ -155,8 +155,8 @@ interface NetworkingContract {
         const val FORMAT_BASIC_AUTH = "Basic %s"
         const val MEDIA_TYPE_OCTET_STREAM = "application/octet-stream"
         const val HTTP_401_UNAUTHORIZED = 401
-        const val AUTHORIZATION_WITH_ACCESS_TOKEN = "Authorization: access_token"
-        const val AUTHORIZATION_WITH_BASIC_AUTH = "Authorization: basic_auth"
-        const val HEADER_CONTENT_TYPE_OCTET_STREAM = "content-type: application/octet-stream"
+        const val AUTHORIZATION_WITH_ACCESS_TOKEN = "$HEADER_AUTHORIZATION: $ACCESS_TOKEN_MARKER"
+        const val AUTHORIZATION_WITH_BASIC_AUTH = "$HEADER_AUTHORIZATION: $BASIC_AUTH_MARKER"
+        const val HEADER_CONTENT_TYPE_OCTET_STREAM = "content-type: $MEDIA_TYPE_OCTET_STREAM"
     }
 }

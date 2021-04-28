@@ -28,8 +28,6 @@ toc::[]
 
 === Fixed
 
-* `DocumentUploadResponse`, `CommonKeyResponse` had been not correctly serialized.
-
 === Bumped
 
 === Migration

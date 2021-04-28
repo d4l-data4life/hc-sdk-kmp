@@ -23,6 +23,8 @@ toc::[]
 === Changed
 
 * `CryptoSecureStore`, `DocumentUploadResponse`, `CommonKeyResponse`, `UserInfo` to Kotlin.
+* Change Securestore to an external dependency link:https://github.com/d4l-data4life/hc-securestore-kmp/[Data4Life Securestore]
+* _*BREAKING*_ Change Android minSDK 21 -> 23
 
 === Removed
 
@@ -31,6 +33,8 @@ toc::[]
 === Bumped
 
 === Migration
+
+Change Android support to min Android 6.0 (API 23) to use this version of the SDK.
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.2...v1.10.0[1.10.0]
 

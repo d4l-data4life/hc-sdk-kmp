@@ -29,7 +29,7 @@ object Versions {
     const val fhirHelper = "1.4.1"
 
     // kotlin
-    const val kotlin = "1.3.72"
+    const val kotlin = "1.4.32"
 
     /**
      *  https://github.com/Kotlin/kotlinx.coroutines
@@ -38,7 +38,7 @@ object Versions {
 
     object GradlePlugins {
         const val kotlin = Versions.kotlin
-        const val android = "4.1.1"
+        const val android = "4.1.3"
 
         /**
          * [Dexcount](https://github.com/KeepSafe/dexcount-gradle-plugin)

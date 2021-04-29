@@ -339,7 +339,7 @@ class RecordServiceTest {
         // Given
         val expected: Completable = mockk()
 
-        every { apiService.deleteRecord(ALIAS, RECORD_ID, USER_ID) } returns expected
+        every { apiService.deleteRecord(ALIAS, USER_ID, RECORD_ID) } returns expected
 
         // When
         val actual = recordService.deleteRecord(userId = USER_ID, recordId = RECORD_ID)
@@ -350,7 +350,7 @@ class RecordServiceTest {
             expected = expected
         )
 
-        verify(exactly = 1) { apiService.deleteRecord(ALIAS, RECORD_ID, USER_ID) }
+        verify(exactly = 1) { apiService.deleteRecord(ALIAS, USER_ID, RECORD_ID) }
     }
 
     @Test
@@ -362,7 +362,7 @@ class RecordServiceTest {
             "2"
         )
 
-        every { apiService.deleteRecord(ALIAS, or(ids[0], ids[1]), USER_ID) } returns expected
+        every { apiService.deleteRecord(ALIAS, USER_ID, or(ids[0], ids[1])) } returns expected
 
         // When
         val subscriber = recordService.deleteRecords(userId = USER_ID, recordIds = ids)
@@ -386,7 +386,7 @@ class RecordServiceTest {
             expected = listOf()
         )
 
-        verify(exactly = 2) { apiService.deleteRecord(ALIAS, or(ids[0], ids[1]), USER_ID) }
+        verify(exactly = 2) { apiService.deleteRecord(ALIAS, USER_ID, or(ids[0], ids[1])) }
     }
 
     @Test

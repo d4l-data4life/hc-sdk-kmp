@@ -50,9 +50,9 @@ internal class Fhir4RecordClient(
         callback: Callback<Fhir4Record<T>>
     ):
         Task = executeOperationFlow(
-            { userId -> recordService.createRecord(userId, resource, annotations) },
-            callback
-        )
+        { userId -> recordService.createRecord(userId, resource, annotations) },
+        callback
+    )
 
     override fun <T : Fhir4Resource> update(
         recordId: String,

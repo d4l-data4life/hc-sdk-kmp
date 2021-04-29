@@ -899,11 +899,11 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val decryptedRecord = DecryptedRecord(
             null,
             resource,
-            null,
+            mockk(),
             defaultAnnotations,
             null,
             null,
-            null,
+            mockk(),
             attachmentKey,
             modelVersion
         )
@@ -1104,11 +1104,11 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val decryptedRecord = DecryptedR4Record(
             null,
             resource,
-            null,
+            mockk(),
             defaultAnnotations,
             null,
             null,
-            null,
+            mockk(),
             attachmentKey,
             modelVersion
         )
@@ -1194,11 +1194,11 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val decryptedRecord = DecryptedR4Record(
             null,
             resource,
-            null,
+            mockk(),
             defaultAnnotations,
             null,
             null,
-            null,
+            mockk(),
             attachmentKey,
             modelVersion
         )
@@ -1399,11 +1399,11 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val decryptedRecord = DecryptedRecord(
             null,
             resource,
-            null,
+            mockk(),
             defaultAnnotations,
             null,
             null,
-            null,
+            mockk(),
             attachmentKey,
             modelVersion
         )

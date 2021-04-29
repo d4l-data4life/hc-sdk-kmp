@@ -668,7 +668,7 @@ class RecordService internal constructor(
         .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
         .map { decryptedRecord -> failOnResourceInconsistency(decryptedRecord, resourceBarrier) }
         .flatMap { decryptedRecord ->
-            downloadAttachmentsFromStorage<T, R>(
+            downloadAttachmentsFromStorage(
                 attachmentIds,
                 userId,
                 type,

@@ -24,6 +24,7 @@ import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.model.Record
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.record.RecordContract
@@ -71,7 +72,7 @@ class RecordServiceFetchRecordsModuleTest {
 
     private lateinit var recordService: RecordContract.Service
     private lateinit var flowHelper: RecordServiceModuleTestFlowHelper
-    private val apiService: ApiService = mockk()
+    private val apiService: NetworkingContract.Service = mockk()
     private lateinit var cryptoService: CryptoContract.Service
     private val fileService: AttachmentContract.FileService = mockk()
     private val imageResizer: AttachmentContract.ImageResizer = mockk()
@@ -308,7 +309,7 @@ class RecordServiceFetchRecordsModuleTest {
         (cryptoService as CryptoServiceFake).iteration = receivedIteration
 
         every {
-            apiService.fetchRecords(
+            apiService.searchRecords(
                 ALIAS,
                 USER_ID,
                 startDate,

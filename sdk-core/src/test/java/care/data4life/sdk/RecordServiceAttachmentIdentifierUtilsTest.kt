@@ -30,6 +30,7 @@ import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.DownloadType
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_FMT
 import care.data4life.sdk.record.RecordContract.Service.Companion.PREVIEW_ID_POS
 import care.data4life.sdk.record.RecordContract.Service.Companion.THUMBNAIL_ID_POS
@@ -60,7 +61,7 @@ import kotlin.test.assertSame
 
 class RecordServiceAttachmentIdentifierUtilsTest {
     private lateinit var recordService: RecordService
-    private val apiService: ApiService = mockk()
+    private val apiService: NetworkingContract.Service = mockk()
     private val cryptoService: CryptoContract.Service = mockk()
     private val fhirService: FhirContract.Service = mockk()
     private val tagEncryptionService: TaggingContract.EncryptionService = mockk()

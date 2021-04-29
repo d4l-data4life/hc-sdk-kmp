@@ -46,6 +46,7 @@ import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.model.UpdateResult
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
@@ -83,7 +84,7 @@ import org.threeten.bp.LocalDate
 class RecordService internal constructor(
     private val partnerId: String,
     private val alias: String,
-    private val apiService: ApiService,
+    private val apiService: NetworkingContract.Service,
     tagEncryptionService: TaggingContract.EncryptionService,
     private val taggingService: TaggingContract.Service,
     fhirService: FhirContract.Service,
@@ -96,7 +97,7 @@ class RecordService internal constructor(
     constructor(
         partnerId: String,
         alias: String,
-        apiService: ApiService,
+        apiService: NetworkingContract.Service,
         tagEncryptionService: TaggingContract.EncryptionService,
         taggingService: TaggingContract.Service,
         fhirService: FhirContract.Service,

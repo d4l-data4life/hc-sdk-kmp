@@ -229,47 +229,56 @@ public final class ApiService implements NetworkingContract.Service {
 
     }
 
+    @Override
     public Single<CommonKeyResponse> fetchCommonKey(String alias, String userId, String commonKeyId) {
         return service.fetchCommonKey(alias, userId, commonKeyId);
     }
 
-    Completable uploadTagEncryptionKey(String alias, String userId, String encryptedKey) {
+    @Override
+    public Completable uploadTagEncryptionKey(String alias, String userId, String encryptedKey) {
         Map<String, String> params = new HashMap<>();
         params.put(PARAM_TEK, encryptedKey);
         return service.uploadTagEncryptionKey(alias, userId, params);
     }
 
-    Single<EncryptedRecord> createRecord(String alias, String userId, NetworkModelContract.EncryptedRecord encryptedRecord) {
+    @Override
+    public Single<EncryptedRecord> createRecord(String alias, String userId, NetworkModelContract.EncryptedRecord encryptedRecord) {
         return service.createRecord(alias, userId, (EncryptedRecord) encryptedRecord);
     }
 
     // TODO remove public
-    public Observable<List<EncryptedRecord>> fetchRecords(String alias,
-                                                   String userId,
-                                                   String startDate,
-                                                   String endDate,
-                                                   Integer pageSize,
-                                                   Integer offset,
-                                                   String tags) {
+    @Override
+    public Observable<List<EncryptedRecord>> searchRecords(
+            String alias,
+            String userId,
+            String startDate,
+            String endDate,
+            int pageSize,
+            int offset,
+            String tags
+    ) {
         return service.searchRecords(alias, userId, startDate, endDate, pageSize, offset, tags);
     }
 
-    Completable deleteRecord(String alias, String recordId, String userId) {
+    @Override
+    public Completable deleteRecord(String alias, String recordId, String userId) {
         return service.deleteRecord(alias, userId, recordId);
     }
 
-    Single<EncryptedRecord> fetchRecord(String alias, String userId, String recordId) {
+    @Override
+    public Single<EncryptedRecord> fetchRecord(String alias, String userId, String recordId) {
         return service.fetchRecord(alias, userId, recordId);
     }
 
-    Single<EncryptedRecord> updateRecord(String alias,
-                                         String userId,
-                                         String recordId,
-                                         NetworkModelContract.EncryptedRecord encryptedRecord) {
+    @Override
+    public Single<EncryptedRecord> updateRecord(String alias,
+                                                String userId,
+                                                String recordId,
+                                                NetworkModelContract.EncryptedRecord encryptedRecord) {
         return service.updateRecord(alias, userId, recordId, (EncryptedRecord) encryptedRecord);
     }
 
-    // TODO remove public
+    @Override
     public Single<String> uploadDocument(String alias,
                                          String userId,
                                          byte[] encryptedAttachment) {
@@ -279,7 +288,7 @@ public final class ApiService implements NetworkingContract.Service {
         ).map(DocumentUploadResponse::getDocumentId);
     }
 
-    // TODO remove public
+    @Override
     public Single<byte[]> downloadDocument(String alias,
                                            String userId,
                                            String documentId) {
@@ -287,7 +296,7 @@ public final class ApiService implements NetworkingContract.Service {
                 .map(ResponseBody::bytes);
     }
 
-    // TODO remove public
+    @Override
     public Single<Boolean> deleteDocument(String alias,
                                           String userId,
                                           String documentId) {
@@ -296,13 +305,14 @@ public final class ApiService implements NetworkingContract.Service {
         return service.deleteDocument(alias, userId, documentId).map(it -> true);
     }
 
-    // TODO remove public
+    @Override
     public Single<Integer> getCount(String alias, String userId, String tags) {
         return service
                 .getRecordsHeader(alias, userId, tags)
                 .map(response -> Integer.parseInt(response.headers().get(HEADER_TOTAL_COUNT)));
     }
 
+    @Override
     public Single<UserInfo> fetchUserInfo(String alias) {
         return service
                 .fetchUserInfo(alias)
@@ -318,6 +328,7 @@ public final class ApiService implements NetworkingContract.Service {
      * @param alias Alias
      * @return Completable
      */
+    @Override
     public Completable logout(String alias) {
         if (this.staticAccessToken != null) {
             throw new D4LRuntimeException("Cannot log out when using a static access token!");
@@ -327,6 +338,7 @@ public final class ApiService implements NetworkingContract.Service {
                 .flatMapCompletable(token -> service.logout(alias, token));
     }
 
+    @Override
     public Single<VersionList> fetchVersionInfo() {
         return service
                 .getVersionUpdateInfo()

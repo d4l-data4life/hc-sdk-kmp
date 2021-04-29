@@ -52,11 +52,11 @@ open class CryptoService : CryptoProtocol, CryptoContract.Service {
 
     private val moshi: Moshi
     private var alias: String
-    private var storage: CryptoSecureStore
+    private var storage: CryptoContract.SecureStore
     private var rng: SecureRandom
     private var base64: Base64
     private var keyFactory: KeyFactory
-    private var commonKeyService: CommonKeyService
+    private var commonKeyService: CryptoContract.CommonKeyService
 
     // for testing only
     constructor(

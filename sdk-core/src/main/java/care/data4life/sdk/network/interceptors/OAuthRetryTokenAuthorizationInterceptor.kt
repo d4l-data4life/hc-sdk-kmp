@@ -23,45 +23,66 @@ import care.data4life.sdk.network.NetworkingContract.Companion.ACCESS_TOKEN_MARK
 import care.data4life.sdk.network.NetworkingContract.Companion.FORMAT_BEARER_TOKEN
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
+import care.data4life.sdk.network.NetworkingContract.Companion.HTTP_401_UNAUTHORIZED
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
 
-class OAuthFetchTokenAuthorizationInterceptor private constructor(
+class OAuthRetryTokenAuthorizationInterceptor private constructor(
     private val authService: AuthorizationContract.Service
 ) : NetworkingContract.Interceptor {
-    private fun modifyRequest(request: Request, alias: String): Request {
-        val token = authService.getAccessToken(alias)
-        return request.newBuilder()
-            .removeHeader(HEADER_ALIAS)
+    private fun needsRetry(
+        alias: String?,
+        marker: String?,
+        status: Int
+    ): Boolean = alias is String && marker == ACCESS_TOKEN_MARKER && status == HTTP_401_UNAUTHORIZED
+
+    private fun requestAgain(
+        chain: Interceptor.Chain,
+        request: Request,
+        failedResponse: Response
+    ): Response = failedResponse.close().let { chain.proceed(request) }
+
+    private fun retry(
+        alias: String,
+        chain: Interceptor.Chain,
+        failedRequest: Request,
+        failedResponse: Response
+    ): Response {
+        val token = try {
+            authService.refreshAccessToken(alias)
+        } catch (e: D4LException) {
+            authService.clear()
+            return failedResponse
+        }
+
+        val request = failedRequest.newBuilder()
             .replaceHeader(
                 HEADER_AUTHORIZATION,
                 String.format(FORMAT_BEARER_TOKEN, token)
-            ).build()
-    }
+            )
+            .build()
 
-    private fun determineRequest(request: Request, alias: String): Request {
-        return try {
-            modifyRequest(request, alias)
-        } catch (e: D4LException) {
-            request
-        }
+        return requestAgain(chain, request, failedResponse)
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
         val alias = request.header(HEADER_ALIAS)
+        val marker = request.header(HEADER_AUTHORIZATION)
 
-        return if (alias is String && request.header(HEADER_AUTHORIZATION) == ACCESS_TOKEN_MARKER) {
-            chain.proceed(determineRequest(request, alias))
+        val response = chain.proceed(chain.request())
+
+        return if (needsRetry(alias, marker, response.code)) {
+            retry(alias!!, chain, request, response)
         } else {
-            chain.proceed(request)
+            response
         }
     }
 
     companion object Factory : NetworkingContract.InterceptorFactory<AuthorizationContract.Service> {
         override fun getInstance(payload: AuthorizationContract.Service): NetworkingContract.Interceptor {
-            return OAuthFetchTokenAuthorizationInterceptor(payload)
+            return OAuthRetryTokenAuthorizationInterceptor(payload)
         }
     }
 }

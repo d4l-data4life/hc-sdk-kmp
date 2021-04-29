@@ -17,7 +17,6 @@
 package care.data4life.sdk.network
 
 import care.data4life.auth.AuthorizationContract
-import care.data4life.sdk.NetworkConnectivityService
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_GC_SDK_VERSION
@@ -65,7 +64,7 @@ class ApiServiceModuleTest {
 
     data class TestConnection(
         override val isConnected: Boolean
-    ) : NetworkConnectivityService
+    ) : NetworkingContract.NetworkConnectivityService
 
     @Before
     fun setUp() {

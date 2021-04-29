@@ -16,7 +16,6 @@
 package care.data4life.sdk.network
 
 import care.data4life.auth.AuthorizationContract
-import care.data4life.sdk.NetworkConnectivityService
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.D4LRuntimeException
 import care.data4life.sdk.network.interceptors.VersionInterceptor
@@ -57,7 +56,7 @@ class ApiService constructor(
     private val clientID: String,
     private val clientSecret: String,
     private val platform: String?,
-    private val connectivityService: NetworkConnectivityService,
+    private val connectivityService: NetworkingContract.NetworkConnectivityService,
     private val clientName: NetworkingContract.Clients,
     private val clientVersion: String,
     staticAccessToken: ByteArray?,
@@ -87,7 +86,7 @@ class ApiService constructor(
         clientID: String,
         clientSecret: String,
         platform: String?,
-        connectivityService: NetworkConnectivityService,
+        connectivityService: NetworkingContract.NetworkConnectivityService,
         clientName: NetworkingContract.Clients,
         clientVersion: String,
         debug: Boolean
@@ -316,7 +315,7 @@ class ApiService constructor(
         var request: Request = chain.request()
         val alias = request.header(NetworkingContract.HEADER_ALIAS)
         val authHeader = request.headers[NetworkingContract.HEADER_AUTHORIZATION]
-        if (authHeader != null && authHeader == NetworkingContract.HEADER_BASIC_AUTH) {
+        if (authHeader != null && authHeader == NetworkingContract.BASIC_AUTH_MARKER) {
             val auth = encodeToString("$clientID:$clientSecret")
             request = request.newBuilder()
                 .removeHeader(NetworkingContract.HEADER_AUTHORIZATION)
@@ -324,7 +323,7 @@ class ApiService constructor(
                     NetworkingContract.HEADER_AUTHORIZATION,
                     String.format(NetworkingContract.FORMAT_BASIC_AUTH, auth)
                 ).build()
-        } else if (authHeader != null && authHeader == NetworkingContract.HEADER_ACCESS_TOKEN) {
+        } else if (authHeader != null && authHeader == NetworkingContract.ACCESS_TOKEN_MARKER) {
             var tokenKey: String
             tokenKey = try {
                 authService.getAccessToken(alias!!)

@@ -84,7 +84,7 @@ interface NetworkingContract {
         fun fetchVersionInfo(): Single<VersionList>
     }
 
-    internal interface CertificatePinnerFactory {
+    interface CertificatePinnerFactory {
         fun getInstance(baseUrl: String, pin: String): CertificatePinner
     }
 
@@ -101,10 +101,6 @@ interface NetworkingContract {
         JAVA("jvm"),
         INGESTION("ingestion")
     }
-
-    interface CertificatePinnerFactory {
-        fun getInstance(baseUrl: String, pin: String): CertificatePinner
-	}
 
     interface NetworkConnectivityService {
         val isConnected: Boolean

@@ -35,7 +35,7 @@ object Versions {
     const val securestore = "0.0.1-add-securestore-implementation-SNAPSHOT"
 
     // kotlin
-    const val kotlin = "1.3.72"
+    const val kotlin = "1.4.32"
 
     /**
      *  https://github.com/Kotlin/kotlinx.coroutines

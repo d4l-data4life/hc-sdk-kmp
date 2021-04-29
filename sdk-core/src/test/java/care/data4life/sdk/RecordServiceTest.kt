@@ -1252,7 +1252,7 @@ class RecordServiceTest {
                 attachmentIds,
                 userId,
                 type,
-                decryptedRecord
+                decryptedRecord as DecryptedBaseRecord<Fhir3Resource>
             )
         } returns Single.just(response)
 
@@ -1283,7 +1283,7 @@ class RecordServiceTest {
                 attachmentIds,
                 userId,
                 type,
-                decryptedRecord
+                decryptedRecord as DecryptedBaseRecord<Fhir3Resource>
             )
         }
     }
@@ -1392,7 +1392,7 @@ class RecordServiceTest {
                 attachmentIds,
                 userId,
                 type,
-                decryptedRecord
+                decryptedRecord as DecryptedBaseRecord<Fhir4Resource>
             )
         } returns Single.just(response)
 
@@ -1423,7 +1423,7 @@ class RecordServiceTest {
                 attachmentIds,
                 userId,
                 type,
-                decryptedRecord
+                decryptedRecord as DecryptedBaseRecord<Fhir4Resource>
             )
         }
     }

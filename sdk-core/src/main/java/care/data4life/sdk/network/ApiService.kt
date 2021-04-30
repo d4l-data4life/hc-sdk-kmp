@@ -18,7 +18,7 @@ package care.data4life.sdk.network
 import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.D4LRuntimeException
-import care.data4life.sdk.network.interceptors.VersionInterceptor
+import care.data4life.sdk.network.interceptor.VersionInterceptor
 import care.data4life.sdk.network.model.CommonKeyResponse
 import care.data4life.sdk.network.model.DocumentUploadResponse
 import care.data4life.sdk.network.model.EncryptedRecord

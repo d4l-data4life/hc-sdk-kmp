@@ -14,7 +14,7 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network.interceptors
+package care.data4life.sdk.network.interceptor
 
 import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.lang.D4LException

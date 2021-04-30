@@ -29,6 +29,8 @@ import care.data4life.sdk.network.model.UserInfo
 import care.data4life.sdk.network.model.Version
 import care.data4life.sdk.network.model.VersionList
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter
+import care.data4life.sdk.network.util.CertificatePinnerFactory
+import care.data4life.sdk.network.util.IHCServiceFactory
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.AUTH_TOKEN
 import care.data4life.sdk.test.util.GenericTestDataProvider.CLIENT_ID
@@ -40,13 +42,19 @@ import care.data4life.sdk.util.Base64
 import com.squareup.moshi.Moshi
 import io.mockk.every
 import io.mockk.mockk
-import okhttp3.HttpUrl
+import io.mockk.mockkObject
+import io.mockk.slot
+import io.mockk.unmockkObject
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.Response
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
+import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -61,6 +69,7 @@ class ApiServiceModuleTest {
     private val clientName = "test"
     private val clientId = CLIENT_ID
     private val secret = "geheim"
+    private val platform = "not important"
 
     data class TestConnection(
         override val isConnected: Boolean
@@ -68,24 +77,43 @@ class ApiServiceModuleTest {
 
     @Before
     fun setUp() {
+        init()
+    }
+
+    fun init(additionalInterceptor: Interceptor? = null) {
         server = MockWebServer()
 
-        every { env.getApiBaseURL(any()) } returns "https://www.i-hate-fat-constructors.com"
+        mockkObject(IHCServiceFactory)
+        mockkObject(CertificatePinnerFactory)
+
+        val slot = slot<OkHttpClient>()
+
+        every { env.getApiBaseURL(any()) } returns server.url("/").toString()
         every { env.getCertificatePin(any()) } returns NetworkingContract.DATA4LIFE_CARE
+        every { CertificatePinnerFactory.getInstance(any(), any()) } returns mockk(relaxed = true)
+
+        every {
+            IHCServiceFactory.getInstance(capture(slot), platform, env)
+        } answers {
+            unmockkObject(IHCServiceFactory)
+            IHCServiceFactory.getInstance(
+                modifyClient(slot.captured, additionalInterceptor),
+                platform,
+                env
+            )
+        }
 
         service = ApiService(
             authService,
             env,
             clientId,
             secret,
-            "not important",
+            platform,
             TestConnection(true),
             NetworkingContract.Clients.ANDROID,
             clientName,
-            false
+            debug = false
         )
-
-        resetService(server.url("/"))
     }
 
     @After
@@ -93,17 +121,23 @@ class ApiServiceModuleTest {
         server.shutdown()
     }
 
-    // ToDo: Remove that after refactoring
-    private fun resetService(baseUrl: HttpUrl) {
-        val client = (service as ApiService).client!!
-            .newBuilder()
+    private fun modifyClient(
+        client: OkHttpClient,
+        additionalInterceptor: Interceptor?
+    ): OkHttpClient {
+        return client.newBuilder()
             .connectTimeout(100, TimeUnit.MILLISECONDS)
             .readTimeout(100, TimeUnit.MILLISECONDS)
             .writeTimeout(100, TimeUnit.MILLISECONDS)
             .callTimeout(100, TimeUnit.MILLISECONDS)
+            .let {
+                if (additionalInterceptor is Interceptor) {
+                    it.addNetworkInterceptor(additionalInterceptor)
+                } else {
+                    it
+                }
+            }
             .build()
-
-        (service as ApiService).resetService(client, baseUrl)
     }
 
     private fun simulateAuthService(alias: String, token: String) {
@@ -760,6 +794,76 @@ class ApiServiceModuleTest {
         assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],
             expected = "Basic ${Base64.encodeToString("$clientId:$secret")}"
+        )
+        assertEquals(
+            actual = request.method,
+            expected = "POST"
+        )
+    }
+
+    @Test
+    fun `Given, an arbitrary Request was made and the client cannot reach the network, it retries again`() {
+        // Given
+        class ErrorCable : Interceptor {
+            private var wasUsed = false
+
+            override fun intercept(chain: Interceptor.Chain): Response {
+                return if (!wasUsed) {
+                    throw SocketTimeoutException().also { wasUsed = true }
+                } else {
+                    chain.proceed(chain.request())
+                }
+            }
+        }
+
+        server.close()
+        init(ErrorCable())
+
+        val alias = ALIAS
+        val userId = USER_ID
+        val record = EncryptedRecord(
+            _commonKeyId = null,
+            identifier = null,
+            encryptedTags = listOf("tags"),
+            encryptedBody = "body",
+            encryptedDataKey = EncryptedKey(Base64.encodeToString("test")),
+            encryptedAttachmentsKey = null,
+            customCreationDate = "today",
+            updatedDate = "tomorrow",
+            modelVersion = 23
+        )
+        val authToken = AUTH_TOKEN
+        val recordResponse = record.copy("id", "id2")
+        val adapter = moshi.adapter(EncryptedRecord::class.java)
+
+        val response = MockResponse().setBody(adapter.toJson(recordResponse))
+
+        addResponsesAndStart(listOf(response))
+        simulateAuthService(alias, authToken)
+
+        // When
+        val actual = service.createRecord(alias, userId, record).blockingGet()
+
+        // Then
+        assertEquals(
+            actual = actual,
+            expected = recordResponse
+        )
+
+        val request = server.takeRequest()
+
+        assertEquals(
+            actual = request.path,
+            expected = "/users/$userId/records"
+        )
+        assertNull(request.headers[HEADER_ALIAS])
+        assertEquals(
+            actual = request.headers[HEADER_AUTHORIZATION],
+            expected = "Bearer $authToken"
+        )
+        assertEquals(
+            actual = request.headers[HEADER_GC_SDK_VERSION],
+            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
         )
         assertEquals(
             actual = request.method,

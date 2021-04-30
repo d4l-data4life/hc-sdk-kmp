@@ -57,10 +57,10 @@ object ClientFactory : NetworkingContract.ClientFactory {
     private fun setInterceptors(
         builder: OkHttpClient.Builder,
         authService: AuthorizationContract.Service,
-        user: String,
+        clientId: String,
         clientSecret: String,
         connectivityService: NetworkingContract.NetworkConnectivityService,
-        clientName: NetworkingContract.Clients,
+        agent: NetworkingContract.Clients,
         clientVersion: String,
         staticAccessToken: ByteArray?,
         debugFlag: Boolean
@@ -68,13 +68,13 @@ object ClientFactory : NetworkingContract.ClientFactory {
         return determineAuthMethod(
             builder,
             authService,
-            user,
+            clientId,
             clientSecret,
             staticAccessToken
         )
             .addInterceptor(RetryInterceptor.getInstance(connectivityService))
             .addInterceptor(LoggingInterceptor.getInstance(debugFlag))
-            .addInterceptor(VersionInterceptor.getInstance(Pair(clientName, clientVersion)))
+            .addInterceptor(VersionInterceptor.getInstance(Pair(agent, clientVersion)))
     }
 
     private fun setTimeouts(builder: OkHttpClient.Builder): OkHttpClient.Builder {
@@ -88,7 +88,7 @@ object ClientFactory : NetworkingContract.ClientFactory {
     override fun getInstance(
         authService: AuthorizationContract.Service,
         environment: NetworkingContract.Environment,
-        user: String,
+        clientId: String,
         clientSecret: String,
         platform: String,
         connectivityService: NetworkingContract.NetworkConnectivityService,
@@ -103,7 +103,7 @@ object ClientFactory : NetworkingContract.ClientFactory {
                 setInterceptors(
                     builder,
                     authService,
-                    user,
+                    clientId,
                     clientSecret,
                     connectivityService,
                     clientName,

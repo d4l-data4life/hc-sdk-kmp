@@ -18,12 +18,15 @@ package care.data4life.sdk.network
 
 import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.lang.D4LRuntimeException
-import care.data4life.sdk.network.NetworkingContract.Companion.PARAM_TEK
+import care.data4life.sdk.network.NetworkingContract.Companion.MEDIA_TYPE_OCTET_STREAM
+import care.data4life.sdk.network.NetworkingContract.Companion.PARAM_TAG_ENCRYPTION_KEY
 import care.data4life.sdk.network.model.CommonKeyResponse
 import care.data4life.sdk.network.model.DocumentUploadResponse
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.UserInfo
 import care.data4life.sdk.network.model.VersionList
+import care.data4life.sdk.network.util.ClientFactory
+import care.data4life.sdk.network.util.IHCServiceFactory
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.CLIENT_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.COMMON_KEY_ID
@@ -32,18 +35,18 @@ import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkConstructor
+import io.mockk.mockkObject
 import io.mockk.slot
-import io.mockk.unmockkConstructor
+import io.mockk.unmockkObject
 import io.mockk.verify
 import io.mockk.verifyOrder
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import okhttp3.CertificatePinner
 import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
@@ -51,7 +54,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
-import retrofit2.Retrofit
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
@@ -59,67 +61,71 @@ import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class ApiServiceTest {
+    private lateinit var service: NetworkingContract.Service
     private val authService: AuthorizationContract.Service = mockk()
     private val env: NetworkingContract.Environment = mockk(relaxed = true)
     private val ihcService: IHCService = mockk()
-    private lateinit var service: NetworkingContract.Service
+    private val client: OkHttpClient = mockk()
+    private val clientId = CLIENT_ID
+    private val secret = "geheim"
+    private val platform = "not important"
+    private val version = "does not matter"
+    private val connection: NetworkingContract.NetworkConnectivityService = mockk()
 
-    // TODO: Remove the fat constructor
     @Before
     fun setup() {
         clearAllMocks()
 
-        val certificateBuilder: CertificatePinner.Builder = mockk()
-        val retrofit: Retrofit = mockk()
+        mockkObject(IHCServiceFactory)
+        mockkObject(ClientFactory)
 
-        mockkConstructor(CertificatePinner.Builder::class)
-        mockkConstructor(Retrofit.Builder::class)
-
+        every { IHCServiceFactory.getInstance(client, platform, env) } returns ihcService
         every {
-            anyConstructed<CertificatePinner.Builder>().add(any(), any())
-        } returns certificateBuilder
-        every {
-            certificateBuilder.build()
-        } returns mockk(relaxed = true)
-
-        every { env.getApiBaseURL(any()) } returns "http://IhateFatConstructors.com"
-
-        every { anyConstructed<Retrofit.Builder>().build() } returns retrofit
-        every { retrofit.create(IHCService::class.java) } returns ihcService
+            ClientFactory.getInstance(
+                authService,
+                env,
+                clientId,
+                secret,
+                platform,
+                connection,
+                NetworkingContract.Clients.JAVA,
+                version,
+                any(),
+                false
+            )
+        } returns client
 
         service = ApiService(
             authService,
             env,
-            CLIENT_ID,
-            "something",
-            "you should not care",
-            mockk(relaxed = true),
+            clientId,
+            secret,
+            platform,
+            connection,
             NetworkingContract.Clients.JAVA,
-            "what so ever",
-            false
+            version,
+            debug = false
         )
     }
 
-    // TODO: Remove the fat constructor
     @After
     fun tearDown() {
-        unmockkConstructor(CertificatePinner.Builder::class)
-        unmockkConstructor(Retrofit.Builder::class)
+        unmockkObject(IHCServiceFactory)
     }
 
     @Test
     fun `It fulfils NetworkingContractService`() {
 
         val service: Any = ApiService(
-            mockk(relaxed = true),
+            authService,
             env,
-            CLIENT_ID,
-            "something",
-            "you should not care",
-            mockk(relaxed = true),
+            clientId,
+            secret,
+            platform,
+            connection,
             NetworkingContract.Clients.JAVA,
-            "what so ever",
-            false
+            version,
+            debug = false
         )
 
         assertTrue(service is NetworkingContract.Service)
@@ -159,7 +165,7 @@ class ApiServiceTest {
         val result: Completable = mockk()
 
         val mappedKey = mapOf(
-            PARAM_TEK to encryptedKey
+            PARAM_TAG_ENCRYPTION_KEY to encryptedKey
         )
 
         every { ihcService.uploadTagEncryptionKey(alias, userId, mappedKey) } returns result
@@ -349,7 +355,7 @@ class ApiServiceTest {
         val alias = ALIAS
         val userId = USER_ID
         val payload = ByteArray(12)
-        val request = payload.toRequestBody(NetworkingContract.MEDIA_TYPE_OCTET_STREAM.toMediaType())
+        val request = payload.toRequestBody(MEDIA_TYPE_OCTET_STREAM.toMediaType())
         val response: DocumentUploadResponse = mockk()
         val result = "Done"
 
@@ -480,14 +486,14 @@ class ApiServiceTest {
     fun `Given, logout is called with an Alias, it fails if service was initialized with a static token`() {
         // Given
         val service = ApiService(
-            mockk(relaxed = true),
+            authService,
             env,
-            CLIENT_ID,
-            "something",
-            "you should not care",
-            mockk(relaxed = true),
+            clientId,
+            secret,
+            platform,
+            connection,
             NetworkingContract.Clients.JAVA,
-            "what so ever",
+            version,
             "token".toByteArray(),
             false
         )

@@ -65,7 +65,7 @@ class NetworkingContract {
 
         fun getCount(alias: String, userId: String, tags: String): Single<Int>
 
-        fun deleteRecord(alias: String, recordId: String, userId: String): Completable
+        fun deleteRecord(alias: String, userId: String, recordId: String): Completable
 
         // TODO: move into a Attachment route
         fun uploadDocument(
@@ -144,7 +144,7 @@ class NetworkingContract {
         fun getInstance(
             authService: AuthorizationContract.Service,
             environment: Environment,
-            user: String,
+            clientId: String,
             clientSecret: String,
             platform: String,
             connectivityService: NetworkConnectivityService,
@@ -177,8 +177,7 @@ class NetworkingContract {
         const val HEADER_GC_SDK_VERSION = "gc-sdk-version"
         const val FORMAT_CLIENT_VERSION = "%s-%s"
         const val HEADER_TOTAL_COUNT = "x-total-count"
-        const val PARAM_FILE_NUMBER = "file_number"
-        const val PARAM_TEK = "tek"
+        const val PARAM_TAG_ENCRYPTION_KEY = "tek"
         const val FORMAT_BEARER_TOKEN = "Bearer %s"
         const val FORMAT_BASIC_AUTH = "Basic %s"
         const val MEDIA_TYPE_OCTET_STREAM = "application/octet-stream"

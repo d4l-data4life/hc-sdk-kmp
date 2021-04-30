@@ -85,7 +85,7 @@ interface NetworkingContract {
     }
 
     interface CertificatePinnerFactory {
-        fun getInstance(baseUrl: String, pin: String): CertificatePinner
+        fun getInstance(platform: String, env: Environment): CertificatePinner
     }
 
     interface Interceptor : okhttp3.Interceptor {

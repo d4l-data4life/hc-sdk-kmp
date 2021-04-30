@@ -16,6 +16,7 @@
 
 package care.data4life.sdk.network
 
+import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.network.model.CommonKeyResponse
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract
@@ -25,6 +26,7 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import okhttp3.CertificatePinner
+import okhttp3.OkHttpClient
 import okhttp3.Response
 
 interface NetworkingContract {
@@ -136,6 +138,21 @@ interface NetworkingContract {
 
     interface EnvironmentFactory {
         fun fromName(name: String?): Environment
+    }
+
+    interface ClientFactory {
+        fun getInstance(
+            authService: AuthorizationContract.Service,
+            environment: Environment,
+            user: String,
+            clientSecret: String,
+            platform: String,
+            connectivityService: NetworkConnectivityService,
+            clientName: Clients,
+            clientVersion: String,
+            staticAccessToken: ByteArray?,
+            debugFlag: Boolean
+        ): OkHttpClient
     }
 
     companion object {

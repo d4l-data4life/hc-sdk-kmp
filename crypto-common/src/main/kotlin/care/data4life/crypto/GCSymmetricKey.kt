@@ -16,4 +16,7 @@
 
 package care.data4life.crypto
 
-expect class GCSymmetricKey
+import care.data4life.crypto.security.SecretKey
+
+@JsonClass(generateAdapter = true)
+data class GCSymmetricKey(val value: SecretKey)

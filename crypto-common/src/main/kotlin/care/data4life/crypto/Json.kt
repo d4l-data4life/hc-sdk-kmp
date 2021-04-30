@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+ * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
  *
  * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
@@ -16,24 +16,5 @@
 
 package care.data4life.crypto
 
-import com.squareup.moshi.Json
-
-actual enum class KeyType {
-    @field:Json(name = "apriv")
-    APP_PRIVATE_KEY,
-
-    @field:Json(name = "apub")
-    APP_PUBLIC_KEY,
-
-    @field:Json(name = "ck")
-    COMMON_KEY,
-
-    @field:Json(name = "dk")
-    DATA_KEY,
-
-    @field:Json(name = "ak")
-    ATTACHMENT_KEY,
-
-    @field:Json(name = "tek")
-    TAG_KEY
-}
+expect annotation class Json(val name: String)
+expect annotation class JsonClass(val generateAdapter: Boolean, val generator: String = "")

@@ -16,4 +16,16 @@
 
 package care.data4life.crypto
 
-expect enum class KeyVersion
+enum class KeyVersion constructor(
+    value: String,
+    val symmetricKeySize: Int,
+    val asymmetricKeySize: Int
+) {
+    @field:Json(name = "0")
+    VERSION_0("0", 256, 2048),
+
+    @field:Json(name = "1")
+    VERSION_1("1", 256, 2048);
+
+    val value: Int = value.toInt()
+}

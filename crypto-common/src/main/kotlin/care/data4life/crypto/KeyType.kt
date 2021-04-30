@@ -16,4 +16,22 @@
 
 package care.data4life.crypto
 
-expect enum class KeyType
+enum class KeyType {
+    @field:Json(name = "apriv")
+    APP_PRIVATE_KEY,
+
+    @field:Json(name = "apub")
+    APP_PUBLIC_KEY,
+
+    @field:Json(name = "ck")
+    COMMON_KEY,
+
+    @field:Json(name = "dk")
+    DATA_KEY,
+
+    @field:Json(name = "ak")
+    ATTACHMENT_KEY,
+
+    @field:Json(name = "tek")
+    TAG_KEY
+}

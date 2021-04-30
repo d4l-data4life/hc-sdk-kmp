@@ -123,7 +123,7 @@ interface NetworkingContract {
         const val DATA4LIFE_CARE = "sha256/AJvjswWs1n4m1KDmFNnTqBit2RHFvXsrVU3Uhxcoe4Y="
         const val HPSGC_DE = "sha256/3f81qEv2rjHvcrwof2egbKo5MjjSHaN/4DOl7R+pH0E="
         const val SMART4HEALTH_EU = "sha256/yPBKbgJMVnMeovGKbAtuz65sfy/gpDu0WTiuB8bE5G0="
-        const val REQUEST_TIMEOUT = 2
+        const val REQUEST_TIMEOUT: Long = 2
         const val HEADER_ALIAS = "gc_alias"
         const val HEADER_ACCESS_TOKEN = "access_token"
         const val HEADER_AUTHORIZATION = "Authorization"

@@ -17,7 +17,6 @@
 package care.data4life.sdk.network
 
 import care.data4life.auth.AuthorizationService
-import care.data4life.sdk.ApiService
 import care.data4life.sdk.lang.D4LRuntimeException
 import care.data4life.sdk.network.NetworkingContract.Companion.PARAM_TEK
 import care.data4life.sdk.network.model.CommonKeyResponse

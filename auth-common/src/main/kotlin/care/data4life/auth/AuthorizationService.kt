@@ -18,10 +18,13 @@ package care.data4life.auth
 
 expect class AuthorizationService : AuthorizationContract.Service {
 
+    @Throws(AuthorizationException.FailedToRestoreRefreshToken::class)
     override fun getAccessToken(alias: String): String
 
+    @Throws(AuthorizationException.FailedToRestoreRefreshToken::class)
     override fun getRefreshToken(alias: String): String
 
+    @Throws(AuthorizationException.FailedToRestoreRefreshToken::class)
     override fun refreshAccessToken(alias: String): String
 
     override fun isAuthorized(alias: String): Boolean

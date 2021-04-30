@@ -20,9 +20,9 @@ import care.data4life.auth.AuthorizationService
 import care.data4life.crypto.GCKey
 import care.data4life.crypto.GCKeyPair
 import care.data4life.crypto.GCSymmetricKey
-import care.data4life.sdk.ApiService
 import care.data4life.sdk.CryptoSecureStore
 import care.data4life.sdk.CryptoService
+import care.data4life.sdk.network.ApiService
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.UserInfo
 import io.mockk.Called

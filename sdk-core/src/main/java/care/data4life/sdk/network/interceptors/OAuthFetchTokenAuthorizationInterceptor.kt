@@ -19,21 +19,18 @@ package care.data4life.sdk.network.interceptors
 import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.network.NetworkingContract
-import care.data4life.sdk.network.NetworkingContract.Companion.ACCESS_TOKEN_MARKER
 import care.data4life.sdk.network.NetworkingContract.Companion.FORMAT_BEARER_TOKEN
-import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
 
-class OAuthFetchTokenAuthorizationInterceptor private constructor(
+class OAuthFetchTokenAuthorizationInterceptor internal constructor(
     private val authService: AuthorizationContract.Service
-) : NetworkingContract.Interceptor {
+) : NetworkingContract.PartialInterceptor<Pair<String, Request>> {
     private fun modifyRequest(request: Request, alias: String): Request {
         val token = authService.getAccessToken(alias)
         return request.newBuilder()
-            .removeHeader(HEADER_ALIAS)
             .replaceHeader(
                 HEADER_AUTHORIZATION,
                 String.format(FORMAT_BEARER_TOKEN, token)
@@ -48,20 +45,12 @@ class OAuthFetchTokenAuthorizationInterceptor private constructor(
         }
     }
 
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
-        val alias = request.header(HEADER_ALIAS)
+    override fun intercept(
+        payload: Pair<String, Request>,
+        chain: Interceptor.Chain
+    ): Response {
+        val (alias, request) = payload
 
-        return if (alias is String && request.header(HEADER_AUTHORIZATION) == ACCESS_TOKEN_MARKER) {
-            chain.proceed(determineRequest(request, alias))
-        } else {
-            chain.proceed(request)
-        }
-    }
-
-    companion object Factory : NetworkingContract.InterceptorFactory<AuthorizationContract.Service> {
-        override fun getInstance(payload: AuthorizationContract.Service): NetworkingContract.Interceptor {
-            return OAuthFetchTokenAuthorizationInterceptor(payload)
-        }
+        return chain.proceed(determineRequest(request, alias))
     }
 }

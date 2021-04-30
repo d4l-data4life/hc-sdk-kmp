@@ -19,24 +19,16 @@ package care.data4life.sdk.network.interceptors
 import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.network.NetworkingContract
-import care.data4life.sdk.network.NetworkingContract.Companion.ACCESS_TOKEN_MARKER
 import care.data4life.sdk.network.NetworkingContract.Companion.FORMAT_BEARER_TOKEN
-import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
 import care.data4life.sdk.network.NetworkingContract.Companion.HTTP_401_UNAUTHORIZED
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
 
-class OAuthRetryTokenAuthorizationInterceptor private constructor(
+class OAuthRetryTokenAuthorizationInterceptor internal constructor(
     private val authService: AuthorizationContract.Service
-) : NetworkingContract.Interceptor {
-    private fun needsRetry(
-        alias: String?,
-        marker: String?,
-        status: Int
-    ): Boolean = alias is String && marker == ACCESS_TOKEN_MARKER && status == HTTP_401_UNAUTHORIZED
-
+) : NetworkingContract.PartialInterceptor<Triple<String, Request, Response>> {
     private fun requestAgain(
         chain: Interceptor.Chain,
         request: Request,
@@ -66,23 +58,16 @@ class OAuthRetryTokenAuthorizationInterceptor private constructor(
         return requestAgain(chain, request, failedResponse)
     }
 
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
-        val alias = request.header(HEADER_ALIAS)
-        val marker = request.header(HEADER_AUTHORIZATION)
+    override fun intercept(
+        payload: Triple<String, Request, Response>,
+        chain: Interceptor.Chain
+    ): Response {
+        val (alias, request, response) = payload
 
-        val response = chain.proceed(chain.request())
-
-        return if (needsRetry(alias, marker, response.code)) {
-            retry(alias!!, chain, request, response)
+        return if (response.code == HTTP_401_UNAUTHORIZED) {
+            retry(alias, chain, request, response)
         } else {
             response
-        }
-    }
-
-    companion object Factory : NetworkingContract.InterceptorFactory<AuthorizationContract.Service> {
-        override fun getInstance(payload: AuthorizationContract.Service): NetworkingContract.Interceptor {
-            return OAuthRetryTokenAuthorizationInterceptor(payload)
         }
     }
 }

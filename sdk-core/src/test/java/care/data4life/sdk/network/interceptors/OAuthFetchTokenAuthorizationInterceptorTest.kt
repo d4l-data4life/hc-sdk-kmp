@@ -19,8 +19,6 @@ package care.data4life.sdk.network.interceptors
 import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.network.NetworkingContract
-import care.data4life.sdk.network.NetworkingContract.Companion.ACCESS_TOKEN_MARKER
-import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import io.mockk.clearAllMocks
@@ -44,51 +42,14 @@ class OAuthFetchTokenAuthorizationInterceptorTest {
     }
 
     @Test
-    fun `It fulfils InterceptorFactory`() {
-        val factory: Any = OAuthFetchTokenAuthorizationInterceptor
+    fun `It fulfils PartialInterceptor`() {
+        val interceptor: Any = OAuthFetchTokenAuthorizationInterceptor(service)
 
-        assertTrue(factory is NetworkingContract.InterceptorFactory<*>)
+        assertTrue(interceptor is NetworkingContract.PartialInterceptor<*>)
     }
 
     @Test
-    fun `Given getInstance is called with a AuthorizationContractService it returns a Interceptor`() {
-        // When
-        val interceptor: Any = OAuthFetchTokenAuthorizationInterceptor.getInstance(service)
-
-        // Then
-        assertTrue(interceptor is NetworkingContract.Interceptor)
-    }
-
-    @Test
-    fun `Given a interceptor was created and intercept was called, it simply proceeds with the cain, if no AUTHORIZATION_WITH_ACCESS_TOKEN is present`() {
-        // Given
-        val response: Response = mockk()
-        val chain: Interceptor.Chain = mockk()
-        val request: Request = mockk()
-
-        every { request.header(HEADER_ALIAS) } returns "woop"
-        every { request.header(HEADER_AUTHORIZATION) } returns "you should not care"
-        every { chain.request() } returns request
-        every { chain.proceed(request) } returns response
-
-        // When
-        val actual = OAuthFetchTokenAuthorizationInterceptor.getInstance(service).intercept(chain)
-
-        // Then
-        assertSame(
-            actual = actual,
-            expected = response
-        )
-
-        verifyOrder {
-            chain.request()
-            request.header(HEADER_AUTHORIZATION)
-            chain.proceed(request)
-        }
-    }
-
-    @Test
-    fun `Given intercept was called, fetches and removes the alias from the HEADER, replaces HEADER_AUTHORIZATION with the resolved token and returns the Requests Response`() {
+    fun `Given intercept was called, it replaces HEADER_AUTHORIZATION with the resolved token and returns the Requests Response`() {
         // Given
         val token = "token"
         val response: Response = mockk()
@@ -99,14 +60,9 @@ class OAuthFetchTokenAuthorizationInterceptorTest {
         val modifiedRequest: Request = mockk()
         val builder: Request.Builder = mockk()
 
-        every { chain.request() } returns request
         every { service.getAccessToken(alias) } returns token
 
-        every { request.header(HEADER_AUTHORIZATION) } returns ACCESS_TOKEN_MARKER
-        every { request.header(HEADER_ALIAS) } returns alias
-
         every { request.newBuilder() } returns builder
-        every { builder.removeHeader(HEADER_ALIAS) } returns builder
         every {
             builder.removeHeader(HEADER_AUTHORIZATION)
         } returns builder
@@ -120,7 +76,10 @@ class OAuthFetchTokenAuthorizationInterceptorTest {
         every { chain.proceed(modifiedRequest) } returns response
 
         // When
-        val actual = OAuthFetchTokenAuthorizationInterceptor.getInstance(service).intercept(chain)
+        val actual = OAuthFetchTokenAuthorizationInterceptor(service).intercept(
+            Pair(alias, request),
+            chain
+        )
 
         // Then
         assertSame(
@@ -128,12 +87,8 @@ class OAuthFetchTokenAuthorizationInterceptorTest {
             expected = response
         )
         verifyOrder {
-            chain.request()
-            request.header(HEADER_ALIAS)
-            request.header(HEADER_AUTHORIZATION)
             service.getAccessToken(alias)
             request.newBuilder()
-            builder.removeHeader(HEADER_ALIAS)
             builder.removeHeader(HEADER_AUTHORIZATION)
             builder.addHeader(HEADER_AUTHORIZATION, "Bearer $token")
             builder.build()
@@ -150,15 +105,15 @@ class OAuthFetchTokenAuthorizationInterceptorTest {
         val chain: Interceptor.Chain = mockk()
         val request: Request = mockk()
 
-        every { chain.request() } returns request
-        every { request.header(HEADER_ALIAS) } returns alias
-        every { request.header(HEADER_AUTHORIZATION) } returns ACCESS_TOKEN_MARKER
         every { service.getAccessToken(alias) } answers { throw D4LException() }
 
         every { chain.proceed(request) } returns response
 
         // When
-        val actual = OAuthFetchTokenAuthorizationInterceptor.getInstance(service).intercept(chain)
+        val actual = OAuthFetchTokenAuthorizationInterceptor(service).intercept(
+            Pair(alias, request),
+            chain
+        )
 
         // Then
         assertSame(
@@ -167,9 +122,6 @@ class OAuthFetchTokenAuthorizationInterceptorTest {
         )
 
         verifyOrder {
-            chain.request()
-            request.header(HEADER_ALIAS)
-            request.header(HEADER_AUTHORIZATION)
             service.getAccessToken(alias)
             chain.proceed(request)
         }

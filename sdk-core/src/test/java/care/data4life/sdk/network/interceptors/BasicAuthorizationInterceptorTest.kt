@@ -33,13 +33,13 @@ import kotlin.test.assertTrue
 class BasicAuthorizationInterceptorTest {
     @Test
     fun `It fulfils InterceptorFactory`() {
-        val factory: Any = VersionInterceptor
+        val factory: Any = BasicAuthorizationInterceptor
 
         assertTrue(factory is NetworkingContract.InterceptorFactory<*>)
     }
 
     @Test
-    fun `Given getInstance is called with cretentials it returns a Interceptor`() {
+    fun `Given getInstance is called with credentials it returns a Interceptor`() {
         // Given
         val credentials = Pair("a", "b")
 

@@ -92,6 +92,13 @@ interface NetworkingContract {
         override fun intercept(chain: okhttp3.Interceptor.Chain): Response
     }
 
+    interface PartialInterceptor<T : Any> {
+        fun intercept(
+            payload: T,
+            chain: okhttp3.Interceptor.Chain
+        ): Response
+    }
+
     interface InterceptorFactory<T : Any> {
         fun getInstance(payload: T): Interceptor
     }

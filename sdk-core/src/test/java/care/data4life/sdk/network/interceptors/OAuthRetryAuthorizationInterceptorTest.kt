@@ -19,15 +19,16 @@ package care.data4life.sdk.network.interceptors
 import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.network.NetworkingContract
-import care.data4life.sdk.network.NetworkingContract.Companion.ACCESS_TOKEN_MARKER
 import care.data4life.sdk.network.NetworkingContract.Companion.HTTP_401_UNAUTHORIZED
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.AUTH_TOKEN
+import io.mockk.Called
 import io.mockk.Runs
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.verify
 import io.mockk.verifyOrder
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -46,19 +47,10 @@ class OAuthRetryAuthorizationInterceptorTest {
     }
 
     @Test
-    fun `It fulfils InterceptorFactory`() {
-        val factory: Any = OAuthRetryTokenAuthorizationInterceptor
+    fun `It fulfils ParialInterceptor`() {
+        val interceptor: Any = OAuthRetryTokenAuthorizationInterceptor(service)
 
-        assertTrue(factory is NetworkingContract.InterceptorFactory<*>)
-    }
-
-    @Test
-    fun `Given getInstance is called with a AuthorizationContractService it returns a Interceptor`() {
-        // When
-        val interceptor: Any = OAuthRetryTokenAuthorizationInterceptor.getInstance(service)
-
-        // Then
-        assertTrue(interceptor is NetworkingContract.Interceptor)
+        assertTrue(interceptor is NetworkingContract.PartialInterceptor<*>)
     }
 
     @Test
@@ -67,14 +59,14 @@ class OAuthRetryAuthorizationInterceptorTest {
         val chain: Interceptor.Chain = mockk()
         val request: Request = mockk()
 
-        every { chain.request() } returns request
-        every { request.header(NetworkingContract.HEADER_ALIAS) } returns "woop"
-        every { request.header(NetworkingContract.HEADER_AUTHORIZATION) } returns "you should not care"
         every { chain.proceed(request) } returns response
         every { response.code } returns 418
 
         // When
-        val actual = OAuthRetryTokenAuthorizationInterceptor.getInstance(service).intercept(chain)
+        val actual = OAuthRetryTokenAuthorizationInterceptor(service).intercept(
+            Triple("egal", request, response),
+            chain
+        )
 
         // Then
         assertSame(
@@ -82,12 +74,8 @@ class OAuthRetryAuthorizationInterceptorTest {
             expected = response
         )
 
-        verifyOrder {
-            chain.request()
-            request.header(NetworkingContract.HEADER_ALIAS)
-            request.header(NetworkingContract.HEADER_AUTHORIZATION)
-            chain.proceed(request)
-        }
+        verify { request wasNot Called }
+        verify { chain wasNot Called }
     }
 
     @Test
@@ -103,11 +91,6 @@ class OAuthRetryAuthorizationInterceptorTest {
         val modifiedRequest: Request = mockk()
         val builder: Request.Builder = mockk()
 
-        every { chain.request() } returns request
-        every { request.header(NetworkingContract.HEADER_ALIAS) } returns alias
-        every { request.header(NetworkingContract.HEADER_AUTHORIZATION) } returns ACCESS_TOKEN_MARKER
-
-        every { chain.proceed(request) } returns orgResponse
         every { chain.proceed(modifiedRequest) } returns newResponse
 
         every { orgResponse.code } returns HTTP_401_UNAUTHORIZED
@@ -127,7 +110,10 @@ class OAuthRetryAuthorizationInterceptorTest {
         } returns modifiedRequest
 
         // When
-        val actual = OAuthRetryTokenAuthorizationInterceptor.getInstance(service).intercept(chain)
+        val actual = OAuthRetryTokenAuthorizationInterceptor(service).intercept(
+            Triple(alias, request, orgResponse),
+            chain
+        )
 
         // Then
         assertSame(
@@ -136,10 +122,6 @@ class OAuthRetryAuthorizationInterceptorTest {
         )
 
         verifyOrder {
-            chain.request()
-            request.header(NetworkingContract.HEADER_ALIAS)
-            request.header(NetworkingContract.HEADER_AUTHORIZATION)
-            chain.proceed(request)
             service.refreshAccessToken(alias)
             builder.removeHeader(NetworkingContract.HEADER_AUTHORIZATION)
             builder.addHeader(NetworkingContract.HEADER_AUTHORIZATION, "Bearer $token")
@@ -155,19 +137,16 @@ class OAuthRetryAuthorizationInterceptorTest {
         val chain: Interceptor.Chain = mockk()
         val request: Request = mockk()
 
-        every { chain.request() } returns request
-        every { request.header(NetworkingContract.HEADER_ALIAS) } returns alias
-        every { request.header(NetworkingContract.HEADER_AUTHORIZATION) } returns ACCESS_TOKEN_MARKER
-
-        every { chain.proceed(request) } returns response
-
         every { response.code } returns HTTP_401_UNAUTHORIZED
 
         every { service.refreshAccessToken(alias) } answers { throw D4LException("fail") }
         every { service.clear() } just Runs
 
         // When
-        val actual = OAuthRetryTokenAuthorizationInterceptor.getInstance(service).intercept(chain)
+        val actual = OAuthRetryTokenAuthorizationInterceptor(service).intercept(
+            Triple(alias, request, response),
+            chain
+        )
 
         // Then
         assertSame(
@@ -175,11 +154,7 @@ class OAuthRetryAuthorizationInterceptorTest {
             expected = response
         )
 
-        verifyOrder {
-            chain.request()
-            request.header(NetworkingContract.HEADER_ALIAS)
-            request.header(NetworkingContract.HEADER_AUTHORIZATION)
-            chain.proceed(request)
-        }
+        verify { request wasNot Called }
+        verify { chain wasNot Called }
     }
 }

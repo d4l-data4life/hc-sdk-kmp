@@ -14,44 +14,55 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network.interceptor
+package care.data4life.sdk.network.util.interceptor
 
+import care.data4life.auth.AuthorizationContract
+import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.network.NetworkingContract
-import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
+import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verifyOrder
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
+import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
-class StaticAuthorizationInterceptorTest {
-    @Test
-    fun `It fulfils Interceptor`() {
-        val interceptor: Any = StaticAuthorizationInterceptor("test")
+class OAuthFetchTokenAuthorizationInterceptorTest {
+    private val service: AuthorizationContract.Service = mockk()
 
-        assertTrue(interceptor is NetworkingContract.Interceptor)
+    @Before
+    fun setUp() {
+        clearAllMocks()
     }
 
     @Test
-    fun `Given intercept is called with a chain, it removes HEADER_ALIAS and replaces HEADER_AUTHORIZATION and returns the Response of the modified Request`() {
+    fun `It fulfils PartialInterceptor`() {
+        val interceptor: Any = OAuthFetchTokenAuthorizationInterceptor(service)
+
+        assertTrue(interceptor is NetworkingContract.PartialInterceptor<*>)
+    }
+
+    @Test
+    fun `Given intercept was called, it replaces HEADER_AUTHORIZATION with the resolved token and returns the Requests Response`() {
         // Given
         val token = "token"
-
         val response: Response = mockk()
+        val alias = ALIAS
 
         val chain: Interceptor.Chain = mockk()
         val request: Request = mockk()
         val modifiedRequest: Request = mockk()
         val builder: Request.Builder = mockk()
 
-        every { chain.request() } returns request
+        every { service.getAccessToken(alias) } returns token
+
         every { request.newBuilder() } returns builder
-        every { builder.removeHeader(HEADER_ALIAS) } returns builder
         every {
             builder.removeHeader(HEADER_AUTHORIZATION)
         } returns builder
@@ -65,7 +76,44 @@ class StaticAuthorizationInterceptorTest {
         every { chain.proceed(modifiedRequest) } returns response
 
         // When
-        val actual = StaticAuthorizationInterceptor(token).intercept(chain)
+        val actual = OAuthFetchTokenAuthorizationInterceptor(service).intercept(
+            Pair(alias, request),
+            chain
+        )
+
+        // Then
+        assertSame(
+            actual = actual,
+            expected = response
+        )
+        verifyOrder {
+            service.getAccessToken(alias)
+            request.newBuilder()
+            builder.removeHeader(HEADER_AUTHORIZATION)
+            builder.addHeader(HEADER_AUTHORIZATION, "Bearer $token")
+            builder.build()
+            chain.proceed(modifiedRequest)
+        }
+    }
+
+    @Test
+    fun `Given intercept was called, forwards the Request, if it cannot resolve the token`() {
+        // Given
+        val response: Response = mockk()
+        val alias = ALIAS
+
+        val chain: Interceptor.Chain = mockk()
+        val request: Request = mockk()
+
+        every { service.getAccessToken(alias) } answers { throw D4LException() }
+
+        every { chain.proceed(request) } returns response
+
+        // When
+        val actual = OAuthFetchTokenAuthorizationInterceptor(service).intercept(
+            Pair(alias, request),
+            chain
+        )
 
         // Then
         assertSame(
@@ -74,10 +122,8 @@ class StaticAuthorizationInterceptorTest {
         )
 
         verifyOrder {
-            builder.removeHeader(HEADER_ALIAS)
-            builder.removeHeader(HEADER_AUTHORIZATION)
-            builder.addHeader(HEADER_AUTHORIZATION, "Bearer $token")
-            builder.build()
+            service.getAccessToken(alias)
+            chain.proceed(request)
         }
     }
 }

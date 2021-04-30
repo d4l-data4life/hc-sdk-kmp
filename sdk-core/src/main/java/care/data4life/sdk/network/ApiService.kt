@@ -18,7 +18,6 @@ package care.data4life.sdk.network
 import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.D4LRuntimeException
-import care.data4life.sdk.network.interceptor.VersionInterceptor
 import care.data4life.sdk.network.model.CommonKeyResponse
 import care.data4life.sdk.network.model.DocumentUploadResponse
 import care.data4life.sdk.network.model.EncryptedRecord
@@ -26,6 +25,7 @@ import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.UserInfo
 import care.data4life.sdk.network.model.VersionList
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter
+import care.data4life.sdk.network.util.interceptor.VersionInterceptor
 import care.data4life.sdk.util.Base64.encodeToString
 import com.squareup.moshi.Moshi
 import io.reactivex.Completable

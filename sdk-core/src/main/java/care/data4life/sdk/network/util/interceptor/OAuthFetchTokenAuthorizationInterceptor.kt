@@ -14,60 +14,43 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network.interceptor
+package care.data4life.sdk.network.util.interceptor
 
 import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.NetworkingContract.Companion.FORMAT_BEARER_TOKEN
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
-import care.data4life.sdk.network.NetworkingContract.Companion.HTTP_401_UNAUTHORIZED
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
 
-class OAuthRetryTokenAuthorizationInterceptor internal constructor(
+class OAuthFetchTokenAuthorizationInterceptor internal constructor(
     private val authService: AuthorizationContract.Service
-) : NetworkingContract.PartialInterceptor<Triple<String, Request, Response>> {
-    private fun requestAgain(
-        chain: Interceptor.Chain,
-        request: Request,
-        failedResponse: Response
-    ): Response = failedResponse.close().let { chain.proceed(request) }
-
-    private fun retry(
-        alias: String,
-        chain: Interceptor.Chain,
-        failedRequest: Request,
-        failedResponse: Response
-    ): Response {
-        val token = try {
-            authService.refreshAccessToken(alias)
-        } catch (e: D4LException) {
-            authService.clear()
-            return failedResponse
-        }
-
-        val request = failedRequest.newBuilder()
+) : NetworkingContract.PartialInterceptor<Pair<String, Request>> {
+    private fun modifyRequest(request: Request, alias: String): Request {
+        val token = authService.getAccessToken(alias)
+        return request.newBuilder()
             .replaceHeader(
                 HEADER_AUTHORIZATION,
                 String.format(FORMAT_BEARER_TOKEN, token)
-            )
-            .build()
+            ).build()
+    }
 
-        return requestAgain(chain, request, failedResponse)
+    private fun determineRequest(request: Request, alias: String): Request {
+        return try {
+            modifyRequest(request, alias)
+        } catch (e: D4LException) {
+            request
+        }
     }
 
     override fun intercept(
-        payload: Triple<String, Request, Response>,
+        payload: Pair<String, Request>,
         chain: Interceptor.Chain
     ): Response {
-        val (alias, request, response) = payload
+        val (alias, request) = payload
 
-        return if (response.code == HTTP_401_UNAUTHORIZED) {
-            retry(alias, chain, request, response)
-        } else {
-            response
-        }
+        return chain.proceed(determineRequest(request, alias))
     }
 }

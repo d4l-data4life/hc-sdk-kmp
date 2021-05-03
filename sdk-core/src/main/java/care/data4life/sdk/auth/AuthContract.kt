@@ -31,8 +31,5 @@ interface AuthContract {
         fun isLoggedIn(alias: String): Single<Boolean>
         fun logout(): Completable
         fun getSessionToken(alias: String): Single<String>
-
-        // TODO: move this into the resource clients
-        fun getVersionInfo(currentVersion: String): Single<Boolean>
     }
 }

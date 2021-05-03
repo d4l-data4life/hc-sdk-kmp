@@ -15,6 +15,7 @@
  */
 package care.data4life.sdk.network.model
 
+import care.data4life.sdk.network.model.NetworkModelContract.VersionStatus
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -24,16 +25,27 @@ data class VersionList(
     override val versions: List<Version>
 ) : NetworkModelContract.VersionList {
 
-    fun isSupported(currentVersion: String): Boolean {
-        var isSupported = true
-        val regex = Regex("^(\\d+\\.)(\\d+\\.)(\\d)")
-        val matchVersion = regex.find(currentVersion)?.groups?.first()?.value
-        for (version in versions) {
-            if (version.name == matchVersion && version.status == NetworkModelContract.Version.KEY_UNSUPPORTED) {
-                isSupported = false
-                break
-            }
+    private fun extractVersion(
+        version: String
+    ): String? = versionPattern.find(version)?.groups?.first()?.value
+
+    private fun isKnownVersion(
+        version: Version,
+        currentVersion: String?
+    ): Boolean = version.name == currentVersion
+
+    override fun resolveSupportStatus(version: String): VersionStatus {
+        val currentVersion = extractVersion(version)
+        val knownVersion = versions.find { knownVersion -> isKnownVersion(knownVersion, currentVersion) }
+
+        return when (knownVersion?.status) {
+            "unsupported" -> VersionStatus.UNSUPPORTED
+            "deprecated" -> VersionStatus.DEPRECATED
+            else -> VersionStatus.SUPPORTED
         }
-        return isSupported
+    }
+
+    companion object {
+        private val versionPattern = Regex("^(\\d+\\.)(\\d+\\.)(\\d)")
     }
 }

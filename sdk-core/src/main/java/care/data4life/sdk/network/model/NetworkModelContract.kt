@@ -67,15 +67,17 @@ class NetworkModelContract {
         val code: Int
         val name: String
         val status: String
+    }
 
-        companion object {
-            var KEY_DEPRECATED = "deprecated"
-            var KEY_UNSUPPORTED = "unsupported"
-        }
+    enum class VersionStatus {
+        DEPRECATED,
+        SUPPORTED,
+        UNSUPPORTED
     }
 
     internal interface VersionList {
         val versions: List<Version>
+        fun resolveSupportStatus(version: String): VersionStatus
     }
 
     internal interface DocumentUploadResponse {

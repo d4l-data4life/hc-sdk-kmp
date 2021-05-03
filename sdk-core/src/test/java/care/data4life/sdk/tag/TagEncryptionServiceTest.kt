@@ -16,10 +16,13 @@
 package care.data4life.sdk.tag
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.CryptoService
+import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.lang.D4LException
+import care.data4life.sdk.tag.TaggingContract.Companion.ANNOTATION_KEY
 import care.data4life.sdk.tag.TaggingContract.Companion.DELIMITER
+import care.data4life.sdk.test.util.GenericTestDataProvider.IV
 import care.data4life.sdk.util.Base64
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -27,19 +30,24 @@ import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 class TagEncryptionServiceTest {
-    private lateinit var cryptoService: CryptoService
-    private lateinit var base64: Base64
-    private lateinit var tagHelper: TaggingContract.Helper
-    private lateinit var subjectUnderTest: TagEncryptionService
+    private val cryptoService: CryptoContract.Service = mockk()
+    private val base64: Base64 = mockk()
+    private val tagHelper: TaggingContract.Helper = mockk()
+    private lateinit var tagEncryptionService: TagEncryptionService
 
     @Before
     fun setUp() {
-        cryptoService = mockk()
-        base64 = mockk()
-        tagHelper = mockk()
-        subjectUnderTest = TagEncryptionService(cryptoService, base64, tagHelper)
+        clearAllMocks()
+        tagEncryptionService = TagEncryptionService(cryptoService, base64, tagHelper)
+    }
+
+    @Test
+    fun `It fulfils the EncryptionService`() {
+        val helper: Any = tagEncryptionService
+        assertTrue(helper is TaggingContract.EncryptionService)
     }
 
     @Test
@@ -63,7 +71,7 @@ class TagEncryptionServiceTest {
         every { base64.encodeToString(symEncrypted) } returns encryptedTag
 
         // when
-        val actual = subjectUnderTest.encryptTagsAndAnnotations(tags, listOf())
+        val actual = tagEncryptionService.encryptTagsAndAnnotations(tags, listOf())
 
         // then
         assertEquals(
@@ -103,7 +111,7 @@ class TagEncryptionServiceTest {
         every { base64.encodeToString(symEncrypted) } returns encryptedAnnotation
 
         // When
-        val actual = subjectUnderTest.encryptTagsAndAnnotations(hashMapOf(), annotations)
+        val actual = tagEncryptionService.encryptTagsAndAnnotations(hashMapOf(), annotations)
 
         // Then
         assertEquals(
@@ -155,7 +163,7 @@ class TagEncryptionServiceTest {
         every { base64.encodeToString(symEncrypted[1]) } returns encryptedAnnotation
 
         // When
-        val actual = subjectUnderTest.encryptTagsAndAnnotations(tags, annotations)
+        val actual = tagEncryptionService.encryptTagsAndAnnotations(tags, annotations)
 
         // Then
         assertEquals(
@@ -199,7 +207,7 @@ class TagEncryptionServiceTest {
 
         // When
         val exception = assertFailsWith<D4LException> {
-            subjectUnderTest.encryptTagsAndAnnotations(tags, listOf())
+            tagEncryptionService.encryptTagsAndAnnotations(tags, listOf())
         }
 
         // Then
@@ -227,7 +235,7 @@ class TagEncryptionServiceTest {
 
         // When
         val exception = assertFailsWith<D4LException> {
-            subjectUnderTest.encryptTagsAndAnnotations(hashMapOf(), annotations)
+            tagEncryptionService.encryptTagsAndAnnotations(hashMapOf(), annotations)
         }
 
         // Then
@@ -258,7 +266,7 @@ class TagEncryptionServiceTest {
         } returns tag.toByteArray()
 
         // when
-        val (decryptedTags, _) = subjectUnderTest.decryptTagsAndAnnotations(
+        val (decryptedTags, _) = tagEncryptionService.decryptTagsAndAnnotations(
             encryptedTagsAndAnnotations
         )
 
@@ -302,7 +310,7 @@ class TagEncryptionServiceTest {
         every { tagHelper.decode(tag) } returns tag
 
         // when
-        val (decryptedTags, _) = subjectUnderTest.decryptTagsAndAnnotations(encryptedTags)
+        val (decryptedTags, _) = tagEncryptionService.decryptTagsAndAnnotations(encryptedTags)
 
         // then
         assertEquals(
@@ -345,7 +353,7 @@ class TagEncryptionServiceTest {
         every { tagHelper.decode(annotation) } returns annotation
 
         // When
-        val (_, decryptedAnnotations) = subjectUnderTest.decryptTagsAndAnnotations(
+        val (_, decryptedAnnotations) = tagEncryptionService.decryptTagsAndAnnotations(
             encryptedAnnotations
         )
 
@@ -389,7 +397,7 @@ class TagEncryptionServiceTest {
         every { tagHelper.decode(tag) } returns tag
 
         // when
-        val (_, decryptedAnnotations) = subjectUnderTest.decryptTagsAndAnnotations(
+        val (_, decryptedAnnotations) = tagEncryptionService.decryptTagsAndAnnotations(
             encryptedAnnotations
         )
 
@@ -448,7 +456,7 @@ class TagEncryptionServiceTest {
         every { tagHelper.decode(annotation) } returns annotation
 
         // when
-        val (decryptedTags, decryptedAnnotations) = subjectUnderTest.decryptTagsAndAnnotations(
+        val (decryptedTags, decryptedAnnotations) = tagEncryptionService.decryptTagsAndAnnotations(
             encryptedTagsAnnotations
         )
 
@@ -483,7 +491,7 @@ class TagEncryptionServiceTest {
 
         // When
         val exception = assertFailsWith<D4LException> {
-            subjectUnderTest.decryptTagsAndAnnotations(mutableListOf("ignore me"))
+            tagEncryptionService.decryptTagsAndAnnotations(mutableListOf("ignore me"))
         }
 
         // Then
@@ -491,10 +499,5 @@ class TagEncryptionServiceTest {
             expected = "Failed to decrypt tag",
             actual = exception.message
         )
-    }
-
-    companion object {
-        private const val ANNOTATION_KEY = "custom"
-        private val IV = ByteArray(16)
     }
 }

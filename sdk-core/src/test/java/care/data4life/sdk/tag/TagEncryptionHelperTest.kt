@@ -24,8 +24,9 @@ import kotlin.test.assertTrue
 
 class TagEncryptionHelperTest {
     @Test
-    fun `it full fills the TaggingContract#Helper`() {
-        assertTrue((TagEncryptionHelper as Any) is TaggingContract.Helper)
+    fun `It fulfils the Helper`() {
+        val helper: Any = TagEncryptionHelper
+        assertTrue(helper is TaggingContract.Helper)
     }
 
     @Test
@@ -114,7 +115,7 @@ class TagEncryptionHelperTest {
         val expected = "TAG"
 
         // When
-        val result = TagEncryptionHelper.encode("$expected")
+        val result = TagEncryptionHelper.encode(expected)
 
         // Then
         assertEquals(
@@ -235,7 +236,7 @@ class TagEncryptionHelperTest {
         val expected = "TAG"
 
         // When
-        val result = TagEncryptionHelper.normalize("$expected")
+        val result = TagEncryptionHelper.normalize(expected)
 
         // Then
         assertEquals(

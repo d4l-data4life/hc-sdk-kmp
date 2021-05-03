@@ -18,6 +18,6 @@ package care.data4life.sdk.network.model
 import com.squareup.moshi.Json
 
 data class DocumentUploadResponse(
-    @Json(name = "document_id")
+    @field:Json(name = "document_id")
     override var documentId: String
 ) : NetworkModelContract.DocumentUploadResponse

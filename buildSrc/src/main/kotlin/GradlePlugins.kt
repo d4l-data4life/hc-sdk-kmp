@@ -21,6 +21,8 @@ object GradlePlugins {
     const val android = "com.android.tools.build:gradle:${Versions.GradlePlugins.android}"
     const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.GradlePlugins.kotlin}"
 
+    const val kapt = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.GradlePlugins.kotlin}"
+
     const val dexcount = "com.getkeepsafe.dexcount:dexcount-gradle-plugin:${Versions.GradlePlugins.dexcount}"
 
     const val downloadTask = "de.undercouch:gradle-download-task:${Versions.GradlePlugins.downloadTask}"

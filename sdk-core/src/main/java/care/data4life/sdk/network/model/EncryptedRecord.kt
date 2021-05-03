@@ -17,10 +17,13 @@ package care.data4life.sdk.network.model
 
 import care.data4life.sdk.network.model.NetworkModelContract.Companion.DEFAULT_COMMON_KEY_ID
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
 
 data class EncryptedRecord(
     @field:Json(name = "common_key_id")
-    private var _commonKeyId: String?,
+    internal var _commonKeyId: String?,
     @field:Json(name = "record_id")
     override val identifier: String?,
     @field:Json(name = "encrypted_tags")
@@ -36,7 +39,9 @@ data class EncryptedRecord(
     @field:Json(name = "model_version")
     override val modelVersion: Int,
     @field:Json(name = "createdAt")
-    override val updatedDate: String? = null
+    override val updatedDate: String? = null,
+    @field:Json(name = "version")
+    override val version: Int = 0
 ) : NetworkModelContract.EncryptedRecord {
 
     init {
@@ -45,6 +50,4 @@ data class EncryptedRecord(
 
     override val commonKeyId: String
         get() = this._commonKeyId!!
-
-    override val version = 0
 }

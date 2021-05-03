@@ -124,7 +124,7 @@ dependencies {
 
     implementation(Dependencies.Android.bouncyCastleJdk15)
 
-    compileOnly(Dependencies.java.javaXAnnotation)
+    compileOnly(Dependencies.Java.javaXAnnotation)
 
     testImplementation(Dependencies.Android.Test.junit)
     testImplementation(Dependencies.Android.Test.truth)

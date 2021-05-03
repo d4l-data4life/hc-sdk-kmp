@@ -19,6 +19,7 @@ plugins {
     id("java-library")
     id("maven-publish")
     id("kotlin")
+    kotlin("kapt")
 }
 
 apply(from = "${project.rootDir}/gradle/jacoco-java.gradle")
@@ -58,7 +59,10 @@ dependencies {
     implementation(Dependencies.Java.rxJava)
     implementation(Dependencies.Java.moshi)
 
-    compileOnly(Dependencies.java.javaXAnnotation)
+    kapt(Dependencies.Java.moshiCodeGen)
+    kaptTest(Dependencies.Java.moshiCodeGen)
+
+    compileOnly(Dependencies.Java.javaXAnnotation)
 
     testImplementation(Dependencies.Java.Test.junit)
     testImplementation(Dependencies.Java.Test.mockitoCore)

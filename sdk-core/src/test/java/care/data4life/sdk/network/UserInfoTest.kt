@@ -74,7 +74,7 @@ class UserInfoTest {
         private val TAG_ENCRYPTION_KEY = EncryptedKey("gh")
 
         private const val SERIALIZED_USER_INFO =
-            "{\"common_key\":\"abc\",\"common_key_id\":\"ID\",\"sub\":\"42\",\"tag_encryption_key\":\"gh\"}"
+            "{\"sub\":\"42\",\"common_key\":\"abc\",\"common_key_id\":\"ID\",\"tag_encryption_key\":\"gh\"}"
         private val USER_INFO = UserInfo(
             "42",
             COMMON_KEY,

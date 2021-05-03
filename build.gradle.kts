@@ -26,6 +26,7 @@ buildscript {
     dependencies {
         classpath(GradlePlugins.android)
         classpath(GradlePlugins.kotlin)
+        classpath(GradlePlugins.kapt)
 
         // https://github.com/vanniktech/gradle-android-junit-jacoco-plugin
         classpath("com.vanniktech:gradle-android-junit-jacoco-plugin:0.16.0")

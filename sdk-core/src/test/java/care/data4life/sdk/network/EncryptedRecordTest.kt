@@ -60,13 +60,13 @@ class EncryptedRecordTest {
         val adapter = moshi.adapter<EncryptedRecord>(EncryptedRecord::class.java)
 
         assertEquals(
-            ENCRYPTED_RECORD_JSON,
-            adapter.toJson(ENCRYPTED_RECORD)
+            expected = ENCRYPTED_RECORD_JSON,
+            actual = adapter.toJson(ENCRYPTED_RECORD)
         )
 
         assertEquals(
-            ENCRYPTED_RECORD_WITH_NULL_FIELDS_JSON,
-            adapter.toJson(ENCRYPTED_RECORD_WITH_NULL_FIELDS)
+            expected = ENCRYPTED_RECORD_WITH_NULL_FIELDS_JSON,
+            actual = adapter.toJson(ENCRYPTED_RECORD_WITH_NULL_FIELDS)
         )
     }
 
@@ -78,13 +78,13 @@ class EncryptedRecordTest {
         val adapter = moshi.adapter<EncryptedRecord>(EncryptedRecord::class.java)
 
         assertEquals(
-            ENCRYPTED_RECORD,
-            adapter.fromJson(ENCRYPTED_RECORD_JSON)
+            actual = ENCRYPTED_RECORD,
+            expected = adapter.fromJson(ENCRYPTED_RECORD_JSON)
         )
 
         assertEquals(
-            ENCRYPTED_RECORD_WITH_NULL_FIELDS,
-            adapter.fromJson(ENCRYPTED_RECORD_WITH_NULL_FIELDS_JSON)
+            actual = ENCRYPTED_RECORD_WITH_NULL_FIELDS,
+            expected = adapter.fromJson(ENCRYPTED_RECORD_WITH_NULL_FIELDS_JSON)
         )
     }
 
@@ -93,7 +93,7 @@ class EncryptedRecordTest {
         private val ENCRYPTED_ATTACHMENT_KEY = EncryptedKey("gh")
 
         private const val ENCRYPTED_RECORD_JSON =
-            "{\"attachment_key\":\"gh\",\"common_key_id\":\"asd\",\"createdAt\":\"awqwe\",\"date\":\"asdasd\",\"encrypted_body\":\"test\",\"encrypted_key\":\"abc\",\"encrypted_tags\":[\"a\",\"b\",\"c\"],\"model_version\":23,\"record_id\":\"abc\",\"version\":0}"
+            "{\"common_key_id\":\"asd\",\"record_id\":\"abc\",\"encrypted_tags\":[\"a\",\"b\",\"c\"],\"encrypted_body\":\"test\",\"date\":\"asdasd\",\"encrypted_key\":\"abc\",\"attachment_key\":\"gh\",\"model_version\":23,\"createdAt\":\"awqwe\",\"version\":0}"
         private val ENCRYPTED_RECORD = EncryptedRecord(
             _commonKeyId = "asd",
             identifier = "abc",
@@ -107,7 +107,7 @@ class EncryptedRecordTest {
         )
 
         private const val ENCRYPTED_RECORD_WITH_NULL_FIELDS_JSON =
-            "{\"common_key_id\":\"asd\",\"encrypted_body\":\"test\",\"encrypted_key\":\"abc\",\"encrypted_tags\":[\"a\",\"b\",\"c\"],\"model_version\":23,\"record_id\":\"abc\",\"version\":0}"
+            "{\"common_key_id\":\"asd\",\"record_id\":\"abc\",\"encrypted_tags\":[\"a\",\"b\",\"c\"],\"encrypted_body\":\"test\",\"encrypted_key\":\"abc\",\"model_version\":23,\"version\":0}"
         private val ENCRYPTED_RECORD_WITH_NULL_FIELDS = EncryptedRecord(
             _commonKeyId = "asd",
             identifier = "abc",

@@ -101,7 +101,7 @@ class PemParserTest {
 
         // then
         val cipher = Cipher.getInstance(
-            gcKeyPair!!.algorithm.transformation,
+            gcKeyPair.algorithm.transformation,
             BouncyCastleProvider.PROVIDER_NAME
         )
         val x509EncodedKeySpec = X509EncodedKeySpec(decode(gcKeyPair.getPublicKeyBase64()))
@@ -137,7 +137,7 @@ class PemParserTest {
 
         // then
         val cipher = Cipher.getInstance(
-            gcKeyPair!!.algorithm.transformation,
+            gcKeyPair.algorithm.transformation,
             BouncyCastleProvider.PROVIDER_NAME
         )
         val x509EncodedKeySpec = X509EncodedKeySpec(decode(gcKeyPair.getPublicKeyBase64()))

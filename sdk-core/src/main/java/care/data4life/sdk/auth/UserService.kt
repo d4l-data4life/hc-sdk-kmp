@@ -41,6 +41,7 @@ class UserService(
             )
         }
 
+    // TODO: Refactor this, so it calls the API only on demand
     override fun finishLogin(isAuthorized: Boolean): Single<Boolean> {
         return Single.just(isAuthorized)
             .flatMap { apiService.fetchUserInfo(alias) }

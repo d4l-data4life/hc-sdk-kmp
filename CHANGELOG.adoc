@@ -34,6 +34,7 @@ toc::[]
 * Gradle 6.7.1 -> 6.8.3
 * Android 4.1.1 -> 4.1.3
 * ktlint: 0.40 -> 0.41
+* Moshi 1.8.0 -> 1.12.0
 
 === Migration
 

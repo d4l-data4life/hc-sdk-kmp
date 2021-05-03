@@ -79,6 +79,7 @@ public class Data4LifeClientTest {
 
     @Test
     public void hasUserId() {
+        doReturn(Single.just(IS_LOGGED_IN)).when(userService).finishLogin(IS_LOGGED_IN);
         assertThat(instance.getUserId()).isEqualTo("uid");
     }
 

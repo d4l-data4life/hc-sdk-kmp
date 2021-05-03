@@ -74,6 +74,7 @@ class BaseClientTest {
     @Test
     fun `Given a User is not logged in and the userID is fetched, it returns the UserId`() {
         // Given
+        every { userService.finishLogin(true) } returns Single.just(true)
         every { userService.userID } returns Single.just(USER_ID)
 
         client = ShallowClient(

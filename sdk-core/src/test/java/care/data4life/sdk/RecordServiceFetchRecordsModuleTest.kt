@@ -316,11 +316,12 @@ class RecordServiceFetchRecordsModuleTest {
                 capture(search)
             )
         } answers {
-            val record = when (search.captured) {
-                encryptedTagsAndAnnotations.joinToString(",") -> encryptedRecord
-                encryptedLegacyTagsAndAnnotations.joinToString(",") -> encryptedLegacyRecord
+            val actual = search.captured
+            val record = when {
+                flowHelper.compareSerialisedTags(actual, encryptedTagsAndAnnotations) -> encryptedRecord
+                flowHelper.compareSerialisedTags(actual, encryptedLegacyTagsAndAnnotations) -> encryptedLegacyRecord
                 else -> throw RuntimeException(
-                    "Unexpected tags and annotations:\n${search.captured}"
+                    "Unexpected tags and annotations:\n$actual"
                 )
             }
 

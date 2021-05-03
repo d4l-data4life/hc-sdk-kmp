@@ -27,6 +27,7 @@ import care.data4life.sdk.test.util.TestSchedulerRule;
 import io.reactivex.Single;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -66,6 +67,7 @@ public class Data4LifeClientTest {
     // TODO Need to define new tests
     @Test
     public void hasUserId() {
+        doReturn(Single.just(IS_LOGGED_IN)).when(userService).finishLogin(IS_LOGGED_IN);
         assertThat(instance.getUserId()).isEqualTo("uid");
     }
 }

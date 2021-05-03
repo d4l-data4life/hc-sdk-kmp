@@ -174,6 +174,7 @@ object Dependencies {
 
         // Data
         const val moshi = "com.squareup.moshi:moshi:${Versions.moshi}"
+        const val moshiCodeGen = "com.squareup.moshi:moshi-kotlin-codegen:${Versions.moshi}"
 
         // Date
         const val threeTenBP = "org.threeten:threetenbp:${Versions.threeTenBP}"

@@ -41,6 +41,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class Data4LifeClientTest {
+    private static final boolean IS_LOGGED_IN = true;
     private static final String ALIAS = "alias";
 
     private UserService userService;
@@ -65,6 +66,7 @@ public class Data4LifeClientTest {
 
     @Test
     public void hasUserId() {
+        doReturn(Single.just(IS_LOGGED_IN)).when(userService).finishLogin(IS_LOGGED_IN);
         assertThat(instance.getUserId()).isEqualTo("uid");
     }
 

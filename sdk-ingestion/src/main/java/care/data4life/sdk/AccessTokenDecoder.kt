@@ -46,7 +46,7 @@ internal class AccessTokenDecoder {
      * @return Client ID
      */
     fun extractClientId(accessToken: ByteArray?): String {
-        var clientId: String?
+        val clientId: String?
         try {
             /*
             Access token is a JWT of the form

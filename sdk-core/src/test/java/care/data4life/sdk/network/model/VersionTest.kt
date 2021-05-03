@@ -47,7 +47,7 @@ class VersionTest {
         // When
         val actual = moshi.adapter<Version>(Version::class.java).toJson(version)
         assertEquals(
-            "{\"status\":\"supported\",\"version_code\":25,\"version_name\":\"1.9.0\"}",
+            "{\"version_code\":25,\"version_name\":\"1.9.0\",\"status\":\"supported\"}",
             actual
         )
     }
@@ -58,7 +58,7 @@ class VersionTest {
         val moshi = Moshi.Builder()
             .build()
         val versionJson =
-            "{\"status\":\"supported\",\"version_code\":25,\"version_name\":\"1.9.0\"}"
+            "{\"version_code\":25,\"version_name\":\"1.9.0\",\"status\":\"supported\"}"
 
         // When
         val version = moshi.adapter<Version>(Version::class.java).fromJson(versionJson)

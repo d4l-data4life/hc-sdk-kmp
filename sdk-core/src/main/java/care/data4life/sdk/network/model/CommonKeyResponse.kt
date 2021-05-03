@@ -16,7 +16,9 @@
 package care.data4life.sdk.network.model
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class CommonKeyResponse(
     @field:Json(name = "common_key")
     override val commonKey: EncryptedKey

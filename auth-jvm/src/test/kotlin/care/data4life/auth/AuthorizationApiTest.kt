@@ -18,17 +18,12 @@ package care.data4life.auth
 
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 
 class AuthorizationApiTest {
 
     private lateinit var sut: AuthorizationApi
-
-    @Before
-    fun setUp() {
-    }
 
     @Test
     fun authorizationBaseUrl() {

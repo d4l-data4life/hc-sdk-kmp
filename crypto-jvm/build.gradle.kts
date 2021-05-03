@@ -17,6 +17,7 @@
 plugins {
     id("kotlin-platform-jvm")
     id("java-library")
+    kotlin("kapt")
 }
 
 apply(from = "${project.rootDir}/gradle/jacoco-java.gradle")
@@ -34,9 +35,11 @@ dependencies {
 
     implementation(Dependencies.Multiplatform.Kotlin.stdlibJdk8)
 
-    implementation(Dependencies.java.bouncyCastleJdk15)
-    implementation(Dependencies.java.moshi)
+    implementation(Dependencies.Java.bouncyCastleJdk15)
+    implementation(Dependencies.Java.moshi)
 
+    kapt(Dependencies.Java.moshiCodeGen)
+    kaptTest(Dependencies.Java.moshiCodeGen)
 
     testImplementation(Dependencies.Java.Test.junit)
     testImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvm)

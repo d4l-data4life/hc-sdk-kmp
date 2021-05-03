@@ -16,6 +16,7 @@
 package care.data4life.sdk.network.model
 
 import care.data4life.sdk.network.model.NetworkModelContract.Companion.DEFAULT_COMMON_KEY_ID
+import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -27,7 +28,7 @@ data class EncryptedRecord(
     @field:Json(name = "record_id")
     override val identifier: String?,
     @field:Json(name = "encrypted_tags")
-    override val encryptedTags: List<String>,
+    override val encryptedTags: EncryptedTagsAndAnnotations,
     @field:Json(name = "encrypted_body")
     override val encryptedBody: String?,
     @field:Json(name = "date")

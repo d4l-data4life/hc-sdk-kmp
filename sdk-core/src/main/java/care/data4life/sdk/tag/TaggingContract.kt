@@ -21,8 +21,9 @@ import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.migration.Migration
 import java.io.IOException
 
-typealias Tags = HashMap<String, String>
+typealias Tags = Map<String, String>
 typealias Annotations = List<String>
+typealias EncryptedTagsAndAnnotations = List<String>
 
 class TaggingContract {
 
@@ -37,9 +38,11 @@ class TaggingContract {
             tags: Tags,
             annotations: Annotations,
             tagEncryptionKey: GCKey? = null
-        ): List<String>
+        ): EncryptedTagsAndAnnotations
 
-        fun decryptTagsAndAnnotations(encryptedTagsAndAnnotations: List<String>): Pair<Tags, Annotations>
+        fun decryptTagsAndAnnotations(
+            encryptedTagsAndAnnotations: EncryptedTagsAndAnnotations
+        ): Pair<Tags, Annotations>
 
         @Throws(IOException::class)
         @Migration("This method should only be used for migration purpose.")
@@ -50,8 +53,9 @@ class TaggingContract {
         ): MutableList<String>
     }
 
+    // TODO: make this package internal
     interface Helper {
-        fun convertToTagMap(tagList: List<String>): HashMap<String, String>
+        fun convertToTagMap(tagList: List<String>): Tags
 
         @Throws(D4LException::class)
         fun encode(tag: String): String

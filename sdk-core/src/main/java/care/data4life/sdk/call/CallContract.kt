@@ -18,6 +18,7 @@ package care.data4life.sdk.call
 
 import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.model.ModelContract.BaseRecord
+import care.data4life.sdk.tag.Annotations
 
 class CallContract {
 
@@ -25,6 +26,6 @@ class CallContract {
         override val identifier: String
         override val resource: T
         override val meta: ModelContract.Meta
-        override val annotations: List<String>
+        override val annotations: Annotations
     }
 }

@@ -22,8 +22,10 @@ import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.fake.CryptoServiceFake
 import care.data4life.sdk.test.fake.CryptoServiceIteration
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
@@ -80,8 +82,8 @@ class RecordServiceCountRecordsModuleTest {
     }
 
     private fun runFlow(
-        tags: Map<String, String>,
-        annotations: List<String> = emptyList(),
+        tags: Tags,
+        annotations: Annotations = emptyList(),
         amounts: Pair<Int, Int>,
         alias: String = ALIAS,
         userId: String = USER_ID,

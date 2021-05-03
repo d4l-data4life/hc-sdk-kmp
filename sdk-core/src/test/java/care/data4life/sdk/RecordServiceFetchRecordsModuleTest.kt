@@ -27,8 +27,10 @@ import care.data4life.sdk.model.Record
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.fake.CryptoServiceFake
 import care.data4life.sdk.test.fake.CryptoServiceIteration
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
@@ -106,7 +108,7 @@ class RecordServiceFetchRecordsModuleTest {
         serializedResource: String,
         encryptedRecord: EncryptedRecord,
         tags: List<String>,
-        annotations: List<String>,
+        annotations: Annotations,
         useStoredCommonKey: Boolean,
         commonKey: Pair<String, GCKey>,
         dataKey: Pair<GCKey, EncryptedKey>,
@@ -154,8 +156,8 @@ class RecordServiceFetchRecordsModuleTest {
 
     private fun runFhirFetchFlow(
         serializedResource: String,
-        tags: Map<String, String>,
-        annotations: List<String> = emptyList(),
+        tags: Tags,
+        annotations: Annotations = emptyList(),
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,
         dataKey: Pair<GCKey, EncryptedKey> = this.dataKey to encryptedDataKey,
@@ -200,8 +202,8 @@ class RecordServiceFetchRecordsModuleTest {
 
     private fun runDataFetchFlow(
         serializedResource: String,
-        tags: Map<String, String>,
-        annotations: List<String> = emptyList(),
+        tags: Tags,
+        annotations: Annotations = emptyList(),
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,
         dataKey: Pair<GCKey, EncryptedKey> = this.dataKey to encryptedDataKey,
@@ -331,9 +333,9 @@ class RecordServiceFetchRecordsModuleTest {
 
     private fun runFhirBatchFlow(
         serializedResources: Pair<String, String>,
-        tags: Map<String, String>,
+        tags: Tags,
         searchTags: Map<String, String>,
-        annotations: List<String> = emptyList(),
+        annotations: Annotations = emptyList(),
         tagEncryptionKeyCalls: Int = 3,
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,
@@ -405,9 +407,9 @@ class RecordServiceFetchRecordsModuleTest {
 
     private fun runDataBatchFlow(
         serializedResources: Pair<String, String>,
-        tags: Map<String, String>,
+        tags: Tags,
         searchTags: Map<String, String>,
-        annotations: List<String> = emptyList(),
+        annotations: Annotations = emptyList(),
         tagEncryptionKeyCalls: Int = 3,
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,

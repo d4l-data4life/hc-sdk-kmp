@@ -25,6 +25,7 @@ import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.Record
+import care.data4life.sdk.tag.Annotations
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.threeten.bp.LocalDate
@@ -36,40 +37,40 @@ interface RecordContract {
         fun createRecord(
             userId: String,
             resource: DataResource,
-            annotations: List<String>
+            annotations: Annotations
         ): Single<DataRecord<DataResource>>
 
         fun <T : Fhir3Resource> createRecord(
             userId: String,
             resource: T,
-            annotations: List<String>
+            annotations: Annotations
         ): Single<Record<T>>
 
         fun <T : Fhir4Resource> createRecord(
             userId: String,
             resource: T,
-            annotations: List<String>
+            annotations: Annotations
         ): Single<Fhir4Record<T>>
 
         fun updateRecord(
             userId: String,
             recordId: String,
             resource: DataResource,
-            annotations: List<String>
+            annotations: Annotations
         ): Single<DataRecord<DataResource>>
 
         fun <T : Fhir3Resource> updateRecord(
             userId: String,
             recordId: String,
             resource: T,
-            annotations: List<String>
+            annotations: Annotations
         ): Single<Record<T>>
 
         fun <T : Fhir4Resource> updateRecord(
             userId: String,
             recordId: String,
             resource: T,
-            annotations: List<String>
+            annotations: Annotations
         ): Single<Fhir4Record<T>>
 
         fun deleteRecord(userId: String, recordId: String): Completable
@@ -87,7 +88,7 @@ interface RecordContract {
 
         fun fetchDataRecords(
             userId: String,
-            annotations: List<String>,
+            annotations: Annotations,
             startDate: LocalDate?,
             endDate: LocalDate?,
             pageSize: Int,
@@ -97,7 +98,7 @@ interface RecordContract {
         fun <T : Fhir3Resource> fetchFhir3Records(
             userId: String,
             resourceType: Class<T>,
-            annotations: List<String>,
+            annotations: Annotations,
             startDate: LocalDate?,
             endDate: LocalDate?,
             pageSize: Int,
@@ -107,7 +108,7 @@ interface RecordContract {
         fun <T : Fhir4Resource> fetchFhir4Records(
             userId: String,
             resourceType: Class<T>,
-            annotations: List<String>,
+            annotations: Annotations,
             startDate: LocalDate?,
             endDate: LocalDate?,
             pageSize: Int,
@@ -117,16 +118,16 @@ interface RecordContract {
         fun countFhir3Records(
             type: Class<out Fhir3Resource>,
             userId: String,
-            annotations: List<String>
+            annotations: Annotations
         ): Single<Int>
 
         fun countFhir4Records(
             type: Class<out Fhir4Resource>,
             userId: String,
-            annotations: List<String>
+            annotations: Annotations
         ): Single<Int>
 
-        fun countAllFhir3Records(userId: String, annotations: List<String>): Single<Int>
+        fun countAllFhir3Records(userId: String, annotations: Annotations): Single<Int>
 
         fun <T : Fhir3Resource> downloadFhir3Record(recordId: String, userId: String): Single<Record<T>>
         fun <T : Fhir4Resource> downloadFhir4Record(recordId: String, userId: String): Single<Fhir4Record<T>>

@@ -20,25 +20,28 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
+import care.data4life.sdk.tag.Tags
 
 class NetworkModelContract {
     internal interface DecryptedRecordBuilder {
         // mandatory
-        fun setTags(tags: HashMap<String, String>?): DecryptedRecordBuilder
+        fun setTags(tags: Tags?): DecryptedRecordBuilder
         fun setCreationDate(creationDate: String?): DecryptedRecordBuilder
         fun setDataKey(dataKey: GCKey?): DecryptedRecordBuilder
         fun setModelVersion(modelVersion: Int?): DecryptedRecordBuilder
 
         // Optional
         fun setIdentifier(identifier: String?): DecryptedRecordBuilder
-        fun setAnnotations(annotations: List<String>?): DecryptedRecordBuilder
+        fun setAnnotations(annotations: Annotations?): DecryptedRecordBuilder
         fun setUpdateDate(updatedDate: String?): DecryptedRecordBuilder
         fun setAttachmentKey(attachmentKey: GCKey?): DecryptedRecordBuilder
 
         @Throws(CoreRuntimeException.InternalFailure::class)
         fun <T : Any?> build(
             resource: T,
-            tags: HashMap<String, String>? = null,
+            tags: Tags? = null,
             creationDate: String? = null,
             dataKey: GCKey? = null,
             modelVersion: Int? = null
@@ -49,7 +52,7 @@ class NetworkModelContract {
 
     internal interface LimitGuard {
         @Throws(DataValidationException.TagsAndAnnotationsLimitViolation::class)
-        fun checkTagsAndAnnotationsLimits(tags: HashMap<String, String>, annotations: List<String>)
+        fun checkTagsAndAnnotationsLimits(tags: Tags, annotations: Annotations)
 
         @Throws(DataValidationException.CustomDataLimitViolation::class)
         fun checkDataLimit(data: ByteArray)
@@ -103,7 +106,7 @@ class NetworkModelContract {
     interface EncryptedRecord {
         val commonKeyId: String
         val identifier: String?
-        val encryptedTags: List<String>
+        val encryptedTags: EncryptedTagsAndAnnotations
         val encryptedBody: String?
         val customCreationDate: String?
         val encryptedDataKey: EncryptedKey

@@ -19,6 +19,8 @@ package care.data4life.sdk.network
 import care.data4life.crypto.GCKey
 import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.sdk.network.model.DecryptedRecordGuard
+import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.Tags
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkAll
@@ -26,8 +28,8 @@ import org.mockito.Mockito
 
 abstract class DecryptedRecordMapperTestBase {
     protected lateinit var identifier: String
-    protected lateinit var tags: HashMap<String, String>
-    protected lateinit var annotations: List<String>
+    protected lateinit var tags: Tags
+    protected lateinit var annotations: Annotations
     protected lateinit var creationDate: String
     protected lateinit var updateDate: String
     protected lateinit var dataKey: GCKey

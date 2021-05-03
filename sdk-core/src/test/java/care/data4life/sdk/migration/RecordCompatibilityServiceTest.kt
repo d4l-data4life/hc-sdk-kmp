@@ -118,7 +118,7 @@ class RecordCompatibilityServiceTest {
         val alias = "alias"
         val userId = "id"
         val tags = hashMapOf("key" to "value")
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
         val encryptedTags = mutableListOf("a", "k")
         val encryptedAnnotations = mutableListOf("d")
         val expected = 42
@@ -192,7 +192,7 @@ class RecordCompatibilityServiceTest {
         val pageSize = 23
         val offset = 42
         val tags = hashMapOf("key" to "value")
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
         val encodedAndEncryptedTagsAndAnnotations: MutableList<String> = mutableListOf("a", "v")
             .also {
                 it.addAll(listOf("d"))
@@ -285,7 +285,7 @@ class RecordCompatibilityServiceTest {
         val pageSize = 23
         val offset = 42
         val tags = hashMapOf("key" to "value")
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
         val encodedAndEncryptedTagsAndAnnotations: MutableList<String> =
             mutableListOf("a", "b", "c")
         val encryptedTags: MutableList<String> = mutableListOf("c", "b", "a")

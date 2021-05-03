@@ -28,12 +28,14 @@ import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
+import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.Tags
 
 // TODO: Add factory to make testing easier
 internal class DecryptedRecordMapper : NetworkModelContract.DecryptedRecordBuilder {
     private var identifier: String? = null
-    private var tags: HashMap<String, String>? = null
-    private var annotations: List<String> = listOf()
+    private var tags: Tags? = null
+    private var annotations: Annotations = listOf()
     private var creationDate: String? = null
     private var updatedDate: String? = null
     private var attachmentKey: GCKey? = null
@@ -44,7 +46,7 @@ internal class DecryptedRecordMapper : NetworkModelContract.DecryptedRecordBuild
 
     // mandatory
     override fun setTags(
-        tags: HashMap<String, String>?
+        tags: Tags?
     ): DecryptedRecordMapper = this.also { it.tags = tags }
 
     override fun setCreationDate(
@@ -65,7 +67,7 @@ internal class DecryptedRecordMapper : NetworkModelContract.DecryptedRecordBuild
     ): DecryptedRecordMapper = this.also { it.identifier = identifier }
 
     override fun setAnnotations(
-        annotations: List<String>?
+        annotations: Annotations?
     ): DecryptedRecordMapper = this.also { it.annotations = annotations ?: listOf() }
 
     override fun setUpdateDate(
@@ -78,7 +80,7 @@ internal class DecryptedRecordMapper : NetworkModelContract.DecryptedRecordBuild
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     private fun validatePayload(
-        tags: HashMap<String, String>?,
+        tags: Tags?,
         creationDate: String?,
         dataKey: GCKey?,
         modelVersion: Int?
@@ -97,7 +99,7 @@ internal class DecryptedRecordMapper : NetworkModelContract.DecryptedRecordBuild
     @Throws(CoreRuntimeException.InternalFailure::class)
     private fun <T : Fhir3Resource?> buildFhir3Record(
         resource: T?,
-        tags: HashMap<String, String>,
+        tags: Tags,
         creationDate: String,
         dataKey: GCKey,
         modelVersion: Int
@@ -117,7 +119,7 @@ internal class DecryptedRecordMapper : NetworkModelContract.DecryptedRecordBuild
     @Throws(CoreRuntimeException.InternalFailure::class)
     private fun <T : Fhir4Resource> buildFhir4Record(
         resource: T,
-        tags: HashMap<String, String>,
+        tags: Tags,
         creationDate: String,
         dataKey: GCKey,
         modelVersion: Int
@@ -137,7 +139,7 @@ internal class DecryptedRecordMapper : NetworkModelContract.DecryptedRecordBuild
     @Throws(CoreRuntimeException.InternalFailure::class)
     private fun buildCustomRecord(
         resource: DataResource,
-        tags: HashMap<String, String>,
+        tags: Tags,
         creationDate: String?,
         dataKey: GCKey?,
         modelVersion: Int?
@@ -157,7 +159,7 @@ internal class DecryptedRecordMapper : NetworkModelContract.DecryptedRecordBuild
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun <T : Any?> build(
         resource: T,
-        tags: HashMap<String, String>?,
+        tags: Tags?,
         creationDate: String?,
         dataKey: GCKey?,
         modelVersion: Int?

@@ -237,8 +237,8 @@ class RecordMapperTest {
     private data class DecryptedUnknownRecord<T : Any>(
         override var identifier: String?,
         override var resource: T,
-        override var tags: HashMap<String, String>?,
-        override var annotations: List<String>,
+        override var tags: Tags?,
+        override var annotations: Annotations,
         override var customCreationDate: String?,
         override var updatedDate: String?,
         override var dataKey: GCKey?,

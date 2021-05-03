@@ -36,7 +36,7 @@ class TagEncryptionService @JvmOverloads constructor(
         tags: Tags,
         annotations: Annotations,
         tagEncryptionKey: GCKey?
-    ): List<String> {
+    ): EncryptedTagsAndAnnotations {
         val encryptionKey = if (tagEncryptionKey is GCKey) {
             tagEncryptionKey
         } else {
@@ -77,7 +77,7 @@ class TagEncryptionService @JvmOverloads constructor(
 
     @Throws(D4LException::class)
     override fun decryptTagsAndAnnotations(
-        encryptedTagsAndAnnotations: List<String>
+        encryptedTagsAndAnnotations: EncryptedTagsAndAnnotations
     ): Pair<Tags, Annotations> {
         val encryptionKey = cryptoService.fetchTagEncryptionKey()
 

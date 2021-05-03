@@ -29,8 +29,10 @@ import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.fake.CryptoServiceFake
 import care.data4life.sdk.test.fake.CryptoServiceIteration
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
@@ -108,8 +110,8 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
     private fun runAttachmentDownloadFlow(
         serializedResource: String,
         rawAttachment: ByteArray,
-        tags: Map<String, String>,
-        annotations: List<String> = emptyList(),
+        tags: Tags,
+        annotations: Annotations = emptyList(),
         attachmentId: String = ATTACHMENT_ID,
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,

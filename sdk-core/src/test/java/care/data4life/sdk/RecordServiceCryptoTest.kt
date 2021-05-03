@@ -33,7 +33,10 @@ import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
 import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
+import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID
@@ -59,11 +62,13 @@ class RecordServiceCryptoTest {
     private val taggingService: TaggingContract.Service = mockk()
     private val attachmentService: AttachmentContract.Service = mockk()
     private val errorHandler: SdkContract.ErrorHandler = mockk()
-    private val tags: HashMap<String, String> =
-        hashMapOf("potato" to "soup", "resourcetype" to "pumpkin")
-    private val annotations: List<String> = listOf("tomato", "soup")
+    private val tags: Tags = mapOf(
+        "potato" to "soup",
+        "resourcetype" to "pumpkin"
+    )
+    private val annotations: Annotations = listOf("tomato", "soup")
 
-    private val encryptedTagsAndAnnotations: List<String> = mockk()
+    private val encryptedTagsAndAnnotations: EncryptedTagsAndAnnotations = mockk()
     private val dataKey: GCKey = mockk()
     private val commonKey: GCKey = mockk()
     private val attachmentKey: GCKey = mockk()

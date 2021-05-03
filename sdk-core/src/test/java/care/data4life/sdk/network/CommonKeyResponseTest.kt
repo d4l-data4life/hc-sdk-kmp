@@ -62,7 +62,7 @@ class CommonKeyResponseTest {
     companion object {
         private val ENCRYPTED_COMMON_KEY = EncryptedKey("abc")
 
-        const val COMMON_KEY_RESPONSE_JSON = "{\"commonKey\":\"abc\"}"
+        const val COMMON_KEY_RESPONSE_JSON = "{\"common_key\":\"abc\"}"
         private val COMMON_KEY_RESPONSE = CommonKeyResponse(ENCRYPTED_COMMON_KEY)
     }
 }

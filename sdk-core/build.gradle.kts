@@ -16,6 +16,7 @@
 plugins {
     id("java-library")
     id("kotlin")
+    kotlin("kapt")
 }
 
 apply(from = "${project.rootDir}/gradle/jacoco-java.gradle")
@@ -39,7 +40,7 @@ dependencies {
     implementation(Dependencies.Multiplatform.D4L.fhirSdk)
     implementation(Dependencies.Java.threeTenBP)
 
-    compileOnly(Dependencies.java.javaXAnnotation)
+    compileOnly(Dependencies.Java.javaXAnnotation)
 
     implementation(Dependencies.Java.rxJava)
 
@@ -49,6 +50,11 @@ dependencies {
     implementation(Dependencies.Java.retrofit)
     implementation(Dependencies.Java.retrofitConverterMoshi)
     implementation(Dependencies.Java.retrofitAdapterRxJava)
+
+    implementation(Dependencies.Java.moshi)
+
+    kapt(Dependencies.Java.moshiCodeGen)
+    kaptTest(Dependencies.Java.moshiCodeGen)
 
     testImplementation(Dependencies.Multiplatform.D4L.fhirHelperJvm) {
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")

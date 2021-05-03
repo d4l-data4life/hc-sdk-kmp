@@ -55,7 +55,7 @@ class DocumentUploadResponseTest {
     }
 
     companion object {
-        private const val DOCUMENT_UPLOAD_RESPONSE_JSON = "{\"documentId\":\"test\"}"
+        private const val DOCUMENT_UPLOAD_RESPONSE_JSON = "{\"document_id\":\"test\"}"
         private val DOCUMENT_UPLOAD_RESPONSE = DocumentUploadResponse("test")
     }
 }

@@ -29,7 +29,6 @@ actual class GCKeyPair actual constructor(
     publicKey: GCAsymmetricKey,
     val keyVersion: Int
 ) : Serializable {
-
     private var privateKeyBase64: String? = null
     private var publicKeyBase64: String? = null
 

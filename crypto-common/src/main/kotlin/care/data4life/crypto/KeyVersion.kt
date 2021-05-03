@@ -21,10 +21,10 @@ enum class KeyVersion constructor(
     val symmetricKeySize: Int,
     val asymmetricKeySize: Int
 ) {
-    @Json("0")
+    @field:Json(name = "0")
     VERSION_0("0", 256, 2048),
 
-    @Json("1")
+    @field:Json(name = "1")
     VERSION_1("1", 256, 2048);
 
     val value: Int = value.toInt()

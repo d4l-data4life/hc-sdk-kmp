@@ -16,7 +16,9 @@
 package care.data4life.sdk.network.model
 
 import care.data4life.sdk.util.Base64
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = false)
 data class EncryptedKey internal constructor(
     override val base64Key: String
 ) : NetworkModelContract.EncryptedKey {

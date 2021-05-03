@@ -23,16 +23,13 @@ import care.data4life.crypto.GCSymmetricKey
 import care.data4life.sdk.ApiService
 import care.data4life.sdk.CryptoSecureStore
 import care.data4life.sdk.CryptoService
-import care.data4life.sdk.log.Log
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.UserInfo
-import care.data4life.sdk.network.model.VersionList
 import io.mockk.Called
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
-import io.mockk.mockkObject
 import io.mockk.spyk
 import io.mockk.verify
 import io.reactivex.Completable
@@ -135,37 +132,6 @@ class UserServiceTest {
         // then
         testSubscriber
             .assertNoValues()
-    }
-
-    @Test
-    fun `Given VersionList is fetched, when the call fails return true`() {
-        // given
-        val error = RuntimeException("error")
-        val response: Single<VersionList> = Single.fromCallable { throw error }
-        mockkObject(Log)
-        every { apiService.fetchVersionInfo() } returns response
-        // when
-        val testSubscriber = userService.getVersionInfo(CURRENT_VERSION)
-            ?.test()
-            ?.await()
-        // then
-        testSubscriber?.assertValue(true)
-        verify(exactly = 1) { Log.error(error, "Version not supported") }
-    }
-
-    @Test
-    fun `Given VersionList is fetched, when version supported return true`() {
-        val versions: VersionList = mockk()
-        val response: Single<VersionList> = Single.just(versions)
-        val currentVersion = "1.9.0"
-        every { apiService.fetchVersionInfo() } returns response
-        every { versions.isSupported(currentVersion) } returns true
-        // when
-        val testSubscriber = userService.getVersionInfo(CURRENT_VERSION)
-            ?.test()
-        // then
-        testSubscriber?.assertValue(true)
-            ?.assertNoErrors()
     }
 
     @Test

@@ -1,5 +1,5 @@
 = Data4Life SDK
-:library_version: 1.10.0
+:library_version: 1.11.0
 :doctype: article
 :!showtitle:
 :toc: macro

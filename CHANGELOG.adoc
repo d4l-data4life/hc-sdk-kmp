@@ -23,6 +23,8 @@ toc::[]
 === Changed
 
 * `CryptoSecureStore`, `DocumentUploadResponse`, `CommonKeyResponse`, `UserInfo` to Kotlin.
+* _*BREAKING*_ Change Android minSDK 21 -> 23
+* targetSdkVersion & compileSdkVersion 29 -> 30
 
 === Removed
 
@@ -30,16 +32,16 @@ toc::[]
 
 === Bumped
 
-* Kotlin 1.3.75 -> 1.4.32
+* *_BREAKING_* FHIR SDK 1.3.1 -> 1.4.0
+* *_BREAKING_* Kotlin 1.3.75 -> 1.4.32
 * Gradle 6.7.1 -> 6.8.3
 * Android 4.1.1 -> 4.1.3
 * ktlint: 0.40 -> 0.41
-* Moshi 1.8.0 -> 1.12.0
+* *_BREAKING_* Moshi 1.8.0 -> 1.12.0
 
 === Migration
 
-* targetSdkVersion & compileSdkVersion 29 -> 30
-* minSdkVersion 21 -> 23
+* Change Android support to min Android 6.0 (API 23) to use this version of the SDK.
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.2...v1.10.0[1.10.0]
 

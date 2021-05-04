@@ -12,7 +12,21 @@ and this project adheres to http://semver.org/spec/v2.0.0.html[Semantic Versioni
 ==== Versions
 toc::[]
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.10.0...main[Unreleased]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.11.0...main[Unreleased]
+
+=== Added
+
+=== Changed
+
+=== Removed
+
+=== Fixed
+
+=== Bumped
+
+=== Migration
+
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.10.0...v1.11.0[1.11.0]
 
 === Added
 
@@ -25,10 +39,6 @@ toc::[]
 * `CryptoSecureStore`, `DocumentUploadResponse`, `CommonKeyResponse`, `UserInfo` to Kotlin.
 * _*BREAKING*_ Change Android minSDK 21 -> 23
 * targetSdkVersion & compileSdkVersion 29 -> 30
-
-=== Removed
-
-=== Fixed
 
 === Bumped
 

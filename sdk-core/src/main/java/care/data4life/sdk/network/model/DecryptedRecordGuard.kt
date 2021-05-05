@@ -31,18 +31,14 @@ internal object DecryptedRecordGuard : NetworkModelContract.LimitGuard {
         tags.forEach { entry ->
             acutal += entry.key.length
             acutal += entry.value.length
-
-            if (acutal >= MAX_LENGTH_TAGS_AND_ANNOTATIONS) {
-                throw DataValidationException.TagsAndAnnotationsLimitViolation()
-            }
         }
 
         annotations.forEach {
             acutal += it.length
+        }
 
-            if (acutal >= MAX_LENGTH_TAGS_AND_ANNOTATIONS) {
-                throw DataValidationException.TagsAndAnnotationsLimitViolation()
-            }
+        if (acutal >= MAX_LENGTH_TAGS_AND_ANNOTATIONS) {
+            throw DataValidationException.TagsAndAnnotationsLimitViolation()
         }
     }
 

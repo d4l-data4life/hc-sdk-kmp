@@ -14,11 +14,8 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network
+package care.data4life.sdk.network.model
 
-import care.data4life.sdk.network.model.EncryptedKey
-import care.data4life.sdk.network.model.EncryptedRecord
-import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter
 import com.squareup.moshi.Moshi
 import org.junit.Test
@@ -27,7 +24,7 @@ import kotlin.test.assertTrue
 
 class EncryptedRecordTest {
     @Test
-    fun `It full fills the EncryptedRecord contract`() {
+    fun `It fulfils EncryptedRecord`() {
         val record: Any = ENCRYPTED_RECORD
         assertTrue(record is NetworkModelContract.EncryptedRecord)
     }
@@ -53,7 +50,7 @@ class EncryptedRecordTest {
     }
 
     @Test
-    fun `Given a EncryptedRecord is serialized, it transforms into the valid json format`() {
+    fun `Given a EncryptedRecord is serialized, it transforms into a valid JSON`() {
         val moshi = Moshi.Builder()
             .add(EncryptedKeyTypeAdapter())
             .build()

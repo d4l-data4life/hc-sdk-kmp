@@ -32,8 +32,8 @@ import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.network.DecryptedRecordMapper
 import care.data4life.sdk.network.model.DecryptedDataRecord
 import care.data4life.sdk.network.model.EncryptedRecord
-import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.Tags

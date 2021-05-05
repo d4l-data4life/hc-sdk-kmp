@@ -25,7 +25,7 @@ import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.ATTACHMENT_ID

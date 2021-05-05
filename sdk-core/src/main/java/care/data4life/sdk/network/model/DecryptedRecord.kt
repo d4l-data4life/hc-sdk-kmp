@@ -17,7 +17,7 @@ package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.Tags
 import java.io.Serializable

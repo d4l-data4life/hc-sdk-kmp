@@ -17,9 +17,11 @@
 package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
+import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
 import care.data4life.sdk.tag.Tags
@@ -118,6 +120,26 @@ class NetworkModelContract {
         val version: Int
     }
 
+    interface DecryptedBaseRecord<T> {
+        var identifier: String?
+        var resource: T
+        var tags: Tags?
+        var annotations: Annotations
+        var customCreationDate: String?
+        var updatedDate: String? // FIXME: This should never be null
+        var dataKey: GCKey?
+        var attachmentsKey: GCKey?
+        var modelVersion: Int
+    }
+
+    // FIXME remove nullable type
+    internal interface DecryptedFhir3Record<T : Fhir3Resource?> : DecryptedBaseRecord<T>
+    internal interface DecryptedFhir4Record<T : Fhir4Resource> : DecryptedBaseRecord<T>
+    internal interface DecryptedCustomDataRecord : DecryptedBaseRecord<DataResource> {
+        override var attachmentsKey: GCKey?
+            get() = null
+            set(_) {}
+    }
     companion object {
         const val DEFAULT_COMMON_KEY_ID: String = "00000000-0000-0000-0000-000000000000"
     }

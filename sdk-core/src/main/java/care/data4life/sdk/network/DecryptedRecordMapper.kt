@@ -25,9 +25,10 @@ import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.NetworkModelContract
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
-import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedCustomDataRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.Tags
 
@@ -143,7 +144,7 @@ internal class DecryptedRecordMapper : NetworkModelContract.DecryptedRecordBuild
         creationDate: String?,
         dataKey: GCKey?,
         modelVersion: Int?
-    ): care.data4life.sdk.network.model.definitions.DecryptedCustomDataRecord =
+    ): DecryptedCustomDataRecord =
         care.data4life.sdk.network.model.DecryptedDataRecord(
             identifier,
             resource,

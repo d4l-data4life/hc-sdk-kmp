@@ -30,7 +30,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import org.threeten.bp.LocalDate
 
-class RecordContract {
+interface RecordContract {
     interface Service {
 
         fun createRecord(

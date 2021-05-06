@@ -23,6 +23,7 @@ interface DataContract {
     interface Client : SdkContract.DataRecordClient
 
     interface Resource {
+        val value: ByteArray
         fun asByteArray(): ByteArray
     }
 }

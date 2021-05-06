@@ -41,6 +41,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class Data4LifeClientTest {
+    private static final boolean IS_LOGGED_IN = true;
     private static final String ALIAS = "alias";
 
     private UserService userService;
@@ -58,9 +59,15 @@ public class Data4LifeClientTest {
         recordService = mock(RecordService.class);
         callHandler = mock(CallHandler.class);
 
-        when(userService.getUID()).thenReturn(Single.just("uid"));
+        when(userService.getUserID()).thenReturn(Single.just("uid"));
 
         instance = spy(new Data4LifeClient(ALIAS, cryptoService, authorizationService, userService, recordService, callHandler));
+    }
+
+    @Test
+    public void hasUserId() {
+        doReturn(Single.just(IS_LOGGED_IN)).when(userService).finishLogin(IS_LOGGED_IN);
+        assertThat(instance.getUserId()).isEqualTo("uid");
     }
 
     @Test

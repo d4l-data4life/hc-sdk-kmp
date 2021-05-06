@@ -17,9 +17,19 @@
 package care.data4life.sdk.auth
 
 import care.data4life.sdk.SdkContract
+import io.reactivex.Completable
+import io.reactivex.Single
 
-internal interface AuthContract {
+interface AuthContract {
 
     interface Client : SdkContract.AuthClient
 
+    interface UserService {
+        val userID: Single<String>
+
+        fun finishLogin(isAuthorized: Boolean): Single<Boolean>
+        fun isLoggedIn(alias: String): Single<Boolean>
+        fun logout(): Completable
+        fun getSessionToken(alias: String): Single<String>
+    }
 }

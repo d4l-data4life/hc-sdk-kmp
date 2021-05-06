@@ -12,14 +12,11 @@ and this project adheres to http://semver.org/spec/v2.0.0.html[Semantic Versioni
 ==== Versions
 toc::[]
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.2...main[Unreleased]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.11.0...main[Unreleased]
 
 === Added
-Add Version control for supported/unsupported versions
 
 === Changed
-
-* `CryptoSecureStore`, `DocumentUploadResponse`, `CommonKeyResponse`, `UserInfo` to Kotlin.
 
 === Removed
 
@@ -28,6 +25,33 @@ Add Version control for supported/unsupported versions
 === Bumped
 
 === Migration
+
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.10.0...v1.11.0[1.11.0]
+
+=== Added
+
+* Version control for supported/unsupported versions.
+* The Client now exposes the UserId.
+* Add Fhir4 support for download Record and Attachment(s).
+
+=== Changed
+
+* `CryptoSecureStore`, `DocumentUploadResponse`, `CommonKeyResponse`, `UserInfo` to Kotlin.
+* _*BREAKING*_ Change Android minSDK 21 -> 23
+* targetSdkVersion & compileSdkVersion 29 -> 30
+
+=== Bumped
+
+* *_BREAKING_* FHIR SDK 1.3.1 -> 1.4.0
+* *_BREAKING_* Kotlin 1.3.75 -> 1.4.32
+* Gradle 6.7.1 -> 6.8.3
+* Android 4.1.1 -> 4.1.3
+* ktlint: 0.40 -> 0.41
+* *_BREAKING_* Moshi 1.8.0 -> 1.12.0
+
+=== Migration
+
+* Change Android support to min Android 6.0 (API 23) to use this version of the SDK.
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.2...v1.10.0[1.10.0]
 

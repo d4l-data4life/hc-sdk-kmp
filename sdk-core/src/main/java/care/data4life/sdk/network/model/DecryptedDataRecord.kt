@@ -18,19 +18,21 @@ package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.data.DataResource
-import care.data4life.sdk.network.model.definitions.DecryptedCustomDataRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedCustomDataRecord
+import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.Tags
 
 /**
  * DecryptedAppDataRecord is an internal decrypted form of AppDataRecord, analogous to DecryptedRecord
  * @see care.data4life.sdk.network.model.DecryptedRecord
  */
 internal data class DecryptedDataRecord(
-        override var identifier: String?,
-        override var resource: DataResource,
-        override var tags: HashMap<String, String>?,
-        override var annotations: List<String>,
-        override var customCreationDate: String?,
-        override var updatedDate: String?,
-        override var dataKey: GCKey?,
-        override var modelVersion: Int
+    override var identifier: String?,
+    override var resource: DataResource,
+    override var tags: Tags?,
+    override var annotations: Annotations,
+    override var customCreationDate: String?,
+    override var updatedDate: String?,
+    override var dataKey: GCKey?,
+    override var modelVersion: Int
 ) : DecryptedCustomDataRecord

@@ -1,33 +1,40 @@
 /*
  * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
  *
- * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"), 
+ * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
  *
  * The SDK and its documentation may be accessed and used for viewing/review purposes only.
- * Any usage of the SDK for other purposes, including usage for the development of 
- * applications/third-party applications shall require the conclusion of a license agreement 
+ * Any usage of the SDK for other purposes, including usage for the development of
+ * applications/third-party applications shall require the conclusion of a license agreement
  * between you and D4L.
  *
- * If you are interested in licensing the SDK for your own applications/third-party 
- * applications and/or if you’d like to contribute to the development of the SDK, please 
+ * If you are interested in licensing the SDK for your own applications/third-party
+ * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
 
 package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.attachment.FileService
+import care.data4life.sdk.attachment.AttachmentContract
+import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_JPEG_QUALITY_PERCENT
+import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_PREVIEW_SIZE_PX
+import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_THUMBNAIL_SIZE_PX
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.network.model.CommonKeyResponse
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
+import care.data4life.sdk.network.model.NetworkModelContract
+import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.util.GenericTestDataProvider.DATE_FORMATTER
 import care.data4life.sdk.test.util.GenericTestDataProvider.DATE_TIME_FORMATTER
 import care.data4life.sdk.util.Base64
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import io.reactivex.Single
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
@@ -38,8 +45,7 @@ import javax.xml.bind.DatatypeConverter
 
 class RecordServiceModuleTestFlowHelper(
     private val apiService: ApiService,
-    private val fileService: FileService,
-    private val imageResizer: ImageResizer
+    private val imageResizer: AttachmentContract.ImageResizer
 ) {
     private val mdHandle = MessageDigest.getInstance("MD5")
 
@@ -51,7 +57,7 @@ class RecordServiceModuleTestFlowHelper(
             .also { mdHandle.reset() }
     }
 
-    fun encode(tag: String): String {
+    private fun encode(tag: String): String {
         return URLEncoder.encode(tag, StandardCharsets.UTF_8.displayName())
             .replace(".", "%2e")
             .replace("+", "%20")
@@ -61,9 +67,7 @@ class RecordServiceModuleTestFlowHelper(
             .toLowerCase()
     }
 
-    fun prepareTags(
-        tags: Map<String, String>
-    ): List<String> {
+    fun prepareTags(tags: Tags): List<String> {
         val encodedTags = mutableListOf<String>()
         tags.forEach { (key, value) ->
             encodedTags.add("$key=${encode(value)}")
@@ -78,7 +82,7 @@ class RecordServiceModuleTestFlowHelper(
     ): String = "${key.toLowerCase()}=${value.toLowerCase()}"
 
     fun prepareCompatibilityTags(
-        tags: Map<String, String>
+        tags: Tags
     ): Pair<List<String>, List<String>> {
         val encodedTags = prepareTags(tags)
         val legacyTags = tags.map { (key, value) -> prepareLegacyTag(key, value) }
@@ -87,15 +91,15 @@ class RecordServiceModuleTestFlowHelper(
     }
 
     private fun prepareLegacyAnnotations(
-        annotations: List<String>
+        annotations: Annotations
     ): List<String> = annotations.map { "custom=${it.toLowerCase()}" }
 
     fun prepareAnnotations(
-        annotations: List<String>
+        annotations: Annotations
     ): List<String> = annotations.map { "custom=${encode(it)}" }
 
     fun prepareCompatibilityAnnotations(
-        annotations: List<String>
+        annotations: Annotations
     ): Pair<List<String>, List<String>> {
         val encodedAnnotations = prepareAnnotations(annotations)
         val legacyAnnotations = prepareLegacyAnnotations(annotations)
@@ -115,23 +119,83 @@ class RecordServiceModuleTestFlowHelper(
         tagsAndAnnotations: List<String>
     ): List<String> = tagsAndAnnotations.map { Base64.encodeToString(md5(it)) }
 
+    fun mapAttachments(
+        payload: ByteArray,
+        resized: Pair<Pair<ByteArray, String>, Pair<ByteArray, String>?>? = null
+    ): List<String> {
+        val attachments = mutableListOf(String(payload))
+
+        if (resized is Pair<*, *>) {
+            attachments.add(String(resized.first.first))
+
+            if (resized.second is Pair<*, *>) {
+                attachments.add(String(resized.second!!.first))
+            }
+        }
+
+        return attachments
+    }
+
     fun uploadAttachment(
-        attachmentKey: GCKey,
+        alias: String,
         userId: String,
         payload: Pair<ByteArray, String>,
         resized: Pair<Pair<ByteArray, String>, Pair<ByteArray, String>?>? = null
     ) {
-        every {
-            fileService.uploadFile(attachmentKey, userId, payload.first)
-        } returns Single.just(payload.second)
+        resizing(payload.first, resized)
 
-        resizing(payload.first, userId, attachmentKey, resized)
+        fakeUpload(
+            userId,
+            alias,
+            payload,
+            resized
+        )
+    }
+
+    private fun fakeUpload(
+        userId: String,
+        alias: String,
+        payload: Pair<ByteArray, String>,
+        resized: Pair<Pair<ByteArray, String>, Pair<ByteArray, String>?>?
+    ) {
+        val sendAttachment = slot<ByteArray>()
+        val (data, ids) = resolveUploadData(payload, resized)
+
+        every {
+            apiService.uploadDocument(alias, userId, capture(sendAttachment))
+        } answers {
+            val idx = data.indexOf(String(sendAttachment.captured))
+
+            if (idx >= 0) {
+                Single.just(ids[idx])
+            } else {
+                throw RuntimeException("Unexpected Attachment.")
+            }
+        }
+    }
+
+    private fun resolveUploadData(
+        payload: Pair<ByteArray, String>,
+        resized: Pair<Pair<ByteArray, String>, Pair<ByteArray, String>?>?
+    ): Pair<List<String>, List<String>> {
+        val ids = mutableListOf(payload.second)
+        val data = mutableListOf(md5(String(payload.first)))
+
+        if (resized is Pair<*, *>) {
+            ids.add(resized.first.second)
+            data.add(md5(String(resized.first.first)))
+
+            if (resized.second is Pair<*, *>) {
+                ids.add(resized.second!!.second)
+                data.add(md5(String(resized.second!!.first)))
+            }
+        }
+
+        return Pair(data, ids)
     }
 
     private fun resizing(
         data: ByteArray,
-        userId: String,
-        attachmentKey: GCKey,
         resizedImages: Pair<Pair<ByteArray, String>, Pair<ByteArray, String>?>?
     ) {
         if (resizedImages == null) {
@@ -142,29 +206,20 @@ class RecordServiceModuleTestFlowHelper(
             resizeImage(
                 data,
                 resizedImages.first.first,
-                resizedImages.first.second,
-                ImageResizer.DEFAULT_PREVIEW_SIZE_PX,
-                userId,
-                attachmentKey
+                DEFAULT_PREVIEW_SIZE_PX
             )
 
             if (resizedImages.second is Pair<*, *>) {
                 resizeImage(
                     data,
                     resizedImages.second!!.first,
-                    resizedImages.second!!.second,
-                    ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX,
-                    userId,
-                    attachmentKey
+                    DEFAULT_THUMBNAIL_SIZE_PX
                 )
             } else {
                 resizeImage(
                     data,
                     null,
-                    null,
-                    ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX,
-                    userId,
-                    attachmentKey
+                    DEFAULT_THUMBNAIL_SIZE_PX
                 )
             }
         }
@@ -173,24 +228,25 @@ class RecordServiceModuleTestFlowHelper(
     private fun resizeImage(
         data: ByteArray,
         resizedImage: ByteArray?,
-        imageId: String?,
-        targetHeight: Int,
-        userId: String,
-        attachmentKey: GCKey
+        targetHeight: Int
     ) {
         every {
             imageResizer.resizeToHeight(
                 data,
                 targetHeight,
-                ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT
+                DEFAULT_JPEG_QUALITY_PERCENT
             )
         } returns resizedImage
+    }
 
-        if (resizedImage is ByteArray) {
-            every {
-                fileService.uploadFile(attachmentKey, userId, resizedImage)
-            } returns Single.just(imageId)
-        }
+    fun downloadAttachment(
+        userId: String,
+        alias: String,
+        payload: Pair<ByteArray, String>
+    ) {
+        every {
+            apiService.downloadDocument(alias, userId, payload.second)
+        } returns Single.just(md5(String(payload.first)).toByteArray())
     }
 
     fun prepareStoredOrUnstoredCommonKeyRun(
@@ -226,7 +282,7 @@ class RecordServiceModuleTestFlowHelper(
         id: String?,
         commonKeyId: String,
         tags: List<String>,
-        annotations: List<String>,
+        annotations: Annotations,
         body: String,
         dates: Pair<String?, String?>,
         keys: Pair<EncryptedKey, EncryptedKey?>
@@ -245,11 +301,11 @@ class RecordServiceModuleTestFlowHelper(
         dates.second
     )
 
-    fun buildEncryptedRecord(
+    private fun buildEncryptedRecord(
         id: String?,
         commonKeyId: String,
         tags: List<String>,
-        annotations: List<String>,
+        annotations: Annotations,
         body: String,
         dates: Pair<String?, String?>,
         keys: Pair<EncryptedKey, EncryptedKey?>
@@ -263,11 +319,11 @@ class RecordServiceModuleTestFlowHelper(
         keys
     )
 
-    fun buildEncryptedRecordWithEncodedBody(
+    private fun buildEncryptedRecordWithEncodedBody(
         id: String?,
         commonKeyId: String,
         tags: List<String>,
-        annotations: List<String>,
+        annotations: Annotations,
         body: String,
         dates: Pair<String?, String?>,
         keys: Pair<EncryptedKey, EncryptedKey?>
@@ -285,7 +341,7 @@ class RecordServiceModuleTestFlowHelper(
         recordId: String?,
         resource: String,
         tags: List<String>,
-        annotations: List<String>,
+        annotations: Annotations,
         commonKeyId: String,
         encryptedDataKey: EncryptedKey,
         encryptedAttachmentsKey: EncryptedKey?,
@@ -305,7 +361,7 @@ class RecordServiceModuleTestFlowHelper(
         recordId: String?,
         resource: String,
         tags: List<String>,
-        annotations: List<String>,
+        annotations: Annotations,
         commonKeyId: String,
         encryptedDataKey: EncryptedKey,
         encryptedAttachmentsKey: EncryptedKey?,
@@ -320,6 +376,56 @@ class RecordServiceModuleTestFlowHelper(
         Pair(creationDate, updateDate),
         Pair(encryptedDataKey, encryptedAttachmentsKey)
     )
+
+    fun compareSerialisedTags(
+        actual: String,
+        expected: List<String>
+    ): Boolean = actual.split(",").sorted() == expected.sorted()
+
+    private fun compareTags(
+        actual: List<String>,
+        expected: List<String>
+    ): Boolean = actual.sorted() == expected.sorted()
+
+    fun compareEncryptedRecords(
+        actual: NetworkModelContract.EncryptedRecord,
+        expected: NetworkModelContract.EncryptedRecord
+    ): Boolean {
+        return actual.commonKeyId == expected.commonKeyId &&
+            actual.identifier == expected.identifier &&
+            actual.encryptedBody == expected.encryptedBody &&
+            actual.encryptedDataKey == expected.encryptedDataKey &&
+            actual.encryptedAttachmentsKey == expected.encryptedAttachmentsKey &&
+            actual.customCreationDate == expected.customCreationDate &&
+            actual.updatedDate == expected.updatedDate &&
+            actual.modelVersion == expected.modelVersion &&
+            actual.version == expected.version &&
+            compareTags(actual.encryptedTags, expected.encryptedTags)
+    }
+
+    fun packResources(
+        serializedResources: List<String>,
+        attachments: List<String>?
+    ): List<String> {
+        return if (attachments is List) {
+            mutableListOf<String>()
+                .also { it.addAll(serializedResources) }
+                .also { it.addAll(attachments) }
+        } else {
+            serializedResources
+        }
+    }
+
+    fun makeKeyOrder(
+        dataKey: Pair<GCKey, EncryptedKey>,
+        attachmentKey: Pair<GCKey, EncryptedKey>?
+    ): List<GCKey> {
+        return if (attachmentKey is Pair<*, *>) {
+            listOf(dataKey.first, attachmentKey.first)
+        } else {
+            listOf(dataKey.first)
+        }
+    }
 
     fun buildMeta(
         customCreationDate: String,

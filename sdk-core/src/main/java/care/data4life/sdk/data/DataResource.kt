@@ -17,23 +17,18 @@
 package care.data4life.sdk.data
 
 data class DataResource(
-        val value: ByteArray
+    override val value: ByteArray
 ) : DataContract.Resource {
 
-    override fun asByteArray(): ByteArray = value
+    override fun asByteArray(): ByteArray = value.clone()
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as DataResource
-
-        if (!value.contentEquals(other.value)) return false
-
-        return true
+        return if (other !is DataContract.Resource) {
+            false
+        } else {
+            value.contentEquals(other.value)
+        }
     }
 
-    override fun hashCode(): Int {
-        return value.contentHashCode()
-    }
+    override fun hashCode(): Int = value.contentHashCode()
 }

@@ -25,7 +25,9 @@ class Authorization {
         const val OAUTH_PATH_TOKEN = "/oauth/token"
 
         @JvmStatic
-        val defaultScopes = setOf("perm:r", "rec:r", "rec:w", "attachment:r", "attachment:w", "user:r", "user:q")
+        val defaultScopes = setOf(
+            "perm:r", "rec:r", "rec:w", "attachment:r", "attachment:w", "user:r", "user:q"
+        )
         val defaultScopesArray = defaultScopes.toTypedArray()
     }
 }

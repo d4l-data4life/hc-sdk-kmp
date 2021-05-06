@@ -23,10 +23,10 @@ import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.ModelContract.BaseRecord
 import care.data4life.sdk.model.ModelContract.RecordFactory
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
-import care.data4life.sdk.network.model.definitions.DecryptedCustomDataRecord
-import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedCustomDataRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
 import care.data4life.sdk.wrapper.SdkDateTimeFormatter
 
 internal object RecordMapper : RecordFactory {
@@ -36,21 +36,21 @@ internal object RecordMapper : RecordFactory {
         @Suppress("UNCHECKED_CAST")
         return when (record) {
             is DecryptedFhir3Record -> Record(
-                    record.resource as Fhir3Resource,
-                    SdkDateTimeFormatter.buildMeta(record),
-                    record.annotations
+                record.resource as Fhir3Resource,
+                SdkDateTimeFormatter.buildMeta(record),
+                record.annotations
             )
             is DecryptedFhir4Record -> Fhir4Record(
-                    record.identifier ?: "",//FIXME
-                    record.resource as Fhir4Resource,
-                    SdkDateTimeFormatter.buildMeta(record),
-                    record.annotations
+                record.identifier ?: "", // FIXME
+                record.resource as Fhir4Resource,
+                SdkDateTimeFormatter.buildMeta(record),
+                record.annotations
             )
             is DecryptedCustomDataRecord -> DataRecord(
-                    record.identifier ?: "",//FIXME
-                    record.resource,
-                    SdkDateTimeFormatter.buildMeta(record),
-                    record.annotations
+                record.identifier ?: "", // FIXME
+                record.resource,
+                SdkDateTimeFormatter.buildMeta(record),
+                record.annotations
             )
             else -> throw CoreRuntimeException.InternalFailure()
         } as BaseRecord<T>

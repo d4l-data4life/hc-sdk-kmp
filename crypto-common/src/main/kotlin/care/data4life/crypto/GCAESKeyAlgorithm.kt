@@ -16,8 +16,11 @@
 
 package care.data4life.crypto
 
-class GCAESKeyAlgorithm private constructor(cipher: Cipher, private val _padding: Padding, blockMode: BlockMode)
-    : Algorithm() {
+class GCAESKeyAlgorithm private constructor(
+    cipher: Cipher,
+    private val _padding: Padding,
+    blockMode: BlockMode
+) : Algorithm() {
 
     init {
         this.cipher = cipher.name
@@ -44,17 +47,22 @@ class GCAESKeyAlgorithm private constructor(cipher: Cipher, private val _padding
 
     override fun hashCode(): Int {
         var result = super.hashCode()
-        result = 31 * result + (iv?.let { items ->
-            var hash = 0
-            items.forEach { hash += it.hashCode() }
-            return@let hash
-        } ?: 0)
+        result = 31 * result + (
+            iv?.let { items ->
+                var hash = 0
+                items.forEach { hash += it.hashCode() }
+                return@let hash
+            } ?: 0
+            )
         return result
     }
 
     companion object {
         fun createDataAlgorithm() = GCAESKeyAlgorithm(Cipher.AES, Padding.NoPadding, BlockMode.GCM)
-        fun createTagAlgorithm() = GCAESKeyAlgorithm(Cipher.AES, Padding.PKCS7Padding, BlockMode.CBC)
+        fun createTagAlgorithm() = GCAESKeyAlgorithm(
+            Cipher.AES,
+            Padding.PKCS7Padding,
+            BlockMode.CBC
+        )
     }
-
 }

@@ -19,18 +19,20 @@ package care.data4life.sdk;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 
+import androidx.test.InstrumentationRegistry;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
 
-import androidx.test.InstrumentationRegistry;
+import care.data4life.sdk.attachment.AttachmentContract.ImageResizer;
 import care.data4life.sdk.lang.ImageResizeException;
 import care.data4life.sdk.test.util.AssetsHelper;
 
-import static care.data4life.sdk.ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT;
-import static care.data4life.sdk.ImageResizer.DEFAULT_PREVIEW_SIZE_PX;
-import static care.data4life.sdk.ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX;
+import static care.data4life.sdk.attachment.AttachmentContract.ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT;
+import static care.data4life.sdk.attachment.AttachmentContract.ImageResizer.DEFAULT_PREVIEW_SIZE_PX;
+import static care.data4life.sdk.attachment.AttachmentContract.ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
 

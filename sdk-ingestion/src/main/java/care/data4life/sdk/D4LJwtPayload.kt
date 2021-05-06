@@ -32,7 +32,8 @@
 
 package care.data4life.sdk
 
-import care.data4life.crypto.Json
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * Class encoding a JWT token payload of the type used by PHDP. For documentation of the format,
@@ -43,17 +44,18 @@ import care.data4life.crypto.Json
  * require any fields to be present in the JSON to be parsed, either (though it will always
  * fill in the "iss" claim in instances since it has a fixed value).
  */
+@JsonClass(generateAdapter = true)
 data class D4LJwtPayload(
-        /* Standard (registered) claims */
-        val iss: String = "urn:ghc",                        // "Issuer" claim
-        val sub: String? = null,                            // "Subject" claim
-        val exp: Double? = null,                            // "Expiration Time" claim
-        val nbf: Double? = null,                            // "Not Before" claim
-        val iat: Double? = null,                            // "Issued At" claim
-        val jti: String? = null,                            // "JWT ID" claim
-        /* Private D4L claims */
-        @field:Json("ghc:scope") val ghc_scope: String? = null,      // Scopes - could consider adding a type adapter for the scopes that parses them in to a list
-        @field:Json("ghc:uid") val ghc_uid: String? = null,          // The source User ID which requested the JWT (not always the subject)
-        @field:Json("ghc:cid") val ghc_cid: String? = null,          // The client ID which requested the JWT
-        @field:Json("ghc:aid") val ghc_aid: String? = null           // The app ID which requested the JWT
+    /* Standard (registered) claims */
+    val iss: String = "urn:ghc", // "Issuer" claim
+    val sub: String? = null, // "Subject" claim
+    val exp: Double? = null, // "Expiration Time" claim
+    val nbf: Double? = null, // "Not Before" claim
+    val iat: Double? = null, // "Issued At" claim
+    val jti: String? = null, // "JWT ID" claim
+    /* Private D4L claims */
+    @field:Json(name = "ghc:scope") val ghc_scope: String? = null, // Scopes - could consider adding a type adapter for the scopes that parses them in to a list
+    @field:Json(name = "ghc:uid") val ghc_uid: String? = null, // The source User ID which requested the JWT (not always the subject)
+    @field:Json(name = "ghc:cid") val ghc_cid: String? = null, // The client ID which requested the JWT
+    @field:Json(name = "ghc:aid") val ghc_aid: String? = null // The app ID which requested the JWT
 )

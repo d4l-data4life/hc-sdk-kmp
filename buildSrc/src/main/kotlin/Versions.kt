@@ -21,7 +21,7 @@ object Versions {
     /**
      * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)
      */
-    const val fhirSdk = "1.3.1"
+    const val fhirSdk = "1.4.0"
 
     /**
      * [hc-fhir-helper-sdk-kmp](https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp)
@@ -29,7 +29,7 @@ object Versions {
     const val fhirHelper = "1.4.1"
 
     // kotlin
-    const val kotlin = "1.3.72"
+    const val kotlin = "1.4.32"
 
     /**
      *  https://github.com/Kotlin/kotlinx.coroutines
@@ -38,7 +38,7 @@ object Versions {
 
     object GradlePlugins {
         const val kotlin = Versions.kotlin
-        const val android = "4.1.1"
+        const val android = "4.1.3"
 
         /**
          * [Dexcount](https://github.com/KeepSafe/dexcount-gradle-plugin)
@@ -135,7 +135,7 @@ object Versions {
     /**
      * [moshi](https://github.com/square/moshi)
      */
-    const val moshi = "1.8.0"
+    const val moshi = "1.12.0"
 
     /**
      *
@@ -143,9 +143,7 @@ object Versions {
      */
     const val gson = "2.9.0"
 
-
     // Date
-
     /**
      * [ThreeTen Backport](https://www.threeten.org/threetenbp)
      */
@@ -189,7 +187,6 @@ object Versions {
      */
     const val pdfView = "3.1.0-beta.1"
 
-
     // Junit Test
     const val testJUnit = "4.12"
 
@@ -221,5 +218,4 @@ object Versions {
     const val androidXTestExtJUnit = "1.1.2"
 
     const val androidXKakao = "1.4.0-androidx"
-
 }

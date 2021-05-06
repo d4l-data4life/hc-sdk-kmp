@@ -26,16 +26,16 @@ import care.data4life.sdk.listener.Callback as LegacyCallback
 import care.data4life.sdk.listener.ResultListener as LegacyListener
 
 class CallHandler(
-        var errorHandler: SdkContract.ErrorHandler
+    var errorHandler: SdkContract.ErrorHandler
 ) {
 
     fun <T> executeSingle(operation: Single<T>, callback: Callback<T>): Task {
         return Task().also { task ->
             task.operationHandle = wireTask(
-                    task,
-                    operation,
-                    { callback.onSuccess(it) },
-                    { callback.onError(it) }
+                task,
+                operation,
+                { callback.onSuccess(it) },
+                { callback.onError(it) }
             )
         }
     }
@@ -43,10 +43,10 @@ class CallHandler(
     fun <T> executeSingle(operation: Single<T>, listener: LegacyListener<T>): Task {
         return Task().also { task ->
             task.operationHandle = wireTask(
-                    task,
-                    operation,
-                    { listener.onSuccess(it) },
-                    { listener.onError(it) }
+                task,
+                operation,
+                { listener.onSuccess(it) },
+                { listener.onError(it) }
             )
         }
     }
@@ -54,25 +54,29 @@ class CallHandler(
     fun executeCompletable(operation: Completable, listener: LegacyCallback): Task {
         return Task().also { task ->
             task.operationHandle = wireTask(
-                    task,
-                    operation.toSingleDefault("Ignore"),
-                    { listener.onSuccess() },
-                    { listener.onError(it) }
+                task,
+                operation.toSingleDefault("Ignore"),
+                { listener.onSuccess() },
+                { listener.onError(it) }
             )
         }
     }
 
-
-    private fun <T> wireTask(task: Task, operation: Single<T>, onSuccess: (T) -> Unit, onError: (D4LException) -> Unit) =
-            operation
-                    .doOnDispose { if (task.isCanceled) onError(prepareError(TaskException.CancelException())) }
-                    .doFinally { task.finish() }
-                    .subscribeOn(Schedulers.io())
-                    .subscribe({ t: T -> onSuccess(t) }
-                    ) { error ->
-                        if (!task.isActive) return@subscribe
-                        onError(prepareError(error))
-                    }
+    private fun <T> wireTask(
+        task: Task,
+        operation: Single<T>,
+        onSuccess: (T) -> Unit,
+        onError: (D4LException) -> Unit
+    ) =
+        operation
+            .doOnDispose { if (task.isCanceled) onError(prepareError(TaskException.CancelException())) }
+            .doFinally { task.finish() }
+            .subscribeOn(Schedulers.io())
+            .subscribe({ t: T -> onSuccess(t) }
+            ) { error ->
+                if (!task.isActive) return@subscribe
+                onError(prepareError(error))
+            }
 
     private fun prepareError(error: Throwable): D4LException {
         val cleanedException = errorHandler.handleError(error)

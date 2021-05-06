@@ -20,7 +20,5 @@ expect class KeyPair {
 
     fun getPublic(): PublicKey
 
-
     fun getPrivate(): PrivateKey
-
 }

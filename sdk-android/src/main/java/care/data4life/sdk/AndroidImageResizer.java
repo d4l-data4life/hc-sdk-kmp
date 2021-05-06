@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 
 import javax.annotation.Nullable;
 
+import care.data4life.sdk.attachment.AttachmentContract.ImageResizer;
 import care.data4life.sdk.lang.CoreRuntimeException;
 import care.data4life.sdk.util.MimeType;
 

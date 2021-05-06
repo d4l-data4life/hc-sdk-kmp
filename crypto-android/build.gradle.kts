@@ -17,6 +17,7 @@
 plugins {
     id("com.android.library")
     id("kotlin-platform-android")
+    kotlin("kapt")
 }
 
 android {
@@ -30,14 +31,16 @@ android {
         versionName = "${project.version}"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments(mapOf(
+        testInstrumentationRunnerArguments(
+            mapOf(
                 "clearPackageData" to "true"
-        ))
+            )
+        )
 
         buildTypes {
             buildTypes {
-                getByName("debug"){
-                    setMatchingFallbacks("debug","release")
+                getByName("debug") {
+                    setMatchingFallbacks("debug", "release")
                 }
             }
         }
@@ -87,8 +90,11 @@ dependencies {
     implementation(Dependencies.Android.AndroidX.appCompat)
     implementation(Dependencies.Android.bouncyCastleJdk15)
     implementation(Dependencies.Android.moshi)
-    compileOnly(Dependencies.java.javaXAnnotation)
 
+    kapt(Dependencies.Java.moshiCodeGen)
+    kaptTest(Dependencies.Java.moshiCodeGen)
+
+    compileOnly(Dependencies.Java.javaXAnnotation)
 
     testImplementation(Dependencies.Android.Test.junit)
     testImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvm)

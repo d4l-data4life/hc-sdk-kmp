@@ -17,13 +17,15 @@
 package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
+import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.AttachmentService
-import care.data4life.sdk.attachment.FileService
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.fhir.FhirService
 import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TagEncryptionService
 import care.data4life.sdk.tag.TaggingService
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.fake.CryptoServiceFake
 import care.data4life.sdk.test.fake.CryptoServiceIteration
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
@@ -48,8 +50,8 @@ class RecordServiceCountRecordsModuleTest {
     private lateinit var flowHelper: RecordServiceModuleTestFlowHelper
     private val apiService: ApiService = mockk()
     private lateinit var cryptoService: CryptoContract.Service
-    private val fileService: FileService = mockk()
-    private val imageResizer: ImageResizer = mockk()
+    private val fileService: AttachmentContract.FileService = mockk()
+    private val imageResizer: AttachmentContract.ImageResizer = mockk()
     private val errorHandler: D4LErrorHandler = mockk()
 
     @Before
@@ -75,14 +77,13 @@ class RecordServiceCountRecordsModuleTest {
 
         flowHelper = RecordServiceModuleTestFlowHelper(
             apiService,
-            fileService,
             imageResizer
         )
     }
 
     private fun runFlow(
-        tags: Map<String, String>,
-        annotations: List<String> = emptyList(),
+        tags: Tags,
+        annotations: Annotations = emptyList(),
         amounts: Pair<Int, Int>,
         alias: String = ALIAS,
         userId: String = USER_ID,
@@ -131,11 +132,12 @@ class RecordServiceCountRecordsModuleTest {
                 capture(search)
             )
         } answers {
-            val amount = when (search.captured) {
-                encryptedTagsAndAnnotations.joinToString(",") -> amounts.first
-                encryptedLegacyTagsAndAnnotations.joinToString(",") -> amounts.second
+            val actual = search.captured
+            val amount = when {
+                flowHelper.compareSerialisedTags(actual, encryptedTagsAndAnnotations) -> amounts.first
+                flowHelper.compareSerialisedTags(actual, encryptedLegacyTagsAndAnnotations) -> amounts.second
                 else -> throw RuntimeException(
-                    "Unexpected tags and annotations:\n${search.captured}"
+                    "Unexpected tags and annotations:\n$actual"
                 )
             }
 

@@ -24,9 +24,9 @@ import care.data4life.sdk.lang.D4LException
 import java.io.IOException
 
 class CommonKeyService(
-        private val alias: String,
-        private val storage: CryptoSecureStore,
-        private val keyFactory: KeyFactory
+    private val alias: String,
+    private val storage: CryptoSecureStore,
+    private val keyFactory: KeyFactory
 ) : CryptoContract.CommonKeyService {
 
     override fun fetchCurrentCommonKeyId(): String {
@@ -70,8 +70,7 @@ class CommonKeyService(
         return storage.contains(aliasCommonKey(commonKeyId))
     }
 
-
-    private fun aliasCommonKey(commonKeyId: String) = "${alias}_crypto_common_key_${commonKeyId}"
+    private fun aliasCommonKey(commonKeyId: String) = "${alias}_crypto_common_key_$commonKeyId"
 
     private val aliasCurrentCommonKeyId = "${alias}_crypto_current_common_key_id"
 }

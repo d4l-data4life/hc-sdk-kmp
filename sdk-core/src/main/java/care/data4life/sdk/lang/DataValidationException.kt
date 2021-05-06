@@ -19,19 +19,32 @@ package care.data4life.sdk.lang
 /**
  * Exception class that will be thrown in case of data validation violations.
  */
-sealed class DataValidationException(message: String? = null, cause: Throwable? = null) : D4LException(message, cause) {
+sealed class DataValidationException(
+    message: String? = null,
+    cause: Throwable? = null
+) : D4LException(message, cause) {
 
     constructor() : this(null, null)
     constructor(message: String?) : this(message, null)
     constructor(cause: Throwable?) : this(cause?.toString(), cause)
 
+    class ModelVersionNotSupported(message: String? = "Model version not supported") :
+        DataValidationException(message = message)
 
-    class ModelVersionNotSupported(message: String? = "Model version not supported") : DataValidationException(message = message)
-    class IdUsageViolation(message: String? = "DomainResource.id is reserved for SDK internal operations") : DataValidationException(message = message)
-    class ExpectedFieldViolation(message: String? = "Field value was expected") : DataValidationException(message = message)
-    class InvalidAttachmentPayloadHash(message: String? = "Attachment hash is invalid") : DataValidationException(message = message)
-    class TagsAndAnnotationsLimitViolation(message: String? = "Annotations and Tags are exceeding maximum length") : DataValidationException(message = message)
-    class CustomDataLimitViolation(message: String? = "The given record data exceeds the maximum size") : DataValidationException(message = message)
+    class IdUsageViolation(message: String? = "DomainResource.id is reserved for SDK internal operations") :
+        DataValidationException(message = message)
+
+    class ExpectedFieldViolation(message: String? = "Field value was expected") :
+        DataValidationException(message = message)
+
+    class InvalidAttachmentPayloadHash(message: String? = "Attachment hash is invalid") :
+        DataValidationException(message = message)
+
+    class TagsAndAnnotationsLimitViolation(message: String? = "Annotations and Tags are exceeding maximum length") :
+        DataValidationException(message = message)
+
+    class CustomDataLimitViolation(message: String? = "The given record data exceeds the maximum size") :
+        DataValidationException(message = message)
+
     class AnnotationViolation(message: String) : DataValidationException(message = message)
 }
-

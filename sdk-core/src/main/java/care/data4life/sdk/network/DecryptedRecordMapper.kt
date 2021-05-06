@@ -25,15 +25,18 @@ import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.NetworkModelContract
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
-import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedCustomDataRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
+import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.Tags
 
 // TODO: Add factory to make testing easier
 internal class DecryptedRecordMapper : NetworkModelContract.DecryptedRecordBuilder {
     private var identifier: String? = null
-    private var tags: HashMap<String, String>? = null
-    private var annotations: List<String> = listOf()
+    private var tags: Tags? = null
+    private var annotations: Annotations = listOf()
     private var creationDate: String? = null
     private var updatedDate: String? = null
     private var attachmentKey: GCKey? = null
@@ -42,52 +45,52 @@ internal class DecryptedRecordMapper : NetworkModelContract.DecryptedRecordBuild
 
     private val guard: NetworkModelContract.LimitGuard = DecryptedRecordGuard
 
-    //mandatory
+    // mandatory
     override fun setTags(
-            tags: HashMap<String, String>?
+        tags: Tags?
     ): DecryptedRecordMapper = this.also { it.tags = tags }
 
     override fun setCreationDate(
-            creationDate: String?
+        creationDate: String?
     ): DecryptedRecordMapper = this.also { it.creationDate = creationDate }
 
     override fun setDataKey(
-            dataKey: GCKey?
+        dataKey: GCKey?
     ): DecryptedRecordMapper = this.also { it.dataKey = dataKey }
 
     override fun setModelVersion(
-            modelVersion: Int?
+        modelVersion: Int?
     ): DecryptedRecordMapper = this.also { it.modelVersion = modelVersion }
 
-    //Optional
+    // Optional
     override fun setIdentifier(
-            identifier: String?
+        identifier: String?
     ): DecryptedRecordMapper = this.also { it.identifier = identifier }
 
     override fun setAnnotations(
-            annotations: List<String>?
+        annotations: Annotations?
     ): DecryptedRecordMapper = this.also { it.annotations = annotations ?: listOf() }
 
     override fun setUpdateDate(
-            updatedDate: String?
+        updatedDate: String?
     ): DecryptedRecordMapper = this.also { it.updatedDate = updatedDate }
 
     override fun setAttachmentKey(
-            attachmentKey: GCKey?
+        attachmentKey: GCKey?
     ): DecryptedRecordMapper = this.also { it.attachmentKey = attachmentKey }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     private fun validatePayload(
-            tags: HashMap<String, String>?,
-            creationDate: String?,
-            dataKey: GCKey?,
-            modelVersion: Int?
+        tags: Tags?,
+        creationDate: String?,
+        dataKey: GCKey?,
+        modelVersion: Int?
     ) {
         if (
-                this.tags == null && tags == null ||
-                this.creationDate == null && creationDate == null ||
-                this.dataKey == null && dataKey == null ||
-                this.modelVersion == null && modelVersion == null
+            this.tags == null && tags == null ||
+            this.creationDate == null && creationDate == null ||
+            this.dataKey == null && dataKey == null ||
+            this.modelVersion == null && modelVersion == null
 
         ) {
             throw CoreRuntimeException.InternalFailure()
@@ -96,52 +99,53 @@ internal class DecryptedRecordMapper : NetworkModelContract.DecryptedRecordBuild
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     private fun <T : Fhir3Resource?> buildFhir3Record(
-            resource: T?,
-            tags: HashMap<String, String>,
-            creationDate: String,
-            dataKey: GCKey,
-            modelVersion: Int
+        resource: T?,
+        tags: Tags,
+        creationDate: String,
+        dataKey: GCKey,
+        modelVersion: Int
     ): DecryptedFhir3Record<T?> =
-            DecryptedRecord(
-                    this.identifier,
-                    resource,
-                    tags,
-                    this.annotations,
-                    creationDate,
-                    this.updatedDate,
-                    dataKey,
-                    this.attachmentKey,
-                    modelVersion
-            )
+        DecryptedRecord(
+            this.identifier,
+            resource,
+            tags,
+            this.annotations,
+            creationDate,
+            this.updatedDate,
+            dataKey,
+            this.attachmentKey,
+            modelVersion
+        )
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     private fun <T : Fhir4Resource> buildFhir4Record(
-            resource: T,
-            tags: HashMap<String, String>,
-            creationDate: String,
-            dataKey: GCKey,
-            modelVersion: Int
+        resource: T,
+        tags: Tags,
+        creationDate: String,
+        dataKey: GCKey,
+        modelVersion: Int
     ): DecryptedFhir4Record<T> =
-            DecryptedR4Record(
-                    this.identifier,
-                    resource,
-                    tags,
-                    this.annotations,
-                    creationDate,
-                    this.updatedDate,
-                    dataKey,
-                    this.attachmentKey,
-                    modelVersion
-            )
+        DecryptedR4Record(
+            this.identifier,
+            resource,
+            tags,
+            this.annotations,
+            creationDate,
+            this.updatedDate,
+            dataKey,
+            this.attachmentKey,
+            modelVersion
+        )
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     private fun buildCustomRecord(
-            resource: DataResource,
-            tags: HashMap<String, String>,
-            creationDate: String?,
-            dataKey: GCKey?,
-            modelVersion: Int?
-    ): care.data4life.sdk.network.model.definitions.DecryptedCustomDataRecord = care.data4life.sdk.network.model.DecryptedDataRecord(
+        resource: DataResource,
+        tags: Tags,
+        creationDate: String?,
+        dataKey: GCKey?,
+        modelVersion: Int?
+    ): DecryptedCustomDataRecord =
+        care.data4life.sdk.network.model.DecryptedDataRecord(
             identifier,
             resource,
             tags,
@@ -150,22 +154,22 @@ internal class DecryptedRecordMapper : NetworkModelContract.DecryptedRecordBuild
             updatedDate,
             dataKey!!,
             modelVersion!!
-    )
+        )
 
     @Suppress("UNCHECKED_CAST", "NAME_SHADOWING")
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun <T : Any?> build(
-            resource: T,
-            tags: HashMap<String, String>?,
-            creationDate: String?,
-            dataKey: GCKey?,
-            modelVersion: Int?
+        resource: T,
+        tags: Tags?,
+        creationDate: String?,
+        dataKey: GCKey?,
+        modelVersion: Int?
     ): DecryptedBaseRecord<T> {
         this.validatePayload(
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
+            tags,
+            creationDate,
+            dataKey,
+            modelVersion
         )
 
         val tags = tags ?: this.tags!!
@@ -177,35 +181,34 @@ internal class DecryptedRecordMapper : NetworkModelContract.DecryptedRecordBuild
 
         return when (resource) {
             null -> this.buildFhir3Record(
-                    resource,
-                    tags,
-                    creationDate,
-                    dataKey,
-                    modelVersion
-            )// ToDo: Explode
+                resource,
+                tags,
+                creationDate,
+                dataKey,
+                modelVersion
+            ) // ToDo: Explode
             is Fhir3Resource -> this.buildFhir3Record(
-                    resource,
-                    tags,
-                    creationDate,
-                    dataKey,
-                    modelVersion
+                resource,
+                tags,
+                creationDate,
+                dataKey,
+                modelVersion
             )
             is Fhir4Resource -> this.buildFhir4Record(
-                    resource,
-                    tags,
-                    creationDate,
-                    dataKey,
-                    modelVersion
+                resource,
+                tags,
+                creationDate,
+                dataKey,
+                modelVersion
             )
             is DataResource -> this.buildCustomRecord(
-                    resource,
-                    tags,
-                    creationDate,
-                    dataKey,
-                    modelVersion
+                resource,
+                tags,
+                creationDate,
+                dataKey,
+                modelVersion
             ).also { this.guard.checkDataLimit(resource.asByteArray()) }
             else -> throw CoreRuntimeException.InternalFailure()
-
         } as DecryptedBaseRecord<T>
     }
 

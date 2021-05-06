@@ -16,7 +16,10 @@
 
 package care.data4life.auth
 
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
 data class AuthState(
-        val alias: String,
-        val secret: String
+    val alias: String,
+    val secret: String
 )

@@ -31,33 +31,27 @@ class CommonKeyServiceTest {
     private val DEFAULT_COMMON_KEY_ID = "00000000-0000-0000-0000-000000000000"
     private val ROTATED_COMMON_KEY_ID = "11111111-1111-1111-1111-111111111111"
 
-
     private val ALIAS = "someAlias"
 
     private val ALIAS_KOMMON_KEY = ""
     private val ALIAS_COMMON_KEY_ID = DEFAULT_COMMON_KEY_ID
     private val ALIAS_ROTATED_COMMON_KEY_ID = ALIAS + ROTATED_COMMON_KEY_ID
 
-
     private val ALIAS_CURRENT_COMMON_KEY_ID = "${ALIAS}_crypto_current_common_key_id"
 
-    private val ALIAS_COMMON_KEY_DEFAULT = "${ALIAS}_crypto_common_key_${DEFAULT_COMMON_KEY_ID}"
-    private val ALIAS_COMMON_KEY_ROTATED = "${ALIAS}_crypto_common_key_${ROTATED_COMMON_KEY_ID}"
-
+    private val ALIAS_COMMON_KEY_DEFAULT = "${ALIAS}_crypto_common_key_$DEFAULT_COMMON_KEY_ID"
+    private val ALIAS_COMMON_KEY_ROTATED = "${ALIAS}_crypto_common_key_$ROTATED_COMMON_KEY_ID"
 
     private val mockStorage = mockk<CryptoSecureStore>(relaxed = true)
     private val mockKeyFactory = mockk<KeyFactory>()
 
-
     // SUT
     private lateinit var commonKeyService: CommonKeyService
-
 
     @Before
     fun setup() {
         commonKeyService = spyk(CommonKeyService(ALIAS, mockStorage, mockKeyFactory))
     }
-
 
     @Test
     fun `fetchCurrentCommonKeyId() SHOULD return current common key`() {
@@ -75,12 +69,11 @@ class CommonKeyServiceTest {
 
     @Test
     fun `fetchCurrentCommonKeyId() SHOULD return default key WHEN current common key not present`() {
-
     }
 
     @Test
     fun `fetchCurrentCommonKeyId() SHOULD return current common key WHEN rotated`() {
-        //TODO
+        // TODO
         // Given
         every { mockStorage.getSecret(ALIAS_CURRENT_COMMON_KEY_ID) } returns ROTATED_COMMON_KEY_ID.toCharArray()
 
@@ -92,7 +85,6 @@ class CommonKeyServiceTest {
             mockStorage.getSecret(ALIAS_CURRENT_COMMON_KEY_ID)
         }
     }
-
 
     @Test
     fun `fetchCurrentCommonKey() SHOULD return current common key`() {
@@ -110,12 +102,11 @@ class CommonKeyServiceTest {
 
     @Test
     fun `fetchCurrentCommonKey() SHOULD return default key WHEN current common key not present`() {
-
     }
 
     @Test
     fun `fetchCurrentCommonKey() SHOULD return current common key WHEN rotated`() {
-        //TODO
+        // TODO
         // Given
         every { mockStorage.getSecret(ALIAS_CURRENT_COMMON_KEY_ID) } returns ROTATED_COMMON_KEY_ID.toCharArray()
 
@@ -127,5 +118,4 @@ class CommonKeyServiceTest {
             mockStorage.getSecret(ALIAS_CURRENT_COMMON_KEY_ID)
         }
     }
-
 }

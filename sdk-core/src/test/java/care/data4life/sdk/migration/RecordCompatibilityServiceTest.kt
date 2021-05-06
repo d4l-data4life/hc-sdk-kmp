@@ -100,7 +100,7 @@ class RecordCompatibilityServiceTest {
     ) {
         verify(exactly = 1) { cryptoService.fetchTagEncryptionKey() }
         verify(exactly = 1) {
-            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations, encryptionKey) 
+            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations, encryptionKey)
         }
         verify(exactly = 1) { tagEncryptionHelper.normalize(tags["key"]!!) }
         verify(exactly = 2) {
@@ -118,7 +118,7 @@ class RecordCompatibilityServiceTest {
         val alias = "alias"
         val userId = "id"
         val tags = hashMapOf("key" to "value")
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
         val encryptedTags = mutableListOf("a", "k")
         val encryptedAnnotations = mutableListOf("d")
         val expected = 42
@@ -145,7 +145,7 @@ class RecordCompatibilityServiceTest {
                 capture(indicator)
             )
         } answers {
-            when(indicator.captured) {
+            when (indicator.captured) {
                 encodedAndEncryptedTagsAndAnnotations.joinToString(",") -> Single.just(21)
                 encryptedTags.joinToString(",") -> Single.just(21)
                 else -> throw RuntimeException("Unknown tags ${indicator.captured}")
@@ -192,7 +192,7 @@ class RecordCompatibilityServiceTest {
         val pageSize = 23
         val offset = 42
         val tags = hashMapOf("key" to "value")
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
         val encodedAndEncryptedTagsAndAnnotations: MutableList<String> = mutableListOf("a", "v")
             .also {
                 it.addAll(listOf("d"))
@@ -223,7 +223,7 @@ class RecordCompatibilityServiceTest {
                 capture(indicator)
             )
         } answers {
-            when(indicator.captured) {
+            when (indicator.captured) {
                 encodedAndEncryptedTagsAndAnnotations.joinToString(",") -> Observable.fromArray(
                     listOf(encryptedRecord1)
                 )
@@ -285,7 +285,7 @@ class RecordCompatibilityServiceTest {
         val pageSize = 23
         val offset = 42
         val tags = hashMapOf("key" to "value")
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
         val encodedAndEncryptedTagsAndAnnotations: MutableList<String> =
             mutableListOf("a", "b", "c")
         val encryptedTags: MutableList<String> = mutableListOf("c", "b", "a")
@@ -314,7 +314,7 @@ class RecordCompatibilityServiceTest {
                 capture(indicator)
             )
         } answers {
-            when(indicator.captured) {
+            when (indicator.captured) {
                 encodedAndEncryptedTagsAndAnnotations.joinToString(",") -> Observable.fromArray(
                     listOf(encryptedRecord1)
                 )
@@ -322,7 +322,6 @@ class RecordCompatibilityServiceTest {
                 else -> throw RuntimeException("Unknown tags ${indicator.captured}")
             }
         }
-
 
         // When
         val observer = service.searchRecords(

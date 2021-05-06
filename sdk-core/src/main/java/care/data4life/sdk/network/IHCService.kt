@@ -43,114 +43,113 @@ interface IHCService {
     @GET("/users/{userId}/commonkeys/{commonKeyId}")
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
     fun fetchCommonKey(
-            @Header(HEADER_ALIAS) alias: String,
-            @Path("userId") userId: String,
-            @Path("commonKeyId") commonKeyId: String
+        @Header(HEADER_ALIAS) alias: String,
+        @Path("userId") userId: String,
+        @Path("commonKeyId") commonKeyId: String
     ): Single<CommonKeyResponse>
 
     @POST("/users/{userId}/tek")
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
     fun uploadTagEncryptionKey(
-            @Header(HEADER_ALIAS) alias: String,
-            @Path("userId") userId: String,
-            @Body params: Map<String, String>
+        @Header(HEADER_ALIAS) alias: String,
+        @Path("userId") userId: String,
+        @Body params: Map<String, String>
     ): Completable
 
     @POST("/users/{userId}/records")
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
     fun createRecord(
-            @Header(HEADER_ALIAS) alias: String,
-            @Path("userId") userId: String,
-            @Body encryptedRecord: EncryptedRecord
+        @Header(HEADER_ALIAS) alias: String,
+        @Path("userId") userId: String,
+        @Body encryptedRecord: EncryptedRecord
     ): Single<EncryptedRecord>
 
     // FIXME validate if startDate, endDate, pageSize and offset are nullable
     @GET("/users/{userId}/records")
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
     fun searchRecords(
-            @Header(HEADER_ALIAS) alias: String,
-            @Path("userId") userId: String,
-            @Query("start_date") startDate: String?,
-            @Query("end_date") endDate: String?,
-            @Query("limit") pageSize: Int,
-            @Query("offset") offset: Int,
-            @Query("tags") tags: String
+        @Header(HEADER_ALIAS) alias: String,
+        @Path("userId") userId: String,
+        @Query("start_date") startDate: String?,
+        @Query("end_date") endDate: String?,
+        @Query("limit") pageSize: Int,
+        @Query("offset") offset: Int,
+        @Query("tags") tags: String
     ): Observable<List<EncryptedRecord>>
 
     @HEAD("/users/{userId}/records")
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
     fun getRecordsHeader(
-            @Header(HEADER_ALIAS) alias: String,
-            @Path("userId") userId: String,
-            @Query("tags") tags: String
+        @Header(HEADER_ALIAS) alias: String,
+        @Path("userId") userId: String,
+        @Query("tags") tags: String
     ): Single<Response<Void>>
 
     @GET("/users/{userId}/records/{recordId}")
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
     fun fetchRecord(
-            @Header(HEADER_ALIAS) alias: String,
-            @Path("userId") userId: String,
-            @Path("recordId") recordId: String
+        @Header(HEADER_ALIAS) alias: String,
+        @Path("userId") userId: String,
+        @Path("recordId") recordId: String
     ): Single<EncryptedRecord>
 
     @DELETE("/users/{userId}/records/{recordId}")
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
     fun deleteRecord(
-            @Header(HEADER_ALIAS) alias: String,
-            @Path("userId") userId: String,
-            @Path("recordId") recordId: String
+        @Header(HEADER_ALIAS) alias: String,
+        @Path("userId") userId: String,
+        @Path("recordId") recordId: String
     ): Completable
 
     @PUT("/users/{userId}/records/{recordId}")
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
     fun updateRecord(
-            @Header(HEADER_ALIAS) alias: String,
-            @Path("userId") userId: String,
-            @Path("recordId") recordId: String,
-            @Body encryptedRecord: EncryptedRecord
+        @Header(HEADER_ALIAS) alias: String,
+        @Path("userId") userId: String,
+        @Path("recordId") recordId: String,
+        @Body encryptedRecord: EncryptedRecord
     ): Single<EncryptedRecord>
 
     @POST("/users/{userId}/documents")
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN, HEADER_CONTENT_TYPE_OCTET_STREAM)
     fun uploadDocument(
-            @Header(HEADER_ALIAS) alias: String,
-            @Path("userId") userId: String,
-            @Body encryptedAttachment: RequestBody
+        @Header(HEADER_ALIAS) alias: String,
+        @Path("userId") userId: String,
+        @Body encryptedAttachment: RequestBody
     ): Single<DocumentUploadResponse>
 
     @GET("/users/{userId}/documents/{documentId}")
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
     fun downloadDocument(
-            @Header(HEADER_ALIAS) alias: String,
-            @Path("userId") userId: String,
-            @Path("documentId") documentId: String
+        @Header(HEADER_ALIAS) alias: String,
+        @Path("userId") userId: String,
+        @Path("documentId") documentId: String
     ): Single<ResponseBody>
 
     @DELETE("/users/{userId}/documents/{documentId}")
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
     fun deleteDocument(
-            @Header(HEADER_ALIAS) alias: String,
-            @Path("userId") userId: String,
-            @Path("documentId") documentId: String
+        @Header(HEADER_ALIAS) alias: String,
+        @Path("userId") userId: String,
+        @Path("documentId") documentId: String
     ): Single<Void>
 
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
     @GET("/userinfo")
     fun fetchUserInfo(
-            @Header(HEADER_ALIAS) alias: String
+        @Header(HEADER_ALIAS) alias: String
     ): Single<UserInfo>
 
     @FormUrlEncoded
     @POST("/oauth/revoke")
     @Headers(AUTHORIZATION_WITH_BASIC_AUTH)
     fun logout(
-            @Header(HEADER_ALIAS) alias: String,
-            @Field("token") refresh_token: String
+        @Header(HEADER_ALIAS) alias: String,
+        @Field("token") refresh_token: String
     ): Completable
 
     @GET("/sdk/v1/android/versions.json")
-    fun getVersionUpdateInfo(
-    ): Single<VersionList>
+    fun getVersionUpdateInfo(): Single<VersionList>
 
     companion object {
         const val AUTHORIZATION_WITH_ACCESS_TOKEN = "Authorization: access_token"

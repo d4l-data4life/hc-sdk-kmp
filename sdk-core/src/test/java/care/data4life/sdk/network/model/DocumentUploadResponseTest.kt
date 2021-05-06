@@ -14,10 +14,8 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network
+package care.data4life.sdk.network.model
 
-import care.data4life.sdk.network.model.DocumentUploadResponse
-import care.data4life.sdk.network.model.NetworkModelContract
 import com.squareup.moshi.Moshi
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -31,7 +29,7 @@ class DocumentUploadResponseTest {
     }
 
     @Test
-    fun `Given a DocumentUploadResponse is serialized it transforms it into valid JSON`() {
+    fun `Given a DocumentUploadResponse is serialized it transforms into a valid JSON`() {
         val moshi = Moshi.Builder()
             .build()
         val adapter = moshi.adapter<DocumentUploadResponse>(DocumentUploadResponse::class.java)
@@ -43,7 +41,7 @@ class DocumentUploadResponseTest {
     }
 
     @Test
-    fun `Given a DocumentUploadResponse in JSON format is deserialized it transforms it into DocumentUploadResponse`() {
+    fun `Given a DocumentUploadResponse in JSON format is deserialized it transforms into DocumentUploadResponse`() {
         val moshi = Moshi.Builder()
             .build()
         val adapter = moshi.adapter<DocumentUploadResponse>(DocumentUploadResponse::class.java)
@@ -55,7 +53,7 @@ class DocumentUploadResponseTest {
     }
 
     companion object {
-        private const val DOCUMENT_UPLOAD_RESPONSE_JSON = "{\"documentId\":\"test\"}"
+        private const val DOCUMENT_UPLOAD_RESPONSE_JSON = "{\"document_id\":\"test\"}"
         private val DOCUMENT_UPLOAD_RESPONSE = DocumentUploadResponse("test")
     }
 }

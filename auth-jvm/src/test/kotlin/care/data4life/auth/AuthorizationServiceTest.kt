@@ -17,9 +17,7 @@
 package care.data4life.auth
 
 import care.data4life.auth.test.util.ClientConfigLoader
-import care.data4life.auth.test.util.Environment
 import care.data4life.auth.test.util.Environment.DEVELOPMENT
-import care.data4life.auth.test.util.TestConfigLoader
 import care.data4life.sdk.util.Base64
 import com.github.scribejava.core.model.OAuth2AccessToken
 import com.github.scribejava.core.model.OAuth2Authorization
@@ -46,12 +44,12 @@ class AuthorizationServiceTest {
         val clientConfig = ClientConfigLoader.load()
 
         val config = AuthorizationConfiguration(
-                clientConfig[DEVELOPMENT].id,
-                clientConfig[DEVELOPMENT].secret,
-                "https://api-phdp-dev.hpsgc.de",
-                "https://api-phdp-dev.hpsgc.de",
-                clientConfig[DEVELOPMENT].redirectScheme,
-                Authorization.defaultScopes
+            clientConfig[DEVELOPMENT].id,
+            clientConfig[DEVELOPMENT].secret,
+            "https://api-phdp-dev.hpsgc.de",
+            "https://api-phdp-dev.hpsgc.de",
+            clientConfig[DEVELOPMENT].redirectScheme,
+            Authorization.defaultScopes
         )
 
         service = AuthorizationService(ALIAS, config, store, base64, oAuthService)
@@ -220,7 +218,6 @@ class AuthorizationServiceTest {
             oAuthService.refreshAccessToken(REFRESH_TOKEN)
             store.writeAuthState(TOKEN_KEY, tokenStateJson)
         }
-
     }
 
     @Test
@@ -233,7 +230,6 @@ class AuthorizationServiceTest {
         assertTrue { actual }
         verify { store.readAuthState(AUTH_KEY) }
         verify { store.readAuthState(TOKEN_KEY) }
-
     }
 
     @Test
@@ -257,14 +253,17 @@ class AuthorizationServiceTest {
 
         const val EMPTY_JSON = "{}"
         const val AUTH_STATE = """{"alias":"$ALIAS","secret": "$SECRET"}"""
-        const val TOKEN_STATE = """{"accessToken":"$ACCESS_TOKEN","refreshToken":"$REFRESH_TOKEN"}"""
+        const val TOKEN_STATE =
+            """{"accessToken":"$ACCESS_TOKEN","refreshToken":"$REFRESH_TOKEN"}"""
 
         const val TOKEN_STATE_BROKEN = """ {"accessToken"; "something"} """
         const val AUTH_STATE_BROKEN = """{"alias";""}"""
 
-        const val PUBLIC_KEY = "eyJwdWIiOiJNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQTJ3UFd2aGxYTFUybVFzOEIybUlaS0ZMK0x0cm81THp3VHR1YllzWWs2cTVPWWJ2eHhBVjRPWnZLaWc3enRaa2orM0R0RWlZaDVKTlVpMEpvQXRFQnhqRXVSeGVacDJ2eGJ4MUg3VDNVY29aRW9aNGE0QUQ0bFZoZ3ZKZVN5bXRUeUNPUC9WczlrUndBYnZuU2svR1d0RkVaeWtidUIvRDBIZ3NSdlNHTk9ZQUxpQzF2eXd4S1krak84QXpocmhna0VFa3M2bFZKTlZ1U0tmVTJwcDhwMVB3Q1pCaTVRQXR6a0JpOG92ODZOa1lmTlYrWC9SOStsVFJlSlZjeGNsNGxBQ3gzcU1nd05iT0Y0ZzluYnBrNFVmK1l6eWw5MWxGemFMY1dWRzNyeTRkVjFuRW9JR3Z2MXNkY05IaGZkSVJBNjd3VFQwaDVmV2ZiOUltdG9kaEpYUUlEQVFBQiIsInQiOiJhcHViIiwidiI6MX0="
+        const val PUBLIC_KEY =
+            "eyJwdWIiOiJNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQTJ3UFd2aGxYTFUybVFzOEIybUlaS0ZMK0x0cm81THp3VHR1YllzWWs2cTVPWWJ2eHhBVjRPWnZLaWc3enRaa2orM0R0RWlZaDVKTlVpMEpvQXRFQnhqRXVSeGVacDJ2eGJ4MUg3VDNVY29aRW9aNGE0QUQ0bFZoZ3ZKZVN5bXRUeUNPUC9WczlrUndBYnZuU2svR1d0RkVaeWtidUIvRDBIZ3NSdlNHTk9ZQUxpQzF2eXd4S1krak84QXpocmhna0VFa3M2bFZKTlZ1U0tmVTJwcDhwMVB3Q1pCaTVRQXR6a0JpOG92ODZOa1lmTlYrWC9SOStsVFJlSlZjeGNsNGxBQ3gzcU1nd05iT0Y0ZzluYnBrNFVmK1l6eWw5MWxGemFMY1dWRzNyeTRkVjFuRW9JR3Z2MXNkY05IaGZkSVJBNjd3VFQwaDVmV2ZiOUltdG9kaEpYUUlEQVFBQiIsInQiOiJhcHViIiwidiI6MX0="
 
-        const val CALLBACK_URL = "http://localhost:8888/icarus/gccallback?code=$EXPECTED_CODE&state=$SECRET"
+        const val CALLBACK_URL =
+            "http://localhost:8888/icarus/gccallback?code=$EXPECTED_CODE&state=$SECRET"
         const val AUTHORIZATION_URL = "expected_auth_url"
     }
 }

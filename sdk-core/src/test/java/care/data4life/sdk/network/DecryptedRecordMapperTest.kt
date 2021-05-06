@@ -24,7 +24,8 @@ import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.NetworkModelContract
-import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedCustomDataRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -57,14 +58,14 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
     fun `Given, build is called with a unknown Resource, Tags, CreationDate, DataKey and ModelVersion, it fails with a InternalFailure`() {
         try {
             DecryptedRecordMapper()
-                    .build(
-                            "something",
-                            tags,
-                            creationDate,
-                            dataKey,
-                            modelVersion
-                    )
-            assertTrue(false)// FIXME: This is stupid
+                .build(
+                    "something",
+                    tags,
+                    creationDate,
+                    dataKey,
+                    modelVersion
+                )
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -76,28 +77,28 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         // When
         val fhir4Resource = mockk<Fhir4Resource>()
         val record = DecryptedRecordMapper().build(
-                fhir4Resource,
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
+            fhir4Resource,
+            tags,
+            creationDate,
+            dataKey,
+            modelVersion
         )
 
         // Then
         assertTrue(record is DecryptedR4Record<*>)
         assertEquals(
-                record,
-                DecryptedR4Record(
-                        null,
-                        fhir4Resource,
-                        tags,
-                        listOf(),
-                        creationDate,
-                        null,
-                        dataKey,
-                        null,
-                        modelVersion
-                )
+            record,
+            DecryptedR4Record(
+                null,
+                fhir4Resource,
+                tags,
+                listOf(),
+                creationDate,
+                null,
+                dataKey,
+                null,
+                modelVersion
+            )
         )
     }
 
@@ -105,28 +106,28 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
     fun `Given, build is called with null, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedFhir3Record`() {
         // When
         val record = DecryptedRecordMapper().build(
-                null,
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
+            null,
+            tags,
+            creationDate,
+            dataKey,
+            modelVersion
         )
 
         // Then
         assertTrue(record is DecryptedFhir3Record<*>)
         assertEquals(
-                record,
-                DecryptedRecord(
-                        null,
-                        null,
-                        tags,
-                        listOf(),
-                        creationDate,
-                        null,
-                        dataKey,
-                        null,
-                        modelVersion
-                )
+            record,
+            DecryptedRecord(
+                null,
+                null,
+                tags,
+                listOf(),
+                creationDate,
+                null,
+                dataKey,
+                null,
+                modelVersion
+            )
         )
     }
 
@@ -134,28 +135,28 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
     fun `Given, build is called with a Fhir3Resource, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedFhir3Record`() {
         // When
         val record = DecryptedRecordMapper().build(
-                fhirResource,
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
+            fhirResource,
+            tags,
+            creationDate,
+            dataKey,
+            modelVersion
         )
 
         // Then
         assertTrue(record is DecryptedFhir3Record<*>)
         assertEquals(
-                record,
-                DecryptedRecord(
-                        null,
-                        fhirResource,
-                        tags,
-                        listOf(),
-                        creationDate,
-                        null,
-                        dataKey,
-                        null,
-                        modelVersion
-                )
+            record,
+            DecryptedRecord(
+                null,
+                fhirResource,
+                tags,
+                listOf(),
+                creationDate,
+                null,
+                dataKey,
+                null,
+                modelVersion
+            )
         )
     }
 
@@ -163,27 +164,27 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
     fun `Given, build is called with ByteArray, Tags, CreationDate, DataKey and ModelVersion, it returns a DecryptedDataRecord`() {
         // When
         val record = DecryptedRecordMapper().build(
-                DataResource(customResource),
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
+            DataResource(customResource),
+            tags,
+            creationDate,
+            dataKey,
+            modelVersion
         )
 
         // Then
-        assertTrue(record is care.data4life.sdk.network.model.definitions.DecryptedCustomDataRecord)
+        assertTrue(record is DecryptedCustomDataRecord)
         assertEquals(
-                record,
-                care.data4life.sdk.network.model.DecryptedDataRecord(
-                        null,
-                        DataResource(customResource),
-                        tags,
-                        listOf(),
-                        creationDate,
-                        null,
-                        dataKey,
-                        modelVersion
-                )
+            record,
+            care.data4life.sdk.network.model.DecryptedDataRecord(
+                null,
+                DataResource(customResource),
+                tags,
+                listOf(),
+                creationDate,
+                null,
+                dataKey,
+                modelVersion
+            )
         )
     }
 
@@ -192,13 +193,13 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         // When
         try {
             DecryptedRecordMapper()
-                    .build(
-                            DataResource(customResource),
-                            creationDate = creationDate,
-                            dataKey = dataKey,
-                            modelVersion = modelVersion
-                    )
-            assertTrue(false)// FIXME: This is stupid
+                .build(
+                    DataResource(customResource),
+                    creationDate = creationDate,
+                    dataKey = dataKey,
+                    modelVersion = modelVersion
+                )
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -210,13 +211,13 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         // When
         try {
             DecryptedRecordMapper()
-                    .build(
-                            DataResource(customResource),
-                            tags = tags,
-                            dataKey = dataKey,
-                            modelVersion = modelVersion
-                    )
-            assertTrue(false)// FIXME: This is stupid
+                .build(
+                    DataResource(customResource),
+                    tags = tags,
+                    dataKey = dataKey,
+                    modelVersion = modelVersion
+                )
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -228,13 +229,13 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         // When
         try {
             DecryptedRecordMapper()
-                    .build(
-                            DataResource(customResource),
-                            tags = tags,
-                            creationDate = creationDate,
-                            modelVersion = modelVersion
-                    )
-            assertTrue(false)// FIXME: This is stupid
+                .build(
+                    DataResource(customResource),
+                    tags = tags,
+                    creationDate = creationDate,
+                    modelVersion = modelVersion
+                )
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -246,13 +247,13 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         // When
         try {
             DecryptedRecordMapper()
-                    .build(
-                            DataResource(customResource),
-                            tags = tags,
-                            creationDate = creationDate,
-                            dataKey = dataKey
-                    )
-            assertTrue(false)// FIXME: This is stupid
+                .build(
+                    DataResource(customResource),
+                    tags = tags,
+                    creationDate = creationDate,
+                    dataKey = dataKey
+                )
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -264,14 +265,14 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         // When
         try {
             DecryptedRecordMapper()
-                    .build(
-                            DataResource(customResource),
-                            null,
-                            creationDate,
-                            dataKey,
-                            modelVersion
-                    )
-            assertTrue(false)// FIXME: This is stupid
+                .build(
+                    DataResource(customResource),
+                    null,
+                    creationDate,
+                    dataKey,
+                    modelVersion
+                )
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -283,14 +284,14 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         // When
         try {
             DecryptedRecordMapper()
-                    .build(
-                            DataResource(customResource),
-                            tags = tags,
-                            creationDate = null,
-                            dataKey = dataKey,
-                            modelVersion = modelVersion
-                    )
-            assertTrue(false)// FIXME: This is stupid
+                .build(
+                    DataResource(customResource),
+                    tags = tags,
+                    creationDate = null,
+                    dataKey = dataKey,
+                    modelVersion = modelVersion
+                )
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -302,14 +303,14 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         // When
         try {
             DecryptedRecordMapper()
-                    .build(
-                            DataResource(customResource),
-                            tags = tags,
-                            creationDate = creationDate,
-                            dataKey = null,
-                            modelVersion = modelVersion
-                    )
-            assertTrue(false)// FIXME: This is stupid
+                .build(
+                    DataResource(customResource),
+                    tags = tags,
+                    creationDate = creationDate,
+                    dataKey = null,
+                    modelVersion = modelVersion
+                )
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -320,14 +321,14 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
     fun `Given, build is called with a valid Resource, Tags, CreationDate, DataKey and null for a ModelVersion, but without using a setter for a ModelVersion, it fails with a InternalFailure`() {
         try {
             DecryptedRecordMapper()
-                    .build(
-                            DataResource(customResource),
-                            tags = tags,
-                            creationDate = creationDate,
-                            dataKey = dataKey,
-                            modelVersion = null
-                    )
-            assertTrue(false)// FIXME: This is stupid
+                .build(
+                    DataResource(customResource),
+                    tags = tags,
+                    creationDate = creationDate,
+                    dataKey = dataKey,
+                    modelVersion = null
+                )
+            assertTrue(false) // FIXME: This is stupid
         } catch (e: Exception) {
             // Then
             assertTrue(e is CoreRuntimeException.InternalFailure)
@@ -341,19 +342,19 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         val delegatedTags = Mockito.mock(HashMap::class.java) as HashMap<String, String>
         // When
         val record = DecryptedRecordMapper()
-                .setTags(tags)
-                .setCreationDate(creationDate)
-                .setDataKey(dataKey)
-                .setModelVersion(modelVersion)
-                .build(
-                        DataResource(customResource),
-                        tags = delegatedTags
-                )
+            .setTags(tags)
+            .setCreationDate(creationDate)
+            .setDataKey(dataKey)
+            .setModelVersion(modelVersion)
+            .build(
+                DataResource(customResource),
+                tags = delegatedTags
+            )
 
         // Then
         assertEquals(
-                record.tags,
-                delegatedTags
+            record.tags,
+            delegatedTags
         )
     }
 
@@ -363,19 +364,19 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         val delegatedDate = "2011-10-12"
         // When
         val record = DecryptedRecordMapper()
-                .setTags(tags)
-                .setCreationDate(creationDate)
-                .setDataKey(dataKey)
-                .setModelVersion(modelVersion)
-                .build(
-                        DataResource(customResource),
-                        creationDate = delegatedDate
-                )
+            .setTags(tags)
+            .setCreationDate(creationDate)
+            .setDataKey(dataKey)
+            .setModelVersion(modelVersion)
+            .build(
+                DataResource(customResource),
+                creationDate = delegatedDate
+            )
 
         // Then
         assertEquals(
-                record.customCreationDate,
-                delegatedDate
+            record.customCreationDate,
+            delegatedDate
         )
     }
 
@@ -385,19 +386,19 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         val delegatedDataKey = Mockito.mock(GCKey::class.java)
         // When
         val record = DecryptedRecordMapper()
-                .setTags(tags)
-                .setCreationDate(creationDate)
-                .setDataKey(dataKey)
-                .setModelVersion(modelVersion)
-                .build(
-                        DataResource(customResource),
-                        dataKey = delegatedDataKey
-                )
+            .setTags(tags)
+            .setCreationDate(creationDate)
+            .setDataKey(dataKey)
+            .setModelVersion(modelVersion)
+            .build(
+                DataResource(customResource),
+                dataKey = delegatedDataKey
+            )
 
         // Then
         assertEquals(
-                record.dataKey,
-                delegatedDataKey
+            record.dataKey,
+            delegatedDataKey
         )
     }
 
@@ -407,19 +408,19 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         val delegatedModelVersion = 23
         // When
         val record = DecryptedRecordMapper()
-                .setTags(tags)
-                .setCreationDate(creationDate)
-                .setDataKey(dataKey)
-                .setModelVersion(modelVersion)
-                .build(
-                        DataResource(customResource),
-                        modelVersion = delegatedModelVersion
-                )
+            .setTags(tags)
+            .setCreationDate(creationDate)
+            .setDataKey(dataKey)
+            .setModelVersion(modelVersion)
+            .build(
+                DataResource(customResource),
+                modelVersion = delegatedModelVersion
+            )
 
         // Then
         assertEquals(
-                record.modelVersion,
-                delegatedModelVersion
+            record.modelVersion,
+            delegatedModelVersion
         )
     }
 
@@ -430,30 +431,30 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
 
         // When
         val record = builder
-                .setIdentifier(identifier)
-                .setTags(tags)
-                .setAnnotations(annotations)
-                .setCreationDate(creationDate)
-                .setUpdateDate(updateDate)
-                .setDataKey(dataKey)
-                .setAttachmentKey(attachmentKey)
-                .setModelVersion(modelVersion)
-                .build(fhirResource)
+            .setIdentifier(identifier)
+            .setTags(tags)
+            .setAnnotations(annotations)
+            .setCreationDate(creationDate)
+            .setUpdateDate(updateDate)
+            .setDataKey(dataKey)
+            .setAttachmentKey(attachmentKey)
+            .setModelVersion(modelVersion)
+            .build(fhirResource)
 
         // Then
         assertEquals(
-                record,
-                DecryptedRecord(
-                        identifier,
-                        fhirResource,
-                        tags,
-                        annotations,
-                        creationDate,
-                        updateDate,
-                        dataKey,
-                        attachmentKey,
-                        modelVersion
-                )
+            record,
+            DecryptedRecord(
+                identifier,
+                fhirResource,
+                tags,
+                annotations,
+                creationDate,
+                updateDate,
+                dataKey,
+                attachmentKey,
+                modelVersion
+            )
         )
     }
 
@@ -465,30 +466,30 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
 
         // When
         val record = builder
-                .setIdentifier(identifier)
-                .setTags(tags)
-                .setAnnotations(annotations)
-                .setCreationDate(creationDate)
-                .setUpdateDate(updateDate)
-                .setDataKey(dataKey)
-                .setAttachmentKey(attachmentKey)
-                .setModelVersion(modelVersion)
-                .build(resource)
+            .setIdentifier(identifier)
+            .setTags(tags)
+            .setAnnotations(annotations)
+            .setCreationDate(creationDate)
+            .setUpdateDate(updateDate)
+            .setDataKey(dataKey)
+            .setAttachmentKey(attachmentKey)
+            .setModelVersion(modelVersion)
+            .build(resource)
 
         // Then
         assertEquals(
-                record,
-                DecryptedR4Record(
-                        identifier,
-                        resource,
-                        tags,
-                        annotations,
-                        creationDate,
-                        updateDate,
-                        dataKey,
-                        attachmentKey,
-                        modelVersion
-                )
+            record,
+            DecryptedR4Record(
+                identifier,
+                resource,
+                tags,
+                annotations,
+                creationDate,
+                updateDate,
+                dataKey,
+                attachmentKey,
+                modelVersion
+            )
         )
     }
 
@@ -499,28 +500,28 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
 
         // When
         val record = builder
-                .setIdentifier(identifier)
-                .setTags(tags)
-                .setAnnotations(annotations)
-                .setCreationDate(creationDate)
-                .setUpdateDate(updateDate)
-                .setDataKey(dataKey)
-                .setAttachmentKey(attachmentKey)
-                .setModelVersion(modelVersion)
-                .build(DataResource(customResource))
+            .setIdentifier(identifier)
+            .setTags(tags)
+            .setAnnotations(annotations)
+            .setCreationDate(creationDate)
+            .setUpdateDate(updateDate)
+            .setDataKey(dataKey)
+            .setAttachmentKey(attachmentKey)
+            .setModelVersion(modelVersion)
+            .build(DataResource(customResource))
 
         assertEquals(
-                record,
-                care.data4life.sdk.network.model.DecryptedDataRecord(
-                        identifier,
-                        DataResource(customResource),
-                        tags,
-                        annotations,
-                        creationDate,
-                        updateDate,
-                        dataKey,
-                        modelVersion
-                )
+            record,
+            care.data4life.sdk.network.model.DecryptedDataRecord(
+                identifier,
+                DataResource(customResource),
+                tags,
+                annotations,
+                creationDate,
+                updateDate,
+                dataKey,
+                modelVersion
+            )
         )
     }
 
@@ -531,11 +532,11 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
 
         // When
         DecryptedRecordMapper().build(
-                DataResource(customResource),
-                tags,
-                creationDate,
-                dataKey,
-                modelVersion
+            DataResource(customResource),
+            tags,
+            creationDate,
+            dataKey,
+            modelVersion
         )
 
         // Then
@@ -548,18 +549,23 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         @Suppress("UNCHECKED_CAST")
         val delegatedTags = Mockito.mock(HashMap::class.java) as HashMap<String, String>
 
-        every { DecryptedRecordGuard.checkTagsAndAnnotationsLimits(delegatedTags, listOf()) } returns Unit
+        every {
+            DecryptedRecordGuard.checkTagsAndAnnotationsLimits(
+                delegatedTags,
+                listOf()
+            )
+        } returns Unit
 
         // When
         DecryptedRecordMapper()
-                .setTags(tags)
-                .build(
-                        DataResource(customResource),
-                        delegatedTags,
-                        creationDate,
-                        dataKey,
-                        modelVersion
-                )
+            .setTags(tags)
+            .build(
+                DataResource(customResource),
+                delegatedTags,
+                creationDate,
+                dataKey,
+                modelVersion
+            )
 
         // Then
         verify { DecryptedRecordGuard.checkTagsAndAnnotationsLimits(delegatedTags, listOf()) }
@@ -571,14 +577,14 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         every { DecryptedRecordGuard.checkTagsAndAnnotationsLimits(tags, annotations) } returns Unit
 
         DecryptedRecordMapper()
-                .setAnnotations(annotations)
-                .build(
-                        DataResource(customResource),
-                        tags,
-                        creationDate,
-                        dataKey,
-                        modelVersion
-                )
+            .setAnnotations(annotations)
+            .build(
+                DataResource(customResource),
+                tags,
+                creationDate,
+                dataKey,
+                modelVersion
+            )
 
         // Then
         verify { DecryptedRecordGuard.checkTagsAndAnnotationsLimits(tags, annotations) }
@@ -590,14 +596,14 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         every { DecryptedRecordGuard.checkDataLimit(customResource) } returns Unit
 
         DecryptedRecordMapper()
-                .setAnnotations(annotations)
-                .build(
-                        DataResource(customResource),
-                        tags,
-                        creationDate,
-                        dataKey,
-                        modelVersion
-                )
+            .setAnnotations(annotations)
+            .build(
+                DataResource(customResource),
+                tags,
+                creationDate,
+                dataKey,
+                modelVersion
+            )
 
         // Then
         verify { DecryptedRecordGuard.checkDataLimit(customResource) }
@@ -609,14 +615,14 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         every { DecryptedRecordGuard.checkDataLimit(any()) } returns Unit
 
         DecryptedRecordMapper()
-                .setAnnotations(annotations)
-                .build(
-                        null,
-                        tags,
-                        creationDate,
-                        dataKey,
-                        modelVersion
-                )
+            .setAnnotations(annotations)
+            .build(
+                null,
+                tags,
+                creationDate,
+                dataKey,
+                modelVersion
+            )
 
         // Then
         verify(exactly = 0) { DecryptedRecordGuard.checkDataLimit(any()) }
@@ -628,14 +634,14 @@ class DecryptedRecordMapperTest : DecryptedRecordMapperTestBase() {
         every { DecryptedRecordGuard.checkDataLimit(any()) } returns Unit
 
         DecryptedRecordMapper()
-                .setAnnotations(annotations)
-                .build(
-                        null,
-                        tags,
-                        creationDate,
-                        dataKey,
-                        modelVersion
-                )
+            .setAnnotations(annotations)
+            .build(
+                null,
+                tags,
+                creationDate,
+                dataKey,
+                modelVersion
+            )
 
         // Then
         verify(exactly = 0) { DecryptedRecordGuard.checkDataLimit(any()) }

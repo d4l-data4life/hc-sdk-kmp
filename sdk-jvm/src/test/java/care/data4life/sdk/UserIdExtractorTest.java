@@ -41,7 +41,8 @@ public class UserIdExtractorTest {
     private static final String STATE_WITH_INVALID_JSON_URL_ENCODED = "eyJzb21ldGhpbmciOyJmYWlsdXJlIn0%3D";
 
 
-    @Mock private UrlDecoder mockUrlDecoder;
+    @Mock
+    private UrlDecoder mockUrlDecoder;
 
 
     private UserIdExtractor extractor;

@@ -17,17 +17,20 @@
 package care.data4life.sdk;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
+import org.junit.Test;
 
 import care.data4life.auth.AuthorizationService;
 import care.data4life.sdk.auth.UserService;
 import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.test.util.TestSchedulerRule;
+import io.reactivex.Single;
 
+import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-@Ignore
 public class Data4LifeClientTest {
 
     private static final boolean IS_LOGGED_IN = true;
@@ -52,6 +55,7 @@ public class Data4LifeClientTest {
         recordService = mock(RecordService.class);
         callHandler = mock(CallHandler.class);
 
+        when(userService.getUserID()).thenReturn(Single.just("uid"));
 
         instance = new Data4LifeClient(
                 ALIAS,
@@ -61,5 +65,9 @@ public class Data4LifeClientTest {
     }
 
     // TODO Need to define new tests
-
+    @Test
+    public void hasUserId() {
+        doReturn(Single.just(IS_LOGGED_IN)).when(userService).finishLogin(IS_LOGGED_IN);
+        assertThat(instance.getUserId()).isEqualTo("uid");
+    }
 }

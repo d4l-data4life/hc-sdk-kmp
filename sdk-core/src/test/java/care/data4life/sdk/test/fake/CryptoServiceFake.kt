@@ -23,27 +23,28 @@ import care.data4life.crypto.KeyType
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.NetworkModelContract
+import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.test.util.GenericTestDataProvider.IV
 import io.mockk.mockk
 import io.reactivex.Single
 
 data class CryptoServiceIteration(
-        val gcKeyOrder: List<GCKey>,
-        val commonKey: GCKey,
-        val commonKeyId: String,
-        val commonKeyIsStored: Boolean,
-        val commonKeyFetchCalls: Int,
-        val encryptedCommonKey: EncryptedKey?,
-        val dataKey: GCKey,
-        val encryptedDataKey: EncryptedKey,
-        val attachmentKey: GCKey?,
-        val encryptedAttachmentKey: EncryptedKey?,
-        val tagEncryptionKey: GCKey,
-        val tagEncryptionKeyCalls: Int,
-        val resources: List<String>,
-        val tags: List<String>,
-        val annotations: List<String>,
-        val hashFunction: (payload: String) -> String
+    val gcKeyOrder: List<GCKey>,
+    val commonKey: GCKey,
+    val commonKeyId: String,
+    val commonKeyIsStored: Boolean,
+    val commonKeyFetchCalls: Int,
+    val encryptedCommonKey: EncryptedKey?,
+    val dataKey: GCKey,
+    val encryptedDataKey: EncryptedKey,
+    val attachmentKey: GCKey?,
+    val encryptedAttachmentKey: EncryptedKey?,
+    val tagEncryptionKey: GCKey,
+    val tagEncryptionKeyCalls: Int,
+    val resources: List<String>,
+    val tags: List<String>,
+    val annotations: Annotations,
+    val hashFunction: (payload: String) -> String
 )
 
 class CryptoServiceFake : CryptoContract.Service {
@@ -73,12 +74,16 @@ class CryptoServiceFake : CryptoContract.Service {
             }
         }
 
+    private fun isResourceKey(
+        key: GCKey
+    ): Boolean = key == currentIteration.dataKey || key == currentIteration.attachmentKey
+
     private fun indexOfResource(resource: String): Int {
         return currentIteration.resources.indexOf(resource)
     }
 
     private fun findResource(key: GCKey, resource: String): Int {
-        return if(key == currentIteration.dataKey) {
+        return if (isResourceKey(key)) {
             indexOfResource(resource)
         } else {
             -1
@@ -90,7 +95,13 @@ class CryptoServiceFake : CryptoContract.Service {
         return if (idx > -1) {
             Single.just(hashedResources[idx].toByteArray())
         } else {
-            throw RuntimeException("Unable to fake resource encryption: \nKey: $key \nData: ${String(data)}")
+            throw RuntimeException(
+                "Unable to fake resource encryption: \nKey: $key \nData: ${
+                String(
+                    data
+                )
+                }"
+            )
         }
     }
 
@@ -99,7 +110,7 @@ class CryptoServiceFake : CryptoContract.Service {
     }
 
     private fun findHashedResource(key: GCKey, hashedResource: String): Int {
-        return if(key == currentIteration.dataKey) {
+        return if (isResourceKey(key)) {
             indexOfEncryptedResource(hashedResource)
         } else {
             -1
@@ -111,7 +122,13 @@ class CryptoServiceFake : CryptoContract.Service {
         return if (idx > -1) {
             Single.just(currentIteration.resources[idx].toByteArray())
         } else {
-            throw RuntimeException("Unable to fake resource decryption: \nKey: $key \nData: ${String(data)}")
+            throw RuntimeException(
+                "Unable to fake resource decryption: \nKey: $key \nData: ${
+                String(
+                    data
+                )
+                }"
+            )
         }
     }
 
@@ -189,7 +206,7 @@ class CryptoServiceFake : CryptoContract.Service {
 
     private fun matchAdditionalTagParameter(key: GCKey, iv: ByteArray): Boolean {
         return key == currentIteration.tagEncryptionKey &&
-                iv.contentEquals(IV)
+            iv.contentEquals(IV)
     }
 
     private fun isEncryptableTag(
@@ -220,7 +237,7 @@ class CryptoServiceFake : CryptoContract.Service {
         } else {
             throw RuntimeException(
                 "Unexpected payload for symEncrypt(probably tag/annotation encryption):" +
-                        "\nKey: $key\nData: ${String(data)}\nIV: $iv"
+                    "\nKey: $key\nData: ${String(data)}\nIV: $iv"
             )
         }
     }
@@ -249,7 +266,7 @@ class CryptoServiceFake : CryptoContract.Service {
         } else {
             throw RuntimeException(
                 "Unexpected payload for symDecrypt(probably tag/annotation encryption):" +
-                        "\nKey: $key\nData: $data\nIV: $iv"
+                    "\nKey: $key\nData: $data\nIV: $iv"
             )
         }
     }
@@ -311,7 +328,6 @@ class CryptoServiceFake : CryptoContract.Service {
         }
     }
 
-
     override fun fetchCurrentCommonKey(): GCKey {
         return if (remainingCommonKeyFetchCalls >= 1) {
             currentIteration.commonKey.also {
@@ -334,7 +350,7 @@ class CryptoServiceFake : CryptoContract.Service {
     }
 
     // Fake util
-    private fun hashResource(iteration: CryptoServiceIteration) {
+    private fun hashResources(iteration: CryptoServiceIteration) {
         val hashedResources = mutableListOf<String>()
         iteration.resources.forEach { hashedResources.add(iteration.hashFunction(it)) }
         this.hashedResources = hashedResources
@@ -350,7 +366,7 @@ class CryptoServiceFake : CryptoContract.Service {
         hashedTagsAndAnnotations[hashed] = tag
     }
 
-    private fun prepareTagsAndAnnotations(tags: List<String>, annotations: List<String>) {
+    private fun prepareTagsAndAnnotations(tags: List<String>, annotations: Annotations) {
         val tagsAndAnnotations = mutableMapOf<String, String>()
         val hashedTagsAndAnnotations = mutableMapOf<String, String>()
 
@@ -386,7 +402,7 @@ class CryptoServiceFake : CryptoContract.Service {
 
         setCallLimits(iteration)
         setCommonKey(iteration)
-        hashResource(iteration)
+        hashResources(iteration)
         prepareTagsAndAnnotations(iteration.tags, iteration.annotations)
     }
 

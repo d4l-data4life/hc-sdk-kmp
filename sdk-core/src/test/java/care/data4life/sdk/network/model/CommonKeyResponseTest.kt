@@ -14,11 +14,8 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network
+package care.data4life.sdk.network.model
 
-import care.data4life.sdk.network.model.CommonKeyResponse
-import care.data4life.sdk.network.model.EncryptedKey
-import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter
 import com.squareup.moshi.Moshi
 import io.mockk.mockk
@@ -34,35 +31,35 @@ class CommonKeyResponseTest {
     }
 
     @Test
-    fun `Given a CommonKeyResponse is serialized it transforms it into valid JSON`() {
+    fun `Given a CommonKeyResponse is serialized it transforms into a valid JSON`() {
         val moshi = Moshi.Builder()
-                .add(EncryptedKeyTypeAdapter())
-                .build()
+            .add(EncryptedKeyTypeAdapter())
+            .build()
         val adapter = moshi.adapter<CommonKeyResponse>(CommonKeyResponse::class.java)
 
         assertEquals(
-                actual = adapter.toJson(COMMON_KEY_RESPONSE),
-                expected = COMMON_KEY_RESPONSE_JSON
+            actual = adapter.toJson(COMMON_KEY_RESPONSE),
+            expected = COMMON_KEY_RESPONSE_JSON
         )
     }
 
     @Test
-    fun `Given a CommonKeyResponse in JSON format is deserialized it transforms it into CommonKeyResponse`() {
+    fun `Given a CommonKeyResponse in JSON format is deserialized it transforms into CommonKeyResponse`() {
         val moshi = Moshi.Builder()
-                .add(EncryptedKeyTypeAdapter())
-                .build()
+            .add(EncryptedKeyTypeAdapter())
+            .build()
         val adapter = moshi.adapter<CommonKeyResponse>(CommonKeyResponse::class.java)
 
         assertEquals(
-                actual = adapter.fromJson(COMMON_KEY_RESPONSE_JSON),
-                expected = COMMON_KEY_RESPONSE
+            actual = adapter.fromJson(COMMON_KEY_RESPONSE_JSON),
+            expected = COMMON_KEY_RESPONSE
         )
     }
 
     companion object {
         private val ENCRYPTED_COMMON_KEY = EncryptedKey("abc")
 
-        const val COMMON_KEY_RESPONSE_JSON = "{\"commonKey\":\"abc\"}"
+        const val COMMON_KEY_RESPONSE_JSON = "{\"common_key\":\"abc\"}"
         private val COMMON_KEY_RESPONSE = CommonKeyResponse(ENCRYPTED_COMMON_KEY)
     }
 }

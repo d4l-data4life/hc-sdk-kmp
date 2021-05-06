@@ -21,6 +21,8 @@ object GradlePlugins {
     const val android = "com.android.tools.build:gradle:${Versions.GradlePlugins.android}"
     const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.GradlePlugins.kotlin}"
 
+    const val kapt = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.GradlePlugins.kotlin}"
+
     const val dexcount = "com.getkeepsafe.dexcount:dexcount-gradle-plugin:${Versions.GradlePlugins.dexcount}"
 
     const val downloadTask = "de.undercouch:gradle-download-task:${Versions.GradlePlugins.downloadTask}"
@@ -29,17 +31,16 @@ object GradlePlugins {
 }
 
 fun PluginDependenciesSpec.kotlinMultiplatform(apply: Boolean = true): PluginDependencySpec =
-        id("org.jetbrains.kotlin.multiplatform").version(Versions.GradlePlugins.kotlin).apply(apply)
+    id("org.jetbrains.kotlin.multiplatform").version(Versions.GradlePlugins.kotlin).apply(apply)
 
 fun PluginDependenciesSpec.kotlinMultiplatform(): PluginDependencySpec =
-        id("org.jetbrains.kotlin.multiplatform")
-
+    id("org.jetbrains.kotlin.multiplatform")
 
 fun PluginDependenciesSpec.androidApp(): PluginDependencySpec =
-        id("com.android.application")
+    id("com.android.application")
 
 fun PluginDependenciesSpec.androidLibrary(): PluginDependencySpec =
-        id("com.android.library")
+    id("com.android.library")
 
 fun PluginDependenciesSpec.androidKotlin(): PluginDependencySpec =
-        id("kotlin-android")
+    id("kotlin-android")

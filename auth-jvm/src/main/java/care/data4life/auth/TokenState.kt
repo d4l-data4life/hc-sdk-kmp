@@ -16,7 +16,10 @@
 
 package care.data4life.auth
 
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
 internal data class TokenState(
-        var accessToken: String? = null,
-        var refreshToken: String? = null
+    var accessToken: String? = null,
+    var refreshToken: String? = null
 )

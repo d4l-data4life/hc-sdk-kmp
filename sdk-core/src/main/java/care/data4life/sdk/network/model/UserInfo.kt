@@ -17,16 +17,18 @@ package care.data4life.sdk.network.model
 
 import care.data4life.sdk.network.model.NetworkModelContract.Companion.DEFAULT_COMMON_KEY_ID
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class UserInfo(
-        @field:Json(name = "sub")
-        override val uid: String,
-        @field:Json(name = "common_key")
-        override val commonKey: EncryptedKey,
-        @field:Json(name = "common_key_id")
-        private var _commonKeyId: String?,
-        @field:Json(name = "tag_encryption_key")
-        override val tagEncryptionKey: EncryptedKey
+    @field:Json(name = "sub")
+    override val uid: String,
+    @field:Json(name = "common_key")
+    override val commonKey: EncryptedKey,
+    @field:Json(name = "common_key_id")
+    internal var _commonKeyId: String?,
+    @field:Json(name = "tag_encryption_key")
+    override val tagEncryptionKey: EncryptedKey
 ) : NetworkModelContract.UserInfo {
 
     init {

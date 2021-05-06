@@ -20,8 +20,11 @@ import android.content.Context
 import care.data4life.securestore.storage.AndroidSharedPreferenceStorage
 
 actual class SecureStoreStorage @JvmOverloads constructor(
-        context: Context,
-        private val storage: SecureStoreContract.Storage = AndroidSharedPreferenceStorage(context, PREFERENCE_NAME)
+    context: Context,
+    private val storage: SecureStoreContract.Storage = AndroidSharedPreferenceStorage(
+        context,
+        PREFERENCE_NAME
+    )
 ) : SecureStoreContract.Storage {
 
     override fun addData(alias: String, data: CharArray) {

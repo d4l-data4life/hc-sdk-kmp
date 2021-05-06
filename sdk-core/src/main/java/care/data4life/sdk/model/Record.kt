@@ -17,12 +17,13 @@ package care.data4life.sdk.model
 
 import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.sdk.model.ModelContract.Fhir3Record
+import care.data4life.sdk.tag.Annotations
 import java.util.Objects.hash
 
 open class Record<T : DomainResource>(
     fhirResource: T,
     meta: ModelContract.Meta?,
-    annotations: List<String>? = null
+    annotations: Annotations? = null
 ) : Fhir3Record<T> {
     constructor(fhirResource: T, meta: Meta?) : this(
         fhirResource,
@@ -41,8 +42,8 @@ open class Record<T : DomainResource>(
     override val meta: ModelContract.Meta?
         get() = _meta
 
-    private var _annotations: List<String>? = annotations
-    override val annotations: List<String>?
+    private var _annotations: Annotations? = annotations
+    override val annotations: Annotations?
         get() = _annotations
 
     override fun equals(other: Any?): Boolean {
@@ -50,8 +51,8 @@ open class Record<T : DomainResource>(
             this === other -> true
             other !is Record<*> -> false
             resource != other.resource ||
-                    meta != other.meta ||
-                    annotations != other.annotations -> false
+                meta != other.meta ||
+                annotations != other.annotations -> false
             else -> true
         }
     }

@@ -22,56 +22,41 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class VersionTest {
+    private val moshi = Moshi.Builder().build()
 
     @Test
-    fun `Given a Version it  the Version interface`() {
-        //Given
+    fun `It fulfils Version`() {
         val version: Any = Version(
-                25,
-                "1.9.0",
-                "supported"
+            25,
+            "1.9.0",
+            "supported"
         )
+
         assertTrue(version is NetworkModelContract.Version)
     }
 
     @Test
-    fun `Version is serializable, it builds the valid json format`() {
-        //Given
-        val version = Version(
-                25,
-                "1.9.0",
-                "supported"
-        )
-        val moshi = Moshi.Builder().build()
-
-        //When
-        val actual = moshi.adapter<Version>(Version::class.java).toJson(version)
+    fun `Version is serializable, it transforms into a valid JSON`() {
         assertEquals(
-                "{\"status\":\"supported\",\"version_code\":25,\"version_name\":\"1.9.0\"}",
-                actual
+            expected = SERIALIZED_VERSION,
+            actual = moshi.adapter(Version::class.java).toJson(VERSION)
         )
     }
 
     @Test
     fun `Given a Version is deserialized it transforms into Version`() {
-        //Given
-        val moshi = Moshi.Builder()
-                .build()
-        val versionJson =
-                "{\"status\":\"supported\",\"version_code\":25,\"version_name\":\"1.9.0\"}"
-
-        //When
-        val version = moshi.adapter<Version>(Version::class.java).fromJson(versionJson)
-
-        //Then
         assertEquals(
-                version,
-                Version(
-                        25,
-                        "1.9.0",
-                        "supported"
-                )
+            expected = VERSION,
+            actual = moshi.adapter(Version::class.java).fromJson(SERIALIZED_VERSION)
         )
     }
 
+    companion object {
+        private val VERSION = Version(
+            25,
+            "1.9.0",
+            "supported"
+        )
+        private const val SERIALIZED_VERSION = "{\"version_code\":25,\"version_name\":\"1.9.0\",\"status\":\"supported\"}"
+    }
 }

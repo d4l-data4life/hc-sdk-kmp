@@ -18,19 +18,5 @@ package care.data4life.crypto
 
 import care.data4life.crypto.security.SecretKey
 
-class GCSymmetricKey(val value: SecretKey) {
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is GCSymmetricKey) return false
-
-        if (value != other.value) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return value.hashCode()
-    }
-
-}
+@JsonClass(generateAdapter = true)
+data class GCSymmetricKey(val value: SecretKey)

@@ -17,17 +17,18 @@
 package care.data4life.sdk.fhir
 
 import care.data4life.crypto.GCKey
+import care.data4life.sdk.tag.Tags
 
-//TODO: make internal
+// TODO: make internal
 interface FhirContract {
 
     interface Service {
         fun _encryptResource(dataKey: GCKey, resource: Any): String
 
         fun <T : Any> decryptResource(
-                dataKey: GCKey,
-                tags: HashMap<String, String>,
-                encryptedResource: String
+            dataKey: GCKey,
+            tags: Tags,
+            encryptedResource: String
         ): T
     }
 

@@ -81,7 +81,6 @@ interface SecureStoreContract {
         fun clear()
     }
 
-
     interface Storage {
 
         /**

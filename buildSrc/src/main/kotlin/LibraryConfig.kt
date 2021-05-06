@@ -21,16 +21,17 @@ object LibraryConfig {
     const val githubOwner = "d4l-data4life"
     const val githubRepository = "hc-sdk-kmp"
 
-    const val version = "1.10.0"
+    const val version = "1.11.0"
     const val referenceSdkVersion = "1.8.0"
 
     val publish = PublishConfig
+
     object PublishConfig {
         const val name = LibraryConfig.name
         const val groupId = LibraryConfig.group
         const val description = "Android SDK for interacting with the Data4Life Personal Health Data Platform."
 
-        const val year = "2020"
+        const val year = "2021"
 
         // URL
         const val host = "github.com"
@@ -55,8 +56,9 @@ object LibraryConfig {
     }
 
     val android = AndroidLibraryConfig
+
     object AndroidLibraryConfig {
-        const val minSdkVersion = 21
+        const val minSdkVersion = 23
         const val compileSdkVersion = 30
         const val targetSdkVersion = 30
 

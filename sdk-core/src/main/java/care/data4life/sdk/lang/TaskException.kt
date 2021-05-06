@@ -16,8 +16,10 @@
 
 package care.data4life.sdk.lang
 
-sealed class TaskException(message: String? = null, cause: Throwable? = null)
-    : D4LRuntimeException(message, cause) {
+sealed class TaskException(
+    message: String? = null,
+    cause: Throwable? = null
+) : D4LRuntimeException(message, cause) {
 
     class CancelException : TaskException(message = "The operation was canceled.")
 }

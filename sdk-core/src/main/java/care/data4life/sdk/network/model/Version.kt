@@ -16,14 +16,14 @@
 package care.data4life.sdk.network.model
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-data class Version (
-
-        @field:Json(name = "version_code")
-        override val code: Int,
-        @field:Json(name = "version_name")
-        override val name: String,
-        @field:Json(name = "status")
-        override val status: String
-
+@JsonClass(generateAdapter = true)
+data class Version(
+    @field:Json(name = "version_code")
+    override val code: Int,
+    @field:Json(name = "version_name")
+    override val name: String,
+    @field:Json(name = "status")
+    override val status: String
 ) : NetworkModelContract.Version

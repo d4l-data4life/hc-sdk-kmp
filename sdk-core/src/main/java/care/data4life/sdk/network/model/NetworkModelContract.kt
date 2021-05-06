@@ -17,31 +17,36 @@
 package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
+import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
+import care.data4life.sdk.tag.Tags
 
 class NetworkModelContract {
     internal interface DecryptedRecordBuilder {
-        //mandatory
-        fun setTags(tags: HashMap<String, String>?): DecryptedRecordBuilder
+        // mandatory
+        fun setTags(tags: Tags?): DecryptedRecordBuilder
         fun setCreationDate(creationDate: String?): DecryptedRecordBuilder
         fun setDataKey(dataKey: GCKey?): DecryptedRecordBuilder
         fun setModelVersion(modelVersion: Int?): DecryptedRecordBuilder
 
-        //Optional
+        // Optional
         fun setIdentifier(identifier: String?): DecryptedRecordBuilder
-        fun setAnnotations(annotations: List<String>?): DecryptedRecordBuilder
+        fun setAnnotations(annotations: Annotations?): DecryptedRecordBuilder
         fun setUpdateDate(updatedDate: String?): DecryptedRecordBuilder
         fun setAttachmentKey(attachmentKey: GCKey?): DecryptedRecordBuilder
 
         @Throws(CoreRuntimeException.InternalFailure::class)
         fun <T : Any?> build(
-                resource: T,
-                tags: HashMap<String, String>? = null,
-                creationDate: String? = null,
-                dataKey: GCKey? = null,
-                modelVersion: Int? = null
+            resource: T,
+            tags: Tags? = null,
+            creationDate: String? = null,
+            dataKey: GCKey? = null,
+            modelVersion: Int? = null
         ): DecryptedBaseRecord<T>
 
         fun clear(): DecryptedRecordBuilder
@@ -49,7 +54,7 @@ class NetworkModelContract {
 
     internal interface LimitGuard {
         @Throws(DataValidationException.TagsAndAnnotationsLimitViolation::class)
-        fun checkTagsAndAnnotationsLimits(tags: HashMap<String, String>, annotations: List<String>)
+        fun checkTagsAndAnnotationsLimits(tags: Tags, annotations: Annotations)
 
         @Throws(DataValidationException.CustomDataLimitViolation::class)
         fun checkDataLimit(data: ByteArray)
@@ -60,21 +65,23 @@ class NetworkModelContract {
         }
     }
 
-
     internal interface Version {
         val code: Int
         val name: String
         val status: String
+    }
 
-        companion object{
-            var KEY_DEPRECATED = "deprecated"
-            var KEY_UNSUPPORTED = "unsupported"
-        }
+    enum class VersionStatus {
+        DEPRECATED,
+        SUPPORTED,
+        UNSUPPORTED
     }
 
     internal interface VersionList {
         val versions: List<Version>
+        fun resolveSupportStatus(version: String): VersionStatus
     }
+
     internal interface DocumentUploadResponse {
         var documentId: String
     }
@@ -103,7 +110,7 @@ class NetworkModelContract {
     interface EncryptedRecord {
         val commonKeyId: String
         val identifier: String?
-        val encryptedTags: List<String>
+        val encryptedTags: EncryptedTagsAndAnnotations
         val encryptedBody: String?
         val customCreationDate: String?
         val encryptedDataKey: EncryptedKey
@@ -111,10 +118,28 @@ class NetworkModelContract {
         val modelVersion: Int
         val updatedDate: String?
         val version: Int
-
-
     }
 
+    interface DecryptedBaseRecord<T> {
+        var identifier: String?
+        var resource: T
+        var tags: Tags?
+        var annotations: Annotations
+        var customCreationDate: String?
+        var updatedDate: String? // FIXME: This should never be null
+        var dataKey: GCKey?
+        var attachmentsKey: GCKey?
+        var modelVersion: Int
+    }
+
+    // FIXME remove nullable type
+    internal interface DecryptedFhir3Record<T : Fhir3Resource?> : DecryptedBaseRecord<T>
+    internal interface DecryptedFhir4Record<T : Fhir4Resource> : DecryptedBaseRecord<T>
+    internal interface DecryptedCustomDataRecord : DecryptedBaseRecord<DataResource> {
+        override var attachmentsKey: GCKey?
+            get() = null
+            set(_) {}
+    }
     companion object {
         const val DEFAULT_COMMON_KEY_ID: String = "00000000-0000-0000-0000-000000000000"
     }

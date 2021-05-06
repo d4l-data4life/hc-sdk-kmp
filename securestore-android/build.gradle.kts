@@ -31,9 +31,11 @@ android {
         versionName = "${project.version}"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments(mapOf(
+        testInstrumentationRunnerArguments(
+            mapOf(
                 "clearPackageData" to "true"
-        ))
+            )
+        )
     }
 
     resourcePrefix("d4l_securestore_")
@@ -81,7 +83,7 @@ dependencies {
     api(Dependencies.Multiplatform.D4L.utilAndroid)
     implementation(Dependencies.Multiplatform.Kotlin.stdlibAndroid)
     implementation(Dependencies.Android.AndroidX.appCompat)
-    compileOnly(Dependencies.java.javaXAnnotation)
+    compileOnly(Dependencies.Java.javaXAnnotation)
 
     implementation(Dependencies.Android.tink)
 

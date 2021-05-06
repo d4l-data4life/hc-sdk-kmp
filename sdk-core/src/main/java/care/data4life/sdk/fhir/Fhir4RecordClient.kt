@@ -17,91 +17,126 @@
 package care.data4life.sdk.fhir
 
 import care.data4life.sdk.SdkContract
-import care.data4life.sdk.auth.UserService
+import care.data4life.sdk.auth.AuthContract
 import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.call.Callback
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.call.Task
+import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.tag.Annotations
+import io.reactivex.Single
 import org.threeten.bp.LocalDate
 
 internal class Fhir4RecordClient(
-        private val userService: UserService,
-        private val recordService: RecordContract.Service,
-        private val handler: CallHandler
+    private val userService: AuthContract.UserService,
+    private val recordService: RecordContract.Service,
+    private val handler: CallHandler
 ) : SdkContract.Fhir4RecordClient {
 
-    override fun <T : Fhir4Resource> create(resource: T, annotations: List<String>, callback: Callback<Fhir4Record<T>>): Task {
-        val operation = userService.finishLogin(true)
-                .flatMap { userService.uID }
-                .flatMap { uid -> recordService.createRecord(uid, resource, annotations) }
-        return handler.executeSingle(operation, callback)
+    private fun <T> executeOperationFlow(
+        operation: (userId: String) -> Single<T>,
+        callback: Callback<T>
+    ): Task {
+        val flow = userService.finishLogin(true)
+            .flatMap { userService.userID }
+            .flatMap { userId -> operation(userId) }
+        return handler.executeSingle(flow, callback)
     }
+
+    override fun <T : Fhir4Resource> create(
+        resource: T,
+        annotations: Annotations,
+        callback: Callback<Fhir4Record<T>>
+    ):
+        Task = executeOperationFlow(
+        { userId -> recordService.createRecord(userId, resource, annotations) },
+        callback
+    )
 
     override fun <T : Fhir4Resource> update(
-            recordId: String,
-            resource: T,
-            annotations: List<String>,
-            callback: Callback<Fhir4Record<T>>
-    ): Task {
-        val operation = userService.finishLogin(true)
-                .flatMap { userService.uID }
-                .flatMap { uid -> recordService.updateRecord(uid, recordId, resource, annotations) }
-        return handler.executeSingle(operation, callback)
-    }
+        recordId: String,
+        resource: T,
+        annotations: Annotations,
+        callback: Callback<Fhir4Record<T>>
+    ): Task = executeOperationFlow(
+        { userId -> recordService.updateRecord(userId, recordId, resource, annotations) },
+        callback
+    )
 
-    override fun delete(recordId: String, callback: Callback<Boolean>): Task {
-        val operation = userService.finishLogin(true)
-                .flatMap { userService.uID }
-                .flatMap { uid -> recordService.deleteRecord(uid, recordId).toSingle { true } }
-        return handler.executeSingle(operation, callback)
-    }
-
-    override fun <T : Fhir4Resource> fetch(recordId: String, callback: Callback<Fhir4Record<T>>): Task {
-        val operation = userService.finishLogin(true)
-                .flatMap { userService.uID }
-                .flatMap { uid -> recordService.fetchFhir4Record<T>(uid, recordId) }
-        return handler.executeSingle(operation, callback)
-    }
+    override fun <T : Fhir4Resource> fetch(
+        recordId: String,
+        callback: Callback<Fhir4Record<T>>
+    ): Task = executeOperationFlow(
+        { userId -> recordService.fetchFhir4Record(userId, recordId) },
+        callback
+    )
 
     override fun <T : Fhir4Resource> search(
-            resourceType: Class<T>,
-            annotations: List<String>,
-            startDate: LocalDate?, endDate: LocalDate?,
-            pageSize: Int,
-            offset: Int,
-            callback: Callback<List<Fhir4Record<T>>>
-    ): Task {
-        val operation = userService.finishLogin(true)
-                .flatMap { userService.uID }
-                .flatMap { uid ->
-                    recordService.fetchFhir4Records(
-                            uid,
-                            resourceType,
-                            annotations,
-                            startDate,
-                            endDate,
-                            pageSize,
-                            offset
-                    )
-                }
-        return handler.executeSingle(operation, callback)
-    }
+        resourceType: Class<T>,
+        annotations: Annotations,
+        startDate: LocalDate?,
+        endDate: LocalDate?,
+        pageSize: Int,
+        offset: Int,
+        callback: Callback<List<Fhir4Record<T>>>
+    ): Task = executeOperationFlow(
+        { userId ->
+            recordService.fetchFhir4Records(
+                userId,
+                resourceType,
+                annotations,
+                startDate,
+                endDate,
+                pageSize,
+                offset
+            )
+        },
+        callback
+    )
+
+    override fun <T : Fhir4Resource> download(
+        recordId: String,
+        callback: Callback<Fhir4Record<T>>
+    ): Task = executeOperationFlow(
+        { userId -> recordService.downloadFhir4Record(recordId, userId) },
+        callback
+    )
 
     override fun <T : Fhir4Resource> count(
-            resourceType: Class<T>,
-            annotations: List<String>,
-            callback: Callback<Int>
-    ): Task {
-        val operation = userService.finishLogin(true)
-                .flatMap { userService.uID }
-                .flatMap { uid ->
-                    recordService.countFhir4Records(
-                            resourceType,
-                            uid,
-                            annotations
-                    )
-                }
-        return handler.executeSingle(operation, callback)
-    }
+        resourceType: Class<T>,
+        annotations: Annotations,
+        callback: Callback<Int>
+    ): Task = executeOperationFlow(
+        { userId -> recordService.countFhir4Records(resourceType, userId, annotations) },
+        callback
+    )
+
+    override fun delete(
+        recordId: String,
+        callback: Callback<Boolean>
+    ): Task = executeOperationFlow(
+        { userId -> recordService.deleteRecord(userId, recordId).toSingle { true } },
+        callback
+    )
+
+    override fun downloadAttachment(
+        recordId: String,
+        attachmentId: String,
+        type: DownloadType,
+        callback: Callback<Fhir4Attachment>
+    ): Task = executeOperationFlow(
+        { userId -> recordService.downloadFhir4Attachment(recordId, attachmentId, userId, type) },
+        callback
+    )
+
+    override fun downloadAttachments(
+        recordId: String,
+        attachmentIds: List<String>,
+        type: DownloadType,
+        callback: Callback<List<Fhir4Attachment>>
+    ): Task = executeOperationFlow(
+        { userId -> recordService.downloadFhir4Attachments(recordId, attachmentIds, userId, type) },
+        callback
+    )
 }

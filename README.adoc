@@ -1,5 +1,5 @@
 = Data4Life SDK
-:library_version: 1.10.0
+:library_version: 1.11.0
 :doctype: article
 :!showtitle:
 :toc: macro
@@ -375,5 +375,3 @@ Every project module has a `{module-name}/src/docs/asciidoc` folder where all do
 
 ==== Generating the documentation
 To generate the latest documentation just call `./gradlew asciidoctor` this will build the `sdk-doc` module and replace the documentation for the current SDK version in the `docs` folder.
-
-

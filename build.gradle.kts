@@ -27,6 +27,7 @@ buildscript {
     dependencies {
         classpath(GradlePlugins.android)
         classpath(GradlePlugins.kotlin)
+        classpath(GradlePlugins.kapt)
 
         // https://github.com/vanniktech/gradle-android-junit-jacoco-plugin
         classpath("com.vanniktech:gradle-android-junit-jacoco-plugin:0.16.0")
@@ -112,6 +113,6 @@ allprojects {
 }
 
 tasks.named<Wrapper>("wrapper") {
-    gradleVersion = "6.7.1"
+    gradleVersion = "6.8.3"
     distributionType = Wrapper.DistributionType.ALL
 }

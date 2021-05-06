@@ -17,5 +17,7 @@
 package care.data4life.crypto
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 actual typealias Json = Json
+actual typealias JsonClass = JsonClass

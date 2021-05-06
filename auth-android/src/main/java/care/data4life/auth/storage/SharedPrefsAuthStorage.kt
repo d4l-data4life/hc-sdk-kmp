@@ -19,8 +19,9 @@ package care.data4life.auth.storage
 import care.data4life.auth.AuthorizationContract
 import care.data4life.securestore.SecureStoreContract
 
-class SharedPrefsAuthStorage(private val store: SecureStoreContract.SecureStore) : AuthorizationContract.Storage {
-
+class SharedPrefsAuthStorage(
+    private val store: SecureStoreContract.SecureStore
+) : AuthorizationContract.Storage {
 
     override fun readAuthState(alias: String): String? {
         return store.getData(key(alias))?.let { String(it) }
@@ -45,7 +46,6 @@ class SharedPrefsAuthStorage(private val store: SecureStoreContract.SecureStore)
     private fun key(alias: String): String {
         return DATA_PREFIX + alias
     }
-
 
     companion object {
         private const val DATA_PREFIX = "store.auth.state."

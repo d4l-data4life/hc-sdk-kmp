@@ -26,12 +26,13 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
+import care.data4life.sdk.attachment.AttachmentContract;
 import care.data4life.sdk.lang.ImageResizeException;
 import care.data4life.sdk.test.util.ResourceHelper;
 
-import static care.data4life.sdk.ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT;
-import static care.data4life.sdk.ImageResizer.DEFAULT_PREVIEW_SIZE_PX;
-import static care.data4life.sdk.ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX;
+import static care.data4life.sdk.attachment.AttachmentContract.ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT;
+import static care.data4life.sdk.attachment.AttachmentContract.ImageResizer.DEFAULT_PREVIEW_SIZE_PX;
+import static care.data4life.sdk.attachment.AttachmentContract.ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
 
@@ -47,7 +48,7 @@ public class JvmImageResizerTest {
     private static int originalHeight;
 
     //SUT
-    private ImageResizer imageResizer = new JvmImageResizer();
+    private AttachmentContract.ImageResizer imageResizer = new JvmImageResizer();
 
     @BeforeClass
     public static void init() {

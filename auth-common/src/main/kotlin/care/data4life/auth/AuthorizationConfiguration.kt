@@ -17,10 +17,10 @@
 package care.data4life.auth
 
 data class AuthorizationConfiguration(
-        val clientId: String,
-        val clientSecret: String,
-        val authorizationEndpoint: String,
-        val tokenEndpoint: String,
-        val callbackUrl: String,
-        val scopes: Set<String> = Authorization.defaultScopes
+    val clientId: String,
+    val clientSecret: String,
+    val authorizationEndpoint: String,
+    val tokenEndpoint: String,
+    val callbackUrl: String,
+    val scopes: Set<String> = Authorization.defaultScopes
 )

@@ -15,12 +15,20 @@
  */
 package care.data4life.sdk.tag
 
-
 import care.data4life.fhir.stu3.model.Patient
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_KEY
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_VALUE
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_CLIENT
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_FHIR_VERSION
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_PARTNER
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_RESOURCE_TYPE
+import care.data4life.sdk.tag.TaggingContract.Companion.TAG_UPDATED_BY_CLIENT
+import care.data4life.sdk.test.util.GenericTestDataProvider.CLIENT_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
 import care.data4life.sdk.wrapper.SdkFhirElementFactory
 import io.mockk.every
 import io.mockk.mockk
@@ -44,7 +52,13 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, appendDefaultTags is called with a Fhir3Resource and null, it returns the default tags`() { //tag_shouldReturnMapWithResourceAndClientTag
+    fun `It fulfils the Service`() {
+        val helper: Any = taggingService
+        assertTrue(helper is TaggingContract.Service)
+    }
+
+    @Test
+    fun `Given, appendDefaultTags is called with a Fhir3Resource and null, it returns the default tags`() { // tag_shouldReturnMapWithResourceAndClientTag
         // Given
         val resource = Fhir3Resource()
 
@@ -66,7 +80,7 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, appendDefaultTags is called with a Fhir4Resource and null, it returns the default tags`() { //tag_shouldReturnMapWithResourceAndClientTag
+    fun `Given, appendDefaultTags is called with a Fhir4Resource and null, it returns the default tags`() { // tag_shouldReturnMapWithResourceAndClientTag
         // Given
         val resource = Fhir4Resource()
 
@@ -107,10 +121,10 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, appendDefaultTags is called with a Resource and old Tags, it preserves the existing Tag and updates the Type`() { //annotatedTag_shouldPreserveExistingTagsAndUpdate
+    fun `Given, appendDefaultTags is called with a Resource and old Tags, it preserves the existing Tag and updates the Type`() { // annotatedTag_shouldPreserveExistingTagsAndUpdate
         // Given
         val type = Fhir3Resource()
-        val existingTags = HashMap<String, String>()
+        val existingTags = mutableMapOf<String, String>()
         existingTags["tag_1_key"] = "tag_1_value"
         existingTags["tag_2_key"] = "tag_2_value"
         existingTags[TAG_RESOURCE_TYPE] = "old_typ"
@@ -134,10 +148,10 @@ class TaggingServiceTest {
     }
 
     @Test
-    fun `Given, appendDefaultTags is called with a Resource and old Tags, sets UpdatedByClient Tag, if the TAG_CLIENT Tag is present`() { //annotatedTag_shouldSetUpdatedByClientTag_whenClientAlreadySet
+    fun `Given, appendDefaultTags is called with a Resource and old Tags, sets UpdatedByClient Tag, if the TAG_CLIENT Tag is present`() { // annotatedTag_shouldSetUpdatedByClientTag_whenClientAlreadySet
         // Given
         val type = Fhir3Resource()
-        val existingTags = HashMap<String, String>()
+        val existingTags = mutableMapOf<String, String>()
         existingTags[TAG_CLIENT] = OTHER_CLIENT_ID
 
         // When
@@ -279,15 +293,6 @@ class TaggingServiceTest {
     }
 
     companion object {
-        private const val CLIENT_ID = "client_id#platform"
         private const val OTHER_CLIENT_ID = "other_client_id"
-        private const val TAG_PARTNER = "partner"
-        private const val PARTNER_ID = "client_id"
-        private const val TAG_RESOURCE_TYPE = "resourcetype"
-        private const val TAG_CLIENT = "client"
-        private const val TAG_UPDATED_BY_CLIENT = "updatedbyclient"
-        private const val TAG_FHIR_VERSION = "fhirversion"
-        private const val TAG_APPDATA_KEY = "flag"
-        private const val TAG_APPDATA_VALUE = "appdata"
     }
 }

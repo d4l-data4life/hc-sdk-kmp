@@ -18,11 +18,12 @@ package care.data4life.sdk.fhir;
 
 import android.content.Context;
 
+import androidx.test.InstrumentationRegistry;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import androidx.test.InstrumentationRegistry;
 import care.data4life.crypto.GCKey;
 import care.data4life.fhir.stu3.model.DocumentReference;
 import care.data4life.fhir.stu3.model.DomainResource;

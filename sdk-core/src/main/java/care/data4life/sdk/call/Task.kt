@@ -26,7 +26,6 @@ class Task {
     var isCanceled = false
         private set
 
-
     fun finish() {
         isActive = false
         operationHandle = null

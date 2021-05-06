@@ -16,7 +16,6 @@
 
 package care.data4life.crypto
 
-
 expect abstract class CryptoProtocol {
 
     fun symEncrypt(key: GCKey, data: ByteArray, iv: ByteArray): ByteArray
@@ -25,5 +24,4 @@ expect abstract class CryptoProtocol {
     fun asymDecrypt(key: GCKeyPair, data: ByteArray): ByteArray
     fun generateAsymKeyPair(algorithm: GCRSAKeyAlgorithm, options: KeyOptions): GCKeyPair
     fun generateSymKey(algorithm: GCAESKeyAlgorithm, options: KeyOptions): GCKey
-
 }

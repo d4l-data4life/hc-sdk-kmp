@@ -33,7 +33,7 @@ class TaggingContract {
         fun getTagsFromType(resourceType: Class<out Any>): Tags
     }
 
-    interface EncryptionService {
+    interface CryptoService {
         fun encryptTagsAndAnnotations(
             tags: Tags,
             annotations: Annotations,

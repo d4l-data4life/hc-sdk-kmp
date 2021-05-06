@@ -45,13 +45,13 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class RecordEncryptionServiceEncryptionTest {
-    private lateinit var service: NetworkModelContract.EncryptionService
+class RecordCryptoServiceEncryptionTest {
+    private lateinit var service: NetworkModelContract.CryptoService
     private var apiService: ApiService = mockk()
     private val cryptoService: CryptoContract.Service = mockk()
     private val taggingService: TaggingContract.Service = mockk()
-    private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
-    private val fhirService: FhirContract.Service = mockk()
+    private val tagCryptoService: TaggingContract.CryptoService = mockk()
+    private val resourceCryptoService: FhirContract.CryptoService = mockk()
     private val dateTimeFormatter: WrapperContract.DateTimeFormatter = mockk()
     private val limitGuard: NetworkModelContract.LimitGuard = mockk()
     private val modelVersion: ModelContract.ModelVersion = mockk()
@@ -60,14 +60,14 @@ class RecordEncryptionServiceEncryptionTest {
     fun setUp() {
         clearAllMocks()
 
-        service = RecordEncryptionService(
+        service = RecordCryptoService(
             ALIAS,
             apiService,
             taggingService,
-            tagEncryptionService,
+            tagCryptoService,
             limitGuard,
             cryptoService,
-            fhirService,
+            resourceCryptoService,
             dateTimeFormatter,
             modelVersion
         )
@@ -97,7 +97,7 @@ class RecordEncryptionServiceEncryptionTest {
         every { decryptedRecord.tags } returns tags
         every { decryptedRecord.annotations } returns annotations
         every {
-            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations)
+            tagCryptoService.encryptTagsAndAnnotations(tags, annotations)
         } returns encryptedTagsAndAnnotations
 
         every { cryptoService.fetchCurrentCommonKey() } returns commonKey
@@ -107,7 +107,7 @@ class RecordEncryptionServiceEncryptionTest {
         every { decryptedRecord.attachmentsKey } returns attachmentKey
         every { decryptedRecord.resource } returns resource
 
-        every { fhirService._encryptResource(dataKey, resource) } returns encryptedResource
+        every { resourceCryptoService._encryptResource(dataKey, resource) } returns encryptedResource
 
         every {
             cryptoService.encryptSymmetricKey(
@@ -264,7 +264,7 @@ class RecordEncryptionServiceEncryptionTest {
             expected = encryptedTagsAndAnnotations
         )
 
-        verify(exactly = 1) { tagEncryptionService.encryptTagsAndAnnotations(tags, annotations) }
+        verify(exactly = 1) { tagCryptoService.encryptTagsAndAnnotations(tags, annotations) }
     }
 
     @Test
@@ -317,7 +317,7 @@ class RecordEncryptionServiceEncryptionTest {
             expected = encryptedResource
         )
 
-        verify(exactly = 1) { fhirService._encryptResource(dataKey, resource) }
+        verify(exactly = 1) { resourceCryptoService._encryptResource(dataKey, resource) }
     }
 
     @Test
@@ -549,7 +549,7 @@ class RecordEncryptionServiceEncryptionTest {
             expected = encryptedTagsAndAnnotations
         )
 
-        verify(exactly = 1) { tagEncryptionService.encryptTagsAndAnnotations(tags, annotations) }
+        verify(exactly = 1) { tagCryptoService.encryptTagsAndAnnotations(tags, annotations) }
     }
 
     @Test
@@ -602,7 +602,7 @@ class RecordEncryptionServiceEncryptionTest {
             expected = encryptedResource
         )
 
-        verify(exactly = 1) { fhirService._encryptResource(dataKey, resource) }
+        verify(exactly = 1) { resourceCryptoService._encryptResource(dataKey, resource) }
     }
 
     @Test
@@ -834,7 +834,7 @@ class RecordEncryptionServiceEncryptionTest {
             expected = encryptedTagsAndAnnotations
         )
 
-        verify(exactly = 1) { tagEncryptionService.encryptTagsAndAnnotations(tags, annotations) }
+        verify(exactly = 1) { tagCryptoService.encryptTagsAndAnnotations(tags, annotations) }
     }
 
     @Test
@@ -887,7 +887,7 @@ class RecordEncryptionServiceEncryptionTest {
             expected = encryptedResource
         )
 
-        verify(exactly = 1) { fhirService._encryptResource(dataKey, resource) }
+        verify(exactly = 1) { resourceCryptoService._encryptResource(dataKey, resource) }
     }
 
     @Test

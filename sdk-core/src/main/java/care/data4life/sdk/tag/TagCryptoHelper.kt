@@ -24,7 +24,7 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.util.Locale
 
-object TagEncryptionHelper : TaggingContract.Helper {
+object TagCryptoHelper : TaggingContract.Helper {
     override fun convertToTagMap(tagList: List<String>): Tags {
         val tags = HashMap<String, String>()
         for (entry in tagList) {

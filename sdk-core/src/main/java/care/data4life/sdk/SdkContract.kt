@@ -65,6 +65,7 @@ interface SdkContract {
         fun logout(listener: LegacyCallback): Task
     }
 
+    // TODO: Split into 2 Client - Resource Client and Resource Client with Attachments
     interface Fhir4RecordClient {
         /**
          * Creates a {@link Fhir4Record}

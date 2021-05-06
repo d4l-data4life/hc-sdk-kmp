@@ -33,7 +33,6 @@ import care.data4life.crypto.error.CryptoException.KeyFetchingFailed
 import care.data4life.sdk.crypto.CommonKeyService
 import care.data4life.sdk.crypto.KeyFactory
 import care.data4life.sdk.network.model.EncryptedKey
-import care.data4life.sdk.test.util.TestSchedulerRule
 import care.data4life.sdk.util.Base64
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -68,7 +67,6 @@ import javax.crypto.KeyGenerator
 import javax.crypto.NoSuchPaddingException
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
-import org.junit.Ignore
 
 class CryptoServiceTest {
 
@@ -259,7 +257,7 @@ class CryptoServiceTest {
             -----BEGIN RSA PRIVATE KEY-----
             $base64TestKey
             -----END RSA PRIVATE KEY-----
-            
+
             """.trimIndent()
 
         val keyPairArg = slot<GCKeyPair>()
@@ -277,7 +275,8 @@ class CryptoServiceTest {
         val storedPrivateKeyBase64 = keyPairArg.captured.getPrivateKeyBase64()
         val storedJavaKey = getPrivateJavaKey(keyFactory, storedPrivateKeyBase64)
 
-        val testKeyNoLinebreaksBase64 = base64TestKey.replace("\n", "")
+        val base64TestKeynoSpace = base64TestKey.replace(" ","")
+        val testKeyNoLinebreaksBase64 = base64TestKeynoSpace.replace("\n", "")
         val testJavaKey = getPrivateJavaKey(keyFactory, testKeyNoLinebreaksBase64)
         Assert.assertEquals(testJavaKey, storedJavaKey)
     }

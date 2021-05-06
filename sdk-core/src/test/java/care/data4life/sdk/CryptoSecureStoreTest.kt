@@ -14,9 +14,6 @@
  * contact D4L by email to help@data4life.care.
  */
 
-
-
-
 /*
  * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
  *
@@ -52,7 +49,6 @@ import io.mockk.verify
 import java.io.IOException
 import junit.framework.Assert.assertEquals
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.mockito.Mockito
 
@@ -85,15 +81,14 @@ class CryptoSecureStoreTest {
         verify(exactly = 1) { secureStore.addData(DATA_ALIAS, DATA.toCharArray()) }
     }
 
-
     @Test
     fun storeSecret_shouldStoreObject() {
         // Given
         val result = Any()
         val adapterObj: JsonAdapter<Any> = mockk()
-        every { moshi.adapter(Any::class.java) } returns adapterObj
+        every { moshi.adapter<Any>(java.lang.Object::class.java) } returns adapterObj
         every { adapterObj.toJson(any()) } returns OBJECT_JSON
-        every { secureStore.addData(DATA_ALIAS, DATA.toCharArray()) } just runs
+        every { secureStore.addData(OBJECT_ALIAS, OBJECT_JSON.toCharArray()) } just runs
 
         // When
         cryptoSecureStore.storeSecret(OBJECT_ALIAS, result)

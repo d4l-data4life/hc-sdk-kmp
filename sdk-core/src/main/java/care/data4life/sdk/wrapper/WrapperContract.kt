@@ -64,7 +64,7 @@ class WrapperContract {
         fun fromResource(resource: Any): String?
     }
 
-    internal interface DateTimeFormatter {
+    interface DateTimeFormatter {
         fun now(): String
         fun formatDate(dateTime: LocalDate): String
         fun buildMeta(record: DecryptedBaseRecord<*>): ModelContract.Meta

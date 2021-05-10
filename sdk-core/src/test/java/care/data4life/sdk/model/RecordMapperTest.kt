@@ -237,11 +237,11 @@ class RecordMapperTest {
     private data class DecryptedUnknownRecord<T : Any>(
         override var identifier: String?,
         override var resource: T,
-        override var tags: Tags?,
+        override var tags: Tags,
         override var annotations: Annotations,
         override var customCreationDate: String?,
         override var updatedDate: String?,
-        override var dataKey: GCKey?,
+        override var dataKey: GCKey,
         override var attachmentsKey: GCKey?,
         override var modelVersion: Int
     ) : DecryptedBaseRecord<T>

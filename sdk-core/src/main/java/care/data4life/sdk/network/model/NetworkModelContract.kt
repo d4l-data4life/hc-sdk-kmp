@@ -20,51 +20,12 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
 import care.data4life.sdk.tag.Tags
 
 class NetworkModelContract {
-    internal interface DecryptedRecordBuilder {
-        // mandatory
-        fun setTags(tags: Tags?): DecryptedRecordBuilder
-        fun setCreationDate(creationDate: String?): DecryptedRecordBuilder
-        fun setDataKey(dataKey: GCKey?): DecryptedRecordBuilder
-        fun setModelVersion(modelVersion: Int?): DecryptedRecordBuilder
-
-        // Optional
-        fun setIdentifier(identifier: String?): DecryptedRecordBuilder
-        fun setAnnotations(annotations: Annotations?): DecryptedRecordBuilder
-        fun setUpdateDate(updatedDate: String?): DecryptedRecordBuilder
-        fun setAttachmentKey(attachmentKey: GCKey?): DecryptedRecordBuilder
-
-        @Throws(CoreRuntimeException.InternalFailure::class)
-        fun <T : Any?> build(
-            resource: T,
-            tags: Tags? = null,
-            creationDate: String? = null,
-            dataKey: GCKey? = null,
-            modelVersion: Int? = null
-        ): DecryptedBaseRecord<T>
-
-        fun clear(): DecryptedRecordBuilder
-    }
-
-    internal interface LimitGuard {
-        @Throws(DataValidationException.TagsAndAnnotationsLimitViolation::class)
-        fun checkTagsAndAnnotationsLimits(tags: Tags, annotations: Annotations)
-
-        @Throws(DataValidationException.CustomDataLimitViolation::class)
-        fun checkDataLimit(data: ByteArray)
-
-        companion object {
-            const val MAX_LENGTH_TAGS_AND_ANNOTATIONS = 1000
-            const val MAX_SIZE_CUSTOM_DATA = 10485760 // = 10 MiB in Bytes
-        }
-    }
-
     internal interface Version {
         val code: Int
         val name: String
@@ -111,7 +72,7 @@ class NetworkModelContract {
         val commonKeyId: String
         val identifier: String?
         val encryptedTags: EncryptedTagsAndAnnotations
-        val encryptedBody: String?
+        val encryptedBody: String
         val customCreationDate: String?
         val encryptedDataKey: EncryptedKey
         val encryptedAttachmentsKey: EncryptedKey?
@@ -123,11 +84,11 @@ class NetworkModelContract {
     interface DecryptedBaseRecord<T> {
         var identifier: String?
         var resource: T
-        var tags: Tags?
+        var tags: Tags
         var annotations: Annotations
         var customCreationDate: String?
         var updatedDate: String? // FIXME: This should never be null
-        var dataKey: GCKey?
+        var dataKey: GCKey
         var attachmentsKey: GCKey?
         var modelVersion: Int
     }
@@ -140,6 +101,26 @@ class NetworkModelContract {
             get() = null
             set(_) {}
     }
+
+    internal interface EncryptionService {
+        fun <T : Any> fromResource(resource: T, annotations: Annotations): DecryptedBaseRecord<T>
+        fun <T : Any> encrypt(decryptedRecord: DecryptedBaseRecord<T>): EncryptedRecord
+        fun <T : Any> decrypt(encryptedRecord: EncryptedRecord, userId: String): DecryptedBaseRecord<T>
+    }
+
+    interface LimitGuard {
+        @Throws(DataValidationException.TagsAndAnnotationsLimitViolation::class)
+        fun checkTagsAndAnnotationsLimits(tags: Tags, annotations: Annotations)
+
+        @Throws(DataValidationException.CustomDataLimitViolation::class)
+        fun checkDataLimit(data: ByteArray)
+
+        companion object {
+            const val MAX_LENGTH_TAGS_AND_ANNOTATIONS = 1000
+            const val MAX_SIZE_CUSTOM_DATA = 10485760 // = 10 MiB in Bytes
+        }
+    }
+
     companion object {
         const val DEFAULT_COMMON_KEY_ID: String = "00000000-0000-0000-0000-000000000000"
     }

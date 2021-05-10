@@ -26,6 +26,7 @@ import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
@@ -53,7 +54,7 @@ import kotlin.test.assertSame
 
 class RecordServiceAttachmentUploadTest {
     private lateinit var recordService: RecordService
-    private val apiService: ApiService = mockk()
+    private val apiService: NetworkingContract.Service = mockk()
     private val cryptoService: CryptoContract.Service = mockk()
     private val resourceCryptoService: FhirContract.CryptoService = mockk()
     private val tagCryptoService: TaggingContract.CryptoService = mockk()

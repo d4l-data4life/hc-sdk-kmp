@@ -17,8 +17,8 @@
 package care.data4life.sdk.migration
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.ApiService
-import care.data4life.sdk.CryptoService
+import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
@@ -37,9 +37,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class RecordCompatibilityServiceTest {
-    private lateinit var apiService: ApiService
-    private lateinit var tagCryptoService: TaggingContract.CryptoService
-    private lateinit var cryptoService: CryptoService
+    private lateinit var apiService: NetworkingContract.Service
+    private lateinit var tagEncryptionService: TaggingContract.EncryptionService
+    private lateinit var cryptoService: CryptoContract.Service
     private lateinit var tagEncryptionHelper: TaggingContract.Helper
     private lateinit var service: MigrationContract.CompatibilityService
 
@@ -213,7 +213,7 @@ class RecordCompatibilityServiceTest {
             encryptionKey
         )
         every {
-            apiService.fetchRecords(
+            apiService.searchRecords(
                 alias,
                 userId,
                 startTime,
@@ -261,7 +261,7 @@ class RecordCompatibilityServiceTest {
             encryptionKey
         )
         verify(exactly = 2) {
-            apiService.fetchRecords(
+            apiService.searchRecords(
                 alias,
                 userId,
                 startTime,
@@ -304,7 +304,7 @@ class RecordCompatibilityServiceTest {
             encryptionKey
         )
         every {
-            apiService.fetchRecords(
+            apiService.searchRecords(
                 alias,
                 userId,
                 startTime,
@@ -352,7 +352,7 @@ class RecordCompatibilityServiceTest {
             encryptionKey
         )
         verify(exactly = 1) {
-            apiService.fetchRecords(
+            apiService.searchRecords(
                 alias,
                 userId,
                 startTime,

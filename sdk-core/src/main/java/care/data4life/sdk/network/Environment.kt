@@ -15,7 +15,7 @@
  */
 package care.data4life.sdk.network
 
-enum class Environment {
+enum class Environment : NetworkingContract.Environment {
 
     LOCAL,
     DEVELOPMENT,
@@ -23,7 +23,7 @@ enum class Environment {
     SANDBOX,
     PRODUCTION;
 
-    fun getApiBaseURL(platform: String): String {
+    override fun getApiBaseURL(platform: String): String {
         if (D4L.equals(platform, ignoreCase = true)) {
             return d4lBaseUrl()
         } else if (S4H.equals(platform, ignoreCase = true)) {
@@ -52,7 +52,7 @@ enum class Environment {
         }
     }
 
-    fun getCertificatePin(platform: String): String {
+    override fun getCertificatePin(platform: String): String {
         if (D4L.equals(platform, ignoreCase = true)) {
             return d4lCertificatePin()
         } else if (S4H.equals(platform, ignoreCase = true)) {
@@ -74,12 +74,12 @@ enum class Environment {
         }
     }
 
-    companion object {
+    companion object Factory : NetworkingContract.EnvironmentFactory {
         private const val D4L = "d4l"
         private const val S4H = "s4h"
 
         @JvmStatic
-        fun fromName(name: String?): Environment {
+        override fun fromName(name: String?): Environment {
             return if (!name.isNullOrBlank()) {
                 when {
                     LOCAL.name.equals(name, ignoreCase = true) -> LOCAL

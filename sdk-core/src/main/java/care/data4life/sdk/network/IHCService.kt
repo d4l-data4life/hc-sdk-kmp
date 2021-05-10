@@ -15,6 +15,10 @@
  */
 package care.data4life.sdk.network
 
+import care.data4life.sdk.network.NetworkingContract.Companion.AUTHORIZATION_WITH_ACCESS_TOKEN
+import care.data4life.sdk.network.NetworkingContract.Companion.AUTHORIZATION_WITH_BASIC_AUTH
+import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS
+import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_CONTENT_TYPE_OCTET_STREAM
 import care.data4life.sdk.network.model.CommonKeyResponse
 import care.data4life.sdk.network.model.DocumentUploadResponse
 import care.data4life.sdk.network.model.EncryptedRecord
@@ -150,11 +154,4 @@ interface IHCService {
 
     @GET("/sdk/v1/android/versions.json")
     fun getVersionUpdateInfo(): Single<VersionList>
-
-    companion object {
-        const val AUTHORIZATION_WITH_ACCESS_TOKEN = "Authorization: access_token"
-        const val AUTHORIZATION_WITH_BASIC_AUTH = "Authorization: basic_auth"
-        const val HEADER_ALIAS = "gc_alias"
-        const val HEADER_CONTENT_TYPE_OCTET_STREAM = "content-type: application/octet-stream"
-    }
 }

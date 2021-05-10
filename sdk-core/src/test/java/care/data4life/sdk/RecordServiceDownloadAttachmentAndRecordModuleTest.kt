@@ -27,6 +27,7 @@ import care.data4life.sdk.fhir.Fhir4Identifier
 import care.data4life.sdk.fhir.ResourceCryptoService
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.Record
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.Annotations
@@ -75,7 +76,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
 
     private lateinit var recordService: RecordContract.Service
     private lateinit var flowHelper: RecordServiceModuleTestFlowHelper
-    private val apiService: ApiService = mockk()
+    private val apiService: NetworkingContract.Service = mockk()
     private lateinit var cryptoService: CryptoContract.Service
     private val imageResizer: AttachmentContract.ImageResizer = mockk()
     private val errorHandler: D4LErrorHandler = mockk()

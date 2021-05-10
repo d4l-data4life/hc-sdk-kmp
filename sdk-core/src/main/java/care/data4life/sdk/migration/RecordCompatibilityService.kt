@@ -17,8 +17,8 @@
 package care.data4life.sdk.migration
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.ApiService
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.NetworkModelContract.EncryptedRecord
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
@@ -34,8 +34,8 @@ import java.io.IOException
 // see: https://gesundheitscloud.atlassian.net/browse/SDK-525
 @Migration("This class should only be used due to migration purpose.")
 class RecordCompatibilityService internal constructor(
-    private val apiService: ApiService,
-    private val tagCryptoService: TaggingContract.CryptoService,
+    private val apiService: NetworkingContract.Service,
+    private val tagEncryptionService: TaggingContract.EncryptionService,
     private val cryptoService: CryptoContract.Service,
     private val tagHelper: TaggingContract.Helper = TagCryptoHelper
 ) : MigrationContract.CompatibilityService {
@@ -101,7 +101,7 @@ class RecordCompatibilityService internal constructor(
         val (encodedAndEncryptedTags, encryptedTags) = encrypt(tags, annotations)
         return if (needsDoubleCall(encodedAndEncryptedTags, encryptedTags)) {
             Observable.zip(
-                apiService.fetchRecords(
+                apiService.searchRecords(
                     alias,
                     userId,
                     startDate,
@@ -110,7 +110,7 @@ class RecordCompatibilityService internal constructor(
                     offSet,
                     encodedAndEncryptedTags.joinToString(",")
                 ),
-                apiService.fetchRecords(
+                apiService.searchRecords(
                     alias,
                     userId,
                     startDate,
@@ -127,7 +127,7 @@ class RecordCompatibilityService internal constructor(
                 }
             )
         } else {
-            apiService.fetchRecords(
+            apiService.searchRecords(
                 alias,
                 userId,
                 startDate,

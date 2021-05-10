@@ -18,7 +18,6 @@ package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
 import care.data4life.crypto.KeyType
-import care.data4life.sdk.ApiService
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
@@ -28,6 +27,7 @@ import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.Tags
@@ -35,7 +35,7 @@ import care.data4life.sdk.wrapper.WrapperContract
 
 class RecordCryptoService(
     private val alias: String,
-    private val apiService: ApiService,
+    private val apiService: NetworkingContract.Service,
     private val taggingService: TaggingContract.Service,
     private val tagCryptoService: TaggingContract.CryptoService,
     private val guard: NetworkModelContract.LimitGuard,

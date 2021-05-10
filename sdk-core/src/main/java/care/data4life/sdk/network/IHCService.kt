@@ -144,6 +144,9 @@ interface IHCService {
         @Header(HEADER_ALIAS) alias: String
     ): Single<UserInfo>
 
+    @GET("/sdk/v1/android/versions.json")
+    fun fetchVersionInfo(): Single<VersionList>
+
     @FormUrlEncoded
     @POST("/oauth/revoke")
     @Headers(AUTHORIZATION_WITH_BASIC_AUTH)
@@ -151,7 +154,4 @@ interface IHCService {
         @Header(HEADER_ALIAS) alias: String,
         @Field("token") refresh_token: String
     ): Completable
-
-    @GET("/sdk/v1/android/versions.json")
-    fun getVersionUpdateInfo(): Single<VersionList>
 }

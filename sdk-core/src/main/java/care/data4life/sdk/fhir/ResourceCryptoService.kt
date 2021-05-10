@@ -151,7 +151,7 @@ class ResourceCryptoService @JvmOverloads constructor(
             .blockingGet()
     }
 
-    // TODO:
+    // TODO: merge this with Fhir
     private fun decryptData(
         dataKey: GCKey,
         encryptedResource: String

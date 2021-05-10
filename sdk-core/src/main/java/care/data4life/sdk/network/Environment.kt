@@ -15,8 +15,13 @@
  */
 package care.data4life.sdk.network
 
-enum class Environment : NetworkingContract.Environment {
+import care.data4life.sdk.network.NetworkingContract.Companion.DATA4LIFE_CARE
+import care.data4life.sdk.network.NetworkingContract.Companion.HPSGC_DE
+import care.data4life.sdk.network.NetworkingContract.Companion.PLATFORM_D4L
+import care.data4life.sdk.network.NetworkingContract.Companion.PLATFORM_S4H
+import care.data4life.sdk.network.NetworkingContract.Companion.SMART4HEALTH_EU
 
+enum class Environment : NetworkingContract.Environment {
     LOCAL,
     DEVELOPMENT,
     STAGING,
@@ -24,70 +29,57 @@ enum class Environment : NetworkingContract.Environment {
     PRODUCTION;
 
     override fun getApiBaseURL(platform: String): String {
-        if (D4L.equals(platform, ignoreCase = true)) {
-            return d4lBaseUrl()
-        } else if (S4H.equals(platform, ignoreCase = true)) {
-            return s4hBaseUrl()
+        return when {
+            PLATFORM_D4L.equals(platform, ignoreCase = true) -> d4lBaseUrl()
+            PLATFORM_S4H.equals(platform, ignoreCase = true) -> s4hBaseUrl()
+            else -> throw IllegalArgumentException("No supported platform found for value($platform)")
         }
-        throw IllegalArgumentException("No supported platform found for value($platform)")
     }
 
     private fun d4lBaseUrl(): String {
-        return when (this) {
-            SANDBOX -> "https://api-phdp-sandbox.hpsgc.de"
-            DEVELOPMENT -> "https://api-phdp-dev.hpsgc.de"
-            STAGING -> "https://api-staging.data4life.care"
-            LOCAL -> "https://api.data4life.local"
-            PRODUCTION -> "https://api.data4life.care"
-        }
+        return NetworkingContract.Data4LifeURI.valueOf(this.name).uri
     }
 
     private fun s4hBaseUrl(): String {
-        return when (this) {
-            SANDBOX -> "https://api-sandbox.smart4health.eu"
-            DEVELOPMENT -> "https://api-dev.smart4health.eu"
-            STAGING -> "https://api-staging.smart4health.eu"
-            LOCAL -> "https://api.smart4health.local"
-            PRODUCTION -> "https://api.smart4health.eu"
-        }
+        return NetworkingContract.Smart4HealthURI.valueOf(this.name).uri
     }
 
     override fun getCertificatePin(platform: String): String {
-        if (D4L.equals(platform, ignoreCase = true)) {
-            return d4lCertificatePin()
-        } else if (S4H.equals(platform, ignoreCase = true)) {
-            return sh4CertificatePin()
+        return when {
+            PLATFORM_D4L.equals(platform, ignoreCase = true) -> d4lCertificatePin()
+            PLATFORM_S4H.equals(platform, ignoreCase = true) -> sh4CertificatePin()
+            else -> throw IllegalArgumentException("No supported platform found for value($platform)")
         }
-        throw IllegalArgumentException("No supported platform found for value($platform)")
     }
 
     private fun d4lCertificatePin(): String {
         return when (this) {
-            SANDBOX, DEVELOPMENT, LOCAL -> "sha256/3f81qEv2rjHvcrwof2egbKo5MjjSHaN/4DOl7R+pH0E="
-            STAGING, PRODUCTION -> "sha256/AJvjswWs1n4m1KDmFNnTqBit2RHFvXsrVU3Uhxcoe4Y="
+            SANDBOX, DEVELOPMENT, LOCAL -> HPSGC_DE
+            STAGING, PRODUCTION -> DATA4LIFE_CARE
         }
     }
 
     private fun sh4CertificatePin(): String {
         return when (this) {
-            SANDBOX, DEVELOPMENT, LOCAL, STAGING, PRODUCTION -> "sha256/yPBKbgJMVnMeovGKbAtuz65sfy/gpDu0WTiuB8bE5G0="
+            SANDBOX, DEVELOPMENT, LOCAL, STAGING, PRODUCTION -> SMART4HEALTH_EU
         }
     }
 
     companion object Factory : NetworkingContract.EnvironmentFactory {
-        private const val D4L = "d4l"
-        private const val S4H = "s4h"
+        private fun determineEnvironment(name: String): Environment {
+            return when {
+                LOCAL.name.equals(name, ignoreCase = true) -> LOCAL
+                DEVELOPMENT.name.equals(name, ignoreCase = true) -> DEVELOPMENT
+                STAGING.name.equals(name, ignoreCase = true) -> STAGING
+                SANDBOX.name.equals(name, ignoreCase = true) -> SANDBOX
+                else -> PRODUCTION
+            }
+        }
 
         @JvmStatic
         override fun fromName(name: String?): Environment {
             return if (!name.isNullOrBlank()) {
-                when {
-                    LOCAL.name.equals(name, ignoreCase = true) -> LOCAL
-                    DEVELOPMENT.name.equals(name, ignoreCase = true) -> DEVELOPMENT
-                    STAGING.name.equals(name, ignoreCase = true) -> STAGING
-                    SANDBOX.name.equals(name, ignoreCase = true) -> SANDBOX
-                    else -> PRODUCTION
-                }
+                determineEnvironment(name)
             } else {
                 PRODUCTION
             }

@@ -19,8 +19,6 @@ buildscript {
         google()
         mavenCentral()
         jcenter()
-
-        maven("https://dl.bintray.com/data4life/maven")
     }
 
     dependencies {

@@ -23,9 +23,13 @@ import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.D
 import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_THUMBNAIL_SIZE_PX
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.CommonKeyResponse
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
+import care.data4life.sdk.network.model.NetworkModelContract
+import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.util.GenericTestDataProvider.DATE_FORMATTER
 import care.data4life.sdk.test.util.GenericTestDataProvider.DATE_TIME_FORMATTER
 import care.data4life.sdk.util.Base64
@@ -41,7 +45,7 @@ import java.security.MessageDigest
 import javax.xml.bind.DatatypeConverter
 
 class RecordServiceModuleTestFlowHelper(
-    private val apiService: ApiService,
+    private val apiService: NetworkingContract.Service,
     private val imageResizer: AttachmentContract.ImageResizer
 ) {
     private val mdHandle = MessageDigest.getInstance("MD5")
@@ -64,9 +68,7 @@ class RecordServiceModuleTestFlowHelper(
             .toLowerCase()
     }
 
-    fun prepareTags(
-        tags: Map<String, String>
-    ): List<String> {
+    fun prepareTags(tags: Tags): List<String> {
         val encodedTags = mutableListOf<String>()
         tags.forEach { (key, value) ->
             encodedTags.add("$key=${encode(value)}")
@@ -81,7 +83,7 @@ class RecordServiceModuleTestFlowHelper(
     ): String = "${key.toLowerCase()}=${value.toLowerCase()}"
 
     fun prepareCompatibilityTags(
-        tags: Map<String, String>
+        tags: Tags
     ): Pair<List<String>, List<String>> {
         val encodedTags = prepareTags(tags)
         val legacyTags = tags.map { (key, value) -> prepareLegacyTag(key, value) }
@@ -90,15 +92,15 @@ class RecordServiceModuleTestFlowHelper(
     }
 
     private fun prepareLegacyAnnotations(
-        annotations: List<String>
+        annotations: Annotations
     ): List<String> = annotations.map { "custom=${it.toLowerCase()}" }
 
     fun prepareAnnotations(
-        annotations: List<String>
+        annotations: Annotations
     ): List<String> = annotations.map { "custom=${encode(it)}" }
 
     fun prepareCompatibilityAnnotations(
-        annotations: List<String>
+        annotations: Annotations
     ): Pair<List<String>, List<String>> {
         val encodedAnnotations = prepareAnnotations(annotations)
         val legacyAnnotations = prepareLegacyAnnotations(annotations)
@@ -281,7 +283,7 @@ class RecordServiceModuleTestFlowHelper(
         id: String?,
         commonKeyId: String,
         tags: List<String>,
-        annotations: List<String>,
+        annotations: Annotations,
         body: String,
         dates: Pair<String?, String?>,
         keys: Pair<EncryptedKey, EncryptedKey?>
@@ -304,7 +306,7 @@ class RecordServiceModuleTestFlowHelper(
         id: String?,
         commonKeyId: String,
         tags: List<String>,
-        annotations: List<String>,
+        annotations: Annotations,
         body: String,
         dates: Pair<String?, String?>,
         keys: Pair<EncryptedKey, EncryptedKey?>
@@ -322,7 +324,7 @@ class RecordServiceModuleTestFlowHelper(
         id: String?,
         commonKeyId: String,
         tags: List<String>,
-        annotations: List<String>,
+        annotations: Annotations,
         body: String,
         dates: Pair<String?, String?>,
         keys: Pair<EncryptedKey, EncryptedKey?>
@@ -340,7 +342,7 @@ class RecordServiceModuleTestFlowHelper(
         recordId: String?,
         resource: String,
         tags: List<String>,
-        annotations: List<String>,
+        annotations: Annotations,
         commonKeyId: String,
         encryptedDataKey: EncryptedKey,
         encryptedAttachmentsKey: EncryptedKey?,
@@ -360,7 +362,7 @@ class RecordServiceModuleTestFlowHelper(
         recordId: String?,
         resource: String,
         tags: List<String>,
-        annotations: List<String>,
+        annotations: Annotations,
         commonKeyId: String,
         encryptedDataKey: EncryptedKey,
         encryptedAttachmentsKey: EncryptedKey?,
@@ -376,13 +378,31 @@ class RecordServiceModuleTestFlowHelper(
         Pair(encryptedDataKey, encryptedAttachmentsKey)
     )
 
-    fun buildMeta(
-        customCreationDate: String,
-        updatedDate: String
-    ): Meta = Meta(
-        LocalDate.parse(customCreationDate, DATE_FORMATTER),
-        LocalDateTime.parse(updatedDate, DATE_TIME_FORMATTER)
-    )
+    fun compareSerialisedTags(
+        actual: String,
+        expected: List<String>
+    ): Boolean = actual.split(",").sorted() == expected.sorted()
+
+    private fun compareTags(
+        actual: List<String>,
+        expected: List<String>
+    ): Boolean = actual.sorted() == expected.sorted()
+
+    fun compareEncryptedRecords(
+        actual: NetworkModelContract.EncryptedRecord,
+        expected: NetworkModelContract.EncryptedRecord
+    ): Boolean {
+        return actual.commonKeyId == expected.commonKeyId &&
+            actual.identifier == expected.identifier &&
+            actual.encryptedBody == expected.encryptedBody &&
+            actual.encryptedDataKey == expected.encryptedDataKey &&
+            actual.encryptedAttachmentsKey == expected.encryptedAttachmentsKey &&
+            actual.customCreationDate == expected.customCreationDate &&
+            actual.updatedDate == expected.updatedDate &&
+            actual.modelVersion == expected.modelVersion &&
+            actual.version == expected.version &&
+            compareTags(actual.encryptedTags, expected.encryptedTags)
+    }
 
     fun packResources(
         serializedResources: List<String>,
@@ -407,4 +427,12 @@ class RecordServiceModuleTestFlowHelper(
             listOf(dataKey.first)
         }
     }
+
+    fun buildMeta(
+        customCreationDate: String,
+        updatedDate: String
+    ): Meta = Meta(
+        LocalDate.parse(customCreationDate, DATE_FORMATTER),
+        LocalDateTime.parse(updatedDate, DATE_TIME_FORMATTER)
+    )
 }

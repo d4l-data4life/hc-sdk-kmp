@@ -18,7 +18,8 @@ package care.data4life.sdk.model
 
 import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
+import care.data4life.sdk.tag.Annotations
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import java.io.Serializable
@@ -33,7 +34,7 @@ class ModelContract {
         val identifier: String
         val resource: T
         val meta: Meta?
-        val annotations: List<String>?
+        val annotations: Annotations?
     }
 
     @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")

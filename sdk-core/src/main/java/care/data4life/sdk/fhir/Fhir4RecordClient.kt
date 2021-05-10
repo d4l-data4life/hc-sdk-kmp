@@ -24,6 +24,7 @@ import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.call.Task
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.tag.Annotations
 import io.reactivex.Single
 import org.threeten.bp.LocalDate
 
@@ -45,7 +46,7 @@ internal class Fhir4RecordClient(
 
     override fun <T : Fhir4Resource> create(
         resource: T,
-        annotations: List<String>,
+        annotations: Annotations,
         callback: Callback<Fhir4Record<T>>
     ):
         Task = executeOperationFlow(
@@ -56,7 +57,7 @@ internal class Fhir4RecordClient(
     override fun <T : Fhir4Resource> update(
         recordId: String,
         resource: T,
-        annotations: List<String>,
+        annotations: Annotations,
         callback: Callback<Fhir4Record<T>>
     ): Task = executeOperationFlow(
         { userId -> recordService.updateRecord(userId, recordId, resource, annotations) },
@@ -73,7 +74,7 @@ internal class Fhir4RecordClient(
 
     override fun <T : Fhir4Resource> search(
         resourceType: Class<T>,
-        annotations: List<String>,
+        annotations: Annotations,
         startDate: LocalDate?,
         endDate: LocalDate?,
         pageSize: Int,
@@ -104,7 +105,7 @@ internal class Fhir4RecordClient(
 
     override fun <T : Fhir4Resource> count(
         resourceType: Class<T>,
-        annotations: List<String>,
+        annotations: Annotations,
         callback: Callback<Int>
     ): Task = executeOperationFlow(
         { userId -> recordService.countFhir4Records(resourceType, userId, annotations) },

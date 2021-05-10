@@ -14,33 +14,32 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network
+package care.data4life.sdk.network.model
 
-import care.data4life.sdk.network.model.EncryptedKey
-import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.util.Base64
 import io.mockk.every
 import io.mockk.mockkObject
+import io.mockk.unmockkObject
 import io.mockk.verify
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class EncryptedKeyTest {
-
     @Test
-    fun `it is a EncryptedKeyMaker`() {
-        assertTrue((EncryptedKey as Any) is NetworkModelContract.EncryptedKeyMaker)
+    fun `It fulfils EncryptedKeyMaker`() {
+        val factory: Any = EncryptedKey
+        assertTrue(factory is NetworkModelContract.EncryptedKeyMaker)
     }
 
     @Test
     fun `Given create is called, it creates a new EncryptedKey`() {
-        val key = EncryptedKey.create("test".toByteArray())
-        assertTrue((key as Any) is NetworkModelContract.EncryptedKey)
+        val key: Any = EncryptedKey.create("test".toByteArray())
+        assertTrue(key is NetworkModelContract.EncryptedKey)
     }
 
     @Test
-    fun `Given create is called, it encodes the given key`() {
+    fun `Given create is called, it encodes the given Key`() {
         // Given
         val expected = "potato"
         val givenValue = "test"
@@ -58,10 +57,11 @@ class EncryptedKeyTest {
         )
 
         verify(exactly = 1) { Base64.encodeToString(givenValue.toByteArray()) }
+        unmockkObject(Base64)
     }
 
     @Test
-    fun `Given decode is called, it decodes the given key`() {
+    fun `Given decode is called, it decodes the given Key`() {
         // Given
         val expected = "test".toByteArray()
         val storedValue = "potato"
@@ -77,5 +77,6 @@ class EncryptedKeyTest {
             expected,
             key.decode()
         )
+        unmockkObject(Base64)
     }
 }

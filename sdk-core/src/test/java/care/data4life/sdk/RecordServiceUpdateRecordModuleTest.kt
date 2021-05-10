@@ -27,13 +27,17 @@ import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Identifier
 import care.data4life.sdk.fhir.Fhir4Identifier
-import care.data4life.sdk.fhir.FhirService
+import care.data4life.sdk.fhir.ResourceCryptoService
 import care.data4life.sdk.model.Record
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
+import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.record.RecordContract
-import care.data4life.sdk.tag.TagEncryptionService
+import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.TagCryptoService
 import care.data4life.sdk.tag.TaggingService
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.fake.CryptoServiceFake
 import care.data4life.sdk.test.fake.CryptoServiceIteration
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
@@ -57,6 +61,7 @@ import care.data4life.sdk.wrapper.SdkFhirParser
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Ignore
@@ -79,7 +84,7 @@ class RecordServiceUpdateRecordModuleTest {
 
     private lateinit var recordService: RecordContract.Service
     private lateinit var flowHelper: RecordServiceModuleTestFlowHelper
-    private val apiService: ApiService = mockk()
+    private val apiService: NetworkingContract.Service = mockk()
     private lateinit var cryptoService: CryptoContract.Service
     private val imageResizer: AttachmentContract.ImageResizer = mockk()
     private val errorHandler: D4LErrorHandler = mockk()
@@ -94,9 +99,9 @@ class RecordServiceUpdateRecordModuleTest {
             PARTNER_ID,
             ALIAS,
             apiService,
-            TagEncryptionService(cryptoService),
+            TagCryptoService(cryptoService),
             TaggingService(CLIENT_ID),
-            FhirService(cryptoService),
+            ResourceCryptoService(cryptoService),
             AttachmentService(
                 FileService(ALIAS, apiService, cryptoService),
                 imageResizer
@@ -128,16 +133,24 @@ class RecordServiceUpdateRecordModuleTest {
             }
         }
 
+        val actualRecord = slot<NetworkModelContract.EncryptedRecord>()
+        val expectedRecord = encryptedReceivedRecord.copy(updatedDate = null)
+
         every {
             apiService.updateRecord(
                 alias,
                 userId,
                 recordId,
-                encryptedReceivedRecord.copy(updatedDate = null)
+                capture(actualRecord)
+
             )
         } answers {
-            Single.just(encryptedReceivedRecord).also {
-                (cryptoService as CryptoServiceFake).iteration = receivedIteration
+            if (flowHelper.compareEncryptedRecords(actualRecord.captured, expectedRecord)) {
+                Single.just(encryptedReceivedRecord).also {
+                    (cryptoService as CryptoServiceFake).iteration = receivedIteration
+                }
+            } else {
+                throw RuntimeException("Unexpected encrypted record\n${actualRecord.captured}")
             }
         }
     }
@@ -148,7 +161,7 @@ class RecordServiceUpdateRecordModuleTest {
         serializedResourceOld: String,
         serializedResourceNew: String,
         tags: List<String>,
-        annotations: List<String>,
+        annotations: Annotations,
         useStoredCommonKey: Boolean,
         commonKey: Pair<String, GCKey>,
         dataKey: Pair<GCKey, EncryptedKey>,
@@ -223,7 +236,7 @@ class RecordServiceUpdateRecordModuleTest {
     }
 
     private fun mergeTags(
-        tags: Map<String, String>,
+        tags: Tags,
         oldTags: Map<String, String>?
     ): Pair<List<String>, List<String>> {
         val allTags = mutableListOf<String>()
@@ -245,8 +258,8 @@ class RecordServiceUpdateRecordModuleTest {
     private fun runFhirFlow(
         serializedResourceOld: String,
         serializedResourceNew: String,
-        tags: Map<String, String>,
-        annotations: List<String> = emptyList(),
+        tags: Tags,
+        annotations: Annotations = emptyList(),
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,
         dataKey: Pair<GCKey, EncryptedKey> = this.dataKey to encryptedDataKey,
@@ -307,8 +320,8 @@ class RecordServiceUpdateRecordModuleTest {
         serializedResourceOld: String,
         serializedResourceNew: String,
         attachmentData: ByteArray,
-        tags: Map<String, String>,
-        annotations: List<String> = emptyList(),
+        tags: Tags,
+        annotations: Annotations = emptyList(),
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,
         dataKey: Pair<GCKey, EncryptedKey> = this.dataKey to encryptedDataKey,
@@ -380,8 +393,8 @@ class RecordServiceUpdateRecordModuleTest {
     private fun runDataFlow(
         serializedResourceOld: String,
         serializedResourceNew: String,
-        tags: Map<String, String>,
-        annotations: List<String> = emptyList(),
+        tags: Tags,
+        annotations: Annotations = emptyList(),
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,
         dataKey: Pair<GCKey, EncryptedKey> = this.dataKey to encryptedDataKey,

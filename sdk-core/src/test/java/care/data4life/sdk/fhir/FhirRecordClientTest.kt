@@ -24,6 +24,7 @@ import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.call.Task
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.tag.Annotations
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -52,7 +53,7 @@ class FhirRecordClientTest {
     fun `Given count is called, with a resourceType, Annotations and a Callback it returns the corresponding Task`() {
         // Given
         val resourceType = Fhir4Resource::class.java
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
         val callback: Callback<Int> = mockk()
 
         val userId = "Potato"

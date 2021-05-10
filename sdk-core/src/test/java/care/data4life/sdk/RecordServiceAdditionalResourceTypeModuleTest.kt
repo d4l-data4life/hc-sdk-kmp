@@ -26,10 +26,12 @@ import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.model.DownloadType
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.EncryptedRecord
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
+import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ADDITIONAL_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
@@ -83,14 +85,14 @@ import care.data4life.fhir.stu3.util.FhirAttachmentHelper as Fhir3AttachmentHelp
 @RunWith(Parameterized::class)
 class RecordServiceAdditionalResourceTypeModuleTest {
     private lateinit var recordService: RecordService
-    private val apiService: ApiService = mockk()
+    private val apiService: NetworkingContract.Service = mockk()
     private val cryptoService: CryptoContract.Service = mockk()
-    private val fhirService: FhirContract.Service = mockk()
-    private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
+    private val resourceCryptoService: FhirContract.CryptoService = mockk()
+    private val tagCryptoService: TaggingContract.CryptoService = mockk()
     private val taggingService: TaggingContract.Service = mockk()
     private val attachmentService: AttachmentContract.Service = mockk()
     private val errorHandler: SdkContract.ErrorHandler = mockk()
-    private val defaultAnnotations: List<String> = emptyList()
+    private val defaultAnnotations: Annotations = emptyList()
 
     private val modelVersion = -1
 
@@ -103,9 +105,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
                 PARTNER_ID,
                 ALIAS,
                 apiService,
-                tagEncryptionService,
+                tagCryptoService,
                 taggingService,
-                fhirService,
+                resourceCryptoService,
                 attachmentService,
                 cryptoService,
                 errorHandler
@@ -409,11 +411,11 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val decryptedRecord = DecryptedRecord(
             null,
             resource,
-            null,
+            mockk(),
             defaultAnnotations,
             null,
             null,
-            null,
+            mockk(),
             null,
             modelVersion
         )
@@ -449,11 +451,11 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val decryptedRecord = DecryptedR4Record(
             null,
             resource,
-            null,
+            mockk(),
             defaultAnnotations,
             null,
             null,
-            null,
+            mockk(),
             null,
             modelVersion
         )
@@ -489,11 +491,11 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val decryptedRecord = DecryptedRecord(
             null,
             originalResource,
-            null,
+            mockk(),
             defaultAnnotations,
             null,
             null,
-            null,
+            mockk(),
             null,
             modelVersion
         )
@@ -538,11 +540,11 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val decryptedRecord = DecryptedR4Record(
             null,
             originalResource,
-            null,
+            mockk(),
             defaultAnnotations,
             null,
             null,
-            null,
+            mockk(),
             null,
             modelVersion
         )
@@ -898,11 +900,11 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val decryptedRecord = DecryptedRecord(
             null,
             resource,
-            null,
+            mockk(),
             defaultAnnotations,
             null,
             null,
-            null,
+            mockk(),
             attachmentKey,
             modelVersion
         )
@@ -998,11 +1000,11 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val decryptedRecord = DecryptedRecord(
             null,
             resource,
-            null,
+            mockk(),
             defaultAnnotations,
             null,
             null,
-            null,
+            mockk(),
             attachmentKey,
             modelVersion
         )
@@ -1103,11 +1105,11 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val decryptedRecord = DecryptedR4Record(
             null,
             resource,
-            null,
+            mockk(),
             defaultAnnotations,
             null,
             null,
-            null,
+            mockk(),
             attachmentKey,
             modelVersion
         )
@@ -1193,11 +1195,11 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val decryptedRecord = DecryptedR4Record(
             null,
             resource,
-            null,
+            mockk(),
             defaultAnnotations,
             null,
             null,
-            null,
+            mockk(),
             attachmentKey,
             modelVersion
         )
@@ -1293,11 +1295,11 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val decryptedRecord = DecryptedR4Record(
             null,
             resource,
-            null,
+            mockk(),
             defaultAnnotations,
             null,
             null,
-            null,
+            mockk(),
             attachmentKey,
             modelVersion
         )
@@ -1398,11 +1400,11 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         val decryptedRecord = DecryptedRecord(
             null,
             resource,
-            null,
+            mockk(),
             defaultAnnotations,
             null,
             null,
-            null,
+            mockk(),
             attachmentKey,
             modelVersion
         )

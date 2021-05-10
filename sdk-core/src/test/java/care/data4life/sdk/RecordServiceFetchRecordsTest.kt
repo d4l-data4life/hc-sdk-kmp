@@ -29,12 +29,14 @@ import care.data4life.sdk.migration.MigrationContract
 import care.data4life.sdk.model.ModelContract.BaseRecord
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.DecryptedDataRecord
 import care.data4life.sdk.network.model.EncryptedRecord
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
-import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID
@@ -62,15 +64,15 @@ import care.data4life.fhir.stu3.model.CarePlan as Fhir3CarePlan
 
 class RecordServiceFetchRecordsTest {
     private lateinit var recordService: RecordService
-    private val apiService: ApiService = mockk()
+    private val apiService: NetworkingContract.Service = mockk()
     private val cryptoService: CryptoContract.Service = mockk()
-    private val fhirService: FhirContract.Service = mockk()
-    private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
+    private val resourceCryptoService: FhirContract.CryptoService = mockk()
+    private val tagCryptoService: TaggingContract.CryptoService = mockk()
     private val taggingService: TaggingContract.Service = mockk()
     private val attachmentService: AttachmentContract.Service = mockk()
     private val errorHandler: SdkContract.ErrorHandler = mockk()
 
-    private val tags: HashMap<String, String> = mockk()
+    private val tags: Tags = mockk()
     private val defaultAnnotation: List<String> = emptyList()
 
     private val compatibilityService: MigrationContract.CompatibilityService = mockk()
@@ -85,9 +87,9 @@ class RecordServiceFetchRecordsTest {
                 PARTNER_ID,
                 ALIAS,
                 apiService,
-                tagEncryptionService,
+                tagCryptoService,
                 taggingService,
-                fhirService,
+                resourceCryptoService,
                 attachmentService,
                 cryptoService,
                 errorHandler,

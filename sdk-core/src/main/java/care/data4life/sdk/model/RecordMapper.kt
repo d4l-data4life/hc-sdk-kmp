@@ -23,10 +23,10 @@ import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.ModelContract.BaseRecord
 import care.data4life.sdk.model.ModelContract.RecordFactory
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
-import care.data4life.sdk.network.model.definitions.DecryptedCustomDataRecord
-import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedCustomDataRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
 import care.data4life.sdk.wrapper.SdkDateTimeFormatter
 
 internal object RecordMapper : RecordFactory {

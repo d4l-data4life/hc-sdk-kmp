@@ -14,11 +14,8 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network
+package care.data4life.sdk.network.model
 
-import care.data4life.sdk.network.model.EncryptedKey
-import care.data4life.sdk.network.model.NetworkModelContract
-import care.data4life.sdk.network.model.UserInfo
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter
 import com.squareup.moshi.Moshi
 import io.mockk.mockk
@@ -44,7 +41,7 @@ class UserInfoTest {
     }
 
     @Test
-    fun `Given a UserInfo is serialized, it transforms into the valid json format`() {
+    fun `Given a UserInfo is serialized, it transforms into a valid JSON format`() {
         val moshi = Moshi.Builder()
             .add(EncryptedKeyTypeAdapter())
             .build()
@@ -57,7 +54,7 @@ class UserInfoTest {
     }
 
     @Test
-    fun `Given a UserInfo is deserialized, it transforms into the valid UserInfo`() {
+    fun `Given a UserInfo is deserialized, it transforms into UserInfo`() {
         val moshi = Moshi.Builder()
             .add(EncryptedKeyTypeAdapter())
             .build()

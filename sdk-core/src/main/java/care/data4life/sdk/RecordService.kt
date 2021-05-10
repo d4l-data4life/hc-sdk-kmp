@@ -16,7 +16,6 @@
 package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
-import care.data4life.crypto.KeyType
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.ThumbnailService
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
@@ -42,19 +41,18 @@ import care.data4life.sdk.model.DownloadResult
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.FetchResult
 import care.data4life.sdk.model.ModelContract.BaseRecord
-import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.model.ModelContract.RecordFactory
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.model.UpdateResult
-import care.data4life.sdk.network.DecryptedRecordMapper
-import care.data4life.sdk.network.model.EncryptedKey
-import care.data4life.sdk.network.model.EncryptedRecord
+import care.data4life.sdk.network.NetworkingContract
+import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.NetworkModelContract
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
-import care.data4life.sdk.network.model.definitions.DecryptedFhir3Record
-import care.data4life.sdk.network.model.definitions.DecryptedFhir4Record
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
+import care.data4life.sdk.network.model.RecordCryptoService
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_FMT
 import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_SIZE
@@ -80,17 +78,16 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.threeten.bp.LocalDate
-import java.io.IOException
 
 // TODO internal
 // TODO add Factory
 class RecordService internal constructor(
     private val partnerId: String,
     private val alias: String,
-    private val apiService: ApiService,
-    private val tagEncryptionService: TaggingContract.EncryptionService,
+    private val apiService: NetworkingContract.Service,
+    tagCryptoService: TaggingContract.CryptoService,
     private val taggingService: TaggingContract.Service,
-    private val fhirService: FhirContract.Service,
+    resourceCryptoService: FhirContract.CryptoService,
     private val attachmentService: AttachmentContract.Service,
     private val cryptoService: CryptoContract.Service,
     private val errorHandler: SdkContract.ErrorHandler,
@@ -100,10 +97,10 @@ class RecordService internal constructor(
     constructor(
         partnerId: String,
         alias: String,
-        apiService: ApiService,
-        tagEncryptionService: TaggingContract.EncryptionService,
+        apiService: NetworkingContract.Service,
+        tagCryptoService: TaggingContract.CryptoService,
         taggingService: TaggingContract.Service,
-        fhirService: FhirContract.Service,
+        resourceCryptoService: FhirContract.CryptoService,
         attachmentService: AttachmentContract.Service,
         cryptoService: CryptoContract.Service,
         errorHandler: SdkContract.ErrorHandler
@@ -111,19 +108,30 @@ class RecordService internal constructor(
         partnerId,
         alias,
         apiService,
-        tagEncryptionService,
+        tagCryptoService,
         taggingService,
-        fhirService,
+        resourceCryptoService,
         attachmentService,
         cryptoService,
         errorHandler,
         RecordCompatibilityService(
             apiService,
-            tagEncryptionService,
+            tagCryptoService,
             cryptoService
         )
     )
 
+    private val recordCryptoService: NetworkModelContract.CryptoService = RecordCryptoService(
+        alias,
+        apiService,
+        taggingService,
+        tagCryptoService,
+        DecryptedRecordGuard,
+        cryptoService,
+        resourceCryptoService,
+        SdkDateTimeFormatter,
+        ModelVersion
+    )
     private val recordFactory: RecordFactory = RecordMapper
     private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper = SdkFhirAttachmentHelper
     private val attachmentFactory: WrapperFactoryContract.AttachmentFactory = SdkAttachmentFactory
@@ -142,19 +150,8 @@ class RecordService internal constructor(
         checkDataRestrictions(resource)
 
         val data = extractUploadData(resource)
-        val record = Single.just(
-            DecryptedRecordMapper()
-                .setAnnotations(annotations)
-                .build(
-                    resource,
-                    taggingService.appendDefaultTags(resource, null),
-                    dateTimeFormatter.now(),
-                    cryptoService.generateGCKey().blockingGet(),
-                    CURRENT
-                )
-        )
 
-        return record
+        return fromResource(resource, annotations)
             .map { createdRecord -> uploadData(createdRecord, userId) }
             .map { createdRecord -> removeUploadData(createdRecord) }
             .map { createdRecord -> encryptRecord(createdRecord) }
@@ -173,7 +170,7 @@ class RecordService internal constructor(
     override fun <T : Fhir3Resource> createRecord(
         userId: String,
         resource: T,
-        annotations: List<String>
+        annotations: Annotations
     ): Single<Record<T>> = createRecord(
         userId,
         resource as Any,
@@ -184,7 +181,7 @@ class RecordService internal constructor(
     override fun createRecord(
         userId: String,
         resource: DataResource,
-        annotations: List<String>
+        annotations: Annotations
     ): Single<DataRecord<DataResource>> = createRecord(
         userId,
         resource as Any,
@@ -195,7 +192,7 @@ class RecordService internal constructor(
     override fun <T : Fhir4Resource> createRecord(
         userId: String,
         resource: T,
-        annotations: List<String>
+        annotations: Annotations
     ): Single<Fhir4Record<T>> = createRecord(
         userId,
         resource as Any,
@@ -223,7 +220,7 @@ class RecordService internal constructor(
     override fun deleteRecord(
         userId: String,
         recordId: String
-    ): Completable = apiService.deleteRecord(alias, recordId, userId)
+    ): Completable = apiService.deleteRecord(alias, userId, recordId)
 
     fun deleteRecords(recordIds: List<String>, userId: String): Single<DeleteResult> {
         val failedDeletes: MutableList<Pair<String, D4LException>> = mutableListOf()
@@ -350,7 +347,7 @@ class RecordService internal constructor(
     override fun <T : Fhir3Resource> fetchFhir3Records(
         userId: String,
         resourceType: Class<T>,
-        annotations: List<String>,
+        annotations: Annotations,
         startDate: LocalDate?,
         endDate: LocalDate?,
         pageSize: Int,
@@ -369,7 +366,7 @@ class RecordService internal constructor(
     override fun <T : Fhir4Resource> fetchFhir4Records(
         userId: String,
         resourceType: Class<T>,
-        annotations: List<String>,
+        annotations: Annotations,
         startDate: LocalDate?,
         endDate: LocalDate?,
         pageSize: Int,
@@ -387,7 +384,7 @@ class RecordService internal constructor(
     @Suppress("UNCHECKED_CAST")
     override fun fetchDataRecords(
         userId: String,
-        annotations: List<String>,
+        annotations: Annotations,
         startDate: LocalDate?,
         endDate: LocalDate?,
         pageSize: Int,
@@ -457,7 +454,7 @@ class RecordService internal constructor(
         userId: String,
         recordId: String,
         resource: T,
-        annotations: List<String>
+        annotations: Annotations
     ): Single<Record<T>> = updateRecord(
         userId,
         recordId,
@@ -474,7 +471,7 @@ class RecordService internal constructor(
         userId: String,
         recordId: String,
         resource: T,
-        annotations: List<String>
+        annotations: Annotations
     ): Single<Fhir4Record<T>> = updateRecord(
         userId,
         recordId,
@@ -487,7 +484,7 @@ class RecordService internal constructor(
         userId: String,
         recordId: String,
         resource: DataResource,
-        annotations: List<String>
+        annotations: Annotations
     ): Single<DataRecord<DataResource>> = updateRecord(
         userId,
         recordId,
@@ -529,7 +526,7 @@ class RecordService internal constructor(
     fun countRecords(
         type: Class<out Fhir3Resource>?,
         userId: String,
-        annotations: List<String> = listOf()
+        annotations: Annotations = listOf()
     ): Single<Int> {
         return if (type == null) {
             countAllFhir3Records(userId, annotations)
@@ -541,18 +538,18 @@ class RecordService internal constructor(
     override fun countFhir3Records(
         type: Class<out Fhir3Resource>,
         userId: String,
-        annotations: List<String>
+        annotations: Annotations
     ): Single<Int> = _countRecords(type, userId, annotations)
 
     override fun countFhir4Records(
         type: Class<out Fhir4Resource>,
         userId: String,
-        annotations: List<String>
+        annotations: Annotations
     ): Single<Int> = _countRecords(type, userId, annotations)
 
     override fun countAllFhir3Records(
         userId: String,
-        annotations: List<String>
+        annotations: Annotations
     ): Single<Int> = countFhir3Records(Fhir3Resource::class.java, userId, annotations)
 
     override fun <T : Fhir3Resource> downloadFhir3Record(
@@ -672,7 +669,7 @@ class RecordService internal constructor(
         .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
         .map { decryptedRecord -> failOnResourceInconsistency(decryptedRecord, resourceBarrier) }
         .flatMap { decryptedRecord ->
-            downloadAttachmentsFromStorage<T, R>(
+            downloadAttachmentsFromStorage(
                 attachmentIds,
                 userId,
                 type,
@@ -692,115 +689,24 @@ class RecordService internal constructor(
             throw IllegalArgumentException("The given Record does not match the expected resource type.")
         }
     }
+    @Deprecated("This is a test concern and should be removed once a proper DI/SL is in place.")
+    internal fun <T : Any> fromResource(
+        resource: T,
+        annotations: Annotations
+    ): Single<DecryptedBaseRecord<T>> = Single.just(
+        recordCryptoService.fromResource(resource, annotations)
+    )
 
-    @Throws(IOException::class)
-    internal fun <T : Any> encryptRecord(record: DecryptedBaseRecord<T>): NetworkModelContract.EncryptedRecord {
-        val encryptedTags =
-            tagEncryptionService.encryptTagsAndAnnotations(record.tags!!, record.annotations)
+    @Deprecated("This is a test concern and should be removed once a proper DI/SL is in place.")
+    internal fun <T : Any> encryptRecord(
+        record: DecryptedBaseRecord<T>
+    ): NetworkModelContract.EncryptedRecord = recordCryptoService.encrypt(record)
 
-        val commonKey = cryptoService.fetchCurrentCommonKey()
-        val currentCommonKeyId = cryptoService.currentCommonKeyId
-        val encryptedDataKey = cryptoService.encryptSymmetricKey(
-            commonKey,
-            KeyType.DATA_KEY,
-            record.dataKey!!
-        ).blockingGet() as EncryptedKey
-
-        val encryptedResource = fhirService._encryptResource(record.dataKey!!, record.resource)
-
-        val encryptedAttachmentsKey = if (record.attachmentsKey == null) {
-            null
-        } else {
-            cryptoService.encryptSymmetricKey(
-                commonKey,
-                KeyType.ATTACHMENT_KEY,
-                record.attachmentsKey!!
-            ).blockingGet() as EncryptedKey
-        }
-
-        return EncryptedRecord(
-            currentCommonKeyId,
-            record.identifier,
-            encryptedTags,
-            encryptedResource,
-            record.customCreationDate,
-            encryptedDataKey,
-            encryptedAttachmentsKey,
-            record.modelVersion
-        )
-    }
-
-    private fun getCommonKey(commonKeyId: String, userId: String): GCKey {
-        val commonKeyStored = cryptoService.hasCommonKey(commonKeyId)
-        return if (commonKeyStored) {
-            cryptoService.getCommonKeyById(commonKeyId)
-        } else {
-            val commonKeyResponse = apiService.fetchCommonKey(
-                alias,
-                userId,
-                commonKeyId
-            ).blockingGet()
-
-            cryptoService.asymDecryptSymetricKey(
-                cryptoService.fetchGCKeyPair().blockingGet(),
-                commonKeyResponse.commonKey
-            ).blockingGet().also {
-                cryptoService.storeCommonKey(commonKeyId, it)
-            }
-        }
-    }
-
-    @Throws(IOException::class, DataValidationException.ModelVersionNotSupported::class)
+    @Deprecated("This is a test concern and should be removed once a proper DI/SL is in place.")
     internal fun <T : Any> decryptRecord(
         record: NetworkModelContract.EncryptedRecord,
         userId: String
-    ): DecryptedBaseRecord<T> {
-        if (!ModelVersion.isModelVersionSupported(record.modelVersion)) {
-            throw DataValidationException.ModelVersionNotSupported("Please update SDK to latest version!")
-        }
-
-        val (tags, annotations) = tagEncryptionService.decryptTagsAndAnnotations(record.encryptedTags)
-
-        val builder = DecryptedRecordMapper()
-            .setIdentifier(record.identifier)
-            .setTags(tags)
-            .setAnnotations(annotations)
-            .setCreationDate(record.customCreationDate)
-            .setUpdateDate(record.updatedDate)
-            .setModelVersion(record.modelVersion)
-
-        val commonKeyId = record.commonKeyId
-        val commonKey: GCKey = getCommonKey(commonKeyId, userId)
-        val dataKey = cryptoService.symDecryptSymmetricKey(
-            commonKey,
-            record.encryptedDataKey
-        ).blockingGet()
-
-        builder.setDataKey(dataKey)
-
-        val attachmentKey = record.encryptedAttachmentsKey
-        if (attachmentKey is EncryptedKey) {
-            builder.setAttachmentKey(
-                cryptoService.symDecryptSymmetricKey(
-                    commonKey,
-                    attachmentKey
-                ).blockingGet()
-            )
-        }
-
-        val body = record.encryptedBody
-        return builder.build(
-            if (body is String && body.isNotEmpty()) {
-                fhirService.decryptResource<T>(
-                    dataKey,
-                    tags,
-                    body
-                )
-            } else {
-                null // Fixme: This is a potential bug
-            }
-        ) as DecryptedBaseRecord<T>
-    }
+    ): DecryptedBaseRecord<T> = recordCryptoService.decrypt(record, userId)
 
     @Throws(
         DataValidationException.IdUsageViolation::class,
@@ -1271,7 +1177,7 @@ class RecordService internal constructor(
     }
 
     // TODO: make it private
-    internal fun <T : Any> assignResourceId(
+    private fun <T : Any> assignResourceId(
         record: DecryptedBaseRecord<T>
     ): DecryptedBaseRecord<T> {
         return record.also {

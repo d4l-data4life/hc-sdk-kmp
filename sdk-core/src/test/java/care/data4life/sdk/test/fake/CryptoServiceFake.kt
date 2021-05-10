@@ -23,6 +23,7 @@ import care.data4life.crypto.KeyType
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.NetworkModelContract
+import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.test.util.GenericTestDataProvider.IV
 import io.mockk.mockk
 import io.reactivex.Single
@@ -42,7 +43,7 @@ data class CryptoServiceIteration(
     val tagEncryptionKeyCalls: Int,
     val resources: List<String>,
     val tags: List<String>,
-    val annotations: List<String>,
+    val annotations: Annotations,
     val hashFunction: (payload: String) -> String
 )
 
@@ -365,7 +366,7 @@ class CryptoServiceFake : CryptoContract.Service {
         hashedTagsAndAnnotations[hashed] = tag
     }
 
-    private fun prepareTagsAndAnnotations(tags: List<String>, annotations: List<String>) {
+    private fun prepareTagsAndAnnotations(tags: List<String>, annotations: Annotations) {
         val tagsAndAnnotations = mutableMapOf<String, String>()
         val hashedTagsAndAnnotations = mutableMapOf<String, String>()
 

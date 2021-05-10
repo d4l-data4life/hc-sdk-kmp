@@ -22,7 +22,7 @@ import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.ModelContract
-import care.data4life.sdk.network.model.definitions.DecryptedBaseRecord
+import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import org.threeten.bp.LocalDate
 
 // TODO restructure this
@@ -64,7 +64,7 @@ class WrapperContract {
         fun fromResource(resource: Any): String?
     }
 
-    internal interface DateTimeFormatter {
+    interface DateTimeFormatter {
         fun now(): String
         fun formatDate(dateTime: LocalDate): String
         fun buildMeta(record: DecryptedBaseRecord<*>): ModelContract.Meta

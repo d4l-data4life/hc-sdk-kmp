@@ -22,13 +22,16 @@ import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.crypto.CryptoContract
-import care.data4life.sdk.fhir.FhirService
+import care.data4life.sdk.fhir.ResourceCryptoService
 import care.data4life.sdk.model.Record
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.record.RecordContract
-import care.data4life.sdk.tag.TagEncryptionService
+import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.TagCryptoService
 import care.data4life.sdk.tag.TaggingService
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.fake.CryptoServiceFake
 import care.data4life.sdk.test.fake.CryptoServiceIteration
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
@@ -69,7 +72,7 @@ class RecordServiceFetchRecordsModuleTest {
 
     private lateinit var recordService: RecordContract.Service
     private lateinit var flowHelper: RecordServiceModuleTestFlowHelper
-    private val apiService: ApiService = mockk()
+    private val apiService: NetworkingContract.Service = mockk()
     private lateinit var cryptoService: CryptoContract.Service
     private val fileService: AttachmentContract.FileService = mockk()
     private val imageResizer: AttachmentContract.ImageResizer = mockk()
@@ -85,9 +88,9 @@ class RecordServiceFetchRecordsModuleTest {
             PARTNER_ID,
             ALIAS,
             apiService,
-            TagEncryptionService(cryptoService),
+            TagCryptoService(cryptoService),
             TaggingService(CLIENT_ID),
-            FhirService(cryptoService),
+            ResourceCryptoService(cryptoService),
             AttachmentService(
                 fileService,
                 imageResizer
@@ -106,7 +109,7 @@ class RecordServiceFetchRecordsModuleTest {
         serializedResource: String,
         encryptedRecord: EncryptedRecord,
         tags: List<String>,
-        annotations: List<String>,
+        annotations: Annotations,
         useStoredCommonKey: Boolean,
         commonKey: Pair<String, GCKey>,
         dataKey: Pair<GCKey, EncryptedKey>,
@@ -154,8 +157,8 @@ class RecordServiceFetchRecordsModuleTest {
 
     private fun runFhirFetchFlow(
         serializedResource: String,
-        tags: Map<String, String>,
-        annotations: List<String> = emptyList(),
+        tags: Tags,
+        annotations: Annotations = emptyList(),
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,
         dataKey: Pair<GCKey, EncryptedKey> = this.dataKey to encryptedDataKey,
@@ -200,8 +203,8 @@ class RecordServiceFetchRecordsModuleTest {
 
     private fun runDataFetchFlow(
         serializedResource: String,
-        tags: Map<String, String>,
-        annotations: List<String> = emptyList(),
+        tags: Tags,
+        annotations: Annotations = emptyList(),
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,
         dataKey: Pair<GCKey, EncryptedKey> = this.dataKey to encryptedDataKey,
@@ -306,7 +309,7 @@ class RecordServiceFetchRecordsModuleTest {
         (cryptoService as CryptoServiceFake).iteration = receivedIteration
 
         every {
-            apiService.fetchRecords(
+            apiService.searchRecords(
                 ALIAS,
                 USER_ID,
                 startDate,
@@ -316,11 +319,12 @@ class RecordServiceFetchRecordsModuleTest {
                 capture(search)
             )
         } answers {
-            val record = when (search.captured) {
-                encryptedTagsAndAnnotations.joinToString(",") -> encryptedRecord
-                encryptedLegacyTagsAndAnnotations.joinToString(",") -> encryptedLegacyRecord
+            val actual = search.captured
+            val record = when {
+                flowHelper.compareSerialisedTags(actual, encryptedTagsAndAnnotations) -> encryptedRecord
+                flowHelper.compareSerialisedTags(actual, encryptedLegacyTagsAndAnnotations) -> encryptedLegacyRecord
                 else -> throw RuntimeException(
-                    "Unexpected tags and annotations:\n${search.captured}"
+                    "Unexpected tags and annotations:\n$actual"
                 )
             }
 
@@ -330,9 +334,9 @@ class RecordServiceFetchRecordsModuleTest {
 
     private fun runFhirBatchFlow(
         serializedResources: Pair<String, String>,
-        tags: Map<String, String>,
+        tags: Tags,
         searchTags: Map<String, String>,
-        annotations: List<String> = emptyList(),
+        annotations: Annotations = emptyList(),
         tagEncryptionKeyCalls: Int = 3,
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,
@@ -404,9 +408,9 @@ class RecordServiceFetchRecordsModuleTest {
 
     private fun runDataBatchFlow(
         serializedResources: Pair<String, String>,
-        tags: Map<String, String>,
+        tags: Tags,
         searchTags: Map<String, String>,
-        annotations: List<String> = emptyList(),
+        annotations: Annotations = emptyList(),
         tagEncryptionKeyCalls: Int = 3,
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,

@@ -24,6 +24,7 @@ import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.model.DownloadType
+import care.data4life.sdk.tag.Annotations
 import org.threeten.bp.LocalDate
 import care.data4life.sdk.listener.Callback as LegacyCallback
 import care.data4life.sdk.listener.ResultListener as LegacyListener
@@ -64,6 +65,7 @@ interface SdkContract {
         fun logout(listener: LegacyCallback): Task
     }
 
+    // TODO: Split into 2 Client - Resource Client and Resource Client with Attachments
     interface Fhir4RecordClient {
         /**
          * Creates a {@link Fhir4Record}
@@ -75,7 +77,7 @@ interface SdkContract {
          */
         fun <T : Fhir4Resource> create(
             resource: T,
-            annotations: List<String>,
+            annotations: Annotations,
             callback: Callback<Fhir4Record<T>>
         ): Task
 
@@ -91,7 +93,7 @@ interface SdkContract {
         fun <T : Fhir4Resource> update(
             recordId: String,
             resource: T,
-            annotations: List<String>,
+            annotations: Annotations,
             callback: Callback<Fhir4Record<T>>
         ): Task
 
@@ -138,7 +140,7 @@ interface SdkContract {
          */
         fun <T : Fhir4Resource> search(
             resourceType: Class<T>,
-            annotations: List<String>,
+            annotations: Annotations,
             startDate: LocalDate?,
             endDate: LocalDate?,
             pageSize: Int,
@@ -156,7 +158,7 @@ interface SdkContract {
          */
         fun <T : Fhir4Resource> count(
             resourceType: Class<T>,
-            annotations: List<String>,
+            annotations: Annotations,
             callback: Callback<Int>
         ): Task
 
@@ -208,7 +210,7 @@ interface SdkContract {
          */
         fun create(
             resource: DataResource,
-            annotations: List<String>,
+            annotations: Annotations,
             callback: Callback<DataRecord<DataResource>>
         ): Task
 
@@ -224,7 +226,7 @@ interface SdkContract {
         fun update(
             recordId: String,
             resource: DataResource,
-            annotations: List<String>,
+            annotations: Annotations,
             callback: Callback<DataRecord<DataResource>>
         ): Task
 
@@ -258,7 +260,7 @@ interface SdkContract {
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
         fun search(
-            annotations: List<String>,
+            annotations: Annotations,
             startDate: LocalDate?,
             endDate: LocalDate?,
             pageSize: Int,

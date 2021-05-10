@@ -26,17 +26,17 @@ import java.io.IOException
 import java.nio.charset.StandardCharsets
 
 // TODO internal
-class TagEncryptionService @JvmOverloads constructor(
+class TagCryptoService @JvmOverloads constructor(
     private val cryptoService: CryptoContract.Service,
     private val base64: Base64 = Base64,
-    private val tagHelper: TaggingContract.Helper = TagEncryptionHelper
-) : TaggingContract.EncryptionService {
+    private val tagHelper: TaggingContract.Helper = TagCryptoHelper
+) : TaggingContract.CryptoService {
     @Throws(D4LException::class)
     override fun encryptTagsAndAnnotations(
         tags: Tags,
         annotations: Annotations,
         tagEncryptionKey: GCKey?
-    ): List<String> {
+    ): EncryptedTagsAndAnnotations {
         val encryptionKey = if (tagEncryptionKey is GCKey) {
             tagEncryptionKey
         } else {
@@ -77,7 +77,7 @@ class TagEncryptionService @JvmOverloads constructor(
 
     @Throws(D4LException::class)
     override fun decryptTagsAndAnnotations(
-        encryptedTagsAndAnnotations: List<String>
+        encryptedTagsAndAnnotations: EncryptedTagsAndAnnotations
     ): Pair<Tags, Annotations> {
         val encryptionKey = cryptoService.fetchTagEncryptionKey()
 

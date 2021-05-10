@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+ * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
  *
  * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
@@ -14,17 +14,18 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network
+package care.data4life.sdk.network.model
 
 import care.data4life.sdk.lang.DataValidationException
-import care.data4life.sdk.network.model.DecryptedRecordGuard
-import care.data4life.sdk.network.model.NetworkModelContract
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.Tags
 import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 class LimitGuardTest {
-    private fun buildMap(numberOfEntries: Int): HashMap<String, String> {
+    private fun buildMap(numberOfEntries: Int): Tags {
         var char = 'A'
         val map = hashMapOf<String, String>()
         for (i in 0 until numberOfEntries) {
@@ -35,7 +36,7 @@ class LimitGuardTest {
         return map
     }
 
-    private fun buildList(numberOfEntries: Int): List<String> {
+    private fun buildList(numberOfEntries: Int): Annotations {
         var char = 'A'
         val list = mutableListOf<String>()
         for (i in 0 until numberOfEntries) {
@@ -47,26 +48,26 @@ class LimitGuardTest {
     }
 
     @Test
-    fun `it is a LimitGuard`() {
-        assertTrue((DecryptedRecordGuard as Any) is NetworkModelContract.LimitGuard)
+    fun `It fulfils LimitGuard`() {
+        val guard: Any = DecryptedRecordGuard
+
+        assertTrue(guard is NetworkModelContract.LimitGuard)
     }
 
     @Test
     fun `Given, checkTagsAndAnnotationsLimits is called with Tags, which exceeds the limit, and empty Annotations, it fails with a TagsAndAnnotationsLimitViolation`() {
         val tags = buildMap(1000)
 
-        // When
-        try {
+        // Then
+        val error = assertFailsWith<DataValidationException.TagsAndAnnotationsLimitViolation> {
+            // When
             DecryptedRecordGuard.checkTagsAndAnnotationsLimits(tags, listOf())
-            assertTrue(false) // FIXME: This is stupid
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is DataValidationException.TagsAndAnnotationsLimitViolation)
-            assertEquals(
-                e.message,
-                "Annotations and Tags are exceeding maximum length"
-            )
         }
+
+        assertEquals(
+            error.message,
+            "Annotations and Tags are exceeding maximum length"
+        )
     }
 
     @Test
@@ -85,18 +86,16 @@ class LimitGuardTest {
     fun `Given, checkTagsAndAnnotationsLimits is called with empty Tags, and empty Annotations, which exceeds the limit, it fails with a TagsAndAnnotationsLimitViolation`() {
         val annotations = buildList(1000)
 
-        // When
-        try {
-            DecryptedRecordGuard.checkTagsAndAnnotationsLimits(hashMapOf(), annotations)
-            assertTrue(false) // FIXME: This is stupid
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is DataValidationException.TagsAndAnnotationsLimitViolation)
-            assertEquals(
-                e.message,
-                "Annotations and Tags are exceeding maximum length"
-            )
+        // Then
+        val error = assertFailsWith<DataValidationException.TagsAndAnnotationsLimitViolation> {
+            // When
+            DecryptedRecordGuard.checkTagsAndAnnotationsLimits(mapOf(), annotations)
         }
+
+        assertEquals(
+            error.message,
+            "Annotations and Tags are exceeding maximum length"
+        )
     }
 
     @Test
@@ -105,7 +104,7 @@ class LimitGuardTest {
         val annotations = buildList(999)
 
         // When
-        DecryptedRecordGuard.checkTagsAndAnnotationsLimits(hashMapOf(), annotations)
+        DecryptedRecordGuard.checkTagsAndAnnotationsLimits(mapOf(), annotations)
 
         // Then
         assertTrue(true)
@@ -116,18 +115,16 @@ class LimitGuardTest {
         val tags = buildMap(25)
         val annotations = buildList(1000)
 
-        // When
-        try {
+        // Then
+        val error = assertFailsWith<DataValidationException.TagsAndAnnotationsLimitViolation> {
+            // When
             DecryptedRecordGuard.checkTagsAndAnnotationsLimits(tags, annotations)
-            assertTrue(false) // FIXME: This is stupid
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is DataValidationException.TagsAndAnnotationsLimitViolation)
-            assertEquals(
-                e.message,
-                "Annotations and Tags are exceeding maximum length"
-            )
         }
+
+        assertEquals(
+            error.message,
+            "Annotations and Tags are exceeding maximum length"
+        )
     }
 
     @Test
@@ -148,18 +145,16 @@ class LimitGuardTest {
         // Given
         val data = ByteArray(10485760)
 
-        // When
-        try {
+        // Then
+        val error = assertFailsWith<DataValidationException.CustomDataLimitViolation> {
+            // When
             DecryptedRecordGuard.checkDataLimit(data)
-            assertTrue(false) // FIXME: This is stupid
-        } catch (e: Exception) {
-            // Then
-            assertTrue(e is DataValidationException.CustomDataLimitViolation)
-            assertEquals(
-                e.message,
-                "The given record data exceeds the maximum size"
-            )
         }
+
+        assertEquals(
+            error.message,
+            "The given record data exceeds the maximum size"
+        )
     }
 
     @Test

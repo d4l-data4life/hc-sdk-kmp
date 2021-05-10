@@ -27,10 +27,12 @@ import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.migration.MigrationContract
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.DecryptedDataRecord
 import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.EncryptedRecord
+import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
@@ -53,10 +55,10 @@ import kotlin.test.assertSame
 
 class RecordServiceUpdateRecordTest {
     private lateinit var recordService: RecordService
-    private val apiService: ApiService = mockk()
+    private val apiService: NetworkingContract.Service = mockk()
     private val cryptoService: CryptoContract.Service = mockk()
-    private val fhirService: FhirContract.Service = mockk()
-    private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
+    private val resourceCryptoService: FhirContract.CryptoService = mockk()
+    private val tagCryptoService: TaggingContract.CryptoService = mockk()
     private val taggingService: TaggingContract.Service = mockk()
     private val attachmentService: AttachmentContract.Service = mockk()
     private val errorHandler: SdkContract.ErrorHandler = mockk()
@@ -74,9 +76,9 @@ class RecordServiceUpdateRecordTest {
                 PARTNER_ID,
                 ALIAS,
                 apiService,
-                tagEncryptionService,
+                tagCryptoService,
                 taggingService,
-                fhirService,
+                resourceCryptoService,
                 attachmentService,
                 cryptoService,
                 errorHandler,
@@ -364,7 +366,7 @@ class RecordServiceUpdateRecordTest {
         val receivedRecord: EncryptedRecord = mockk()
         val receivedDecryptedRecord: DecryptedRecord<Fhir3Resource> = mockk(relaxed = true)
         val record: Record<Fhir3Resource> = mockk()
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
         val identifier = "id"
 
         every { receivedDecryptedRecord.identifier } returns identifier
@@ -454,7 +456,7 @@ class RecordServiceUpdateRecordTest {
         val receivedRecord: EncryptedRecord = mockk()
         val receivedDecryptedRecord: DecryptedR4Record<Fhir4Resource> = mockk(relaxed = true)
         val record: Fhir4Record<Fhir4Resource> = mockk()
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
         val identifier = "id"
 
         every { receivedDecryptedRecord.identifier } returns identifier
@@ -544,7 +546,7 @@ class RecordServiceUpdateRecordTest {
         val receivedRecord: EncryptedRecord = mockk()
         val receivedDecryptedRecord: DecryptedDataRecord = mockk(relaxed = true)
         val record: DataRecord<DataResource> = mockk()
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
 
         every {
             apiService.fetchRecord(

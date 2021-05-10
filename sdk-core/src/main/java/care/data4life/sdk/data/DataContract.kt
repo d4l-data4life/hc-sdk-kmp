@@ -18,11 +18,13 @@ package care.data4life.sdk.data
 
 import care.data4life.sdk.SdkContract
 
+// TODO: merge with FhirContract
 interface DataContract {
 
     interface Client : SdkContract.DataRecordClient
 
     interface Resource {
+        val value: ByteArray
         fun asByteArray(): ByteArray
     }
 }

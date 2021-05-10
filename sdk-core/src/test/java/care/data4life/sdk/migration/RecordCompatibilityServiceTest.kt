@@ -17,8 +17,8 @@
 package care.data4life.sdk.migration
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.ApiService
-import care.data4life.sdk.CryptoService
+import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
@@ -37,9 +37,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class RecordCompatibilityServiceTest {
-    private lateinit var apiService: ApiService
-    private lateinit var tagEncryptionService: TaggingContract.EncryptionService
-    private lateinit var cryptoService: CryptoService
+    private lateinit var apiService: NetworkingContract.Service
+    private lateinit var tagCryptoService: TaggingContract.CryptoService
+    private lateinit var cryptoService: CryptoContract.Service
     private lateinit var tagEncryptionHelper: TaggingContract.Helper
     private lateinit var service: MigrationContract.CompatibilityService
 
@@ -47,11 +47,11 @@ class RecordCompatibilityServiceTest {
     fun setUp() {
         apiService = mockk()
         cryptoService = mockk()
-        tagEncryptionService = mockk()
+        tagCryptoService = mockk()
         tagEncryptionHelper = mockk()
         service = RecordCompatibilityService(
             apiService,
-            tagEncryptionService,
+            tagCryptoService,
             cryptoService,
             tagEncryptionHelper
         )
@@ -73,11 +73,11 @@ class RecordCompatibilityServiceTest {
     ) {
         every { cryptoService.fetchTagEncryptionKey() } returns encryptionKey
         every {
-            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations, encryptionKey)
+            tagCryptoService.encryptTagsAndAnnotations(tags, annotations, encryptionKey)
         } returns encodedAndEncryptedTagsAndAnnotations
 
         every {
-            tagEncryptionService.encryptList(
+            tagCryptoService.encryptList(
                 annotations,
                 encryptionKey,
                 ANNOTATION_KEY + DELIMITER
@@ -86,7 +86,7 @@ class RecordCompatibilityServiceTest {
 
         every { tagEncryptionHelper.normalize(tags["key"]!!) } returns tags["key"]!!
         every {
-            tagEncryptionService.encryptList(
+            tagCryptoService.encryptList(
                 eq(listOf("key=value")),
                 encryptionKey
             )
@@ -100,11 +100,11 @@ class RecordCompatibilityServiceTest {
     ) {
         verify(exactly = 1) { cryptoService.fetchTagEncryptionKey() }
         verify(exactly = 1) {
-            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations, encryptionKey)
+            tagCryptoService.encryptTagsAndAnnotations(tags, annotations, encryptionKey)
         }
         verify(exactly = 1) { tagEncryptionHelper.normalize(tags["key"]!!) }
         verify(exactly = 2) {
-            tagEncryptionService.encryptList(
+            tagCryptoService.encryptList(
                 or(eq(listOf("key=value")), annotations),
                 or(encryptionKey, encryptionKey),
                 or("", ANNOTATION_KEY + DELIMITER)
@@ -118,7 +118,7 @@ class RecordCompatibilityServiceTest {
         val alias = "alias"
         val userId = "id"
         val tags = hashMapOf("key" to "value")
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
         val encryptedTags = mutableListOf("a", "k")
         val encryptedAnnotations = mutableListOf("d")
         val expected = 42
@@ -192,7 +192,7 @@ class RecordCompatibilityServiceTest {
         val pageSize = 23
         val offset = 42
         val tags = hashMapOf("key" to "value")
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
         val encodedAndEncryptedTagsAndAnnotations: MutableList<String> = mutableListOf("a", "v")
             .also {
                 it.addAll(listOf("d"))
@@ -213,7 +213,7 @@ class RecordCompatibilityServiceTest {
             encryptionKey
         )
         every {
-            apiService.fetchRecords(
+            apiService.searchRecords(
                 alias,
                 userId,
                 startTime,
@@ -261,7 +261,7 @@ class RecordCompatibilityServiceTest {
             encryptionKey
         )
         verify(exactly = 2) {
-            apiService.fetchRecords(
+            apiService.searchRecords(
                 alias,
                 userId,
                 startTime,
@@ -285,7 +285,7 @@ class RecordCompatibilityServiceTest {
         val pageSize = 23
         val offset = 42
         val tags = hashMapOf("key" to "value")
-        val annotations: List<String> = mockk()
+        val annotations: Annotations = mockk()
         val encodedAndEncryptedTagsAndAnnotations: MutableList<String> =
             mutableListOf("a", "b", "c")
         val encryptedTags: MutableList<String> = mutableListOf("c", "b", "a")
@@ -304,7 +304,7 @@ class RecordCompatibilityServiceTest {
             encryptionKey
         )
         every {
-            apiService.fetchRecords(
+            apiService.searchRecords(
                 alias,
                 userId,
                 startTime,
@@ -352,7 +352,7 @@ class RecordCompatibilityServiceTest {
             encryptionKey
         )
         verify(exactly = 1) {
-            apiService.fetchRecords(
+            apiService.searchRecords(
                 alias,
                 userId,
                 startTime,

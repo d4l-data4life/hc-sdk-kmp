@@ -27,6 +27,7 @@ import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_KEY
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_FHIR_VERSION
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_RESOURCE_TYPE
+import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.util.Base64
 import care.data4life.sdk.wrapper.SdkFhirParser
 import care.data4life.sdk.wrapper.WrapperContract
@@ -36,10 +37,10 @@ import io.reactivex.Single
 // TODO remove @JvmOverloads when Data4LifeClient changed to Kotlin
 // TODO use of Single is not necessary as it's finalized with blockingGet()
 // TODO internal
-class FhirService @JvmOverloads constructor(
+class ResourceCryptoService @JvmOverloads constructor(
     private val cryptoService: CryptoContract.Service,
     private val parserFhir3: FhirParser<Any> = Fhir().createStu3Parser()
-) : FhirContract.Service {
+) : FhirContract.CryptoService {
     private val parser: WrapperContract.FhirParser = SdkFhirParser
 
     @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
@@ -108,7 +109,7 @@ class FhirService @JvmOverloads constructor(
 
     override fun <T : Any> decryptResource(
         dataKey: GCKey,
-        tags: HashMap<String, String>,
+        tags: Tags,
         encryptedResource: String
     ): T {
         return if (tags.containsKey(TAG_APPDATA_KEY)) {
@@ -120,7 +121,7 @@ class FhirService @JvmOverloads constructor(
 
     private fun <T : Any> parseFhir(
         decryptedResourceJson: String,
-        tags: HashMap<String, String>,
+        tags: Tags,
         resourceType: String
     ): T {
         return if (tags[TAG_FHIR_VERSION] == FhirContract.FhirVersion.FHIR_4.version) {
@@ -133,7 +134,7 @@ class FhirService @JvmOverloads constructor(
     private fun <T : Any> decryptFhir(
         dataKey: GCKey,
         resourceType: String,
-        tags: HashMap<String, String>,
+        tags: Tags,
         encryptedResource: String
     ): T {
         return Single
@@ -150,6 +151,7 @@ class FhirService @JvmOverloads constructor(
             .blockingGet()
     }
 
+    // TODO: merge this with Fhir
     private fun decryptData(
         dataKey: GCKey,
         encryptedResource: String

@@ -64,17 +64,17 @@ afterEvaluate {
 
             maven {
                 name = "ReleasePackages"
-                url = uri("$target/releases")
+                url = uri("$target/maven-releases/releases")
             }
 
             maven {
                 name = "SnapshotPackages"
-                url = uri("$target/snapshots")
+                url = uri("$target/maven-snapshots/snapshots")
             }
 
             maven {
                 name = "FeaturePackages"
-                url = uri("$target/features")
+                url = uri("$target/maven-features/features")
             }
         }
         publications {

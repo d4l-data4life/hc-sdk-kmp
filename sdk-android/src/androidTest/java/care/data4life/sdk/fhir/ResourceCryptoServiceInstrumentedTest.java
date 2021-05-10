@@ -41,12 +41,12 @@ import care.data4life.securestore.SecureStoreStorage;
 import static com.google.common.truth.Truth.assertThat;
 
 @Ignore("Ignored until deep copy of fhir resource is implemented")
-public class FhirServiceInstrumentedTest {
+public class ResourceCryptoServiceInstrumentedTest {
 
     private static final String PATH = "design-documents/crypto/test-fixture/v1/";
     private static final String DEFAULT_ALIAS = "defaultAlias";
 
-    private FhirService fhirService;
+    private ResourceCryptoService resourceCryptoService;
     private GCKey dataKey;
 
     @Before
@@ -60,7 +60,7 @@ public class FhirServiceInstrumentedTest {
         SecureStore secureStore = new SecureStore(new SecureStoreCryptor(context), new SecureStoreStorage(context));
         CryptoSecureStore storage = new CryptoSecureStore(secureStore);
         CryptoService cryptoService = new CryptoService(DEFAULT_ALIAS, storage);
-        fhirService = new FhirService(cryptoService);
+        resourceCryptoService = new ResourceCryptoService(cryptoService);
     }
 
     @Test
@@ -69,8 +69,8 @@ public class FhirServiceInstrumentedTest {
         DocumentReference dummyDocRef = DocumentReferenceFactory.buildDocument();
 
         // when
-        String encryptedResource = fhirService.encryptResource(dataKey, dummyDocRef);
-        DomainResource decryptedResource = fhirService.decryptResource(dataKey, DocumentReference.resourceType, encryptedResource);
+        String encryptedResource = resourceCryptoService.encryptResource(dataKey, dummyDocRef);
+        DomainResource decryptedResource = resourceCryptoService.decryptResource(dataKey, DocumentReference.resourceType, encryptedResource);
 
         assertThat(decryptedResource).isInstanceOf(DocumentReference.class);
         DocumentReference docRef = (DocumentReference) decryptedResource;

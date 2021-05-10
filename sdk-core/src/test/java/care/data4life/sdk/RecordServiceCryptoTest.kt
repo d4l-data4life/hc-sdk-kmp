@@ -22,7 +22,7 @@ import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
-import care.data4life.sdk.network.model.RecordEncryptionService
+import care.data4life.sdk.network.model.RecordCryptoService
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
@@ -44,8 +44,8 @@ class RecordServiceCryptoTest {
     private lateinit var recordService: RecordService
     private val apiService: NetworkingContract.Service = mockk()
     private val cryptoService: CryptoContract.Service = mockk()
-    private val fhirService: FhirContract.Service = mockk()
-    private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
+    private val resourceCryptoService: FhirContract.CryptoService = mockk()
+    private val tagCryptoService: TaggingContract.CryptoService = mockk()
     private val taggingService: TaggingContract.Service = mockk()
     private val attachmentService: AttachmentContract.Service = mockk()
     private val errorHandler: SdkContract.ErrorHandler = mockk()
@@ -53,16 +53,16 @@ class RecordServiceCryptoTest {
     @Before
     fun setUp() {
         clearAllMocks()
-        mockkConstructor(RecordEncryptionService::class)
+        mockkConstructor(RecordCryptoService::class)
 
         recordService = spyk(
             RecordService(
                 PARTNER_ID,
                 ALIAS,
                 apiService,
-                tagEncryptionService,
+                tagCryptoService,
                 taggingService,
-                fhirService,
+                resourceCryptoService,
                 attachmentService,
                 cryptoService,
                 errorHandler,
@@ -73,7 +73,7 @@ class RecordServiceCryptoTest {
 
     @After
     fun tearDown() {
-        unmockkConstructor(RecordEncryptionService::class)
+        unmockkConstructor(RecordCryptoService::class)
     }
 
     @Test
@@ -84,7 +84,7 @@ class RecordServiceCryptoTest {
         val expected: DecryptedBaseRecord<Any> = mockk()
 
         every {
-            anyConstructed<RecordEncryptionService>().fromResource(
+            anyConstructed<RecordCryptoService>().fromResource(
                 resource,
                 annotations
             )
@@ -100,7 +100,7 @@ class RecordServiceCryptoTest {
         )
 
         verify(exactly = 1) {
-            anyConstructed<RecordEncryptionService>().fromResource(
+            anyConstructed<RecordCryptoService>().fromResource(
                 resource,
                 annotations
             )
@@ -114,7 +114,7 @@ class RecordServiceCryptoTest {
         val expected: NetworkModelContract.EncryptedRecord = mockk()
 
         every {
-            anyConstructed<RecordEncryptionService>().encrypt(record)
+            anyConstructed<RecordCryptoService>().encrypt(record)
         } returns expected
 
         // When
@@ -127,7 +127,7 @@ class RecordServiceCryptoTest {
         )
 
         verify(exactly = 1) {
-            anyConstructed<RecordEncryptionService>().encrypt(record)
+            anyConstructed<RecordCryptoService>().encrypt(record)
         }
     }
 
@@ -138,7 +138,7 @@ class RecordServiceCryptoTest {
         val record: NetworkModelContract.EncryptedRecord = mockk()
 
         every {
-            anyConstructed<RecordEncryptionService>().decrypt<Any>(record, USER_ID)
+            anyConstructed<RecordCryptoService>().decrypt<Any>(record, USER_ID)
         } returns expected
 
         // When
@@ -151,7 +151,7 @@ class RecordServiceCryptoTest {
         )
 
         verify(exactly = 1) {
-            anyConstructed<RecordEncryptionService>().decrypt<Any>(record, USER_ID)
+            anyConstructed<RecordCryptoService>().decrypt<Any>(record, USER_ID)
         }
     }
 }

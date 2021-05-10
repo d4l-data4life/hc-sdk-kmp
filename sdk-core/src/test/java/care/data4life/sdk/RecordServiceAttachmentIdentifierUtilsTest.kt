@@ -63,8 +63,8 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     private lateinit var recordService: RecordService
     private val apiService: NetworkingContract.Service = mockk()
     private val cryptoService: CryptoContract.Service = mockk()
-    private val fhirService: FhirContract.Service = mockk()
-    private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
+    private val resourceCryptoService: FhirContract.CryptoService = mockk()
+    private val tagCryptoService: TaggingContract.CryptoService = mockk()
     private val taggingService: TaggingContract.Service = mockk()
     private val attachmentService: AttachmentContract.Service = mockk()
     private val errorHandler: SdkContract.ErrorHandler = mockk()
@@ -78,9 +78,9 @@ class RecordServiceAttachmentIdentifierUtilsTest {
                 PARTNER_ID,
                 ALIAS,
                 apiService,
-                tagEncryptionService,
+                tagCryptoService,
                 taggingService,
-                fhirService,
+                resourceCryptoService,
                 attachmentService,
                 cryptoService,
                 errorHandler,

@@ -102,7 +102,7 @@ class NetworkModelContract {
             set(_) {}
     }
 
-    internal interface EncryptionService {
+    internal interface CryptoService {
         fun <T : Any> fromResource(resource: T, annotations: Annotations): DecryptedBaseRecord<T>
         fun <T : Any> encrypt(decryptedRecord: DecryptedBaseRecord<T>): EncryptedRecord
         fun <T : Any> decrypt(encryptedRecord: EncryptedRecord, userId: String): DecryptedBaseRecord<T>

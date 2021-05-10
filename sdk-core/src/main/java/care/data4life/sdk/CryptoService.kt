@@ -48,6 +48,7 @@ import java.security.SecureRandom
 
 // TODO internal
 // TODO remove open (only needed for Test)
+// TODO remove inheritances of CryptoProtocol
 open class CryptoService : CryptoProtocol, CryptoContract.Service {
 
     private val moshi: Moshi

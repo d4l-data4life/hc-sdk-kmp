@@ -38,7 +38,7 @@ import kotlin.test.assertTrue
 
 class RecordCompatibilityServiceTest {
     private lateinit var apiService: NetworkingContract.Service
-    private lateinit var tagEncryptionService: TaggingContract.EncryptionService
+    private lateinit var tagCryptoService: TaggingContract.CryptoService
     private lateinit var cryptoService: CryptoContract.Service
     private lateinit var tagEncryptionHelper: TaggingContract.Helper
     private lateinit var service: MigrationContract.CompatibilityService
@@ -47,11 +47,11 @@ class RecordCompatibilityServiceTest {
     fun setUp() {
         apiService = mockk()
         cryptoService = mockk()
-        tagEncryptionService = mockk()
+        tagCryptoService = mockk()
         tagEncryptionHelper = mockk()
         service = RecordCompatibilityService(
             apiService,
-            tagEncryptionService,
+            tagCryptoService,
             cryptoService,
             tagEncryptionHelper
         )
@@ -73,11 +73,11 @@ class RecordCompatibilityServiceTest {
     ) {
         every { cryptoService.fetchTagEncryptionKey() } returns encryptionKey
         every {
-            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations, encryptionKey)
+            tagCryptoService.encryptTagsAndAnnotations(tags, annotations, encryptionKey)
         } returns encodedAndEncryptedTagsAndAnnotations
 
         every {
-            tagEncryptionService.encryptList(
+            tagCryptoService.encryptList(
                 annotations,
                 encryptionKey,
                 ANNOTATION_KEY + DELIMITER
@@ -86,7 +86,7 @@ class RecordCompatibilityServiceTest {
 
         every { tagEncryptionHelper.normalize(tags["key"]!!) } returns tags["key"]!!
         every {
-            tagEncryptionService.encryptList(
+            tagCryptoService.encryptList(
                 eq(listOf("key=value")),
                 encryptionKey
             )
@@ -100,11 +100,11 @@ class RecordCompatibilityServiceTest {
     ) {
         verify(exactly = 1) { cryptoService.fetchTagEncryptionKey() }
         verify(exactly = 1) {
-            tagEncryptionService.encryptTagsAndAnnotations(tags, annotations, encryptionKey)
+            tagCryptoService.encryptTagsAndAnnotations(tags, annotations, encryptionKey)
         }
         verify(exactly = 1) { tagEncryptionHelper.normalize(tags["key"]!!) }
         verify(exactly = 2) {
-            tagEncryptionService.encryptList(
+            tagCryptoService.encryptList(
                 or(eq(listOf("key=value")), annotations),
                 or(encryptionKey, encryptionKey),
                 or("", ANNOTATION_KEY + DELIMITER)

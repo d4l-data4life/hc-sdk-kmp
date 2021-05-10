@@ -50,13 +50,13 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class RecordEncryptionServiceDecryptionTest {
-    private lateinit var service: NetworkModelContract.EncryptionService
+class RecordCryptoServiceDecryptionTest {
+    private lateinit var service: NetworkModelContract.CryptoService
     private var apiService: NetworkingContract.Service = mockk()
     private val cryptoService: CryptoContract.Service = mockk()
     private val taggingService: TaggingContract.Service = mockk()
-    private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
-    private val fhirService: FhirContract.Service = mockk()
+    private val tagCryptoService: TaggingContract.CryptoService = mockk()
+    private val resourceCryptoService: FhirContract.CryptoService = mockk()
     private val dateTimeFormatter: WrapperContract.DateTimeFormatter = mockk()
     private val limitGuard: NetworkModelContract.LimitGuard = mockk()
     private val modelVersion: ModelContract.ModelVersion = mockk()
@@ -65,14 +65,14 @@ class RecordEncryptionServiceDecryptionTest {
     fun setUp() {
         clearAllMocks()
 
-        service = RecordEncryptionService(
+        service = RecordCryptoService(
             ALIAS,
             apiService,
             taggingService,
-            tagEncryptionService,
+            tagCryptoService,
             limitGuard,
             cryptoService,
-            fhirService,
+            resourceCryptoService,
             dateTimeFormatter,
             modelVersion
         )
@@ -144,7 +144,7 @@ class RecordEncryptionServiceDecryptionTest {
         every { encryptedRecord.encryptedTags } returns encryptedTagsAndAnnotations
 
         every {
-            tagEncryptionService.decryptTagsAndAnnotations(encryptedTagsAndAnnotations)
+            tagCryptoService.decryptTagsAndAnnotations(encryptedTagsAndAnnotations)
         } returns Pair(tags, annotations)
 
         every { encryptedRecord.commonKeyId } returns commonKeyId
@@ -184,7 +184,7 @@ class RecordEncryptionServiceDecryptionTest {
         every { encryptedRecord.encryptedBody } returns encryptedResource
 
         every {
-            fhirService.decryptResource<T>(dataKey, tags, encryptedResource)
+            resourceCryptoService.decryptResource<T>(dataKey, tags, encryptedResource)
         } returns resource
     }
 
@@ -446,7 +446,7 @@ class RecordEncryptionServiceDecryptionTest {
         )
 
         verify(exactly = 1) {
-            tagEncryptionService.decryptTagsAndAnnotations(encryptedTagsAndAnnotations)
+            tagCryptoService.decryptTagsAndAnnotations(encryptedTagsAndAnnotations)
         }
     }
 
@@ -655,7 +655,7 @@ class RecordEncryptionServiceDecryptionTest {
                 any(),
                 any()
             )
-            fhirService.decryptResource<Fhir3Resource>(
+            resourceCryptoService.decryptResource<Fhir3Resource>(
                 dataKey,
                 tags,
                 encryptedResource
@@ -867,7 +867,7 @@ class RecordEncryptionServiceDecryptionTest {
         )
 
         verify(exactly = 1) {
-            tagEncryptionService.decryptTagsAndAnnotations(encryptedTagsAndAnnotations)
+            tagCryptoService.decryptTagsAndAnnotations(encryptedTagsAndAnnotations)
         }
     }
 
@@ -1076,7 +1076,7 @@ class RecordEncryptionServiceDecryptionTest {
                 any(),
                 any()
             )
-            fhirService.decryptResource<Fhir4Resource>(
+            resourceCryptoService.decryptResource<Fhir4Resource>(
                 dataKey,
                 tags,
                 encryptedResource
@@ -1288,7 +1288,7 @@ class RecordEncryptionServiceDecryptionTest {
         )
 
         verify(exactly = 1) {
-            tagEncryptionService.decryptTagsAndAnnotations(encryptedTagsAndAnnotations)
+            tagCryptoService.decryptTagsAndAnnotations(encryptedTagsAndAnnotations)
         }
     }
 
@@ -1435,7 +1435,7 @@ class RecordEncryptionServiceDecryptionTest {
                 any(),
                 any()
             )
-            fhirService.decryptResource<DataResource>(
+            resourceCryptoService.decryptResource<DataResource>(
                 dataKey,
                 tags,
                 encryptedResource

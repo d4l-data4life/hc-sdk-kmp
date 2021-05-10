@@ -44,13 +44,13 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class RecordEncryptionServiceTest {
-    private lateinit var service: NetworkModelContract.EncryptionService
+class RecordCryptoServiceTest {
+    private lateinit var service: NetworkModelContract.CryptoService
     private var apiService: NetworkingContract.Service = mockk()
     private val cryptoService: CryptoContract.Service = mockk()
     private val taggingService: TaggingContract.Service = mockk()
-    private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
-    private val fhirService: FhirContract.Service = mockk()
+    private val tagCryptoService: TaggingContract.CryptoService = mockk()
+    private val resourceCryptoService: FhirContract.CryptoService = mockk()
     private val dateTimeFormatter: WrapperContract.DateTimeFormatter = mockk()
     private val limitGuard: NetworkModelContract.LimitGuard = mockk()
     private val modelVersion: ModelContract.ModelVersion = mockk()
@@ -59,14 +59,14 @@ class RecordEncryptionServiceTest {
     fun setUp() {
         clearAllMocks()
 
-        service = RecordEncryptionService(
+        service = RecordCryptoService(
             ALIAS,
             apiService,
             taggingService,
-            tagEncryptionService,
+            tagCryptoService,
             limitGuard,
             cryptoService,
-            fhirService,
+            resourceCryptoService,
             dateTimeFormatter,
             modelVersion
         )
@@ -102,7 +102,7 @@ class RecordEncryptionServiceTest {
     fun `It fulfils EncryptionService`() {
         val service: Any = this.service
 
-        assertTrue(service is NetworkModelContract.EncryptionService)
+        assertTrue(service is NetworkModelContract.CryptoService)
     }
 
     @Test

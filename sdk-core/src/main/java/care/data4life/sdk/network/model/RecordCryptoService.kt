@@ -33,17 +33,17 @@ import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.wrapper.WrapperContract
 
-class RecordEncryptionService(
+class RecordCryptoService(
     private val alias: String,
     private val apiService: NetworkingContract.Service,
     private val taggingService: TaggingContract.Service,
-    private val tagEncryptionService: TaggingContract.EncryptionService,
+    private val tagCryptoService: TaggingContract.CryptoService,
     private val guard: NetworkModelContract.LimitGuard,
     private val cryptoService: CryptoContract.Service,
-    private val fhirService: FhirContract.Service,
+    private val resourceCryptoService: FhirContract.CryptoService,
     private val dateTimeFormatter: WrapperContract.DateTimeFormatter,
     private val modelVersion: ModelContract.ModelVersion
-) : NetworkModelContract.EncryptionService {
+) : NetworkModelContract.CryptoService {
     private fun <T : Fhir3Resource> buildFhir3Record(
         identifier: String?,
         resource: T,
@@ -233,11 +233,11 @@ class RecordEncryptionService(
         return EncryptedRecord(
             commonKeyId,
             decryptedRecord.identifier,
-            tagEncryptionService.encryptTagsAndAnnotations(
+            tagCryptoService.encryptTagsAndAnnotations(
                 decryptedRecord.tags,
                 decryptedRecord.annotations
             ),
-            fhirService._encryptResource(dataKey, decryptedRecord.resource),
+            resourceCryptoService._encryptResource(dataKey, decryptedRecord.resource),
             decryptedRecord.customCreationDate,
             encryptedDataKey,
             encryptedAttachmentKey,
@@ -306,7 +306,7 @@ class RecordEncryptionService(
     ): NetworkModelContract.DecryptedBaseRecord<T> {
         validateRecord(encryptedRecord.encryptedBody, encryptedRecord.modelVersion)
 
-        val (tags, annotations) = tagEncryptionService.decryptTagsAndAnnotations(
+        val (tags, annotations) = tagCryptoService.decryptTagsAndAnnotations(
             encryptedRecord.encryptedTags
         )
         val commonKey = getCommonKey(encryptedRecord.commonKeyId, userId)
@@ -318,7 +318,7 @@ class RecordEncryptionService(
 
         return buildRecord(
             encryptedRecord.identifier,
-            fhirService.decryptResource(dataKey, tags, encryptedRecord.encryptedBody),
+            resourceCryptoService.decryptResource(dataKey, tags, encryptedRecord.encryptedBody),
             tags,
             annotations,
             encryptedRecord.customCreationDate,

@@ -30,10 +30,10 @@ import care.data4life.sdk.attachment.AttachmentService;
 import care.data4life.sdk.attachment.FileService;
 import care.data4life.sdk.auth.UserService;
 import care.data4life.sdk.call.CallHandler;
-import care.data4life.sdk.fhir.FhirService;
+import care.data4life.sdk.fhir.ResourceCryptoService;
 import care.data4life.sdk.log.Log;
 import care.data4life.sdk.network.Environment;
-import care.data4life.sdk.tag.TagEncryptionService;
+import care.data4life.sdk.tag.TagCryptoService;
 import care.data4life.sdk.tag.TaggingService;
 import care.data4life.securestore.SecureStore;
 import care.data4life.securestore.SecureStoreContract;
@@ -137,15 +137,15 @@ public final class Data4LifeClient extends BaseClient {
 
         UserService userService = new UserService(ALIAS, authorizationService, apiService, cryptoSecureStore, cryptoService);
 
-        TagEncryptionService tagEncryptionService = new TagEncryptionService(cryptoService);
+        TagCryptoService tagEncryptionService = new TagCryptoService(cryptoService);
         TaggingService taggingService = new TaggingService(clientId);
-        FhirService fhirService = new FhirService(cryptoService);
+        ResourceCryptoService resourceCryptoService = new ResourceCryptoService(cryptoService);
         FileService fileService = new FileService(ALIAS, apiService, cryptoService);
         AttachmentService attachmentService = new AttachmentService(fileService, new JvmImageResizer());
         D4LErrorHandler errorHandler = new D4LErrorHandler();
         CallHandler callHandler = new CallHandler(errorHandler);
         String partnerId = clientId.split(CLIENT_ID_SPLIT_CHAR)[PARTNER_ID_INDEX];
-        RecordService recordService = new RecordService(partnerId, ALIAS, apiService, tagEncryptionService, taggingService, fhirService, attachmentService, cryptoService, errorHandler);
+        RecordService recordService = new RecordService(partnerId, ALIAS, apiService, tagEncryptionService, taggingService, resourceCryptoService, attachmentService, cryptoService, errorHandler);
 
         return new Data4LifeClient(ALIAS, userService, recordService, callHandler);
     }

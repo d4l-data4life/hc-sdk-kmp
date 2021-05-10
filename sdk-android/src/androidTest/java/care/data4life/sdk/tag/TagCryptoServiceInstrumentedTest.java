@@ -35,13 +35,13 @@ import care.data4life.securestore.SecureStoreStorage;
 
 import static junit.framework.Assert.assertEquals;
 
-public class TagEncryptionServiceInstrumentedTest {
+public class TagCryptoServiceInstrumentedTest {
 
     private static final String PATH = "design-documents/crypto/test-fixture/v1/";
     private static final String DEFAULT_ALIAS = "data4life_android";
 
     private Context context;
-    private TagEncryptionService tekService;
+    private TagCryptoService tekService;
 
     @Before
     public void setUp() {
@@ -49,7 +49,7 @@ public class TagEncryptionServiceInstrumentedTest {
         SecureStore secureStore = new SecureStore(new SecureStoreCryptor(context), new SecureStoreStorage(context));
         CryptoSecureStore storage = new CryptoSecureStore(secureStore);
         CryptoService cryptoService = new CryptoService(DEFAULT_ALIAS, storage);
-        tekService = new TagEncryptionService(cryptoService);
+        tekService = new TagCryptoService(cryptoService);
     }
 
     @Test

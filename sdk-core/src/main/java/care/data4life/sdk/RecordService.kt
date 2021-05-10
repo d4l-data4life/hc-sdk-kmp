@@ -52,7 +52,7 @@ import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
-import care.data4life.sdk.network.model.RecordEncryptionService
+import care.data4life.sdk.network.model.RecordCryptoService
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_FMT
 import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_SIZE
@@ -85,9 +85,9 @@ class RecordService internal constructor(
     private val partnerId: String,
     private val alias: String,
     private val apiService: NetworkingContract.Service,
-    tagEncryptionService: TaggingContract.EncryptionService,
+    tagCryptoService: TaggingContract.CryptoService,
     private val taggingService: TaggingContract.Service,
-    fhirService: FhirContract.Service,
+    resourceCryptoService: FhirContract.CryptoService,
     private val attachmentService: AttachmentContract.Service,
     private val cryptoService: CryptoContract.Service,
     private val errorHandler: SdkContract.ErrorHandler,
@@ -98,9 +98,9 @@ class RecordService internal constructor(
         partnerId: String,
         alias: String,
         apiService: NetworkingContract.Service,
-        tagEncryptionService: TaggingContract.EncryptionService,
+        tagCryptoService: TaggingContract.CryptoService,
         taggingService: TaggingContract.Service,
-        fhirService: FhirContract.Service,
+        resourceCryptoService: FhirContract.CryptoService,
         attachmentService: AttachmentContract.Service,
         cryptoService: CryptoContract.Service,
         errorHandler: SdkContract.ErrorHandler
@@ -108,27 +108,27 @@ class RecordService internal constructor(
         partnerId,
         alias,
         apiService,
-        tagEncryptionService,
+        tagCryptoService,
         taggingService,
-        fhirService,
+        resourceCryptoService,
         attachmentService,
         cryptoService,
         errorHandler,
         RecordCompatibilityService(
             apiService,
-            tagEncryptionService,
+            tagCryptoService,
             cryptoService
         )
     )
 
-    private val recordEncryptionService: NetworkModelContract.EncryptionService = RecordEncryptionService(
+    private val recordCryptoService: NetworkModelContract.CryptoService = RecordCryptoService(
         alias,
         apiService,
         taggingService,
-        tagEncryptionService,
+        tagCryptoService,
         DecryptedRecordGuard,
         cryptoService,
-        fhirService,
+        resourceCryptoService,
         SdkDateTimeFormatter,
         ModelVersion
     )
@@ -694,19 +694,19 @@ class RecordService internal constructor(
         resource: T,
         annotations: Annotations
     ): Single<DecryptedBaseRecord<T>> = Single.just(
-        recordEncryptionService.fromResource(resource, annotations)
+        recordCryptoService.fromResource(resource, annotations)
     )
 
     @Deprecated("This is a test concern and should be removed once a proper DI/SL is in place.")
     internal fun <T : Any> encryptRecord(
         record: DecryptedBaseRecord<T>
-    ): NetworkModelContract.EncryptedRecord = recordEncryptionService.encrypt(record)
+    ): NetworkModelContract.EncryptedRecord = recordCryptoService.encrypt(record)
 
     @Deprecated("This is a test concern and should be removed once a proper DI/SL is in place.")
     internal fun <T : Any> decryptRecord(
         record: NetworkModelContract.EncryptedRecord,
         userId: String
-    ): DecryptedBaseRecord<T> = recordEncryptionService.decrypt(record, userId)
+    ): DecryptedBaseRecord<T> = recordCryptoService.decrypt(record, userId)
 
     @Throws(
         DataValidationException.IdUsageViolation::class,

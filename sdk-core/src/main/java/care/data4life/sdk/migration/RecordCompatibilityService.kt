@@ -22,7 +22,7 @@ import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.NetworkModelContract.EncryptedRecord
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
-import care.data4life.sdk.tag.TagEncryptionHelper
+import care.data4life.sdk.tag.TagCryptoHelper
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.TaggingContract.Companion.ANNOTATION_KEY
 import care.data4life.sdk.tag.Tags
@@ -35,9 +35,9 @@ import java.io.IOException
 @Migration("This class should only be used due to migration purpose.")
 class RecordCompatibilityService internal constructor(
     private val apiService: NetworkingContract.Service,
-    private val tagEncryptionService: TaggingContract.EncryptionService,
+    private val tagCryptoService: TaggingContract.CryptoService,
     private val cryptoService: CryptoContract.Service,
-    private val tagHelper: TaggingContract.Helper = TagEncryptionHelper
+    private val tagHelper: TaggingContract.Helper = TagCryptoHelper
 ) : MigrationContract.CompatibilityService {
     private fun encrypt(
         plainTags: Tags,
@@ -45,7 +45,7 @@ class RecordCompatibilityService internal constructor(
     ): Pair<EncryptedTagsAndAnnotations, EncryptedTagsAndAnnotations> {
         val tagEncryptionKey = cryptoService.fetchTagEncryptionKey()
         return Pair(
-            tagEncryptionService.encryptTagsAndAnnotations(
+            tagCryptoService.encryptTagsAndAnnotations(
                 plainTags,
                 plainAnnotations,
                 tagEncryptionKey
@@ -64,7 +64,7 @@ class RecordCompatibilityService internal constructor(
         return tags
             .map { entry -> entry.key + TaggingContract.DELIMITER + tagHelper.normalize(entry.value) }
             .let { normalizedTags ->
-                tagEncryptionService.encryptList(
+                tagCryptoService.encryptList(
                     normalizedTags,
                     tagEncryptionKey
                 )
@@ -76,7 +76,7 @@ class RecordCompatibilityService internal constructor(
         annotations: Annotations,
         tagEncryptionKey: GCKey
     ): MutableList<String> {
-        return tagEncryptionService.encryptList(
+        return tagCryptoService.encryptList(
             annotations,
             tagEncryptionKey,
             ANNOTATION_KEY + TaggingContract.DELIMITER

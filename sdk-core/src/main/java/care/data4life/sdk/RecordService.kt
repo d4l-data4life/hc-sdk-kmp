@@ -220,7 +220,7 @@ class RecordService internal constructor(
     override fun deleteRecord(
         userId: String,
         recordId: String
-    ): Completable = apiService.deleteRecord(alias, recordId, userId)
+    ): Completable = apiService.deleteRecord(alias, userId, recordId)
 
     fun deleteRecords(recordIds: List<String>, userId: String): Single<DeleteResult> {
         val failedDeletes: MutableList<Pair<String, D4LException>> = mutableListOf()

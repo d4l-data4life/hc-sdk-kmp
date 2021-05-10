@@ -24,11 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
 import care.data4life.auth.AuthorizationService;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.lang.D4LRuntimeException;
-import care.data4life.sdk.network.Environment;
 import care.data4life.sdk.network.IHCService;
 import care.data4life.sdk.network.NetworkingContract;
 import care.data4life.sdk.network.model.CommonKeyResponse;
@@ -55,7 +53,6 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
-
 import static care.data4life.sdk.network.NetworkingContract.FORMAT_ANDROID_CLIENT_NAME;
 import static care.data4life.sdk.network.NetworkingContract.FORMAT_BASIC_AUTH;
 import static care.data4life.sdk.network.NetworkingContract.FORMAT_BEARER_TOKEN;
@@ -79,7 +76,7 @@ public final class ApiService implements NetworkingContract.Service {
     private final String clientID;
     private final String clientSecret;
     private final AuthorizationService authService;
-    private final Environment environment;
+    private final NetworkingContract.Environment environment;
     private String platform;
     private final NetworkConnectivityService connectivityService;
     private OkHttpClient client;
@@ -106,8 +103,8 @@ public final class ApiService implements NetworkingContract.Service {
      * @param staticAccessToken   Prefetched OAuth token - if not null, it will be used directly (no token renewal).
      * @param debug               Debug flag
      */
-    ApiService(AuthorizationService authService,
-               Environment environment,
+    public ApiService(AuthorizationService authService,
+               NetworkingContract.Environment environment,
                String clientID,
                String clientSecret,
                String platform,
@@ -139,8 +136,8 @@ public final class ApiService implements NetworkingContract.Service {
      * @param clientName          Client name
      * @param debug               Debug flag
      */
-    ApiService(AuthorizationService authService,
-               Environment environment,
+    public ApiService(AuthorizationService authService,
+              NetworkingContract.Environment environment,
                String clientID,
                String clientSecret,
                String platform,
@@ -246,7 +243,19 @@ public final class ApiService implements NetworkingContract.Service {
         return service.createRecord(alias, userId, (EncryptedRecord) encryptedRecord);
     }
 
-    // TODO remove public
+    @Override
+    public Single<EncryptedRecord> updateRecord(String alias,
+                                                String userId,
+                                                String recordId,
+                                                NetworkModelContract.EncryptedRecord encryptedRecord) {
+        return service.updateRecord(alias, userId, recordId, (EncryptedRecord) encryptedRecord);
+    }
+
+    @Override
+    public Single<EncryptedRecord> fetchRecord(String alias, String userId, String recordId) {
+        return service.fetchRecord(alias, userId, recordId);
+    }
+
     @Override
     public Observable<List<EncryptedRecord>> searchRecords(
             String alias,
@@ -261,21 +270,15 @@ public final class ApiService implements NetworkingContract.Service {
     }
 
     @Override
-    public Completable deleteRecord(String alias, String recordId, String userId) {
+    public Single<Integer> getCount(String alias, String userId, String tags) {
+        return service
+                .getRecordsHeader(alias, userId, tags)
+                .map(response -> Integer.parseInt(response.headers().get(HEADER_TOTAL_COUNT)));
+    }
+
+    @Override
+    public Completable deleteRecord(String alias, String userId, String recordId) {
         return service.deleteRecord(alias, userId, recordId);
-    }
-
-    @Override
-    public Single<EncryptedRecord> fetchRecord(String alias, String userId, String recordId) {
-        return service.fetchRecord(alias, userId, recordId);
-    }
-
-    @Override
-    public Single<EncryptedRecord> updateRecord(String alias,
-                                                String userId,
-                                                String recordId,
-                                                NetworkModelContract.EncryptedRecord encryptedRecord) {
-        return service.updateRecord(alias, userId, recordId, (EncryptedRecord) encryptedRecord);
     }
 
     @Override
@@ -306,19 +309,18 @@ public final class ApiService implements NetworkingContract.Service {
     }
 
     @Override
-    public Single<Integer> getCount(String alias, String userId, String tags) {
-        return service
-                .getRecordsHeader(alias, userId, tags)
-                .map(response -> Integer.parseInt(response.headers().get(HEADER_TOTAL_COUNT)));
-    }
-
-    @Override
     public Single<UserInfo> fetchUserInfo(String alias) {
         return service
                 .fetchUserInfo(alias)
                 .subscribeOn(Schedulers.io());
     }
 
+    @Override
+    public Single<VersionList> fetchVersionInfo() {
+        return service
+                .fetchVersionInfo()
+                .subscribeOn(Schedulers.io());
+    }
     /**
      * Carry out needed logout actions.
      * <p>
@@ -336,13 +338,6 @@ public final class ApiService implements NetworkingContract.Service {
         return Single
                 .fromCallable(() -> authService.getRefreshToken(alias))
                 .flatMapCompletable(token -> service.logout(alias, token));
-    }
-
-    @Override
-    public Single<VersionList> fetchVersionInfo() {
-        return service
-                .getVersionUpdateInfo()
-                .subscribeOn(Schedulers.io());
     }
 
     /**

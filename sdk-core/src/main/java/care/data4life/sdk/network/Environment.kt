@@ -15,11 +15,11 @@
  */
 package care.data4life.sdk.network
 
-import care.data4life.sdk.network.NetworkingContract.Companion.D4L_SDL_CERT
-import care.data4life.sdk.network.NetworkingContract.Companion.D4L_SP_CERT
+import care.data4life.sdk.network.NetworkingContract.Companion.HPSGC_DE
+import care.data4life.sdk.network.NetworkingContract.Companion.DATA4LIFE_CARE
 import care.data4life.sdk.network.NetworkingContract.Companion.PLATFORM_D4L
 import care.data4life.sdk.network.NetworkingContract.Companion.PLATFORM_S4H
-import care.data4life.sdk.network.NetworkingContract.Companion.S4H_CERT
+import care.data4life.sdk.network.NetworkingContract.Companion.SMART4HEALTH_EU
 
 enum class Environment : NetworkingContract.Environment {
     LOCAL,
@@ -54,14 +54,14 @@ enum class Environment : NetworkingContract.Environment {
 
     private fun d4lCertificatePin(): String {
         return when (this) {
-            SANDBOX, DEVELOPMENT, LOCAL -> D4L_SDL_CERT
-            STAGING, PRODUCTION -> D4L_SP_CERT
+            SANDBOX, DEVELOPMENT, LOCAL -> HPSGC_DE
+            STAGING, PRODUCTION -> DATA4LIFE_CARE
         }
     }
 
     private fun sh4CertificatePin(): String {
         return when (this) {
-            SANDBOX, DEVELOPMENT, LOCAL, STAGING, PRODUCTION -> S4H_CERT
+            SANDBOX, DEVELOPMENT, LOCAL, STAGING, PRODUCTION -> SMART4HEALTH_EU
         }
     }
 

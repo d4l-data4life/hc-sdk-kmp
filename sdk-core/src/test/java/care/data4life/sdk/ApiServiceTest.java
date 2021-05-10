@@ -210,7 +210,7 @@ public class ApiServiceTest {
 
     @Test
     public void fetchRecords_shouldReturnObservable() {
-        assertThat(apiService.fetchRecords(anyString(), anyString(), any(), any(), anyInt(), anyInt(), any()),
+        assertThat(apiService.searchRecords(anyString(), anyString(), any(), any(), anyInt(), anyInt(), any()),
                 instanceOf(Observable.class));
     }
 

@@ -143,12 +143,12 @@ class CryptoContract {
 
     internal interface CommonKeyService {
 
-        fun fetchCurrentCommonKeyId(): String?
+        fun fetchCurrentCommonKeyId(): String
 
         @Throws(IOException::class)
-        fun fetchCurrentCommonKey(): GCKey?
+        fun fetchCurrentCommonKey(): GCKey
 
-        fun fetchCommonKey(commonKeyId: String): GCKey?
+        fun fetchCommonKey(commonKeyId: String): GCKey
 
         fun storeCurrentCommonKeyId(commonKeyId: String)
 

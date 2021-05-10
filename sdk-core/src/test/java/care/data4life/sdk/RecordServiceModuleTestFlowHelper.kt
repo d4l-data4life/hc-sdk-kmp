@@ -23,6 +23,7 @@ import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.D
 import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_THUMBNAIL_SIZE_PX
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.CommonKeyResponse
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
@@ -44,7 +45,7 @@ import java.security.MessageDigest
 import javax.xml.bind.DatatypeConverter
 
 class RecordServiceModuleTestFlowHelper(
-    private val apiService: ApiService,
+    private val apiService: NetworkingContract.Service,
     private val imageResizer: AttachmentContract.ImageResizer
 ) {
     private val mdHandle = MessageDigest.getInstance("MD5")

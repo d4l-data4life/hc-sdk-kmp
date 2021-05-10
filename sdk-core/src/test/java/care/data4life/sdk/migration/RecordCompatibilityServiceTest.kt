@@ -38,7 +38,7 @@ import kotlin.test.assertTrue
 
 class RecordCompatibilityServiceTest {
     private lateinit var apiService: NetworkingContract.Service
-    private lateinit var tagEncryptionService: TaggingContract.EncryptionService
+    private lateinit var tagCryptoService: TaggingContract.CryptoService
     private lateinit var cryptoService: CryptoContract.Service
     private lateinit var tagEncryptionHelper: TaggingContract.Helper
     private lateinit var service: MigrationContract.CompatibilityService

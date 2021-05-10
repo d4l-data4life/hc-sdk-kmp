@@ -35,7 +35,7 @@ import java.io.IOException
 @Migration("This class should only be used due to migration purpose.")
 class RecordCompatibilityService internal constructor(
     private val apiService: NetworkingContract.Service,
-    private val tagEncryptionService: TaggingContract.EncryptionService,
+    private val tagCryptoService: TaggingContract.CryptoService,
     private val cryptoService: CryptoContract.Service,
     private val tagHelper: TaggingContract.Helper = TagCryptoHelper
 ) : MigrationContract.CompatibilityService {

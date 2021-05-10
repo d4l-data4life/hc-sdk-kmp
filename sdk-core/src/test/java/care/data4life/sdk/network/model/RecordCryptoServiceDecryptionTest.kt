@@ -51,7 +51,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class RecordCryptoServiceDecryptionTest {
-    private lateinit var service: NetworkModelContract.EncryptionService
+    private lateinit var service: NetworkModelContract.CryptoService
     private var apiService: NetworkingContract.Service = mockk()
     private val cryptoService: CryptoContract.Service = mockk()
     private val taggingService: TaggingContract.Service = mockk()

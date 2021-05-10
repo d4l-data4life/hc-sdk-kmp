@@ -15,8 +15,8 @@
  */
 package care.data4life.sdk.network
 
-import care.data4life.sdk.network.NetworkingContract.Companion.HPSGC_DE
 import care.data4life.sdk.network.NetworkingContract.Companion.DATA4LIFE_CARE
+import care.data4life.sdk.network.NetworkingContract.Companion.HPSGC_DE
 import care.data4life.sdk.network.NetworkingContract.Companion.PLATFORM_D4L
 import care.data4life.sdk.network.NetworkingContract.Companion.PLATFORM_S4H
 import care.data4life.sdk.network.NetworkingContract.Companion.SMART4HEALTH_EU

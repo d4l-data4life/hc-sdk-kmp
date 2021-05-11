@@ -14,21 +14,6 @@
  * contact D4L by email to help@data4life.care.
  */
 
-/*
- * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
- *
- * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
- * including any intellectual property rights that subsist in the SDK.
- *
- * The SDK and its documentation may be accessed and used for viewing/review purposes only.
- * Any usage of the SDK for other purposes, including usage for the development of
- * applications/third-party applications shall require the conclusion of a license agreement
- * between you and D4L.
- *
- * If you are interested in licensing the SDK for your own applications/third-party
- * applications and/or if you’d like to contribute to the development of the SDK, please
- * contact D4L by email to help@data4life.care.
- */
 
 package care.data4life.sdk
 
@@ -45,33 +30,29 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
+import io.mockk.spyk
 import io.mockk.verify
 import java.io.IOException
 import junit.framework.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
 
 class CryptoSecureStoreTest {
-    private lateinit var secureStore: SecureStoreContract.SecureStore
-    private lateinit var moshi: Moshi
-    private lateinit var adapter: JsonAdapter<ExchangeKey>
+    private var secureStore: SecureStoreContract.SecureStore = mockk()
+    private var moshi: Moshi = mockk()
+    private var adapter: JsonAdapter<ExchangeKey> = mockk()
 
     // SUT
-    private lateinit var cryptoSecureStore: CryptoSecureStore
+    private var cryptoSecureStore: CryptoSecureStore = spyk(CryptoSecureStore(moshi, secureStore))
 
     @Before
     fun setUp() {
-        secureStore = mockk()
-        moshi = mockk()
-        adapter = mockk()
         every { moshi.adapter(ExchangeKey::class.java) } returns adapter
-        cryptoSecureStore = Mockito.spy(CryptoSecureStore(moshi, secureStore))
     }
 
     @Test
     fun storeSecret_shouldStoreString() {
-        // given
+        // Given
         every { secureStore.addData(DATA_ALIAS, DATA.toCharArray()) } just runs
 
         // When
@@ -115,18 +96,18 @@ class CryptoSecureStoreTest {
     fun secret_shouldReturnObject() {
         // Given
         every { secureStore.getData(OBJECT_ALIAS) } returns OBJECT_JSON.toCharArray()
-        every { adapter.fromJson(OBJECT_JSON) } returns OBJECT
+        every { adapter.fromJson(OBJECT_JSON) } returns mockk<ExchangeKey>()
 
         // When
         val result = cryptoSecureStore.getSecret(OBJECT_ALIAS, ExchangeKey::class.java)
 
         // Then
-        assertEquals(OBJECT, result)
+        assertEquals(mockk<ExchangeKey>(), result)
     }
 
     @Test
     fun clearStorage_shoudBeCalledOnce() {
-        // given
+        // Given
         every { secureStore.clear() } just runs
         // When
         cryptoSecureStore.clear()
@@ -148,7 +129,7 @@ class CryptoSecureStoreTest {
 
     @Test
     fun storeGCKey() {
-        // given
+        // Given
         val key = mockk<GCKey>()
         every { adapter.toJson(any<ExchangeKey>()) } returns DATA
         every { secureStore.addData(DATA_ALIAS, DATA.toCharArray()) } just runs
@@ -168,7 +149,7 @@ class CryptoSecureStoreTest {
 
     @Test
     fun storeGCKeyPair() {
-        // given
+        // Given
         val key = mockk<GCKeyPair>()
         val algorithm = GCRSAKeyAlgorithm()
         every { key.algorithm } returns algorithm
@@ -209,13 +190,6 @@ class CryptoSecureStoreTest {
         private const val DATA_ALIAS = "data_alias"
         private const val DATA = "data"
         private const val OBJECT_ALIAS = "object_alias"
-        private val OBJECT = ExchangeKey(
-            KeyType.COMMON_KEY,
-            "",
-            "",
-            "keyBase64",
-            1
-        )
         private const val OBJECT_JSON = "object_json"
     }
 }

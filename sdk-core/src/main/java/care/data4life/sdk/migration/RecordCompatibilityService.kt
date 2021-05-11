@@ -22,7 +22,7 @@ import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.NetworkModelContract.EncryptedRecord
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
-import care.data4life.sdk.tag.TagCryptoHelper
+import care.data4life.sdk.tag.TagEncoding
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.TaggingContract.Companion.ANNOTATION_KEY
 import care.data4life.sdk.tag.Tags
@@ -37,7 +37,7 @@ class RecordCompatibilityService internal constructor(
     private val apiService: NetworkingContract.Service,
     private val tagCryptoService: TaggingContract.CryptoService,
     private val cryptoService: CryptoContract.Service,
-    private val tagHelper: TaggingContract.Helper = TagCryptoHelper
+    private val tagEncoding: TaggingContract.Encoding = TagEncoding
 ) : MigrationContract.CompatibilityService {
     private fun encrypt(
         plainTags: Tags,
@@ -62,7 +62,7 @@ class RecordCompatibilityService internal constructor(
     @Throws(IOException::class)
     private fun encryptTags(tags: Tags, tagEncryptionKey: GCKey): MutableList<String> {
         return tags
-            .map { entry -> entry.key + TaggingContract.DELIMITER + tagHelper.normalize(entry.value) }
+            .map { entry -> entry.key + TaggingContract.DELIMITER + tagEncoding.normalize(entry.value) }
             .let { normalizedTags ->
                 tagCryptoService.encryptList(
                     normalizedTags,

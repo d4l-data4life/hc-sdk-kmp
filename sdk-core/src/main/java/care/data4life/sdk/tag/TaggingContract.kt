@@ -51,16 +51,22 @@ class TaggingContract {
             encryptionKey: GCKey,
             prefix: String = ""
         ): MutableList<String>
+
+        companion object {
+            internal val IV = ByteArray(16)
+        }
+    }
+
+    interface Converter {
+        @Throws(D4LException::class)
+        fun toTags(tagList: List<String>): Tags
     }
 
     // TODO: make this package internal
-    interface Helper {
-        fun convertToTagMap(tagList: List<String>): Tags
-
+    interface Encoding {
         @Throws(D4LException::class)
         fun encode(tag: String): String
 
-        @Throws(D4LException::class)
         @Migration("This method should only be used for migration purpose.")
         fun normalize(tag: String): String
 

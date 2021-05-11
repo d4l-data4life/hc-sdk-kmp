@@ -32,22 +32,22 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
-class TagEncryptionServiceTest {
+class TagCryptoServiceTest {
     private val cryptoService: CryptoContract.Service = mockk()
     private val base64: Base64 = mockk()
     private val tagHelper: TaggingContract.Helper = mockk()
-    private lateinit var tagEncryptionService: TagEncryptionService
+    private lateinit var tagEncryptionService: TagCryptoService
 
     @Before
     fun setUp() {
         clearAllMocks()
-        tagEncryptionService = TagEncryptionService(cryptoService, base64, tagHelper)
+        tagEncryptionService = TagCryptoService(cryptoService, base64, tagHelper)
     }
 
     @Test
     fun `It fulfils the EncryptionService`() {
         val helper: Any = tagEncryptionService
-        assertTrue(helper is TaggingContract.EncryptionService)
+        assertTrue(helper is TaggingContract.CryptoService)
     }
 
     @Test

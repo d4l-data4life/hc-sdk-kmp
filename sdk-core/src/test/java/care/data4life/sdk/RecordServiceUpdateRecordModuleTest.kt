@@ -27,14 +27,15 @@ import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Identifier
 import care.data4life.sdk.fhir.Fhir4Identifier
-import care.data4life.sdk.fhir.FhirService
+import care.data4life.sdk.fhir.ResourceCryptoService
 import care.data4life.sdk.model.Record
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.Annotations
-import care.data4life.sdk.tag.TagEncryptionService
+import care.data4life.sdk.tag.TagCryptoService
 import care.data4life.sdk.tag.TaggingService
 import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.fake.CryptoServiceFake
@@ -83,7 +84,7 @@ class RecordServiceUpdateRecordModuleTest {
 
     private lateinit var recordService: RecordContract.Service
     private lateinit var flowHelper: RecordServiceModuleTestFlowHelper
-    private val apiService: ApiService = mockk()
+    private val apiService: NetworkingContract.Service = mockk()
     private lateinit var cryptoService: CryptoContract.Service
     private val imageResizer: AttachmentContract.ImageResizer = mockk()
     private val errorHandler: D4LErrorHandler = mockk()
@@ -98,9 +99,9 @@ class RecordServiceUpdateRecordModuleTest {
             PARTNER_ID,
             ALIAS,
             apiService,
-            TagEncryptionService(cryptoService),
+            TagCryptoService(cryptoService),
             TaggingService(CLIENT_ID),
-            FhirService(cryptoService),
+            ResourceCryptoService(cryptoService),
             AttachmentService(
                 FileService(ALIAS, apiService, cryptoService),
                 imageResizer

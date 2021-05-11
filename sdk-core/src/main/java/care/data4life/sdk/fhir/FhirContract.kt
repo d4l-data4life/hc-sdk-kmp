@@ -20,9 +20,10 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.tag.Tags
 
 // TODO: make internal
+// TODO: merge with arbitrary data
 interface FhirContract {
 
-    interface Service {
+    interface CryptoService {
         fun _encryptResource(dataKey: GCKey, resource: Any): String
 
         fun <T : Any> decryptResource(

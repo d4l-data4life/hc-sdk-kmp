@@ -22,46 +22,11 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
-class TagCryptoHelperTest {
+class TagEncodingTest {
     @Test
-    fun `It fulfils the Helper`() {
-        val helper: Any = TagCryptoHelper
-        assertTrue(helper is TaggingContract.Helper)
-    }
-
-    @Test
-    fun `Given, convertToTagMap is called with a List of Strings, it converts them into a list and deserializes the key and string`() {
-        // Given
-        val serializesTags = listOf(
-            "potato=bread",
-            "tomato=soup"
-        )
-
-        val expected = hashMapOf(
-            "potato" to "bread",
-            "tomato" to "soup"
-        )
-
-        // When
-        val tags = TagCryptoHelper.convertToTagMap(serializesTags)
-
-        // Then
-        assertEquals(
-            expected,
-            tags
-        )
-    }
-
-    @Test
-    fun `Given convertToTagMap is called with a empty List, it returns a empty Map`() {
-        // Given
-        val serializesTags = listOf<String>()
-
-        // When
-        val result = TagCryptoHelper.convertToTagMap(serializesTags)
-
-        // Then
-        assertTrue(result.isEmpty())
+    fun `It fulfils the Encoding`() {
+        val helper: Any = TagEncoding
+        assertTrue(helper is TaggingContract.Encoding)
     }
 
     @Test
@@ -70,7 +35,7 @@ class TagCryptoHelperTest {
         val tag = " "
 
         // When
-        val exception = assertFailsWith<D4LException> { TagCryptoHelper.encode(tag) }
+        val exception = assertFailsWith<D4LException> { TagEncoding.encode(tag) }
 
         assertTrue(exception is DataValidationException.AnnotationViolation)
         assertEquals(
@@ -85,7 +50,7 @@ class TagCryptoHelperTest {
         val tag = "tag"
 
         // When
-        val result = TagCryptoHelper.encode(tag)
+        val result = TagEncoding.encode(tag)
 
         // Then
         assertEquals(
@@ -100,7 +65,7 @@ class TagCryptoHelperTest {
         val expected = "tag"
 
         // When
-        val result = TagCryptoHelper.encode("  $expected   ")
+        val result = TagEncoding.encode("  $expected   ")
 
         // Then
         assertEquals(
@@ -115,7 +80,7 @@ class TagCryptoHelperTest {
         val expected = "TAG"
 
         // When
-        val result = TagCryptoHelper.encode(expected)
+        val result = TagEncoding.encode(expected)
 
         // Then
         assertEquals(
@@ -130,7 +95,7 @@ class TagCryptoHelperTest {
         val tag = "你好，世界"
 
         // When
-        val result = TagCryptoHelper.encode(tag)
+        val result = TagEncoding.encode(tag)
 
         // Then
         assertEquals(
@@ -145,7 +110,7 @@ class TagCryptoHelperTest {
         val tag = "! '()*-_.~"
 
         // When
-        val result = TagCryptoHelper.encode(tag)
+        val result = TagEncoding.encode(tag)
 
         // Then
         assertEquals(
@@ -160,7 +125,7 @@ class TagCryptoHelperTest {
         val tag = "你好! world."
 
         // When
-        val result = TagCryptoHelper.encode(tag)
+        val result = TagEncoding.encode(tag)
 
         // Then
         assertEquals(
@@ -175,7 +140,7 @@ class TagCryptoHelperTest {
         val encodedTag = "%e4%bd%a0%e5%a5%bd%ef%bc%8c%e4%b8%96%e7%95%8c"
 
         // When
-        val result = TagCryptoHelper.decode(encodedTag)
+        val result = TagEncoding.decode(encodedTag)
 
         // Then
         assertEquals(
@@ -190,7 +155,7 @@ class TagCryptoHelperTest {
         val tag = " "
 
         // When
-        val exception = assertFailsWith<D4LException> { TagCryptoHelper.normalize(tag) }
+        val exception = assertFailsWith<D4LException> { TagEncoding.normalize(tag) }
 
         // Then
         assertTrue(exception is DataValidationException.AnnotationViolation)
@@ -206,7 +171,7 @@ class TagCryptoHelperTest {
         val tag = "tag"
 
         // When
-        val result = TagCryptoHelper.normalize(tag)
+        val result = TagEncoding.normalize(tag)
 
         // Then
         assertEquals(
@@ -221,7 +186,7 @@ class TagCryptoHelperTest {
         val expected = "tag"
 
         // When
-        val result = TagCryptoHelper.normalize("  $expected   ")
+        val result = TagEncoding.normalize("  $expected   ")
 
         // Then
         assertEquals(
@@ -236,7 +201,7 @@ class TagCryptoHelperTest {
         val expected = "TAG"
 
         // When
-        val result = TagCryptoHelper.normalize(expected)
+        val result = TagEncoding.normalize(expected)
 
         // Then
         assertEquals(
@@ -251,7 +216,7 @@ class TagCryptoHelperTest {
         val encodedTag = "%21%27%28%29%2a%2d%5f%2e%7e%20"
 
         // When
-        val result = TagCryptoHelper.decode(encodedTag)
+        val result = TagEncoding.decode(encodedTag)
 
         // Then
         assertEquals(
@@ -266,7 +231,7 @@ class TagCryptoHelperTest {
         val encodedTag = "%e4%bd%a0%e5%a5%bd%21%20world%2e"
 
         // When
-        val result = TagCryptoHelper.decode(encodedTag)
+        val result = TagEncoding.decode(encodedTag)
 
         // Then
         assertEquals(

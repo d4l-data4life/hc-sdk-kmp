@@ -17,33 +17,18 @@ package care.data4life.sdk.tag
 
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
-import care.data4life.sdk.tag.TaggingContract.Companion.DELIMITER
 import okhttp3.internal.toHexString
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.util.Locale
 
-object TagCryptoHelper : TaggingContract.Helper {
-    override fun convertToTagMap(tagList: List<String>): Tags {
-        val tags = HashMap<String, String>()
-        for (entry in tagList) {
-            val split = entry.split(DELIMITER)
-            if (split.size == 2) {
-                val key = split[0]
-                val value = split[1]
-                if (key.isNotBlank() && value.isNotBlank()) {
-                    tags[key] = value
-                }
-            }
-        }
-        return tags
-    }
+object TagEncoding : TaggingContract.Encoding {
+    private val specialChars = listOf('*', '-', '_', '.')
 
     private fun normalizeEncodedChar(char: Char): Char = char.toLowerCase()
 
     private fun replaceSpecial(char: Char): String {
-        val specialChars = listOf('*', '-', '_', '.')
         return when (char) {
             '+' -> "%20"
             in specialChars -> "%${char.toInt().toHexString()}"

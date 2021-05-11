@@ -25,6 +25,7 @@ import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.TaggingContract.Companion.ANNOTATION_KEY
 import care.data4life.sdk.tag.TaggingContract.Companion.DELIMITER
 import care.data4life.sdk.tag.Tags
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -37,23 +38,21 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class RecordCompatibilityServiceTest {
-    private lateinit var apiService: NetworkingContract.Service
-    private lateinit var tagCryptoService: TaggingContract.CryptoService
-    private lateinit var cryptoService: CryptoContract.Service
-    private lateinit var tagEncryptionHelper: TaggingContract.Helper
+    private var apiService: NetworkingContract.Service = mockk()
+    private var tagCryptoService: TaggingContract.CryptoService = mockk()
+    private var cryptoService: CryptoContract.Service = mockk()
+    private var tagEncryptionEncoding: TaggingContract.Encoding = mockk()
     private lateinit var service: MigrationContract.CompatibilityService
 
     @Before
     fun setUp() {
-        apiService = mockk()
-        cryptoService = mockk()
-        tagCryptoService = mockk()
-        tagEncryptionHelper = mockk()
+        clearAllMocks()
+
         service = RecordCompatibilityService(
             apiService,
             tagCryptoService,
             cryptoService,
-            tagEncryptionHelper
+            tagEncryptionEncoding
         )
     }
 
@@ -84,7 +83,7 @@ class RecordCompatibilityServiceTest {
             )
         } returns encryptedAnnotations
 
-        every { tagEncryptionHelper.normalize(tags["key"]!!) } returns tags["key"]!!
+        every { tagEncryptionEncoding.normalize(tags["key"]!!) } returns tags["key"]!!
         every {
             tagCryptoService.encryptList(
                 eq(listOf("key=value")),
@@ -102,7 +101,7 @@ class RecordCompatibilityServiceTest {
         verify(exactly = 1) {
             tagCryptoService.encryptTagsAndAnnotations(tags, annotations, encryptionKey)
         }
-        verify(exactly = 1) { tagEncryptionHelper.normalize(tags["key"]!!) }
+        verify(exactly = 1) { tagEncryptionEncoding.normalize(tags["key"]!!) }
         verify(exactly = 2) {
             tagCryptoService.encryptList(
                 or(eq(listOf("key=value")), annotations),
@@ -185,6 +184,7 @@ class RecordCompatibilityServiceTest {
 
     @Test
     fun `Given searchRecords is called with a UserId, a ResourceType, a StartDate, a EndDate, the PageSize, Offset, Tags and Annotations, it calls the ApiService twice with the encodedAndEncrypted and the encrypted Tags`() {
+        // Given
         val alias = "alias"
         val userId = "id"
         val startTime = "start"
@@ -278,6 +278,7 @@ class RecordCompatibilityServiceTest {
 
     @Test
     fun `Given searchRecords is called with its appropriate parameter, it calls the ApiService only if the legacy encrypted tags equal the current version of encrypted tags`() {
+        // Given
         val alias = "alias"
         val userId = "id"
         val startTime = "start"

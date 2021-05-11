@@ -123,7 +123,7 @@ object Versions {
     /**
      * [okHttp](https://github.com/square/okhttp)
      */
-    const val okHttp = "4.7.2"
+    const val okHttp = "4.9.1"
 
     /**
      *

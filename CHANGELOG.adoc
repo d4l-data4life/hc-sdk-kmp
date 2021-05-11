@@ -26,6 +26,8 @@ toc::[]
 
 === Bumped
 
+* OkHTTP 4.7.2 -> 4.9.1
+
 === Migration
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.10.0...v1.11.0[1.11.0]

@@ -45,7 +45,7 @@ internal object CompatibilityEncoder : MigrationContract.CompatibilityEncoder {
 
         return Triple(
             validEncoding,
-            normalizedTag,
+            normalizedTag, // aka KMPLegacyTags
             jsLegacyEncoding
         )
     }

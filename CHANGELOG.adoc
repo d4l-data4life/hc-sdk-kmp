@@ -16,6 +16,8 @@ toc::[]
 
 === Added
 
+* LegacyEnoding for Javascript.
+
 === Changed
 
 * ApiService is now in Kotlin.

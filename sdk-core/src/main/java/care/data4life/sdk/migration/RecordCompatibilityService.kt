@@ -51,9 +51,9 @@ class RecordCompatibilityService internal constructor(
         tagGroupKey: String,
         tagOrGroup: Triple<String, String, String>,
         tagEncryptionKey: GCKey,
-        pipe: NetworkingContract.SearchTagsBuilder
+        builder: NetworkingContract.SearchTagsBuilder
     ) {
-        pipe.addOrTuple(
+        builder.addOrTuple(
             encryptTags(
                 tagEncryptionKey,
                 tagGroupKey,
@@ -65,11 +65,11 @@ class RecordCompatibilityService internal constructor(
     private fun mapTags(
         tags: Tags,
         tagEncryptionKey: GCKey,
-        pipe: NetworkingContract.SearchTagsBuilder
+        builder: NetworkingContract.SearchTagsBuilder
     ) {
         tags.map { tagGroup ->
             Pair(
-                tagGroup.key + TaggingContract.DELIMITER,
+                tagGroup.key + DELIMITER,
                 compatibilityEncoder.encode(tagGroup.value)
             )
         }.map { encodedTagGroup ->
@@ -77,7 +77,7 @@ class RecordCompatibilityService internal constructor(
                 encodedTagGroup.first,
                 encodedTagGroup.second,
                 tagEncryptionKey,
-                pipe
+                builder
             )
         }
     }
@@ -85,7 +85,7 @@ class RecordCompatibilityService internal constructor(
     private fun mapAnnotations(
         annotations: Annotations,
         tagEncryptionKey: GCKey,
-        pipe: NetworkingContract.SearchTagsBuilder
+        builder: NetworkingContract.SearchTagsBuilder
     ) {
         annotations.map { annotation ->
             Pair(
@@ -99,7 +99,7 @@ class RecordCompatibilityService internal constructor(
                 encodedTagGroup.first,
                 encodedTagGroup.second,
                 tagEncryptionKey,
-                pipe
+                builder
             )
         }
     }
@@ -108,12 +108,12 @@ class RecordCompatibilityService internal constructor(
         tags: Tags,
         annotation: Annotations
     ): NetworkingContract.SearchTags {
-        val pipe = searchTagsBuilderBuilderFactory.newBuilder()
+        val builder = searchTagsBuilderBuilderFactory.newBuilder()
         val tagEncryptionKey = cryptoService.fetchTagEncryptionKey()
 
-        mapTags(tags, tagEncryptionKey, pipe)
-        mapAnnotations(annotation, tagEncryptionKey, pipe)
+        mapTags(tags, tagEncryptionKey, builder)
+        mapAnnotations(annotation, tagEncryptionKey, builder)
 
-        return pipe.seal()
+        return builder.seal()
     }
 }

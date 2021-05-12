@@ -26,7 +26,7 @@ import io.reactivex.Single
 @MustBeDocumented
 annotation class Migration(val message: String)
 
-interface MigrationContract {
+class MigrationContract {
     interface CompatibilityService {
         fun searchRecords(
             alias: String,
@@ -47,14 +47,16 @@ interface MigrationContract {
         ): Single<Int>
     }
 
-    interface LegacyTagEncoder {
+    internal interface CompatibilityEncoder {
+        fun encode(tagValue: String): Triple<String, String, String>
+
         companion object {
-            val JS_LEGACY_ENCODING_EXCEPTIONS = listOf(
-                "%2a",
-                "%2d",
-                "%2e",
-                "%5f",
-                "%7e"
+            val JS_LEGACY_ENCODING_EXCEPTIONS = mapOf(
+                "%2A" to "%2a",
+                "%2D" to "%2d",
+                "%2E" to "%2e",
+                "%5F" to "%5f",
+                "%7E" to "%7e"
             )
         }
     }

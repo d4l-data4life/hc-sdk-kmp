@@ -31,7 +31,7 @@ import care.data4life.sdk.network.model.VersionList
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter
 import care.data4life.sdk.network.util.CertificatePinnerFactory
 import care.data4life.sdk.network.util.IHCServiceFactory
-import care.data4life.sdk.network.util.SearchTagsPipe
+import care.data4life.sdk.network.util.SearchTagsBuilder
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.AUTH_TOKEN
 import care.data4life.sdk.test.util.GenericTestDataProvider.CLIENT_ID
@@ -374,7 +374,7 @@ class ApiServiceModuleTest {
         val pageSize = 23
         val offset = 42
         val formattedTags = "tag1,tag2,tag3"
-        val tags = SearchTagsPipe.newPipe()
+        val tags = SearchTagsBuilder.newBuilder()
             .addOrTuple(listOf("tag1"))
             .addOrTuple(listOf("tag2"))
             .addOrTuple(listOf("tag3"))
@@ -463,7 +463,7 @@ class ApiServiceModuleTest {
         val alias = ALIAS
         val userId = USER_ID
         val formattedTags = "tag1,tag2,tag3"
-        val tags = SearchTagsPipe.newPipe()
+        val tags = SearchTagsBuilder.newBuilder()
             .addOrTuple(listOf("tag1"))
             .addOrTuple(listOf("tag2"))
             .addOrTuple(listOf("tag3"))

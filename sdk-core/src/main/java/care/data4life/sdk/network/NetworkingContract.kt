@@ -60,10 +60,10 @@ class NetworkingContract {
             endDate: String?,
             pageSize: Int,
             offset: Int,
-            tags: SearchTagsPipeOut
+            tags: SearchTags
         ): Observable<List<EncryptedRecord>>
 
-        fun getCount(alias: String, userId: String, tags: SearchTagsPipeOut): Single<Int>
+        fun getCount(alias: String, userId: String, tags: SearchTags): Single<Int>
 
         fun deleteRecord(alias: String, userId: String, recordId: String): Completable
 
@@ -163,17 +163,17 @@ class NetworkingContract {
         ): IHCService
     }
 
-    interface SearchTagsPipeIn {
-        fun addOrTuple(tuple: List<String>): SearchTagsPipeIn
-        fun seal(): SearchTagsPipeOut
+    interface SearchTagsBuilder {
+        fun addOrTuple(tuple: List<String>): SearchTagsBuilder
+        fun seal(): SearchTags
     }
 
-    interface SearchTagsPipeOut {
-        fun pullOut(): String
+    interface SearchTags {
+        val tags: String
     }
 
-    interface SearchTagsPipeFactory {
-        fun newPipe(): SearchTagsPipeIn
+    interface SearchTagsBuilderFactory {
+        fun newBuilder(): SearchTagsBuilder
     }
 
     companion object {

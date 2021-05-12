@@ -29,7 +29,7 @@ class MigrationContract {
         fun resolveSearchTags(
             tags: Tags,
             annotation: Annotations
-        ): NetworkingContract.SearchTagsPipeOut
+        ): NetworkingContract.SearchTags
     }
 
     internal interface CompatibilityEncoder {

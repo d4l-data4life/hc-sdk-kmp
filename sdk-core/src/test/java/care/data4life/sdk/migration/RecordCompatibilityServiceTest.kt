@@ -33,8 +33,8 @@ class RecordCompatibilityServiceTest {
     private val cryptoService: CryptoContract.Service = mockk()
     private val tagCryptoService: TaggingContract.CryptoService = mockk()
     private val compatibilityEncoder: MigrationContract.CompatibilityEncoder = mockk()
-    private val searchTagsPipeFactory: NetworkingContract.SearchTagsPipeFactory = mockk()
-    private val searchTagsPipe: NetworkingContract.SearchTagsPipeIn = mockk()
+    private val searchTagsBuilderFactory: NetworkingContract.SearchTagsBuilderFactory = mockk()
+    private val searchTagsPipe: NetworkingContract.SearchTagsBuilder = mockk()
     private lateinit var service: MigrationContract.CompatibilityService
 
     @Before
@@ -45,7 +45,7 @@ class RecordCompatibilityServiceTest {
             cryptoService,
             tagCryptoService,
             compatibilityEncoder,
-            searchTagsPipeFactory
+            searchTagsBuilderFactory
         )
     }
 
@@ -61,24 +61,24 @@ class RecordCompatibilityServiceTest {
         val tagEncryptionKey: GCKey = mockk()
 
         every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
-        every { searchTagsPipeFactory.newPipe() } returns mockk(relaxed = true)
+        every { searchTagsBuilderFactory.newBuilder() } returns mockk(relaxed = true)
 
         // When
         service.resolveSearchTags(emptyMap(), emptyList())
 
         // Then
         verify(exactly = 1) { cryptoService.fetchTagEncryptionKey() }
-        verify(exactly = 1) { searchTagsPipeFactory.newPipe() }
+        verify(exactly = 1) { searchTagsBuilderFactory.newBuilder() }
     }
 
     @Test
     fun `Given, resolveSearchTags is called with proper Arguments, it seals the SearchTags and returns them`() {
         // Given
-        val sealedSearchTags: NetworkingContract.SearchTagsPipeOut = mockk()
+        val sealedSearchTags: NetworkingContract.SearchTags = mockk()
 
         every { cryptoService.fetchTagEncryptionKey() } returns mockk()
 
-        every { searchTagsPipeFactory.newPipe() } returns searchTagsPipe
+        every { searchTagsBuilderFactory.newBuilder() } returns searchTagsPipe
         every { searchTagsPipe.seal() } returns sealedSearchTags
 
         // When
@@ -109,7 +109,7 @@ class RecordCompatibilityServiceTest {
         every { cryptoService.fetchTagEncryptionKey() } returns mockk()
         every { tagCryptoService.encryptList(any(), any(), any()) } returns mockk()
 
-        every { searchTagsPipeFactory.newPipe() } returns mockk(relaxed = true)
+        every { searchTagsBuilderFactory.newBuilder() } returns mockk(relaxed = true)
 
         // When
         service.resolveSearchTags(tags, emptyList())
@@ -141,7 +141,7 @@ class RecordCompatibilityServiceTest {
 
         every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
 
-        every { searchTagsPipeFactory.newPipe() } returns mockk(relaxed = true)
+        every { searchTagsBuilderFactory.newBuilder() } returns mockk(relaxed = true)
 
         every {
             tagCryptoService.encryptList(
@@ -229,7 +229,7 @@ class RecordCompatibilityServiceTest {
             tagCryptoService.encryptList(encodedTags[2].toList(), any(), any())
         } returns encryptedGroups[2]
 
-        every { searchTagsPipeFactory.newPipe() } returns searchTagsPipe
+        every { searchTagsBuilderFactory.newBuilder() } returns searchTagsPipe
         every { searchTagsPipe.addOrTuple(encryptedGroups[0]) } returns searchTagsPipe
         every { searchTagsPipe.addOrTuple(encryptedGroups[1]) } returns searchTagsPipe
         every { searchTagsPipe.addOrTuple(encryptedGroups[2]) } returns searchTagsPipe
@@ -265,7 +265,7 @@ class RecordCompatibilityServiceTest {
         every { cryptoService.fetchTagEncryptionKey() } returns mockk()
         every { tagCryptoService.encryptList(any(), any(), any()) } returns mockk()
 
-        every { searchTagsPipeFactory.newPipe() } returns mockk(relaxed = true)
+        every { searchTagsBuilderFactory.newBuilder() } returns mockk(relaxed = true)
 
         // When
         service.resolveSearchTags(emptyMap(), annotations)
@@ -301,7 +301,7 @@ class RecordCompatibilityServiceTest {
 
         every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
 
-        every { searchTagsPipeFactory.newPipe() } returns mockk(relaxed = true)
+        every { searchTagsBuilderFactory.newBuilder() } returns mockk(relaxed = true)
 
         every {
             tagCryptoService.encryptList(
@@ -409,7 +409,7 @@ class RecordCompatibilityServiceTest {
             )
         } returns encryptedGroups[2]
 
-        every { searchTagsPipeFactory.newPipe() } returns searchTagsPipe
+        every { searchTagsBuilderFactory.newBuilder() } returns searchTagsPipe
         every { searchTagsPipe.addOrTuple(encryptedGroups[0]) } returns searchTagsPipe
         every { searchTagsPipe.addOrTuple(encryptedGroups[1]) } returns searchTagsPipe
         every { searchTagsPipe.addOrTuple(encryptedGroups[2]) } returns searchTagsPipe

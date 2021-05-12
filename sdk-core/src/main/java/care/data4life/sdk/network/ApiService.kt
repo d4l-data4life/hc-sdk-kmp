@@ -131,7 +131,7 @@ class ApiService @JvmOverloads constructor(
         endDate: String?,
         pageSize: Int,
         offset: Int,
-        tags: NetworkingContract.SearchTagsPipeOut
+        tags: NetworkingContract.SearchTags
     ): Observable<List<EncryptedRecord>> {
         return service.searchRecords(
             alias,
@@ -140,13 +140,13 @@ class ApiService @JvmOverloads constructor(
             endDate,
             pageSize,
             offset,
-            tags.pullOut()
+            tags.tags
         )
     }
 
-    override fun getCount(alias: String, userId: String, tags: NetworkingContract.SearchTagsPipeOut): Single<Int> {
+    override fun getCount(alias: String, userId: String, tags: NetworkingContract.SearchTags): Single<Int> {
         return service
-            .getRecordsHeader(alias, userId, tags.pullOut())
+            .getRecordsHeader(alias, userId, tags.tags)
             .map { response ->
                 response.headers()[NetworkingContract.HEADER_TOTAL_COUNT]!!
                     .toInt()

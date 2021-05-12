@@ -19,7 +19,7 @@ package care.data4life.sdk.migration
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.network.NetworkingContract
-import care.data4life.sdk.network.util.SearchTagsPipe
+import care.data4life.sdk.network.util.SearchTagsBuilder
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.TaggingContract.Companion.ANNOTATION_KEY
@@ -33,7 +33,7 @@ class RecordCompatibilityService internal constructor(
     private val cryptoService: CryptoContract.Service,
     private val tagCryptoService: TaggingContract.CryptoService,
     private val compatibilityEncoder: MigrationContract.CompatibilityEncoder = CompatibilityEncoder,
-    private val searchTagsPipeBuilderFactory: NetworkingContract.SearchTagsPipeFactory = SearchTagsPipe
+    private val searchTagsBuilderBuilderFactory: NetworkingContract.SearchTagsBuilderFactory = SearchTagsBuilder
 ) : MigrationContract.CompatibilityService {
     private fun encryptTags(
         tagEncryptionKey: GCKey,
@@ -51,7 +51,7 @@ class RecordCompatibilityService internal constructor(
         tagGroupKey: String,
         tagOrGroup: Triple<String, String, String>,
         tagEncryptionKey: GCKey,
-        pipe: NetworkingContract.SearchTagsPipeIn
+        pipe: NetworkingContract.SearchTagsBuilder
     ) {
         pipe.addOrTuple(
             encryptTags(
@@ -65,7 +65,7 @@ class RecordCompatibilityService internal constructor(
     private fun mapTags(
         tags: Tags,
         tagEncryptionKey: GCKey,
-        pipe: NetworkingContract.SearchTagsPipeIn
+        pipe: NetworkingContract.SearchTagsBuilder
     ) {
         tags.map { tagGroup ->
             Pair(
@@ -85,7 +85,7 @@ class RecordCompatibilityService internal constructor(
     private fun mapAnnotations(
         annotations: Annotations,
         tagEncryptionKey: GCKey,
-        pipe: NetworkingContract.SearchTagsPipeIn
+        pipe: NetworkingContract.SearchTagsBuilder
     ) {
         annotations.map { annotation ->
             Pair(
@@ -107,8 +107,8 @@ class RecordCompatibilityService internal constructor(
     override fun resolveSearchTags(
         tags: Tags,
         annotation: Annotations
-    ): NetworkingContract.SearchTagsPipeOut {
-        val pipe = searchTagsPipeBuilderFactory.newPipe()
+    ): NetworkingContract.SearchTags {
+        val pipe = searchTagsBuilderBuilderFactory.newBuilder()
         val tagEncryptionKey = cryptoService.fetchTagEncryptionKey()
 
         mapTags(tags, tagEncryptionKey, pipe)

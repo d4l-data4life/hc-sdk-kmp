@@ -27,7 +27,7 @@ import care.data4life.sdk.model.Record
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
-import care.data4life.sdk.network.util.SearchTagsPipe
+import care.data4life.sdk.network.util.SearchTagsBuilder
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TagCryptoService
@@ -293,7 +293,7 @@ class RecordServiceFetchRecordsModuleTest {
             hashFunction = { value -> flowHelper.md5(value) }
         )
 
-        val search = slot<NetworkingContract.SearchTagsPipeOut>()
+        val search = slot<NetworkingContract.SearchTags>()
 
         (cryptoService as CryptoServiceFake).iteration = receivedIteration
 
@@ -309,7 +309,7 @@ class RecordServiceFetchRecordsModuleTest {
             )
         } answers {
             val actual = flowHelper.decryptSerializedTags(
-                search.captured.pullOut(),
+                search.captured.tags,
                 cryptoService,
                 tagEncryptionKey
             )
@@ -349,11 +349,11 @@ class RecordServiceFetchRecordsModuleTest {
             annotations
         )
 
-        val searchTags = SearchTagsPipe.newPipe()
+        val searchTags = SearchTagsBuilder.newBuilder()
             .let { flowHelper.buildExpectedTagGroups(it, encodedTags, legacyKMPTags, legacyJSTags) }
             .let { flowHelper.buildExpectedTagGroups(it, encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations) }
             .seal()
-            .pullOut()
+            .tags
 
         val encryptedRecord = flowHelper.prepareEncryptedFhirRecord(
             recordIds.first,
@@ -436,11 +436,11 @@ class RecordServiceFetchRecordsModuleTest {
         val (encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations) = flowHelper.prepareCompatibilityAnnotations(
             annotations
         )
-        val searchTags = SearchTagsPipe.newPipe()
+        val searchTags = SearchTagsBuilder.newBuilder()
             .let { flowHelper.buildExpectedTagGroups(it, encodedTags, legacyKMPTags, legacyJSTags) }
             .let { flowHelper.buildExpectedTagGroups(it, encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations) }
             .seal()
-            .pullOut()
+            .tags
 
         val encryptedRecord = flowHelper.prepareEncryptedDataRecord(
             recordIds.first,

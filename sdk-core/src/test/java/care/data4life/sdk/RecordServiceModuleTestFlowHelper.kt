@@ -139,11 +139,11 @@ class RecordServiceModuleTestFlowHelper(
     }
 
     fun buildExpectedTagGroups(
-        builder: NetworkingContract.SearchTagsPipeIn,
+        builder: NetworkingContract.SearchTagsBuilder,
         validGroup: List<String>,
         kmpLegacyGroup: List<String>,
         jsLegacyGroup: List<String>
-    ): NetworkingContract.SearchTagsPipeIn {
+    ): NetworkingContract.SearchTagsBuilder {
         validGroup.indices.forEach { idx ->
             if (!validGroup[idx].startsWith("client") && !validGroup[idx].startsWith("partner")) {
                 builder.addOrTuple(

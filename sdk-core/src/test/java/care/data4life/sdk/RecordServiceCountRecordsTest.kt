@@ -81,7 +81,7 @@ class RecordServiceCountRecordsTest {
         // Given
         val expected = 42
         val annotations: Annotations = mockk()
-        val searchTags: NetworkingContract.SearchTagsPipeOut = mockk()
+        val searchTags: NetworkingContract.SearchTags = mockk()
 
         every { taggingService.getTagsFromType(Fhir3Resource::class.java as Class<Any>) } returns tags
         every { compatibilityService.resolveSearchTags(tags, annotations) } returns searchTags
@@ -116,7 +116,7 @@ class RecordServiceCountRecordsTest {
         // Given
         val expected = 42
         val annotations: Annotations = mockk()
-        val searchTags: NetworkingContract.SearchTagsPipeOut = mockk()
+        val searchTags: NetworkingContract.SearchTags = mockk()
 
         every { taggingService.getTagsFromType(Fhir4Resource::class.java as Class<Any>) } returns tags
         every { compatibilityService.resolveSearchTags(tags, annotations) } returns searchTags

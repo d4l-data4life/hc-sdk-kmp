@@ -22,7 +22,7 @@ import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.fhir.ResourceCryptoService
 import care.data4life.sdk.network.NetworkingContract
-import care.data4life.sdk.network.util.SearchTagsPipe
+import care.data4life.sdk.network.util.SearchTagsBuilder
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TagCryptoService
@@ -96,11 +96,11 @@ class RecordServiceCountRecordsModuleTest {
             annotations
         )
 
-        val searchTags = SearchTagsPipe.newPipe()
+        val searchTags = SearchTagsBuilder.newBuilder()
             .let { flowHelper.buildExpectedTagGroups(it, encodedTags, legacyKMPTags, legacyJSTags) }
             .let { flowHelper.buildExpectedTagGroups(it, encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations) }
             .seal()
-            .pullOut()
+            .tags
 
         val receivedIteration = CryptoServiceIteration(
             gcKeyOrder = emptyList(),
@@ -123,7 +123,7 @@ class RecordServiceCountRecordsModuleTest {
 
         (cryptoService as CryptoServiceFake).iteration = receivedIteration
 
-        val search = slot<NetworkingContract.SearchTagsPipeOut>()
+        val search = slot<NetworkingContract.SearchTags>()
 
         every {
             apiService.getCount(
@@ -133,7 +133,7 @@ class RecordServiceCountRecordsModuleTest {
             )
         } answers {
             val actual = flowHelper.decryptSerializedTags(
-                search.captured.pullOut(),
+                search.captured.tags,
                 cryptoService,
                 tagEncryptionKey
             )

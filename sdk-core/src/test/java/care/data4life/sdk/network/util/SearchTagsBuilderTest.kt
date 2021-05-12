@@ -24,38 +24,38 @@ import kotlin.test.assertEquals
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
-class SearchTagsPipeTest {
-    private lateinit var pipeIn: NetworkingContract.SearchTagsPipeIn
+class SearchTagsBuilderTest {
+    private lateinit var builder: NetworkingContract.SearchTagsBuilder
 
     @Before
     fun setUp() {
-        pipeIn = SearchTagsPipe.newPipe()
+        builder = SearchTagsBuilder.newBuilder()
     }
 
     @Test
-    fun `It fulfils SearchTagsPipeOutFactory`() {
-        val factory: Any = SearchTagsPipe
+    fun `It fulfils SearchTagsBuilderFactory`() {
+        val factory: Any = SearchTagsBuilder
 
-        assertTrue(factory is NetworkingContract.SearchTagsPipeFactory)
+        assertTrue(factory is NetworkingContract.SearchTagsBuilderFactory)
     }
 
     @Test
-    fun `Given newBuilder is called, it returns a SearchTagsPipeIn`() {
-        val pipe: Any = SearchTagsPipe.newPipe()
+    fun `Given newBuilder is called, it returns a SearchTagsBuilder`() {
+        val pipe: Any = SearchTagsBuilder.newBuilder()
 
-        assertTrue(pipe is NetworkingContract.SearchTagsPipeIn)
+        assertTrue(pipe is NetworkingContract.SearchTagsBuilder)
     }
 
     @Test
-    fun `Given seal is called on existing pipe, it returns a SearchTagsPipeOut`() {
-        val pipe: Any = SearchTagsPipe.newPipe().seal()
+    fun `Given seal is called on existing pipe, it returns a SearchTags`() {
+        val pipe: Any = SearchTagsBuilder.newBuilder().seal()
 
-        assertTrue(pipe is NetworkingContract.SearchTagsPipeOut)
+        assertTrue(pipe is NetworkingContract.SearchTags)
     }
 
     @Test
-    fun `Given addOrTuple on existing pipe is called, it returns the SearchTagsPipeOutIn`() {
-        val pipe: Any = this.pipeIn.addOrTuple(mockk())
+    fun `Given addOrTuple on existing pipe is called, it returns the SearchTagsBuilder`() {
+        val pipe: Any = this.builder.addOrTuple(mockk())
 
         assertSame(
             actual = pipe,
@@ -64,7 +64,7 @@ class SearchTagsPipeTest {
     }
 
     @Test
-    fun `Given before build is called on existing pipe, addOrTuple with an arbitrary number of singles it returns a comma separated list`() {
+    fun `Given before seal is called on existing pipe, addOrTuple with an arbitrary number of singles it returns a comma separated list`() {
         // Given
         val singles = listOf(
             listOf("a"),
@@ -75,10 +75,10 @@ class SearchTagsPipeTest {
         )
 
         // When
-        var pipe = this.pipeIn
+        var pipe = this.builder
         singles.forEach { single -> pipe = pipe.addOrTuple(single) }
 
-        val searchTags = pipe.seal().pullOut()
+        val searchTags = pipe.seal().tags
 
         // Then
         assertEquals(
@@ -88,7 +88,7 @@ class SearchTagsPipeTest {
     }
 
     @Test
-    fun `Given before build is called on existing pipe, addOrTuple with an arbitrary number of singles, which contain duplicates, it removes them and it returns a comma separated list`() {
+    fun `Given before seal is called on existing pipe, addOrTuple with an arbitrary number of singles, which contain duplicates, it removes them and it returns a comma separated list`() {
         // Given
         val singles = listOf(
             listOf("a"),
@@ -99,10 +99,10 @@ class SearchTagsPipeTest {
         )
 
         // When
-        var pipe = this.pipeIn
+        var pipe = this.builder
         singles.forEach { single -> pipe = pipe.addOrTuple(single) }
 
-        val searchTags = pipe.seal().pullOut()
+        val searchTags = pipe.seal().tags
 
         // Then
         assertEquals(
@@ -112,7 +112,7 @@ class SearchTagsPipeTest {
     }
 
     @Test
-    fun `Given before build is called on existing pipe, addOrTuple with an arbitrary number of arbitrary tuples it removes duplicates in the tuples, while bracing them`() {
+    fun `Given before seal is called on existing pipe, addOrTuple with an arbitrary number of arbitrary tuples it removes duplicates in the tuples, while bracing them`() {
         // Given
         val singles = listOf(
             listOf("a", "a", "b"),
@@ -121,10 +121,10 @@ class SearchTagsPipeTest {
         )
 
         // When
-        var pipe = this.pipeIn
+        var pipe = this.builder
         singles.forEach { single -> pipe = pipe.addOrTuple(single) }
 
-        val searchTags = pipe.seal().pullOut()
+        val searchTags = pipe.seal().tags
 
         // Then
         assertEquals(
@@ -134,7 +134,7 @@ class SearchTagsPipeTest {
     }
 
     @Test
-    fun `Given before build is called on existing pipe, addOrTuple with an arbitrary number of arbitrary tuples it returns a comma separated list, while bracing tuples`() {
+    fun `Given before seal is called on existing pipe, addOrTuple with an arbitrary number of arbitrary tuples it returns a comma separated list, while bracing tuples`() {
         // Given
         val singles = listOf(
             listOf("a", "b", "c"),
@@ -143,10 +143,10 @@ class SearchTagsPipeTest {
         )
 
         // When
-        var pipe = this.pipeIn
+        var pipe = this.builder
         singles.forEach { single -> pipe = pipe.addOrTuple(single) }
 
-        val searchTags = pipe.seal().pullOut()
+        val searchTags = pipe.seal().tags
 
         // Then
         assertEquals(
@@ -156,7 +156,7 @@ class SearchTagsPipeTest {
     }
 
     @Test
-    fun `Given before build is called on existing pipe, addOrTuple with an arbitrary number of arbitrary tuples it returns a comma separated list, it determines braces correctly`() {
+    fun `Given before seal is called on existing pipe, addOrTuple with an arbitrary number of arbitrary tuples it returns a comma separated list, it determines braces correctly`() {
         // Given
         val singles = listOf(
             listOf("a", "a"),
@@ -166,10 +166,10 @@ class SearchTagsPipeTest {
         )
 
         // When
-        var pipe = this.pipeIn
+        var pipe = this.builder
         singles.forEach { single -> pipe = pipe.addOrTuple(single) }
 
-        val searchTags = pipe.seal().pullOut()
+        val searchTags = pipe.seal().tags
 
         // Then
         assertEquals(

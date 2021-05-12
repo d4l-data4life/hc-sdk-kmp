@@ -332,7 +332,7 @@ class RecordServiceFetchRecordsTest {
         val offset = 42
         val pageSize = 23
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
-        val searchTags: NetworkingContract.SearchTagsPipeOut = mockk()
+        val searchTags: NetworkingContract.SearchTags = mockk()
 
         every {
             hint(Fhir3CarePlan::class)
@@ -461,7 +461,7 @@ class RecordServiceFetchRecordsTest {
         val offset = 42
         val pageSize = 23
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
-        val searchTags: NetworkingContract.SearchTagsPipeOut = mockk()
+        val searchTags: NetworkingContract.SearchTags = mockk()
 
         every {
             hint(Fhir3CarePlan::class)
@@ -592,7 +592,7 @@ class RecordServiceFetchRecordsTest {
         val offset = 42
         val pageSize = 23
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
-        val searchTags: NetworkingContract.SearchTagsPipeOut = mockk()
+        val searchTags: NetworkingContract.SearchTags = mockk()
 
         every {
             hint(Fhir4CarePlan::class)
@@ -713,7 +713,7 @@ class RecordServiceFetchRecordsTest {
         val offset = 42
         val pageSize = 23
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
-        val searchTags: NetworkingContract.SearchTagsPipeOut = mockk()
+        val searchTags: NetworkingContract.SearchTags = mockk()
 
         every {
             hint(Fhir4CarePlan::class)

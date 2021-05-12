@@ -32,6 +32,7 @@ import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.fhir.ResourceCryptoService;
 import care.data4life.sdk.log.Log;
 import care.data4life.sdk.log.Logger;
+import care.data4life.sdk.network.ApiService;
 import care.data4life.sdk.network.Environment;
 import care.data4life.sdk.tag.TagCryptoService;
 import care.data4life.sdk.tag.TaggingService;

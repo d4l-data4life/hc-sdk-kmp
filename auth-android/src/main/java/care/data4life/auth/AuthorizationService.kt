@@ -105,6 +105,7 @@ actual class AuthorizationService internal constructor(
         }
     }
 
+    @Throws(AuthorizationException.FailedToRestoreAccessToken::class)
     actual override fun getAccessToken(alias: String): String {
         val state = readAuthState()
 
@@ -115,6 +116,7 @@ actual class AuthorizationService internal constructor(
         throw AuthorizationException.FailedToRestoreAccessToken()
     }
 
+    @Throws(AuthorizationException.FailedToRestoreRefreshToken::class)
     actual override fun getRefreshToken(alias: String): String {
         val state = readAuthState()
 
@@ -125,6 +127,7 @@ actual class AuthorizationService internal constructor(
         throw AuthorizationException.FailedToRestoreRefreshToken()
     }
 
+    @Throws(AuthorizationException.FailedToRefreshAccessToken::class)
     actual override fun refreshAccessToken(alias: String): String {
         var accessToken: String? = null
         runBlocking {

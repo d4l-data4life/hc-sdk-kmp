@@ -20,11 +20,14 @@ interface AuthorizationContract {
 
     interface Service {
 
-        fun getAccessToken(alias: String): String?
+        @Throws(AuthorizationException.FailedToRestoreAccessToken::class)
+        fun getAccessToken(alias: String): String
 
-        fun getRefreshToken(alias: String): String?
+        @Throws(AuthorizationException.FailedToRestoreRefreshToken::class)
+        fun getRefreshToken(alias: String): String
 
-        fun refreshAccessToken(alias: String): String?
+        @Throws(AuthorizationException.FailedToRefreshAccessToken::class)
+        fun refreshAccessToken(alias: String): String
 
         fun isAuthorized(alias: String): Boolean
 

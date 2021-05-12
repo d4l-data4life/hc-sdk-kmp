@@ -37,6 +37,7 @@ import care.data4life.sdk.fhir.ResourceCryptoService;
 import care.data4life.sdk.lang.CoreRuntimeException;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.Callback;
+import care.data4life.sdk.network.ApiService;
 import care.data4life.sdk.network.Environment;
 import care.data4life.sdk.tag.TagCryptoService;
 import care.data4life.sdk.tag.TaggingService;

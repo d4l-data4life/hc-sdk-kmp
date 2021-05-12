@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 import care.data4life.crypto.GCKey;
-import care.data4life.sdk.ApiService;
+import care.data4life.sdk.network.ApiService;
 import care.data4life.sdk.CryptoService;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;

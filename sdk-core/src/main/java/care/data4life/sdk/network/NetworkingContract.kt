@@ -163,6 +163,15 @@ class NetworkingContract {
         ): IHCService
     }
 
+    interface SearchTagsBuilder {
+        fun addOrTuple(tuple: List<String>): SearchTagsBuilder
+        fun build(): String
+    }
+
+    interface SearchTagsBuilderFactory {
+        fun newBuilder(): SearchTagsBuilder
+    }
+
     companion object {
         const val PLATFORM_D4L = "d4l"
         const val PLATFORM_S4H = "s4h"

@@ -38,10 +38,11 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class RecordCompatibilityServiceTest {
-    private var apiService: NetworkingContract.Service = mockk()
-    private var tagCryptoService: TaggingContract.CryptoService = mockk()
-    private var cryptoService: CryptoContract.Service = mockk()
-    private var tagEncryptionEncoding: TaggingContract.Encoding = mockk()
+    private val apiService: NetworkingContract.Service = mockk()
+    private val cryptoService: CryptoContract.Service = mockk()
+    private val tagCryptoService: TaggingContract.CryptoService = mockk()
+    private val tagEncoding: TaggingContract.Encoding = mockk()
+    private val compatibilityEncoder: MigrationContract.CompatibilityEncoder = mockk()
     private lateinit var service: MigrationContract.CompatibilityService
 
     @Before
@@ -50,17 +51,124 @@ class RecordCompatibilityServiceTest {
 
         service = RecordCompatibilityService(
             apiService,
-            tagCryptoService,
             cryptoService,
-            tagEncryptionEncoding
+            tagEncoding,
+            tagCryptoService,
+            compatibilityEncoder
         )
     }
 
     @Test
-    fun `it fulfills the CompatibilityService`() {
-        val service: Any = RecordCompatibilityService(mockk(), mockk(), mockk(), mockk())
+    fun `It fulfills the CompatibilityService`() {
+        val service: Any = RecordCompatibilityService(
+            apiService,
+            cryptoService,
+            tagEncoding,
+            tagCryptoService,
+            compatibilityEncoder
+        )
         assertTrue(service is MigrationContract.CompatibilityService)
     }
+
+    /*@Test
+    fun `Given, countRecords is called with proper Arguments, delegates the plain Tags to the CompatibilityEncoder`() {
+        // Given
+        val tags = mapOf(
+            "tag1" to "tag1Value",
+            "tag2" to "tag2Value",
+            "tag3" to "tag3Value"
+        )
+
+        every { compatibilityEncoder.encode("tag1Value") } returns mockk()
+        every { compatibilityEncoder.encode("tag2Value") } returns mockk()
+        every { compatibilityEncoder.encode("tag3Value") } returns mockk()
+        every { cryptoService.fetchTagEncryptionKey() } returns mockk()
+        every { tagCryptoService.encryptList(any(), any(), any()) } returns mockk()
+
+        // When
+        service.countRecords("NoVIP", "NoVIP", tags, emptyList())
+
+        // Then
+        verify(atLeast = 1) { compatibilityEncoder.encode("tag1Value") }
+        verify(atLeast = 1) { compatibilityEncoder.encode("tag2Value") }
+        verify(atLeast = 1) { compatibilityEncoder.encode("tag3Value") }
+    }
+
+    @Test
+    fun `Given, countRecords is called with proper Arguments, delegates uses the TagKey and Separator as Prefix and delegates it with the encoded TagValues to the TagCryptoService`() {
+        // Given
+        val tagEncryptionKey: GCKey = mockk()
+        val tags = mapOf(
+            "tag1" to "tag1Value",
+            "tag2" to "tag2Value",
+            "tag3" to "tag3Value"
+        )
+        val encodedTags = listOf(
+            Triple("encodedTag1Value", "encodedAndroidLegacyTag1Value", "encodedJSLegacyTag1Value"),
+            Triple("encodedTag2Value", "encodedAndroidLegacyTag2Value", "encodedJSLegacyTag2Value"),
+            Triple("encodedTag3Value", "encodedAndroidLegacyTag3Value", "encodedJSLegacyTag3Value")
+        )
+
+        every { compatibilityEncoder.encode("tag1Value") } returns encodedTags[0]
+        every { compatibilityEncoder.encode("tag2Value") } returns encodedTags[1]
+        every { compatibilityEncoder.encode("tag3Value") } returns encodedTags[2]
+
+        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
+
+        every {
+            tagCryptoService.encryptList(
+                encodedTags[0].toList(),
+                tagEncryptionKey,
+                "${tags.keys.toList()[0]}${TaggingContract.DELIMITER}"
+            )
+        } returns mockk()
+
+        every {
+            tagCryptoService.encryptList(
+                encodedTags[1].toList(),
+                tagEncryptionKey,
+                "${tags.keys.toList()[1]}${TaggingContract.DELIMITER}"
+            )
+        } returns mockk()
+
+        every {
+            tagCryptoService.encryptList(
+                encodedTags[2].toList(),
+                tagEncryptionKey,
+                "${tags.keys.toList()[2]}${TaggingContract.DELIMITER}"
+            )
+        } returns mockk()
+
+        // When
+        service.countRecords("NoVIP", "NoVIP", tags, emptyList())
+
+        // Then
+        verify(exactly = 1) { cryptoService.fetchTagEncryptionKey() }
+
+        verify(atLeast = 1) {
+            tagCryptoService.encryptList(
+                encodedTags[0].toList(),
+                tagEncryptionKey,
+                "${tags.keys.toList()[0]}${TaggingContract.DELIMITER}"
+            )
+        }
+
+        verify(atLeast = 1) {
+            tagCryptoService.encryptList(
+                encodedTags[1].toList(),
+                tagEncryptionKey,
+                "${tags.keys.toList()[1]}${TaggingContract.DELIMITER}"
+            )
+        }
+
+        verify(atLeast = 1) {
+            tagCryptoService.encryptList(
+                encodedTags[2].toList(),
+                tagEncryptionKey,
+                "${tags.keys.toList()[2]}${TaggingContract.DELIMITER}"
+            )
+        }
+    }*/
 
     private fun encryptTagsAndAnnotationsFlow(
         tags: Tags,
@@ -83,7 +191,7 @@ class RecordCompatibilityServiceTest {
             )
         } returns encryptedAnnotations
 
-        every { tagEncryptionEncoding.normalize(tags["key"]!!) } returns tags["key"]!!
+        every { tagEncoding.normalize(tags["key"]!!) } returns tags["key"]!!
         every {
             tagCryptoService.encryptList(
                 eq(listOf("key=value")),
@@ -101,7 +209,7 @@ class RecordCompatibilityServiceTest {
         verify(exactly = 1) {
             tagCryptoService.encryptTagsAndAnnotations(tags, annotations, encryptionKey)
         }
-        verify(exactly = 1) { tagEncryptionEncoding.normalize(tags["key"]!!) }
+        verify(exactly = 1) { tagEncoding.normalize(tags["key"]!!) }
         verify(exactly = 2) {
             tagCryptoService.encryptList(
                 or(eq(listOf("key=value")), annotations),

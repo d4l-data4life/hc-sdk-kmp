@@ -163,13 +163,17 @@ class NetworkingContract {
         ): IHCService
     }
 
-    interface SearchTagsBuilder {
-        fun addOrTuple(tuple: List<String>): SearchTagsBuilder
-        fun build(): String
+    interface SearchTagsPipeIn {
+        fun addOrTuple(tuple: List<String>): SearchTagsPipeIn
+        fun seal(): SearchTagsPipeOut
     }
 
-    interface SearchTagsBuilderFactory {
-        fun newBuilder(): SearchTagsBuilder
+    interface SearchTagsPipeOut {
+        fun pullOut(): String
+    }
+
+    interface SearchTagsPipeFactory {
+        fun newPipe(): SearchTagsPipeIn
     }
 
     companion object {

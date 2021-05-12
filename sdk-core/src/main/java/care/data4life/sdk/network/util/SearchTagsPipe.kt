@@ -18,10 +18,10 @@ package care.data4life.sdk.network.util
 
 import care.data4life.sdk.network.NetworkingContract
 
-class SearchTagsBuilder private constructor() : NetworkingContract.SearchTagsBuilder {
+class SearchTagsPipe private constructor() : NetworkingContract.SearchTagsPipeIn, NetworkingContract.SearchTagsPipeOut {
     private val orTuples: MutableList<List<String>> = mutableListOf()
 
-    override fun addOrTuple(tuple: List<String>): NetworkingContract.SearchTagsBuilder {
+    override fun addOrTuple(tuple: List<String>): NetworkingContract.SearchTagsPipeIn {
         orTuples.add(tuple)
         return this
     }
@@ -38,13 +38,15 @@ class SearchTagsBuilder private constructor() : NetworkingContract.SearchTagsBui
         }
     }
 
-    override fun build(): String {
+    override fun seal(): NetworkingContract.SearchTagsPipeOut = this
+
+    override fun pullOut(): String {
         return orTuples
             .toSet()
             .joinToString(",", transform = ::joinTuples)
     }
 
-    companion object Factory : NetworkingContract.SearchTagsBuilderFactory {
-        override fun newBuilder(): NetworkingContract.SearchTagsBuilder = SearchTagsBuilder()
+    companion object Factory : NetworkingContract.SearchTagsPipeFactory {
+        override fun newPipe(): NetworkingContract.SearchTagsPipeIn = SearchTagsPipe()
     }
 }

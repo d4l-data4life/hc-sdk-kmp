@@ -21,39 +21,50 @@ import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
-class SearchTagsBuilderTest {
-    private lateinit var builder: NetworkingContract.SearchTagsBuilder
+class SearchTagsPipeTest {
+    private lateinit var pipeIn: NetworkingContract.SearchTagsPipeIn
 
     @Before
     fun setUp() {
-        builder = SearchTagsBuilder.newBuilder()
+        pipeIn = SearchTagsPipe.newPipe()
     }
 
     @Test
-    fun `It fulfils SearchParameterBuilderFactory`() {
-        val factory: Any = SearchTagsBuilder
+    fun `It fulfils SearchTagsPipeOutFactory`() {
+        val factory: Any = SearchTagsPipe
 
-        assertTrue(factory is NetworkingContract.SearchTagsBuilderFactory)
+        assertTrue(factory is NetworkingContract.SearchTagsPipeFactory)
     }
 
     @Test
-    fun `Given newBuilder is called, it returns a SearchParameterBuilder`() {
-        val builder: Any = SearchTagsBuilder.newBuilder()
+    fun `Given newBuilder is called, it returns a SearchTagsPipeIn`() {
+        val pipe: Any = SearchTagsPipe.newPipe()
 
-        assertTrue(builder is NetworkingContract.SearchTagsBuilder)
+        assertTrue(pipe is NetworkingContract.SearchTagsPipeIn)
     }
 
     @Test
-    fun `Given addOrTuple on existing builder is called, it returns a SearchParameterBuilder`() {
-        val builder: Any = this.builder.addOrTuple(mockk())
+    fun `Given seal is called on existing pipe, it returns a SearchTagsPipeOut`() {
+        val pipe: Any = SearchTagsPipe.newPipe().seal()
 
-        assertTrue(builder is NetworkingContract.SearchTagsBuilder)
+        assertTrue(pipe is NetworkingContract.SearchTagsPipeOut)
     }
 
     @Test
-    fun `Given before build is called on existing builder, addOrTuple with an arbitrary number of singles it returns a comma separated list`() {
+    fun `Given addOrTuple on existing pipe is called, it returns the SearchTagsPipeOutIn`() {
+        val pipe: Any = this.pipeIn.addOrTuple(mockk())
+
+        assertSame(
+            actual = pipe,
+            expected = pipe
+        )
+    }
+
+    @Test
+    fun `Given before build is called on existing pipe, addOrTuple with an arbitrary number of singles it returns a comma separated list`() {
         // Given
         val singles = listOf(
             listOf("a"),
@@ -64,10 +75,10 @@ class SearchTagsBuilderTest {
         )
 
         // When
-        var builder = this.builder
-        singles.forEach { single -> builder = builder.addOrTuple(single) }
+        var pipe = this.pipeIn
+        singles.forEach { single -> pipe = pipe.addOrTuple(single) }
 
-        val searchTags = builder.build()
+        val searchTags = pipe.seal().pullOut()
 
         // Then
         assertEquals(
@@ -77,7 +88,7 @@ class SearchTagsBuilderTest {
     }
 
     @Test
-    fun `Given before build is called on existing builder, addOrTuple with an arbitrary number of singles, which contain duplicates, it removes them and it returns a comma separated list`() {
+    fun `Given before build is called on existing pipe, addOrTuple with an arbitrary number of singles, which contain duplicates, it removes them and it returns a comma separated list`() {
         // Given
         val singles = listOf(
             listOf("a"),
@@ -88,10 +99,10 @@ class SearchTagsBuilderTest {
         )
 
         // When
-        var builder = this.builder
-        singles.forEach { single -> builder = builder.addOrTuple(single) }
+        var pipe = this.pipeIn
+        singles.forEach { single -> pipe = pipe.addOrTuple(single) }
 
-        val searchTags = builder.build()
+        val searchTags = pipe.seal().pullOut()
 
         // Then
         assertEquals(
@@ -101,7 +112,7 @@ class SearchTagsBuilderTest {
     }
 
     @Test
-    fun `Given before build is called on existing builder, addOrTuple with an arbitrary number of arbitrary tuples it removes duplicates in the tuples, while bracing them`() {
+    fun `Given before build is called on existing pipe, addOrTuple with an arbitrary number of arbitrary tuples it removes duplicates in the tuples, while bracing them`() {
         // Given
         val singles = listOf(
             listOf("a", "a", "b"),
@@ -110,10 +121,10 @@ class SearchTagsBuilderTest {
         )
 
         // When
-        var builder = this.builder
-        singles.forEach { single -> builder = builder.addOrTuple(single) }
+        var pipe = this.pipeIn
+        singles.forEach { single -> pipe = pipe.addOrTuple(single) }
 
-        val searchTags = builder.build()
+        val searchTags = pipe.seal().pullOut()
 
         // Then
         assertEquals(
@@ -123,7 +134,7 @@ class SearchTagsBuilderTest {
     }
 
     @Test
-    fun `Given before build is called on existing builder, addOrTuple with an arbitrary number of arbitrary tuples it returns a comma separated list, while bracing tuples`() {
+    fun `Given before build is called on existing pipe, addOrTuple with an arbitrary number of arbitrary tuples it returns a comma separated list, while bracing tuples`() {
         // Given
         val singles = listOf(
             listOf("a", "b", "c"),
@@ -132,10 +143,10 @@ class SearchTagsBuilderTest {
         )
 
         // When
-        var builder = this.builder
-        singles.forEach { single -> builder = builder.addOrTuple(single) }
+        var pipe = this.pipeIn
+        singles.forEach { single -> pipe = pipe.addOrTuple(single) }
 
-        val searchTags = builder.build()
+        val searchTags = pipe.seal().pullOut()
 
         // Then
         assertEquals(
@@ -145,7 +156,7 @@ class SearchTagsBuilderTest {
     }
 
     @Test
-    fun `Given before build is called on existing builder, addOrTuple with an arbitrary number of arbitrary tuples it returns a comma separated list, it determines braces correctly`() {
+    fun `Given before build is called on existing pipe, addOrTuple with an arbitrary number of arbitrary tuples it returns a comma separated list, it determines braces correctly`() {
         // Given
         val singles = listOf(
             listOf("a", "a"),
@@ -155,10 +166,10 @@ class SearchTagsBuilderTest {
         )
 
         // When
-        var builder = this.builder
-        singles.forEach { single -> builder = builder.addOrTuple(single) }
+        var pipe = this.pipeIn
+        singles.forEach { single -> pipe = pipe.addOrTuple(single) }
 
-        val searchTags = builder.build()
+        val searchTags = pipe.seal().pullOut()
 
         // Then
         assertEquals(

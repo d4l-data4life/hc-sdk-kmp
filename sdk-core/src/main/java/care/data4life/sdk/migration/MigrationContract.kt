@@ -16,8 +16,11 @@
 
 package care.data4life.sdk.migration
 
+import care.data4life.crypto.GCKey
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.Tags
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -59,5 +62,21 @@ class MigrationContract {
                 "%7E" to "%7e"
             )
         }
+    }
+
+    internal interface CompatibilityTagBuilder {
+        fun add(
+            tagGroupKey: String,
+            tagOrGroup: Triple<String, String, String>
+        ): CompatibilityTagBuilder
+
+        fun build(): NetworkingContract.SearchTagsPipeOut
+    }
+
+    internal interface CompatibilityTagBuilderFactory {
+        fun newBuilder(
+            tagCryptoService: TaggingContract.CryptoService,
+            tagEncryptionKey: GCKey
+        ): CompatibilityTagBuilder
     }
 }

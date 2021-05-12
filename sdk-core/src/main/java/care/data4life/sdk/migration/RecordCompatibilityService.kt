@@ -22,7 +22,6 @@ import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.NetworkModelContract.EncryptedRecord
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
-import care.data4life.sdk.tag.TagEncoding
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.TaggingContract.Companion.ANNOTATION_KEY
 import care.data4life.sdk.tag.Tags
@@ -35,10 +34,57 @@ import java.io.IOException
 @Migration("This class should only be used due to migration purpose.")
 class RecordCompatibilityService internal constructor(
     private val apiService: NetworkingContract.Service,
-    private val tagCryptoService: TaggingContract.CryptoService,
     private val cryptoService: CryptoContract.Service,
-    private val tagEncoding: TaggingContract.Encoding = TagEncoding
+    private val tagEncoding: TaggingContract.Encoding,
+    private val tagCryptoService: TaggingContract.CryptoService,
+    private val compatibilityEncoder: MigrationContract.CompatibilityEncoder = CompatibilityEncoder
 ) : MigrationContract.CompatibilityService {
+    /*private fun mapTagKeyToEncodings(tag: Map.Entry<String, String>): Pair<String, List<String>> {
+        val key = "${tag.key}${TaggingContract.DELIMITER}"
+        return Pair(
+            key,
+            compatibilityEncoder.encode(tag.value).toList()
+        )
+    }
+
+    private fun encryptTags(
+        tagEncryptionKey: GCKey,
+        encodedTagMapping: Pair<String, List<String>>
+    ): List<String> {
+        val (tagGroupKey, tagOrGroup) = encodedTagMapping
+        return tagCryptoService.encryptList(
+            tagOrGroup,
+            tagEncryptionKey,
+            tagGroupKey
+        )
+    }
+
+    override fun countRecords(
+        alias: String,
+        userId: String,
+        tags: Tags,
+        annotations: Annotations
+    ): Single<Int> {
+        val tagEncryptionKey = cryptoService.fetchTagEncryptionKey()
+        tags.map(::mapTagKeyToEncodings)
+            .map { encodedTagMapping -> encryptTags(tagEncryptionKey, encodedTagMapping)}
+
+        return Single.just(0)
+    }
+
+    override fun searchRecords(
+        alias: String,
+        userId: String,
+        startDate: String?,
+        endDate: String?,
+        pageSize: Int,
+        offSet: Int,
+        tags: Tags,
+        annotations: Annotations
+    ): Observable<List<EncryptedRecord>> {
+        TODO("Not yet implemented")
+    }*/
+
     private fun encrypt(
         plainTags: Tags,
         plainAnnotations: Annotations

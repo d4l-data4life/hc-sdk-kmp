@@ -25,6 +25,7 @@ import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.TaggingContract.Companion.ANNOTATION_KEY
 import care.data4life.sdk.tag.Tags
 
+// see: https://gesundheitscloud.atlassian.net/browse/SDK-572
 // see: https://gesundheitscloud.atlassian.net/browse/SDK-525
 @Migration("This class should only be used due to migration purpose.")
 class RecordCompatibilityService internal constructor(
@@ -89,7 +90,7 @@ class RecordCompatibilityService internal constructor(
             Pair(
                 ANNOTATION_KEY + TaggingContract.DELIMITER,
                 compatibilityEncoder.encode(annotation).copy(
-                    second = annotation
+                    second = compatibilityEncoder.normalize(annotation)
                 )
             )
         }.map { encodedTagGroup ->
@@ -115,119 +116,4 @@ class RecordCompatibilityService internal constructor(
 
         return pipe.seal()
     }
-
-    /*private fun encrypt(
-        plainTags: Tags,
-        plainAnnotations: Annotations
-    ): Pair<EncryptedTagsAndAnnotations, EncryptedTagsAndAnnotations> {
-        val tagEncryptionKey = cryptoService.fetchTagEncryptionKey()
-        return Pair(
-            tagCryptoService.encryptTagsAndAnnotations(
-                plainTags,
-                plainAnnotations,
-                tagEncryptionKey
-            ),
-            encryptTags(plainTags, tagEncryptionKey)
-                .also { encryptedTags ->
-                    encryptedTags.addAll(
-                        encryptAnnotations(plainAnnotations, tagEncryptionKey)
-                    )
-                }
-        )
-    }
-
-    @Throws(IOException::class)
-    private fun encryptTags(tags: Tags, tagEncryptionKey: GCKey): MutableList<String> {
-        return tags
-            .map { entry -> entry.key + TaggingContract.DELIMITER + tagEncoding.normalize(entry.value) }
-            .let { normalizedTags ->
-                tagCryptoService.encryptList(
-                    normalizedTags,
-                    tagEncryptionKey
-                )
-            }
-    }
-
-    @Throws(IOException::class)
-    private fun encryptAnnotations(
-        annotations: Annotations,
-        tagEncryptionKey: GCKey
-    ): MutableList<String> {
-        return tagCryptoService.encryptList(
-            annotations,
-            tagEncryptionKey,
-            ANNOTATION_KEY + TaggingContract.DELIMITER
-        )
-    }
-
-    private fun needsDoubleCall(
-        encodedAndEncryptedTags: List<String>,
-        encryptedTags: List<String>
-    ): Boolean = encodedAndEncryptedTags.sorted() != encryptedTags.sorted()
-
-    override fun searchRecords(
-        alias: String,
-        userId: String,
-        startDate: String?,
-        endDate: String?,
-        pageSize: Int,
-        offSet: Int,
-        tags: Tags,
-        annotations: Annotations
-    ): Observable<List<EncryptedRecord>> {
-        val (encodedAndEncryptedTags, encryptedTags) = encrypt(tags, annotations)
-        return if (needsDoubleCall(encodedAndEncryptedTags, encryptedTags)) {
-            Observable.zip(
-                apiService.searchRecords(
-                    alias,
-                    userId,
-                    startDate,
-                    endDate,
-                    pageSize,
-                    offSet,
-                    encodedAndEncryptedTags.joinToString(",")
-                ),
-                apiService.searchRecords(
-                    alias,
-                    userId,
-                    startDate,
-                    endDate,
-                    pageSize,
-                    offSet,
-                    encryptedTags.joinToString(",")
-                ),
-                BiFunction<List<EncryptedRecord>, List<EncryptedRecord>, List<EncryptedRecord>> { records1, records2 ->
-                    mutableListOf<EncryptedRecord>().also {
-                        it.addAll(records1)
-                        it.addAll(records2)
-                    }
-                }
-            )
-        } else {
-            apiService.searchRecords(
-                alias,
-                userId,
-                startDate,
-                endDate,
-                pageSize,
-                offSet,
-                encodedAndEncryptedTags.joinToString(",")
-            ) as Observable<List<EncryptedRecord>>
-        }
-    }
-
-    override fun countRecords(
-        alias: String,
-        userId: String,
-        tags: Tags,
-        annotations: Annotations
-    ): Single<Int> {
-        val (encodedAndEncryptedTags, encryptedTags) = encrypt(tags, annotations)
-
-        return Single.zip(
-            apiService.getCount(alias, userId, encodedAndEncryptedTags.joinToString(",")),
-            apiService.getCount(alias, userId, encryptedTags.joinToString(",")),
-            BiFunction<Int, Int, Int> { c1, c2 -> c1 + c2 }
-        )
-    }*/
 }

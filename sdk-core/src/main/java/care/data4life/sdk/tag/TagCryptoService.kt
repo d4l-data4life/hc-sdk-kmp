@@ -36,14 +36,9 @@ class TagCryptoService @JvmOverloads constructor(
     @Throws(D4LException::class)
     override fun encryptTagsAndAnnotations(
         tags: Tags,
-        annotations: Annotations,
-        tagEncryptionKey: GCKey?
+        annotations: Annotations
     ): EncryptedTagsAndAnnotations {
-        val encryptionKey = if (tagEncryptionKey is GCKey) {
-            tagEncryptionKey
-        } else {
-            cryptoService.fetchTagEncryptionKey()
-        }
+        val encryptionKey = cryptoService.fetchTagEncryptionKey()
 
         return encryptAndEncodeTags(tags, encryptionKey)
             .also { encryptedTags ->
@@ -127,12 +122,11 @@ class TagCryptoService @JvmOverloads constructor(
 
     @Throws(D4LException::class)
     private fun encryptItem(key: GCKey, tag: String): String {
-        return try {
-            cryptoService.symEncrypt(key, tag.toByteArray(), IV)
-                .let { data -> base64.encodeToString(data) }
-        } catch (e: Exception) {
+        return cryptoService.symEncrypt(key, tag.toByteArray(), IV)
+                .let { data -> base64.encodeToString(data) }//try {
+        /*} catch (e: Exception) {
             throw CryptoException.EncryptionFailed("Failed to encrypt tag")
-        }
+        }*/
     }
 
     @Throws(IOException::class)

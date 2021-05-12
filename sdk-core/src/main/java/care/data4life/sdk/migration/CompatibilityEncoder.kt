@@ -38,13 +38,17 @@ internal object CompatibilityEncoder : MigrationContract.CompatibilityEncoder {
 
     override fun encode(tagValue: String): Triple<String, String, String> {
         val validEncoding = tagEncoding.encode(tagValue)
-        val androidLegacyEncoding = tagEncoding.normalize(tagValue)
-        val jsLegacyEncoding = mapJSExceptions(urlEncoding.encode(tagValue))
+        val normalizedTag = tagEncoding.normalize(tagValue)
+        val jsLegacyEncoding = mapJSExceptions(
+            urlEncoding.encode(normalizedTag)
+        )
 
         return Triple(
             validEncoding,
-            androidLegacyEncoding,
+            normalizedTag,
             jsLegacyEncoding
         )
     }
+
+    override fun normalize(tagValue: String): String = tagEncoding.normalize(tagValue)
 }

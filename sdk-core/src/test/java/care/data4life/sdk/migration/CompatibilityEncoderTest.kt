@@ -101,10 +101,11 @@ class CompatibilityEncoderTest {
         // Given
         val tagValue = "I am a value"
         val expected = "Well done"
+        val normalized = "Soon"
 
         every { TagEncoding.encode(tagValue) } returns "notImportant"
-        every { TagEncoding.normalize(tagValue) } returns "notImportant"
-        every { URLEncoding.encode(tagValue) } returns expected
+        every { TagEncoding.normalize(tagValue) } returns normalized
+        every { URLEncoding.encode(normalized) } returns expected
 
         // When
         val (_, _, encoded) = compatibilityEncoder.encode(tagValue)
@@ -115,7 +116,8 @@ class CompatibilityEncoderTest {
             actual = encoded
         )
 
-        verify(exactly = 1) { URLEncoding.encode(tagValue) }
+        verify(exactly = 1) { TagEncoding.normalize(tagValue) }
+        verify(exactly = 1) { URLEncoding.encode(normalized) }
     }
 
     @Test
@@ -125,7 +127,7 @@ class CompatibilityEncoderTest {
         val expected = "%21%27%28%29%2a%2d%5f%2e%7e"
 
         every { TagEncoding.encode(tagValue) } returns "notImportant"
-        every { TagEncoding.normalize(tagValue) } returns "notImportant"
+        every { TagEncoding.normalize(tagValue) } returns tagValue
         every { URLEncoding.encode(tagValue) } returns expected.toUpperCase()
 
         // When
@@ -137,6 +139,27 @@ class CompatibilityEncoderTest {
             actual = encoded
         )
 
+        verify(exactly = 1) { TagEncoding.normalize(tagValue) }
         verify(exactly = 1) { URLEncoding.encode(tagValue) }
+    }
+
+    @Test
+    fun `Given normalize is called with a String, it passes it through to the TagEncoder and returns its result`() {
+        // Given
+        val tagValue = "AAA"
+        val expected = "BBB"
+
+        every { TagEncoding.normalize(tagValue) } returns expected
+
+        // When
+        val normalized = compatibilityEncoder.normalize(tagValue)
+
+        // Then
+        assertEquals(
+            expected = expected,
+            actual = normalized
+        )
+
+        verify(exactly = 1) { TagEncoding.normalize(tagValue) }
     }
 }

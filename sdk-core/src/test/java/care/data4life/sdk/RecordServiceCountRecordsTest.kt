@@ -79,18 +79,13 @@ class RecordServiceCountRecordsTest {
     @Throws(InterruptedException::class, IOException::class)
     fun `Given, countFhir3Records is called with a Fhir3Resource, a UserId and Annotations, it returns amount of occurrences`() {
         // Given
-        /*val expected = 42
+        val expected = 42
         val annotations: Annotations = mockk()
+        val searchTags: NetworkingContract.SearchTagsPipeOut = mockk()
 
         every { taggingService.getTagsFromType(Fhir3Resource::class.java as Class<Any>) } returns tags
-        every {
-            compatibilityService.countRecords(
-                ALIAS,
-                USER_ID,
-                tags,
-                annotations
-            )
-        } returns Single.just(expected)
+        every { compatibilityService.resolveSearchTags(tags, annotations) } returns searchTags
+        every { apiService.getCount(ALIAS, USER_ID, searchTags) } returns Single.just(expected)
 
         // When
         val observer = recordService.countFhir3Records(
@@ -111,25 +106,21 @@ class RecordServiceCountRecordsTest {
             actual = result
         )
         verify(exactly = 1) { taggingService.getTagsFromType(Fhir3Resource::class.java as Class<Any>) }
-        verify(exactly = 1) { compatibilityService.countRecords(ALIAS, USER_ID, tags, annotations) }*/
+        verify(exactly = 1) { compatibilityService.resolveSearchTags(tags, annotations) }
+        verify(exactly = 1) { apiService.getCount(ALIAS, USER_ID, searchTags) }
     }
 
     @Test
     @Throws(InterruptedException::class, IOException::class)
     fun `Given, countFhir4Records is called with a Fhir4Resource, a UserId and Annotations, it returns amount of occurrences`() {
         // Given
-        /*val expected = 42
+        val expected = 42
         val annotations: Annotations = mockk()
+        val searchTags: NetworkingContract.SearchTagsPipeOut = mockk()
 
         every { taggingService.getTagsFromType(Fhir4Resource::class.java as Class<Any>) } returns tags
-        every {
-            compatibilityService.countRecords(
-                ALIAS,
-                USER_ID,
-                tags,
-                annotations
-            )
-        } returns Single.just(expected)
+        every { compatibilityService.resolveSearchTags(tags, annotations) } returns searchTags
+        every { apiService.getCount(ALIAS, USER_ID, searchTags) } returns Single.just(expected)
 
         // When
         val observer = recordService.countFhir4Records(
@@ -150,7 +141,8 @@ class RecordServiceCountRecordsTest {
             actual = result
         )
         verify(exactly = 1) { taggingService.getTagsFromType(Fhir4Resource::class.java as Class<Any>) }
-        verify(exactly = 1) { compatibilityService.countRecords(ALIAS, USER_ID, tags, annotations) }*/
+        verify(exactly = 1) { compatibilityService.resolveSearchTags(tags, annotations) }
+        verify(exactly = 1) { apiService.getCount(ALIAS, USER_ID, searchTags) }
     }
 
     @Test

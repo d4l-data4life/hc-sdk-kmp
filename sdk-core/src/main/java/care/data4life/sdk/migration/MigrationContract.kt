@@ -34,6 +34,7 @@ class MigrationContract {
 
     internal interface CompatibilityEncoder {
         fun encode(tagValue: String): Triple<String, String, String>
+        fun normalize(tagValue: String): String
 
         companion object {
             val JS_LEGACY_ENCODING_EXCEPTIONS = mapOf(

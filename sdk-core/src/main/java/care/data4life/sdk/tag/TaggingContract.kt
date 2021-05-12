@@ -36,8 +36,7 @@ class TaggingContract {
     interface CryptoService {
         fun encryptTagsAndAnnotations(
             tags: Tags,
-            annotations: Annotations,
-            tagEncryptionKey: GCKey? = null
+            annotations: Annotations
         ): EncryptedTagsAndAnnotations
 
         fun decryptTagsAndAnnotations(

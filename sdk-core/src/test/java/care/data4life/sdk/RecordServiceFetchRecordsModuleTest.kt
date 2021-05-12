@@ -249,8 +249,7 @@ class RecordServiceFetchRecordsModuleTest {
 
     private fun runBatchFlow(
         serializedResources: Pair<String, String>,
-        encryptedRecord: EncryptedRecord,
-        encryptedLegacyRecord: EncryptedRecord,
+        encryptedRecords: List<EncryptedRecord>,
         searchTags: Map<String, String>,
         encodedTags: List<String>,
         encodedAnnotations: List<String>,

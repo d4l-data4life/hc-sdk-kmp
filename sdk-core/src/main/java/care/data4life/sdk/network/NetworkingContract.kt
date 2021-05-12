@@ -127,6 +127,19 @@ interface NetworkingContract {
         fun fromName(name: String?): Environment
     }
 
+    interface SearchTagsBuilder {
+        fun addOrTuple(tuple: List<String>): SearchTagsBuilder
+        fun seal(): SearchTags
+    }
+
+    interface SearchTags {
+        val tags: String
+    }
+
+    interface SearchTagsBuilderFactory {
+        fun newBuilder(): SearchTagsBuilder
+    }
+
     companion object {
         const val PLATFORM_D4L = "d4l"
         const val PLATFORM_S4H = "s4h"

@@ -35,11 +35,10 @@ import java.io.IOException
 class RecordCompatibilityService internal constructor(
     private val apiService: NetworkingContract.Service,
     private val cryptoService: CryptoContract.Service,
-    private val tagEncoding: TaggingContract.Encoding,
     private val tagCryptoService: TaggingContract.CryptoService,
     private val compatibilityEncoder: MigrationContract.CompatibilityEncoder = CompatibilityEncoder
 ) : MigrationContract.CompatibilityService {
-    /*private fun mapTagKeyToEncodings(tag: Map.Entry<String, String>): Pair<String, List<String>> {
+    private fun mapTagKeyToEncodings(tag: Map.Entry<String, String>): Pair<String, List<String>> {
         val key = "${tag.key}${TaggingContract.DELIMITER}"
         return Pair(
             key,
@@ -83,9 +82,9 @@ class RecordCompatibilityService internal constructor(
         annotations: Annotations
     ): Observable<List<EncryptedRecord>> {
         TODO("Not yet implemented")
-    }*/
+    }
 
-    private fun encrypt(
+    /*private fun encrypt(
         plainTags: Tags,
         plainAnnotations: Annotations
     ): Pair<EncryptedTagsAndAnnotations, EncryptedTagsAndAnnotations> {
@@ -198,5 +197,5 @@ class RecordCompatibilityService internal constructor(
             apiService.getCount(alias, userId, encryptedTags.joinToString(",")),
             BiFunction<Int, Int, Int> { c1, c2 -> c1 + c2 }
         )
-    }
+    }*/
 }

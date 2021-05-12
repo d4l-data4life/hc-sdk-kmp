@@ -304,7 +304,7 @@ class RecordServiceFetchRecordsModuleTest {
             hashFunction = { value -> flowHelper.md5(value) }
         )
 
-        val search = slot<String>()
+        val search = slot<NetworkingContract.SearchTagsPipeOut>()
 
         (cryptoService as CryptoServiceFake).iteration = receivedIteration
 
@@ -321,8 +321,8 @@ class RecordServiceFetchRecordsModuleTest {
         } answers {
             val actual = search.captured
             val record = when {
-                flowHelper.compareSerialisedTags(actual, encryptedTagsAndAnnotations) -> encryptedRecord
-                flowHelper.compareSerialisedTags(actual, encryptedLegacyTagsAndAnnotations) -> encryptedLegacyRecord
+                flowHelper.compareSerialisedTags(actual.pullOut(), encryptedTagsAndAnnotations) -> encryptedRecord
+                flowHelper.compareSerialisedTags(actual.pullOut(), encryptedLegacyTagsAndAnnotations) -> encryptedLegacyRecord
                 else -> throw RuntimeException(
                     "Unexpected tags and annotations:\n$actual"
                 )

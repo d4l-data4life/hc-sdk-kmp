@@ -124,7 +124,7 @@ class RecordServiceCountRecordsModuleTest {
 
         (cryptoService as CryptoServiceFake).iteration = receivedIteration
 
-        val search = slot<String>()
+        val search = slot<NetworkingContract.SearchTagsPipeOut>()
 
         every {
             apiService.getCount(
@@ -135,8 +135,8 @@ class RecordServiceCountRecordsModuleTest {
         } answers {
             val actual = search.captured
             val amount = when {
-                flowHelper.compareSerialisedTags(actual, encryptedTagsAndAnnotations) -> amounts.first
-                flowHelper.compareSerialisedTags(actual, encryptedLegacyTagsAndAnnotations) -> amounts.second
+                flowHelper.compareSerialisedTags(actual.pullOut(), encryptedTagsAndAnnotations) -> amounts.first
+                flowHelper.compareSerialisedTags(actual.pullOut(), encryptedLegacyTagsAndAnnotations) -> amounts.second
                 else -> throw RuntimeException(
                     "Unexpected tags and annotations:\n$actual"
                 )

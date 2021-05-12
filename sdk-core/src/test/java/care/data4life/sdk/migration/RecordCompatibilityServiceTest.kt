@@ -41,7 +41,6 @@ class RecordCompatibilityServiceTest {
     private val apiService: NetworkingContract.Service = mockk()
     private val cryptoService: CryptoContract.Service = mockk()
     private val tagCryptoService: TaggingContract.CryptoService = mockk()
-    private val tagEncoding: TaggingContract.Encoding = mockk()
     private val compatibilityEncoder: MigrationContract.CompatibilityEncoder = mockk()
     private lateinit var service: MigrationContract.CompatibilityService
 
@@ -52,7 +51,6 @@ class RecordCompatibilityServiceTest {
         service = RecordCompatibilityService(
             apiService,
             cryptoService,
-            tagEncoding,
             tagCryptoService,
             compatibilityEncoder
         )
@@ -63,7 +61,6 @@ class RecordCompatibilityServiceTest {
         val service: Any = RecordCompatibilityService(
             apiService,
             cryptoService,
-            tagEncoding,
             tagCryptoService,
             compatibilityEncoder
         )
@@ -170,7 +167,7 @@ class RecordCompatibilityServiceTest {
         }
     }*/
 
-    private fun encryptTagsAndAnnotationsFlow(
+    /*private fun encryptTagsAndAnnotationsFlow(
         tags: Tags,
         annotations: Annotations,
         encodedAndEncryptedTagsAndAnnotations: MutableList<String>,
@@ -471,5 +468,5 @@ class RecordCompatibilityServiceTest {
                 encodedAndEncryptedTagsAndAnnotations.joinToString(",")
             )
         }
-    }
+    }*/
 }

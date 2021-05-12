@@ -267,12 +267,15 @@ class ApiServiceTest {
         val endDate = "somewhen else"
         val pageSize = 23
         val offset = 42
-        val tags = "tags"
+        val formattedTags = "tags"
+        val tags: NetworkingContract.SearchTagsPipeOut = mockk()
         val result: Observable<List<EncryptedRecord>> = mockk()
 
         every {
-            service.searchRecords(alias, userId, startDate, endDate, pageSize, offset, tags)
+            ihcService.searchRecords(alias, userId, startDate, endDate, pageSize, offset, formattedTags)
         } returns result
+
+        every { tags.pullOut() } returns formattedTags
 
         // When
         val actual = service.searchRecords(
@@ -292,8 +295,10 @@ class ApiServiceTest {
         )
 
         verify(exactly = 1) {
-            ihcService.searchRecords(alias, userId, startDate, endDate, pageSize, offset, tags)
+            ihcService.searchRecords(alias, userId, startDate, endDate, pageSize, offset, formattedTags)
         }
+
+        verify(exactly = 1) { tags.pullOut() }
     }
 
     @Test
@@ -301,12 +306,14 @@ class ApiServiceTest {
         // Given
         val alias = ALIAS
         val userId = USER_ID
-        val tags = RECORD_ID
+        val formattedTags = "tags"
+        val tags: NetworkingContract.SearchTagsPipeOut = mockk()
         val amount = "23"
         val response: Response<Void> = mockk()
         val headers: Headers = mockk()
 
-        every { ihcService.getRecordsHeader(alias, userId, tags) } returns Single.just(response)
+        every { tags.pullOut() } returns formattedTags
+        every { ihcService.getRecordsHeader(alias, userId, formattedTags) } returns Single.just(response)
         every { response.headers() } returns headers
         every { headers[NetworkingContract.HEADER_TOTAL_COUNT] } returns amount
 
@@ -320,8 +327,9 @@ class ApiServiceTest {
         )
 
         verify(exactly = 1) {
-            ihcService.getRecordsHeader(alias, userId, tags)
+            ihcService.getRecordsHeader(alias, userId, formattedTags)
         }
+        verify(exactly = 1) { tags.pullOut() }
     }
 
     @Test

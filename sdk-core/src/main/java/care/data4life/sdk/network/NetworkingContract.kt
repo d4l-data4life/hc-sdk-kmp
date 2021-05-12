@@ -60,10 +60,10 @@ class NetworkingContract {
             endDate: String?,
             pageSize: Int,
             offset: Int,
-            tags: String
+            tags: SearchTagsPipeOut
         ): Observable<List<EncryptedRecord>>
 
-        fun getCount(alias: String, userId: String, tags: String): Single<Int>
+        fun getCount(alias: String, userId: String, tags: SearchTagsPipeOut): Single<Int>
 
         fun deleteRecord(alias: String, userId: String, recordId: String): Completable
 

@@ -22,10 +22,10 @@ import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.wrapper.URLEncoding
 import care.data4life.sdk.wrapper.WrapperContract
 
-internal class CompatibilityEncoder(
-    private val tagEncoding: TaggingContract.Encoding = TagEncoding,
+internal object CompatibilityEncoder : MigrationContract.CompatibilityEncoder {
+    private val tagEncoding: TaggingContract.Encoding = TagEncoding
     private val urlEncoding: WrapperContract.URLEncoding = URLEncoding
-) : MigrationContract.CompatibilityEncoder {
+
     private fun mapJSExceptions(encodedTag: String): String {
         var result = encodedTag
 

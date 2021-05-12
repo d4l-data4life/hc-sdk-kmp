@@ -23,6 +23,7 @@ import care.data4life.sdk.network.util.SearchTagsPipe
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.TaggingContract.Companion.ANNOTATION_KEY
+import care.data4life.sdk.tag.TaggingContract.Companion.DELIMITER
 import care.data4life.sdk.tag.Tags
 
 // see: https://gesundheitscloud.atlassian.net/browse/SDK-572
@@ -88,7 +89,7 @@ class RecordCompatibilityService internal constructor(
     ) {
         annotations.map { annotation ->
             Pair(
-                ANNOTATION_KEY + TaggingContract.DELIMITER,
+                ANNOTATION_KEY + DELIMITER,
                 compatibilityEncoder.encode(annotation).copy(
                     second = compatibilityEncoder.normalize(annotation)
                 )
@@ -112,7 +113,6 @@ class RecordCompatibilityService internal constructor(
 
         mapTags(tags, tagEncryptionKey, pipe)
         mapAnnotations(annotation, tagEncryptionKey, pipe)
-
 
         return pipe.seal()
     }

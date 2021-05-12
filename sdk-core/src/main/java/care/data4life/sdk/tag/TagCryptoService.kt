@@ -122,11 +122,12 @@ class TagCryptoService @JvmOverloads constructor(
 
     @Throws(D4LException::class)
     private fun encryptItem(key: GCKey, tag: String): String {
-        return cryptoService.symEncrypt(key, tag.toByteArray(), IV)
-                .let { data -> base64.encodeToString(data) }//try {
-        /*} catch (e: Exception) {
+        return try {
+            cryptoService.symEncrypt(key, tag.toByteArray(), IV)
+                .let { data -> base64.encodeToString(data) }
+        } catch (e: Exception) {
             throw CryptoException.EncryptionFailed("Failed to encrypt tag")
-        }*/
+        }
     }
 
     @Throws(IOException::class)

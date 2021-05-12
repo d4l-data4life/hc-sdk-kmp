@@ -20,8 +20,6 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.tag.TaggingContract
-import care.data4life.sdk.tag.TaggingContract.Companion.ANNOTATION_KEY
-import care.data4life.sdk.tag.TaggingContract.Companion.DELIMITER
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
@@ -149,7 +147,7 @@ class RecordCompatibilityServiceTest {
             tagCryptoService.encryptList(
                 encodedTags[0].toList(),
                 tagEncryptionKey,
-                "${tags.keys.toList()[0]}${DELIMITER}"
+                "${tags.keys.toList()[0]}${TaggingContract.DELIMITER}"
             )
         } returns mockk()
 
@@ -157,7 +155,7 @@ class RecordCompatibilityServiceTest {
             tagCryptoService.encryptList(
                 encodedTags[1].toList(),
                 tagEncryptionKey,
-                "${tags.keys.toList()[1]}${DELIMITER}"
+                "${tags.keys.toList()[1]}${TaggingContract.DELIMITER}"
             )
         } returns mockk()
 
@@ -165,10 +163,10 @@ class RecordCompatibilityServiceTest {
             tagCryptoService.encryptList(
                 encodedTags[2].toList(),
                 tagEncryptionKey,
-                "${tags.keys.toList()[2]}${DELIMITER}"
+                "${tags.keys.toList()[2]}${TaggingContract.DELIMITER}"
             )
         } returns mockk()
-        
+
         // When
         service.resolveSearchTags(tags, emptyList())
 
@@ -177,7 +175,7 @@ class RecordCompatibilityServiceTest {
             tagCryptoService.encryptList(
                 encodedTags[0].toList(),
                 tagEncryptionKey,
-                "${tags.keys.toList()[0]}${DELIMITER}"
+                "${tags.keys.toList()[0]}${TaggingContract.DELIMITER}"
             )
         }
 
@@ -185,7 +183,7 @@ class RecordCompatibilityServiceTest {
             tagCryptoService.encryptList(
                 encodedTags[1].toList(),
                 tagEncryptionKey,
-                "${tags.keys.toList()[1]}${DELIMITER}"
+                "${tags.keys.toList()[1]}${TaggingContract.DELIMITER}"
             )
         }
 
@@ -193,7 +191,7 @@ class RecordCompatibilityServiceTest {
             tagCryptoService.encryptList(
                 encodedTags[2].toList(),
                 tagEncryptionKey,
-                "${tags.keys.toList()[2]}${DELIMITER}"
+                "${tags.keys.toList()[2]}${TaggingContract.DELIMITER}"
             )
         }
     }
@@ -260,6 +258,10 @@ class RecordCompatibilityServiceTest {
         every { compatibilityEncoder.encode(annotations[1]) } returns mockk(relaxed = true)
         every { compatibilityEncoder.encode(annotations[2]) } returns mockk(relaxed = true)
 
+        every { compatibilityEncoder.normalize(annotations[0]) } returns "a"
+        every { compatibilityEncoder.normalize(annotations[1]) } returns "b"
+        every { compatibilityEncoder.normalize(annotations[2]) } returns "c"
+
         every { cryptoService.fetchTagEncryptionKey() } returns mockk()
         every { tagCryptoService.encryptList(any(), any(), any()) } returns mockk()
 
@@ -293,31 +295,35 @@ class RecordCompatibilityServiceTest {
         every { compatibilityEncoder.encode(annotations[1]) } returns encodedTags[1]
         every { compatibilityEncoder.encode(annotations[2]) } returns encodedTags[2]
 
+        every { compatibilityEncoder.normalize(annotations[0]) } returns "1"
+        every { compatibilityEncoder.normalize(annotations[1]) } returns "2"
+        every { compatibilityEncoder.normalize(annotations[2]) } returns "3"
+
         every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
 
         every { searchTagsPipeFactory.newPipe() } returns mockk(relaxed = true)
 
         every {
             tagCryptoService.encryptList(
-                encodedTags[0].copy(second = annotations[0]).toList(),
+                encodedTags[0].copy(second = "1").toList(),
                 tagEncryptionKey,
-                "$ANNOTATION_KEY${DELIMITER}"
+                "${TaggingContract.ANNOTATION_KEY}${TaggingContract.DELIMITER}"
             )
         } returns mockk()
 
         every {
             tagCryptoService.encryptList(
-                encodedTags[1].copy(second = annotations[1]).toList(),
+                encodedTags[1].copy(second = "2").toList(),
                 tagEncryptionKey,
-                "$ANNOTATION_KEY${DELIMITER}"
+                "${TaggingContract.ANNOTATION_KEY}${TaggingContract.DELIMITER}"
             )
         } returns mockk()
 
         every {
             tagCryptoService.encryptList(
-                encodedTags[2].copy(second = annotations[2]).toList(),
+                encodedTags[2].copy(second = "3").toList(),
                 tagEncryptionKey,
-                "$ANNOTATION_KEY${DELIMITER}"
+                "${TaggingContract.ANNOTATION_KEY}${TaggingContract.DELIMITER}"
             )
         } returns mockk()
 
@@ -327,27 +333,31 @@ class RecordCompatibilityServiceTest {
         // Then
         verify(atMost = 1) {
             tagCryptoService.encryptList(
-                encodedTags[0].copy(second = annotations[0]).toList(),
+                encodedTags[0].copy(second = "1").toList(),
                 tagEncryptionKey,
-                "$ANNOTATION_KEY${DELIMITER}"
+                "${TaggingContract.ANNOTATION_KEY}${TaggingContract.DELIMITER}"
             )
         }
 
         verify(atMost = 1) {
             tagCryptoService.encryptList(
-                encodedTags[1].copy(second = annotations[1]).toList(),
+                encodedTags[1].copy(second = "2").toList(),
                 tagEncryptionKey,
-                "$ANNOTATION_KEY${DELIMITER}"
+                "${TaggingContract.ANNOTATION_KEY}${TaggingContract.DELIMITER}"
             )
         }
 
         verify(atMost = 1) {
             tagCryptoService.encryptList(
-                encodedTags[2].copy(second = annotations[2]).toList(),
+                encodedTags[2].copy(second = "3").toList(),
                 tagEncryptionKey,
-                "$ANNOTATION_KEY${DELIMITER}"
+                "${TaggingContract.ANNOTATION_KEY}${TaggingContract.DELIMITER}"
             )
         }
+
+        verify(atMost = 1) { compatibilityEncoder.normalize(annotations[0]) }
+        verify(atMost = 1) { compatibilityEncoder.normalize(annotations[1]) }
+        verify(atMost = 1) { compatibilityEncoder.normalize(annotations[2]) }
     }
 
     @Test
@@ -371,16 +381,32 @@ class RecordCompatibilityServiceTest {
         every { compatibilityEncoder.encode(annotations[1]) } returns encodedTags[1]
         every { compatibilityEncoder.encode(annotations[2]) } returns encodedTags[2]
 
+        every { compatibilityEncoder.normalize(annotations[0]) } returns "1"
+        every { compatibilityEncoder.normalize(annotations[1]) } returns "2"
+        every { compatibilityEncoder.normalize(annotations[2]) } returns "3"
+
         every {
-            tagCryptoService.encryptList(encodedTags[0].copy(second = annotations[0]).toList(), any(), any())
+            tagCryptoService.encryptList(
+                encodedTags[0].copy(second = "1").toList(),
+                any(),
+                any()
+            )
         } returns encryptedGroups[0]
 
         every {
-            tagCryptoService.encryptList(encodedTags[1].copy(second = annotations[1]).toList(), any(), any())
+            tagCryptoService.encryptList(
+                encodedTags[1].copy(second = "2").toList(),
+                any(),
+                any()
+            )
         } returns encryptedGroups[1]
 
         every {
-            tagCryptoService.encryptList(encodedTags[2].copy(second = annotations[2]).toList(), any(), any())
+            tagCryptoService.encryptList(
+                encodedTags[2].copy(second = "3").toList(),
+                any(),
+                any()
+            )
         } returns encryptedGroups[2]
 
         every { searchTagsPipeFactory.newPipe() } returns searchTagsPipe

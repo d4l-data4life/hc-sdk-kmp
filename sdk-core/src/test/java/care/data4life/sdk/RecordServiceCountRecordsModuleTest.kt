@@ -96,9 +96,9 @@ class RecordServiceCountRecordsModuleTest {
             annotations
         )
 
-        val expectedSearchTags = SearchTagsPipe.newPipe()
+        val searchTags = SearchTagsPipe.newPipe()
             .let { flowHelper.buildExpectedTagGroups(it, encodedTags, legacyKMPTags, legacyJSTags) }
-            .let { flowHelper.buildExpectedTagGroups(it, encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations ) }
+            .let { flowHelper.buildExpectedTagGroups(it, encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations) }
             .seal()
             .pullOut()
 
@@ -138,15 +138,13 @@ class RecordServiceCountRecordsModuleTest {
                 tagEncryptionKey
             )
 
-            val actualAmount = if(expectedSearchTags == actual) {
-                amount
+            if (searchTags == actual) {
+                Single.just(amount)
             } else {
                 throw RuntimeException(
-                    "Unexpected tags and annotations:\n${actual}"
+                    "Unexpected tags and annotations - \nexpected: $searchTags\ngot: $actual"
                 )
             }
-
-            Single.just(actualAmount)
         }
     }
 

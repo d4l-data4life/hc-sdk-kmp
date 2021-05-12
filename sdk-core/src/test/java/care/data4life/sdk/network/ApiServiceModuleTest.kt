@@ -373,7 +373,7 @@ class ApiServiceModuleTest {
         val endDate = "somewhen else"
         val pageSize = 23
         val offset = 42
-        val formattedTags = "tag1,tag2,tag"
+        val formattedTags = "tag1,tag2,tag3"
         val tags = SearchTagsPipe.newPipe()
             .addOrTuple(listOf("tag1"))
             .addOrTuple(listOf("tag2"))
@@ -462,7 +462,7 @@ class ApiServiceModuleTest {
         // Given
         val alias = ALIAS
         val userId = USER_ID
-        val formattedTags = "tag1,tag2,tag"
+        val formattedTags = "tag1,tag2,tag3"
         val tags = SearchTagsPipe.newPipe()
             .addOrTuple(listOf("tag1"))
             .addOrTuple(listOf("tag2"))

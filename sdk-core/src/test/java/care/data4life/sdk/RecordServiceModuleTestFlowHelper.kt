@@ -143,15 +143,17 @@ class RecordServiceModuleTestFlowHelper(
         validGroup: List<String>,
         kmpLegacyGroup: List<String>,
         jsLegacyGroup: List<String>
-    ) : NetworkingContract.SearchTagsPipeIn {
+    ): NetworkingContract.SearchTagsPipeIn {
         validGroup.indices.forEach { idx ->
-            builder.addOrTuple(
-                listOf(
-                    validGroup[idx],
-                    kmpLegacyGroup[idx],
-                    jsLegacyGroup[idx]
+            if (!validGroup[idx].startsWith("client") && !validGroup[idx].startsWith("partner")) {
+                builder.addOrTuple(
+                    listOf(
+                        validGroup[idx],
+                        kmpLegacyGroup[idx],
+                        jsLegacyGroup[idx]
+                    )
                 )
-            )
+            }
         }
 
         return builder
@@ -161,20 +163,22 @@ class RecordServiceModuleTestFlowHelper(
         tags: String,
         cryptoService: CryptoContract.Service,
         tagEncryptionKey: GCKey
-    ) : Map<String, String> {
+    ): Map<String, String> {
         val unOrderedTags = tags.replace("(", "")
             .replace(")", "")
             .split(",")
 
         val mappedTags = mutableMapOf<String, String>()
 
-        unOrderedTags.forEach{ tag ->
+        unOrderedTags.forEach { tag ->
             Base64.decode(tag)
-                .let { encrypted -> cryptoService.symDecrypt(
-                    tagEncryptionKey,
-                    encrypted,
-                    TaggingContract.CryptoService.IV
-                ) }
+                .let { encrypted ->
+                    cryptoService.symDecrypt(
+                        tagEncryptionKey,
+                        encrypted,
+                        TaggingContract.CryptoService.IV
+                    )
+                }
                 .let { decrypted -> String(decrypted, StandardCharsets.UTF_8) }
                 .also { mappedTags[tag] = it }
         }
@@ -195,8 +199,6 @@ class RecordServiceModuleTestFlowHelper(
 
         return plain
     }
-
-
 
     fun hashAndEncodeTagsAndAnnotations(
         tagsAndAnnotations: List<String>

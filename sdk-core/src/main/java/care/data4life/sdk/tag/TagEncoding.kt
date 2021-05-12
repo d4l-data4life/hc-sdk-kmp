@@ -19,7 +19,6 @@ import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.tag.TaggingContract.Companion.LOCALE
 import care.data4life.sdk.wrapper.URLEncoding
-import java.util.Locale
 
 object TagEncoding : TaggingContract.Encoding {
     @Throws(D4LException::class)

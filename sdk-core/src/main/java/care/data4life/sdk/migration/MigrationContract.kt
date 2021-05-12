@@ -16,14 +16,9 @@
 
 package care.data4life.sdk.migration
 
-import care.data4life.crypto.GCKey
 import care.data4life.sdk.network.NetworkingContract
-import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.tag.Annotations
-import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.Tags
-import io.reactivex.Observable
-import io.reactivex.Single
 
 @Retention(AnnotationRetention.SOURCE)
 @MustBeDocumented
@@ -31,23 +26,10 @@ annotation class Migration(val message: String)
 
 class MigrationContract {
     interface CompatibilityService {
-        fun searchRecords(
-            alias: String,
-            userId: String,
-            startDate: String?,
-            endDate: String?,
-            pageSize: Int,
-            offSet: Int,
+        fun resolveSearchTags(
             tags: Tags,
-            annotations: Annotations
-        ): Observable<List<NetworkModelContract.EncryptedRecord>>
-
-        fun countRecords(
-            alias: String,
-            userId: String,
-            tags: Tags,
-            annotations: Annotations
-        ): Single<Int>
+            annotation: Annotations
+        ) : NetworkingContract.SearchTagsPipeOut
     }
 
     internal interface CompatibilityEncoder {
@@ -62,21 +44,5 @@ class MigrationContract {
                 "%7E" to "%7e"
             )
         }
-    }
-
-    internal interface CompatibilityTagBuilder {
-        fun add(
-            tagGroupKey: String,
-            tagOrGroup: Triple<String, String, String>
-        ): CompatibilityTagBuilder
-
-        fun build(): NetworkingContract.SearchTagsPipeOut
-    }
-
-    internal interface CompatibilityTagBuilderFactory {
-        fun newBuilder(
-            tagCryptoService: TaggingContract.CryptoService,
-            tagEncryptionKey: GCKey
-        ): CompatibilityTagBuilder
     }
 }

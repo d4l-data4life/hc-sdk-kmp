@@ -19,69 +19,101 @@ package care.data4life.sdk.migration
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.network.NetworkingContract
-import care.data4life.sdk.network.model.NetworkModelContract.EncryptedRecord
+import care.data4life.sdk.network.util.SearchTagsPipe
 import care.data4life.sdk.tag.Annotations
-import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.TaggingContract.Companion.ANNOTATION_KEY
 import care.data4life.sdk.tag.Tags
-import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.functions.BiFunction
-import java.io.IOException
 
 // see: https://gesundheitscloud.atlassian.net/browse/SDK-525
 @Migration("This class should only be used due to migration purpose.")
 class RecordCompatibilityService internal constructor(
-    private val apiService: NetworkingContract.Service,
     private val cryptoService: CryptoContract.Service,
     private val tagCryptoService: TaggingContract.CryptoService,
-    private val compatibilityEncoder: MigrationContract.CompatibilityEncoder = CompatibilityEncoder
+    private val compatibilityEncoder: MigrationContract.CompatibilityEncoder = CompatibilityEncoder,
+    private val searchTagsPipeBuilderFactory: NetworkingContract.SearchTagsPipeFactory = SearchTagsPipe
 ) : MigrationContract.CompatibilityService {
-    private fun mapTagKeyToEncodings(tag: Map.Entry<String, String>): Pair<String, List<String>> {
-        val key = "${tag.key}${TaggingContract.DELIMITER}"
-        return Pair(
-            key,
-            compatibilityEncoder.encode(tag.value).toList()
-        )
-    }
-
     private fun encryptTags(
         tagEncryptionKey: GCKey,
-        encodedTagMapping: Pair<String, List<String>>
+        tagGroupKey: String,
+        tagOrGroup: List<String>
     ): List<String> {
-        val (tagGroupKey, tagOrGroup) = encodedTagMapping
         return tagCryptoService.encryptList(
-            tagOrGroup,
+            tagOrGroup.toList(),
             tagEncryptionKey,
             tagGroupKey
         )
     }
 
-    override fun countRecords(
-        alias: String,
-        userId: String,
-        tags: Tags,
-        annotations: Annotations
-    ): Single<Int> {
-        val tagEncryptionKey = cryptoService.fetchTagEncryptionKey()
-        tags.map(::mapTagKeyToEncodings)
-            .map { encodedTagMapping -> encryptTags(tagEncryptionKey, encodedTagMapping)}
-
-        return Single.just(0)
+    private fun addTags(
+        tagGroupKey: String,
+        tagOrGroup: Triple<String, String, String>,
+        tagEncryptionKey: GCKey,
+        pipe: NetworkingContract.SearchTagsPipeIn
+    ) {
+        pipe.addOrTuple(
+            encryptTags(
+                tagEncryptionKey,
+                tagGroupKey,
+                tagOrGroup.toList()
+            )
+        )
     }
 
-    override fun searchRecords(
-        alias: String,
-        userId: String,
-        startDate: String?,
-        endDate: String?,
-        pageSize: Int,
-        offSet: Int,
+    private fun mapTags(
         tags: Tags,
-        annotations: Annotations
-    ): Observable<List<EncryptedRecord>> {
-        TODO("Not yet implemented")
+        tagEncryptionKey: GCKey,
+        pipe: NetworkingContract.SearchTagsPipeIn
+    ) {
+        tags.map { tagGroup ->
+            Pair(
+                tagGroup.key + TaggingContract.DELIMITER,
+                compatibilityEncoder.encode(tagGroup.value)
+            )
+        }.map { encodedTagGroup ->
+            addTags(
+                encodedTagGroup.first,
+                encodedTagGroup.second,
+                tagEncryptionKey,
+                pipe
+            )
+        }
+    }
+
+    private fun mapAnnotations(
+        annotations: Annotations,
+        tagEncryptionKey: GCKey,
+        pipe: NetworkingContract.SearchTagsPipeIn
+    ) {
+        annotations.map { annotation ->
+            Pair(
+                ANNOTATION_KEY + TaggingContract.DELIMITER,
+                compatibilityEncoder.encode(annotation).copy(
+                    second = annotation
+                )
+            )
+        }.map { encodedTagGroup ->
+            addTags(
+                encodedTagGroup.first,
+                encodedTagGroup.second,
+                tagEncryptionKey,
+                pipe
+            )
+        }
+    }
+
+    override fun resolveSearchTags(
+        tags: Tags,
+        annotation: Annotations
+    ): NetworkingContract.SearchTagsPipeOut {
+        val pipe = searchTagsPipeBuilderFactory.newPipe()
+        val tagEncryptionKey = cryptoService.fetchTagEncryptionKey()
+
+        mapTags(tags, tagEncryptionKey, pipe)
+        mapAnnotations(annotation, tagEncryptionKey, pipe)
+
+
+        return pipe.seal()
     }
 
     /*private fun encrypt(

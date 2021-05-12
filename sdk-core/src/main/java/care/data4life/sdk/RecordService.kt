@@ -114,11 +114,7 @@ class RecordService internal constructor(
         attachmentService,
         cryptoService,
         errorHandler,
-        RecordCompatibilityService(
-            apiService,
-            cryptoService,
-            tagCryptoService
-        )
+        RecordCompatibilityService(cryptoService, tagCryptoService)
     )
 
     private val recordCryptoService: NetworkModelContract.CryptoService = RecordCryptoService(
@@ -301,14 +297,14 @@ class RecordService internal constructor(
         endDate: LocalDate?,
         pageSize: Int,
         offset: Int
-    ): Single<List<BaseRecord<T>>> {
+    ): Single<List<BaseRecord<T>>> = TODO() /*{
         val startTime = if (startDate != null) dateTimeFormatter.formatDate(startDate) else null
         val endTime = if (endDate != null) dateTimeFormatter.formatDate(endDate) else null
 
         return Observable
             .fromCallable { taggingService.getTagsFromType(resourceType) }
             .flatMap { tags ->
-                compatibilityService.searchRecords(
+                apiService.searchRecords(
                     alias,
                     userId,
                     startTime,
@@ -324,7 +320,7 @@ class RecordService internal constructor(
             .map { decryptedRecord -> assignResourceId(decryptedRecord) }
             .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) }
             .toList() as Single<List<BaseRecord<T>>>
-    }
+    }*/
 
     fun <T : Fhir3Resource> fetchFhir3Records(
         userId: String,
@@ -514,12 +510,12 @@ class RecordService internal constructor(
         type: Class<out Any>,
         userId: String,
         annotations: Annotations
-    ): Single<Int> = compatibilityService.countRecords(
+    ): Single<Int> = TODO()/*compatibilityService.countRecords(
         alias,
         userId,
         taggingService.getTagsFromType(type),
         annotations
-    )
+    )*/
 
     @JvmOverloads
     @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")

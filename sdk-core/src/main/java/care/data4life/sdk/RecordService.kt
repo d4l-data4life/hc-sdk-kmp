@@ -965,10 +965,14 @@ class RecordService internal constructor(
                         )
                     newAttachment.id == null -> validAttachments.add(newAttachment)
                     else -> {
-                        val oldAttachment = oldAttachments[newAttachment.id]
-                            ?: throw DataValidationException.IdUsageViolation(
-                                "Valid Attachment.id expected"
-                            )
+                        val oldAttachment = oldAttachments.getOrElse(
+                            newAttachment.id,
+                            {
+                                throw DataValidationException.IdUsageViolation(
+                                    "Valid Attachment.id expected"
+                                )
+                            }
+                        )
                         if (oldAttachment.hash == null || newAttachment.hash != oldAttachment.hash) {
                             validAttachments.add(newAttachment)
                         }

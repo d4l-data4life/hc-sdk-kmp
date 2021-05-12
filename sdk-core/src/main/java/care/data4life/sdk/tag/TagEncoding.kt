@@ -17,25 +17,10 @@ package care.data4life.sdk.tag
 
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
-import okhttp3.internal.toHexString
-import java.net.URLDecoder
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
+import care.data4life.sdk.wrapper.URLEncoding
 import java.util.Locale
 
 object TagEncoding : TaggingContract.Encoding {
-    private val specialChars = listOf('*', '-', '_', '.')
-
-    private fun normalizeEncodedChar(char: Char): Char = char.toLowerCase()
-
-    private fun replaceSpecial(char: Char): String {
-        return when (char) {
-            '+' -> "%20"
-            in specialChars -> "%${char.toInt().toHexString()}"
-            else -> char.toString()
-        }
-    }
-
     @Throws(D4LException::class)
     private fun validateTag(tag: String) {
         if (tag.isBlank()) {
@@ -46,16 +31,9 @@ object TagEncoding : TaggingContract.Encoding {
     }
 
     @Throws(D4LException::class)
-    override fun encode(tag: String): String {
-        return URLEncoder.encode(
-            normalize(tag),
-            StandardCharsets.UTF_8.displayName()
-        ).map { char ->
-            replaceSpecial(
-                normalizeEncodedChar(char)
-            )
-        }.joinToString("")
-    }
+    override fun encode(
+        tag: String
+    ): String = URLEncoding.encode(normalize(tag)).toLowerCase(Locale.US)
 
     @Throws(D4LException::class)
     override fun normalize(tag: String): String {
@@ -65,5 +43,5 @@ object TagEncoding : TaggingContract.Encoding {
 
     override fun decode(
         encodedTag: String
-    ): String = URLDecoder.decode(encodedTag, StandardCharsets.UTF_8.displayName())
+    ): String = URLEncoding.decode(encodedTag)
 }

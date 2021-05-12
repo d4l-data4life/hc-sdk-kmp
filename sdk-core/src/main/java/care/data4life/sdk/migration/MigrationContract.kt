@@ -46,4 +46,16 @@ interface MigrationContract {
             annotations: Annotations
         ): Single<Int>
     }
+
+    interface LegacyTagEncoder {
+        companion object {
+            val JS_LEGACY_ENCODING_EXCEPTIONS = listOf(
+                "%2a",
+                "%2d",
+                "%2e",
+                "%5f",
+                "%7e"
+            )
+        }
+    }
 }

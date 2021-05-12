@@ -20,6 +20,7 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.migration.Migration
 import java.io.IOException
+import java.util.Locale
 
 typealias Tags = Map<String, String>
 typealias Annotations = List<String>
@@ -57,7 +58,8 @@ class TaggingContract {
         }
     }
 
-    interface Converter {
+    // TODO: make this package internal
+    fun interface Converter {
         @Throws(D4LException::class)
         fun toTags(tagList: List<String>): Tags
     }
@@ -84,6 +86,7 @@ class TaggingContract {
         const val TAG_FHIR_VERSION = "fhirversion"
         const val TAG_APPDATA_KEY = "flag"
         const val TAG_APPDATA_VALUE = "appdata"
+        val LOCALE: Locale = Locale.US
         const val SEPARATOR = "#"
     }
 }

@@ -45,8 +45,8 @@ class TagConverterTest {
 
         // Then
         assertEquals(
-            expected,
-            tags
+            expected = expected,
+            actual = tags
         )
     }
 

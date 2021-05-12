@@ -25,8 +25,8 @@ import kotlin.test.assertTrue
 class TagEncodingTest {
     @Test
     fun `It fulfils the Encoding`() {
-        val helper: Any = TagEncoding
-        assertTrue(helper is TaggingContract.Encoding)
+        val encoding: Any = TagEncoding
+        assertTrue(encoding is TaggingContract.Encoding)
     }
 
     @Test
@@ -39,8 +39,8 @@ class TagEncodingTest {
 
         assertTrue(exception is DataValidationException.AnnotationViolation)
         assertEquals(
-            "Annotation is empty.",
-            exception.message
+            expected = "Annotation is empty.",
+            actual = exception.message
         )
     }
 
@@ -50,12 +50,12 @@ class TagEncodingTest {
         val tag = "tag"
 
         // When
-        val result = TagEncoding.encode(tag)
+        val encoded = TagEncoding.encode(tag)
 
         // Then
         assertEquals(
-            tag,
-            result
+            expected = tag,
+            actual = encoded
         )
     }
 
@@ -65,12 +65,12 @@ class TagEncodingTest {
         val expected = "tag"
 
         // When
-        val result = TagEncoding.encode("  $expected   ")
+        val encoded = TagEncoding.encode("  $expected   ")
 
         // Then
         assertEquals(
-            expected,
-            result
+            expected = expected,
+            actual = encoded
         )
     }
 
@@ -80,12 +80,12 @@ class TagEncodingTest {
         val expected = "TAG"
 
         // When
-        val result = TagEncoding.encode(expected)
+        val encoded = TagEncoding.encode(expected)
 
         // Then
         assertEquals(
-            "tag",
-            result
+            expected = "tag",
+            actual = encoded
         )
     }
 
@@ -95,12 +95,12 @@ class TagEncodingTest {
         val tag = "你好，世界"
 
         // When
-        val result = TagEncoding.encode(tag)
+        val encoded = TagEncoding.encode(tag)
 
         // Then
         assertEquals(
-            "%e4%bd%a0%e5%a5%bd%ef%bc%8c%e4%b8%96%e7%95%8c",
-            result
+            expected = "%e4%bd%a0%e5%a5%bd%ef%bc%8c%e4%b8%96%e7%95%8c",
+            actual = encoded
         )
     }
 
@@ -110,12 +110,12 @@ class TagEncodingTest {
         val tag = "! '()*-_.~"
 
         // When
-        val result = TagEncoding.encode(tag)
+        val encoded = TagEncoding.encode(tag)
 
         // Then
         assertEquals(
-            "%21%20%27%28%29%2a%2d%5f%2e%7e",
-            result
+            expected = "%21%20%27%28%29%2a%2d%5f%2e%7e",
+            actual = encoded
         )
     }
 
@@ -125,12 +125,12 @@ class TagEncodingTest {
         val tag = "你好! world."
 
         // When
-        val result = TagEncoding.encode(tag)
+        val encoded = TagEncoding.encode(tag)
 
         // Then
         assertEquals(
-            "%e4%bd%a0%e5%a5%bd%21%20world%2e",
-            result
+            expected = "%e4%bd%a0%e5%a5%bd%21%20world%2e",
+            actual = encoded
         )
     }
 
@@ -140,12 +140,42 @@ class TagEncodingTest {
         val encodedTag = "%e4%bd%a0%e5%a5%bd%ef%bc%8c%e4%b8%96%e7%95%8c"
 
         // When
-        val result = TagEncoding.decode(encodedTag)
+        val decoded = TagEncoding.decode(encodedTag)
 
         // Then
         assertEquals(
-            "你好，世界",
-            result
+            expected = "你好，世界",
+            actual = decoded
+        )
+    }
+
+    @Test
+    fun `Given, decode is called with a encoded String, which contains special chars, it decodes it`() {
+        // Given
+        val encodedTag = "%21%27%28%29%2a%2d%5f%2e%7e%20"
+
+        // When
+        val decoded = TagEncoding.decode(encodedTag)
+
+        // Then
+        assertEquals(
+            expected = "!'()*-_.~ ",
+            actual = decoded
+        )
+    }
+
+    @Test
+    fun `Given, decode is called with a encoded String, which contains mixed chars, it decodes it`() {
+        // Given
+        val encodedTag = "%e4%bd%a0%e5%a5%bd%21%20world%2e"
+
+        // When
+        val decoded = TagEncoding.decode(encodedTag)
+
+        // Then
+        assertEquals(
+            expected = "你好! world.",
+            actual = decoded
         )
     }
 
@@ -160,8 +190,8 @@ class TagEncodingTest {
         // Then
         assertTrue(exception is DataValidationException.AnnotationViolation)
         assertEquals(
-            exception.message,
-            "Annotation is empty."
+            expected = exception.message,
+            actual = "Annotation is empty."
         )
     }
 
@@ -171,12 +201,12 @@ class TagEncodingTest {
         val tag = "tag"
 
         // When
-        val result = TagEncoding.normalize(tag)
+        val normalized = TagEncoding.normalize(tag)
 
         // Then
         assertEquals(
-            tag,
-            result
+            expected = tag,
+            actual = normalized
         )
     }
 
@@ -186,12 +216,12 @@ class TagEncodingTest {
         val expected = "tag"
 
         // When
-        val result = TagEncoding.normalize("  $expected   ")
+        val normalized = TagEncoding.normalize("  $expected   ")
 
         // Then
         assertEquals(
-            expected,
-            result
+            expected = expected,
+            actual = normalized
         )
     }
 
@@ -201,42 +231,12 @@ class TagEncodingTest {
         val expected = "TAG"
 
         // When
-        val result = TagEncoding.normalize(expected)
+        val normalized = TagEncoding.normalize(expected)
 
         // Then
         assertEquals(
-            "tag",
-            result
-        )
-    }
-
-    @Test
-    fun `Given, decode is called with a encoded String, which contains special chars, it decodes it`() {
-        // Given
-        val encodedTag = "%21%27%28%29%2a%2d%5f%2e%7e%20"
-
-        // When
-        val result = TagEncoding.decode(encodedTag)
-
-        // Then
-        assertEquals(
-            "!'()*-_.~ ",
-            result
-        )
-    }
-
-    @Test
-    fun `Given, decode is called with a encoded String, which contains mixed chars, it decodes it`() {
-        // Given
-        val encodedTag = "%e4%bd%a0%e5%a5%bd%21%20world%2e"
-
-        // When
-        val result = TagEncoding.decode(encodedTag)
-
-        // Then
-        assertEquals(
-            "你好! world.",
-            result
+            expected = "tag",
+            actual = normalized
         )
     }
 }

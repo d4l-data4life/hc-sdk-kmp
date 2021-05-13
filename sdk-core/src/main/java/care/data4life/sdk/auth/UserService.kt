@@ -16,10 +16,10 @@
 
 package care.data4life.sdk.auth
 
-import care.data4life.auth.AuthorizationService
-import care.data4life.sdk.ApiService
+import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.log.Log
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.UserInfo
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -27,8 +27,8 @@ import io.reactivex.Single
 // TODO internal
 class UserService(
     private val alias: String,
-    private val authService: AuthorizationService,
-    private val apiService: ApiService,
+    private val authService: AuthorizationContract.Service,
+    private val apiService: NetworkingContract.Service,
     private val secureStore: CryptoContract.SecureStore,
     private val cryptoService: CryptoContract.Service
 ) : AuthContract.UserService {

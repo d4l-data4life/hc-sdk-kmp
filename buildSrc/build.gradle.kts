@@ -21,7 +21,6 @@ plugins {
 repositories {
     gradlePluginPortal()
     mavenCentral()
-    maven("https://dl.bintray.com/data4life/maven")
 }
 
 dependencies {
@@ -32,7 +31,7 @@ dependencies {
     // download scripts
     implementation("de.undercouch:gradle-download-task:4.1.1")
     // publishing.gradle.kts
-    implementation("care.data4life:gradle-git-publish:3.2.0")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:5.11.0.202103091610-r")
     // quality.gradle.kts
     implementation("com.diffplug.spotless:spotless-plugin-gradle:5.10.2")
     implementation("com.pinterest:ktlint:0.41.0")

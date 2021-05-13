@@ -25,6 +25,7 @@ import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
@@ -62,10 +63,10 @@ import kotlin.test.assertTrue
 
 class RecordServiceAttachmentUtilsTest {
     private lateinit var recordService: RecordService
-    private val apiService: ApiService = mockk()
+    private val apiService: NetworkingContract.Service = mockk()
     private val cryptoService: CryptoContract.Service = mockk()
-    private val fhirService: FhirContract.Service = mockk()
-    private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
+    private val fhirService: FhirContract.CryptoService = mockk()
+    private val tagCryptoService: TaggingContract.CryptoService = mockk()
     private val taggingService: TaggingContract.Service = mockk()
     private val attachmentService: AttachmentContract.Service = mockk()
     private val errorHandler: SdkContract.ErrorHandler = mockk()
@@ -79,7 +80,7 @@ class RecordServiceAttachmentUtilsTest {
                 PARTNER_ID,
                 ALIAS,
                 apiService,
-                tagEncryptionService,
+                tagCryptoService,
                 taggingService,
                 fhirService,
                 attachmentService,

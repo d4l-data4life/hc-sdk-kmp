@@ -15,7 +15,6 @@
  */
 package care.data4life.sdk
 
-import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
@@ -26,28 +25,23 @@ import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.migration.MigrationContract
 import care.data4life.sdk.model.ModelContract.BaseRecord
-import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
-import care.data4life.sdk.network.DecryptedRecordMapper
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.DecryptedDataRecord
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
-import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
-import care.data4life.sdk.wrapper.SdkDateTimeFormatter
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkConstructor
 import io.mockk.mockkObject
 import io.mockk.spyk
-import io.mockk.unmockkConstructor
 import io.mockk.unmockkObject
 import io.mockk.verify
 import io.mockk.verifyOrder
@@ -61,20 +55,17 @@ import kotlin.test.assertTrue
 
 class RecordServiceCreateRecordTest {
     private lateinit var recordService: RecordService
-    private val apiService: ApiService = mockk()
+    private val apiService: NetworkingContract.Service = mockk()
     private val cryptoService: CryptoContract.Service = mockk()
-    private val fhirService: FhirContract.Service = mockk()
-    private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
+    private val resourceCryptoService: FhirContract.CryptoService = mockk()
+    private val tagCryptoService: TaggingContract.CryptoService = mockk()
     private val taggingService: TaggingContract.Service = mockk()
     private val attachmentService: AttachmentContract.Service = mockk()
     private val errorHandler: SdkContract.ErrorHandler = mockk()
 
-    private val tags: Tags = mockk()
     private val defaultAnnotation: List<String> = emptyList()
 
     private val compatibilityService: MigrationContract.CompatibilityService = mockk()
-    private val decryptedRecordMapper: DecryptedRecordMapper = mockk()
-    private val dataKey: GCKey = mockk()
     private val encryptedRecord: EncryptedRecord = mockk()
 
     @Before
@@ -86,9 +77,9 @@ class RecordServiceCreateRecordTest {
                 PARTNER_ID,
                 ALIAS,
                 apiService,
-                tagEncryptionService,
+                tagCryptoService,
                 taggingService,
-                fhirService,
+                resourceCryptoService,
                 attachmentService,
                 cryptoService,
                 errorHandler,
@@ -97,17 +88,14 @@ class RecordServiceCreateRecordTest {
         )
 
         mockkObject(RecordMapper)
-        mockkObject(SdkDateTimeFormatter)
-        mockkConstructor(DecryptedRecordMapper::class)
     }
 
     @After
     fun tearDown() {
         unmockkObject(RecordMapper)
-        unmockkObject(SdkDateTimeFormatter)
-        unmockkConstructor(DecryptedRecordMapper::class)
     }
 
+    // FHIR3
     @Test
     fun `Given, createRecord is called with a Fhir3 resource and a UserId, it returns a new Record`() {
         // Given
@@ -115,30 +103,16 @@ class RecordServiceCreateRecordTest {
         val createdRecord: DecryptedFhir3Record<Fhir3Resource> = mockk()
         val receivedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk(relaxed = true)
         val record: Record<Fhir3Resource> = mockk()
-        val date = "now"
         val identifier = "id"
 
-        every { SdkDateTimeFormatter.now() } returns date
         every { createdRecord.resource } returns resource
         every { receivedRecord.resource } returns resource
         every { receivedRecord.identifier } returns identifier
 
         every {
-            anyConstructed<DecryptedRecordMapper>().setAnnotations(defaultAnnotation)
-        } returns decryptedRecordMapper
+            recordService.fromResource(resource, defaultAnnotation)
+        } returns Single.just(createdRecord)
 
-        every { taggingService.appendDefaultTags(resource, null) } returns tags
-        every { cryptoService.generateGCKey() } returns Single.just(dataKey)
-
-        every {
-            decryptedRecordMapper.build(
-                resource,
-                tags,
-                date,
-                dataKey,
-                CURRENT
-            )
-        } returns createdRecord
         every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
         every {
             apiService.createRecord(
@@ -158,8 +132,11 @@ class RecordServiceCreateRecordTest {
         every { RecordMapper.getInstance(receivedRecord) } returns record as BaseRecord<Fhir3Resource>
 
         // When
-        val subscriber =
-            recordService.createRecord(USER_ID, resource, defaultAnnotation).test().await()
+        val subscriber = recordService.createRecord(
+            USER_ID,
+            resource,
+            defaultAnnotation
+        ).test().await()
 
         // Then
         val result = subscriber
@@ -176,16 +153,7 @@ class RecordServiceCreateRecordTest {
             recordService.createRecord(USER_ID, resource, defaultAnnotation)
             recordService.checkDataRestrictions(resource)
             recordService.extractUploadData(resource)
-            taggingService.appendDefaultTags(resource, null)
-            SdkDateTimeFormatter.now()
-            cryptoService.generateGCKey()
-            decryptedRecordMapper.build(
-                resource,
-                tags,
-                date,
-                dataKey,
-                CURRENT
-            )
+            recordService.fromResource(resource, defaultAnnotation)
             recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
             recordService.encryptRecord(createdRecord)
@@ -203,199 +171,6 @@ class RecordServiceCreateRecordTest {
             resource.id = receivedRecord.identifier
             RecordMapper.getInstance(receivedRecord)
         }
-    }
-
-    @Test
-    fun `Given, createRecord is called with a Fhir4 resource and a UserId, it returns a new Record`() {
-        // Given
-        val resource: Fhir4Resource = mockk(relaxed = true)
-        val createdRecord: DecryptedFhir4Record<Fhir4Resource> = mockk()
-        val receivedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
-        val record: Fhir4Record<Fhir4Resource> = mockk()
-        val date = "now"
-        val identifier = "id"
-
-        every { SdkDateTimeFormatter.now() } returns date
-        every { createdRecord.resource } returns resource
-        every { receivedRecord.resource } returns resource
-        every { receivedRecord.identifier } returns identifier
-
-        every {
-            anyConstructed<DecryptedRecordMapper>().setAnnotations(defaultAnnotation)
-        } returns decryptedRecordMapper
-
-        every { taggingService.appendDefaultTags(resource, null) } returns tags
-        every { cryptoService.generateGCKey() } returns Single.just(dataKey)
-
-        every {
-            decryptedRecordMapper.build(
-                resource,
-                tags,
-                date,
-                dataKey,
-                CURRENT
-            )
-        } returns createdRecord
-        every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
-        every {
-            apiService.createRecord(
-                ALIAS,
-                USER_ID,
-                encryptedRecord
-            )
-        } returns Single.just(encryptedRecord)
-        every {
-            recordService.decryptRecord<Fhir4Resource>(
-                encryptedRecord,
-                USER_ID
-            )
-        } returns receivedRecord
-
-        @Suppress("UNCHECKED_CAST")
-        every { RecordMapper.getInstance(receivedRecord) } returns record as BaseRecord<Fhir4Resource>
-
-        // When
-        val subscriber =
-            recordService.createRecord(USER_ID, resource, defaultAnnotation).test().await()
-
-        // Then
-        val result = subscriber
-            .assertNoErrors()
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
-
-        assertSame(
-            actual = result,
-            expected = record
-        )
-        verifyOrder {
-            recordService.createRecord(USER_ID, resource, defaultAnnotation)
-            recordService.checkDataRestrictions(resource)
-            recordService.extractUploadData(resource)
-            taggingService.appendDefaultTags(resource, null)
-            SdkDateTimeFormatter.now()
-            cryptoService.generateGCKey()
-            decryptedRecordMapper.build(
-                resource,
-                tags,
-                date,
-                dataKey,
-                CURRENT
-            )
-            recordService.uploadData(createdRecord, USER_ID)
-            recordService.removeUploadData(createdRecord)
-            recordService.encryptRecord(createdRecord)
-            apiService.createRecord(
-                ALIAS,
-                USER_ID,
-                encryptedRecord
-            )
-            recordService.decryptRecord<Fhir3Resource>(encryptedRecord, USER_ID)
-            recordService.restoreUploadData(
-                receivedRecord,
-                resource,
-                null
-            )
-            resource.id = receivedRecord.identifier
-            RecordMapper.getInstance(receivedRecord)
-        }
-    }
-
-    @Test
-    fun `Given, createRecord is called with a DataResource and a UserId, it returns a new Record`() {
-        // Given
-        val resource: DataResource = mockk()
-        val createdRecord: DecryptedDataRecord = mockk()
-        val receivedRecord: DecryptedDataRecord = mockk(relaxed = true)
-        val record: DataRecord<DataResource> = mockk()
-        val date = "now"
-
-        every { SdkDateTimeFormatter.now() } returns date
-        every { createdRecord.resource } returns resource
-        every { receivedRecord.resource } returns resource
-
-        every {
-            anyConstructed<DecryptedRecordMapper>().setAnnotations(defaultAnnotation)
-        } returns decryptedRecordMapper
-
-        every { taggingService.appendDefaultTags(resource, null) } returns tags
-        every { cryptoService.generateGCKey() } returns Single.just(dataKey)
-
-        every {
-            decryptedRecordMapper.build(
-                resource,
-                tags,
-                date,
-                dataKey,
-                CURRENT
-            )
-        } returns createdRecord
-        every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
-        every {
-            apiService.createRecord(
-                ALIAS,
-                USER_ID,
-                encryptedRecord
-            )
-        } returns Single.just(encryptedRecord)
-        every {
-            recordService.decryptRecord<DataResource>(
-                encryptedRecord,
-                USER_ID
-            )
-        } returns receivedRecord
-
-        @Suppress("UNCHECKED_CAST")
-        every { RecordMapper.getInstance(receivedRecord) } returns record as BaseRecord<DataResource>
-
-        // When
-        val subscriber =
-            recordService.createRecord(USER_ID, resource, defaultAnnotation).test().await()
-
-        // Then
-        val result = subscriber
-            .assertNoErrors()
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
-
-        assertSame(
-            actual = result,
-            expected = record
-        )
-        verifyOrder {
-            recordService.createRecord(USER_ID, resource, defaultAnnotation)
-            recordService.checkDataRestrictions(resource)
-            recordService.extractUploadData(resource)
-            taggingService.appendDefaultTags(resource, null)
-            SdkDateTimeFormatter.now()
-            cryptoService.generateGCKey()
-            decryptedRecordMapper.build(
-                resource,
-                tags,
-                date,
-                dataKey,
-                CURRENT
-            )
-            recordService.uploadData(createdRecord, USER_ID)
-            recordService.removeUploadData(createdRecord)
-            recordService.encryptRecord(createdRecord)
-            apiService.createRecord(
-                ALIAS,
-                USER_ID,
-                encryptedRecord
-            )
-            recordService.decryptRecord<Fhir3Resource>(encryptedRecord, USER_ID)
-            recordService.restoreUploadData(
-                receivedRecord,
-                resource,
-                null
-            )
-            RecordMapper.getInstance(receivedRecord)
-        }
-
-        verify(exactly = 0) { receivedRecord.identifier = any() }
     }
 
     @Test
@@ -406,31 +181,17 @@ class RecordServiceCreateRecordTest {
         val receivedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk(relaxed = true)
         val record: Record<Fhir3Resource> = mockk()
         val uploadData: HashMap<Any, String?> = mockk()
-        val date = "now"
         val identifier = "id"
 
-        every { SdkDateTimeFormatter.now() } returns date
         every { createdRecord.resource } returns resource
         every { receivedRecord.resource } returns resource
         every { record.identifier } returns identifier
 
         every {
-            anyConstructed<DecryptedRecordMapper>().setAnnotations(defaultAnnotation)
-        } returns decryptedRecordMapper
+            recordService.fromResource(resource, defaultAnnotation)
+        } returns Single.just(createdRecord)
 
         every { recordService.extractUploadData(resource) } returns uploadData
-        every { taggingService.appendDefaultTags(resource, null) } returns tags
-        every { cryptoService.generateGCKey() } returns Single.just(dataKey)
-
-        every {
-            decryptedRecordMapper.build(
-                resource,
-                tags,
-                date,
-                dataKey,
-                CURRENT
-            )
-        } returns createdRecord
         every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
         every {
             apiService.createRecord(
@@ -450,8 +211,11 @@ class RecordServiceCreateRecordTest {
         every { RecordMapper.getInstance(receivedRecord) } returns record as BaseRecord<Fhir3Resource>
 
         // When
-        val subscriber =
-            recordService.createRecord(USER_ID, resource, defaultAnnotation).test().await()
+        val subscriber = recordService.createRecord(
+            USER_ID,
+            resource,
+            defaultAnnotation
+        ).test().await()
 
         // Then
         val result = subscriber
@@ -468,115 +232,7 @@ class RecordServiceCreateRecordTest {
             recordService.createRecord(USER_ID, resource, defaultAnnotation)
             recordService.checkDataRestrictions(resource)
             recordService.extractUploadData(resource)
-            taggingService.appendDefaultTags(resource, null)
-            SdkDateTimeFormatter.now()
-            cryptoService.generateGCKey()
-            decryptedRecordMapper.build(
-                resource,
-                tags,
-                date,
-                dataKey,
-                CURRENT
-            )
-            recordService.uploadData(createdRecord, USER_ID)
-            recordService.removeUploadData(createdRecord)
-            recordService.encryptRecord(createdRecord)
-            apiService.createRecord(
-                ALIAS,
-                USER_ID,
-                encryptedRecord
-            )
-            recordService.decryptRecord<Fhir3Resource>(encryptedRecord, USER_ID)
-            recordService.restoreUploadData(
-                receivedRecord,
-                resource,
-                uploadData
-            )
-            resource.id = receivedRecord.identifier
-            RecordMapper.getInstance(receivedRecord)
-        }
-    }
-
-    @Test
-    fun `Given, createRecord is called with a Fhir4 resource, which contains an attachment, and a UserId, it returns a new Record`() {
-        // Given
-        val resource: Fhir4Resource = mockk(relaxed = true)
-        val createdRecord: DecryptedFhir4Record<Fhir4Resource> = mockk()
-        val receivedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
-        val record: Fhir4Record<Fhir4Resource> = mockk()
-        val uploadData: HashMap<Any, String?> = mockk()
-        val date = "now"
-        val identifier = "id"
-
-        every { SdkDateTimeFormatter.now() } returns date
-        every { createdRecord.resource } returns resource
-        every { receivedRecord.resource } returns resource
-        every { record.identifier } returns identifier
-
-        every {
-            anyConstructed<DecryptedRecordMapper>().setAnnotations(defaultAnnotation)
-        } returns decryptedRecordMapper
-
-        every { recordService.extractUploadData(resource) } returns uploadData
-        every { taggingService.appendDefaultTags(resource, null) } returns tags
-        every { cryptoService.generateGCKey() } returns Single.just(dataKey)
-
-        every {
-            decryptedRecordMapper.build(
-                resource,
-                tags,
-                date,
-                dataKey,
-                CURRENT
-            )
-        } returns createdRecord
-        every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
-        every {
-            apiService.createRecord(
-                ALIAS,
-                USER_ID,
-                encryptedRecord
-            )
-        } returns Single.just(encryptedRecord)
-        every {
-            recordService.decryptRecord<Fhir4Resource>(
-                encryptedRecord,
-                USER_ID
-            )
-        } returns receivedRecord
-
-        @Suppress("UNCHECKED_CAST")
-        every { RecordMapper.getInstance(receivedRecord) } returns record as BaseRecord<Fhir4Resource>
-
-        // When
-        val subscriber =
-            recordService.createRecord(USER_ID, resource, defaultAnnotation).test().await()
-
-        // Then
-        val result = subscriber
-            .assertNoErrors()
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
-
-        assertSame(
-            actual = result,
-            expected = record
-        )
-        verifyOrder {
-            recordService.createRecord(USER_ID, resource, defaultAnnotation)
-            recordService.checkDataRestrictions(resource)
-            recordService.extractUploadData(resource)
-            taggingService.appendDefaultTags(resource, null)
-            SdkDateTimeFormatter.now()
-            cryptoService.generateGCKey()
-            decryptedRecordMapper.build(
-                resource,
-                tags,
-                date,
-                dataKey,
-                CURRENT
-            )
+            recordService.fromResource(resource, defaultAnnotation)
             recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
             recordService.encryptRecord(createdRecord)
@@ -603,31 +259,17 @@ class RecordServiceCreateRecordTest {
         val createdRecord: DecryptedFhir3Record<Fhir3Resource> = mockk()
         val receivedRecord: DecryptedFhir3Record<Fhir3Resource> = mockk(relaxed = true)
         val record: Record<Fhir3Resource> = mockk()
-        val date = "now"
         val identifier = "id"
         val annotations: Annotations = mockk()
 
-        every { SdkDateTimeFormatter.now() } returns date
         every { createdRecord.resource } returns resource
         every { receivedRecord.resource } returns resource
         every { receivedRecord.identifier } returns identifier
 
         every {
-            anyConstructed<DecryptedRecordMapper>().setAnnotations(annotations)
-        } returns decryptedRecordMapper
+            recordService.fromResource(resource, annotations)
+        } returns Single.just(createdRecord)
 
-        every { taggingService.appendDefaultTags(resource, null) } returns tags
-        every { cryptoService.generateGCKey() } returns Single.just(dataKey)
-
-        every {
-            decryptedRecordMapper.build(
-                resource,
-                tags,
-                date,
-                dataKey,
-                CURRENT
-            )
-        } returns createdRecord
         every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
         every {
             apiService.createRecord(
@@ -664,16 +306,7 @@ class RecordServiceCreateRecordTest {
             recordService.createRecord(USER_ID, resource, annotations)
             recordService.checkDataRestrictions(resource)
             recordService.extractUploadData(resource)
-            taggingService.appendDefaultTags(resource, null)
-            SdkDateTimeFormatter.now()
-            cryptoService.generateGCKey()
-            decryptedRecordMapper.build(
-                resource,
-                tags,
-                date,
-                dataKey,
-                CURRENT
-            )
+            recordService.fromResource(resource, annotations)
             recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
             recordService.encryptRecord(createdRecord)
@@ -693,6 +326,163 @@ class RecordServiceCreateRecordTest {
         }
     }
 
+    // FHIR4
+    @Test
+    fun `Given, createRecord is called with a Fhir4 resource and a UserId, it returns a new Record`() {
+        // Given
+        val resource: Fhir4Resource = mockk(relaxed = true)
+        val createdRecord: DecryptedFhir4Record<Fhir4Resource> = mockk()
+        val receivedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
+        val record: Fhir4Record<Fhir4Resource> = mockk()
+        val identifier = "id"
+
+        every { createdRecord.resource } returns resource
+        every { receivedRecord.resource } returns resource
+        every { receivedRecord.identifier } returns identifier
+
+        every {
+            recordService.fromResource(resource, defaultAnnotation)
+        } returns Single.just(createdRecord)
+
+        every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
+        every {
+            apiService.createRecord(
+                ALIAS,
+                USER_ID,
+                encryptedRecord
+            )
+        } returns Single.just(encryptedRecord)
+        every {
+            recordService.decryptRecord<Fhir4Resource>(
+                encryptedRecord,
+                USER_ID
+            )
+        } returns receivedRecord
+
+        @Suppress("UNCHECKED_CAST")
+        every { RecordMapper.getInstance(receivedRecord) } returns record as BaseRecord<Fhir4Resource>
+
+        // When
+        val subscriber = recordService.createRecord(
+            USER_ID,
+            resource,
+            defaultAnnotation
+        ).test().await()
+
+        // Then
+        val result = subscriber
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
+
+        assertSame(
+            actual = result,
+            expected = record
+        )
+        verifyOrder {
+            recordService.createRecord(USER_ID, resource, defaultAnnotation)
+            recordService.checkDataRestrictions(resource)
+            recordService.extractUploadData(resource)
+            recordService.fromResource(resource, defaultAnnotation)
+            recordService.uploadData(createdRecord, USER_ID)
+            recordService.removeUploadData(createdRecord)
+            recordService.encryptRecord(createdRecord)
+            apiService.createRecord(
+                ALIAS,
+                USER_ID,
+                encryptedRecord
+            )
+            recordService.decryptRecord<Fhir4Resource>(encryptedRecord, USER_ID)
+            recordService.restoreUploadData(
+                receivedRecord,
+                resource,
+                null
+            )
+            resource.id = receivedRecord.identifier
+            RecordMapper.getInstance(receivedRecord)
+        }
+    }
+
+    @Test
+    fun `Given, createRecord is called with a Fhir4 resource, which contains an attachment, and a UserId, it returns a new Record`() {
+        // Given
+        val resource: Fhir4Resource = mockk(relaxed = true)
+        val createdRecord: DecryptedFhir4Record<Fhir4Resource> = mockk()
+        val receivedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
+        val record: Fhir4Record<Fhir4Resource> = mockk()
+        val uploadData: HashMap<Any, String?> = mockk()
+        val identifier = "id"
+
+        every { createdRecord.resource } returns resource
+        every { receivedRecord.resource } returns resource
+        every { record.identifier } returns identifier
+
+        every {
+            recordService.fromResource(resource, defaultAnnotation)
+        } returns Single.just(createdRecord)
+
+        every { recordService.extractUploadData(resource) } returns uploadData
+        every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
+        every {
+            apiService.createRecord(
+                ALIAS,
+                USER_ID,
+                encryptedRecord
+            )
+        } returns Single.just(encryptedRecord)
+        every {
+            recordService.decryptRecord<Fhir4Resource>(
+                encryptedRecord,
+                USER_ID
+            )
+        } returns receivedRecord
+
+        @Suppress("UNCHECKED_CAST")
+        every { RecordMapper.getInstance(receivedRecord) } returns record as BaseRecord<Fhir4Resource>
+
+        // When
+        val subscriber = recordService.createRecord(
+            USER_ID,
+            resource,
+            defaultAnnotation
+        ).test().await()
+
+        // Then
+        val result = subscriber
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
+
+        assertSame(
+            actual = result,
+            expected = record
+        )
+        verifyOrder {
+            recordService.createRecord(USER_ID, resource, defaultAnnotation)
+            recordService.checkDataRestrictions(resource)
+            recordService.extractUploadData(resource)
+            recordService.fromResource(resource, defaultAnnotation)
+            recordService.uploadData(createdRecord, USER_ID)
+            recordService.removeUploadData(createdRecord)
+            recordService.encryptRecord(createdRecord)
+            apiService.createRecord(
+                ALIAS,
+                USER_ID,
+                encryptedRecord
+            )
+            recordService.decryptRecord<Fhir4Resource>(encryptedRecord, USER_ID)
+            recordService.restoreUploadData(
+                receivedRecord,
+                resource,
+                uploadData
+            )
+            resource.id = receivedRecord.identifier
+            RecordMapper.getInstance(receivedRecord)
+        }
+    }
+
     @Test
     fun `Given, createRecords is called a Fhir4 resource and a UserId and Annotations, it returns a new Record`() {
         // Given
@@ -700,31 +490,17 @@ class RecordServiceCreateRecordTest {
         val createdRecord: DecryptedFhir4Record<Fhir4Resource> = mockk()
         val receivedRecord: DecryptedFhir4Record<Fhir4Resource> = mockk(relaxed = true)
         val record: Fhir4Record<Fhir4Resource> = mockk()
-        val date = "now"
         val identifier = "id"
         val annotations: Annotations = mockk()
 
-        every { SdkDateTimeFormatter.now() } returns date
         every { createdRecord.resource } returns resource
         every { receivedRecord.resource } returns resource
         every { receivedRecord.identifier } returns identifier
 
         every {
-            anyConstructed<DecryptedRecordMapper>().setAnnotations(annotations)
-        } returns decryptedRecordMapper
+            recordService.fromResource(resource, annotations)
+        } returns Single.just(createdRecord)
 
-        every { taggingService.appendDefaultTags(resource, null) } returns tags
-        every { cryptoService.generateGCKey() } returns Single.just(dataKey)
-
-        every {
-            decryptedRecordMapper.build(
-                resource,
-                tags,
-                date,
-                dataKey,
-                CURRENT
-            )
-        } returns createdRecord
         every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
         every {
             apiService.createRecord(
@@ -761,16 +537,83 @@ class RecordServiceCreateRecordTest {
             recordService.createRecord(USER_ID, resource, annotations)
             recordService.checkDataRestrictions(resource)
             recordService.extractUploadData(resource)
-            taggingService.appendDefaultTags(resource, null)
-            SdkDateTimeFormatter.now()
-            cryptoService.generateGCKey()
-            decryptedRecordMapper.build(
-                resource,
-                tags,
-                date,
-                dataKey,
-                CURRENT
+            recordService.fromResource(resource, annotations)
+            recordService.uploadData(createdRecord, USER_ID)
+            recordService.removeUploadData(createdRecord)
+            recordService.encryptRecord(createdRecord)
+            apiService.createRecord(
+                ALIAS,
+                USER_ID,
+                encryptedRecord
             )
+            recordService.decryptRecord<Fhir4Resource>(encryptedRecord, USER_ID)
+            recordService.restoreUploadData(
+                receivedRecord,
+                resource,
+                null
+            )
+            resource.id = receivedRecord.identifier
+            RecordMapper.getInstance(receivedRecord)
+        }
+    }
+
+    // Arbitrary Data
+    @Test
+    fun `Given, createRecord is called with a DataResource and a UserId, it returns a new Record`() {
+        // Given
+        val resource: DataResource = mockk()
+        val createdRecord: DecryptedDataRecord = mockk()
+        val receivedRecord: DecryptedDataRecord = mockk(relaxed = true)
+        val record: DataRecord<DataResource> = mockk()
+
+        every { createdRecord.resource } returns resource
+        every { receivedRecord.resource } returns resource
+
+        every {
+            recordService.fromResource(resource, defaultAnnotation)
+        } returns Single.just(createdRecord)
+
+        every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
+        every {
+            apiService.createRecord(
+                ALIAS,
+                USER_ID,
+                encryptedRecord
+            )
+        } returns Single.just(encryptedRecord)
+        every {
+            recordService.decryptRecord<DataResource>(
+                encryptedRecord,
+                USER_ID
+            )
+        } returns receivedRecord
+
+        @Suppress("UNCHECKED_CAST")
+        every { RecordMapper.getInstance(receivedRecord) } returns record as BaseRecord<DataResource>
+
+        // When
+        val subscriber = recordService.createRecord(
+            USER_ID,
+            resource,
+            defaultAnnotation
+        ).test().await()
+
+        // Then
+        val result = subscriber
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
+
+        assertSame(
+            actual = result,
+            expected = record
+        )
+        verifyOrder {
+            recordService.createRecord(USER_ID, resource, defaultAnnotation)
+            recordService.checkDataRestrictions(resource)
+            recordService.extractUploadData(resource)
+            recordService.fromResource(resource, defaultAnnotation)
             recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
             recordService.encryptRecord(createdRecord)
@@ -785,9 +628,10 @@ class RecordServiceCreateRecordTest {
                 resource,
                 null
             )
-            resource.id = receivedRecord.identifier
             RecordMapper.getInstance(receivedRecord)
         }
+
+        verify(exactly = 0) { receivedRecord.identifier = any() }
     }
 
     @Test
@@ -797,29 +641,15 @@ class RecordServiceCreateRecordTest {
         val createdRecord: DecryptedDataRecord = mockk()
         val receivedRecord: DecryptedDataRecord = mockk(relaxed = true)
         val record: DataRecord<DataResource> = mockk()
-        val date = "now"
         val annotations: Annotations = mockk()
 
-        every { SdkDateTimeFormatter.now() } returns date
         every { createdRecord.resource } returns resource
         every { receivedRecord.resource } returns resource
 
         every {
-            anyConstructed<DecryptedRecordMapper>().setAnnotations(annotations)
-        } returns decryptedRecordMapper
+            recordService.fromResource(resource, annotations)
+        } returns Single.just(createdRecord)
 
-        every { taggingService.appendDefaultTags(resource, null) } returns tags
-        every { cryptoService.generateGCKey() } returns Single.just(dataKey)
-
-        every {
-            decryptedRecordMapper.build(
-                resource,
-                tags,
-                date,
-                dataKey,
-                CURRENT
-            )
-        } returns createdRecord
         every { recordService.encryptRecord(createdRecord) } returns encryptedRecord
         every {
             apiService.createRecord(
@@ -856,16 +686,7 @@ class RecordServiceCreateRecordTest {
             recordService.createRecord(USER_ID, resource, annotations)
             recordService.checkDataRestrictions(resource)
             recordService.extractUploadData(resource)
-            taggingService.appendDefaultTags(resource, null)
-            SdkDateTimeFormatter.now()
-            cryptoService.generateGCKey()
-            decryptedRecordMapper.build(
-                resource,
-                tags,
-                date,
-                dataKey,
-                CURRENT
-            )
+            recordService.fromResource(resource, annotations)
             recordService.uploadData(createdRecord, USER_ID)
             recordService.removeUploadData(createdRecord)
             recordService.encryptRecord(createdRecord)
@@ -886,6 +707,8 @@ class RecordServiceCreateRecordTest {
         verify(exactly = 0) { receivedRecord.identifier = any() }
     }
 
+    // Batch API
+    // FHIR3
     @Test
     fun `Given, createRecords is called with multiple Fhir3 resources and a UserId, it returns a multiple Records`() {
         val resources = listOf<Fhir3Resource>(

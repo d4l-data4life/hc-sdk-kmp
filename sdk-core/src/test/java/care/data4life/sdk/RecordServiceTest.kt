@@ -31,6 +31,7 @@ import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
@@ -67,10 +68,10 @@ import kotlin.test.assertTrue
 
 class RecordServiceTest {
     private lateinit var recordService: RecordService
-    private val apiService: ApiService = mockk()
+    private val apiService: NetworkingContract.Service = mockk()
     private val cryptoService: CryptoContract.Service = mockk()
-    private val fhirService: FhirContract.Service = mockk()
-    private val tagEncryptionService: TaggingContract.EncryptionService = mockk()
+    private val resourceCryptoService: FhirContract.CryptoService = mockk()
+    private val tagCryptoService: TaggingContract.CryptoService = mockk()
     private val taggingService: TaggingContract.Service = mockk()
     private val attachmentService: AttachmentContract.Service = mockk()
     private val errorHandler: SdkContract.ErrorHandler = mockk()
@@ -84,9 +85,9 @@ class RecordServiceTest {
                 PARTNER_ID,
                 ALIAS,
                 apiService,
-                tagEncryptionService,
+                tagCryptoService,
                 taggingService,
-                fhirService,
+                resourceCryptoService,
                 attachmentService,
                 cryptoService,
                 errorHandler,
@@ -338,7 +339,7 @@ class RecordServiceTest {
         // Given
         val expected: Completable = mockk()
 
-        every { apiService.deleteRecord(ALIAS, RECORD_ID, USER_ID) } returns expected
+        every { apiService.deleteRecord(ALIAS, USER_ID, RECORD_ID) } returns expected
 
         // When
         val actual = recordService.deleteRecord(userId = USER_ID, recordId = RECORD_ID)
@@ -349,7 +350,7 @@ class RecordServiceTest {
             expected = expected
         )
 
-        verify(exactly = 1) { apiService.deleteRecord(ALIAS, RECORD_ID, USER_ID) }
+        verify(exactly = 1) { apiService.deleteRecord(ALIAS, USER_ID, RECORD_ID) }
     }
 
     @Test
@@ -361,7 +362,7 @@ class RecordServiceTest {
             "2"
         )
 
-        every { apiService.deleteRecord(ALIAS, or(ids[0], ids[1]), USER_ID) } returns expected
+        every { apiService.deleteRecord(ALIAS, USER_ID, or(ids[0], ids[1])) } returns expected
 
         // When
         val subscriber = recordService.deleteRecords(userId = USER_ID, recordIds = ids)
@@ -385,7 +386,7 @@ class RecordServiceTest {
             expected = listOf()
         )
 
-        verify(exactly = 2) { apiService.deleteRecord(ALIAS, or(ids[0], ids[1]), USER_ID) }
+        verify(exactly = 2) { apiService.deleteRecord(ALIAS, USER_ID, or(ids[0], ids[1])) }
     }
 
     @Test

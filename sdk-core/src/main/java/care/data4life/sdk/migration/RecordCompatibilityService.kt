@@ -72,9 +72,7 @@ class RecordCompatibilityService internal constructor(
         return annotations.map { annotation ->
             Pair(
                 ANNOTATION_KEY + DELIMITER,
-                compatibilityEncoder.encode(annotation).copy(
-                    second = compatibilityEncoder.normalize(annotation)
-                )
+                compatibilityEncoder.encode(annotation).copy(second = annotation)
             )
         }.map { encodedTagGroup ->
             encryptTags(

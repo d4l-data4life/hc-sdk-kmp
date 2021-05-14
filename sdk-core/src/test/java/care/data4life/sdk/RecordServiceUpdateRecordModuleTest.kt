@@ -895,6 +895,128 @@ class RecordServiceUpdateRecordModuleTest {
         }
     }
 
+    @Test
+    fun `Given, updateFhir3Record is called with the appropriate payload with Annotations and Attachments, it return a updated Record, if the Record does not contain new Attachments`() {
+        // Given
+        val resourceType = "DocumentReference"
+        val tags = mapOf(
+            "partner" to PARTNER_ID,
+            "client" to CLIENT_ID,
+            "fhirversion" to "3.0.1",
+            "resourcetype" to resourceType
+        )
+
+        val annotations = listOf(
+            "wow",
+            "it",
+            "works",
+            "and",
+            "like_a_duracell_häsi"
+        )
+
+        val rawAttachment = TestResourceHelper.getByteResource("attachments", "sample.pdf")
+        val attachment = Base64.encodeToString(rawAttachment)
+
+        val template = TestResourceHelper.loadTemplate(
+            "common",
+            "documentReference-sdk-599-template",
+            RECORD_ID,
+            PARTNER_ID
+        )
+
+        val internalResource = SdkFhirParser.toFhir3(
+            resourceType,
+            template
+        ) as Fhir3DocumentReference
+
+        val resourceNew = SdkFhirParser.toFhir3(
+            resourceType,
+            template
+        ) as Fhir3DocumentReference
+
+        val resourceOld = SdkFhirParser.toFhir3(
+            resourceType,
+            template
+        ) as Fhir3DocumentReference
+
+        resourceOld.description = "A outdated mock"
+        resourceOld.content[0].attachment.data = null
+
+        /*
+        resourceNew.identifier = mutableListOf(
+            Fhir3Identifier().also {
+                it.value = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
+                it.assigner = Fhir3Reference().also { ref -> ref.reference = PARTNER_ID }
+            },
+            Fhir3Identifier().also {
+                it.value = ATTACHMENT_ID
+                it.assigner = Fhir3Reference().also { ref -> ref.reference = PARTNER_ID }
+            },
+            Fhir3Identifier().also { it.value = PREVIEW_ID },
+            Fhir3Identifier().also { it.value = THUMBNAIL_ID },
+            Fhir3Identifier().also { it.value = "AdditionalId" }
+        )
+
+        internalResource.identifier = mutableListOf(
+            Fhir3Identifier().also {
+                it.value = ATTACHMENT_ID
+                it.assigner = Fhir3Reference().also { ref -> ref.reference = PARTNER_ID }
+            },
+            Fhir3Identifier().also { it.value = PREVIEW_ID },
+            Fhir3Identifier().also { it.value = THUMBNAIL_ID },
+            Fhir3Identifier().also { it.value = "AdditionalId" }
+        )
+        internalResource.content[0].attachment.id = "$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"*/
+        // internalResource.content[0].attachment.data = null
+
+        runFhirFlow(
+            serializedResourceOld = SdkFhirParser.fromResource(resourceOld)!!,
+            serializedResourceNew = SdkFhirParser.fromResource(internalResource)!!,
+            tags = tags,
+            annotations = annotations,
+            updateDates = Pair(SdkDateTimeFormatter.now(), UPDATE_DATE)
+        )
+
+        // When
+        val result = recordService.updateRecord(
+            USER_ID,
+            RECORD_ID,
+            resourceNew,
+            annotations
+        ).blockingGet()
+
+        // Then
+        assertTrue(result is Record)
+        assertEquals(
+            expected = flowHelper.buildMeta(CREATION_DATE, UPDATE_DATE),
+            actual = result.meta
+        )
+        assertEquals(
+            actual = result.annotations,
+            expected = annotations
+        )
+        assertEquals(
+            expected = result.resource,
+            actual = result.resource
+        )
+        assertEquals(
+            actual = result.resource.content.size,
+            expected = 1
+        )
+        assertEquals(
+            actual = result.resource.content[0].attachment.data,
+            expected = attachment
+        )
+        assertEquals(
+            actual = result.resource.content[0].attachment.id,
+            expected = "$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
+        )
+        assertEquals(
+            actual = result.resource.identifier!!.size,
+            expected = 4
+        )
+    }
+
     // FHIR4
     @Test
     fun `Given, updateFhir4Record is called with the appropriate payload without Annotations or Attachments, it return a updated Record`() {

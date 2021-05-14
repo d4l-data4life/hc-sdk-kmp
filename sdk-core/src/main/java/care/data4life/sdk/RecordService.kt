@@ -17,6 +17,8 @@ package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.AttachmentContract
+import care.data4life.sdk.attachment.AttachmentGuardian
+import care.data4life.sdk.attachment.AttachmentHasher
 import care.data4life.sdk.attachment.ThumbnailService
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.call.DataRecord
@@ -63,8 +65,6 @@ import care.data4life.sdk.record.RecordContract.Service.Companion.THUMBNAIL_ID_P
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.util.Base64.decode
-import care.data4life.sdk.util.Base64.encodeToString
-import care.data4life.sdk.util.HashUtil.sha1
 import care.data4life.sdk.util.MimeType
 import care.data4life.sdk.util.MimeType.Companion.recognizeMimeType
 import care.data4life.sdk.wrapper.HelperContract
@@ -137,6 +137,8 @@ class RecordService internal constructor(
     private val attachmentFactory: WrapperFactoryContract.AttachmentFactory = SdkAttachmentFactory
     private val identifierFactory: WrapperFactoryContract.IdentifierFactory = SdkIdentifierFactory
     private val dateTimeFormatter: WrapperContract.DateTimeFormatter = SdkDateTimeFormatter
+    private val attachmentGuardian: AttachmentContract.Guardian = AttachmentGuardian
+    private val attachmentHash: AttachmentContract.Hasher = AttachmentHasher
 
     private fun isFhir3(resource: Any?): Boolean = resource is Fhir3Resource
     private fun isFhir4(resource: Any?): Boolean = resource is Fhir4Resource
@@ -912,6 +914,31 @@ class RecordService internal constructor(
         return record
     }
 
+    private fun determineUploadableAttachment(
+        rawNewAttachments: List<Any?>,
+        oldAttachments: MutableMap<String, WrapperContract.Attachment>,
+        validAttachments: MutableList<WrapperContract.Attachment>
+    ) {
+        for (rawNewAttachment in rawNewAttachments) {
+            if (rawNewAttachment != null) {
+                val newAttachment = attachmentFactory.wrap(rawNewAttachment)
+                attachmentGuardian.guardSize(newAttachment)
+
+                val oldAttachment = if(newAttachment.id == null) {
+                    attachmentGuardian.guardHash(newAttachment)
+                    null
+                } else {
+                    attachmentGuardian.guardIdAgainstExistingIds(newAttachment, oldAttachments.keys)
+                    oldAttachments[newAttachment.id]
+                }
+
+                if(attachmentGuardian.guardHash(newAttachment, oldAttachment)) {
+                    validAttachments.add(newAttachment)
+                }
+            }
+        }
+    }
+
     @Throws(
         DataValidationException.IdUsageViolation::class,
         DataValidationException.ExpectedFieldViolation::class,
@@ -931,54 +958,29 @@ class RecordService internal constructor(
             throw CoreRuntimeException.UnsupportedOperation()
         }
 
-        var resource = record.resource
-        if (!fhirAttachmentHelper.hasAttachment(resource)) return record
-        val attachments = fhirAttachmentHelper.getAttachment(resource) ?: listOf<Any>()
+        if (!fhirAttachmentHelper.hasAttachment(record.resource)) return record
+        val attachments = fhirAttachmentHelper.getAttachment(record.resource) ?: listOf<Any>()
 
         val validAttachments: MutableList<WrapperContract.Attachment> = mutableListOf()
-        val oldAttachments: HashMap<String?, WrapperContract.Attachment> = hashMapOf()
+        val oldAttachments: MutableMap<String, WrapperContract.Attachment> = mutableMapOf()
 
         for (rawAttachment in attachments) {
             if (rawAttachment != null) {
                 val attachment = attachmentFactory.wrap(rawAttachment)
 
                 if (attachment.id != null) {
-                    oldAttachments[attachment.id] = attachment
+                    oldAttachments[attachment.id!!] = attachment
                 }
             }
         }
 
-        resource = newResource
-        val newAttachments = fhirAttachmentHelper.getAttachment(newResource) ?: listOf<Any>()
+        determineUploadableAttachment(
+            fhirAttachmentHelper.getAttachment(newResource) ?: listOf<Any>(),
+            oldAttachments,
+            validAttachments
+        )
 
-        for (rawNewAttachment in newAttachments) {
-            if (rawNewAttachment != null) {
-                val newAttachment = attachmentFactory.wrap(rawNewAttachment)
-
-                when {
-                    newAttachment.hash == null || newAttachment.size == null ->
-                        throw DataValidationException.ExpectedFieldViolation(
-                            "Attachment.hash and Attachment.size expected"
-                        )
-                    getValidHash(newAttachment) != newAttachment.hash ->
-                        throw DataValidationException.InvalidAttachmentPayloadHash(
-                            "Attachment.hash is not valid"
-                        )
-                    newAttachment.id == null -> validAttachments.add(newAttachment)
-                    else -> {
-                        val oldAttachment = oldAttachments[newAttachment.id]
-                            ?: throw DataValidationException.IdUsageViolation(
-                                "Valid Attachment.id expected"
-                            )
-                        if (oldAttachment.hash == null || newAttachment.hash != oldAttachment.hash) {
-                            validAttachments.add(newAttachment)
-                        }
-                    }
-                }
-            }
-        }
-
-        uploadAttachmentsOnDemand(record, resource, validAttachments, userId)
+        uploadAttachmentsOnDemand(record, newResource, validAttachments, userId)
         return record
     }
 
@@ -1161,20 +1163,18 @@ class RecordService internal constructor(
         return parts
     }
 
-    private fun hashAttachmentData(data: ByteArray): String = encodeToString(sha1(data))
-
     // TODO move to AttachmentService
     fun updateAttachmentMeta(attachment: WrapperContract.Attachment): WrapperContract.Attachment {
         val data = decode(attachment.data!!)
         attachment.size = data.size
-        attachment.hash = hashAttachmentData(data)
+        attachment.hash = AttachmentHasher.hash(data)
         return attachment
     }
 
     // TODO move to AttachmentService
     internal fun getValidHash(attachment: WrapperContract.Attachment): String {
         val data = decode(attachment.data!!)
-        return hashAttachmentData(data)
+        return AttachmentHasher.hash(data)
     }
 
     // TODO: make it private

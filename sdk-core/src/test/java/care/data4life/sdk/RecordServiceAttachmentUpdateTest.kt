@@ -174,7 +174,7 @@ class RecordServiceAttachmentUpdateTest {
     }
 
     @Test
-    fun `Given, updateData is called with a DecryptedRecord, which contains a Fhir3Resource, a Fhir3 resource and a UserId, it fails, if the new attachment has no hash`() {
+    fun `Given, updateData is called with a DecryptedRecord, which contains a Fhir3Resource, a Fhir3 resource and a UserId, it determines its constrains`() {
         // Given
         val oldResource: Fhir3Resource = mockk()
         val newResource: Fhir3Resource = mockk()

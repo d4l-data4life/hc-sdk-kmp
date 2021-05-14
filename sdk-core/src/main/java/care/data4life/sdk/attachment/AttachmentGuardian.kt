@@ -55,9 +55,7 @@ object AttachmentGuardian : AttachmentContract.Guardian {
     private fun guardHashWithReference(
         attachment: WrapperContract.Attachment,
         hash: String
-    ) : Boolean {
-        return attachment.hash == null || attachment.hash != hash
-    }
+    ) : Boolean = attachment.hash != hash
 
     override fun guardHash(
         attachment: WrapperContract.Attachment,

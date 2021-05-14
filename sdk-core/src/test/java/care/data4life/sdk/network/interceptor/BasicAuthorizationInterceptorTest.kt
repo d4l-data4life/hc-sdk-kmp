@@ -51,7 +51,7 @@ class BasicAuthorizationInterceptorTest {
     }
 
     @Test
-    fun `Given intercept is called, it simply forwards the given chain, if no HEADER_AUTHORIZATION is present, proceeds with the Request and returns the Response`() {
+    fun `Given intercept is called, it simply forwards the given chain, if no HEADER_AUTHORIZATION is present,and proceeds with the Request and returns the Response`() {
         // Given
         val response: Response = mockk()
 
@@ -79,7 +79,7 @@ class BasicAuthorizationInterceptorTest {
     }
 
     @Test
-    fun `Given intercept is called, it simply forwards the given chain, AUTHORIZATION_WITH_BASIC_AUTH is present, proceeds with the Request and returns the Response`() {
+    fun `Given intercept is called, it simply forwards the given chain, if no AUTHORIZATION_WITH_BASIC_AUTH is present, and proceeds with the Request and returns the Response`() {
         // Given
         val response: Response = mockk()
 
@@ -107,7 +107,7 @@ class BasicAuthorizationInterceptorTest {
     }
 
     @Test
-    fun `Given intercept is called, it replaces HEADER_AUTHORIZATION, if AUTHORIZATION_WITH_BASIC_AUTH is present, proceeds with the Request and returns the Response`() {
+    fun `Given intercept is called, it replaces HEADER_AUTHORIZATION, if AUTHORIZATION_WITH_BASIC_AUTH is present, and proceeds with the Request and returns the Response`() {
         // Given
         val clientId = "me"
         val secret = "secret"

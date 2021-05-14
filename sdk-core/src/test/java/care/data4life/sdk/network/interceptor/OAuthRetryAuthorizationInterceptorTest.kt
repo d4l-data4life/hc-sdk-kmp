@@ -54,7 +54,7 @@ class OAuthRetryAuthorizationInterceptorTest {
     }
 
     @Test
-    fun `Given a interceptor was created and intercept was called, it resolves the Alias and if AUTHORIZATION_WITH_ACCESS_TOKEN is present, while forwarding the Request`() {
+    fun `Given a interceptor was created and intercept was called, it resolves the Alias, if AUTHORIZATION_WITH_ACCESS_TOKEN is present, while forwarding the Request`() {
         val response: Response = mockk()
         val chain: Interceptor.Chain = mockk()
         val request: Request = mockk()

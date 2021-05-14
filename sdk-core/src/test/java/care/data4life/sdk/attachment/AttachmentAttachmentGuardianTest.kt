@@ -72,6 +72,40 @@ class AttachmentAttachmentGuardianTest {
     }
 
     @Test
+    fun `Given, guardNonId is called with an Attachment, it fails with a DataValidationException#IdUsageViolation, if the AttachmentId is null`() {
+        // Given
+        val attachment: WrapperContract.Attachment = mockk()
+
+        every { attachment.id } returns null
+
+        // Then
+        val error = assertFailsWith<DataValidationException.IdUsageViolation> {
+            // When
+            AttachmentGuardian.guardNonNullId(attachment)
+        }
+
+        assertEquals(
+            actual = error.message,
+            expected = "Attachment.id expected"
+        )
+        verify(exactly = 1) { attachment.id }
+    }
+
+    @Test
+    fun `Given, guardNonId is called with an Attachment, it accepts, if the AttachmentId is not null`() {
+        // Given
+        val attachment: WrapperContract.Attachment = mockk()
+
+        every { attachment.id } returns "non null"
+
+        // When
+        AttachmentGuardian.guardNonNullId(attachment)
+
+        // Then
+        verify(exactly = 1) { attachment.id }
+    }
+
+    @Test
     fun `Given, guardIdAgainstExistingIds is called with an Attachment and a Set of ReferenceIds, it fails with a DataValidationException#IdUsageViolation, if the Attachment is not reflected by the ReferenceIds`() {
         // Given
         val attachment: WrapperContract.Attachment = mockk()

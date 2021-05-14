@@ -1003,7 +1003,7 @@ class RecordService internal constructor(
             if (rawAttachment != null) {
                 val attachment = attachmentFactory.wrap(rawAttachment)
 
-                attachmentGuardian.guardId(attachment)
+                attachmentGuardian.guardNonNullId(attachment)
 
                 attachments.add(attachment)
             }

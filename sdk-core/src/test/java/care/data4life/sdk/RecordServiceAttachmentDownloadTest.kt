@@ -183,7 +183,7 @@ class RecordServiceAttachmentDownloadTest {
         every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
         every { SdkAttachmentFactory.wrap(attachments[0]) } returns wrappedAttachment
 
-        every { AttachmentGuardian.guardId(wrappedAttachment) } just Runs
+        every { AttachmentGuardian.guardNonNullId(wrappedAttachment) } just Runs
 
         every {
             attachmentService.download(
@@ -203,7 +203,7 @@ class RecordServiceAttachmentDownloadTest {
         )
 
         verifyOrder {
-            AttachmentGuardian.guardId(wrappedAttachment)
+            AttachmentGuardian.guardNonNullId(wrappedAttachment)
             attachmentService.download(
                 listOf(wrappedAttachment),
                 attachmentKey,
@@ -238,7 +238,7 @@ class RecordServiceAttachmentDownloadTest {
         every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
         every { SdkAttachmentFactory.wrap(attachments[0]) } returns wrappedAttachment
 
-        every { AttachmentGuardian.guardId(wrappedAttachment) } just Runs
+        every { AttachmentGuardian.guardNonNullId(wrappedAttachment) } just Runs
 
         every { cryptoService.generateGCKey() } returns Single.just(attachmentKey)
         every { decryptedRecord.attachmentsKey = attachmentKey } returns Unit
@@ -261,7 +261,7 @@ class RecordServiceAttachmentDownloadTest {
         )
 
         verifyOrder {
-            AttachmentGuardian.guardId(wrappedAttachment)
+            AttachmentGuardian.guardNonNullId(wrappedAttachment)
             cryptoService.generateGCKey()
             decryptedRecord.attachmentsKey
             attachmentService.download(
@@ -296,7 +296,7 @@ class RecordServiceAttachmentDownloadTest {
         every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
         every { SdkAttachmentFactory.wrap(attachments[1]!!) } returns wrappedAttachment
 
-        every { AttachmentGuardian.guardId(wrappedAttachment) } just Runs
+        every { AttachmentGuardian.guardNonNullId(wrappedAttachment) } just Runs
 
         every { cryptoService.generateGCKey() } returns Single.just(attachmentKey)
         every { decryptedRecord.attachmentsKey = attachmentKey } returns Unit
@@ -319,7 +319,7 @@ class RecordServiceAttachmentDownloadTest {
         )
 
         verifyOrder {
-            AttachmentGuardian.guardId(wrappedAttachment)
+            AttachmentGuardian.guardNonNullId(wrappedAttachment)
             cryptoService.generateGCKey()
             decryptedRecord.attachmentsKey
             attachmentService.download(
@@ -412,7 +412,7 @@ class RecordServiceAttachmentDownloadTest {
         every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
         every { SdkAttachmentFactory.wrap(attachments[0]) } returns wrappedAttachment
 
-        every { AttachmentGuardian.guardId(wrappedAttachment) } just Runs
+        every { AttachmentGuardian.guardNonNullId(wrappedAttachment) } just Runs
 
         every {
             attachmentService.download(
@@ -432,7 +432,7 @@ class RecordServiceAttachmentDownloadTest {
         )
 
         verifyOrder {
-            AttachmentGuardian.guardId(wrappedAttachment)
+            AttachmentGuardian.guardNonNullId(wrappedAttachment)
             attachmentService.download(
                 listOf(wrappedAttachment),
                 attachmentKey,
@@ -467,7 +467,7 @@ class RecordServiceAttachmentDownloadTest {
         every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
         every { SdkAttachmentFactory.wrap(attachments[0]) } returns wrappedAttachment
 
-        every { AttachmentGuardian.guardId(wrappedAttachment) } just Runs
+        every { AttachmentGuardian.guardNonNullId(wrappedAttachment) } just Runs
 
         every { cryptoService.generateGCKey() } returns Single.just(attachmentKey)
         every { decryptedRecord.attachmentsKey = attachmentKey } returns Unit
@@ -490,7 +490,7 @@ class RecordServiceAttachmentDownloadTest {
         )
 
         verifyOrder {
-            AttachmentGuardian.guardId(wrappedAttachment)
+            AttachmentGuardian.guardNonNullId(wrappedAttachment)
             cryptoService.generateGCKey()
             decryptedRecord.attachmentsKey
             attachmentService.download(
@@ -525,7 +525,7 @@ class RecordServiceAttachmentDownloadTest {
         every { SdkFhirAttachmentHelper.getAttachment(resource) } returns attachments as MutableList<Any?>
         every { SdkAttachmentFactory.wrap(attachments[1]!!) } returns wrappedAttachment
 
-        every { AttachmentGuardian.guardId(wrappedAttachment) } just Runs
+        every { AttachmentGuardian.guardNonNullId(wrappedAttachment) } just Runs
 
         every { cryptoService.generateGCKey() } returns Single.just(attachmentKey)
         every { decryptedRecord.attachmentsKey = attachmentKey } returns Unit
@@ -548,7 +548,7 @@ class RecordServiceAttachmentDownloadTest {
         )
 
         verifyOrder {
-            AttachmentGuardian.guardId(wrappedAttachment)
+            AttachmentGuardian.guardNonNullId(wrappedAttachment)
             cryptoService.generateGCKey()
             decryptedRecord.attachmentsKey
             attachmentService.download(

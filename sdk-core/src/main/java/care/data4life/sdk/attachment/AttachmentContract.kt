@@ -86,6 +86,9 @@ class AttachmentContract {
         fun guardId(attachment: Attachment)
 
         @Throws(DataValidationException.IdUsageViolation::class)
+        fun guardNonNullId(attachment: Attachment)
+
+        @Throws(DataValidationException.IdUsageViolation::class)
         fun guardIdAgainstExistingIds(attachment: Attachment, referenceIds: Set<String>)
 
         @Throws(

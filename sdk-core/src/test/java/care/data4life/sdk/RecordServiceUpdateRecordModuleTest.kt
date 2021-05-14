@@ -896,6 +896,7 @@ class RecordServiceUpdateRecordModuleTest {
         }
     }
 
+    // see: https://gesundheitscloud.atlassian.net/browse/SDK-599
     @Test
     fun `Given, updateFhir3Record is called with the appropriate payload with Annotations and Attachments, it return a updated Record, if the Record does not contain new Attachments`() {
         // Given
@@ -1586,6 +1587,7 @@ class RecordServiceUpdateRecordModuleTest {
         }
     }
 
+    // see: https://gesundheitscloud.atlassian.net/browse/SDK-599
     @Test
     fun `Given, updateFhir4Record is called with the appropriate payload with Annotations and Attachments, it return a updated Record, if the Record does not contain new Attachments`() {
         // Given

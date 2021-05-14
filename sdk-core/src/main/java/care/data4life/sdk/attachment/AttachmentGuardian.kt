@@ -29,6 +29,12 @@ object AttachmentGuardian : AttachmentContract.Guardian {
         }
     }
 
+    override fun guardNonNullId(attachment: WrapperContract.Attachment) {
+        if (attachment.id == null) {
+            throw DataValidationException.IdUsageViolation("Attachment.id expected")
+        }
+    }
+
     override fun guardIdAgainstExistingIds(
         attachment: WrapperContract.Attachment,
         referenceIds: Set<String>

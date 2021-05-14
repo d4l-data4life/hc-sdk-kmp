@@ -22,6 +22,8 @@ toc::[]
 
 === Fixed
 
+* Nullpointer occurred while uploading a Records, which does not alter Attachments.
+
 === Bumped
 
 === Migration

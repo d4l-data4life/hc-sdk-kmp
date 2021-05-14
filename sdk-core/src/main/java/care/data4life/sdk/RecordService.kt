@@ -914,7 +914,7 @@ class RecordService internal constructor(
         return record
     }
 
-    private fun determineUploadableAttachment(
+    private fun determineUpdateableAttachment(
         rawNewAttachments: List<Any?>,
         oldAttachments: MutableMap<String, WrapperContract.Attachment>,
         validAttachments: MutableList<WrapperContract.Attachment>
@@ -925,7 +925,6 @@ class RecordService internal constructor(
                 attachmentGuardian.guardSize(newAttachment)
 
                 val oldAttachment = if(newAttachment.id == null) {
-                    attachmentGuardian.guardHash(newAttachment)
                     null
                 } else {
                     attachmentGuardian.guardIdAgainstExistingIds(newAttachment, oldAttachments.keys)
@@ -974,7 +973,7 @@ class RecordService internal constructor(
             }
         }
 
-        determineUploadableAttachment(
+        determineUpdateableAttachment(
             fhirAttachmentHelper.getAttachment(newResource) ?: listOf<Any>(),
             oldAttachments,
             validAttachments

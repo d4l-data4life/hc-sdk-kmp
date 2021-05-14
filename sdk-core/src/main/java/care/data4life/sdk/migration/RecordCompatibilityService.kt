@@ -38,7 +38,7 @@ class RecordCompatibilityService internal constructor(
     private fun encryptTags(
         tagEncryptionKey: GCKey,
         tagGroupKey: String,
-        tagOrGroup: List<String>
+        tagOrGroup: Triple<String, String, String>
     ): List<String> {
         return tagCryptoService.encryptList(
             tagOrGroup.toList(),
@@ -47,47 +47,29 @@ class RecordCompatibilityService internal constructor(
         )
     }
 
-    private fun addTags(
-        tagGroupKey: String,
-        tagOrGroup: Triple<String, String, String>,
-        tagEncryptionKey: GCKey,
-        builder: NetworkingContract.SearchTagsBuilder
-    ) {
-        builder.addOrTuple(
-            encryptTags(
-                tagEncryptionKey,
-                tagGroupKey,
-                tagOrGroup.toList()
-            )
-        )
-    }
-
     private fun mapTags(
         tags: Tags,
-        tagEncryptionKey: GCKey,
-        builder: NetworkingContract.SearchTagsBuilder
-    ) {
-        tags.map { tagGroup ->
+        tagEncryptionKey: GCKey
+    ): List<List<String>> {
+        return tags.map { tagGroup ->
             Pair(
                 tagGroup.key + DELIMITER,
                 compatibilityEncoder.encode(tagGroup.value)
             )
         }.map { encodedTagGroup ->
-            addTags(
-                encodedTagGroup.first,
-                encodedTagGroup.second,
+            encryptTags(
                 tagEncryptionKey,
-                builder
+                encodedTagGroup.first,
+                encodedTagGroup.second
             )
         }
     }
 
     private fun mapAnnotations(
         annotations: Annotations,
-        tagEncryptionKey: GCKey,
-        builder: NetworkingContract.SearchTagsBuilder
-    ) {
-        annotations.map { annotation ->
+        tagEncryptionKey: GCKey
+    ): List<List<String>> {
+        return annotations.map { annotation ->
             Pair(
                 ANNOTATION_KEY + DELIMITER,
                 compatibilityEncoder.encode(annotation).copy(
@@ -95,11 +77,10 @@ class RecordCompatibilityService internal constructor(
                 )
             )
         }.map { encodedTagGroup ->
-            addTags(
-                encodedTagGroup.first,
-                encodedTagGroup.second,
+            encryptTags(
                 tagEncryptionKey,
-                builder
+                encodedTagGroup.first,
+                encodedTagGroup.second
             )
         }
     }
@@ -111,8 +92,8 @@ class RecordCompatibilityService internal constructor(
         val builder = searchTagsBuilderBuilderFactory.newBuilder()
         val tagEncryptionKey = cryptoService.fetchTagEncryptionKey()
 
-        mapTags(tags, tagEncryptionKey, builder)
-        mapAnnotations(annotation, tagEncryptionKey, builder)
+        mapTags(tags, tagEncryptionKey).map { tagGroup -> builder.addOrTuple(tagGroup) }
+        mapAnnotations(annotation, tagEncryptionKey).map { tagGroup -> builder.addOrTuple(tagGroup) }
 
         return builder.seal()
     }

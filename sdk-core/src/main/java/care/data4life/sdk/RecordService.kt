@@ -868,6 +868,23 @@ class RecordService internal constructor(
         }
     }
 
+    private fun determineUploadableAttachment(
+        rawAttachments: List<Any?>,
+        validAttachments: MutableList<WrapperContract.Attachment>
+    ) {
+        for (rawAttachment in rawAttachments) {
+            if (rawAttachment != null) {
+
+                val attachment = attachmentFactory.wrap(rawAttachment)
+                attachmentGuardian.guardId(attachment)
+                attachmentGuardian.guardSize(attachment)
+                attachmentGuardian.guardHash(attachment)
+
+                validAttachments.add(attachment)
+            }
+        }
+    }
+
     @Throws(
         DataValidationException.IdUsageViolation::class,
         DataValidationException.ExpectedFieldViolation::class,
@@ -888,28 +905,8 @@ class RecordService internal constructor(
             ?: return record
 
         val validAttachments: MutableList<WrapperContract.Attachment> = arrayListOf()
-        for (rawAttachment in attachments) {
-            if (rawAttachment != null) {
 
-                val attachment = attachmentFactory.wrap(rawAttachment)
-
-                when {
-                    attachment.id != null ->
-                        throw DataValidationException.IdUsageViolation("Attachment.id should be null")
-
-                    attachment.hash == null || attachment.size == null ->
-                        throw DataValidationException.ExpectedFieldViolation(
-                            "Attachment.hash and Attachment.size expected"
-                        )
-                    getValidHash(attachment) != attachment.hash ->
-                        throw DataValidationException.InvalidAttachmentPayloadHash(
-                            "Attachment.hash is not valid"
-                        )
-                    else -> validAttachments.add(attachment)
-                }
-            }
-        }
-
+        determineUploadableAttachment(attachments, validAttachments)
         uploadAttachmentsOnDemand(record, resource, validAttachments, userId)
         return record
     }

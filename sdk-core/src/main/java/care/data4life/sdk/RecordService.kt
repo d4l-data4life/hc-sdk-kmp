@@ -1167,12 +1167,6 @@ class RecordService internal constructor(
         return attachment
     }
 
-    // TODO move to AttachmentService
-    internal fun getValidHash(attachment: WrapperContract.Attachment): String {
-        val data = decode(attachment.data!!)
-        return AttachmentHasher.hash(data)
-    }
-
     // TODO: make it private
     private fun <T : Any> assignResourceId(
         record: DecryptedBaseRecord<T>

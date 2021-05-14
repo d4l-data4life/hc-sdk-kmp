@@ -365,7 +365,6 @@ class RecordServiceAttachmentUploadTest {
         )
 
         verifyOrder {
-            recordService.getValidHash(wrappedAttachment)
             cryptoService.generateGCKey()
             decryptedRecord.attachmentsKey = attachmentKey
             attachmentService.upload(
@@ -636,7 +635,6 @@ class RecordServiceAttachmentUploadTest {
         )
 
         verifyOrder {
-            recordService.getValidHash(wrappedAttachment)
             cryptoService.generateGCKey()
             decryptedRecord.attachmentsKey = attachmentKey
             attachmentService.upload(

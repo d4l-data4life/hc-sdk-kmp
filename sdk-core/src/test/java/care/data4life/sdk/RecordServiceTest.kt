@@ -104,23 +104,6 @@ class RecordServiceTest {
     }
 
     @Test
-    fun `Given, getValidHash is called with a WrappedAttachment, which contains data, it returns a hash`() {
-        // Given
-        val attachment: WrapperContract.Attachment = mockk()
-
-        every { attachment.data } returns "dGVzdA==" // == test
-
-        // When
-        val hash = recordService.getValidHash(attachment)
-
-        //
-        assertEquals(
-            actual = hash,
-            expected = "qUqP5cyxm6YcTAhz05Hph5gvu9M="
-        )
-    }
-
-    @Test
     fun `Given, updateAttachmentMeta is called, with a Fhir3Attachment, it updates its meta information`() {
         // Given
         mockkObject(AttachmentHasher)

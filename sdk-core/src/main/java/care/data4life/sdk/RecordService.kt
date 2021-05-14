@@ -732,6 +732,7 @@ class RecordService internal constructor(
                 }
             }
 
+            // TODO: This is meaningless
             if (validAttachments.size != attachmentIds.size)
                 throw DataValidationException.IdUsageViolation("Please provide correct attachment ids!")
 
@@ -826,7 +827,7 @@ class RecordService internal constructor(
             return record
         }
 
-        // ToDo: This should not be done here, also should this not also resign Fhir onto Arbitrary Data?
+        // ToDo: This should not be done here
         record.resource = originalResource
 
         return if (attachmentData == null || !fhirAttachmentHelper.hasAttachment(record.resource)) {

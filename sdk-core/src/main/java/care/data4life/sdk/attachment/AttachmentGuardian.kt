@@ -24,7 +24,7 @@ object AttachmentGuardian : AttachmentContract.Guardian {
     private fun hash(data: String): String = AttachmentHasher.hash(Base64.decode(data))
 
     override fun guardId(attachment: WrapperContract.Attachment) {
-        if(attachment.id != null) {
+        if (attachment.id != null) {
             throw DataValidationException.IdUsageViolation("Attachment.id should be null")
         }
     }
@@ -33,7 +33,7 @@ object AttachmentGuardian : AttachmentContract.Guardian {
         attachment: WrapperContract.Attachment,
         referenceIds: Set<String>
     ) {
-        if(attachment.id !in referenceIds) {
+        if (attachment.id !in referenceIds) {
             throw DataValidationException.IdUsageViolation("Valid Attachment.id expected")
         }
     }
@@ -41,11 +41,11 @@ object AttachmentGuardian : AttachmentContract.Guardian {
     private fun guardHashWithoutReference(
         attachment: WrapperContract.Attachment,
         hash: String
-    ) : Boolean {
-        val data = attachment.data ?:
-        throw DataValidationException.ExpectedFieldViolation("Attachment.data expected")
+    ): Boolean {
+        val data = attachment.data
+            ?: throw DataValidationException.ExpectedFieldViolation("Attachment.data expected")
 
-        if(hash(data) != hash) {
+        if (hash(data) != hash) {
             throw DataValidationException.InvalidAttachmentPayloadHash("Attachment.hash is not valid")
         }
 
@@ -55,16 +55,16 @@ object AttachmentGuardian : AttachmentContract.Guardian {
     private fun guardHashWithReference(
         attachment: WrapperContract.Attachment,
         hash: String
-    ) : Boolean = attachment.hash != hash
+    ): Boolean = attachment.hash != hash
 
     override fun guardHash(
         attachment: WrapperContract.Attachment,
         reference: WrapperContract.Attachment?
-    ) : Boolean {
-        val hash = attachment.hash ?:
-            throw DataValidationException.ExpectedFieldViolation("Attachment.hash expected")
+    ): Boolean {
+        val hash = attachment.hash
+            ?: throw DataValidationException.ExpectedFieldViolation("Attachment.hash expected")
 
-        return if(reference is WrapperContract.Attachment) {
+        return if (reference is WrapperContract.Attachment) {
             guardHashWithReference(reference, hash)
         } else {
             guardHashWithoutReference(attachment, hash)
@@ -72,7 +72,7 @@ object AttachmentGuardian : AttachmentContract.Guardian {
     }
 
     override fun guardSize(attachment: WrapperContract.Attachment) {
-        if(attachment.size == null) {
+        if (attachment.size == null) {
             throw DataValidationException.ExpectedFieldViolation("Attachment.size expected")
         }
     }

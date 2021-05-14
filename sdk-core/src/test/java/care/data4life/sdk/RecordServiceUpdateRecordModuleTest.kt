@@ -68,6 +68,7 @@ import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
 import care.data4life.fhir.r4.model.Reference as Fhir4Reference
@@ -689,8 +690,8 @@ class RecordServiceUpdateRecordModuleTest {
             expected = annotations
         )
         assertEquals(
-            expected = result.resource,
-            actual = result.resource
+            expected = SdkFhirParser.fromResource(result.resource),
+            actual = SdkFhirParser.fromResource(resourceNew)
         )
         assertEquals(
             actual = result.resource.content.size,
@@ -804,8 +805,8 @@ class RecordServiceUpdateRecordModuleTest {
             expected = annotations
         )
         assertEquals(
-            expected = result.resource,
-            actual = result.resource
+            expected = SdkFhirParser.fromResource(result.resource),
+            actual = SdkFhirParser.fromResource(resourceNew)
         )
         assertEquals(
             actual = result.resource.content.size,
@@ -914,9 +915,6 @@ class RecordServiceUpdateRecordModuleTest {
             "like_a_duracell_häsi"
         )
 
-        val rawAttachment = TestResourceHelper.getByteResource("attachments", "sample.pdf")
-        val attachment = Base64.encodeToString(rawAttachment)
-
         val template = TestResourceHelper.loadTemplate(
             "common",
             "documentReference-sdk-599-template",
@@ -940,34 +938,6 @@ class RecordServiceUpdateRecordModuleTest {
         ) as Fhir3DocumentReference
 
         resourceOld.description = "A outdated mock"
-        resourceOld.content[0].attachment.data = null
-
-        /*
-        resourceNew.identifier = mutableListOf(
-            Fhir3Identifier().also {
-                it.value = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
-                it.assigner = Fhir3Reference().also { ref -> ref.reference = PARTNER_ID }
-            },
-            Fhir3Identifier().also {
-                it.value = ATTACHMENT_ID
-                it.assigner = Fhir3Reference().also { ref -> ref.reference = PARTNER_ID }
-            },
-            Fhir3Identifier().also { it.value = PREVIEW_ID },
-            Fhir3Identifier().also { it.value = THUMBNAIL_ID },
-            Fhir3Identifier().also { it.value = "AdditionalId" }
-        )
-
-        internalResource.identifier = mutableListOf(
-            Fhir3Identifier().also {
-                it.value = ATTACHMENT_ID
-                it.assigner = Fhir3Reference().also { ref -> ref.reference = PARTNER_ID }
-            },
-            Fhir3Identifier().also { it.value = PREVIEW_ID },
-            Fhir3Identifier().also { it.value = THUMBNAIL_ID },
-            Fhir3Identifier().also { it.value = "AdditionalId" }
-        )
-        internalResource.content[0].attachment.id = "$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"*/
-        // internalResource.content[0].attachment.data = null
 
         runFhirFlow(
             serializedResourceOld = SdkFhirParser.fromResource(resourceOld)!!,
@@ -996,25 +966,26 @@ class RecordServiceUpdateRecordModuleTest {
             expected = annotations
         )
         assertEquals(
-            expected = result.resource,
-            actual = result.resource
+            expected = SdkFhirParser.fromResource(result.resource),
+            actual = SdkFhirParser.fromResource(resourceNew)
         )
         assertEquals(
             actual = result.resource.content.size,
-            expected = 1
+            expected = 2
         )
-        assertEquals(
-            actual = result.resource.content[0].attachment.data,
-            expected = attachment
-        )
+        assertNull(result.resource.content[0].attachment.data)
         assertEquals(
             actual = result.resource.content[0].attachment.id,
-            expected = "$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
+            expected = resourceOld.content[0].attachment.id
         )
+
+        assertNull(result.resource.content[1].attachment.data)
         assertEquals(
-            actual = result.resource.identifier!!.size,
-            expected = 4
+            actual = result.resource.content[1].attachment.id,
+            expected = resourceOld.content[1].attachment.id
         )
+
+        assertNull(result.resource.identifier)
     }
 
     // FHIR4
@@ -1256,8 +1227,8 @@ class RecordServiceUpdateRecordModuleTest {
             expected = annotations
         )
         assertEquals(
-            expected = result.resource,
-            actual = result.resource
+            expected = SdkFhirParser.fromResource(result.resource),
+            actual = SdkFhirParser.fromResource(resourceNew)
         )
         assertEquals(
             actual = result.resource.content.size,
@@ -1371,8 +1342,8 @@ class RecordServiceUpdateRecordModuleTest {
             expected = annotations
         )
         assertEquals(
-            expected = result.resource,
-            actual = result.resource
+            expected = SdkFhirParser.fromResource(result.resource),
+            actual = SdkFhirParser.fromResource(resourceNew)
         )
         assertEquals(
             actual = result.resource.content.size,
@@ -1613,5 +1584,97 @@ class RecordServiceUpdateRecordModuleTest {
                 listOf()
             ).blockingGet()
         }
+    }
+
+    @Test
+    fun `Given, updateFhir4Record is called with the appropriate payload with Annotations and Attachments, it return a updated Record, if the Record does not contain new Attachments`() {
+        // Given
+        val resourceType = "DocumentReference"
+        val tags = mapOf(
+            "partner" to PARTNER_ID,
+            "client" to CLIENT_ID,
+            "fhirversion" to "4.0.1",
+            "resourcetype" to resourceType
+        )
+
+        val annotations = listOf(
+            "wow",
+            "it",
+            "works",
+            "and",
+            "like_a_duracell_häsi"
+        )
+
+        val template = TestResourceHelper.loadTemplate(
+            "common",
+            "documentReference-sdk-599-template",
+            RECORD_ID,
+            PARTNER_ID
+        )
+
+        val internalResource = SdkFhirParser.toFhir4(
+            resourceType,
+            template
+        ) as Fhir4DocumentReference
+
+        val resourceNew = SdkFhirParser.toFhir4(
+            resourceType,
+            template
+        ) as Fhir4DocumentReference
+
+        val resourceOld = SdkFhirParser.toFhir4(
+            resourceType,
+            template
+        ) as Fhir4DocumentReference
+
+        resourceOld.description = "A outdated mock"
+
+        runFhirFlow(
+            serializedResourceOld = SdkFhirParser.fromResource(resourceOld)!!,
+            serializedResourceNew = SdkFhirParser.fromResource(internalResource)!!,
+            tags = tags,
+            annotations = annotations,
+            updateDates = Pair(SdkDateTimeFormatter.now(), UPDATE_DATE)
+        )
+
+        // When
+        val result = recordService.updateRecord(
+            USER_ID,
+            RECORD_ID,
+            resourceNew,
+            annotations
+        ).blockingGet()
+
+        // Then
+        assertTrue(result is Fhir4Record)
+        assertEquals(
+            expected = flowHelper.buildMeta(CREATION_DATE, UPDATE_DATE),
+            actual = result.meta
+        )
+        assertEquals(
+            actual = result.annotations,
+            expected = annotations
+        )
+        assertEquals(
+            expected = SdkFhirParser.fromResource(result.resource),
+            actual = SdkFhirParser.fromResource(resourceNew)
+        )
+        assertEquals(
+            actual = result.resource.content.size,
+            expected = 2
+        )
+        assertNull(result.resource.content[0].attachment.data)
+        assertEquals(
+            actual = result.resource.content[0].attachment.id,
+            expected = resourceOld.content[0].attachment.id
+        )
+
+        assertNull(result.resource.content[1].attachment.data)
+        assertEquals(
+            actual = result.resource.content[1].attachment.id,
+            expected = resourceOld.content[1].attachment.id
+        )
+
+        assertNull(result.resource.identifier)
     }
 }

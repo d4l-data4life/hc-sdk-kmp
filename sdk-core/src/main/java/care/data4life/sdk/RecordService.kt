@@ -921,14 +921,14 @@ class RecordService internal constructor(
                 val newAttachment = attachmentFactory.wrap(rawNewAttachment)
                 attachmentGuardian.guardSize(newAttachment)
 
-                val oldAttachment = if(newAttachment.id == null) {
+                val oldAttachment = if (newAttachment.id == null) {
                     null
                 } else {
                     attachmentGuardian.guardIdAgainstExistingIds(newAttachment, oldAttachments.keys)
                     oldAttachments[newAttachment.id]
                 }
 
-                if(attachmentGuardian.guardHash(newAttachment, oldAttachment)) {
+                if (attachmentGuardian.guardHash(newAttachment, oldAttachment)) {
                     validAttachments.add(newAttachment)
                 }
             }
@@ -1003,8 +1003,7 @@ class RecordService internal constructor(
             if (rawAttachment != null) {
                 val attachment = attachmentFactory.wrap(rawAttachment)
 
-                attachment.id
-                    ?: throw DataValidationException.IdUsageViolation("Attachment.id expected")
+                attachmentGuardian.guardId(attachment)
 
                 attachments.add(attachment)
             }

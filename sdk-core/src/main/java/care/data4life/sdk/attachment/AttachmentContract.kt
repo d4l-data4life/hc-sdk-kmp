@@ -92,7 +92,7 @@ class AttachmentContract {
             DataValidationException.ExpectedFieldViolation::class,
             DataValidationException.InvalidAttachmentPayloadHash::class
         )
-        fun guardHash(attachment: Attachment, reference: Attachment? = null) : Boolean
+        fun guardHash(attachment: Attachment, reference: Attachment? = null): Boolean
 
         @Throws(DataValidationException.ExpectedFieldViolation::class)
         fun guardSize(attachment: Attachment)

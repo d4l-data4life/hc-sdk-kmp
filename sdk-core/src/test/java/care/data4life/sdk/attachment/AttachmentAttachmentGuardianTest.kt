@@ -23,11 +23,11 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
+import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import org.junit.Test
 
 class AttachmentAttachmentGuardianTest {
     @Test
@@ -52,7 +52,7 @@ class AttachmentAttachmentGuardianTest {
 
         assertEquals(
             actual = error.message,
-            expected =  "Attachment.id should be null"
+            expected = "Attachment.id should be null"
         )
         verify(exactly = 1) { attachment.id }
     }
@@ -160,7 +160,6 @@ class AttachmentAttachmentGuardianTest {
         every { attachment.data } returns "dGVzdA=="
         every { attachment.hash } returns "123456789"
         every { AttachmentHasher.hash("test".toByteArray()) } returns "NotValid"
-
 
         // Then
         val error = assertFailsWith<DataValidationException.InvalidAttachmentPayloadHash> {
@@ -303,7 +302,7 @@ class AttachmentAttachmentGuardianTest {
 
         every { attachment.size } returns 42
 
-         // When
+        // When
         AttachmentGuardian.guardSize(attachment)
 
         // Then

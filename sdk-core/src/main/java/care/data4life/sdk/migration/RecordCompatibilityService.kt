@@ -90,8 +90,8 @@ class RecordCompatibilityService internal constructor(
         val builder = searchTagsBuilderBuilderFactory.newBuilder()
         val tagEncryptionKey = cryptoService.fetchTagEncryptionKey()
 
-        mapTags(tags, tagEncryptionKey).map { tagGroup -> builder.addOrTuple(tagGroup) }
-        mapAnnotations(annotation, tagEncryptionKey).map { tagGroup -> builder.addOrTuple(tagGroup) }
+        mapTags(tags, tagEncryptionKey).forEach { tagGroup -> builder.addOrTuple(tagGroup) }
+        mapAnnotations(annotation, tagEncryptionKey).forEach { tagGroup -> builder.addOrTuple(tagGroup) }
 
         return builder.seal()
     }

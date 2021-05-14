@@ -111,6 +111,7 @@ class ApiServiceTest {
     @After
     fun tearDown() {
         unmockkObject(IHCServiceFactory)
+        unmockkObject(ClientFactory)
     }
 
     @Test

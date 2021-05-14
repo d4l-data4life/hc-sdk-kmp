@@ -111,6 +111,7 @@ class NetworkingContract {
         INGESTION("ingestion")
     }
 
+    // TODO: make this a functional interface
     interface NetworkConnectivityService {
         val isConnected: Boolean
     }

@@ -88,6 +88,16 @@ interface NetworkingContract {
         override fun intercept(chain: okhttp3.Interceptor.Chain): Response
     }
 
+    interface InterceptorFactory<T : Any> {
+        fun getInstance(payload: T): Interceptor
+    }
+
+    enum class Clients(val identifier: String) {
+        ANDROID("android"),
+        JAVA("jvm"),
+        INGESTION("ingestion")
+    }
+
     interface CertificatePinnerFactory {
         fun getInstance(baseUrl: String, pin: String): CertificatePinner
     }
@@ -128,13 +138,13 @@ interface NetworkingContract {
         const val HEADER_ACCESS_TOKEN = "access_token"
         const val HEADER_AUTHORIZATION = "Authorization"
         const val HEADER_BASIC_AUTH = "basic_auth"
-        const val HEADER_GC_SDK_VERSION = "GC-SDK-Version"
+        const val HEADER_SDK_VERSION = "d4l-sdk-version"
+        const val FORMAT_CLIENT_VERSION = "%s-%s"
         const val HEADER_TOTAL_COUNT = "x-total-count"
         const val PARAM_FILE_NUMBER = "file_number"
         const val PARAM_TEK = "tek"
         const val FORMAT_BEARER_TOKEN = "Bearer %s"
         const val FORMAT_BASIC_AUTH = "Basic %s"
-        const val FORMAT_ANDROID_CLIENT_NAME = "Android %s"
         const val MEDIA_TYPE_OCTET_STREAM = "application/octet-stream"
         const val HTTP_401_UNAUTHORIZED = 401
         const val AUTHORIZATION_WITH_ACCESS_TOKEN = "Authorization: access_token"

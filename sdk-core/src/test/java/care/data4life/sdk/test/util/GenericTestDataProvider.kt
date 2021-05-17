@@ -121,4 +121,8 @@ object GenericTestDataProvider {
         .parseLenient()
         .appendPattern(DATE_TIME_FORMAT)
         .toFormatter(Locale.US)
+
+    const val AUTH_TOKEN = "authToken"
+
+    const val DOCUMENT_ID = "docID"
 }

@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.network
 
-import care.data4life.auth.AuthorizationService
+import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.lang.D4LRuntimeException
 import care.data4life.sdk.network.NetworkingContract.Companion.PARAM_TEK
 import care.data4life.sdk.network.model.CommonKeyResponse
@@ -59,7 +59,7 @@ import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class ApiServiceTest {
-    private val authService: AuthorizationService = mockk()
+    private val authService: AuthorizationContract.Service = mockk()
     private val env: NetworkingContract.Environment = mockk(relaxed = true)
     private val ihcService: IHCService = mockk()
     private lateinit var service: NetworkingContract.Service
@@ -503,7 +503,7 @@ class ApiServiceTest {
     }
 
     @Test
-    fun `Given, logout is called with an Alias, it resolves the accessToken, delegates it with the Alias to the IHCService and resturns its result`() {
+    fun `Given, logout is called with an Alias, it resolves the accessToken, delegates it with the Alias to the IHCService and returns its result`() {
         // Given
         val alias = ALIAS
         val token = "token"

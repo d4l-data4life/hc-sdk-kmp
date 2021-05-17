@@ -33,6 +33,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import okhttp3.CertificatePinner
+import okhttp3.HttpUrl
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -173,6 +174,7 @@ class ApiService constructor(
         return service!!.fetchCommonKey(alias, userId, commonKeyId)
     }
 
+    // TODO: Is this method even in use?
     override fun uploadTagEncryptionKey(
         alias: String,
         userId: String,
@@ -409,5 +411,11 @@ class ApiService constructor(
      */
     init {
         configureService()
+    }
+
+    // TODO: This is a test concern and will be removed soon
+    fun resetService(client: OkHttpClient, baseUrl: HttpUrl) {
+        this.client = client
+        this.service = createService(baseUrl.toString())
     }
 }

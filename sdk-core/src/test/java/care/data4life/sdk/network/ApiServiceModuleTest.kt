@@ -20,7 +20,7 @@ import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.NetworkConnectivityService
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
-import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_GC_SDK_VERSION
+import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_SDK_VERSION
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_TOTAL_COUNT
 import care.data4life.sdk.network.model.CommonKeyResponse
 import care.data4life.sdk.network.model.DocumentUploadResponse
@@ -81,6 +81,7 @@ class ApiServiceModuleTest {
             secret,
             "not important",
             TestConnection(true),
+            NetworkingContract.Clients.ANDROID,
             clientName,
             false
         )
@@ -154,8 +155,8 @@ class ApiServiceModuleTest {
             expected = "Bearer $authToken"
         )
         assertEquals(
-            actual = request.headers[HEADER_GC_SDK_VERSION],
-            expected = "Android $clientName"
+            actual = request.headers[HEADER_SDK_VERSION],
+            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
         )
         assertEquals(
             actual = request.method,
@@ -209,6 +210,10 @@ class ApiServiceModuleTest {
             expected = "Bearer $authToken"
         )
         assertEquals(
+            actual = request.headers[HEADER_SDK_VERSION],
+            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+        )
+        assertEquals(
             actual = request.method,
             expected = "POST"
         )
@@ -256,6 +261,10 @@ class ApiServiceModuleTest {
             expected = "/users/$userId/records/$recordId"
         )
         assertNull(request.headers[HEADER_ALIAS])
+        assertEquals(
+            actual = request.headers[HEADER_SDK_VERSION],
+            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+        )
         assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],
             expected = "Bearer $authToken"
@@ -307,6 +316,10 @@ class ApiServiceModuleTest {
             expected = "/users/$userId/records/$recordId"
         )
         assertNull(request.headers[HEADER_ALIAS])
+        assertEquals(
+            actual = request.headers[HEADER_SDK_VERSION],
+            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+        )
         assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],
             expected = "Bearer $authToken"
@@ -372,6 +385,10 @@ class ApiServiceModuleTest {
         )
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
+            actual = request.headers[HEADER_SDK_VERSION],
+            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+        )
+        assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],
             expected = "Bearer $authToken"
         )
@@ -432,6 +449,10 @@ class ApiServiceModuleTest {
         )
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
+            actual = request.headers[HEADER_SDK_VERSION],
+            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+        )
+        assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],
             expected = "Bearer $authToken"
         )
@@ -467,6 +488,10 @@ class ApiServiceModuleTest {
             expected = "/users/$userId/records/$recordId"
         )
         assertNull(request.headers[HEADER_ALIAS])
+        assertEquals(
+            actual = request.headers[HEADER_SDK_VERSION],
+            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+        )
         assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],
             expected = "Bearer $authToken"
@@ -511,6 +536,10 @@ class ApiServiceModuleTest {
         )
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
+            actual = request.headers[HEADER_SDK_VERSION],
+            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+        )
+        assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],
             expected = "Bearer $authToken"
         )
@@ -547,6 +576,10 @@ class ApiServiceModuleTest {
             expected = "/users/$userId/documents/$documentId"
         )
         assertNull(request.headers[HEADER_ALIAS])
+        assertEquals(
+            actual = request.headers[HEADER_SDK_VERSION],
+            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+        )
         assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],
             expected = "Bearer $authToken"
@@ -632,6 +665,10 @@ class ApiServiceModuleTest {
         )
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
+            actual = request.headers[HEADER_SDK_VERSION],
+            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+        )
+        assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],
             expected = "Bearer $authToken"
         )
@@ -676,6 +713,10 @@ class ApiServiceModuleTest {
         assertNull(request.headers[HEADER_ALIAS])
         assertNull(request.headers[HEADER_AUTHORIZATION])
         assertEquals(
+            actual = request.headers[HEADER_SDK_VERSION],
+            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+        )
+        assertEquals(
             actual = request.method,
             expected = "GET"
         )
@@ -712,6 +753,10 @@ class ApiServiceModuleTest {
         assertEquals(
             actual = request.headers[HEADER_ALIAS],
             expected = alias
+        )
+        assertEquals(
+            actual = request.headers[HEADER_SDK_VERSION],
+            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
         )
         assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],

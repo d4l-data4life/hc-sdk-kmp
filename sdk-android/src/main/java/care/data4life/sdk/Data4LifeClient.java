@@ -40,6 +40,7 @@ import care.data4life.sdk.listener.Callback;
 import care.data4life.sdk.network.ApiService;
 import care.data4life.sdk.network.Environment;
 import care.data4life.sdk.tag.TagCryptoService;
+import care.data4life.sdk.network.NetworkingContract;
 import care.data4life.sdk.tag.TaggingService;
 import care.data4life.securestore.SecureStore;
 import care.data4life.securestore.SecureStoreCryptor;
@@ -171,7 +172,17 @@ public final class Data4LifeClient extends BaseClient {
 
         NetworkConnectivityService connectivityService = new NetworkConnectivityServiceAndroid(context);
 
-        ApiService apiService = new ApiService(authorizationService, environment, clientId, clientSecret, platform, connectivityService, BuildConfig.VERSION_NAME, debug);
+        ApiService apiService = new ApiService(
+                authorizationService,
+                environment,
+                clientId,
+                clientSecret,
+                platform,
+                connectivityService,
+                NetworkingContract.Clients.ANDROID,
+                BuildConfig.VERSION_NAME,
+                debug
+        );
         CryptoService cryptoService = new CryptoService(initConfig.getAlias(), store);
         TagCryptoService tagEncryptionService = new TagCryptoService(cryptoService);
         //noinspection KotlinInternalInJava

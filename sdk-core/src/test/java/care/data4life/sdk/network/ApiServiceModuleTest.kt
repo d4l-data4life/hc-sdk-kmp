@@ -71,7 +71,7 @@ class ApiServiceModuleTest {
     fun setUp() {
         server = MockWebServer()
 
-        every { env.getApiBaseURL(any()) } returns "https://www.i-hate-fat-constructors.com"
+        every { env.getApiBaseURL(any()) } returns "https://www.example.com"
         every { env.getCertificatePin(any()) } returns NetworkingContract.DATA4LIFE_CARE
 
         service = ApiService(

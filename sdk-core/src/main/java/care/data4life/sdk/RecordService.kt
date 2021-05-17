@@ -297,12 +297,17 @@ class RecordService internal constructor(
         endDate: LocalDate?,
         pageSize: Int,
         offset: Int
-    ): Single<List<BaseRecord<T>>> = TODO() /*{
+    ): Single<List<BaseRecord<T>>> {
         val startTime = if (startDate != null) dateTimeFormatter.formatDate(startDate) else null
         val endTime = if (endDate != null) dateTimeFormatter.formatDate(endDate) else null
 
         return Observable
-            .fromCallable { taggingService.getTagsFromType(resourceType) }
+            .fromCallable {
+                compatibilityService.resolveSearchTags(
+                    taggingService.getTagsFromType(resourceType),
+                    annotations
+                )
+            }
             .flatMap { tags ->
                 apiService.searchRecords(
                     alias,
@@ -311,16 +316,15 @@ class RecordService internal constructor(
                     endTime,
                     pageSize,
                     offset,
-                    tags,
-                    annotations
+                    tags
                 )
             }
             .flatMapIterable { it }
             .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
             .map { decryptedRecord -> assignResourceId(decryptedRecord) }
             .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) }
-            .toList() as Single<List<BaseRecord<T>>>
-    }*/
+            .toList()
+    }
 
     fun <T : Fhir3Resource> fetchFhir3Records(
         userId: String,
@@ -510,12 +514,18 @@ class RecordService internal constructor(
         type: Class<out Any>,
         userId: String,
         annotations: Annotations
-    ): Single<Int> = TODO()/*compatibilityService.countRecords(
-        alias,
-        userId,
-        taggingService.getTagsFromType(type),
-        annotations
-    )*/
+    ): Single<Int> {
+        val searchTags = compatibilityService.resolveSearchTags(
+            taggingService.getTagsFromType(type),
+            annotations
+        )
+
+        return apiService.countRecord(
+            alias,
+            userId,
+            searchTags
+        )
+    }
 
     @JvmOverloads
     @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")

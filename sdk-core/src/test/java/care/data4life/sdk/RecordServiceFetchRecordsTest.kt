@@ -317,7 +317,7 @@ class RecordServiceFetchRecordsTest {
     @Test
     fun `Given, fetchFhir3Records called with a UserId, a ResourceType, a nulled StartDate, a nulled EndDate, the PageSize and Offset, it returns List of Records`() {
         // Given
-        /*mockkObject(SdkDateTimeFormatter)
+        mockkObject(SdkDateTimeFormatter)
 
         val resource1: Fhir3CarePlan = mockk()
         val id1 = "id1"
@@ -332,6 +332,7 @@ class RecordServiceFetchRecordsTest {
         val offset = 42
         val pageSize = 23
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
+        val searchTags: NetworkingContract.SearchTags = mockk()
 
         every {
             hint(Fhir3CarePlan::class)
@@ -347,16 +348,17 @@ class RecordServiceFetchRecordsTest {
         every { decryptedRecord2.annotations } returns defaultAnnotation
 
         every { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
+        every { compatibilityService.resolveSearchTags(tags, defaultAnnotation) } returns searchTags
+
         every {
-            compatibilityService.searchRecords(
+            apiService.searchRecords(
                 ALIAS,
                 USER_ID,
                 null,
                 null,
                 pageSize,
                 offset,
-                tags,
-                defaultAnnotation
+                searchTags
             )
         } returns Observable.fromArray(encryptedRecords)
         every {
@@ -409,15 +411,15 @@ class RecordServiceFetchRecordsTest {
                 offset
             )
             taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>)
-            compatibilityService.searchRecords(
+            compatibilityService.resolveSearchTags(tags, defaultAnnotation)
+            apiService.searchRecords(
                 ALIAS,
                 USER_ID,
                 null,
                 null,
                 pageSize,
                 offset,
-                tags,
-                defaultAnnotation
+                searchTags
             )
             recordService.decryptRecord<Fhir3CarePlan>(
                 encryptedRecord1,
@@ -434,13 +436,13 @@ class RecordServiceFetchRecordsTest {
         }
         verify(exactly = 0) { SdkDateTimeFormatter.formatDate(any()) }
 
-        unmockkObject(SdkDateTimeFormatter)*/
+        unmockkObject(SdkDateTimeFormatter)
     }
 
     @Test
     fun `Given, fetchFhir3Records called with a UserId, a ResourceType, a StartDate, a EndDate, the PageSize and Offset, it returns List of Records`() {
         // Given
-        /*mockkObject(SdkDateTimeFormatter)
+        mockkObject(SdkDateTimeFormatter)
 
         val resource1: Fhir3CarePlan = mockk()
         val id1 = "id1"
@@ -459,6 +461,7 @@ class RecordServiceFetchRecordsTest {
         val offset = 42
         val pageSize = 23
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
+        val searchTags: NetworkingContract.SearchTags = mockk()
 
         every {
             hint(Fhir3CarePlan::class)
@@ -476,17 +479,19 @@ class RecordServiceFetchRecordsTest {
 
         every { SdkDateTimeFormatter.formatDate(startDate) } returns start
         every { SdkDateTimeFormatter.formatDate(endDate) } returns end
+
         every { taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>) } returns tags
+        every { compatibilityService.resolveSearchTags(tags, defaultAnnotation) } returns searchTags
+
         every {
-            compatibilityService.searchRecords(
+            apiService.searchRecords(
                 ALIAS,
                 USER_ID,
                 start,
                 end,
                 pageSize,
                 offset,
-                tags,
-                defaultAnnotation
+                searchTags
             )
         } returns Observable.fromArray(encryptedRecords)
 
@@ -542,15 +547,15 @@ class RecordServiceFetchRecordsTest {
             SdkDateTimeFormatter.formatDate(startDate)
             SdkDateTimeFormatter.formatDate(endDate)
             taggingService.getTagsFromType(Fhir3CarePlan::class.java as Class<Any>)
-            compatibilityService.searchRecords(
+            compatibilityService.resolveSearchTags(tags, defaultAnnotation)
+            apiService.searchRecords(
                 ALIAS,
                 USER_ID,
                 start,
                 end,
                 pageSize,
                 offset,
-                tags,
-                defaultAnnotation
+                searchTags
             )
             recordService.decryptRecord<Fhir3CarePlan>(
                 encryptedRecord1,
@@ -566,13 +571,13 @@ class RecordServiceFetchRecordsTest {
             RecordMapper.getInstance(decryptedRecord2)
         }
 
-        unmockkObject(SdkDateTimeFormatter)*/
+        unmockkObject(SdkDateTimeFormatter)
     }
 
     @Test
     fun `Given, fetchFhir4Records called with a UserId, a ResourceType, a nulled StartDate, a nulled EndDate, the PageSize and Offset, it returns List of Fhir4Records`() {
         // Given
-        /*mockkObject(SdkDateTimeFormatter)
+        mockkObject(SdkDateTimeFormatter)
 
         val resource1: Fhir4CarePlan = mockk()
         val id1 = "id1"
@@ -587,6 +592,7 @@ class RecordServiceFetchRecordsTest {
         val offset = 42
         val pageSize = 23
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
+        val searchTags: NetworkingContract.SearchTags = mockk()
 
         every {
             hint(Fhir4CarePlan::class)
@@ -600,16 +606,17 @@ class RecordServiceFetchRecordsTest {
         every { decryptedRecord2.identifier } returns id2
 
         every { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
+        every { compatibilityService.resolveSearchTags(tags, defaultAnnotation) } returns searchTags
+
         every {
-            compatibilityService.searchRecords(
+            apiService.searchRecords(
                 ALIAS,
                 USER_ID,
                 null,
                 null,
                 pageSize,
                 offset,
-                tags,
-                defaultAnnotation
+                searchTags
             )
         } returns Observable.fromArray(encryptedRecords)
         every { decryptedRecord1.annotations } returns defaultAnnotation
@@ -656,15 +663,15 @@ class RecordServiceFetchRecordsTest {
 
         verifyOrder {
             taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>)
-            compatibilityService.searchRecords(
+            compatibilityService.resolveSearchTags(tags, defaultAnnotation)
+            apiService.searchRecords(
                 ALIAS,
                 USER_ID,
                 null,
                 null,
                 pageSize,
                 offset,
-                tags,
-                defaultAnnotation
+                searchTags
             )
             recordService.decryptRecord<Fhir4CarePlan>(
                 encryptedRecord1,
@@ -681,13 +688,13 @@ class RecordServiceFetchRecordsTest {
         }
         verify(exactly = 0) { SdkDateTimeFormatter.formatDate(any()) }
 
-        unmockkObject(SdkDateTimeFormatter)*/
+        unmockkObject(SdkDateTimeFormatter)
     }
 
     @Test
     fun `Given, fetchFhir4Records called with a UserId, a ResourceType, a StartDate, a EndDate, the PageSize and Offset, it returns List of Fhir4Records`() {
         // Given
-        /*mockkObject(SdkDateTimeFormatter)
+        mockkObject(SdkDateTimeFormatter)
 
         val resource1: Fhir4CarePlan = mockk()
         val id1 = "id1"
@@ -706,6 +713,7 @@ class RecordServiceFetchRecordsTest {
         val offset = 42
         val pageSize = 23
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
+        val searchTags: NetworkingContract.SearchTags = mockk()
 
         every {
             hint(Fhir4CarePlan::class)
@@ -723,17 +731,19 @@ class RecordServiceFetchRecordsTest {
 
         every { SdkDateTimeFormatter.formatDate(startDate) } returns start
         every { SdkDateTimeFormatter.formatDate(endDate) } returns end
+
         every { taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>) } returns tags
+        every { compatibilityService.resolveSearchTags(tags, defaultAnnotation) } returns searchTags
+
         every {
-            compatibilityService.searchRecords(
+            apiService.searchRecords(
                 ALIAS,
                 USER_ID,
                 start,
                 end,
                 pageSize,
                 offset,
-                tags,
-                defaultAnnotation
+                searchTags
             )
         } returns Observable.fromArray(encryptedRecords)
 
@@ -790,15 +800,15 @@ class RecordServiceFetchRecordsTest {
             SdkDateTimeFormatter.formatDate(startDate)
             SdkDateTimeFormatter.formatDate(endDate)
             taggingService.getTagsFromType(Fhir4CarePlan::class.java as Class<Any>)
-            compatibilityService.searchRecords(
+            compatibilityService.resolveSearchTags(tags, defaultAnnotation)
+            apiService.searchRecords(
                 ALIAS,
                 USER_ID,
                 start,
                 end,
                 pageSize,
                 offset,
-                tags,
-                defaultAnnotation
+                searchTags
             )
             recordService.decryptRecord<Fhir4CarePlan>(
                 encryptedRecord1,
@@ -814,6 +824,6 @@ class RecordServiceFetchRecordsTest {
             RecordMapper.getInstance(decryptedRecord2)
         }
 
-        unmockkObject(SdkDateTimeFormatter)*/
+        unmockkObject(SdkDateTimeFormatter)
     }
 }

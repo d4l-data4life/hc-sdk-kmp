@@ -74,3 +74,31 @@ dependencies {
     testImplementation(Dependencies.Java.Test.okHttpMockWebServer)
     testImplementation(Dependencies.Java.Test.jsonAssert)
 }
+
+val templatesPath = "${projectDir}/src/main/resources/templates"
+val configPath = "${projectDir}/src/main/java/care/data4life/sdk/config"
+
+val provideConfig: Task by tasks.creating {
+    doFirst {
+        val templates = File(templatesPath)
+        val configs = File(configPath)
+
+        if (!templates.exists()) templates.mkdirs()
+        val config = File(templates, "SDKConfig.tmpl")
+            .readText()
+            .replace("SDK_VERSION", version.toString())
+
+        if (!configs.exists()) templates.mkdirs()
+        File(configPath, "SDKConfig.kt").writeText(config)
+    }
+}
+
+tasks.named("compileKotlin") {
+    dependsOn(provideConfig)
+}
+
+tasks.named("clean") {
+    doLast {
+        delete("${configPath}/SDKConfig.kt")
+    }
+}

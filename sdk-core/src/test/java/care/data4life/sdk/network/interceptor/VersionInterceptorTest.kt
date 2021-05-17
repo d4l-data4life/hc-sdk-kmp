@@ -17,7 +17,7 @@
 package care.data4life.sdk.network.interceptor
 
 import care.data4life.sdk.network.NetworkingContract
-import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_GC_SDK_VERSION
+import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_SDK_VERSION
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -70,7 +70,7 @@ class VersionInterceptorTest {
         every { request.newBuilder() } returns builder
         every {
             builder.addHeader(
-                HEADER_GC_SDK_VERSION,
+                HEADER_SDK_VERSION,
                 version
             )
         } returns builder
@@ -95,7 +95,7 @@ class VersionInterceptorTest {
 
         verify(exactly = 1) {
             builder.addHeader(
-                HEADER_GC_SDK_VERSION,
+                HEADER_SDK_VERSION,
                 version
             )
         }
@@ -120,7 +120,7 @@ class VersionInterceptorTest {
         every { request.newBuilder() } returns builder
         every {
             builder.addHeader(
-                HEADER_GC_SDK_VERSION,
+                HEADER_SDK_VERSION,
                 version
             )
         } returns builder
@@ -145,7 +145,7 @@ class VersionInterceptorTest {
 
         verify(exactly = 1) {
             builder.addHeader(
-                HEADER_GC_SDK_VERSION,
+                HEADER_SDK_VERSION,
                 version
             )
         }
@@ -169,7 +169,7 @@ class VersionInterceptorTest {
         every { request.newBuilder() } returns builder
         every {
             builder.addHeader(
-                HEADER_GC_SDK_VERSION,
+                HEADER_SDK_VERSION,
                 version
             )
         } returns builder
@@ -194,7 +194,7 @@ class VersionInterceptorTest {
 
         verify(exactly = 1) {
             builder.addHeader(
-                HEADER_GC_SDK_VERSION,
+                HEADER_SDK_VERSION,
                 version
             )
         }

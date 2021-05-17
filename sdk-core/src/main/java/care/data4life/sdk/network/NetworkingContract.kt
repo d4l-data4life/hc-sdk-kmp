@@ -149,7 +149,7 @@ interface NetworkingContract {
         const val HEADER_AUTHORIZATION = "Authorization"
         const val ACCESS_TOKEN_MARKER = "access_token"
         const val BASIC_AUTH_MARKER = "basic_auth"
-        const val HEADER_GC_SDK_VERSION = "gc-sdk-version"
+        const val HEADER_SDK_VERSION = "d4l-sdk-version"
         const val FORMAT_CLIENT_VERSION = "%s-%s"
         const val HEADER_TOTAL_COUNT = "x-total-count"
         const val PARAM_FILE_NUMBER = "file_number"

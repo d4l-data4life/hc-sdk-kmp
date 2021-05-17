@@ -54,7 +54,7 @@ class EncryptedRecordTest {
         val moshi = Moshi.Builder()
             .add(EncryptedKeyTypeAdapter())
             .build()
-        val adapter = moshi.adapter<EncryptedRecord>(EncryptedRecord::class.java)
+        val adapter = moshi.adapter(EncryptedRecord::class.java)
 
         assertEquals(
             expected = ENCRYPTED_RECORD_JSON,
@@ -72,7 +72,7 @@ class EncryptedRecordTest {
         val moshi = Moshi.Builder()
             .add(EncryptedKeyTypeAdapter())
             .build()
-        val adapter = moshi.adapter<EncryptedRecord>(EncryptedRecord::class.java)
+        val adapter = moshi.adapter(EncryptedRecord::class.java)
 
         assertEquals(
             actual = ENCRYPTED_RECORD,

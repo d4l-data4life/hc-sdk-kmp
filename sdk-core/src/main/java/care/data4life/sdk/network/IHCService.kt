@@ -44,6 +44,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface IHCService {
+    // Key
     @GET("/users/{userId}/commonkeys/{commonKeyId}")
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
     fun fetchCommonKey(
@@ -60,12 +61,30 @@ interface IHCService {
         @Body params: Map<String, String>
     ): Completable
 
+    // Record
     @POST("/users/{userId}/records")
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
     fun createRecord(
         @Header(HEADER_ALIAS) alias: String,
         @Path("userId") userId: String,
         @Body encryptedRecord: EncryptedRecord
+    ): Single<EncryptedRecord>
+
+    @PUT("/users/{userId}/records/{recordId}")
+    @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
+    fun updateRecord(
+        @Header(HEADER_ALIAS) alias: String,
+        @Path("userId") userId: String,
+        @Path("recordId") recordId: String,
+        @Body encryptedRecord: EncryptedRecord
+    ): Single<EncryptedRecord>
+
+    @GET("/users/{userId}/records/{recordId}")
+    @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
+    fun fetchRecord(
+        @Header(HEADER_ALIAS) alias: String,
+        @Path("userId") userId: String,
+        @Path("recordId") recordId: String
     ): Single<EncryptedRecord>
 
     // FIXME validate if startDate, endDate, pageSize and offset are nullable
@@ -89,14 +108,6 @@ interface IHCService {
         @Query("tags") tags: String
     ): Single<Response<Void>>
 
-    @GET("/users/{userId}/records/{recordId}")
-    @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
-    fun fetchRecord(
-        @Header(HEADER_ALIAS) alias: String,
-        @Path("userId") userId: String,
-        @Path("recordId") recordId: String
-    ): Single<EncryptedRecord>
-
     @DELETE("/users/{userId}/records/{recordId}")
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
     fun deleteRecord(
@@ -105,15 +116,7 @@ interface IHCService {
         @Path("recordId") recordId: String
     ): Completable
 
-    @PUT("/users/{userId}/records/{recordId}")
-    @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
-    fun updateRecord(
-        @Header(HEADER_ALIAS) alias: String,
-        @Path("userId") userId: String,
-        @Path("recordId") recordId: String,
-        @Body encryptedRecord: EncryptedRecord
-    ): Single<EncryptedRecord>
-
+    // Attachments
     @POST("/users/{userId}/documents")
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN, HEADER_CONTENT_TYPE_OCTET_STREAM)
     fun uploadDocument(
@@ -138,6 +141,7 @@ interface IHCService {
         @Path("documentId") documentId: String
     ): Single<Void>
 
+    // Misc
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
     @GET("/userinfo")
     fun fetchUserInfo(

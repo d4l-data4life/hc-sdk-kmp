@@ -124,10 +124,7 @@ class BasicAuthorizationInterceptorTest {
         every { request.header(HEADER_AUTHORIZATION) } returns BASIC_AUTH_MARKER
         every { request.newBuilder() } returns builder
         every {
-            builder.removeHeader(HEADER_AUTHORIZATION)
-        } returns builder
-        every {
-            builder.addHeader(HEADER_AUTHORIZATION, "Basic $credential")
+            builder.header(HEADER_AUTHORIZATION, "Basic $credential")
         } returns builder
         every {
             builder.build()
@@ -148,8 +145,7 @@ class BasicAuthorizationInterceptorTest {
             chain.request()
             request.header(HEADER_AUTHORIZATION)
             request.newBuilder()
-            builder.removeHeader(HEADER_AUTHORIZATION)
-            builder.addHeader(HEADER_AUTHORIZATION, "Basic $credential")
+            builder.header(HEADER_AUTHORIZATION, "Basic $credential")
             builder.build()
             chain.proceed(modifiedRequest)
         }

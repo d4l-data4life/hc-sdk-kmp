@@ -47,7 +47,7 @@ class OAuthRetryAuthorizationInterceptorTest {
     }
 
     @Test
-    fun `It fulfils ParialInterceptor`() {
+    fun `It fulfils PartialInterceptor`() {
         val interceptor: Any = OAuthRetryTokenAuthorizationInterceptor(service)
 
         assertTrue(interceptor is NetworkingContract.PartialInterceptor<*>)
@@ -100,10 +100,7 @@ class OAuthRetryAuthorizationInterceptorTest {
 
         every { request.newBuilder() } returns builder
         every {
-            builder.removeHeader(NetworkingContract.HEADER_AUTHORIZATION)
-        } returns builder
-        every {
-            builder.addHeader(NetworkingContract.HEADER_AUTHORIZATION, "Bearer $token")
+            builder.header(NetworkingContract.HEADER_AUTHORIZATION, "Bearer $token")
         } returns builder
         every {
             builder.build()
@@ -123,8 +120,7 @@ class OAuthRetryAuthorizationInterceptorTest {
 
         verifyOrder {
             service.refreshAccessToken(alias)
-            builder.removeHeader(NetworkingContract.HEADER_AUTHORIZATION)
-            builder.addHeader(NetworkingContract.HEADER_AUTHORIZATION, "Bearer $token")
+            builder.header(NetworkingContract.HEADER_AUTHORIZATION, "Bearer $token")
             chain.proceed(modifiedRequest)
         }
     }

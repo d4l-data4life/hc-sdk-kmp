@@ -64,10 +64,7 @@ class OAuthFetchTokenAuthorizationInterceptorTest {
 
         every { request.newBuilder() } returns builder
         every {
-            builder.removeHeader(HEADER_AUTHORIZATION)
-        } returns builder
-        every {
-            builder.addHeader(HEADER_AUTHORIZATION, "Bearer $token")
+            builder.header(HEADER_AUTHORIZATION, "Bearer $token")
         } returns builder
         every {
             builder.build()
@@ -89,8 +86,7 @@ class OAuthFetchTokenAuthorizationInterceptorTest {
         verifyOrder {
             service.getAccessToken(alias)
             request.newBuilder()
-            builder.removeHeader(HEADER_AUTHORIZATION)
-            builder.addHeader(HEADER_AUTHORIZATION, "Bearer $token")
+            builder.header(HEADER_AUTHORIZATION, "Bearer $token")
             builder.build()
             chain.proceed(modifiedRequest)
         }

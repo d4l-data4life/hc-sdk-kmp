@@ -53,10 +53,7 @@ class StaticAuthorizationInterceptorTest {
         every { request.newBuilder() } returns builder
         every { builder.removeHeader(HEADER_ALIAS) } returns builder
         every {
-            builder.removeHeader(HEADER_AUTHORIZATION)
-        } returns builder
-        every {
-            builder.addHeader(HEADER_AUTHORIZATION, "Bearer $token")
+            builder.header(HEADER_AUTHORIZATION, "Bearer $token")
         } returns builder
         every {
             builder.build()
@@ -75,8 +72,7 @@ class StaticAuthorizationInterceptorTest {
 
         verifyOrder {
             builder.removeHeader(HEADER_ALIAS)
-            builder.removeHeader(HEADER_AUTHORIZATION)
-            builder.addHeader(HEADER_AUTHORIZATION, "Bearer $token")
+            builder.header(NetworkingContract.HEADER_AUTHORIZATION, "Bearer $token")
             builder.build()
         }
     }

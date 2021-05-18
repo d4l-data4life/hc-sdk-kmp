@@ -16,6 +16,8 @@ toc::[]
 
 === Added
 
+* LegacyEncoding for Javascript.
+
 === Changed
 
 === Removed

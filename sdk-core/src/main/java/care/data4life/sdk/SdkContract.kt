@@ -270,7 +270,7 @@ interface SdkContract {
     }
 
     companion object {
-        const val VERSION = "1.10.0"
+        const val VERSION = "1.12.0"
     }
 
     /**

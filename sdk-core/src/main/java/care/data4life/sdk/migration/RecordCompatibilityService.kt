@@ -26,6 +26,11 @@ import care.data4life.sdk.tag.TaggingContract.Companion.ANNOTATION_KEY
 import care.data4life.sdk.tag.TaggingContract.Companion.DELIMITER
 import care.data4life.sdk.tag.Tags
 
+private data class OrGroupEntry(
+    val key: String,
+    val orGroup: Triple<String, String, String>
+)
+
 // see: https://gesundheitscloud.atlassian.net/browse/SDK-572
 // see: https://gesundheitscloud.atlassian.net/browse/SDK-525
 @Migration("This class should only be used due to migration purpose.")
@@ -37,13 +42,12 @@ class RecordCompatibilityService internal constructor(
 ) : MigrationContract.CompatibilityService {
     private fun encryptTags(
         tagEncryptionKey: GCKey,
-        tagGroupKey: String,
-        tagOrGroup: Triple<String, String, String>
+        tagGroupEntry: OrGroupEntry
     ): List<String> {
         return tagCryptoService.encryptList(
-            tagOrGroup.toList(),
+            tagGroupEntry.orGroup.toList(),
             tagEncryptionKey,
-            tagGroupKey
+            tagGroupEntry.key
         )
     }
 
@@ -52,15 +56,14 @@ class RecordCompatibilityService internal constructor(
         tagEncryptionKey: GCKey
     ): List<List<String>> {
         return tags.map { tagGroup ->
-            Pair(
+            OrGroupEntry(
                 tagGroup.key + DELIMITER,
                 compatibilityEncoder.encode(tagGroup.value)
             )
         }.map { encodedTagGroup ->
             encryptTags(
                 tagEncryptionKey,
-                encodedTagGroup.first,
-                encodedTagGroup.second
+                encodedTagGroup
             )
         }
     }
@@ -70,15 +73,14 @@ class RecordCompatibilityService internal constructor(
         tagEncryptionKey: GCKey
     ): List<List<String>> {
         return annotations.map { annotation ->
-            Pair(
+            OrGroupEntry(
                 ANNOTATION_KEY + DELIMITER,
                 compatibilityEncoder.encode(annotation).copy(second = annotation)
             )
         }.map { encodedTagGroup ->
             encryptTags(
                 tagEncryptionKey,
-                encodedTagGroup.first,
-                encodedTagGroup.second
+                encodedTagGroup
             )
         }
     }

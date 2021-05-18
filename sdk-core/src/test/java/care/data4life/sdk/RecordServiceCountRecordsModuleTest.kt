@@ -22,6 +22,7 @@ import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.fhir.ResourceCryptoService
 import care.data4life.sdk.network.NetworkingContract
+import care.data4life.sdk.network.util.SearchTagsBuilder
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TagCryptoService
@@ -85,23 +86,21 @@ class RecordServiceCountRecordsModuleTest {
     private fun runFlow(
         tags: Tags,
         annotations: Annotations = emptyList(),
-        amounts: Pair<Int, Int>,
+        amount: Int,
         alias: String = ALIAS,
         userId: String = USER_ID,
         tagEncryptionKey: GCKey = this.tagEncryptionKey
     ) {
-        val (encodedTags, legacyTags) = flowHelper.prepareCompatibilityTags(tags)
-        val (encodedAnnotations, legacyAnnotations) = flowHelper.prepareCompatibilityAnnotations(
+        val (encodedTags, legacyKMPTags, legacyJSTags) = flowHelper.prepareCompatibilityTags(tags)
+        val (encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations) = flowHelper.prepareCompatibilityAnnotations(
             annotations
         )
 
-        val encryptedTagsAndAnnotations = flowHelper.hashAndEncodeTagsAndAnnotations(
-            flowHelper.mergeTags(encodedTags, encodedAnnotations)
-        )
-
-        val encryptedLegacyTagsAndAnnotations = flowHelper.hashAndEncodeTagsAndAnnotations(
-            flowHelper.mergeTags(legacyTags, legacyAnnotations)
-        )
+        val searchTags = SearchTagsBuilder.newBuilder()
+            .let { flowHelper.buildExpectedTagGroups(it, encodedTags, legacyKMPTags, legacyJSTags) }
+            .let { flowHelper.buildExpectedTagGroups(it, encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations) }
+            .seal()
+            .tags
 
         val receivedIteration = CryptoServiceIteration(
             gcKeyOrder = emptyList(),
@@ -117,32 +116,35 @@ class RecordServiceCountRecordsModuleTest {
             tagEncryptionKey = tagEncryptionKey,
             tagEncryptionKeyCalls = 1,
             resources = emptyList(),
-            tags = flowHelper.mergeTags(encodedTags, legacyTags),
-            annotations = flowHelper.mergeTags(encodedAnnotations, legacyAnnotations),
+            tags = flowHelper.mergeTags(encodedTags, legacyKMPTags, legacyJSTags),
+            annotations = flowHelper.mergeTags(encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations),
             hashFunction = { value -> flowHelper.md5(value) }
         )
 
         (cryptoService as CryptoServiceFake).iteration = receivedIteration
 
-        val search = slot<String>()
+        val search = slot<NetworkingContract.SearchTags>()
 
         every {
-            apiService.getCount(
+            apiService.countRecords(
                 alias,
                 userId,
                 capture(search)
             )
         } answers {
-            val actual = search.captured
-            val amount = when {
-                flowHelper.compareSerialisedTags(actual, encryptedTagsAndAnnotations) -> amounts.first
-                flowHelper.compareSerialisedTags(actual, encryptedLegacyTagsAndAnnotations) -> amounts.second
-                else -> throw RuntimeException(
-                    "Unexpected tags and annotations:\n$actual"
+            val actual = flowHelper.decryptSerializedTags(
+                search.captured.tags,
+                cryptoService,
+                tagEncryptionKey
+            )
+
+            if (searchTags == actual) {
+                Single.just(amount)
+            } else {
+                throw RuntimeException(
+                    "Unexpected tags and annotations - \nexpected: $searchTags\ngot: $actual"
                 )
             }
-
-            Single.just(amount)
         }
     }
 
@@ -158,7 +160,7 @@ class RecordServiceCountRecordsModuleTest {
 
         runFlow(
             tags = tags,
-            amounts = Pair(21, 21)
+            amount = 42
         )
 
         // When
@@ -195,7 +197,7 @@ class RecordServiceCountRecordsModuleTest {
         runFlow(
             tags = tags,
             annotations = annotations,
-            amounts = Pair(12, 11)
+            amount = 23
         )
 
         // When
@@ -223,7 +225,7 @@ class RecordServiceCountRecordsModuleTest {
 
         runFlow(
             tags = tags,
-            amounts = Pair(21, 21)
+            amount = 42
         )
 
         // When
@@ -260,7 +262,7 @@ class RecordServiceCountRecordsModuleTest {
         runFlow(
             tags = tags,
             annotations = annotations,
-            amounts = Pair(12, 11)
+            amount = 23
         )
 
         // When
@@ -295,7 +297,7 @@ class RecordServiceCountRecordsModuleTest {
         runFlow(
             tags = tags,
             annotations = annotations,
-            amounts = Pair(12, 11)
+            amount = 23
         )
 
         // When
@@ -323,7 +325,7 @@ class RecordServiceCountRecordsModuleTest {
 
         runFlow(
             tags = tags,
-            amounts = Pair(23, 23)
+            amount = 46
         )
 
         // When
@@ -360,7 +362,7 @@ class RecordServiceCountRecordsModuleTest {
         runFlow(
             tags = tags,
             annotations = annotations,
-            amounts = Pair(12, 11)
+            amount = 23
         )
 
         // When

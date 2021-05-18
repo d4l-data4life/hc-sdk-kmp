@@ -58,10 +58,10 @@ interface NetworkingContract {
             endDate: String?,
             pageSize: Int,
             offset: Int,
-            tags: String
+            tags: SearchTags
         ): Observable<List<EncryptedRecord>>
 
-        fun getCount(alias: String, userId: String, tags: String): Single<Int>
+        fun countRecords(alias: String, userId: String, tags: SearchTags): Single<Int>
 
         fun deleteRecord(alias: String, recordId: String, userId: String): Completable
 
@@ -136,6 +136,19 @@ interface NetworkingContract {
 
     interface EnvironmentFactory {
         fun fromName(name: String?): Environment
+    }
+
+    interface SearchTagsBuilder {
+        fun addOrTuple(tuple: List<String>): SearchTagsBuilder
+        fun seal(): SearchTags
+    }
+
+    interface SearchTags {
+        val tags: String
+    }
+
+    interface SearchTagsBuilderFactory {
+        fun newBuilder(): SearchTagsBuilder
     }
 
     companion object {

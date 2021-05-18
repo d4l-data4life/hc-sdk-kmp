@@ -16,34 +16,34 @@
 
 package care.data4life.sdk.migration
 
-import care.data4life.sdk.network.model.NetworkModelContract
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.Tags
-import io.reactivex.Observable
-import io.reactivex.Single
 
 @Retention(AnnotationRetention.SOURCE)
 @MustBeDocumented
 annotation class Migration(val message: String)
 
-interface MigrationContract {
+class MigrationContract {
     interface CompatibilityService {
-        fun searchRecords(
-            alias: String,
-            userId: String,
-            startDate: String?,
-            endDate: String?,
-            pageSize: Int,
-            offSet: Int,
+        fun resolveSearchTags(
             tags: Tags,
-            annotations: Annotations
-        ): Observable<List<NetworkModelContract.EncryptedRecord>>
+            annotation: Annotations
+        ): NetworkingContract.SearchTags
+    }
 
-        fun countRecords(
-            alias: String,
-            userId: String,
-            tags: Tags,
-            annotations: Annotations
-        ): Single<Int>
+    internal interface CompatibilityEncoder {
+        fun encode(tagValue: String): Triple<String, String, String>
+        fun normalize(tagValue: String): String
+
+        companion object {
+            val JS_LEGACY_ENCODING_REPLACEMENTS = mapOf(
+                "%2A" to "%2a",
+                "%2D" to "%2d",
+                "%2E" to "%2e",
+                "%5F" to "%5f",
+                "%7E" to "%7e"
+            )
+        }
     }
 }

@@ -32,7 +32,6 @@ import org.threeten.bp.LocalDate
 
 interface RecordContract {
     interface Service {
-
         fun createRecord(
             userId: String,
             resource: DataResource,

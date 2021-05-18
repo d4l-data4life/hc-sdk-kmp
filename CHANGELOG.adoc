@@ -32,6 +32,10 @@ toc::[]
 
 * LegacyEncoding for Javascript.
 
+=== Changed
+
+* The clients sending now the correct version of the SDK.
+
 === Fixed
 
 * Nullpointer occurred while uploading a Records, which does not alter Attachments.

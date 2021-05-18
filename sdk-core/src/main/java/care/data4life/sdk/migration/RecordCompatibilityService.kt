@@ -19,138 +19,82 @@ package care.data4life.sdk.migration
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.network.NetworkingContract
-import care.data4life.sdk.network.model.NetworkModelContract.EncryptedRecord
+import care.data4life.sdk.network.util.SearchTagsBuilder
 import care.data4life.sdk.tag.Annotations
-import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
-import care.data4life.sdk.tag.TagCryptoHelper
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.TaggingContract.Companion.ANNOTATION_KEY
+import care.data4life.sdk.tag.TaggingContract.Companion.DELIMITER
 import care.data4life.sdk.tag.Tags
-import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.functions.BiFunction
-import java.io.IOException
 
+private data class OrGroupEntry(
+    val key: String,
+    val orGroup: Triple<String, String, String>
+)
+
+// see: https://gesundheitscloud.atlassian.net/browse/SDK-572
 // see: https://gesundheitscloud.atlassian.net/browse/SDK-525
 @Migration("This class should only be used due to migration purpose.")
 class RecordCompatibilityService internal constructor(
-    private val apiService: NetworkingContract.Service,
-    private val tagCryptoService: TaggingContract.CryptoService,
     private val cryptoService: CryptoContract.Service,
-    private val tagHelper: TaggingContract.Helper = TagCryptoHelper
+    private val tagCryptoService: TaggingContract.CryptoService,
+    private val compatibilityEncoder: MigrationContract.CompatibilityEncoder = CompatibilityEncoder,
+    private val searchTagsBuilderFactory: NetworkingContract.SearchTagsBuilderFactory = SearchTagsBuilder
 ) : MigrationContract.CompatibilityService {
-    private fun encrypt(
-        plainTags: Tags,
-        plainAnnotations: Annotations
-    ): Pair<EncryptedTagsAndAnnotations, EncryptedTagsAndAnnotations> {
-        val tagEncryptionKey = cryptoService.fetchTagEncryptionKey()
-        return Pair(
-            tagCryptoService.encryptTagsAndAnnotations(
-                plainTags,
-                plainAnnotations,
-                tagEncryptionKey
-            ),
-            encryptTags(plainTags, tagEncryptionKey)
-                .also { encryptedTags ->
-                    encryptedTags.addAll(
-                        encryptAnnotations(plainAnnotations, tagEncryptionKey)
-                    )
-                }
-        )
-    }
-
-    @Throws(IOException::class)
-    private fun encryptTags(tags: Tags, tagEncryptionKey: GCKey): MutableList<String> {
-        return tags
-            .map { entry -> entry.key + TaggingContract.DELIMITER + tagHelper.normalize(entry.value) }
-            .let { normalizedTags ->
-                tagCryptoService.encryptList(
-                    normalizedTags,
-                    tagEncryptionKey
-                )
-            }
-    }
-
-    @Throws(IOException::class)
-    private fun encryptAnnotations(
-        annotations: Annotations,
-        tagEncryptionKey: GCKey
-    ): MutableList<String> {
+    private fun encryptTags(
+        tagEncryptionKey: GCKey,
+        tagGroupEntry: OrGroupEntry
+    ): List<String> {
         return tagCryptoService.encryptList(
-            annotations,
+            tagGroupEntry.orGroup.toList(),
             tagEncryptionKey,
-            ANNOTATION_KEY + TaggingContract.DELIMITER
+            tagGroupEntry.key
         )
     }
 
-    private fun needsDoubleCall(
-        encodedAndEncryptedTags: List<String>,
-        encryptedTags: List<String>
-    ): Boolean = encodedAndEncryptedTags.sorted() != encryptedTags.sorted()
-
-    override fun searchRecords(
-        alias: String,
-        userId: String,
-        startDate: String?,
-        endDate: String?,
-        pageSize: Int,
-        offSet: Int,
+    private fun mapTags(
         tags: Tags,
-        annotations: Annotations
-    ): Observable<List<EncryptedRecord>> {
-        val (encodedAndEncryptedTags, encryptedTags) = encrypt(tags, annotations)
-        return if (needsDoubleCall(encodedAndEncryptedTags, encryptedTags)) {
-            Observable.zip(
-                apiService.searchRecords(
-                    alias,
-                    userId,
-                    startDate,
-                    endDate,
-                    pageSize,
-                    offSet,
-                    encodedAndEncryptedTags.joinToString(",")
-                ),
-                apiService.searchRecords(
-                    alias,
-                    userId,
-                    startDate,
-                    endDate,
-                    pageSize,
-                    offSet,
-                    encryptedTags.joinToString(",")
-                ),
-                BiFunction<List<EncryptedRecord>, List<EncryptedRecord>, List<EncryptedRecord>> { records1, records2 ->
-                    mutableListOf<EncryptedRecord>().also {
-                        it.addAll(records1)
-                        it.addAll(records2)
-                    }
-                }
+        tagEncryptionKey: GCKey
+    ): List<List<String>> {
+        return tags.map { tagGroup ->
+            OrGroupEntry(
+                tagGroup.key + DELIMITER,
+                compatibilityEncoder.encode(tagGroup.value)
             )
-        } else {
-            apiService.searchRecords(
-                alias,
-                userId,
-                startDate,
-                endDate,
-                pageSize,
-                offSet,
-                encodedAndEncryptedTags.joinToString(",")
-            ) as Observable<List<EncryptedRecord>>
+        }.map { encodedTagGroup ->
+            encryptTags(
+                tagEncryptionKey,
+                encodedTagGroup
+            )
         }
     }
 
-    override fun countRecords(
-        alias: String,
-        userId: String,
-        tags: Tags,
-        annotations: Annotations
-    ): Single<Int> {
-        val (encodedAndEncryptedTags, encryptedTags) = encrypt(tags, annotations)
+    private fun mapAnnotations(
+        annotations: Annotations,
+        tagEncryptionKey: GCKey
+    ): List<List<String>> {
+        return annotations.map { annotation ->
+            OrGroupEntry(
+                ANNOTATION_KEY + DELIMITER,
+                compatibilityEncoder.encode(annotation).copy(second = annotation)
+            )
+        }.map { encodedTagGroup ->
+            encryptTags(
+                tagEncryptionKey,
+                encodedTagGroup
+            )
+        }
+    }
 
-        return Single.zip(
-            apiService.getCount(alias, userId, encodedAndEncryptedTags.joinToString(",")),
-            apiService.getCount(alias, userId, encryptedTags.joinToString(",")),
-            BiFunction<Int, Int, Int> { c1, c2 -> c1 + c2 }
-        )
+    override fun resolveSearchTags(
+        tags: Tags,
+        annotation: Annotations
+    ): NetworkingContract.SearchTags {
+        val builder = searchTagsBuilderFactory.newBuilder()
+        val tagEncryptionKey = cryptoService.fetchTagEncryptionKey()
+
+        mapTags(tags, tagEncryptionKey).forEach { tagGroup -> builder.addOrTuple(tagGroup) }
+        mapAnnotations(annotation, tagEncryptionKey).forEach { tagGroup -> builder.addOrTuple(tagGroup) }
+
+        return builder.seal()
     }
 }

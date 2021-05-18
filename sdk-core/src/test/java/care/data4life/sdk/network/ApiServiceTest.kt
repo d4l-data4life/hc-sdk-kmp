@@ -312,7 +312,7 @@ class ApiServiceTest {
         every { headers[NetworkingContract.HEADER_TOTAL_COUNT] } returns amount
 
         // When
-        val actual = service.countRecord(alias, userId, tags).blockingGet()
+        val actual = service.countRecords(alias, userId, tags).blockingGet()
 
         // Then
         assertSame(

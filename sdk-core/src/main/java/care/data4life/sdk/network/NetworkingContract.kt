@@ -61,7 +61,7 @@ interface NetworkingContract {
             tags: SearchTags
         ): Observable<List<EncryptedRecord>>
 
-        fun countRecord(alias: String, userId: String, tags: SearchTags): Single<Int>
+        fun countRecords(alias: String, userId: String, tags: SearchTags): Single<Int>
 
         fun deleteRecord(alias: String, recordId: String, userId: String): Completable
 

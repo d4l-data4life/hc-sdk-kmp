@@ -229,7 +229,7 @@ class ApiService constructor(
         )
     }
 
-    override fun countRecord(
+    override fun countRecords(
         alias: String,
         userId: String,
         tags: NetworkingContract.SearchTags

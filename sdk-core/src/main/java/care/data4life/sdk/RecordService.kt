@@ -520,7 +520,7 @@ class RecordService internal constructor(
             annotations
         )
 
-        return apiService.countRecord(
+        return apiService.countRecords(
             alias,
             userId,
             searchTags

@@ -85,7 +85,7 @@ class RecordServiceCountRecordsTest {
 
         every { taggingService.getTagsFromType(Fhir3Resource::class.java as Class<Any>) } returns tags
         every { compatibilityService.resolveSearchTags(tags, annotations) } returns searchTags
-        every { apiService.getCount(ALIAS, USER_ID, searchTags) } returns Single.just(expected)
+        every { apiService.countRecords(ALIAS, USER_ID, searchTags) } returns Single.just(expected)
 
         // When
         val observer = recordService.countFhir3Records(
@@ -107,7 +107,7 @@ class RecordServiceCountRecordsTest {
         )
         verify(exactly = 1) { taggingService.getTagsFromType(Fhir3Resource::class.java as Class<Any>) }
         verify(exactly = 1) { compatibilityService.resolveSearchTags(tags, annotations) }
-        verify(exactly = 1) { apiService.getCount(ALIAS, USER_ID, searchTags) }
+        verify(exactly = 1) { apiService.countRecords(ALIAS, USER_ID, searchTags) }
     }
 
     @Test
@@ -120,7 +120,7 @@ class RecordServiceCountRecordsTest {
 
         every { taggingService.getTagsFromType(Fhir4Resource::class.java as Class<Any>) } returns tags
         every { compatibilityService.resolveSearchTags(tags, annotations) } returns searchTags
-        every { apiService.getCount(ALIAS, USER_ID, searchTags) } returns Single.just(expected)
+        every { apiService.countRecords(ALIAS, USER_ID, searchTags) } returns Single.just(expected)
 
         // When
         val observer = recordService.countFhir4Records(
@@ -142,7 +142,7 @@ class RecordServiceCountRecordsTest {
         )
         verify(exactly = 1) { taggingService.getTagsFromType(Fhir4Resource::class.java as Class<Any>) }
         verify(exactly = 1) { compatibilityService.resolveSearchTags(tags, annotations) }
-        verify(exactly = 1) { apiService.getCount(ALIAS, USER_ID, searchTags) }
+        verify(exactly = 1) { apiService.countRecords(ALIAS, USER_ID, searchTags) }
     }
 
     @Test

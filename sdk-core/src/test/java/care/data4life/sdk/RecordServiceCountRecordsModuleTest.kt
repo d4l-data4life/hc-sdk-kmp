@@ -126,7 +126,7 @@ class RecordServiceCountRecordsModuleTest {
         val search = slot<NetworkingContract.SearchTags>()
 
         every {
-            apiService.countRecord(
+            apiService.countRecords(
                 alias,
                 userId,
                 capture(search)

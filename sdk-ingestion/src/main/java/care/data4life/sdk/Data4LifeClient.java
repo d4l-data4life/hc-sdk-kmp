@@ -30,6 +30,7 @@ import care.data4life.sdk.attachment.AttachmentService;
 import care.data4life.sdk.attachment.FileService;
 import care.data4life.sdk.auth.UserService;
 import care.data4life.sdk.call.CallHandler;
+import care.data4life.sdk.config.SDKConfig;
 import care.data4life.sdk.fhir.ResourceCryptoService;
 import care.data4life.sdk.log.Log;
 import care.data4life.sdk.network.ApiService;
@@ -41,8 +42,6 @@ import care.data4life.securestore.SecureStore;
 import care.data4life.securestore.SecureStoreContract;
 import care.data4life.securestore.SecureStoreCryptor;
 import care.data4life.securestore.SecureStoreStorage;
-
-import static care.data4life.sdk.SdkContract.VERSION;
 
 public final class Data4LifeClient extends BaseClient {
 
@@ -139,7 +138,7 @@ public final class Data4LifeClient extends BaseClient {
                 platform,
                 networkConnectivityService,
                 NetworkingContract.Clients.INGESTION,
-                VERSION,
+                SDKConfig.version,
                 accessToken,
                 DEBUG
         );

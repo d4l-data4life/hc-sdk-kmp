@@ -33,6 +33,7 @@ import care.data4life.sdk.attachment.AttachmentService;
 import care.data4life.sdk.attachment.FileService;
 import care.data4life.sdk.auth.UserService;
 import care.data4life.sdk.call.CallHandler;
+import care.data4life.sdk.config.SDKConfig;
 import care.data4life.sdk.fhir.ResourceCryptoService;
 import care.data4life.sdk.lang.CoreRuntimeException;
 import care.data4life.sdk.lang.D4LException;
@@ -180,7 +181,7 @@ public final class Data4LifeClient extends BaseClient {
                 platform,
                 connectivityService,
                 NetworkingContract.Clients.ANDROID,
-                BuildConfig.VERSION_NAME,
+                SDKConfig.version,
                 debug
         );
         CryptoService cryptoService = new CryptoService(initConfig.getAlias(), store);

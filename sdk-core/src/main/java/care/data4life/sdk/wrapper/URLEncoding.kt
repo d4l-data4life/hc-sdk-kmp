@@ -23,7 +23,7 @@ import java.util.Locale
 
 private fun Int.toHex(): String = Integer.toHexString(this).toUpperCase(Locale.US)
 
-object URLEncoding : WrapperContract.URLEncoding {
+object UrlEncoding : WrapperContract.UrlEncoding {
     private val specialChars = listOf('*', '-', '_', '.')
 
     private fun replaceSpecial(char: Char): String {

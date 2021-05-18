@@ -37,7 +37,7 @@ class MigrationContract {
         fun normalize(tagValue: String): String
 
         companion object {
-            val JS_LEGACY_ENCODING_EXCEPTIONS = mapOf(
+            val JS_LEGACY_ENCODING_REPLACEMENTS = mapOf(
                 "%2A" to "%2a",
                 "%2D" to "%2d",
                 "%2E" to "%2e",

@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.test.util
 
-import care.data4life.sdk.migration.MigrationContract.CompatibilityEncoder.Companion.JS_LEGACY_ENCODING_EXCEPTIONS
+import care.data4life.sdk.migration.MigrationContract.CompatibilityEncoder.Companion.JS_LEGACY_ENCODING_REPLACEMENTS
 import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -26,7 +26,7 @@ object JSLegacyTagConverter {
 
     private fun filterEncodings(rawEncodings: List<String>): Set<String> {
         return rawEncodings
-            .filter { encoding -> encoding !in JS_LEGACY_ENCODING_EXCEPTIONS.values }
+            .filter { encoding -> encoding !in JS_LEGACY_ENCODING_REPLACEMENTS.values }
             .toSet()
     }
 

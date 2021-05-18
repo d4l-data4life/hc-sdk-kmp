@@ -17,7 +17,7 @@
 package care.data4life.sdk.migration
 
 import care.data4life.sdk.tag.TagEncoding
-import care.data4life.sdk.wrapper.URLEncoding
+import care.data4life.sdk.wrapper.UrlEncoding
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
@@ -34,7 +34,7 @@ class CompatibilityEncoderTest {
     @Before
     fun setUp() {
         mockkObject(TagEncoding)
-        mockkObject(URLEncoding)
+        mockkObject(UrlEncoding)
 
         compatibilityEncoder = CompatibilityEncoder
     }
@@ -42,7 +42,7 @@ class CompatibilityEncoderTest {
     @After
     fun tearDown() {
         unmockkObject(TagEncoding)
-        unmockkObject(URLEncoding)
+        unmockkObject(UrlEncoding)
     }
 
     @Test
@@ -60,7 +60,7 @@ class CompatibilityEncoderTest {
 
         every { TagEncoding.encode(tagValue) } returns expected
         every { TagEncoding.normalize(tagValue) } returns "notImportant"
-        every { URLEncoding.encode(tagValue) } returns "notImportant"
+        every { UrlEncoding.encode(tagValue) } returns "notImportant"
 
         // When
         val (encoded, _, _) = compatibilityEncoder.encode(tagValue)
@@ -82,7 +82,7 @@ class CompatibilityEncoderTest {
 
         every { TagEncoding.encode(tagValue) } returns "notImportant"
         every { TagEncoding.normalize(tagValue) } returns expected
-        every { URLEncoding.encode(tagValue) } returns "notImportant"
+        every { UrlEncoding.encode(tagValue) } returns "notImportant"
 
         // When
         val (_, encoded, _) = compatibilityEncoder.encode(tagValue)
@@ -105,7 +105,7 @@ class CompatibilityEncoderTest {
 
         every { TagEncoding.encode(tagValue) } returns "notImportant"
         every { TagEncoding.normalize(tagValue) } returns normalized
-        every { URLEncoding.encode(normalized) } returns expected
+        every { UrlEncoding.encode(normalized) } returns expected
 
         // When
         val (_, _, encoded) = compatibilityEncoder.encode(tagValue)
@@ -117,7 +117,7 @@ class CompatibilityEncoderTest {
         )
 
         verify(exactly = 1) { TagEncoding.normalize(tagValue) }
-        verify(exactly = 1) { URLEncoding.encode(normalized) }
+        verify(exactly = 1) { UrlEncoding.encode(normalized) }
     }
 
     @Test
@@ -128,7 +128,7 @@ class CompatibilityEncoderTest {
 
         every { TagEncoding.encode(tagValue) } returns "notImportant"
         every { TagEncoding.normalize(tagValue) } returns tagValue
-        every { URLEncoding.encode(tagValue) } returns expected.toUpperCase()
+        every { UrlEncoding.encode(tagValue) } returns expected.toUpperCase()
 
         // When
         val (_, _, encoded) = compatibilityEncoder.encode(tagValue)
@@ -140,7 +140,7 @@ class CompatibilityEncoderTest {
         )
 
         verify(exactly = 1) { TagEncoding.normalize(tagValue) }
-        verify(exactly = 1) { URLEncoding.encode(tagValue) }
+        verify(exactly = 1) { UrlEncoding.encode(tagValue) }
     }
 
     @Test

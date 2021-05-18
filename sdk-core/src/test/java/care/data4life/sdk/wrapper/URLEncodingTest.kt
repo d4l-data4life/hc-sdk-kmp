@@ -20,12 +20,12 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class URLEncodingTest {
+class UrlEncodingTest {
     @Test
     fun `It fulfils URLEncoding`() {
-        val encoding: Any = URLEncoding
+        val encoding: Any = UrlEncoding
 
-        assertTrue(encoding is WrapperContract.URLEncoding)
+        assertTrue(encoding is WrapperContract.UrlEncoding)
     }
 
     @Test
@@ -34,7 +34,7 @@ class URLEncodingTest {
         val str = "ABCabc"
 
         // When
-        val encoded = URLEncoding.encode(str)
+        val encoded = UrlEncoding.encode(str)
 
         // Then
         assertEquals(
@@ -49,7 +49,7 @@ class URLEncodingTest {
         val str = "你好，世界"
 
         // When
-        val encoded = URLEncoding.encode(str)
+        val encoded = UrlEncoding.encode(str)
 
         // Then
         assertEquals(
@@ -64,7 +64,7 @@ class URLEncodingTest {
         val str = "! '()*-_.~"
 
         // When
-        val encoded = URLEncoding.encode(str)
+        val encoded = UrlEncoding.encode(str)
 
         // Then
         assertEquals(
@@ -79,7 +79,7 @@ class URLEncodingTest {
         val str = "你好! world."
 
         // When
-        val encoded = URLEncoding.encode(str)
+        val encoded = UrlEncoding.encode(str)
 
         // Then
         assertEquals(
@@ -94,7 +94,7 @@ class URLEncodingTest {
         val encodedTag = "%e4%bd%a0%e5%a5%bd%ef%bc%8c%e4%b8%96%e7%95%8c"
 
         // When
-        val decoded = URLEncoding.decode(encodedTag)
+        val decoded = UrlEncoding.decode(encodedTag)
 
         // Then
         assertEquals(
@@ -109,7 +109,7 @@ class URLEncodingTest {
         val encodedTag = "%E4%BD%A0%E5%A5%BD%21%20world%2E"
 
         // When
-        val decoded = URLEncoding.decode(encodedTag)
+        val decoded = UrlEncoding.decode(encodedTag)
 
         // Then
         assertEquals(

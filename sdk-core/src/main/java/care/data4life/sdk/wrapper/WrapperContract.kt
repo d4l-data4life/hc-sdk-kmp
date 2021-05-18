@@ -76,7 +76,7 @@ class WrapperContract {
     }
 
     // TODO: Move that to kmp utils repo
-    interface URLEncoding {
+    interface UrlEncoding {
         fun encode(str: String): String
         fun decode(str: String): String
     }

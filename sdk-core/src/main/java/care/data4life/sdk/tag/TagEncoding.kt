@@ -18,7 +18,7 @@ package care.data4life.sdk.tag
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.tag.TaggingContract.Companion.LOCALE
-import care.data4life.sdk.wrapper.URLEncoding
+import care.data4life.sdk.wrapper.UrlEncoding
 
 object TagEncoding : TaggingContract.Encoding {
     @Throws(D4LException::class)
@@ -33,7 +33,7 @@ object TagEncoding : TaggingContract.Encoding {
     @Throws(D4LException::class)
     override fun encode(
         tag: String
-    ): String = URLEncoding.encode(normalize(tag)).toLowerCase(LOCALE)
+    ): String = UrlEncoding.encode(normalize(tag)).toLowerCase(LOCALE)
 
     @Throws(D4LException::class)
     override fun normalize(tag: String): String {
@@ -43,5 +43,5 @@ object TagEncoding : TaggingContract.Encoding {
 
     override fun decode(
         encodedTag: String
-    ): String = URLEncoding.decode(encodedTag)
+    ): String = UrlEncoding.decode(encodedTag)
 }

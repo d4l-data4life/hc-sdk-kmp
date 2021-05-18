@@ -734,7 +734,6 @@ class RecordService internal constructor(
                 }
             }
 
-            // TODO: This is meaningless
             if (validAttachments.size != attachmentIds.size)
                 throw DataValidationException.IdUsageViolation("Please provide correct attachment ids!")
 

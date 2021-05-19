@@ -170,7 +170,7 @@ public final class Data4LifeClient extends BaseClient {
 
         CryptoSecureStore store = new CryptoSecureStore(secureStore);
 
-        NetworkConnectivityService connectivityService = new NetworkConnectivityServiceAndroid(context);
+        NetworkingContract.NetworkConnectivityService connectivityService = new NetworkConnectivityServiceAndroid(context);
 
         ApiService apiService = new ApiService(
                 authorizationService,

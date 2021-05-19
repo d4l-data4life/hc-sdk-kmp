@@ -123,7 +123,7 @@ class ApiService constructor(
             try {
                 response = chain.proceed(request)
             } catch (exception: SocketTimeoutException) {
-                if (connectivityService.isConnected) {
+                if (connectivityService.isConnected()) {
                     response = chain.proceed(request)
                 }
             }

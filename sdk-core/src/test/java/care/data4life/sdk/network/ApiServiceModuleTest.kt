@@ -63,10 +63,6 @@ class ApiServiceModuleTest {
     private val clientId = CLIENT_ID
     private val secret = "geheim"
 
-    data class TestConnection(
-        override val isConnected: Boolean
-    ) : NetworkingContract.NetworkConnectivityService
-
     @Before
     fun setUp() {
         server = MockWebServer()
@@ -80,7 +76,7 @@ class ApiServiceModuleTest {
             clientId,
             secret,
             "not important",
-            TestConnection(true),
+            { true },
             NetworkingContract.Clients.ANDROID,
             clientName,
             false

@@ -109,8 +109,8 @@ interface NetworkingContract {
         INGESTION("ingestion")
     }
 
-    interface NetworkConnectivityService {
-        val isConnected: Boolean
+    fun interface NetworkConnectivityService {
+        fun isConnected(): Boolean
     }
 
     enum class Data4LifeURI(val uri: String) {

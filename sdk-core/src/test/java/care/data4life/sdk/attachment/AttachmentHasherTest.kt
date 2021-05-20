@@ -14,11 +14,32 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network.util.interceptor
+package care.data4life.sdk.attachment
 
-import okhttp3.Request
+import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
-fun Request.Builder.replaceHeader(
-    name: String,
-    value: String
-): Request.Builder = this.header(name, value)
+class AttachmentHasherTest {
+    @Test
+    fun `It fulfils Hasher`() {
+        val hasher: Any = AttachmentHasher
+
+        assertTrue(hasher is AttachmentContract.Hasher)
+    }
+
+    @Test
+    fun `Given hash is called with a Bytearray, it hashes it`() {
+        // Given
+        val payload = "test".toByteArray()
+
+        // When
+        val hash = AttachmentHasher.hash(payload)
+
+        // Then
+        assertEquals(
+            expected = "qUqP5cyxm6YcTAhz05Hph5gvu9M=",
+            actual = hash
+        )
+    }
+}

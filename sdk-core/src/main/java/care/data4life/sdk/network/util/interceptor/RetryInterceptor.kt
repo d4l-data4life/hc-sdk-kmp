@@ -27,7 +27,7 @@ class RetryInterceptor private constructor(
     private val connection: NetworkingContract.NetworkConnectivityService
 ) : NetworkingContract.Interceptor {
     private fun retry(request: Request, chain: Interceptor.Chain): Response {
-        return if (connection.isConnected) {
+        return if (connection.isConnected()) {
             chain.proceed(request)
         } else {
             throw CoreRuntimeException.InternalFailure()

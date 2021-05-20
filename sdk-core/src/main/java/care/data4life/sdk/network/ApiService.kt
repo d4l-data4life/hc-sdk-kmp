@@ -123,7 +123,7 @@ class ApiService constructor(
             try {
                 response = chain.proceed(request)
             } catch (exception: SocketTimeoutException) {
-                if (connectivityService.isConnected) {
+                if (connectivityService.isConnected()) {
                     response = chain.proceed(request)
                 }
             }
@@ -215,14 +215,26 @@ class ApiService constructor(
         endDate: String?,
         pageSize: Int,
         offset: Int,
-        tags: String
+        tags: NetworkingContract.SearchTags
     ): Observable<List<EncryptedRecord>> {
-        return service!!.searchRecords(alias, userId, startDate, endDate, pageSize, offset, tags)
+        return service!!.searchRecords(
+            alias,
+            userId,
+            startDate,
+            endDate,
+            pageSize,
+            offset,
+            tags.tags
+        )
     }
 
-    override fun getCount(alias: String, userId: String, tags: String): Single<Int> {
+    override fun countRecords(
+        alias: String,
+        userId: String,
+        tags: NetworkingContract.SearchTags
+    ): Single<Int> {
         return service!!
-            .getRecordsHeader(alias, userId, tags)
+            .getRecordsHeader(alias, userId, tags.tags)
             .map { response ->
                 response.headers()[NetworkingContract.HEADER_TOTAL_COUNT]!!
                     .toInt()

@@ -65,10 +65,10 @@ If you just want to explore the SDK you'll find a test configuration in `sample-
 
 === Software requirements
 
-* Android 5.0.1 (API 21) to Android 10 (API 29)
-* Kotlin 1.3.72
+* Android 6.0 (API 23) to Android 11 (API 30)
+* Kotlin 1.4.32
 * Java 8 link:https://developer.android.com/studio/write/java8-support[Limitations] link:https://jakewharton.com/d8-library-desugaring/[Desugaring]
-* Gradle 6.4.1
+* Gradle 6.8.3
 
 === Dependencies
 
@@ -252,12 +252,12 @@ There are several requirements for building the SDK.
 
 === Requirements
 
-* Android 5.0.1 (API 21) to Android 10 (API 29)
-* Kotlin 1.3.72
+* Android 6.0 (API 23) to Android 11 (API 30)
+* Kotlin 1.4.32
 * Java 8 link:https://developer.android.com/studio/write/java8-support[Limitations] link:https://jakewharton.com/d8-library-desugaring/[Desugaring]
-* Gradle 6.5
-* link:https://developer.android.com/studio#downloads[Android Studio 4.1.1]
-* Android Emulator 21 - 29
+* Gradle 6.8.3
+* link:https://developer.android.com/studio#downloads[Android Studio 4.2.1]
+* Android Emulator 23 - 30
 
 **Note:** Disable Instant Run in Android Studio, or the project fails to compile.
 

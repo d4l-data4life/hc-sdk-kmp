@@ -51,7 +51,7 @@ class BasicAuthorizationInterceptorTest {
     }
 
     @Test
-    fun `Given intercept is called, it simply forwards the given chain, if no HEADER_AUTHORIZATION is present, proceeds with the Request and returns the Response`() {
+    fun `Given intercept is called, it simply forwards the given chain, if no HEADER_AUTHORIZATION is present,and proceeds with the Request and returns the Response`() {
         // Given
         val response: Response = mockk()
 
@@ -79,7 +79,7 @@ class BasicAuthorizationInterceptorTest {
     }
 
     @Test
-    fun `Given intercept is called, it simply forwards the given chain, AUTHORIZATION_WITH_BASIC_AUTH is present, proceeds with the Request and returns the Response`() {
+    fun `Given intercept is called, it simply forwards the given chain, if no AUTHORIZATION_WITH_BASIC_AUTH is present, and proceeds with the Request and returns the Response`() {
         // Given
         val response: Response = mockk()
 
@@ -107,7 +107,7 @@ class BasicAuthorizationInterceptorTest {
     }
 
     @Test
-    fun `Given intercept is called, it replaces HEADER_AUTHORIZATION, if AUTHORIZATION_WITH_BASIC_AUTH is present, proceeds with the Request and returns the Response`() {
+    fun `Given intercept is called, it replaces HEADER_AUTHORIZATION, if AUTHORIZATION_WITH_BASIC_AUTH is present, and proceeds with the Request and returns the Response`() {
         // Given
         val clientId = "me"
         val secret = "secret"
@@ -124,10 +124,7 @@ class BasicAuthorizationInterceptorTest {
         every { request.header(HEADER_AUTHORIZATION) } returns BASIC_AUTH_MARKER
         every { request.newBuilder() } returns builder
         every {
-            builder.removeHeader(HEADER_AUTHORIZATION)
-        } returns builder
-        every {
-            builder.addHeader(HEADER_AUTHORIZATION, "Basic $credential")
+            builder.header(HEADER_AUTHORIZATION, "Basic $credential")
         } returns builder
         every {
             builder.build()
@@ -148,8 +145,7 @@ class BasicAuthorizationInterceptorTest {
             chain.request()
             request.header(HEADER_AUTHORIZATION)
             request.newBuilder()
-            builder.removeHeader(HEADER_AUTHORIZATION)
-            builder.addHeader(HEADER_AUTHORIZATION, "Basic $credential")
+            builder.header(HEADER_AUTHORIZATION, "Basic $credential")
             builder.build()
             chain.proceed(modifiedRequest)
         }

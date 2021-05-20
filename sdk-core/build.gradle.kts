@@ -75,8 +75,14 @@ dependencies {
     testImplementation(Dependencies.Java.Test.jsonAssert)
 }
 
+configure<SourceSetContainer> {
+    main {
+        java.srcDirs("src/main/java", "src-gen/main/java")
+    }
+}
+
 val templatesPath = "${projectDir}/src/main/resources/templates"
-val configPath = "${projectDir}/src/main/java/care/data4life/sdk/config"
+val configPath = "${projectDir}/src-gen/main/java/care/data4life/sdk/config"
 
 val provideConfig: Task by tasks.creating {
     doFirst {

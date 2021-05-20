@@ -14,30 +14,11 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network.interceptor
+package care.data4life.sdk.network.util.interceptor
 
 import okhttp3.Request
-import org.junit.Test
-import kotlin.test.assertEquals
 
-class InterceptorHelperTest {
-    @Test
-    fun `Given replaceHeader is called, it replaces the given Header`() {
-        // Given
-        val field = "test"
-        val expected = "expected"
-
-        // When
-        val request = Request.Builder()
-            .url("http://somewhere")
-            .addHeader(field, "not important")
-            .replaceHeader(field, expected)
-            .build()
-
-        // Then
-        assertEquals(
-            actual = request.header(field),
-            expected = expected
-        )
-    }
-}
+fun Request.Builder.replaceHeader(
+    name: String,
+    value: String
+): Request.Builder = this.header(name, value)

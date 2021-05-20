@@ -14,7 +14,7 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network.interceptor
+package care.data4life.sdk.network.util.interceptor
 
 import care.data4life.sdk.network.NetworkingContract
 import okhttp3.Interceptor

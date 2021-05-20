@@ -14,11 +14,22 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network.interceptor
+package care.data4life.sdk.network.util
 
-import okhttp3.Request
+import care.data4life.sdk.network.NetworkingContract
+import okhttp3.CertificatePinner
 
-fun Request.Builder.replaceHeader(
-    name: String,
-    value: String
-): Request.Builder = this.header(name, value)
+object CertificatePinnerFactory : NetworkingContract.CertificatePinnerFactory {
+    private fun extractHostname(apiBaseURL: String): String {
+        return apiBaseURL.replaceFirst("https://", "")
+    }
+
+    override fun getInstance(platform: String, env: NetworkingContract.Environment): CertificatePinner {
+        return CertificatePinner.Builder()
+            .add(
+                extractHostname(env.getApiBaseURL(platform)),
+                env.getCertificatePin(platform)
+            )
+            .build()
+    }
+}

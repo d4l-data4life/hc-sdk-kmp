@@ -17,7 +17,6 @@
 package care.data4life.sdk.network
 
 import care.data4life.auth.AuthorizationContract
-import care.data4life.sdk.NetworkConnectivityService
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_SDK_VERSION
@@ -64,10 +63,6 @@ class ApiServiceModuleTest {
     private val clientId = CLIENT_ID
     private val secret = "geheim"
 
-    data class TestConnection(
-        override val isConnected: Boolean
-    ) : NetworkConnectivityService
-
     @Before
     fun setUp() {
         server = MockWebServer()
@@ -81,7 +76,7 @@ class ApiServiceModuleTest {
             clientId,
             secret,
             "not important",
-            TestConnection(true),
+            { true },
             NetworkingContract.Clients.ANDROID,
             clientName,
             false

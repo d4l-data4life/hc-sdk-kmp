@@ -127,7 +127,7 @@ public final class Data4LifeClient extends BaseClient {
                 authorizationStore
         );
 
-        NetworkConnectivityService networkConnectivityService = () -> true;
+        NetworkingContract.NetworkConnectivityService networkConnectivityService = () -> true;
 
         // Create ApiService that uses a static token
         ApiService apiService = new ApiService(

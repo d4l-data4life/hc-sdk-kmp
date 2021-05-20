@@ -124,7 +124,7 @@ public final class Data4LifeClient extends BaseClient {
                 authorizationStore
         );
 
-        NetworkConnectivityService networkConnectivityService = () -> true;
+        NetworkingContract.NetworkConnectivityService networkConnectivityService = () -> true;
 
         ApiService apiService = new ApiService(
                 authorizationService,

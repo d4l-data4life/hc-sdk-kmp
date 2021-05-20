@@ -83,7 +83,7 @@ class RetryInterceptorTest {
 
         var isFail = false
 
-        every { service.isConnected } returns true
+        every { service.isConnected() } returns true
         every { chain.request() } returns request
         every { chain.proceed(request) } answers {
             if (isFail) {
@@ -117,7 +117,7 @@ class RetryInterceptorTest {
 
         var isFail = false
 
-        every { service.isConnected } returns false
+        every { service.isConnected() } returns false
         every { chain.request() } returns request
         every { chain.proceed(request) } answers {
             if (isFail) {

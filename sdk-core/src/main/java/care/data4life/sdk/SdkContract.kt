@@ -269,6 +269,10 @@ interface SdkContract {
         ): Task
     }
 
+    companion object {
+        const val VERSION = "1.12.0"
+    }
+
     /**
      * Legacy Client interface
      *

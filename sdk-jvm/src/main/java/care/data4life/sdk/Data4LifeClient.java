@@ -35,15 +35,16 @@ import care.data4life.sdk.log.Logger;
 import care.data4life.sdk.network.ApiService;
 import care.data4life.sdk.network.Environment;
 import care.data4life.sdk.tag.TagCryptoService;
+import care.data4life.sdk.network.NetworkingContract;
 import care.data4life.sdk.tag.TaggingService;
 import care.data4life.securestore.SecureStore;
 import care.data4life.securestore.SecureStoreContract;
 import care.data4life.securestore.SecureStoreCryptor;
 import care.data4life.securestore.SecureStoreStorage;
 
-public final class Data4LifeClient extends BaseClient {
+import static care.data4life.sdk.SdkContract.VERSION;
 
-    private static final String CLIENT_NAME = "SDK";
+public final class Data4LifeClient extends BaseClient {
     private static final boolean DEBUG = true;
 
 
@@ -124,9 +125,19 @@ public final class Data4LifeClient extends BaseClient {
                 authorizationStore
         );
 
-        NetworkConnectivityService networkConnectivityService = () -> true;
+        NetworkingContract.NetworkConnectivityService networkConnectivityService = () -> true;
 
-        ApiService apiService = new ApiService(authorizationService, environment, clientId, clientSecret, platform, networkConnectivityService, CLIENT_NAME, DEBUG);
+        ApiService apiService = new ApiService(
+                authorizationService,
+                environment,
+                clientId,
+                clientSecret,
+                platform,
+                networkConnectivityService,
+                NetworkingContract.Clients.JAVA,
+                VERSION,
+                DEBUG
+        );
 
         CryptoSecureStore cryptoSecureStore = new CryptoSecureStore(secureStore);
         CryptoService cryptoService = new CryptoService(alias, cryptoSecureStore);

@@ -35,11 +35,14 @@ import care.data4life.sdk.log.Log;
 import care.data4life.sdk.network.ApiService;
 import care.data4life.sdk.network.Environment;
 import care.data4life.sdk.tag.TagCryptoService;
+import care.data4life.sdk.network.NetworkingContract;
 import care.data4life.sdk.tag.TaggingService;
 import care.data4life.securestore.SecureStore;
 import care.data4life.securestore.SecureStoreContract;
 import care.data4life.securestore.SecureStoreCryptor;
 import care.data4life.securestore.SecureStoreStorage;
+
+import static care.data4life.sdk.SdkContract.VERSION;
 
 public final class Data4LifeClient extends BaseClient {
 
@@ -125,10 +128,21 @@ public final class Data4LifeClient extends BaseClient {
                 authorizationStore
         );
 
-        NetworkConnectivityService networkConnectivityService = () -> true;
+        NetworkingContract.NetworkConnectivityService networkConnectivityService = () -> true;
 
         // Create ApiService that uses a static token
-        ApiService apiService = new ApiService(authorizationService, environment, clientId, DUMMY_CLIENT_SECRET, platform, networkConnectivityService, CLIENT_NAME, accessToken, DEBUG);
+        ApiService apiService = new ApiService(
+                authorizationService,
+                environment,
+                clientId,
+                DUMMY_CLIENT_SECRET,
+                platform,
+                networkConnectivityService,
+                NetworkingContract.Clients.INGESTION,
+                VERSION,
+                accessToken,
+                DEBUG
+        );
 
         CryptoSecureStore cryptoSecureStore = new CryptoSecureStore(secureStore);
         CryptoService cryptoService = new CryptoService(ALIAS, cryptoSecureStore);

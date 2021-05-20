@@ -19,348 +19,396 @@ package care.data4life.sdk.migration
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.network.NetworkingContract
-import care.data4life.sdk.network.model.EncryptedRecord
-import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
-import care.data4life.sdk.tag.TaggingContract.Companion.ANNOTATION_KEY
-import care.data4life.sdk.tag.TaggingContract.Companion.DELIMITER
-import care.data4life.sdk.tag.Tags
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
-import io.reactivex.Observable
-import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
-import kotlin.test.assertEquals
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class RecordCompatibilityServiceTest {
-    private lateinit var apiService: NetworkingContract.Service
-    private lateinit var tagCryptoService: TaggingContract.CryptoService
-    private lateinit var cryptoService: CryptoContract.Service
-    private lateinit var tagEncryptionHelper: TaggingContract.Helper
+    private val cryptoService: CryptoContract.Service = mockk()
+    private val tagCryptoService: TaggingContract.CryptoService = mockk()
+    private val compatibilityEncoder: MigrationContract.CompatibilityEncoder = mockk()
+    private val searchTagsBuilderFactory: NetworkingContract.SearchTagsBuilderFactory = mockk()
+    private val searchTagsPipe: NetworkingContract.SearchTagsBuilder = mockk()
     private lateinit var service: MigrationContract.CompatibilityService
 
     @Before
     fun setUp() {
-        apiService = mockk()
-        cryptoService = mockk()
-        tagCryptoService = mockk()
-        tagEncryptionHelper = mockk()
+        clearAllMocks()
+
         service = RecordCompatibilityService(
-            apiService,
-            tagCryptoService,
             cryptoService,
-            tagEncryptionHelper
+            tagCryptoService,
+            compatibilityEncoder,
+            searchTagsBuilderFactory
         )
     }
 
     @Test
-    fun `it fulfills the CompatibilityService`() {
-        val service: Any = RecordCompatibilityService(mockk(), mockk(), mockk(), mockk())
+    fun `It fulfills the CompatibilityService`() {
+        val service: Any = RecordCompatibilityService(cryptoService, tagCryptoService)
         assertTrue(service is MigrationContract.CompatibilityService)
     }
 
-    private fun encryptTagsAndAnnotationsFlow(
-        tags: Tags,
-        annotations: Annotations,
-        encodedAndEncryptedTagsAndAnnotations: MutableList<String>,
-        encryptedTags: MutableList<String>,
-        encryptedAnnotations: MutableList<String>,
-        encryptionKey: GCKey
-    ) {
-        every { cryptoService.fetchTagEncryptionKey() } returns encryptionKey
-        every {
-            tagCryptoService.encryptTagsAndAnnotations(tags, annotations, encryptionKey)
-        } returns encodedAndEncryptedTagsAndAnnotations
-
-        every {
-            tagCryptoService.encryptList(
-                annotations,
-                encryptionKey,
-                ANNOTATION_KEY + DELIMITER
-            )
-        } returns encryptedAnnotations
-
-        every { tagEncryptionHelper.normalize(tags["key"]!!) } returns tags["key"]!!
-        every {
-            tagCryptoService.encryptList(
-                eq(listOf("key=value")),
-                encryptionKey
-            )
-        } returns encryptedTags
-    }
-
-    private fun verifyEncryptTagsAndAnnotationsFlow(
-        tags: Tags,
-        annotations: Annotations,
-        encryptionKey: GCKey
-    ) {
-        verify(exactly = 1) { cryptoService.fetchTagEncryptionKey() }
-        verify(exactly = 1) {
-            tagCryptoService.encryptTagsAndAnnotations(tags, annotations, encryptionKey)
-        }
-        verify(exactly = 1) { tagEncryptionHelper.normalize(tags["key"]!!) }
-        verify(exactly = 2) {
-            tagCryptoService.encryptList(
-                or(eq(listOf("key=value")), annotations),
-                or(encryptionKey, encryptionKey),
-                or("", ANNOTATION_KEY + DELIMITER)
-            )
-        }
-    }
-
     @Test
-    fun `Given countRecords is called, with a Alias, UserId and Tags, it calls the ApiService twice with the encodedAndEncrypted and the encrypted Tags`() {
+    fun `Given, resolveSearchTags is called with proper Arguments, setsUp a new SearchTagsPipeIn`() {
         // Given
-        val alias = "alias"
-        val userId = "id"
-        val tags = hashMapOf("key" to "value")
-        val annotations: Annotations = mockk()
-        val encryptedTags = mutableListOf("a", "k")
-        val encryptedAnnotations = mutableListOf("d")
-        val expected = 42
-        val encryptionKey: GCKey = mockk()
-        val encodedAndEncryptedTagsAndAnnotations = mutableListOf("a", "v")
-            .also {
-                it.addAll(listOf("d"))
-            }
-        val indicator = slot<String>()
+        val tagEncryptionKey: GCKey = mockk()
 
-        encryptTagsAndAnnotationsFlow(
-            tags,
-            annotations,
-            encodedAndEncryptedTagsAndAnnotations,
-            encryptedTags,
-            encryptedAnnotations,
-            encryptionKey
-        )
-
-        every {
-            apiService.getCount(
-                alias,
-                userId,
-                capture(indicator)
-            )
-        } answers {
-            when (indicator.captured) {
-                encodedAndEncryptedTagsAndAnnotations.joinToString(",") -> Single.just(21)
-                encryptedTags.joinToString(",") -> Single.just(21)
-                else -> throw RuntimeException("Unknown tags ${indicator.captured}")
-            }
-        }
+        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
+        every { searchTagsBuilderFactory.newBuilder() } returns mockk(relaxed = true)
 
         // When
-        val observer = service.countRecords(alias, userId, tags, annotations).test().await()
+        service.resolveSearchTags(emptyMap(), emptyList())
 
         // Then
-        val result = observer
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
+        verify(exactly = 1) { cryptoService.fetchTagEncryptionKey() }
+        verify(exactly = 1) { searchTagsBuilderFactory.newBuilder() }
+    }
 
-        assertEquals(
-            expected = expected,
-            actual = result
+    @Test
+    fun `Given, resolveSearchTags is called with proper Arguments, it seals the SearchTags and returns them`() {
+        // Given
+        val sealedSearchTags: NetworkingContract.SearchTags = mockk()
+
+        every { cryptoService.fetchTagEncryptionKey() } returns mockk()
+
+        every { searchTagsBuilderFactory.newBuilder() } returns searchTagsPipe
+        every { searchTagsPipe.seal() } returns sealedSearchTags
+
+        // When
+        val tags = service.resolveSearchTags(emptyMap(), emptyList())
+
+        // Then
+        assertSame(
+            expected = sealedSearchTags,
+            actual = tags
+        )
+        verify(exactly = 1) { searchTagsPipe.seal() }
+    }
+
+    // Tags
+    @Test
+    fun `Given, resolveSearchTags is called with Tags, delegates the plain Tags to the CompatibilityEncoder`() {
+        // Given
+        val tags = mapOf(
+            "tag1" to "tag1Value",
+            "tag2" to "tag2Value",
+            "tag3" to "tag3Value"
         )
 
-        verifyEncryptTagsAndAnnotationsFlow(
-            tags,
-            annotations,
-            encryptionKey
+        every { compatibilityEncoder.encode(tags["tag1"]!!) } returns mockk(relaxed = true)
+        every { compatibilityEncoder.encode(tags["tag2"]!!) } returns mockk(relaxed = true)
+        every { compatibilityEncoder.encode(tags["tag3"]!!) } returns mockk(relaxed = true)
+
+        every { cryptoService.fetchTagEncryptionKey() } returns mockk()
+        every { tagCryptoService.encryptList(any(), any(), any()) } returns mockk()
+
+        every { searchTagsBuilderFactory.newBuilder() } returns mockk(relaxed = true)
+
+        // When
+        service.resolveSearchTags(tags, emptyList())
+
+        // Then
+        verify(atMost = 1) { compatibilityEncoder.encode(tags["tag1"]!!) }
+        verify(atMost = 1) { compatibilityEncoder.encode(tags["tag2"]!!) }
+        verify(atMost = 1) { compatibilityEncoder.encode(tags["tag3"]!!) }
+    }
+
+    @Test
+    fun `Given, resolveSearchTags is called with Tags, delegates the TagGroupKey and the TagGroupValue to the TagCryptoService`() {
+        // Given
+        val tagEncryptionKey: GCKey = mockk()
+        val tags = mapOf(
+            "tag1" to "tag1Value",
+            "tag2" to "tag2Value",
+            "tag3" to "tag3Value"
         )
-        verify(exactly = 2) {
-            apiService.getCount(
-                alias,
-                userId,
-                or(
-                    encodedAndEncryptedTagsAndAnnotations.joinToString(","),
-                    encryptedTags.joinToString(",")
-                )
+        val encodedTags = listOf(
+            Triple("encodedTag1Value", "encodedAndroidLegacyTag1Value", "encodedJSLegacyTag1Value"),
+            Triple("encodedTag2Value", "encodedAndroidLegacyTag2Value", "encodedJSLegacyTag2Value"),
+            Triple("encodedTag3Value", "encodedAndroidLegacyTag3Value", "encodedJSLegacyTag3Value")
+        )
+
+        every { compatibilityEncoder.encode(tags["tag1"]!!) } returns encodedTags[0]
+        every { compatibilityEncoder.encode(tags["tag2"]!!) } returns encodedTags[1]
+        every { compatibilityEncoder.encode(tags["tag3"]!!) } returns encodedTags[2]
+
+        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
+
+        every { searchTagsBuilderFactory.newBuilder() } returns mockk(relaxed = true)
+
+        every {
+            tagCryptoService.encryptList(
+                encodedTags[0].toList(),
+                tagEncryptionKey,
+                "${tags.keys.toList()[0]}${TaggingContract.DELIMITER}"
+            )
+        } returns mockk()
+
+        every {
+            tagCryptoService.encryptList(
+                encodedTags[1].toList(),
+                tagEncryptionKey,
+                "${tags.keys.toList()[1]}${TaggingContract.DELIMITER}"
+            )
+        } returns mockk()
+
+        every {
+            tagCryptoService.encryptList(
+                encodedTags[2].toList(),
+                tagEncryptionKey,
+                "${tags.keys.toList()[2]}${TaggingContract.DELIMITER}"
+            )
+        } returns mockk()
+
+        // When
+        service.resolveSearchTags(tags, emptyList())
+
+        // Then
+        verify(atMost = 1) {
+            tagCryptoService.encryptList(
+                encodedTags[0].toList(),
+                tagEncryptionKey,
+                "${tags.keys.toList()[0]}${TaggingContract.DELIMITER}"
+            )
+        }
+
+        verify(atMost = 1) {
+            tagCryptoService.encryptList(
+                encodedTags[1].toList(),
+                tagEncryptionKey,
+                "${tags.keys.toList()[1]}${TaggingContract.DELIMITER}"
+            )
+        }
+
+        verify(atMost = 1) {
+            tagCryptoService.encryptList(
+                encodedTags[2].toList(),
+                tagEncryptionKey,
+                "${tags.keys.toList()[2]}${TaggingContract.DELIMITER}"
             )
         }
     }
 
     @Test
-    fun `Given searchRecords is called with a UserId, a ResourceType, a StartDate, a EndDate, the PageSize, Offset, Tags and Annotations, it calls the ApiService twice with the encodedAndEncrypted and the encrypted Tags`() {
-        val alias = "alias"
-        val userId = "id"
-        val startTime = "start"
-        val endTime = "end"
-        val pageSize = 23
-        val offset = 42
-        val tags = hashMapOf("key" to "value")
-        val annotations: Annotations = mockk()
-        val encodedAndEncryptedTagsAndAnnotations: MutableList<String> = mutableListOf("a", "v")
-            .also {
-                it.addAll(listOf("d"))
-            }
-        val encryptedTags: MutableList<String> = mutableListOf("a", "k")
-        val encryptedAnnotations: MutableList<String> = mutableListOf("d")
-        val encryptionKey: GCKey = mockk()
-        val encryptedRecord1: EncryptedRecord = mockk()
-        val encryptedRecord2: EncryptedRecord = mockk()
-        val indicator = slot<String>()
-
-        encryptTagsAndAnnotationsFlow(
-            tags,
-            annotations,
-            encodedAndEncryptedTagsAndAnnotations,
-            encryptedTags,
-            encryptedAnnotations,
-            encryptionKey
+    fun `Given, resolveSearchTags is called with Tags, it adds the encrypted OrGroup to the SearchTagsPipe`() {
+        // Given
+        val tags = mapOf(
+            "tag1" to "tag1Value",
+            "tag2" to "tag2Value",
+            "tag3" to "tag3Value"
         )
+        val encodedTags = listOf(
+            Triple("encodedTag1Value", "encodedAndroidLegacyTag1Value", "encodedJSLegacyTag1Value"),
+            Triple("encodedTag2Value", "encodedAndroidLegacyTag2Value", "encodedJSLegacyTag2Value"),
+            Triple("encodedTag3Value", "encodedAndroidLegacyTag3Value", "encodedJSLegacyTag3Value")
+        )
+        val encryptedGroups = listOf<MutableList<String>>(mockk(), mockk(), mockk())
+
+        every { cryptoService.fetchTagEncryptionKey() } returns mockk()
+
+        every { compatibilityEncoder.encode(tags["tag1"]!!) } returns encodedTags[0]
+        every { compatibilityEncoder.encode(tags["tag2"]!!) } returns encodedTags[1]
+        every { compatibilityEncoder.encode(tags["tag3"]!!) } returns encodedTags[2]
+
         every {
-            apiService.searchRecords(
-                alias,
-                userId,
-                startTime,
-                endTime,
-                pageSize,
-                offset,
-                capture(indicator)
-            )
-        } answers {
-            when (indicator.captured) {
-                encodedAndEncryptedTagsAndAnnotations.joinToString(",") -> Observable.fromArray(
-                    listOf(encryptedRecord1)
-                )
-                encryptedTags.joinToString(",") -> Observable.fromArray(listOf(encryptedRecord2))
-                else -> throw RuntimeException("Unknown tags ${indicator.captured}")
-            }
-        }
+            tagCryptoService.encryptList(encodedTags[0].toList(), any(), any())
+        } returns encryptedGroups[0]
+
+        every {
+            tagCryptoService.encryptList(encodedTags[1].toList(), any(), any())
+        } returns encryptedGroups[1]
+
+        every {
+            tagCryptoService.encryptList(encodedTags[2].toList(), any(), any())
+        } returns encryptedGroups[2]
+
+        every { searchTagsBuilderFactory.newBuilder() } returns searchTagsPipe
+        every { searchTagsPipe.addOrTuple(encryptedGroups[0]) } returns searchTagsPipe
+        every { searchTagsPipe.addOrTuple(encryptedGroups[1]) } returns searchTagsPipe
+        every { searchTagsPipe.addOrTuple(encryptedGroups[2]) } returns searchTagsPipe
+        every { searchTagsPipe.seal() } returns mockk()
 
         // When
-        val observer = service.searchRecords(
-            alias,
-            userId,
-            startTime,
-            endTime,
-            pageSize,
-            offset,
-            tags,
-            annotations
-        ).test().await()
+        service.resolveSearchTags(tags, emptyList())
 
         // Then
-        val result = observer
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
+        verify(atLeast = 1) { searchTagsPipe.addOrTuple(encryptedGroups[0]) }
+        verify(atLeast = 1) { searchTagsPipe.addOrTuple(encryptedGroups[1]) }
+        verify(atLeast = 1) { searchTagsPipe.addOrTuple(encryptedGroups[2]) }
+    }
 
-        assertEquals(
-            expected = listOf(encryptedRecord1, encryptedRecord2),
-            actual = result
+    // Annotations
+    @Test
+    fun `Given, resolveSearchTags is called with Annotations, delegates the plain Tags to the CompatibilityEncoder`() {
+        // Given
+        val annotations = listOf(
+            "annotation1Value",
+            "annotation2Value",
+            "annotation3Value"
         )
 
-        verifyEncryptTagsAndAnnotationsFlow(
-            tags,
-            annotations,
-            encryptionKey
+        every { compatibilityEncoder.encode(annotations[0]) } returns mockk(relaxed = true)
+        every { compatibilityEncoder.encode(annotations[1]) } returns mockk(relaxed = true)
+        every { compatibilityEncoder.encode(annotations[2]) } returns mockk(relaxed = true)
+
+        every { compatibilityEncoder.normalize(annotations[0]) } returns "a"
+        every { compatibilityEncoder.normalize(annotations[1]) } returns "b"
+        every { compatibilityEncoder.normalize(annotations[2]) } returns "c"
+
+        every { cryptoService.fetchTagEncryptionKey() } returns mockk()
+        every { tagCryptoService.encryptList(any(), any(), any()) } returns mockk()
+
+        every { searchTagsBuilderFactory.newBuilder() } returns mockk(relaxed = true)
+
+        // When
+        service.resolveSearchTags(emptyMap(), annotations)
+
+        // Then
+        verify(atMost = 1) { compatibilityEncoder.encode(annotations[0]) }
+        verify(atMost = 1) { compatibilityEncoder.encode(annotations[1]) }
+        verify(atMost = 1) { compatibilityEncoder.encode(annotations[2]) }
+    }
+
+    @Test
+    fun `Given, resolveSearchTags is called with Annotations, delegates the TagGroupKey and the TagGroupValue to the TagCryptoService`() {
+        // Given
+        val tagEncryptionKey: GCKey = mockk()
+        val annotations = listOf(
+            "annotation1Value",
+            "annotation2Value",
+            "annotation3Value"
         )
-        verify(exactly = 2) {
-            apiService.searchRecords(
-                alias,
-                userId,
-                startTime,
-                endTime,
-                pageSize,
-                offset,
-                or(
-                    encodedAndEncryptedTagsAndAnnotations.joinToString(","),
-                    encryptedTags.joinToString(",")
-                )
+        val encodedTags = listOf(
+            Triple("encodedTag1Value", "encodedAndroidLegacyTag1Value", "encodedJSLegacyTag1Value"),
+            Triple("encodedTag2Value", "encodedAndroidLegacyTag2Value", "encodedJSLegacyTag2Value"),
+            Triple("encodedTag3Value", "encodedAndroidLegacyTag3Value", "encodedJSLegacyTag3Value")
+        )
+
+        every { compatibilityEncoder.encode(annotations[0]) } returns encodedTags[0]
+        every { compatibilityEncoder.encode(annotations[1]) } returns encodedTags[1]
+        every { compatibilityEncoder.encode(annotations[2]) } returns encodedTags[2]
+
+        every { cryptoService.fetchTagEncryptionKey() } returns tagEncryptionKey
+
+        every { searchTagsBuilderFactory.newBuilder() } returns mockk(relaxed = true)
+
+        every {
+            tagCryptoService.encryptList(
+                encodedTags[0].copy(second = annotations[0]).toList(),
+                tagEncryptionKey,
+                "${TaggingContract.ANNOTATION_KEY}${TaggingContract.DELIMITER}"
+            )
+        } returns mockk()
+
+        every {
+            tagCryptoService.encryptList(
+                encodedTags[1].copy(second = annotations[1]).toList(),
+                tagEncryptionKey,
+                "${TaggingContract.ANNOTATION_KEY}${TaggingContract.DELIMITER}"
+            )
+        } returns mockk()
+
+        every {
+            tagCryptoService.encryptList(
+                encodedTags[2].copy(second = annotations[2]).toList(),
+                tagEncryptionKey,
+                "${TaggingContract.ANNOTATION_KEY}${TaggingContract.DELIMITER}"
+            )
+        } returns mockk()
+
+        // When
+        service.resolveSearchTags(emptyMap(), annotations)
+
+        // Then
+        verify(atMost = 1) {
+            tagCryptoService.encryptList(
+                encodedTags[0].copy(second = annotations[0]).toList(),
+                tagEncryptionKey,
+                "${TaggingContract.ANNOTATION_KEY}${TaggingContract.DELIMITER}"
+            )
+        }
+
+        verify(atMost = 1) {
+            tagCryptoService.encryptList(
+                encodedTags[1].copy(second = annotations[1]).toList(),
+                tagEncryptionKey,
+                "${TaggingContract.ANNOTATION_KEY}${TaggingContract.DELIMITER}"
+            )
+        }
+
+        verify(atMost = 1) {
+            tagCryptoService.encryptList(
+                encodedTags[2].copy(second = annotations[2]).toList(),
+                tagEncryptionKey,
+                "${TaggingContract.ANNOTATION_KEY}${TaggingContract.DELIMITER}"
             )
         }
     }
 
     @Test
-    fun `Given searchRecords is called with its appropriate parameter, it calls the ApiService only if the legacy encrypted tags equal the current version of encrypted tags`() {
-        val alias = "alias"
-        val userId = "id"
-        val startTime = "start"
-        val endTime = "end"
-        val pageSize = 23
-        val offset = 42
-        val tags = hashMapOf("key" to "value")
-        val annotations: Annotations = mockk()
-        val encodedAndEncryptedTagsAndAnnotations: MutableList<String> =
-            mutableListOf("a", "b", "c")
-        val encryptedTags: MutableList<String> = mutableListOf("c", "b", "a")
-        val encryptionKey: GCKey = mockk()
-        val encryptedAnnotations: MutableList<String> = mutableListOf()
-        val encryptedRecord1: EncryptedRecord = mockk()
-        val encryptedRecord2: EncryptedRecord = mockk()
-        val indicator = slot<String>()
-
-        encryptTagsAndAnnotationsFlow(
-            tags,
-            annotations,
-            encodedAndEncryptedTagsAndAnnotations,
-            encryptedTags,
-            encryptedAnnotations,
-            encryptionKey
+    fun `Given, resolveSearchTags is called with Annotations, it adds the encrypted OrGroup to the SearchTagsPipe`() {
+        // Given
+        val annotations = listOf(
+            "annotation1Value",
+            "annotation2Value",
+            "annotation3Value"
         )
+        val encodedTags = listOf(
+            Triple("encodedTag1Value", "encodedAndroidLegacyTag1Value", "encodedJSLegacyTag1Value"),
+            Triple("encodedTag2Value", "encodedAndroidLegacyTag2Value", "encodedJSLegacyTag2Value"),
+            Triple("encodedTag3Value", "encodedAndroidLegacyTag3Value", "encodedJSLegacyTag3Value")
+        )
+        val encryptedGroups = listOf<MutableList<String>>(mockk(), mockk(), mockk())
+
+        every { cryptoService.fetchTagEncryptionKey() } returns mockk()
+
+        every { compatibilityEncoder.encode(annotations[0]) } returns encodedTags[0]
+        every { compatibilityEncoder.encode(annotations[1]) } returns encodedTags[1]
+        every { compatibilityEncoder.encode(annotations[2]) } returns encodedTags[2]
+
         every {
-            apiService.searchRecords(
-                alias,
-                userId,
-                startTime,
-                endTime,
-                pageSize,
-                offset,
-                capture(indicator)
+            tagCryptoService.encryptList(
+                encodedTags[0].copy(second = annotations[0]).toList(),
+                any(),
+                any()
             )
-        } answers {
-            when (indicator.captured) {
-                encodedAndEncryptedTagsAndAnnotations.joinToString(",") -> Observable.fromArray(
-                    listOf(encryptedRecord1)
-                )
-                encryptedTags.joinToString(",") -> Observable.fromArray(listOf(encryptedRecord2))
-                else -> throw RuntimeException("Unknown tags ${indicator.captured}")
-            }
-        }
+        } returns encryptedGroups[0]
+
+        every {
+            tagCryptoService.encryptList(
+                encodedTags[1].copy(second = annotations[1]).toList(),
+                any(),
+                any()
+            )
+        } returns encryptedGroups[1]
+
+        every {
+            tagCryptoService.encryptList(
+                encodedTags[2].copy(second = annotations[2]).toList(),
+                any(),
+                any()
+            )
+        } returns encryptedGroups[2]
+
+        every { searchTagsBuilderFactory.newBuilder() } returns searchTagsPipe
+        every { searchTagsPipe.addOrTuple(encryptedGroups[0]) } returns searchTagsPipe
+        every { searchTagsPipe.addOrTuple(encryptedGroups[1]) } returns searchTagsPipe
+        every { searchTagsPipe.addOrTuple(encryptedGroups[2]) } returns searchTagsPipe
+        every { searchTagsPipe.seal() } returns mockk()
 
         // When
-        val observer = service.searchRecords(
-            alias,
-            userId,
-            startTime,
-            endTime,
-            pageSize,
-            offset,
-            tags,
-            annotations
-        ).test().await()
+        service.resolveSearchTags(emptyMap(), annotations)
 
         // Then
-        val result = observer
-            .assertComplete()
-            .assertValueCount(1)
-            .values()[0]
-
-        assertEquals(
-            expected = listOf(encryptedRecord1),
-            actual = result
-        )
-
-        verifyEncryptTagsAndAnnotationsFlow(
-            tags,
-            annotations,
-            encryptionKey
-        )
-        verify(exactly = 1) {
-            apiService.searchRecords(
-                alias,
-                userId,
-                startTime,
-                endTime,
-                pageSize,
-                offset,
-                encodedAndEncryptedTagsAndAnnotations.joinToString(",")
-            )
-        }
+        verify(atLeast = 1) { searchTagsPipe.addOrTuple(encryptedGroups[0]) }
+        verify(atLeast = 1) { searchTagsPipe.addOrTuple(encryptedGroups[1]) }
+        verify(atLeast = 1) { searchTagsPipe.addOrTuple(encryptedGroups[2]) }
     }
 }

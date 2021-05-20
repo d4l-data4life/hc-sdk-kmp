@@ -16,7 +16,6 @@
 package care.data4life.sdk.network
 
 import care.data4life.auth.AuthorizationContract
-import care.data4life.sdk.NetworkConnectivityService
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.D4LRuntimeException
 import care.data4life.sdk.network.model.CommonKeyResponse
@@ -26,6 +25,7 @@ import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.UserInfo
 import care.data4life.sdk.network.model.VersionList
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter
+import care.data4life.sdk.network.util.interceptor.VersionInterceptor
 import care.data4life.sdk.util.Base64.encodeToString
 import com.squareup.moshi.Moshi
 import io.reactivex.Completable
@@ -33,6 +33,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import okhttp3.CertificatePinner
+import okhttp3.HttpUrl
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -55,8 +56,9 @@ class ApiService constructor(
     private val clientID: String,
     private val clientSecret: String,
     private val platform: String?,
-    private val connectivityService: NetworkConnectivityService,
-    private val clientName: String?,
+    private val connectivityService: NetworkingContract.NetworkConnectivityService,
+    private val clientName: NetworkingContract.Clients,
+    private val clientVersion: String,
     staticAccessToken: ByteArray?,
     private val debug: Boolean
 ) : NetworkingContract.Service {
@@ -75,6 +77,7 @@ class ApiService constructor(
      * @param platform            Usage platform (D4L, S4H)
      * @param connectivityService Connectivity service
      * @param clientName          Client name
+     * @param clientName          Client version
      * @param debug               Debug flag
      */
     constructor(
@@ -83,8 +86,9 @@ class ApiService constructor(
         clientID: String,
         clientSecret: String,
         platform: String?,
-        connectivityService: NetworkConnectivityService,
-        clientName: String?,
+        connectivityService: NetworkingContract.NetworkConnectivityService,
+        clientName: NetworkingContract.Clients,
+        clientVersion: String,
         debug: Boolean
     ) : this(
         authService,
@@ -94,6 +98,7 @@ class ApiService constructor(
         platform,
         connectivityService,
         clientName,
+        clientVersion,
         null,
         debug
     )
@@ -109,16 +114,6 @@ class ApiService constructor(
             .build()
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.setLevel(if (debug) HttpLoggingInterceptor.Level.HEADERS else HttpLoggingInterceptor.Level.NONE)
-        val versionInterceptor = { chain: Interceptor.Chain ->
-            var request = chain.request()
-            request = request.newBuilder()
-                .addHeader(
-                    NetworkingContract.HEADER_GC_SDK_VERSION,
-                    String.format(NetworkingContract.FORMAT_ANDROID_CLIENT_NAME, clientName)
-                )
-                .build()
-            chain.proceed(request)
-        }
 
         // Pick authentication interceptor based on whether a static access token is used or not
         val authorizationInterceptor = if (staticAccessToken != null) ::staticTokenIntercept else ::intercept
@@ -128,7 +123,7 @@ class ApiService constructor(
             try {
                 response = chain.proceed(request)
             } catch (exception: SocketTimeoutException) {
-                if (connectivityService.isConnected) {
+                if (connectivityService.isConnected()) {
                     response = chain.proceed(request)
                 }
             }
@@ -136,7 +131,11 @@ class ApiService constructor(
         }
         client = OkHttpClient.Builder()
             .certificatePinner(certificatePinner)
-            .addInterceptor(versionInterceptor)
+            .addInterceptor(
+                VersionInterceptor.getInstance(
+                    Pair(clientName, clientVersion)
+                )
+            )
             .addInterceptor(authorizationInterceptor)
             .addInterceptor(loggingInterceptor)
             .addInterceptor(retryInterceptor)
@@ -173,6 +172,7 @@ class ApiService constructor(
         return service!!.fetchCommonKey(alias, userId, commonKeyId)
     }
 
+    // TODO: Is this method even in use?
     override fun uploadTagEncryptionKey(
         alias: String,
         userId: String,
@@ -215,14 +215,26 @@ class ApiService constructor(
         endDate: String?,
         pageSize: Int,
         offset: Int,
-        tags: String
+        tags: NetworkingContract.SearchTags
     ): Observable<List<EncryptedRecord>> {
-        return service!!.searchRecords(alias, userId, startDate, endDate, pageSize, offset, tags)
+        return service!!.searchRecords(
+            alias,
+            userId,
+            startDate,
+            endDate,
+            pageSize,
+            offset,
+            tags.tags
+        )
     }
 
-    override fun getCount(alias: String, userId: String, tags: String): Single<Int> {
+    override fun countRecords(
+        alias: String,
+        userId: String,
+        tags: NetworkingContract.SearchTags
+    ): Single<Int> {
         return service!!
-            .getRecordsHeader(alias, userId, tags)
+            .getRecordsHeader(alias, userId, tags.tags)
             .map { response ->
                 response.headers()[NetworkingContract.HEADER_TOTAL_COUNT]!!
                     .toInt()
@@ -315,7 +327,7 @@ class ApiService constructor(
         var request: Request = chain.request()
         val alias = request.header(NetworkingContract.HEADER_ALIAS)
         val authHeader = request.headers[NetworkingContract.HEADER_AUTHORIZATION]
-        if (authHeader != null && authHeader == NetworkingContract.HEADER_BASIC_AUTH) {
+        if (authHeader != null && authHeader == NetworkingContract.BASIC_AUTH_MARKER) {
             val auth = encodeToString("$clientID:$clientSecret")
             request = request.newBuilder()
                 .removeHeader(NetworkingContract.HEADER_AUTHORIZATION)
@@ -323,7 +335,7 @@ class ApiService constructor(
                     NetworkingContract.HEADER_AUTHORIZATION,
                     String.format(NetworkingContract.FORMAT_BASIC_AUTH, auth)
                 ).build()
-        } else if (authHeader != null && authHeader == NetworkingContract.HEADER_ACCESS_TOKEN) {
+        } else if (authHeader != null && authHeader == NetworkingContract.ACCESS_TOKEN_MARKER) {
             var tokenKey: String
             tokenKey = try {
                 authService.getAccessToken(alias!!)
@@ -404,10 +416,17 @@ class ApiService constructor(
      * @param platform            Usage platform (D4L, S4H)
      * @param connectivityService Connectivity service
      * @param clientName          Client name
+     * @param clientVersion         Client version
      * @param staticAccessToken   Prefetched OAuth token - if not null, it will be used directly (no token renewal).
      * @param debug               Debug flag
      */
     init {
         configureService()
+    }
+
+    // TODO: This is a test concern and will be removed soon
+    fun resetService(client: OkHttpClient, baseUrl: HttpUrl) {
+        this.client = client
+        this.service = createService(baseUrl.toString())
     }
 }

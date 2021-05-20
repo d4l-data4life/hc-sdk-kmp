@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.network
 
-import care.data4life.auth.AuthorizationService
+import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.lang.D4LRuntimeException
 import care.data4life.sdk.network.NetworkingContract.Companion.PARAM_TEK
 import care.data4life.sdk.network.model.CommonKeyResponse
@@ -59,7 +59,7 @@ import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class ApiServiceTest {
-    private val authService: AuthorizationService = mockk()
+    private val authService: AuthorizationContract.Service = mockk()
     private val env: NetworkingContract.Environment = mockk(relaxed = true)
     private val ihcService: IHCService = mockk()
     private lateinit var service: NetworkingContract.Service
@@ -94,6 +94,7 @@ class ApiServiceTest {
             "something",
             "you should not care",
             mockk(relaxed = true),
+            NetworkingContract.Clients.JAVA,
             "what so ever",
             false
         )
@@ -116,6 +117,7 @@ class ApiServiceTest {
             "something",
             "you should not care",
             mockk(relaxed = true),
+            NetworkingContract.Clients.JAVA,
             "what so ever",
             false
         )
@@ -259,12 +261,15 @@ class ApiServiceTest {
         val endDate = "somewhen else"
         val pageSize = 23
         val offset = 42
-        val tags = "tags"
+        val formattedTags = "tags"
+        val tags: NetworkingContract.SearchTags = mockk()
         val result: Observable<List<EncryptedRecord>> = mockk()
 
         every {
-            service.searchRecords(alias, userId, startDate, endDate, pageSize, offset, tags)
+            ihcService.searchRecords(alias, userId, startDate, endDate, pageSize, offset, formattedTags)
         } returns result
+
+        every { tags.tags } returns formattedTags
 
         // When
         val actual = service.searchRecords(
@@ -284,26 +289,30 @@ class ApiServiceTest {
         )
 
         verify(exactly = 1) {
-            ihcService.searchRecords(alias, userId, startDate, endDate, pageSize, offset, tags)
+            ihcService.searchRecords(alias, userId, startDate, endDate, pageSize, offset, formattedTags)
         }
+
+        verify(exactly = 1) { tags.tags }
     }
 
     @Test
-    fun `Given, getCount is called with an Alias, UserId and Tags, it delegates it to the IHCService, parses the result and returns it`() {
+    fun `Given, countRecords is called with an Alias, UserId and Tags, it delegates it to the IHCService, parses the result and returns it`() {
         // Given
         val alias = ALIAS
         val userId = USER_ID
-        val tags = RECORD_ID
+        val formattedTags = "tags"
+        val tags: NetworkingContract.SearchTags = mockk()
         val amount = "23"
         val response: Response<Void> = mockk()
         val headers: Headers = mockk()
 
-        every { ihcService.getRecordsHeader(alias, userId, tags) } returns Single.just(response)
+        every { tags.tags } returns formattedTags
+        every { ihcService.getRecordsHeader(alias, userId, formattedTags) } returns Single.just(response)
         every { response.headers() } returns headers
         every { headers[NetworkingContract.HEADER_TOTAL_COUNT] } returns amount
 
         // When
-        val actual = service.getCount(alias, userId, tags).blockingGet()
+        val actual = service.countRecords(alias, userId, tags).blockingGet()
 
         // Then
         assertSame(
@@ -312,8 +321,9 @@ class ApiServiceTest {
         )
 
         verify(exactly = 1) {
-            ihcService.getRecordsHeader(alias, userId, tags)
+            ihcService.getRecordsHeader(alias, userId, formattedTags)
         }
+        verify(exactly = 1) { tags.tags }
     }
 
     @Test
@@ -484,6 +494,7 @@ class ApiServiceTest {
             "something",
             "you should not care",
             mockk(relaxed = true),
+            NetworkingContract.Clients.JAVA,
             "what so ever",
             "token".toByteArray(),
             false
@@ -503,7 +514,7 @@ class ApiServiceTest {
     }
 
     @Test
-    fun `Given, logout is called with an Alias, it resolves the accessToken, delegates it with the Alias to the IHCService and resturns its result`() {
+    fun `Given, logout is called with an Alias, it resolves the accessToken, delegates it with the Alias to the IHCService and returns its result`() {
         // Given
         val alias = ALIAS
         val token = "token"

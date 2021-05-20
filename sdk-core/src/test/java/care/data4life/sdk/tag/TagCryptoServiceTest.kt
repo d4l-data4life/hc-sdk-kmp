@@ -35,13 +35,14 @@ import kotlin.test.assertTrue
 class TagCryptoServiceTest {
     private val cryptoService: CryptoContract.Service = mockk()
     private val base64: Base64 = mockk()
-    private val tagHelper: TaggingContract.Helper = mockk()
+    private val tagEncoding: TaggingContract.Encoding = mockk()
+    private val tagConverter: TaggingContract.Converter = mockk()
     private lateinit var tagEncryptionService: TagCryptoService
 
     @Before
     fun setUp() {
         clearAllMocks()
-        tagEncryptionService = TagCryptoService(cryptoService, base64, tagHelper)
+        tagEncryptionService = TagCryptoService(cryptoService, base64, tagEncoding, tagConverter)
     }
 
     @Test
@@ -59,7 +60,7 @@ class TagCryptoServiceTest {
         val encryptedTag = "encryptedTag"
         val symEncrypted = ByteArray(23)
 
-        every { tagHelper.encode(tag.second) } returns tag.second
+        every { tagEncoding.encode(tag.second) } returns tag.second
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(
@@ -80,7 +81,7 @@ class TagCryptoServiceTest {
         )
 
         verify(exactly = 1) { cryptoService.fetchTagEncryptionKey() }
-        verify(exactly = 1) { tagHelper.encode(tag.second) }
+        verify(exactly = 1) { tagEncoding.encode(tag.second) }
         verify(exactly = 1) { base64.encodeToString(symEncrypted) }
         verify(exactly = 1) {
             cryptoService.symEncrypt(
@@ -99,7 +100,7 @@ class TagCryptoServiceTest {
         val encryptedAnnotation = "encryptedAnnotation"
         val symEncrypted = ByteArray(23)
 
-        every { tagHelper.encode(annotations[0]) } returns annotations[0]
+        every { tagEncoding.encode(annotations[0]) } returns annotations[0]
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(
@@ -120,7 +121,7 @@ class TagCryptoServiceTest {
         )
 
         verify(exactly = 1) { cryptoService.fetchTagEncryptionKey() }
-        verify(exactly = 1) { tagHelper.encode(annotations[0]) }
+        verify(exactly = 1) { tagEncoding.encode(annotations[0]) }
         verify(exactly = 1) { base64.encodeToString(symEncrypted) }
         verify {
             cryptoService.symEncrypt(
@@ -142,8 +143,8 @@ class TagCryptoServiceTest {
         val encryptedAnnotation = "encryptedAnnotation"
         val symEncrypted = listOf(ByteArray(23), ByteArray(42))
 
-        every { tagHelper.encode(tag.second) } returns tag.second
-        every { tagHelper.encode(annotations[0]) } returns annotations[0]
+        every { tagEncoding.encode(tag.second) } returns tag.second
+        every { tagEncoding.encode(annotations[0]) } returns annotations[0]
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(
@@ -171,7 +172,7 @@ class TagCryptoServiceTest {
             expected = listOf(encryptedTag, encryptedAnnotation)
         )
         verify(exactly = 1) { cryptoService.fetchTagEncryptionKey() }
-        verify(exactly = 2) { tagHelper.encode(or(tag.second, annotations[0])) }
+        verify(exactly = 2) { tagEncoding.encode(or(tag.second, annotations[0])) }
         verify(exactly = 2) {
             base64.encodeToString(or(symEncrypted[0], symEncrypted[1]))
         }
@@ -195,7 +196,7 @@ class TagCryptoServiceTest {
         val gcKey: GCKey = mockk()
         val encryptedTag = "encryptedTag"
 
-        every { tagHelper.encode(tag.second) } returns tag.second
+        every { tagEncoding.encode(tag.second) } returns tag.second
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(
@@ -223,7 +224,7 @@ class TagCryptoServiceTest {
         val annotations = listOf("value")
         val gcKey: GCKey = mockk()
 
-        every { tagHelper.encode(annotations[0]) } returns annotations[0]
+        every { tagEncoding.encode(annotations[0]) } returns annotations[0]
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every {
             cryptoService.symEncrypt(
@@ -253,8 +254,8 @@ class TagCryptoServiceTest {
         val encryptedTag = "encryptedTag"
         val encryptedTagsAndAnnotations: MutableList<String> = arrayListOf(encryptedTag)
 
-        every { tagHelper.decode(tag) } returns tag
-        every { tagHelper.convertToTagMap(listOf(tag)) } returns hashMapOf("key" to "value")
+        every { tagEncoding.decode(tag) } returns tag
+        every { tagConverter.toTags(listOf(tag)) } returns hashMapOf("key" to "value")
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every { base64.decode(encryptedTag) } returns encryptedTag.toByteArray()
         every {
@@ -276,7 +277,7 @@ class TagCryptoServiceTest {
             expected = hashMapOf("key" to "value")
         )
 
-        verify(exactly = 2) { tagHelper.decode(tag) }
+        verify(exactly = 2) { tagEncoding.decode(tag) }
         verify(exactly = 2) { base64.decode(encryptedTag) }
         verify(exactly = 2) {
             cryptoService.symDecrypt(
@@ -285,7 +286,7 @@ class TagCryptoServiceTest {
                 IV
             )
         }
-        verify(exactly = 1) { tagHelper.convertToTagMap(listOf(tag)) }
+        verify(exactly = 1) { tagConverter.toTags(listOf(tag)) }
         verify(exactly = 1) { cryptoService.fetchTagEncryptionKey() }
     }
 
@@ -297,7 +298,7 @@ class TagCryptoServiceTest {
         val encryptedTag = "encryptedTag"
         val encryptedTags: MutableList<String> = arrayListOf(encryptedTag)
 
-        every { tagHelper.convertToTagMap(listOf()) } returns hashMapOf()
+        every { tagConverter.toTags(listOf()) } returns hashMapOf()
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
         every { base64.decode(encryptedTag) } returns encryptedTag.toByteArray()
         every {
@@ -307,7 +308,7 @@ class TagCryptoServiceTest {
                 IV
             )
         } returns tag.toByteArray()
-        every { tagHelper.decode(tag) } returns tag
+        every { tagEncoding.decode(tag) } returns tag
 
         // when
         val (decryptedTags, _) = tagEncryptionService.decryptTagsAndAnnotations(encryptedTags)
@@ -318,7 +319,7 @@ class TagCryptoServiceTest {
             expected = hashMapOf()
         )
 
-        verify(exactly = 2) { tagHelper.decode(tag) }
+        verify(exactly = 2) { tagEncoding.decode(tag) }
         verify(exactly = 2) { base64.decode(encryptedTag) }
         verify(exactly = 2) {
             cryptoService.symDecrypt(
@@ -327,7 +328,7 @@ class TagCryptoServiceTest {
                 IV
             )
         }
-        verify(exactly = 1) { tagHelper.convertToTagMap(listOf()) }
+        verify(exactly = 1) { tagConverter.toTags(listOf()) }
         verify(exactly = 1) { cryptoService.fetchTagEncryptionKey() }
     }
 
@@ -341,7 +342,7 @@ class TagCryptoServiceTest {
         val encryptedAnnotations: MutableList<String> = arrayListOf(encryptedAnnotation)
 
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
-        every { tagHelper.convertToTagMap(listOf()) } returns hashMapOf()
+        every { tagConverter.toTags(listOf()) } returns hashMapOf()
         every { base64.decode(encryptedAnnotation) } returns encryptedAnnotation.toByteArray()
         every {
             cryptoService.symDecrypt(
@@ -350,7 +351,7 @@ class TagCryptoServiceTest {
                 IV
             )
         } returns annotation.toByteArray()
-        every { tagHelper.decode(annotation) } returns annotation
+        every { tagEncoding.decode(annotation) } returns annotation
 
         // When
         val (_, decryptedAnnotations) = tagEncryptionService.decryptTagsAndAnnotations(
@@ -363,7 +364,7 @@ class TagCryptoServiceTest {
             expected = listOf(expected)
         )
 
-        verify(exactly = 2) { tagHelper.decode(annotation) }
+        verify(exactly = 2) { tagEncoding.decode(annotation) }
         verify(exactly = 2) { base64.decode(encryptedAnnotation) }
         verify(exactly = 2) {
             cryptoService.symDecrypt(
@@ -372,7 +373,7 @@ class TagCryptoServiceTest {
                 IV
             )
         }
-        verify(exactly = 1) { tagHelper.convertToTagMap(listOf()) }
+        verify(exactly = 1) { tagConverter.toTags(listOf()) }
         verify(exactly = 1) { cryptoService.fetchTagEncryptionKey() }
     }
 
@@ -385,7 +386,7 @@ class TagCryptoServiceTest {
         val encryptedAnnotations: MutableList<String> = arrayListOf(encryptedTag)
 
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
-        every { tagHelper.convertToTagMap(listOf(tag)) } returns hashMapOf("key" to "value")
+        every { tagConverter.toTags(listOf(tag)) } returns hashMapOf("key" to "value")
         every { base64.decode(encryptedTag) } returns encryptedTag.toByteArray()
         every {
             cryptoService.symDecrypt(
@@ -394,7 +395,7 @@ class TagCryptoServiceTest {
                 IV
             )
         } returns tag.toByteArray()
-        every { tagHelper.decode(tag) } returns tag
+        every { tagEncoding.decode(tag) } returns tag
 
         // when
         val (_, decryptedAnnotations) = tagEncryptionService.decryptTagsAndAnnotations(
@@ -407,7 +408,7 @@ class TagCryptoServiceTest {
             expected = listOf()
         )
 
-        verify(exactly = 2) { tagHelper.decode(tag) }
+        verify(exactly = 2) { tagEncoding.decode(tag) }
         verify(exactly = 2) { base64.decode(encryptedTag) }
         verify(exactly = 2) {
             cryptoService.symDecrypt(
@@ -416,7 +417,7 @@ class TagCryptoServiceTest {
                 IV
             )
         }
-        verify(exactly = 1) { tagHelper.convertToTagMap(listOf(tag)) }
+        verify(exactly = 1) { tagConverter.toTags(listOf(tag)) }
         verify(exactly = 1) { cryptoService.fetchTagEncryptionKey() }
     }
 
@@ -434,7 +435,7 @@ class TagCryptoServiceTest {
         )
 
         every { cryptoService.fetchTagEncryptionKey() } returns gcKey
-        every { tagHelper.convertToTagMap(listOf(tag)) } returns hashMapOf("key" to "value")
+        every { tagConverter.toTags(listOf(tag)) } returns hashMapOf("key" to "value")
         every { base64.decode(encryptedTag) } returns encryptedTag.toByteArray()
         every {
             cryptoService.symDecrypt(
@@ -443,7 +444,7 @@ class TagCryptoServiceTest {
                 IV
             )
         } returns tag.toByteArray()
-        every { tagHelper.decode(tag) } returns tag
+        every { tagEncoding.decode(tag) } returns tag
 
         every { base64.decode(encryptedAnnotation) } returns encryptedAnnotation.toByteArray()
         every {
@@ -453,7 +454,7 @@ class TagCryptoServiceTest {
                 IV
             )
         } returns annotation.toByteArray()
-        every { tagHelper.decode(annotation) } returns annotation
+        every { tagEncoding.decode(annotation) } returns annotation
 
         // when
         val (decryptedTags, decryptedAnnotations) = tagEncryptionService.decryptTagsAndAnnotations(
@@ -470,7 +471,7 @@ class TagCryptoServiceTest {
             expected = listOf("test")
         )
 
-        verify(exactly = 2) { tagHelper.decode(tag) }
+        verify(exactly = 2) { tagEncoding.decode(tag) }
         verify(exactly = 2) { base64.decode(encryptedTag) }
         verify(exactly = 2) {
             cryptoService.symDecrypt(
@@ -479,7 +480,7 @@ class TagCryptoServiceTest {
                 IV
             )
         }
-        verify(exactly = 1) { tagHelper.convertToTagMap(listOf(tag)) }
+        verify(exactly = 1) { tagConverter.toTags(listOf(tag)) }
         verify(exactly = 1) { cryptoService.fetchTagEncryptionKey() }
     }
 

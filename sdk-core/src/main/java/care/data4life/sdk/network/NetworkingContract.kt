@@ -58,10 +58,10 @@ interface NetworkingContract {
             endDate: String?,
             pageSize: Int,
             offset: Int,
-            tags: String
+            tags: SearchTags
         ): Observable<List<EncryptedRecord>>
 
-        fun getCount(alias: String, userId: String, tags: String): Single<Int>
+        fun countRecords(alias: String, userId: String, tags: SearchTags): Single<Int>
 
         fun deleteRecord(alias: String, recordId: String, userId: String): Completable
 
@@ -84,12 +84,33 @@ interface NetworkingContract {
         fun fetchVersionInfo(): Single<VersionList>
     }
 
+    interface CertificatePinnerFactory {
+        fun getInstance(platform: String, env: Environment): CertificatePinner
+    }
+
     interface Interceptor : okhttp3.Interceptor {
         override fun intercept(chain: okhttp3.Interceptor.Chain): Response
     }
 
-    interface CertificatePinnerFactory {
-        fun getInstance(baseUrl: String, pin: String): CertificatePinner
+    interface PartialInterceptor<T : Any> {
+        fun intercept(
+            payload: T,
+            chain: okhttp3.Interceptor.Chain
+        ): Response
+    }
+
+    interface InterceptorFactory<T : Any> {
+        fun getInstance(payload: T): Interceptor
+    }
+
+    enum class Clients(val identifier: String) {
+        ANDROID("android"),
+        JAVA("jvm"),
+        INGESTION("ingestion")
+    }
+
+    fun interface NetworkConnectivityService {
+        fun isConnected(): Boolean
     }
 
     enum class Data4LifeURI(val uri: String) {
@@ -117,6 +138,19 @@ interface NetworkingContract {
         fun fromName(name: String?): Environment
     }
 
+    interface SearchTagsBuilder {
+        fun addOrTuple(tuple: List<String>): SearchTagsBuilder
+        fun seal(): SearchTags
+    }
+
+    interface SearchTags {
+        val tags: String
+    }
+
+    interface SearchTagsBuilderFactory {
+        fun newBuilder(): SearchTagsBuilder
+    }
+
     companion object {
         const val PLATFORM_D4L = "d4l"
         const val PLATFORM_S4H = "s4h"
@@ -125,20 +159,20 @@ interface NetworkingContract {
         const val SMART4HEALTH_EU = "sha256/yPBKbgJMVnMeovGKbAtuz65sfy/gpDu0WTiuB8bE5G0="
         const val REQUEST_TIMEOUT: Long = 2
         const val HEADER_ALIAS = "gc_alias"
-        const val HEADER_ACCESS_TOKEN = "access_token"
         const val HEADER_AUTHORIZATION = "Authorization"
-        const val HEADER_BASIC_AUTH = "basic_auth"
-        const val HEADER_GC_SDK_VERSION = "GC-SDK-Version"
+        const val ACCESS_TOKEN_MARKER = "access_token"
+        const val BASIC_AUTH_MARKER = "basic_auth"
+        const val HEADER_SDK_VERSION = "d4l-sdk-version"
+        const val FORMAT_CLIENT_VERSION = "%s-%s"
         const val HEADER_TOTAL_COUNT = "x-total-count"
         const val PARAM_FILE_NUMBER = "file_number"
         const val PARAM_TEK = "tek"
         const val FORMAT_BEARER_TOKEN = "Bearer %s"
         const val FORMAT_BASIC_AUTH = "Basic %s"
-        const val FORMAT_ANDROID_CLIENT_NAME = "Android %s"
         const val MEDIA_TYPE_OCTET_STREAM = "application/octet-stream"
         const val HTTP_401_UNAUTHORIZED = 401
-        const val AUTHORIZATION_WITH_ACCESS_TOKEN = "Authorization: access_token"
-        const val AUTHORIZATION_WITH_BASIC_AUTH = "Authorization: basic_auth"
-        const val HEADER_CONTENT_TYPE_OCTET_STREAM = "content-type: application/octet-stream"
+        const val AUTHORIZATION_WITH_ACCESS_TOKEN = "$HEADER_AUTHORIZATION: $ACCESS_TOKEN_MARKER"
+        const val AUTHORIZATION_WITH_BASIC_AUTH = "$HEADER_AUTHORIZATION: $BASIC_AUTH_MARKER"
+        const val HEADER_CONTENT_TYPE_OCTET_STREAM = "content-type: $MEDIA_TYPE_OCTET_STREAM"
     }
 }

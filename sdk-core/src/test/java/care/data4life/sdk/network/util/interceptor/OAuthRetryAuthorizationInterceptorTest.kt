@@ -47,14 +47,14 @@ class OAuthRetryAuthorizationInterceptorTest {
     }
 
     @Test
-    fun `It fulfils ParialInterceptor`() {
+    fun `It fulfils PartialInterceptor`() {
         val interceptor: Any = OAuthRetryTokenAuthorizationInterceptor(service)
 
         assertTrue(interceptor is NetworkingContract.PartialInterceptor<*>)
     }
 
     @Test
-    fun `Given a interceptor was created and intercept was called, it resolves the Alias and if AUTHORIZATION_WITH_ACCESS_TOKEN is present, while forwarding the Request`() {
+    fun `Given a interceptor was created and intercept was called, it resolves the Alias, if AUTHORIZATION_WITH_ACCESS_TOKEN is present, while forwarding the Request`() {
         val response: Response = mockk()
         val chain: Interceptor.Chain = mockk()
         val request: Request = mockk()
@@ -100,10 +100,7 @@ class OAuthRetryAuthorizationInterceptorTest {
 
         every { request.newBuilder() } returns builder
         every {
-            builder.removeHeader(NetworkingContract.HEADER_AUTHORIZATION)
-        } returns builder
-        every {
-            builder.addHeader(NetworkingContract.HEADER_AUTHORIZATION, "Bearer $token")
+            builder.header(NetworkingContract.HEADER_AUTHORIZATION, "Bearer $token")
         } returns builder
         every {
             builder.build()
@@ -123,8 +120,7 @@ class OAuthRetryAuthorizationInterceptorTest {
 
         verifyOrder {
             service.refreshAccessToken(alias)
-            builder.removeHeader(NetworkingContract.HEADER_AUTHORIZATION)
-            builder.addHeader(NetworkingContract.HEADER_AUTHORIZATION, "Bearer $token")
+            builder.header(NetworkingContract.HEADER_AUTHORIZATION, "Bearer $token")
             chain.proceed(modifiedRequest)
         }
     }

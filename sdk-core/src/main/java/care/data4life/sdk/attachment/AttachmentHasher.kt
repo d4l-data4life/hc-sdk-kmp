@@ -14,11 +14,11 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network.util.interceptor
+package care.data4life.sdk.attachment
 
-import okhttp3.Request
+import care.data4life.sdk.util.Base64
+import care.data4life.sdk.util.HashUtil
 
-fun Request.Builder.replaceHeader(
-    name: String,
-    value: String
-): Request.Builder = this.header(name, value)
+object AttachmentHasher : AttachmentContract.Hasher {
+    override fun hash(data: ByteArray): String = Base64.encodeToString(HashUtil.sha1(data))
+}

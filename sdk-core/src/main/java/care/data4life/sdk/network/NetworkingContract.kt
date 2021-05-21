@@ -33,7 +33,11 @@ class NetworkingContract {
     // TODO: Break this down
     interface Service {
         // TODO: move into a key route
-        fun fetchCommonKey(alias: String, userId: String, commonKeyId: String): Single<CommonKeyResponse>
+        fun fetchCommonKey(
+            alias: String,
+            userId: String,
+            commonKeyId: String
+        ): Single<CommonKeyResponse>
 
         fun uploadTagEncryptionKey(alias: String, userId: String, encryptedKey: String): Completable
 
@@ -49,7 +53,7 @@ class NetworkingContract {
             userId: String,
             recordId: String,
             encryptedRecord: NetworkModelContract.EncryptedRecord
-        ): Single<EncryptedRecord >
+        ): Single<EncryptedRecord>
 
         fun fetchRecord(alias: String, userId: String, recordId: String): Single<EncryptedRecord>
 
@@ -60,10 +64,10 @@ class NetworkingContract {
             endDate: String?,
             pageSize: Int,
             offset: Int,
-            tags: String
+            tags: SearchTags
         ): Observable<List<EncryptedRecord>>
 
-        fun getCount(alias: String, userId: String, tags: String): Single<Int>
+        fun countRecords(alias: String, userId: String, tags: SearchTags): Single<Int>
 
         fun deleteRecord(alias: String, recordId: String, userId: String): Completable
 
@@ -111,8 +115,8 @@ class NetworkingContract {
         INGESTION("ingestion")
     }
 
-    interface NetworkConnectivityService {
-        val isConnected: Boolean
+    fun interface NetworkConnectivityService {
+        fun isConnected(): Boolean
     }
 
     internal enum class Data4LifeURI(val uri: String) {
@@ -163,6 +167,19 @@ class NetworkingContract {
         ): IHCService
     }
 
+    interface SearchTagsBuilder {
+        fun addOrTuple(tuple: List<String>): SearchTagsBuilder
+        fun seal(): SearchTags
+    }
+
+    interface SearchTags {
+        val tags: String
+    }
+
+    interface SearchTagsBuilderFactory {
+        fun newBuilder(): SearchTagsBuilder
+    }
+
     companion object {
         const val PLATFORM_D4L = "d4l"
         const val PLATFORM_S4H = "s4h"
@@ -174,7 +191,7 @@ class NetworkingContract {
         const val HEADER_AUTHORIZATION = "Authorization"
         const val ACCESS_TOKEN_MARKER = "access_token"
         const val BASIC_AUTH_MARKER = "basic_auth"
-        const val HEADER_GC_SDK_VERSION = "gc-sdk-version"
+        const val HEADER_SDK_VERSION = "d4l-sdk-version"
         const val FORMAT_CLIENT_VERSION = "%s-%s"
         const val HEADER_TOTAL_COUNT = "x-total-count"
         const val PARAM_FILE_NUMBER = "file_number"

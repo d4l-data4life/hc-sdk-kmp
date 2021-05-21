@@ -14,11 +14,21 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network.util.interceptor
+package care.data4life.sdk.tag
 
-import okhttp3.Request
-
-fun Request.Builder.replaceHeader(
-    name: String,
-    value: String
-): Request.Builder = this.header(name, value)
+object TagConverter : TaggingContract.Converter {
+    override fun toTags(tagList: List<String>): Tags {
+        val tags = mutableMapOf<String, String>()
+        for (entry in tagList) {
+            val split = entry.split(TaggingContract.DELIMITER)
+            if (split.size == 2) {
+                val key = split[0]
+                val value = split[1]
+                if (key.isNotBlank() && value.isNotBlank()) {
+                    tags[key] = value
+                }
+            }
+        }
+        return tags
+    }
+}

@@ -23,7 +23,7 @@ import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
 
-class StaticAuthorizationInterceptor internal constructor(
+class StaticAuthorizationInterceptor private constructor(
     token: String
 ) : NetworkingContract.Interceptor {
     private val authHeader = String.format(NetworkingContract.FORMAT_BEARER_TOKEN, token)
@@ -47,5 +47,11 @@ class StaticAuthorizationInterceptor internal constructor(
             .replaceHeader(HEADER_AUTHORIZATION, authHeader)
             .build()
         return chain.proceed(request)
+    }
+
+    companion object Factory : NetworkingContract.InterceptorFactory<String> {
+        override fun getInstance(payload: String): NetworkingContract.Interceptor {
+            return StaticAuthorizationInterceptor(payload)
+        }
     }
 }

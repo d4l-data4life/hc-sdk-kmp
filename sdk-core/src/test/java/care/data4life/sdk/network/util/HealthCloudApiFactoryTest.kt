@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.network.util
 
-import care.data4life.sdk.network.IHCService
+import care.data4life.sdk.network.HealthCloudApi
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter
 import com.squareup.moshi.Moshi
@@ -36,16 +36,16 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
-class IHCServiceFactoryTest {
+class HealthCloudApiFactoryTest {
     @Test
-    fun `It fulfils IHCServiceFactory`() {
-        val factory: Any = IHCServiceFactory
+    fun `It fulfils HealthCloudApiFactory`() {
+        val factory: Any = HealthCloudApiFactory
 
-        assertTrue(factory is NetworkingContract.IHCServiceFactory)
+        assertTrue(factory is NetworkingContract.HealthCloudApiFactory)
     }
 
     @Test
-    fun `Given getInstance is called, it creates a IHCService`() {
+    fun `Given getInstance is called, it creates a HealthCloudApi`() {
         // Given
         mockkConstructor(Moshi.Builder::class)
         mockkConstructor(Retrofit.Builder::class)
@@ -56,7 +56,7 @@ class IHCServiceFactoryTest {
         val url = "https://notimportant.com"
         val client: OkHttpClient = mockk()
         val environment: NetworkingContract.Environment = mockk()
-        val service: IHCService = mockk()
+        val service: HealthCloudApi = mockk()
 
         val retrofitBuilder: Retrofit.Builder = mockk()
         val retrofit: Retrofit = mockk()
@@ -100,10 +100,10 @@ class IHCServiceFactoryTest {
         every {
             retrofitBuilder.build()
         } returns retrofit
-        every { retrofit.create(IHCService::class.java) } returns service
+        every { retrofit.create(HealthCloudApi::class.java) } returns service
 
         // When
-        val actual = IHCServiceFactory.getInstance(client, platform, environment)
+        val actual = HealthCloudApiFactory.getInstance(client, platform, environment)
 
         // Then
         assertSame(
@@ -124,7 +124,7 @@ class IHCServiceFactoryTest {
         verify(exactly = 1) {
             retrofitBuilder.baseUrl(url)
         }
-        verify(exactly = 1) { retrofit.create(IHCService::class.java) }
+        verify(exactly = 1) { retrofit.create(HealthCloudApi::class.java) }
 
         unmockkConstructor(Moshi.Builder::class)
         unmockkConstructor(Retrofit.Builder::class)

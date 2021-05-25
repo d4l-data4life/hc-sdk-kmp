@@ -43,7 +43,7 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-interface IHCService {
+interface HealthCloudApi {
     // Key
     @GET("/users/{userId}/commonkeys/{commonKeyId}")
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)

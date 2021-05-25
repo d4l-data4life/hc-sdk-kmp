@@ -24,11 +24,14 @@ object CertificatePinnerFactory : NetworkingContract.CertificatePinnerFactory {
         return apiBaseURL.replaceFirst("https://", "")
     }
 
-    override fun getInstance(platform: String, env: NetworkingContract.Environment): CertificatePinner {
+    override fun getInstance(
+        platform: String,
+        environment: NetworkingContract.Environment
+    ): CertificatePinner {
         return CertificatePinner.Builder()
             .add(
-                extractHostname(env.getApiBaseURL(platform)),
-                env.getCertificatePin(platform)
+                extractHostname(environment.getApiBaseURL(platform)),
+                environment.getCertificatePin(platform)
             )
             .build()
     }

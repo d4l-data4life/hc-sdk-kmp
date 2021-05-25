@@ -38,7 +38,7 @@ object Versions {
 
     object GradlePlugins {
         const val kotlin = Versions.kotlin
-        const val android = "4.1.3"
+        const val android = "4.2.1"
 
         /**
          * [Dexcount](https://github.com/KeepSafe/dexcount-gradle-plugin)
@@ -54,11 +54,6 @@ object Versions {
          * [Dokka - Documentation Engine for Kotlin](https://github.com/Kotlin/dokka)
          */
         const val dokka = "0.10.1"
-
-        /**
-         * [jGitVer](https://github.com/jgitver/gradle-jgitver-plugin)
-         */
-        const val gitVersioning = "0.10.0-rc03"
 
         /**
          * [Git-Version](https://github.com/palantir/gradle-git-version)

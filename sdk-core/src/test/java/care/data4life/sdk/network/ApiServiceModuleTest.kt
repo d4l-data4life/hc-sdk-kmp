@@ -19,7 +19,7 @@ package care.data4life.sdk.network
 import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
-import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_GC_SDK_VERSION
+import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_SDK_VERSION
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_TOTAL_COUNT
 import care.data4life.sdk.network.model.CommonKeyResponse
 import care.data4life.sdk.network.model.DocumentUploadResponse
@@ -31,6 +31,7 @@ import care.data4life.sdk.network.model.VersionList
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter
 import care.data4life.sdk.network.util.CertificatePinnerFactory
 import care.data4life.sdk.network.util.IHCServiceFactory
+import care.data4life.sdk.network.util.SearchTagsBuilder
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.AUTH_TOKEN
 import care.data4life.sdk.test.util.GenericTestDataProvider.CLIENT_ID
@@ -56,6 +57,8 @@ import org.junit.Ignore
 import org.junit.Test
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
+import java.util.logging.Level
+import java.util.logging.Logger
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -71,17 +74,14 @@ class ApiServiceModuleTest {
     private val secret = "geheim"
     private val platform = "not important"
 
-    data class TestConnection(
-        override val isConnected: Boolean
-    ) : NetworkingContract.NetworkConnectivityService
-
     @Before
     fun setUp() {
         init()
     }
 
-    fun init(additionalInterceptor: Interceptor? = null) {
+    private fun init(additionalInterceptor: Interceptor? = null) {
         server = MockWebServer()
+        Logger.getLogger(MockWebServer::class.java.name).level = Level.OFF
 
         mockkObject(IHCServiceFactory)
         mockkObject(CertificatePinnerFactory)
@@ -109,7 +109,7 @@ class ApiServiceModuleTest {
             clientId,
             secret,
             platform,
-            TestConnection(true),
+            { true },
             NetworkingContract.Clients.ANDROID,
             clientName,
             debug = false
@@ -188,7 +188,7 @@ class ApiServiceModuleTest {
             expected = "Bearer $authToken"
         )
         assertEquals(
-            actual = request.headers[HEADER_GC_SDK_VERSION],
+            actual = request.headers[HEADER_SDK_VERSION],
             expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
         )
         assertEquals(
@@ -243,7 +243,7 @@ class ApiServiceModuleTest {
             expected = "Bearer $authToken"
         )
         assertEquals(
-            actual = request.headers[HEADER_GC_SDK_VERSION],
+            actual = request.headers[HEADER_SDK_VERSION],
             expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
         )
         assertEquals(
@@ -295,7 +295,7 @@ class ApiServiceModuleTest {
         )
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
-            actual = request.headers[HEADER_GC_SDK_VERSION],
+            actual = request.headers[HEADER_SDK_VERSION],
             expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
         )
         assertEquals(
@@ -350,7 +350,7 @@ class ApiServiceModuleTest {
         )
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
-            actual = request.headers[HEADER_GC_SDK_VERSION],
+            actual = request.headers[HEADER_SDK_VERSION],
             expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
         )
         assertEquals(
@@ -372,7 +372,12 @@ class ApiServiceModuleTest {
         val endDate = "somewhen else"
         val pageSize = 23
         val offset = 42
-        val tags = "tag1,tag2,tag"
+        val formattedTags = "tag1,tag2,tag3"
+        val tags = SearchTagsBuilder.newBuilder()
+            .addOrTuple(listOf("tag1"))
+            .addOrTuple(listOf("tag2"))
+            .addOrTuple(listOf("tag3"))
+            .seal()
 
         val recordResponse = EncryptedRecord(
             _commonKeyId = null,
@@ -418,7 +423,7 @@ class ApiServiceModuleTest {
         )
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
-            actual = request.headers[HEADER_GC_SDK_VERSION],
+            actual = request.headers[HEADER_SDK_VERSION],
             expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
         )
         assertEquals(
@@ -426,24 +431,24 @@ class ApiServiceModuleTest {
             expected = "Bearer $authToken"
         )
         assertEquals(
-            actual = request.requestUrl!!.queryParameter("start_date"),
+            actual = request.requestUrl?.queryParameter("start_date"),
             expected = startDate
         )
         assertEquals(
-            actual = request.requestUrl!!.queryParameter("end_date"),
+            actual = request.requestUrl?.queryParameter("end_date"),
             expected = endDate
         )
         assertEquals(
-            actual = request.requestUrl!!.queryParameter("limit"),
+            actual = request.requestUrl?.queryParameter("limit"),
             expected = pageSize.toString()
         )
         assertEquals(
-            actual = request.requestUrl!!.queryParameter("offset"),
+            actual = request.requestUrl?.queryParameter("offset"),
             expected = offset.toString()
         )
         assertEquals(
-            actual = request.requestUrl!!.queryParameter("tags"),
-            expected = tags
+            actual = request.requestUrl?.queryParameter("tags"),
+            expected = formattedTags
         )
         assertEquals(
             actual = request.method,
@@ -456,7 +461,12 @@ class ApiServiceModuleTest {
         // Given
         val alias = ALIAS
         val userId = USER_ID
-        val tags = "tag1,tag2,tag"
+        val formattedTags = "tag1,tag2,tag3"
+        val tags = SearchTagsBuilder.newBuilder()
+            .addOrTuple(listOf("tag1"))
+            .addOrTuple(listOf("tag2"))
+            .addOrTuple(listOf("tag3"))
+            .seal()
         val amount = 23
         val authToken = AUTH_TOKEN
 
@@ -466,7 +476,7 @@ class ApiServiceModuleTest {
         simulateAuthService(alias, authToken)
 
         // When
-        val actual = service.getCount(alias, userId, tags).blockingGet()
+        val actual = service.countRecords(alias, userId, tags).blockingGet()
 
         // Then
         assertEquals(
@@ -478,11 +488,11 @@ class ApiServiceModuleTest {
 
         assertEquals(
             actual = request.path,
-            expected = "/users/$userId/records?tags=${tags.replace(",", "%2C")}"
+            expected = "/users/$userId/records?tags=${formattedTags.replace(",", "%2C")}"
         )
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
-            actual = request.headers[HEADER_GC_SDK_VERSION],
+            actual = request.headers[HEADER_SDK_VERSION],
             expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
         )
         assertEquals(
@@ -522,7 +532,7 @@ class ApiServiceModuleTest {
         )
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
-            actual = request.headers[HEADER_GC_SDK_VERSION],
+            actual = request.headers[HEADER_SDK_VERSION],
             expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
         )
         assertEquals(
@@ -569,7 +579,7 @@ class ApiServiceModuleTest {
         )
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
-            actual = request.headers[HEADER_GC_SDK_VERSION],
+            actual = request.headers[HEADER_SDK_VERSION],
             expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
         )
         assertEquals(
@@ -610,7 +620,7 @@ class ApiServiceModuleTest {
         )
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
-            actual = request.headers[HEADER_GC_SDK_VERSION],
+            actual = request.headers[HEADER_SDK_VERSION],
             expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
         )
         assertEquals(
@@ -698,7 +708,7 @@ class ApiServiceModuleTest {
         )
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
-            actual = request.headers[HEADER_GC_SDK_VERSION],
+            actual = request.headers[HEADER_SDK_VERSION],
             expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
         )
         assertEquals(
@@ -746,7 +756,7 @@ class ApiServiceModuleTest {
         assertNull(request.headers[HEADER_ALIAS])
         assertNull(request.headers[HEADER_AUTHORIZATION])
         assertEquals(
-            actual = request.headers[HEADER_GC_SDK_VERSION],
+            actual = request.headers[HEADER_SDK_VERSION],
             expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
         )
         assertEquals(
@@ -788,7 +798,7 @@ class ApiServiceModuleTest {
             expected = alias
         )
         assertEquals(
-            actual = request.headers[HEADER_GC_SDK_VERSION],
+            actual = request.headers[HEADER_SDK_VERSION],
             expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
         )
         assertEquals(
@@ -862,7 +872,7 @@ class ApiServiceModuleTest {
             expected = "Bearer $authToken"
         )
         assertEquals(
-            actual = request.headers[HEADER_GC_SDK_VERSION],
+            actual = request.headers[HEADER_SDK_VERSION],
             expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
         )
         assertEquals(

@@ -51,7 +51,9 @@ object GenericTestDataProvider {
 
     const val RECORD_ID = "recordId"
 
-    const val RECORD_ID_COMPATIBILITY = "otherRecordId"
+    const val RECORD_ID_LEGACY_KMP = "kmpRecordId"
+
+    const val RECORD_ID_LEGACY_JS = "jsRecordId"
 
     const val USER_ID = "userId"
 

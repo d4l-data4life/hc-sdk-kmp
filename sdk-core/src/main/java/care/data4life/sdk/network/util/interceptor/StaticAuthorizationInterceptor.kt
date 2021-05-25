@@ -23,7 +23,7 @@ import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
 
-class StaticAuthorizationInterceptor private constructor(
+internal class StaticAuthorizationInterceptor private constructor(
     token: String
 ) : NetworkingContract.Interceptor {
     private val authHeader = String.format(NetworkingContract.FORMAT_BEARER_TOKEN, token)

@@ -29,7 +29,7 @@ import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
 import okhttp3.Response
 
-interface NetworkingContract {
+class NetworkingContract {
     // TODO: Break this down
     interface Service {
         // TODO: move into a key route
@@ -90,22 +90,22 @@ interface NetworkingContract {
         fun fetchVersionInfo(): Single<VersionList>
     }
 
-    interface CertificatePinnerFactory {
+    internal interface CertificatePinnerFactory {
         fun getInstance(platform: String, env: Environment): CertificatePinner
     }
 
-    interface Interceptor : okhttp3.Interceptor {
+    internal interface Interceptor : okhttp3.Interceptor {
         override fun intercept(chain: okhttp3.Interceptor.Chain): Response
     }
 
-    interface PartialInterceptor<T : Any> {
+    internal interface PartialInterceptor<T : Any> {
         fun intercept(
             payload: T,
             chain: okhttp3.Interceptor.Chain
         ): Response
     }
 
-    interface InterceptorFactory<T : Any> {
+    internal interface InterceptorFactory<T : Any> {
         fun getInstance(payload: T): Interceptor
     }
 
@@ -119,7 +119,7 @@ interface NetworkingContract {
         fun isConnected(): Boolean
     }
 
-    enum class Data4LifeURI(val uri: String) {
+    internal enum class Data4LifeURI(val uri: String) {
         SANDBOX("https://api-phdp-sandbox.hpsgc.de"),
         DEVELOPMENT("https://api-phdp-dev.hpsgc.de"),
         STAGING("https://api-staging.data4life.care"),
@@ -127,7 +127,7 @@ interface NetworkingContract {
         PRODUCTION("https://api.data4life.care")
     }
 
-    enum class Smart4HealthURI(val uri: String) {
+    internal enum class Smart4HealthURI(val uri: String) {
         SANDBOX("https://api-sandbox.smart4health.eu"),
         DEVELOPMENT("https://api-dev.smart4health.eu"),
         STAGING("https://api-staging.smart4health.eu"),
@@ -144,7 +144,7 @@ interface NetworkingContract {
         fun fromName(name: String?): Environment
     }
 
-    interface ClientFactory {
+    internal interface ClientFactory {
         fun getInstance(
             authService: AuthorizationContract.Service,
             environment: Environment,
@@ -157,6 +157,14 @@ interface NetworkingContract {
             staticAccessToken: ByteArray?,
             debugFlag: Boolean
         ): OkHttpClient
+    }
+
+    internal interface IHCServiceFactory {
+        fun getInstance(
+            client: OkHttpClient,
+            platform: String,
+            environment: Environment
+        ): IHCService
     }
 
     interface SearchTagsBuilder {

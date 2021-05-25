@@ -16,6 +16,7 @@
 
 package care.data4life.sdk.network
 
+import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.network.model.CommonKeyResponse
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract
@@ -25,13 +26,18 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import okhttp3.CertificatePinner
+import okhttp3.OkHttpClient
 import okhttp3.Response
 
-interface NetworkingContract {
+class NetworkingContract {
     // TODO: Break this down
     interface Service {
         // TODO: move into a key route
-        fun fetchCommonKey(alias: String, userId: String, commonKeyId: String): Single<CommonKeyResponse>
+        fun fetchCommonKey(
+            alias: String,
+            userId: String,
+            commonKeyId: String
+        ): Single<CommonKeyResponse>
 
         fun uploadTagEncryptionKey(alias: String, userId: String, encryptedKey: String): Completable
 
@@ -47,7 +53,7 @@ interface NetworkingContract {
             userId: String,
             recordId: String,
             encryptedRecord: NetworkModelContract.EncryptedRecord
-        ): Single<EncryptedRecord >
+        ): Single<EncryptedRecord>
 
         fun fetchRecord(alias: String, userId: String, recordId: String): Single<EncryptedRecord>
 
@@ -63,7 +69,7 @@ interface NetworkingContract {
 
         fun countRecords(alias: String, userId: String, tags: SearchTags): Single<Int>
 
-        fun deleteRecord(alias: String, recordId: String, userId: String): Completable
+        fun deleteRecord(alias: String, userId: String, recordId: String): Completable
 
         // TODO: move into a Attachment route
         fun uploadDocument(
@@ -84,22 +90,22 @@ interface NetworkingContract {
         fun fetchVersionInfo(): Single<VersionList>
     }
 
-    interface CertificatePinnerFactory {
-        fun getInstance(platform: String, env: Environment): CertificatePinner
+    internal interface CertificatePinnerFactory {
+        fun getInstance(platform: String, environment: Environment): CertificatePinner
     }
 
-    interface Interceptor : okhttp3.Interceptor {
+    internal interface Interceptor : okhttp3.Interceptor {
         override fun intercept(chain: okhttp3.Interceptor.Chain): Response
     }
 
-    interface PartialInterceptor<T : Any> {
+    internal interface PartialInterceptor<T : Any> {
         fun intercept(
             payload: T,
             chain: okhttp3.Interceptor.Chain
         ): Response
     }
 
-    interface InterceptorFactory<T : Any> {
+    internal interface InterceptorFactory<T : Any> {
         fun getInstance(payload: T): Interceptor
     }
 
@@ -113,7 +119,7 @@ interface NetworkingContract {
         fun isConnected(): Boolean
     }
 
-    enum class Data4LifeURI(val uri: String) {
+    internal enum class Data4LifeURI(val uri: String) {
         SANDBOX("https://api-phdp-sandbox.hpsgc.de"),
         DEVELOPMENT("https://api-phdp-dev.hpsgc.de"),
         STAGING("https://api-staging.data4life.care"),
@@ -121,7 +127,7 @@ interface NetworkingContract {
         PRODUCTION("https://api.data4life.care")
     }
 
-    enum class Smart4HealthURI(val uri: String) {
+    internal enum class Smart4HealthURI(val uri: String) {
         SANDBOX("https://api-sandbox.smart4health.eu"),
         DEVELOPMENT("https://api-dev.smart4health.eu"),
         STAGING("https://api-staging.smart4health.eu"),
@@ -138,13 +144,36 @@ interface NetworkingContract {
         fun fromName(name: String?): Environment
     }
 
+    internal interface ClientFactory {
+        fun getInstance(
+            authService: AuthorizationContract.Service,
+            environment: Environment,
+            clientId: String,
+            clientSecret: String,
+            platform: String,
+            connectivityService: NetworkConnectivityService,
+            clientName: Clients,
+            clientVersion: String,
+            staticAccessToken: ByteArray?,
+            debugFlag: Boolean
+        ): OkHttpClient
+    }
+
+    internal interface HealthCloudApiFactory {
+        fun getInstance(
+            client: OkHttpClient,
+            platform: String,
+            environment: Environment
+        ): HealthCloudApi
+    }
+
     interface SearchTagsBuilder {
         fun addOrTuple(tuple: List<String>): SearchTagsBuilder
         fun seal(): SearchTags
     }
 
     interface SearchTags {
-        val tags: String
+        val tagGroups: String
     }
 
     interface SearchTagsBuilderFactory {
@@ -165,8 +194,7 @@ interface NetworkingContract {
         const val HEADER_SDK_VERSION = "d4l-sdk-version"
         const val FORMAT_CLIENT_VERSION = "%s-%s"
         const val HEADER_TOTAL_COUNT = "x-total-count"
-        const val PARAM_FILE_NUMBER = "file_number"
-        const val PARAM_TEK = "tek"
+        const val PARAM_TAG_ENCRYPTION_KEY = "tek"
         const val FORMAT_BEARER_TOKEN = "Bearer %s"
         const val FORMAT_BASIC_AUTH = "Basic %s"
         const val MEDIA_TYPE_OCTET_STREAM = "application/octet-stream"

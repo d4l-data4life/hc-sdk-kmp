@@ -31,8 +31,15 @@ import kotlin.test.assertTrue
 
 class StaticAuthorizationInterceptorTest {
     @Test
-    fun `It fulfils Interceptor`() {
-        val interceptor: Any = StaticAuthorizationInterceptor("test")
+    fun `It fulfils InterceptorFactory`() {
+        val factory: Any = StaticAuthorizationInterceptor
+
+        assertTrue(factory is NetworkingContract.InterceptorFactory<*>)
+    }
+
+    @Test
+    fun `Given getInstance is called it creates a Interceptor`() {
+        val interceptor: Any = StaticAuthorizationInterceptor.getInstance("test")
 
         assertTrue(interceptor is NetworkingContract.Interceptor)
     }
@@ -62,7 +69,7 @@ class StaticAuthorizationInterceptorTest {
         every { chain.proceed(modifiedRequest) } returns response
 
         // When
-        val actual = StaticAuthorizationInterceptor(token).intercept(chain)
+        val actual = StaticAuthorizationInterceptor.getInstance(token).intercept(chain)
 
         // Then
         assertSame(

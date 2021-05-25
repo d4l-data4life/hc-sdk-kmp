@@ -18,11 +18,15 @@ toc::[]
 
 === Changed
 
+* ApiService is now in Kotlin.
+
 === Removed
 
 === Fixed
 
 === Bumped
+
+* OkHTTP 4.7.2 -> 4.9.1
 
 === Migration
 

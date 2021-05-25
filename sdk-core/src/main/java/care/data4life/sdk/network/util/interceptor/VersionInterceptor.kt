@@ -21,7 +21,7 @@ import care.data4life.sdk.network.NetworkingContract.Companion.FORMAT_CLIENT_VER
 import okhttp3.Interceptor
 import okhttp3.Response
 
-class VersionInterceptor private constructor(
+internal class VersionInterceptor private constructor(
     private val version: String
 ) : NetworkingContract.Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -48,8 +48,10 @@ class VersionInterceptor private constructor(
         }
 
         override fun getInstance(payload: Pair<NetworkingContract.Clients, String>): NetworkingContract.Interceptor {
+            val (platform, version) = payload
+
             return VersionInterceptor(
-                format(payload.first, payload.second)
+                format(platform, version)
             )
         }
     }

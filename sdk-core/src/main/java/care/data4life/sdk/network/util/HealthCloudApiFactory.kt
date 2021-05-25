@@ -16,23 +16,34 @@
 
 package care.data4life.sdk.network.util
 
+import care.data4life.sdk.network.HealthCloudApi
 import care.data4life.sdk.network.NetworkingContract
-import okhttp3.CertificatePinner
+import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter
+import com.squareup.moshi.Moshi
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
 
-object CertificatePinnerFactory : NetworkingContract.CertificatePinnerFactory {
-    private fun extractHostname(apiBaseURL: String): String {
-        return apiBaseURL.replaceFirst("https://", "")
+object HealthCloudApiFactory :
+    NetworkingContract.HealthCloudApiFactory {
+    private fun buildMoshi(): Moshi {
+        return Moshi.Builder()
+            .add(EncryptedKeyTypeAdapter())
+            .build()
     }
 
     override fun getInstance(
+        client: OkHttpClient,
         platform: String,
         environment: NetworkingContract.Environment
-    ): CertificatePinner {
-        return CertificatePinner.Builder()
-            .add(
-                extractHostname(environment.getApiBaseURL(platform)),
-                environment.getCertificatePin(platform)
-            )
+    ): HealthCloudApi {
+        return Retrofit.Builder()
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addConverterFactory(MoshiConverterFactory.create(buildMoshi()))
+            .baseUrl(environment.getApiBaseURL(platform))
+            .client(client)
             .build()
+            .create(HealthCloudApi::class.java)
     }
 }

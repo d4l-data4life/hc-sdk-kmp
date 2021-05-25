@@ -14,25 +14,8 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.network.util
+package care.data4life.sdk.config
 
-import care.data4life.sdk.network.NetworkingContract
-import okhttp3.CertificatePinner
-
-object CertificatePinnerFactory : NetworkingContract.CertificatePinnerFactory {
-    private fun extractHostname(apiBaseURL: String): String {
-        return apiBaseURL.replaceFirst("https://", "")
-    }
-
-    override fun getInstance(
-        platform: String,
-        environment: NetworkingContract.Environment
-    ): CertificatePinner {
-        return CertificatePinner.Builder()
-            .add(
-                extractHostname(environment.getApiBaseURL(platform)),
-                environment.getCertificatePin(platform)
-            )
-            .build()
-    }
+object SDKConfig {
+    const val version: String = "1.11.0-change-ihc-service-SNAPSHOT"
 }

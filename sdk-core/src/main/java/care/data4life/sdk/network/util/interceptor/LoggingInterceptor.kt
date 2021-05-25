@@ -21,7 +21,7 @@ import okhttp3.Interceptor
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 
-class LoggingInterceptor private constructor(
+internal class LoggingInterceptor private constructor(
     private val interceptor: HttpLoggingInterceptor
 ) : NetworkingContract.Interceptor {
     override fun intercept(

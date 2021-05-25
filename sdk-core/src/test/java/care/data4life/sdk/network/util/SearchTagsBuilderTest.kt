@@ -78,7 +78,7 @@ class SearchTagsBuilderTest {
         var builder = this.builder
         singles.forEach { single -> builder = builder.addOrTuple(single) }
 
-        val searchTags = builder.seal().tags
+        val searchTags = builder.seal().tagGroups
 
         // Then
         assertEquals(
@@ -102,7 +102,7 @@ class SearchTagsBuilderTest {
         var builder = this.builder
         singles.forEach { single -> builder = builder.addOrTuple(single) }
 
-        val searchTags = builder.seal().tags
+        val searchTags = builder.seal().tagGroups
 
         // Then
         assertEquals(
@@ -124,7 +124,7 @@ class SearchTagsBuilderTest {
         var builder = this.builder
         singles.forEach { single -> builder = builder.addOrTuple(single) }
 
-        val searchTags = builder.seal().tags
+        val searchTags = builder.seal().tagGroups
 
         // Then
         assertEquals(
@@ -146,7 +146,7 @@ class SearchTagsBuilderTest {
         var builder = this.builder
         singles.forEach { single -> builder = builder.addOrTuple(single) }
 
-        val searchTags = builder.seal().tags
+        val searchTags = builder.seal().tagGroups
 
         // Then
         assertEquals(
@@ -169,7 +169,7 @@ class SearchTagsBuilderTest {
         var builder = this.builder
         singles.forEach { single -> builder = builder.addOrTuple(single) }
 
-        val searchTags = builder.seal().tags
+        val searchTags = builder.seal().tagGroups
 
         // Then
         assertEquals(

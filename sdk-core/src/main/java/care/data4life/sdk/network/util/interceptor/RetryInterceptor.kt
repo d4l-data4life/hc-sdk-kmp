@@ -23,7 +23,7 @@ import okhttp3.Request
 import okhttp3.Response
 import java.net.SocketTimeoutException
 
-class RetryInterceptor private constructor(
+internal class RetryInterceptor private constructor(
     private val connection: NetworkingContract.NetworkConnectivityService
 ) : NetworkingContract.Interceptor {
     private fun retry(request: Request, chain: Interceptor.Chain): Response {

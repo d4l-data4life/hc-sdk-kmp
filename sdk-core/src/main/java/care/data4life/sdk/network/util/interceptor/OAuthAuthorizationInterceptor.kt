@@ -27,7 +27,7 @@ import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
 
-class OAuthAuthorizationInterceptor private constructor(
+internal class OAuthAuthorizationInterceptor private constructor(
     private val fetchInterceptor: NetworkingContract.PartialInterceptor<Pair<String, Request>>,
     private val retryInterceptor: NetworkingContract.PartialInterceptor<Triple<String, Request, Response>>,
 ) : NetworkingContract.Interceptor {

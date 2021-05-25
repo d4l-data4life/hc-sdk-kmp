@@ -100,7 +100,7 @@ class RecordServiceCountRecordsModuleTest {
             .let { flowHelper.buildExpectedTagGroups(it, encodedTags, legacyKMPTags, legacyJSTags) }
             .let { flowHelper.buildExpectedTagGroups(it, encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations) }
             .seal()
-            .tags
+            .tagGroups
 
         val receivedIteration = CryptoServiceIteration(
             gcKeyOrder = emptyList(),
@@ -133,7 +133,7 @@ class RecordServiceCountRecordsModuleTest {
             )
         } answers {
             val actual = flowHelper.decryptSerializedTags(
-                search.captured.tags,
+                search.captured.tagGroups,
                 cryptoService,
                 tagEncryptionKey
             )

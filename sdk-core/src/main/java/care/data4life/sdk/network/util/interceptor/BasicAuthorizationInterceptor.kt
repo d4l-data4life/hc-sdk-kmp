@@ -26,7 +26,7 @@ import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
 
-class BasicAuthorizationInterceptor private constructor(
+internal class BasicAuthorizationInterceptor private constructor(
     private val credentials: String
 ) : NetworkingContract.Interceptor {
     private fun modifyRequest(request: Request): Request {
@@ -60,9 +60,10 @@ class BasicAuthorizationInterceptor private constructor(
 
     companion object Factory : NetworkingContract.InterceptorFactory<Pair<String, String>> {
         private fun prepareCredentials(credentials: Pair<String, String>): String {
+            val (user, secret) = credentials
             return String.format(
                 FORMAT_BASIC_AUTH,
-                Base64.encodeToString("${credentials.first}:${credentials.second}")
+                Base64.encodeToString("$user:$secret")
             )
         }
 

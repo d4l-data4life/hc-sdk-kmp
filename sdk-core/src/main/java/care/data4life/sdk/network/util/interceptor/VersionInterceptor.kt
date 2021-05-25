@@ -28,7 +28,7 @@ internal class VersionInterceptor private constructor(
         val request = chain.request()
             .newBuilder()
             .addHeader(
-                NetworkingContract.HEADER_GC_SDK_VERSION,
+                NetworkingContract.HEADER_SDK_VERSION,
                 version
             )
             .build()

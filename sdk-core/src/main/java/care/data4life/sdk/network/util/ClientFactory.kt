@@ -28,7 +28,7 @@ import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
 object ClientFactory : NetworkingContract.ClientFactory {
-    private fun setPin(
+    private fun setCertificationPinner(
         builder: OkHttpClient.Builder,
         environment: NetworkingContract.Environment,
         platform: String,
@@ -39,7 +39,7 @@ object ClientFactory : NetworkingContract.ClientFactory {
             )
     }
 
-    private fun determineAuthMethod(
+    private fun addAuthorizationInterceptor(
         builder: OkHttpClient.Builder,
         authService: AuthorizationContract.Service,
         user: String,
@@ -47,10 +47,20 @@ object ClientFactory : NetworkingContract.ClientFactory {
         staticAccessToken: ByteArray?
     ): OkHttpClient.Builder {
         return if (staticAccessToken is ByteArray) {
-            builder.addInterceptor(StaticAuthorizationInterceptor.getInstance(String(staticAccessToken)))
+            builder.addInterceptor(
+                StaticAuthorizationInterceptor.getInstance(
+                    String(
+                        staticAccessToken
+                    )
+                )
+            )
         } else {
             builder.addInterceptor(OAuthAuthorizationInterceptor.getInstance(authService))
-                .addInterceptor(BasicAuthorizationInterceptor.getInstance(Pair(user, clientSecret)))
+                .addInterceptor(
+                    BasicAuthorizationInterceptor.getInstance(
+                        Pair(user, clientSecret)
+                    )
+                )
         }
     }
 
@@ -65,7 +75,7 @@ object ClientFactory : NetworkingContract.ClientFactory {
         staticAccessToken: ByteArray?,
         debugFlag: Boolean
     ): OkHttpClient.Builder {
-        return determineAuthMethod(
+        return addAuthorizationInterceptor(
             builder,
             authService,
             clientId,
@@ -98,7 +108,7 @@ object ClientFactory : NetworkingContract.ClientFactory {
         debugFlag: Boolean
     ): OkHttpClient {
         return OkHttpClient.Builder()
-            .let { builder -> setPin(builder, environment, platform) }
+            .let { builder -> setCertificationPinner(builder, environment, platform) }
             .let { builder ->
                 setInterceptors(
                     builder,

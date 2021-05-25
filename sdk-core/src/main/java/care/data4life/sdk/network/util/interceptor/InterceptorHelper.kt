@@ -18,8 +18,7 @@ package care.data4life.sdk.network.util.interceptor
 
 import okhttp3.Request
 
-fun Request.Builder.replaceHeader(name: String, value: String): Request.Builder {
-    return this
-        .removeHeader(name)
-        .addHeader(name, value)
-}
+fun Request.Builder.replaceHeader(
+    name: String,
+    value: String
+): Request.Builder = this.header(name, value)

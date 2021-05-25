@@ -268,12 +268,23 @@ class ApiServiceTest {
         val endDate = "somewhen else"
         val pageSize = 23
         val offset = 42
-        val tags = "tags"
+        val formattedTags = "tags"
+        val tags: NetworkingContract.SearchTags = mockk()
         val result: Observable<List<EncryptedRecord>> = mockk()
 
         every {
-            service.searchRecords(alias, userId, startDate, endDate, pageSize, offset, tags)
+            ihcService.searchRecords(
+                alias,
+                userId,
+                startDate,
+                endDate,
+                pageSize,
+                offset,
+                formattedTags
+            )
         } returns result
+
+        every { tags.tags } returns formattedTags
 
         // When
         val actual = service.searchRecords(
@@ -293,26 +304,40 @@ class ApiServiceTest {
         )
 
         verify(exactly = 1) {
-            ihcService.searchRecords(alias, userId, startDate, endDate, pageSize, offset, tags)
+            ihcService.searchRecords(
+                alias,
+                userId,
+                startDate,
+                endDate,
+                pageSize,
+                offset,
+                formattedTags
+            )
         }
+
+        verify(exactly = 1) { tags.tags }
     }
 
     @Test
-    fun `Given, getCount is called with an Alias, UserId and Tags, it delegates it to the IHCService, parses the result and returns it`() {
+    fun `Given, countRecords is called with an Alias, UserId and Tags, it delegates it to the IHCService, parses the result and returns it`() {
         // Given
         val alias = ALIAS
         val userId = USER_ID
-        val tags = RECORD_ID
+        val formattedTags = "tags"
+        val tags: NetworkingContract.SearchTags = mockk()
         val amount = "23"
         val response: Response<Void> = mockk()
         val headers: Headers = mockk()
 
-        every { ihcService.getRecordsHeader(alias, userId, tags) } returns Single.just(response)
+        every { tags.tags } returns formattedTags
+        every { ihcService.getRecordsHeader(alias, userId, formattedTags) } returns Single.just(
+            response
+        )
         every { response.headers() } returns headers
         every { headers[NetworkingContract.HEADER_TOTAL_COUNT] } returns amount
 
         // When
-        val actual = service.getCount(alias, userId, tags).blockingGet()
+        val actual = service.countRecords(alias, userId, tags).blockingGet()
 
         // Then
         assertSame(
@@ -321,8 +346,9 @@ class ApiServiceTest {
         )
 
         verify(exactly = 1) {
-            ihcService.getRecordsHeader(alias, userId, tags)
+            ihcService.getRecordsHeader(alias, userId, formattedTags)
         }
+        verify(exactly = 1) { tags.tags }
     }
 
     @Test
@@ -398,7 +424,9 @@ class ApiServiceTest {
         val response: ResponseBody = mockk()
         val document = ByteArray(23)
 
-        every { ihcService.downloadDocument(alias, userId, documentId) } returns Single.just(response)
+        every { ihcService.downloadDocument(alias, userId, documentId) } returns Single.just(
+            response
+        )
         every { response.bytes() } returns document
 
         // When

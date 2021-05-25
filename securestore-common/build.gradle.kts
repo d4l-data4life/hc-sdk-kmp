@@ -22,6 +22,12 @@ apply(from = "${project.rootDir}/gradle/deploy-java.gradle")
 
 group = LibraryConfig.group
 
+kotlin {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions.jvmTarget = "1.8"
+    }
+}
+
 dependencies {
     implementation(Dependencies.Multiplatform.Kotlin.stdlibCommon)
 

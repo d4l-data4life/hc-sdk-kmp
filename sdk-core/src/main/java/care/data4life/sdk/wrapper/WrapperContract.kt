@@ -74,4 +74,10 @@ class WrapperContract {
             const val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss[.SSS]"
         }
     }
+
+    // TODO: Move that to kmp utils repo
+    interface UrlEncoding {
+        fun encode(str: String): String
+        fun decode(str: String): String
+    }
 }

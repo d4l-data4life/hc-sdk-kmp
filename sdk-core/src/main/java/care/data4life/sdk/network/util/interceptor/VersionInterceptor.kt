@@ -48,8 +48,10 @@ internal class VersionInterceptor private constructor(
         }
 
         override fun getInstance(payload: Pair<NetworkingContract.Clients, String>): NetworkingContract.Interceptor {
+            val (platform, version) = payload
+
             return VersionInterceptor(
-                format(payload.first, payload.second)
+                format(platform, version)
             )
         }
     }

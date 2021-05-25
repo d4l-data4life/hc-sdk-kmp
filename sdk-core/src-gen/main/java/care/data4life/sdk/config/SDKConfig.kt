@@ -17,5 +17,5 @@
 package care.data4life.sdk.config
 
 object SDKConfig {
-    const val version: String = "1.11.0-change-client-version-header-dynamic-SNAPSHOT"
+    const val version: String = "1.11.0-change-api-service-SNAPSHOT"
 }

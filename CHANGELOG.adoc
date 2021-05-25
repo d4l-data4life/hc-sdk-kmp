@@ -18,6 +18,8 @@ toc::[]
 
 === Changed
 
+* ApiService is now in Kotlin.
+
 === Removed
 
 === Fixed

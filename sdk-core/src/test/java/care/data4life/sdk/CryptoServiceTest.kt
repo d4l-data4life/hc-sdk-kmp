@@ -43,10 +43,6 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.slot
 import io.mockk.verify
-import org.junit.After
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
 import java.io.IOException
 import java.security.InvalidAlgorithmParameterException
 import java.security.InvalidKeyException
@@ -59,7 +55,7 @@ import java.security.SecureRandom
 import java.security.spec.InvalidKeySpecException
 import java.security.spec.KeySpec
 import java.security.spec.PKCS8EncodedKeySpec
-import java.util.*
+import java.util.Objects
 import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
 import javax.crypto.IllegalBlockSizeException
@@ -67,6 +63,10 @@ import javax.crypto.KeyGenerator
 import javax.crypto.NoSuchPaddingException
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
+import org.junit.After
+import org.junit.Assert
+import org.junit.Before
+import org.junit.Test
 
 class CryptoServiceTest {
 
@@ -80,7 +80,6 @@ class CryptoServiceTest {
     private lateinit var mockBase64: Base64
     private lateinit var mockKeyFactory: KeyFactory
     private lateinit var mockCommonKeyService: CommonKeyService
-
 
     @Before
     fun setUp() {
@@ -219,7 +218,6 @@ class CryptoServiceTest {
             .onComplete()
     }
 
-
     @Test
     @Throws(NoSuchAlgorithmException::class, InvalidKeySpecException::class)
     fun setGCKeyPairFromPemPrivateKey_shouldStoreCorrectPrivateKey() {
@@ -275,7 +273,7 @@ class CryptoServiceTest {
         val storedPrivateKeyBase64 = keyPairArg.captured.getPrivateKeyBase64()
         val storedJavaKey = getPrivateJavaKey(keyFactory, storedPrivateKeyBase64)
 
-        val base64TestKeynoSpace = base64TestKey.replace(" ","")
+        val base64TestKeynoSpace = base64TestKey.replace(" ", "")
         val testKeyNoLinebreaksBase64 = base64TestKeynoSpace.replace("\n", "")
         val testJavaKey = getPrivateJavaKey(keyFactory, testKeyNoLinebreaksBase64)
         Assert.assertEquals(testJavaKey, storedJavaKey)
@@ -290,12 +288,14 @@ class CryptoServiceTest {
      * @throws InvalidKeySpecException
      */
     @Throws(InvalidKeySpecException::class)
-    private fun getPrivateJavaKey(keyFactory: java.security.KeyFactory, privateKeyBase64: String): PrivateKey {
+    private fun getPrivateJavaKey(
+        keyFactory: java.security.KeyFactory,
+        privateKeyBase64: String
+    ): PrivateKey {
         val storedPrivateKey: ByteArray = Base64.decode(privateKeyBase64)
         val encodedStoredKeySpec = PKCS8EncodedKeySpec(storedPrivateKey)
         return keyFactory.generatePrivate(encodedStoredKeySpec)
     }
-
 
     @Test
     fun saveGCKeyPair_shouldStoreKeysAndAlgorithm() {
@@ -307,7 +307,6 @@ class CryptoServiceTest {
         // then
         verify { mockStorage.storeKey(PREFIX + GC_KEYPAIR, any<GCKeyPair>()) }
     }
-
 
     @Test
     @Throws(Exception::class)
@@ -329,7 +328,13 @@ class CryptoServiceTest {
         every { algorithm.transformation } returns "AES"
         every { mockCommonKeyService.fetchCurrentCommonKeyId() } returns commonKeyId
         every { mockCommonKeyService.fetchCurrentCommonKey() } returns commonKey
-        every { mockStorage.getExchangeKey(PREFIX + commonKeyId) } returns ExchangeKey(KeyType.COMMON_KEY, "", "", "keyBase64", 1)
+        every { mockStorage.getExchangeKey(PREFIX + commonKeyId) } returns ExchangeKey(
+            KeyType.COMMON_KEY,
+            "",
+            "",
+            "keyBase64",
+            1
+        )
         every { mockCommonKeyService.storeCommonKey(commonKeyId, commonKey) } just runs
 
         //when
@@ -339,7 +344,6 @@ class CryptoServiceTest {
         //then
         verify { mockCommonKeyService.storeCommonKey(commonKeyId, commonKey) }
     }
-
 
     @Test
     @Throws(Exception::class)
@@ -370,7 +374,6 @@ class CryptoServiceTest {
         val gcKeyPair = observer.values()[0]
     }
 
-
     @Test
     fun fetchGCKeyPair_shouldThrowException() {
         // when
@@ -379,7 +382,6 @@ class CryptoServiceTest {
         // then
         test.assertError(KeyFetchingFailed::class.java as Class<out Throwable?>)
     }
-
 
     @Test
     fun convertAsymmetricKeyToBase64ExchangeKey() {
@@ -426,13 +428,12 @@ class CryptoServiceTest {
     fun symDecryptSymmetricTagKey() {
         // given
         val commonKey = mockk<GCKey>()
-        val encryptedKey =  mockk<EncryptedKey>()
+        val encryptedKey = mockk<EncryptedKey>()
         val ek = createKey(KeyVersion.VERSION_1, KeyType.TAG_KEY, "")
 
         every { adapter.fromJson(any<String>()) } returns ek
         every { mockKeyFactory.createGCKey(ek) } returns gcKey
         every { encryptedKey.decode() } returns ByteArray(16)
-
 
         // when
         val testObserver = cryptoService.symDecryptSymmetricKey(commonKey, encryptedKey)
@@ -451,7 +452,7 @@ class CryptoServiceTest {
         val commonKey = mockk<GCKey>()
         val encryptedKey = mockk<EncryptedKey>()
         val ek = ExchangeKey(KeyType.TAG_KEY, null, null, null, KeyVersion.VERSION_1)
-        every { encryptedKey.decode() } returns  ByteArray(16)
+        every { encryptedKey.decode() } returns ByteArray(16)
         every { adapter.fromJson(any<String>()) } returns ek
 
         // when
@@ -463,7 +464,6 @@ class CryptoServiceTest {
             .assertError(KeyDecryptionFailed::class.java as Class<out Throwable?>)
             .assertError { throwable: Throwable -> throwable.message == "Failed to decrypt exchange key" }
     }
-
 
     @Test
     @Throws(IOException::class)
@@ -484,13 +484,12 @@ class CryptoServiceTest {
             .assertComplete()
     }
 
-
     @Test
     @Throws(IOException::class)
     fun asymDecryptSymmetricKey_shouldThrowWrongVersionException() {
         // given
         val encryptedKey = EncryptedKey("")
-        val ek = ExchangeKey(KeyType.DATA_KEY, "","", "", KeyVersion.VERSION_0)
+        val ek = ExchangeKey(KeyType.DATA_KEY, "", "", "", KeyVersion.VERSION_0)
         every { adapter.fromJson(any<String>()) } returns ek
 
         // when
@@ -502,6 +501,7 @@ class CryptoServiceTest {
             .assertError(InvalidKeyVersion::class.java as Class<out Throwable?>)
             .assertError { throwable: Throwable -> throwable.message!!.contains("Key version '" + KeyVersion.VERSION_0.value + "' is not supported") }
     }
+
     @Test
     @Throws(IOException::class)
     fun asymDecryptSymmetricKey_shouldThrowExceptionWhenExchangeKeyIsAsymmetric() {
@@ -517,6 +517,7 @@ class CryptoServiceTest {
             .assertError(KeyDecryptionFailed::class.java as Class<out Throwable?>)
             .assertError { throwable: Throwable -> throwable.message!!.contains("can't decrypt asymmetric to symmetric key") }
     }
+
     @Test
     @Throws(Exception::class)
     fun fetchingAndSavingTEK() {
@@ -524,7 +525,13 @@ class CryptoServiceTest {
         val algorithm = mockk<GCAESKeyAlgorithm>()
         every { algorithm.transformation } returns "AES"
         val tekKey = mockk<GCKey>()
-        every { mockStorage.getExchangeKey(PREFIX + TEK_KEY) } returns ExchangeKey(KeyType.TAG_KEY, "","", "tekKeyBase64", 1)
+        every { mockStorage.getExchangeKey(PREFIX + TEK_KEY) } returns ExchangeKey(
+            KeyType.TAG_KEY,
+            "",
+            "",
+            "tekKeyBase64",
+            1
+        )
         every { mockKeyFactory.createGCKey(any<ExchangeKey>()) } returns tekKey
         every { mockStorage.storeKey(PREFIX + TEK_KEY, tekKey, KeyType.TAG_KEY) } just runs
         // when
@@ -534,11 +541,14 @@ class CryptoServiceTest {
         verify { mockStorage.storeKey(PREFIX + TEK_KEY, tekKey, KeyType.TAG_KEY) }
         verify { mockStorage.getExchangeKey(PREFIX + TEK_KEY) }
     }
+
     @After
     fun tearDown() {
         clearAllMocks()
     }
-    inner class MockCryptoService(alias: String?,
+
+    inner class MockCryptoService(
+        alias: String?,
         storage: CryptoSecureStore?,
         moshi: Moshi?,
         rng: SecureRandom?,
@@ -546,20 +556,44 @@ class CryptoServiceTest {
         private val mockCipher: Cipher,
         private val mockKeyGenerator: KeyGenerator,
         keyFactory: KeyFactory?,
-        commonKeyService: CommonKeyService?) : CryptoService(alias!!, storage!!, moshi!!, rng!!, base64!!, keyFactory!!, commonKeyService!!) {
-        @Throws(InvalidAlgorithmParameterException::class, InvalidKeyException::class, NoSuchPaddingException::class, NoSuchAlgorithmException::class, BadPaddingException::class, IllegalBlockSizeException::class, NoSuchProviderException::class)
+        commonKeyService: CommonKeyService?
+    ) : CryptoService(
+        alias!!,
+        storage!!,
+        moshi!!,
+        rng!!,
+        base64!!,
+        keyFactory!!,
+        commonKeyService!!
+    ) {
+        @Throws(
+            InvalidAlgorithmParameterException::class,
+            InvalidKeyException::class,
+            NoSuchPaddingException::class,
+            NoSuchAlgorithmException::class,
+            BadPaddingException::class,
+            IllegalBlockSizeException::class,
+            NoSuchProviderException::class
+        )
         override fun symDecrypt(key: GCKey, data: ByteArray, iv: ByteArray): ByteArray {
             return data
         }
-        @Throws(NoSuchPaddingException::class, NoSuchAlgorithmException::class, NoSuchProviderException::class)
+
+        @Throws(
+            NoSuchPaddingException::class,
+            NoSuchAlgorithmException::class,
+            NoSuchProviderException::class
+        )
         override fun createCypher(transformation: String): Cipher {
             return mockCipher
         }
+
         @Throws(NoSuchProviderException::class, NoSuchAlgorithmException::class)
         override fun createKeyGenerator(algorithm: String?): KeyGenerator {
             return mockKeyGenerator
         }
     }
+
     companion object {
         private const val ALIAS = "dataAlias"
         private const val PREFIX = ALIAS + "_"

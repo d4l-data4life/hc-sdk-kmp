@@ -95,18 +95,19 @@ class CryptoSecureStoreTest {
     @Test
     fun secret_shouldReturnObject() {
         // Given
+        val exchangeKey = mockk<ExchangeKey>()
         every { secureStore.getData(OBJECT_ALIAS) } returns OBJECT_JSON.toCharArray()
-        every { adapter.fromJson(OBJECT_JSON) } returns mockk<ExchangeKey>()
+        every { adapter.fromJson(OBJECT_JSON) } returns exchangeKey
 
         // When
         val result = cryptoSecureStore.getSecret(OBJECT_ALIAS, ExchangeKey::class.java)
 
         // Then
-        assertEquals(mockk<ExchangeKey>(), result)
+        assertEquals(exchangeKey, result)
     }
 
     @Test
-    fun clearStorage_shoudBeCalledOnce() {
+    fun clearStorage_shouldBeCalledOnce() {
         // Given
         every { secureStore.clear() } just runs
         // When

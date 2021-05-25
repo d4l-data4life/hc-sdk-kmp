@@ -25,7 +25,7 @@ import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.UserInfo
 import care.data4life.sdk.network.model.VersionList
 import care.data4life.sdk.network.util.ClientFactory
-import care.data4life.sdk.network.util.IHCServiceFactory
+import care.data4life.sdk.network.util.HealthCloudApiFactory
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -67,7 +67,7 @@ class ApiService @JvmOverloads constructor(
     private val staticAccessToken: ByteArray? = null,
     debug: Boolean
 ) : NetworkingContract.Service {
-    private val service = IHCServiceFactory.getInstance(
+    private val service = HealthCloudApiFactory.getInstance(
         ClientFactory.getInstance(
             authService,
             environment,

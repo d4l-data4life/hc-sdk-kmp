@@ -26,7 +26,7 @@ import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.UserInfo
 import care.data4life.sdk.network.model.VersionList
 import care.data4life.sdk.network.util.ClientFactory
-import care.data4life.sdk.network.util.IHCServiceFactory
+import care.data4life.sdk.network.util.HealthCloudApiFactory
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.CLIENT_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.COMMON_KEY_ID
@@ -64,7 +64,7 @@ class ApiServiceTest {
     private lateinit var service: NetworkingContract.Service
     private val authService: AuthorizationContract.Service = mockk()
     private val env: NetworkingContract.Environment = mockk(relaxed = true)
-    private val ihcService: IHCService = mockk()
+    private val healthCloudApi: HealthCloudApi = mockk()
     private val client: OkHttpClient = mockk()
     private val clientId = CLIENT_ID
     private val secret = "geheim"
@@ -76,10 +76,10 @@ class ApiServiceTest {
     fun setup() {
         clearAllMocks()
 
-        mockkObject(IHCServiceFactory)
+        mockkObject(HealthCloudApiFactory)
         mockkObject(ClientFactory)
 
-        every { IHCServiceFactory.getInstance(client, platform, env) } returns ihcService
+        every { HealthCloudApiFactory.getInstance(client, platform, env) } returns healthCloudApi
         every {
             ClientFactory.getInstance(
                 authService,
@@ -110,7 +110,7 @@ class ApiServiceTest {
 
     @After
     fun tearDown() {
-        unmockkObject(IHCServiceFactory)
+        unmockkObject(HealthCloudApiFactory)
         unmockkObject(ClientFactory)
     }
 
@@ -134,14 +134,14 @@ class ApiServiceTest {
 
     // keys
     @Test
-    fun `Given, fetchCommonKey is called with an Alias, UserId and a CommonKeyId, it delegates it to the IHCService and returns its result`() {
+    fun `Given, fetchCommonKey is called with an Alias, UserId and a CommonKeyId, it delegates it to the HealthCloudApi and returns its result`() {
         // Given
         val alias = ALIAS
         val userId = USER_ID
         val commonKeyId = COMMON_KEY_ID
         val result: Single<CommonKeyResponse> = mockk()
 
-        every { ihcService.fetchCommonKey(alias, userId, commonKeyId) } returns result
+        every { healthCloudApi.fetchCommonKey(alias, userId, commonKeyId) } returns result
 
         // When
         val actual = service.fetchCommonKey(alias, userId, commonKeyId)
@@ -153,12 +153,12 @@ class ApiServiceTest {
         )
 
         verify(exactly = 1) {
-            ihcService.fetchCommonKey(alias, userId, commonKeyId)
+            healthCloudApi.fetchCommonKey(alias, userId, commonKeyId)
         }
     }
 
     @Test
-    fun `Given, uploadTagEncryptionKey is called with an Alias, UserId and a EncryptedKey, it delegates it to the IHCService and returns its result`() {
+    fun `Given, uploadTagEncryptionKey is called with an Alias, UserId and a EncryptedKey, it delegates it to the HealthCloudApi and returns its result`() {
         // Given
         val alias = ALIAS
         val userId = USER_ID
@@ -169,7 +169,7 @@ class ApiServiceTest {
             PARAM_TAG_ENCRYPTION_KEY to encryptedKey
         )
 
-        every { ihcService.uploadTagEncryptionKey(alias, userId, mappedKey) } returns result
+        every { healthCloudApi.uploadTagEncryptionKey(alias, userId, mappedKey) } returns result
 
         // When
         val actual = service.uploadTagEncryptionKey(alias, userId, encryptedKey)
@@ -181,20 +181,20 @@ class ApiServiceTest {
         )
 
         verify(exactly = 1) {
-            ihcService.uploadTagEncryptionKey(alias, userId, mappedKey)
+            healthCloudApi.uploadTagEncryptionKey(alias, userId, mappedKey)
         }
     }
 
     // records
     @Test
-    fun `Given, createRecord is called with an Alias, UserId and a EncryptedRecord, it delegates it to the IHCService and returns its result`() {
+    fun `Given, createRecord is called with an Alias, UserId and a EncryptedRecord, it delegates it to the HealthCloudApi and returns its result`() {
         // Given
         val alias = ALIAS
         val userId = USER_ID
         val record: EncryptedRecord = mockk()
         val result: Single<EncryptedRecord> = mockk()
 
-        every { ihcService.createRecord(alias, userId, record) } returns result
+        every { healthCloudApi.createRecord(alias, userId, record) } returns result
 
         // When
         val actual = service.createRecord(alias, userId, record)
@@ -206,12 +206,12 @@ class ApiServiceTest {
         )
 
         verify(exactly = 1) {
-            ihcService.createRecord(alias, userId, record)
+            healthCloudApi.createRecord(alias, userId, record)
         }
     }
 
     @Test
-    fun `Given, updateRecord is called with an Alias, UserId, RecordId and a EncryptedRecord, it delegates it to the IHCService and returns its result`() {
+    fun `Given, updateRecord is called with an Alias, UserId, RecordId and a EncryptedRecord, it delegates it to the HealthCloudApi and returns its result`() {
         // Given
         val alias = ALIAS
         val userId = USER_ID
@@ -219,7 +219,7 @@ class ApiServiceTest {
         val record: EncryptedRecord = mockk()
         val result: Single<EncryptedRecord> = mockk()
 
-        every { ihcService.updateRecord(alias, userId, recordId, record) } returns result
+        every { healthCloudApi.updateRecord(alias, userId, recordId, record) } returns result
 
         // When
         val actual = service.updateRecord(alias, userId, recordId, record)
@@ -231,19 +231,19 @@ class ApiServiceTest {
         )
 
         verify(exactly = 1) {
-            ihcService.updateRecord(alias, userId, recordId, record)
+            healthCloudApi.updateRecord(alias, userId, recordId, record)
         }
     }
 
     @Test
-    fun `Given, fetchRecord is called with an Alias, UserId and a RecordId, it delegates it to the IHCService and returns its result`() {
+    fun `Given, fetchRecord is called with an Alias, UserId and a RecordId, it delegates it to the HealthCloudApi and returns its result`() {
         // Given
         val alias = ALIAS
         val userId = USER_ID
         val recordId = RECORD_ID
         val result: Single<EncryptedRecord> = mockk()
 
-        every { ihcService.fetchRecord(alias, userId, recordId) } returns result
+        every { healthCloudApi.fetchRecord(alias, userId, recordId) } returns result
 
         // When
         val actual = service.fetchRecord(alias, userId, recordId)
@@ -255,12 +255,12 @@ class ApiServiceTest {
         )
 
         verify(exactly = 1) {
-            ihcService.fetchRecord(alias, userId, recordId)
+            healthCloudApi.fetchRecord(alias, userId, recordId)
         }
     }
 
     @Test
-    fun `Given, searchRecords is called with its appropriate parameter, it delegates it to the IHCService and returns its result`() {
+    fun `Given, searchRecords is called with its appropriate parameter, it delegates it to the HealthCloudApi and returns its result`() {
         // Given
         val alias = ALIAS
         val userId = USER_ID
@@ -273,7 +273,7 @@ class ApiServiceTest {
         val result: Observable<List<EncryptedRecord>> = mockk()
 
         every {
-            ihcService.searchRecords(
+            healthCloudApi.searchRecords(
                 alias,
                 userId,
                 startDate,
@@ -304,7 +304,7 @@ class ApiServiceTest {
         )
 
         verify(exactly = 1) {
-            ihcService.searchRecords(
+            healthCloudApi.searchRecords(
                 alias,
                 userId,
                 startDate,
@@ -319,7 +319,7 @@ class ApiServiceTest {
     }
 
     @Test
-    fun `Given, countRecords is called with an Alias, UserId and Tags, it delegates it to the IHCService, parses the result and returns it`() {
+    fun `Given, countRecords is called with an Alias, UserId and Tags, it delegates it to the HealthCloudApi, parses the result and returns it`() {
         // Given
         val alias = ALIAS
         val userId = USER_ID
@@ -330,7 +330,7 @@ class ApiServiceTest {
         val headers: Headers = mockk()
 
         every { tags.tagGroups } returns formattedTags
-        every { ihcService.getRecordsHeader(alias, userId, formattedTags) } returns Single.just(
+        every { healthCloudApi.getRecordsHeader(alias, userId, formattedTags) } returns Single.just(
             response
         )
         every { response.headers() } returns headers
@@ -346,20 +346,20 @@ class ApiServiceTest {
         )
 
         verify(exactly = 1) {
-            ihcService.getRecordsHeader(alias, userId, formattedTags)
+            healthCloudApi.getRecordsHeader(alias, userId, formattedTags)
         }
         verify(exactly = 1) { tags.tagGroups }
     }
 
     @Test
-    fun `Given, deleteRecord is called with an Alias, UserId and a RecordId, it delegates it to the IHCService and returns its result`() {
+    fun `Given, deleteRecord is called with an Alias, UserId and a RecordId, it delegates it to the HealthCloudApi and returns its result`() {
         // Given
         val alias = ALIAS
         val userId = USER_ID
         val recordId = RECORD_ID
         val result: Completable = mockk()
 
-        every { ihcService.deleteRecord(alias, userId, recordId) } returns result
+        every { healthCloudApi.deleteRecord(alias, userId, recordId) } returns result
 
         // When
         val actual = service.deleteRecord(alias, userId, recordId)
@@ -371,13 +371,13 @@ class ApiServiceTest {
         )
 
         verify(exactly = 1) {
-            ihcService.deleteRecord(alias, userId, recordId)
+            healthCloudApi.deleteRecord(alias, userId, recordId)
         }
     }
 
     // attachments
     @Test
-    fun `Given, uploadDocument is called with an Alias, UserId and a data payload, while building a RequestBody out of it, it delegates it to the IHCService and returns the DocumentID`() {
+    fun `Given, uploadDocument is called with an Alias, UserId and a data payload, while building a RequestBody out of it, it delegates it to the HealthCloudApi and returns the DocumentID`() {
         // Given
         val alias = ALIAS
         val userId = USER_ID
@@ -388,7 +388,7 @@ class ApiServiceTest {
 
         val slot = slot<RequestBody>()
 
-        every { ihcService.uploadDocument(alias, userId, capture(slot)) } answers {
+        every { healthCloudApi.uploadDocument(alias, userId, capture(slot)) } answers {
             if (slot.captured.contentType() == request.contentType() &&
                 // This hard to test, we can apply only a weak indicator
                 slot.captured.contentLength() == request.contentLength()
@@ -411,12 +411,12 @@ class ApiServiceTest {
         )
 
         verify(exactly = 1) {
-            ihcService.uploadDocument(alias, userId, any())
+            healthCloudApi.uploadDocument(alias, userId, any())
         }
     }
 
     @Test
-    fun `Given, downloadDocument is called with an Alias, UserId and a DocumentId, it delegates it to the IHCService and returns the Resonses Datablob`() {
+    fun `Given, downloadDocument is called with an Alias, UserId and a DocumentId, it delegates it to the HealthCloudApi and returns the Resonses Datablob`() {
         // Given
         val alias = ALIAS
         val userId = USER_ID
@@ -424,7 +424,7 @@ class ApiServiceTest {
         val response: ResponseBody = mockk()
         val document = ByteArray(23)
 
-        every { ihcService.downloadDocument(alias, userId, documentId) } returns Single.just(
+        every { healthCloudApi.downloadDocument(alias, userId, documentId) } returns Single.just(
             response
         )
         every { response.bytes() } returns document
@@ -439,18 +439,18 @@ class ApiServiceTest {
         )
 
         verify(exactly = 1) {
-            ihcService.downloadDocument(alias, userId, documentId)
+            healthCloudApi.downloadDocument(alias, userId, documentId)
         }
     }
 
     @Test
-    fun `Given, deleteDocument is called with an Alias, UserId and a DocumentId, it delegates it to the IHCService and returns always true`() {
+    fun `Given, deleteDocument is called with an Alias, UserId and a DocumentId, it delegates it to the HealthCloudApi and returns always true`() {
         // Given
         val alias = ALIAS
         val userId = USER_ID
         val documentId = "doc"
 
-        every { ihcService.deleteDocument(alias, userId, documentId) } returns Single.just(mockk())
+        every { healthCloudApi.deleteDocument(alias, userId, documentId) } returns Single.just(mockk())
 
         // When
         val actual = service.deleteDocument(alias, userId, documentId).blockingGet()
@@ -459,18 +459,18 @@ class ApiServiceTest {
         assertTrue(actual)
 
         verify(exactly = 1) {
-            ihcService.deleteDocument(alias, userId, documentId)
+            healthCloudApi.deleteDocument(alias, userId, documentId)
         }
     }
 
     // Mixed
     @Test
-    fun `Given, fetchUserInfo is called with an Alias, it delegates it to the IHCService, subscripts on the Schedulers returns the result`() {
+    fun `Given, fetchUserInfo is called with an Alias, it delegates it to the HealthCloudApi, subscripts on the Schedulers returns the result`() {
         // Given
         val alias = ALIAS
         val response: Single<UserInfo> = mockk()
 
-        every { ihcService.fetchUserInfo(alias) } returns response
+        every { healthCloudApi.fetchUserInfo(alias) } returns response
         every { response.subscribeOn(Schedulers.io()) } returns response
 
         // When
@@ -483,17 +483,17 @@ class ApiServiceTest {
         )
 
         verifyOrder {
-            ihcService.fetchUserInfo(alias)
+            healthCloudApi.fetchUserInfo(alias)
             response.subscribeOn(Schedulers.io())
         }
     }
 
     @Test
-    fun `Given, fetchVersionInfo is called, it delegates it to the IHCService, subscripts on the Schedulers returns the result`() {
+    fun `Given, fetchVersionInfo is called, it delegates it to the HealthCloudApi, subscripts on the Schedulers returns the result`() {
         // Given
         val response: Single<VersionList> = mockk()
 
-        every { ihcService.fetchVersionInfo() } returns response
+        every { healthCloudApi.fetchVersionInfo() } returns response
         every { response.subscribeOn(Schedulers.io()) } returns response
 
         // When
@@ -506,7 +506,7 @@ class ApiServiceTest {
         )
 
         verifyOrder {
-            ihcService.fetchVersionInfo()
+            healthCloudApi.fetchVersionInfo()
             response.subscribeOn(Schedulers.io())
         }
     }
@@ -541,14 +541,14 @@ class ApiServiceTest {
     }
 
     @Test
-    fun `Given, logout is called with an Alias, it resolves the accessToken, delegates it with the Alias to the IHCService and returns its result`() {
+    fun `Given, logout is called with an Alias, it resolves the accessToken, delegates it with the Alias to the HealthCloudApi and returns its result`() {
         // Given
         val alias = ALIAS
         val token = "token"
         val result = "ignore me"
 
         every { authService.getRefreshToken(alias) } returns token
-        every { ihcService.logout(alias, token) } returns Completable.fromCallable { result }
+        every { healthCloudApi.logout(alias, token) } returns Completable.fromCallable { result }
 
         // When
         val actual = service.logout(alias).blockingGet()
@@ -556,6 +556,6 @@ class ApiServiceTest {
         // Then
         assertNull(actual)
 
-        verify(exactly = 1) { ihcService.logout(alias, token) }
+        verify(exactly = 1) { healthCloudApi.logout(alias, token) }
     }
 }

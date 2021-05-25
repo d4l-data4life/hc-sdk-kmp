@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.network.util
 
-import care.data4life.sdk.network.IHCService
+import care.data4life.sdk.network.HealthCloudApi
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter
 import com.squareup.moshi.Moshi
@@ -25,7 +25,8 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 
-object IHCServiceFactory : NetworkingContract.IHCServiceFactory {
+object HealthCloudApiFactory :
+    NetworkingContract.HealthCloudApiFactory {
     private fun buildMoshi(): Moshi {
         return Moshi.Builder()
             .add(EncryptedKeyTypeAdapter())
@@ -36,13 +37,13 @@ object IHCServiceFactory : NetworkingContract.IHCServiceFactory {
         client: OkHttpClient,
         platform: String,
         environment: NetworkingContract.Environment
-    ): IHCService {
+    ): HealthCloudApi {
         return Retrofit.Builder()
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create(buildMoshi()))
             .baseUrl(environment.getApiBaseURL(platform))
             .client(client)
             .build()
-            .create(IHCService::class.java)
+            .create(HealthCloudApi::class.java)
     }
 }

@@ -159,12 +159,12 @@ class NetworkingContract {
         ): OkHttpClient
     }
 
-    internal interface IHCServiceFactory {
+    internal interface HealthCloudApiFactory {
         fun getInstance(
             client: OkHttpClient,
             platform: String,
             environment: Environment
-        ): IHCService
+        ): HealthCloudApi
     }
 
     interface SearchTagsBuilder {

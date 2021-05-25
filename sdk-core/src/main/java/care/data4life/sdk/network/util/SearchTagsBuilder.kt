@@ -19,7 +19,7 @@ package care.data4life.sdk.network.util
 import care.data4life.sdk.network.NetworkingContract
 
 data class SearchTags(
-    override val tags: String
+    override val tagGroups: String
 ) : NetworkingContract.SearchTags
 
 class SearchTagsBuilder private constructor() : NetworkingContract.SearchTagsBuilder {

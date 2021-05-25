@@ -309,7 +309,7 @@ class RecordServiceFetchRecordsModuleTest {
             )
         } answers {
             val actual = flowHelper.decryptSerializedTags(
-                search.captured.tags,
+                search.captured.tagGroups,
                 cryptoService,
                 tagEncryptionKey
             )
@@ -353,7 +353,7 @@ class RecordServiceFetchRecordsModuleTest {
             .let { flowHelper.buildExpectedTagGroups(it, encodedTags, legacyKMPTags, legacyJSTags) }
             .let { flowHelper.buildExpectedTagGroups(it, encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations) }
             .seal()
-            .tags
+            .tagGroups
 
         val encryptedRecord = flowHelper.prepareEncryptedFhirRecord(
             recordIds.first,
@@ -440,7 +440,7 @@ class RecordServiceFetchRecordsModuleTest {
             .let { flowHelper.buildExpectedTagGroups(it, encodedTags, legacyKMPTags, legacyJSTags) }
             .let { flowHelper.buildExpectedTagGroups(it, encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations) }
             .seal()
-            .tags
+            .tagGroups
 
         val encryptedRecord = flowHelper.prepareEncryptedDataRecord(
             recordIds.first,

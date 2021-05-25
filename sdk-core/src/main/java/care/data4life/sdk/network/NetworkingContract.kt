@@ -91,7 +91,7 @@ class NetworkingContract {
     }
 
     internal interface CertificatePinnerFactory {
-        fun getInstance(platform: String, env: Environment): CertificatePinner
+        fun getInstance(platform: String, environment: Environment): CertificatePinner
     }
 
     internal interface Interceptor : okhttp3.Interceptor {
@@ -173,7 +173,7 @@ class NetworkingContract {
     }
 
     interface SearchTags {
-        val tags: String
+        val tagGroups: String
     }
 
     interface SearchTagsBuilderFactory {

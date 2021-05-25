@@ -57,6 +57,8 @@ import org.junit.Ignore
 import org.junit.Test
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
+import java.util.logging.Level
+import java.util.logging.Logger
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -77,8 +79,9 @@ class ApiServiceModuleTest {
         init()
     }
 
-    fun init(additionalInterceptor: Interceptor? = null) {
+    private fun init(additionalInterceptor: Interceptor? = null) {
         server = MockWebServer()
+        Logger.getLogger(MockWebServer::class.java.name).level = Level.OFF
 
         mockkObject(IHCServiceFactory)
         mockkObject(CertificatePinnerFactory)
@@ -428,23 +431,23 @@ class ApiServiceModuleTest {
             expected = "Bearer $authToken"
         )
         assertEquals(
-            actual = request.requestUrl!!.queryParameter("start_date"),
+            actual = request.requestUrl?.queryParameter("start_date"),
             expected = startDate
         )
         assertEquals(
-            actual = request.requestUrl!!.queryParameter("end_date"),
+            actual = request.requestUrl?.queryParameter("end_date"),
             expected = endDate
         )
         assertEquals(
-            actual = request.requestUrl!!.queryParameter("limit"),
+            actual = request.requestUrl?.queryParameter("limit"),
             expected = pageSize.toString()
         )
         assertEquals(
-            actual = request.requestUrl!!.queryParameter("offset"),
+            actual = request.requestUrl?.queryParameter("offset"),
             expected = offset.toString()
         )
         assertEquals(
-            actual = request.requestUrl!!.queryParameter("tags"),
+            actual = request.requestUrl?.queryParameter("tags"),
             expected = formattedTags
         )
         assertEquals(

@@ -140,7 +140,7 @@ class ApiService @JvmOverloads constructor(
             endDate,
             pageSize,
             offset,
-            tags.tags
+            tags.tagGroups
         )
     }
 
@@ -150,7 +150,7 @@ class ApiService @JvmOverloads constructor(
         tags: NetworkingContract.SearchTags
     ): Single<Int> {
         return service
-            .getRecordsHeader(alias, userId, tags.tags)
+            .getRecordsHeader(alias, userId, tags.tagGroups)
             .map { response ->
                 response.headers()[NetworkingContract.HEADER_TOTAL_COUNT]!!
                     .toInt()

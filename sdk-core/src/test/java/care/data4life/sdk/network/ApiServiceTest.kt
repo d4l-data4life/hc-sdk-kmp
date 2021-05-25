@@ -284,7 +284,7 @@ class ApiServiceTest {
             )
         } returns result
 
-        every { tags.tags } returns formattedTags
+        every { tags.tagGroups } returns formattedTags
 
         // When
         val actual = service.searchRecords(
@@ -315,7 +315,7 @@ class ApiServiceTest {
             )
         }
 
-        verify(exactly = 1) { tags.tags }
+        verify(exactly = 1) { tags.tagGroups }
     }
 
     @Test
@@ -329,7 +329,7 @@ class ApiServiceTest {
         val response: Response<Void> = mockk()
         val headers: Headers = mockk()
 
-        every { tags.tags } returns formattedTags
+        every { tags.tagGroups } returns formattedTags
         every { ihcService.getRecordsHeader(alias, userId, formattedTags) } returns Single.just(
             response
         )
@@ -348,7 +348,7 @@ class ApiServiceTest {
         verify(exactly = 1) {
             ihcService.getRecordsHeader(alias, userId, formattedTags)
         }
-        verify(exactly = 1) { tags.tags }
+        verify(exactly = 1) { tags.tagGroups }
     }
 
     @Test

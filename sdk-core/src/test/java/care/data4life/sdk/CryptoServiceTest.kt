@@ -36,13 +36,15 @@ import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.util.Base64
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.slot
 import io.mockk.verify
+import org.junit.Assert
+import org.junit.Before
+import org.junit.Test
 import java.io.IOException
 import java.security.InvalidAlgorithmParameterException
 import java.security.InvalidKeyException
@@ -63,10 +65,6 @@ import javax.crypto.KeyGenerator
 import javax.crypto.NoSuchPaddingException
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
-import org.junit.After
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
 
 class CryptoServiceTest {
 
@@ -250,20 +248,20 @@ class CryptoServiceTest {
             QyhWfy6A4sU7XdwJfNhQUAoLvvRrECtqMR7Ayn7xoWgeuhqQCHeg
             """.trimIndent()
 
-        //base64TestKeyWord.replace("\n", "", false)
+        // base64TestKeyWord.replace("\n", "", false)
         val pemTestKeyString = """
             -----BEGIN RSA PRIVATE KEY-----
             $base64TestKey
             -----END RSA PRIVATE KEY-----
 
-            """.trimIndent()
+        """.trimIndent()
 
         val keyPairArg = slot<GCKeyPair>()
         every { mockStorage.storeKey(PREFIX + GC_KEYPAIR, capture(keyPairArg)) } just runs
 
         // when
         cryptoService.setGCKeyPairFromPemPrivateKey(pemTestKeyString)
-        //then
+        // then
         /* The base64 serialized input and out keys may differ due to irrelevant meta-data
         differences and hence cannot be compared directly. Hence, we convert both the original
         and the stored key to Java key objects before comparing them. */
@@ -321,7 +319,7 @@ class CryptoServiceTest {
     @Test
     @Throws(Exception::class)
     fun fetchingAndSavingCommonKey() {
-        //given
+        // given
         val commonKeyId = "1234-1234-1234-1234"
         val algorithm = mockk<GCAESKeyAlgorithm>()
         val commonKey = mockk<GCKey>()
@@ -337,11 +335,11 @@ class CryptoServiceTest {
         )
         every { mockCommonKeyService.storeCommonKey(commonKeyId, commonKey) } just runs
 
-        //when
+        // when
         cryptoService.storeCommonKey(commonKeyId, commonKey)
         cryptoService.fetchCurrentCommonKey()
 
-        //then
+        // then
         verify { mockCommonKeyService.storeCommonKey(commonKeyId, commonKey) }
     }
 
@@ -540,11 +538,6 @@ class CryptoServiceTest {
         // then
         verify { mockStorage.storeKey(PREFIX + TEK_KEY, tekKey, KeyType.TAG_KEY) }
         verify { mockStorage.getExchangeKey(PREFIX + TEK_KEY) }
-    }
-
-    @After
-    fun tearDown() {
-        clearAllMocks()
     }
 
     inner class MockCryptoService(

@@ -14,7 +14,6 @@
  * contact D4L by email to help@data4life.care.
  */
 
-
 package care.data4life.sdk
 
 import care.data4life.crypto.ExchangeKey
@@ -32,10 +31,10 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.spyk
 import io.mockk.verify
-import java.io.IOException
 import junit.framework.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import java.io.IOException
 
 class CryptoSecureStoreTest {
     private var secureStore: SecureStoreContract.SecureStore = mockk()

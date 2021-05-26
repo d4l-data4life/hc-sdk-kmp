@@ -30,7 +30,7 @@ import care.data4life.sdk.network.model.Version
 import care.data4life.sdk.network.model.VersionList
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter
 import care.data4life.sdk.network.util.CertificatePinnerFactory
-import care.data4life.sdk.network.util.IHCServiceFactory
+import care.data4life.sdk.network.util.HealthCloudApiFactory
 import care.data4life.sdk.network.util.SearchTagsBuilder
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.AUTH_TOKEN
@@ -83,7 +83,7 @@ class ApiServiceModuleTest {
         server = MockWebServer()
         Logger.getLogger(MockWebServer::class.java.name).level = Level.OFF
 
-        mockkObject(IHCServiceFactory)
+        mockkObject(HealthCloudApiFactory)
         mockkObject(CertificatePinnerFactory)
 
         val slot = slot<OkHttpClient>()
@@ -93,10 +93,10 @@ class ApiServiceModuleTest {
         every { CertificatePinnerFactory.getInstance(any(), any()) } returns mockk(relaxed = true)
 
         every {
-            IHCServiceFactory.getInstance(capture(slot), platform, env)
+            HealthCloudApiFactory.getInstance(capture(slot), platform, env)
         } answers {
-            unmockkObject(IHCServiceFactory)
-            IHCServiceFactory.getInstance(
+            unmockkObject(HealthCloudApiFactory)
+            HealthCloudApiFactory.getInstance(
                 modifyClient(slot.captured, additionalInterceptor),
                 platform,
                 env

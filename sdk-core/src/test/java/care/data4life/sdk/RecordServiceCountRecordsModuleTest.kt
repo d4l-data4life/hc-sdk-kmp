@@ -20,6 +20,7 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.ResourceCryptoService
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.util.SearchTagsBuilder
@@ -31,6 +32,7 @@ import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.fake.CryptoServiceFake
 import care.data4life.sdk.test.fake.CryptoServiceIteration
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
+import care.data4life.sdk.test.util.GenericTestDataProvider.ARBITRARY_DATA_KEY
 import care.data4life.sdk.test.util.GenericTestDataProvider.CLIENT_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
@@ -98,7 +100,14 @@ class RecordServiceCountRecordsModuleTest {
 
         val searchTags = SearchTagsBuilder.newBuilder()
             .let { flowHelper.buildExpectedTagGroups(it, encodedTags, legacyKMPTags, legacyJSTags) }
-            .let { flowHelper.buildExpectedTagGroups(it, encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations) }
+            .let {
+                flowHelper.buildExpectedTagGroups(
+                    it,
+                    encodedAnnotations,
+                    legacyKMPAnnotations,
+                    legacyJSAnnotations
+                )
+            }
             .seal()
             .tagGroups
 
@@ -117,7 +126,11 @@ class RecordServiceCountRecordsModuleTest {
             tagEncryptionKeyCalls = 1,
             resources = emptyList(),
             tags = flowHelper.mergeTags(encodedTags, legacyKMPTags, legacyJSTags),
-            annotations = flowHelper.mergeTags(encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations),
+            annotations = flowHelper.mergeTags(
+                encodedAnnotations,
+                legacyKMPAnnotations,
+                legacyJSAnnotations
+            ),
             hashFunction = { value -> flowHelper.md5(value) }
         )
 
@@ -368,6 +381,72 @@ class RecordServiceCountRecordsModuleTest {
         // When
         val result = recordService.countFhir4Records(
             Fhir4Reference::class.java,
+            USER_ID,
+            annotations
+        ).blockingGet()
+
+        // Then
+        assertEquals(
+            expected = 23,
+            actual = result
+        )
+    }
+
+    // Arbitrary Data
+    @Test
+    fun `Given, countDataRecords is called with a type and UserId, it returns the amount of DataRecords`() {
+        // Given
+        val tags = mapOf(
+            "flag" to ARBITRARY_DATA_KEY,
+            "partner" to PARTNER_ID,
+            "client" to CLIENT_ID
+        )
+
+        runFlow(
+            tags = tags,
+            amount = 46
+        )
+
+        // When
+        val result = recordService.countDataRecords(
+            DataResource::class.java,
+            USER_ID,
+            emptyList()
+        ).blockingGet()
+
+        // Then
+        assertEquals(
+            expected = 46,
+            actual = result
+        )
+    }
+
+    @Test
+    fun `Given, countDataRecords is called with a type, UserId and Annotations, it returns the amount of DataRecords`() {
+        // Given
+        val tags = mapOf(
+            "flag" to ARBITRARY_DATA_KEY,
+            "partner" to PARTNER_ID,
+            "client" to CLIENT_ID
+        )
+
+        val annotations = listOf(
+            "wow",
+            "it",
+            "works",
+            "and",
+            "like_a_duracell_häsi"
+        )
+
+        runFlow(
+            tags = tags,
+            annotations = annotations,
+            amount = 23
+        )
+
+        // When
+        val result = recordService.countDataRecords(
+            DataResource::class.java,
             USER_ID,
             annotations
         ).blockingGet()

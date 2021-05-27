@@ -16,6 +16,8 @@ toc::[]
 
 === Added
 
+* Enable count for arbitrary data.
+
 === Changed
 
 * ApiService is now in Kotlin.

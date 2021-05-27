@@ -25,14 +25,20 @@ import care.data4life.sdk.call.Task
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.test.util.GenericTestDataProvider.ATTACHMENT_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import io.reactivex.Completable
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
+import org.threeten.bp.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
+import kotlin.test.assertTrue
 
 class FhirRecordClientTest {
     private val recordService: RecordContract.Service = mockk()
@@ -50,7 +56,216 @@ class FhirRecordClientTest {
     }
 
     @Test
-    fun `Given count is called, with a resourceType, Annotations and a Callback it returns the corresponding Task`() {
+    fun `Given create is called, with a Resource, Annotations and a Callback it returns the corresponding Task`() {
+        // Given
+        val resource: Fhir4Resource = mockk()
+        val annotations: Annotations = mockk()
+        val callback: Callback<Fhir4Record<Fhir4Resource>> = mockk()
+
+        val userId = USER_ID
+        val expectedRecord: Fhir4Record<Fhir4Resource> = mockk()
+        val record: Single<Fhir4Record<Fhir4Resource>> = Single.just(expectedRecord)
+        val expected: Task = mockk()
+        val observer = slot<Single<Fhir4Record<Fhir4Resource>>>()
+
+        every { userService.finishLogin(true) } returns Single.just(true)
+        every { userService.userID } returns Single.just(userId)
+        every {
+            recordService.createRecord(userId, resource, annotations)
+        } returns record
+        every {
+            callHandler.executeSingle(capture(observer), callback)
+        } answers {
+            assertEquals(
+                expected = expectedRecord,
+                actual = observer.captured.blockingGet()
+            )
+            expected
+        }
+
+        // When
+        val actual = client.create(resource, annotations, callback)
+
+        // Then
+        assertSame(
+            expected = expected,
+            actual = actual
+        )
+    }
+
+    @Test
+    fun `Given update is called, with a RecordId, a Resource, Annotations and a Callback it returns the corresponding Task`() {
+        // Given
+        val resource: Fhir4Resource = mockk()
+        val annotations: Annotations = mockk()
+        val callback: Callback<Fhir4Record<Fhir4Resource>> = mockk()
+        val recordId = RECORD_ID
+
+        val userId = USER_ID
+        val expectedRecord: Fhir4Record<Fhir4Resource> = mockk()
+        val record: Single<Fhir4Record<Fhir4Resource>> = Single.just(expectedRecord)
+        val expected: Task = mockk()
+        val observer = slot<Single<Fhir4Record<Fhir4Resource>>>()
+
+        every { userService.finishLogin(true) } returns Single.just(true)
+        every { userService.userID } returns Single.just(userId)
+        every {
+            recordService.updateRecord(userId, recordId, resource, annotations)
+        } returns record
+        every {
+            callHandler.executeSingle(capture(observer), callback)
+        } answers {
+            assertEquals(
+                expected = expectedRecord,
+                actual = observer.captured.blockingGet()
+            )
+            expected
+        }
+
+        // When
+        val actual = client.update(recordId, resource, annotations, callback)
+
+        // Then
+        assertSame(
+            expected = expected,
+            actual = actual
+        )
+    }
+
+    @Test
+    fun `Given fetch is called, with a RecordId and a Callback it returns the corresponding Task`() {
+        // Given
+        val callback: Callback<Fhir4Record<Fhir4Resource>> = mockk()
+        val recordId = RECORD_ID
+
+        val userId = USER_ID
+        val expectedRecord: Fhir4Record<Fhir4Resource> = mockk()
+        val record: Single<Fhir4Record<Fhir4Resource>> = Single.just(expectedRecord)
+        val expected: Task = mockk()
+        val observer = slot<Single<Fhir4Record<Fhir4Resource>>>()
+
+        every { userService.finishLogin(true) } returns Single.just(true)
+        every { userService.userID } returns Single.just(userId)
+        every {
+            recordService.fetchFhir4Record<Fhir4Resource>(userId, recordId)
+        } returns record
+        every {
+            callHandler.executeSingle(capture(observer), callback)
+        } answers {
+            assertEquals(
+                expected = expectedRecord,
+                actual = observer.captured.blockingGet()
+            )
+            expected
+        }
+
+        // When
+        val actual = client.fetch(recordId, callback)
+
+        // Then
+        assertSame(
+            expected = expected,
+            actual = actual
+        )
+    }
+
+    @Test
+    fun `Given search is called, with a ResourceType, Annotations, a Startdate, a Enddate, Pagesize, Offset and a Callback it returns the corresponding Task`() {
+        // Given
+        val callback: Callback<List<Fhir4Record<Fhir4Resource>>> = mockk()
+        val resourceType = Fhir4Resource::class.java
+        val annotations: Annotations = mockk()
+        val startDate: LocalDate = mockk()
+        val endDate: LocalDate = mockk()
+        val pageSize = 23
+        val offset = 42
+
+        val userId = USER_ID
+        val expectedRecords: List<Fhir4Record<Fhir4Resource>> = mockk()
+        val records: Single<List<Fhir4Record<Fhir4Resource>>> = Single.just(expectedRecords)
+        val expected: Task = mockk()
+        val observer = slot<Single<List<Fhir4Record<Fhir4Resource>>>>()
+
+        every { userService.finishLogin(true) } returns Single.just(true)
+        every { userService.userID } returns Single.just(userId)
+        every {
+            recordService.fetchFhir4Records(
+                userId,
+                resourceType,
+                annotations,
+                startDate,
+                endDate,
+                pageSize,
+                offset
+            )
+        } returns records
+        every {
+            callHandler.executeSingle(capture(observer), callback)
+        } answers {
+            assertEquals(
+                expected = expectedRecords,
+                actual = observer.captured.blockingGet()
+            )
+            expected
+        }
+
+        // When
+        val actual = client.search(
+            resourceType,
+            annotations,
+            startDate,
+            endDate,
+            pageSize,
+            offset,
+            callback
+        )
+
+        // Then
+        assertSame(
+            expected = expected,
+            actual = actual
+        )
+    }
+
+    @Test
+    fun `Given download is called, with a RecordId and a Callback, it returns the corresponding Task`() {
+        // Given
+        val callback: Callback<Fhir4Record<Fhir4Resource>> = mockk()
+
+        val recordId = RECORD_ID
+        val userId = USER_ID
+        val record: Fhir4Record<Fhir4Resource> = mockk()
+        val result = Single.just(record)
+        val expected: Task = mockk()
+        val observer = slot<Single<Fhir4Record<Fhir4Resource>>>()
+
+        every { userService.finishLogin(true) } returns Single.just(true)
+        every { userService.userID } returns Single.just(userId)
+        every {
+            recordService.downloadFhir4Record<Fhir4Resource>(recordId, userId)
+        } returns result
+        every {
+            callHandler.executeSingle(capture(observer), callback)
+        } answers {
+            assertEquals(
+                expected = record,
+                actual = observer.captured.blockingGet()
+            )
+            expected
+        }
+
+        // When
+        val actual = client.download(recordId, callback)
+
+        // Then
+        assertSame(
+            expected = expected,
+            actual = actual
+        )
+    }
+
+    @Test
+    fun `Given count is called, with a ResourceType, Annotations and a Callback it returns the corresponding Task`() {
         // Given
         val resourceType = Fhir4Resource::class.java
         val annotations: Annotations = mockk()
@@ -88,34 +303,30 @@ class FhirRecordClientTest {
     }
 
     @Test
-    fun `Given download is called, with a recordId and a Callback, it returns the corresponding Task`() {
+    fun `Given delete is called, with a RecordId and a Callback, it returns the corresponding Task`() {
         // Given
-        val callback: Callback<Fhir4Record<Fhir4Resource>> = mockk()
+        val callback: Callback<Boolean> = mockk()
 
-        val recordId = "Potato"
-        val userId = "Soup"
-        val record: Fhir4Record<Fhir4Resource> = mockk()
-        val result = Single.just(record)
+        val recordId = RECORD_ID
+        val userId = USER_ID
+        val result = Completable.fromCallable { true }
         val expected: Task = mockk()
-        val observer = slot<Single<Fhir4Record<Fhir4Resource>>>()
+        val observer = slot<Single<Boolean>>()
 
         every { userService.finishLogin(true) } returns Single.just(true)
         every { userService.userID } returns Single.just(userId)
         every {
-            recordService.downloadFhir4Record<Fhir4Resource>(recordId, userId)
+            recordService.deleteRecord(userId, recordId)
         } returns result
         every {
             callHandler.executeSingle(capture(observer), callback)
         } answers {
-            assertEquals(
-                expected = record,
-                actual = observer.captured.blockingGet()
-            )
+            assertTrue(observer.captured.blockingGet())
             expected
         }
 
         // When
-        val actual = client.download(recordId, callback)
+        val actual = client.delete(recordId, callback)
 
         // Then
         assertSame(
@@ -129,9 +340,9 @@ class FhirRecordClientTest {
         // Given
         val callback: Callback<Fhir4Attachment> = mockk()
 
-        val recordId = "Potato"
-        val attachmentId = "Tomato"
-        val userId = "Soup"
+        val recordId = RECORD_ID
+        val userId = USER_ID
+        val attachmentId = ATTACHMENT_ID
         val downloadType = DownloadType.Full
         val attachment: Fhir4Attachment = mockk()
         val result = Single.just(attachment)
@@ -168,9 +379,9 @@ class FhirRecordClientTest {
         // Given
         val callback: Callback<List<Fhir4Attachment>> = mockk()
 
-        val recordId = "Potato"
+        val recordId = RECORD_ID
+        val userId = USER_ID
         val attachmentIds: List<String> = mockk()
-        val userId = "Soup"
         val downloadType = DownloadType.Full
         val attachments: List<Fhir4Attachment> = mockk()
         val result = Single.just(attachments)

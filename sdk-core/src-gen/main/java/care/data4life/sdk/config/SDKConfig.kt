@@ -17,5 +17,5 @@
 package care.data4life.sdk.config
 
 object SDKConfig {
-    const val version: String = "1.12.0-change-resource-client-tests-SNAPSHOT"
+    const val version: String = "1.12.0-change-resource-clients-SNAPSHOT"
 }

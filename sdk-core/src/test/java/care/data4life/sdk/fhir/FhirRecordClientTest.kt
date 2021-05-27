@@ -35,10 +35,10 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
+import org.threeten.bp.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
-import org.threeten.bp.LocalDate
 
 class FhirRecordClientTest {
     private val recordService: RecordContract.Service = mockk()

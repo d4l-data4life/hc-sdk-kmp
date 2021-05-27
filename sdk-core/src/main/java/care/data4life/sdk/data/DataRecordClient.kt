@@ -23,6 +23,7 @@ import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Task
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.Annotations
+import io.reactivex.Single
 import org.threeten.bp.LocalDate
 
 internal class DataRecordClient(
@@ -30,43 +31,42 @@ internal class DataRecordClient(
     private val recordService: RecordContract.Service,
     private val handler: CallHandler
 ) : DataContract.Client {
+    private fun <T> executeOperationFlow(
+        operation: (userId: String) -> Single<T>,
+        callback: Callback<T>
+    ): Task {
+        val flow = userService.finishLogin(true)
+            .flatMap { userService.userID }
+            .flatMap { userId -> operation(userId) }
+        return handler.executeSingle(flow, callback)
+    }
 
     override fun create(
         resource: DataResource,
         annotations: Annotations,
         callback: Callback<DataRecord<DataResource>>
-    ): Task {
-        val operation = userService.finishLogin(true)
-            .flatMap { userService.userID }
-            .flatMap { uid -> recordService.createRecord(uid, resource, annotations) }
-        return handler.executeSingle(operation, callback)
-    }
+    ): Task = executeOperationFlow(
+        { userId -> recordService.createRecord(userId, resource, annotations) },
+        callback
+    )
 
     override fun update(
         recordId: String,
         resource: DataResource,
         annotations: Annotations,
         callback: Callback<DataRecord<DataResource>>
-    ): Task {
-        val operation = userService.finishLogin(true)
-            .flatMap { userService.userID }
-            .flatMap { uid -> recordService.updateRecord(uid, recordId, resource, annotations) }
-        return handler.executeSingle(operation, callback)
-    }
+    ): Task = executeOperationFlow(
+        { userId -> recordService.updateRecord(userId, recordId, resource, annotations) },
+        callback
+    )
 
-    override fun delete(recordId: String, callback: Callback<Boolean>): Task {
-        val operation = userService.finishLogin(true)
-            .flatMap { userService.userID }
-            .flatMap { uid -> recordService.deleteRecord(uid, recordId).toSingle { true } }
-        return handler.executeSingle(operation, callback)
-    }
-
-    override fun fetch(recordId: String, callback: Callback<DataRecord<DataResource>>): Task {
-        val operation = userService.finishLogin(true)
-            .flatMap { userService.userID }
-            .flatMap { uid -> recordService.fetchDataRecord(uid, recordId) }
-        return handler.executeSingle(operation, callback)
-    }
+    override fun fetch(
+        recordId: String,
+        callback: Callback<DataRecord<DataResource>>
+    ): Task = executeOperationFlow(
+        { userId -> recordService.fetchDataRecord(userId, recordId) },
+        callback
+    )
 
     override fun search(
         annotations: Annotations,
@@ -75,19 +75,33 @@ internal class DataRecordClient(
         pageSize: Int,
         offset: Int,
         callback: Callback<List<DataRecord<DataResource>>>
-    ): Task {
-        val operation = userService.finishLogin(true)
-            .flatMap { userService.userID }
-            .flatMap { uid ->
-                recordService.fetchDataRecords(
-                    uid,
-                    annotations,
-                    startDate,
-                    endDate,
-                    pageSize,
-                    offset
-                )
-            }
-        return handler.executeSingle(operation, callback)
-    }
+    ): Task = executeOperationFlow(
+        { userId ->
+            recordService.fetchDataRecords(
+                userId,
+                annotations,
+                startDate,
+                endDate,
+                pageSize,
+                offset
+            )
+        },
+        callback
+    )
+
+    override fun count(
+        annotations: Annotations,
+        callback: Callback<Int>
+    ): Task = executeOperationFlow(
+        { userId -> recordService.countDataRecords(DataResource::class.java, userId, annotations) },
+        callback
+    )
+
+    override fun delete(
+        recordId: String,
+        callback: Callback<Boolean>
+    ): Task = executeOperationFlow(
+        { userId -> recordService.deleteRecord(userId, recordId).toSingle { true } },
+        callback
+    )
 }

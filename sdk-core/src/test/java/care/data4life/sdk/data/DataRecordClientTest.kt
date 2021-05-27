@@ -222,6 +222,44 @@ class DataRecordClientTest {
     }
 
     @Test
+    fun `Given count is called, with a ResourceType, Annotations and a Callback it returns the corresponding Task`() {
+        // Given
+        val resourceType = DataResource::class.java
+        val annotations: Annotations = mockk()
+        val callback: Callback<Int> = mockk()
+
+        val userId = "Potato"
+        val expectedAmount = 23
+        val amount = Single.just(23)
+        val expected: Task = mockk()
+        val observer = slot<Single<Int>>()
+
+        every { userService.finishLogin(true) } returns Single.just(true)
+        every { userService.userID } returns Single.just(userId)
+        every {
+            recordService.countDataRecords(resourceType, userId, annotations)
+        } returns amount
+        every {
+            callHandler.executeSingle(capture(observer), callback)
+        } answers {
+            assertEquals(
+                expected = expectedAmount,
+                actual = observer.captured.blockingGet()
+            )
+            expected
+        }
+
+        // When
+        val actual = client.count(annotations, callback)
+
+        // Then
+        assertSame(
+            expected = expected,
+            actual = actual
+        )
+    }
+
+    @Test
     fun `Given delete is called, with a RecordId and a Callback, it returns the corresponding Task`() {
         // Given
         val callback: Callback<Boolean> = mockk()

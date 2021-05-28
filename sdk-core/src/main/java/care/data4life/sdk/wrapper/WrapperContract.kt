@@ -55,10 +55,7 @@ class WrapperContract {
 
     interface FhirParser {
         @Throws(FhirException::class)
-        fun toFhir3(resourceType: String, source: String): Fhir3Resource?
-
-        @Throws(FhirException::class)
-        fun toFhir4(resourceType: String, source: String): Fhir4Resource?
+        fun <T : Any> toFhir(resourceType: String, version: String, source: String): T
 
         @Throws(FhirException::class)
         fun fromResource(resource: Any): String

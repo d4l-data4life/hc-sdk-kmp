@@ -192,13 +192,13 @@ open class CryptoService : CryptoProtocol, CryptoContract.Service {
 
     private fun convertExchangeKeyToGCKey(exchangeKey: ExchangeKey): Single<GCKey> {
         return Single.fromCallable { exchangeKey }
-            .map { exchKey ->
-                if (exchKey.getVersion() !== KeyVersion.VERSION_1) {
-                    throw (CryptoException.InvalidKeyVersion(exchKey.getVersion().value))
-                } else if (exchKey.type === KeyType.APP_PUBLIC_KEY || exchKey.type === KeyType.APP_PRIVATE_KEY) {
+            .map { exchangeKey ->
+                if (exchangeKey.getVersion() !== KeyVersion.VERSION_1) {
+                    throw (CryptoException.InvalidKeyVersion(exchangeKey.getVersion().value))
+                } else if (exchangeKey.type === KeyType.APP_PUBLIC_KEY || exchangeKey.type === KeyType.APP_PRIVATE_KEY) {
                     throw (CryptoException.KeyDecryptionFailed("can't decrypt asymmetric to symmetric key"))
                 }
-                keyFactory.createGCKey(exchKey)
+                keyFactory.createGCKey(exchangeKey)
             }
             .onErrorResumeNext { error ->
                 Log.error(error, "Failed to decrypt exchangeKey")

@@ -18,6 +18,7 @@ package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -25,7 +26,6 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class FhirParserTest {
-
     @Test
     fun `It fulfils ResourceParser`() {
         val parser: Any = SdkFhirParser
@@ -33,27 +33,43 @@ class FhirParserTest {
     }
 
     @Test
-    fun `Given, toFhir3 is called with a ResourceType and a Source, it returns a Resource`() {
+    fun `Given, toFhir is called with a ResourceType, a unknown version and a Source, it fails`() {
+        assertFailsWith<CoreRuntimeException.UnsupportedOperation> {
+            SdkFhirParser.toFhir("type", "unknown", "resource")
+        }
+    }
+
+    @Test
+    fun `Given, toFhir is called with a ResourceType, a Fhir3 version and a Source, it returns a Fhir3Resource`() {
         // Given
         val type = "DocumentReference"
-        val source = "{\"resourceType\":\"DomainResource\"}"
+        val source = "{\"resourceType\":\"DocumentReference\"}"
 
         // When
-        val resource: Any = SdkFhirParser.toFhir3(type, source)
+        val resource: Any = SdkFhirParser.toFhir(
+            type,
+            FhirContract.FhirVersion.FHIR_3.version,
+            source
+        )
 
         // Then
         assertTrue(resource is Fhir3Resource)
     }
 
     @Test
-    fun `Given, toFhir4 is called with a ResourceType and a Source, it returns a Resource`() {
+    fun `Given, toFhir is called with a ResourceType, a Fhir4 version and a Source, it returns a Fhir4Resource`() {
         // Given
         val type = "DocumentReference"
         val source = "{\"resourceType\":\"DomainResource\"}"
 
         // When
-        val resource: Any = SdkFhirParser.toFhir4(type, source)
+        val resource: Any = SdkFhirParser.toFhir(
+            type,
+            FhirContract.FhirVersion.FHIR_4.version,
+            source
+        )
 
+        // Then
         assertTrue(resource is Fhir4Resource)
     }
 

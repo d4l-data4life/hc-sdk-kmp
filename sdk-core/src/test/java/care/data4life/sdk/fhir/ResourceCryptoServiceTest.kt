@@ -318,8 +318,9 @@ class ResourceCryptoServiceTest {
         } returns Single.just(serializedResource)
 
         every {
-            SdkFhirParser.toFhir3(
+            SdkFhirParser.toFhir<Fhir3Resource>(
                 tags[TAG_RESOURCE_TYPE]!!,
+                tags[TAG_FHIR_VERSION]!!,
                 serializedResource
             )
         } throws exception
@@ -360,8 +361,9 @@ class ResourceCryptoServiceTest {
         } returns Single.just(serializedResource)
 
         every {
-            SdkFhirParser.toFhir3(
+            SdkFhirParser.toFhir<Fhir3Resource>(
                 tags[TAG_RESOURCE_TYPE]!!,
+                tags[TAG_FHIR_VERSION]!!,
                 serializedResource
             )
         } returns resource
@@ -455,8 +457,9 @@ class ResourceCryptoServiceTest {
         } returns Single.just(serializedResource)
 
         every {
-            SdkFhirParser.toFhir4(
+            SdkFhirParser.toFhir<Fhir4Resource>(
                 tags[TAG_RESOURCE_TYPE]!!,
+                tags[TAG_FHIR_VERSION]!!,
                 serializedResource
             )
         } throws exception
@@ -497,8 +500,9 @@ class ResourceCryptoServiceTest {
         } returns Single.just(serializedResource)
 
         every {
-            SdkFhirParser.toFhir4(
+            SdkFhirParser.toFhir<Fhir4Resource>(
                 tags[TAG_RESOURCE_TYPE]!!,
+                tags[TAG_FHIR_VERSION]!!,
                 serializedResource
             )
         } returns resource

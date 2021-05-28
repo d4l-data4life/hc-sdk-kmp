@@ -108,39 +108,25 @@ class ResourceCryptoService constructor(
         encryptedResource: String
     ): T {
         return propagateDecryptionErrors {
-            parseFhir(
-                cryptoService.decodeAndDecryptString(dataKey, encryptedResource).blockingGet(),
-                tags,
-                resourceType
+            parser.toFhir(
+                resourceType,
+                tags[TAG_FHIR_VERSION]!!,
+                cryptoService.decodeAndDecryptString(dataKey, encryptedResource).blockingGet()
             )
         }
-    }
-
-    private fun <T : Any> parseFhir(
-        decryptedResourceJson: String,
-        tags: Tags,
-        resourceType: String
-    ): T {
-        return if (tags[TAG_FHIR_VERSION] == FhirContract.FhirVersion.FHIR_4.version) {
-            parser.toFhir4(resourceType, decryptedResourceJson)
-        } else {
-            parser.toFhir3(resourceType, decryptedResourceJson)
-        } as T
     }
 
     private fun decryptData(
         dataKey: GCKey,
         encryptedResource: String
     ): DataContract.Resource {
-        return try {
+        return propagateDecryptionErrors {
             DataResource(
                 cryptoService.decodeAndDecryptByteArray(
                     dataKey,
                     encryptedResource
                 ).blockingGet()
             )
-        } catch (error: Exception) {
-            throw DecryptionFailed("Failed to decrypt resource", error)
         }
     }
 }

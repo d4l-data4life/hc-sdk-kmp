@@ -26,7 +26,10 @@ import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Identifier
+import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Identifier
+import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.fhir.ResourceCryptoService
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.network.NetworkingContract
@@ -394,13 +397,14 @@ class RecordServiceCreationRecordModuleTest {
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         runFhirFlow(
-            serializedResource = SdkFhirParser.fromResource(resource)!!,
+            serializedResource = SdkFhirParser.fromResource(resource),
             tags = tags,
             useStoredCommonKey = false
         )
@@ -452,13 +456,14 @@ class RecordServiceCreationRecordModuleTest {
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         runFhirFlow(
-            serializedResource = SdkFhirParser.fromResource(resource)!!,
+            serializedResource = SdkFhirParser.fromResource(resource),
             tags = tags,
             annotations = annotations
         )
@@ -519,13 +524,15 @@ class RecordServiceCreationRecordModuleTest {
             attachment
         )
 
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val internalResource = SdkFhirParser.toFhir3(
+        val internalResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
@@ -540,7 +547,7 @@ class RecordServiceCreationRecordModuleTest {
         internalResource.content[0].attachment.data = null
 
         runFhirFlowWithAttachment(
-            serializedResource = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResource = SdkFhirParser.fromResource(internalResource),
             attachmentData = rawAttachment,
             tags = tags,
             annotations = annotations,
@@ -619,13 +626,15 @@ class RecordServiceCreationRecordModuleTest {
             attachment
         )
 
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val internalResource = SdkFhirParser.toFhir3(
+        val internalResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
@@ -643,7 +652,7 @@ class RecordServiceCreationRecordModuleTest {
         val thumbnail = Pair(THUMBNAIL, THUMBNAIL_ID)
 
         runFhirFlowWithAttachment(
-            serializedResource = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResource = SdkFhirParser.fromResource(internalResource),
             attachmentData = rawAttachment,
             tags = tags,
             annotations = annotations,
@@ -724,13 +733,14 @@ class RecordServiceCreationRecordModuleTest {
             attachment
         )
 
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         runFhirFlowWithAttachment(
-            serializedResource = SdkFhirParser.fromResource(resource)!!,
+            serializedResource = SdkFhirParser.fromResource(resource),
             attachmentData = rawAttachment,
             tags = tags,
             annotations = annotations,
@@ -767,13 +777,14 @@ class RecordServiceCreationRecordModuleTest {
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         runFhirFlow(
-            serializedResource = SdkFhirParser.fromResource(resource)!!,
+            serializedResource = SdkFhirParser.fromResource(resource),
             tags = tags,
             useStoredCommonKey = false
         )
@@ -825,13 +836,14 @@ class RecordServiceCreationRecordModuleTest {
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         runFhirFlow(
-            serializedResource = SdkFhirParser.fromResource(resource)!!,
+            serializedResource = SdkFhirParser.fromResource(resource),
             tags = tags,
             annotations = annotations
         )
@@ -892,13 +904,15 @@ class RecordServiceCreationRecordModuleTest {
             attachment
         )
 
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val internalResource = SdkFhirParser.toFhir4(
+        val internalResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
@@ -914,7 +928,7 @@ class RecordServiceCreationRecordModuleTest {
         internalResource.content[0].attachment.data = null
 
         runFhirFlowWithAttachment(
-            serializedResource = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResource = SdkFhirParser.fromResource(internalResource),
             attachmentData = rawAttachment,
             tags = tags,
             annotations = annotations,
@@ -993,13 +1007,15 @@ class RecordServiceCreationRecordModuleTest {
             attachment
         )
 
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val internalResource = SdkFhirParser.toFhir4(
+        val internalResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
@@ -1018,7 +1034,7 @@ class RecordServiceCreationRecordModuleTest {
         val thumbnail = Pair(ByteArray(1), THUMBNAIL_ID)
 
         runFhirFlowWithAttachment(
-            serializedResource = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResource = SdkFhirParser.fromResource(internalResource),
             attachmentData = rawAttachment,
             tags = tags,
             annotations = annotations,
@@ -1099,13 +1115,14 @@ class RecordServiceCreationRecordModuleTest {
             attachment
         )
 
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         runFhirFlowWithAttachment(
-            serializedResource = SdkFhirParser.fromResource(resource)!!,
+            serializedResource = SdkFhirParser.fromResource(resource),
             attachmentData = rawAttachment,
             tags = tags,
             annotations = annotations,

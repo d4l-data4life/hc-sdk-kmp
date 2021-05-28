@@ -520,7 +520,11 @@ class RecordServiceAttachmentUtilsTest {
             "s4h-patient-example.patient"
         )
 
-        val doc = SdkFhirParser.toFhir4("Patient", resourceStr)
+        val doc = SdkFhirParser.toFhir<Fhir4Resource>(
+            "Patient",
+            FhirContract.FhirVersion.FHIR_4.version,
+            resourceStr
+        )
 
         // When
         recordService.checkDataRestrictions(doc)

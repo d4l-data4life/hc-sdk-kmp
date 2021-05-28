@@ -62,7 +62,10 @@ class CryptoContract {
         fun encrypt(key: GCKey, data: ByteArray): Single<ByteArray>
         fun decrypt(key: GCKey, data: ByteArray): Single<ByteArray>
 
+        // ToDo move this into a convenience layer
         fun encryptAndEncodeString(key: GCKey, data: String): Single<String>
+
+        // ToDo move this into a convenience layer
         fun encryptAndEncodeByteArray(key: GCKey, data: ByteArray): Single<String>
 
         fun encryptSymmetricKey(
@@ -71,7 +74,10 @@ class CryptoContract {
             gcKey: GCKey
         ): Single<NetworkModelContract.EncryptedKey>
 
+        // ToDo move this into a convenience layer
         fun decodeAndDecryptString(key: GCKey, dataBase64: String): Single<String>
+
+        // ToDo move this into a convenience layer
         fun decodeAndDecryptByteArray(key: GCKey, dataBase64: String): Single<ByteArray>
 
         fun symDecryptSymmetricKey(

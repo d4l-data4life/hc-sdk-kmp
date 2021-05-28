@@ -313,8 +313,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir3") || resourcePrefixes.contains("common"))
 
         // Given
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -337,8 +338,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir4") || resourcePrefixes.contains("common"))
 
         // Given
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
         // When
@@ -362,9 +364,13 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir3") || resourcePrefixes.contains("common"))
 
         // Given
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), "$resourceName-nulled-attachment")
+            FhirContract.FhirVersion.FHIR_3.version,
+            TestResourceHelper.getJSONResource(
+                determineFhir3Folder(resourcePrefixes),
+                "$resourceName-nulled-attachment"
+            )
         )
 
         // When
@@ -386,9 +392,13 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir4") || resourcePrefixes.contains("common"))
 
         // Given
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), "$resourceName-nulled-attachment")
+            FhirContract.FhirVersion.FHIR_4.version,
+            TestResourceHelper.getJSONResource(
+                determineFhir4Folder(resourcePrefixes),
+                "$resourceName-nulled-attachment"
+            )
         )
 
         // When
@@ -403,8 +413,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir3") || resourcePrefixes.contains("common"))
 
         // Given
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -443,8 +454,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir4") || resourcePrefixes.contains("common"))
 
         // Given
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
@@ -480,8 +492,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir3") || resourcePrefixes.contains("common"))
 
         // Given
-        val originalResource = SdkFhirParser.toFhir3(
+        val originalResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -529,8 +542,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir4") || resourcePrefixes.contains("common"))
 
         // Given
-        val originalResource = SdkFhirParser.toFhir4(
+        val originalResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
@@ -638,8 +652,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir3") || resourcePrefixes.contains("common"))
 
         // Given
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -715,8 +730,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir4") || resourcePrefixes.contains("common"))
 
         // Given
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
@@ -741,8 +757,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir3") || resourcePrefixes.contains("common"))
 
         // Given
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -765,8 +782,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir4") || resourcePrefixes.contains("common"))
 
         // Given
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
@@ -783,8 +801,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
     fun `Given, checkForUnsupportedData is called, with a Fhir3Resource, it fails due to unsupported data`() {
         Assume.assumeTrue(resourcePrefixes.contains("fhir3") || resourcePrefixes.contains("common"))
 
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -804,8 +823,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
     fun `Given, checkForUnsupportedData is called, with a Fhir4Resource, it fails due to unsupported data`() {
         Assume.assumeTrue(resourcePrefixes.contains("fhir4") || resourcePrefixes.contains("common"))
 
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
@@ -820,8 +840,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
     fun `Given, checkForUnsupportedData is called, with a Fhir3Resource, it fails due  to file size limit breach`() {
         Assume.assumeTrue(resourcePrefixes.contains("fhir3") || resourcePrefixes.contains("common"))
 
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -841,8 +862,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
     fun `Given, checkForUnsupportedData is called, with a Fhir4Resource, it fails due  to file size limit breach`() {
         Assume.assumeTrue(resourcePrefixes.contains("fhir4") || resourcePrefixes.contains("common"))
 
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
@@ -859,8 +881,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir3") || resourcePrefixes.contains("common"))
 
         // Given
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -909,7 +932,12 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             modelVersion
         )
 
-        every { recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID) } returns decryptedRecord
+        every {
+            recordService.decryptRecord<Fhir3Resource>(
+                fetchedRecord,
+                USER_ID
+            )
+        } returns decryptedRecord
         every {
             apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
         } returns Single.just(fetchedRecord)
@@ -959,8 +987,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir3") || resourcePrefixes.contains("common"))
 
         // Given
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -1064,8 +1093,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir4") || resourcePrefixes.contains("common"))
 
         // Given
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
@@ -1114,7 +1144,12 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             modelVersion
         )
 
-        every { recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID) } returns decryptedRecord
+        every {
+            recordService.decryptRecord<Fhir4Resource>(
+                fetchedRecord,
+                USER_ID
+            )
+        } returns decryptedRecord
         every {
             apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
         } returns Single.just(fetchedRecord)
@@ -1154,8 +1189,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir4") || resourcePrefixes.contains("common"))
 
         // Given
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
@@ -1204,7 +1240,12 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             modelVersion
         )
 
-        every { recordService.decryptRecord<Fhir4Resource>(fetchedRecord, USER_ID) } returns decryptedRecord
+        every {
+            recordService.decryptRecord<Fhir4Resource>(
+                fetchedRecord,
+                USER_ID
+            )
+        } returns decryptedRecord
         every {
             apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
         } returns Single.just(fetchedRecord)
@@ -1254,8 +1295,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir4") || resourcePrefixes.contains("common"))
 
         // Given
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
@@ -1359,8 +1401,9 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         Assume.assumeTrue(resourcePrefixes.contains("fhir3") || resourcePrefixes.contains("common"))
 
         // Given
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -1409,7 +1452,12 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             modelVersion
         )
 
-        every { recordService.decryptRecord<Fhir3Resource>(fetchedRecord, USER_ID) } returns decryptedRecord
+        every {
+            recordService.decryptRecord<Fhir3Resource>(
+                fetchedRecord,
+                USER_ID
+            )
+        } returns decryptedRecord
         every {
             apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
         } returns Single.just(fetchedRecord)

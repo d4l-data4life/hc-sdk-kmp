@@ -231,6 +231,18 @@ interface SdkContract {
         ): Task
 
         /**
+         * Count {@link DataRecord}s
+         *
+         * @param annotations custom annotations added as tags to the record
+         * @param callback    either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
+         * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
+         */
+        fun count(
+            annotations: Annotations,
+            callback: Callback<Int>
+        ): Task
+
+        /**
          * Delete an {@link DataRecord}
          *
          * @param recordId      the id of the record that shall be deleted
@@ -267,10 +279,6 @@ interface SdkContract {
             offset: Int,
             callback: Callback<List<DataRecord<DataResource>>>
         ): Task
-    }
-
-    companion object {
-        const val VERSION = "1.12.0"
     }
 
     /**

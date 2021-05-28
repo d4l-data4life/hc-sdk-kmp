@@ -125,10 +125,23 @@ interface RecordContract {
             annotations: Annotations
         ): Single<Int>
 
+        fun countDataRecords(
+            type: Class<out DataResource>,
+            userId: String,
+            annotations: Annotations
+        ): Single<Int>
+
         fun countAllFhir3Records(userId: String, annotations: Annotations): Single<Int>
 
-        fun <T : Fhir3Resource> downloadFhir3Record(recordId: String, userId: String): Single<Record<T>>
-        fun <T : Fhir4Resource> downloadFhir4Record(recordId: String, userId: String): Single<Fhir4Record<T>>
+        fun <T : Fhir3Resource> downloadFhir3Record(
+            recordId: String,
+            userId: String
+        ): Single<Record<T>>
+
+        fun <T : Fhir4Resource> downloadFhir4Record(
+            recordId: String,
+            userId: String
+        ): Single<Fhir4Record<T>>
 
         @Throws(IllegalArgumentException::class)
         fun downloadFhir3Attachment(

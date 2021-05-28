@@ -560,6 +560,12 @@ class RecordService internal constructor(
         annotations: Annotations
     ): Single<Int> = countFhir3Records(Fhir3Resource::class.java, userId, annotations)
 
+    override fun countDataRecords(
+        type: Class<out DataResource>,
+        userId: String,
+        annotations: Annotations
+    ): Single<Int> = _countRecords(type, userId, annotations)
+
     override fun <T : Fhir3Resource> downloadFhir3Record(
         recordId: String,
         userId: String
@@ -1167,7 +1173,7 @@ class RecordService internal constructor(
     fun updateAttachmentMeta(attachment: WrapperContract.Attachment): WrapperContract.Attachment {
         val data = decode(attachment.data!!)
         attachment.size = data.size
-        attachment.hash = AttachmentHasher.hash(data)
+        attachment.hash = attachmentHash.hash(data)
         return attachment
     }
 

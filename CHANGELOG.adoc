@@ -16,6 +16,8 @@ toc::[]
 
 === Added
 
+* Enable count for arbitrary data.
+
 === Changed
 
 * ApiService is now in Kotlin.
@@ -27,6 +29,7 @@ toc::[]
 === Bumped
 
 * OkHTTP 4.7.2 -> 4.9.1
+* FHIR SDK 1.4.0 -> 1.5.0
 
 === Migration
 

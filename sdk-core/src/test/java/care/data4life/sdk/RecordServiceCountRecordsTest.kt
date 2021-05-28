@@ -19,6 +19,7 @@ package care.data4life.sdk
 import care.data4life.fhir.stu3.model.Patient
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
@@ -73,6 +74,41 @@ class RecordServiceCountRecordsTest {
                 compatibilityService
             )
         )
+    }
+
+    @Test
+    @Throws(InterruptedException::class, IOException::class)
+    fun `Given, countDataRecords is called with a DataResource, a UserId and Annotations, it returns amount of occurrences`() {
+        // Given
+        val expected = 42
+        val annotations: Annotations = mockk()
+        val searchTags: NetworkingContract.SearchTags = mockk()
+
+        every { taggingService.getTagsFromType(DataResource::class.java as Class<Any>) } returns tags
+        every { compatibilityService.resolveSearchTags(tags, annotations) } returns searchTags
+        every { apiService.countRecords(ALIAS, USER_ID, searchTags) } returns Single.just(expected)
+
+        // When
+        val observer = recordService.countDataRecords(
+            DataResource::class.java,
+            USER_ID,
+            annotations
+        ).test().await()
+
+        // Then
+        val result = observer
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+            .values()[0]
+
+        assertEquals(
+            expected = expected,
+            actual = result
+        )
+        verify(exactly = 1) { taggingService.getTagsFromType(DataResource::class.java as Class<Any>) }
+        verify(exactly = 1) { compatibilityService.resolveSearchTags(tags, annotations) }
+        verify(exactly = 1) { apiService.countRecords(ALIAS, USER_ID, searchTags) }
     }
 
     @Test

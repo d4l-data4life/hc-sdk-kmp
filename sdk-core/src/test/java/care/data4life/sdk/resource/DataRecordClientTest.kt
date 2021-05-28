@@ -22,6 +22,7 @@ import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.call.Callback
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Task
+import care.data4life.sdk.client.DataRecordClient
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.test.util.GenericTestDataProvider

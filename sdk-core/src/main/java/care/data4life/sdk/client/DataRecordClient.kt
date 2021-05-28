@@ -14,26 +14,25 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.resource
+package care.data4life.sdk.client
 
-import care.data4life.sdk.SdkContract
 import care.data4life.sdk.auth.AuthContract
 import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.call.Callback
-import care.data4life.sdk.call.Fhir4Record
+import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Task
-import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.resource.DataResource
+import care.data4life.sdk.resource.ResourceContract
 import care.data4life.sdk.tag.Annotations
 import io.reactivex.Single
 import org.threeten.bp.LocalDate
 
-internal class Fhir4RecordClient(
+internal class DataRecordClient(
     private val userService: AuthContract.UserService,
     private val recordService: RecordContract.Service,
     private val handler: CallHandler
-) : SdkContract.Fhir4RecordClient {
-
+) : ResourceContract.Client {
     private fun <T> executeOperationFlow(
         operation: (userId: String) -> Single<T>,
         callback: Callback<T>
@@ -44,46 +43,44 @@ internal class Fhir4RecordClient(
         return handler.executeSingle(flow, callback)
     }
 
-    override fun <T : Fhir4Resource> create(
-        resource: T,
+    override fun create(
+        resource: ResourceContract.DataResource,
         annotations: Annotations,
-        callback: Callback<Fhir4Record<T>>
+        callback: Callback<DataRecord<ResourceContract.DataResource>>
     ): Task = executeOperationFlow(
         { userId -> recordService.createRecord(userId, resource, annotations) },
         callback
     )
 
-    override fun <T : Fhir4Resource> update(
+    override fun update(
         recordId: String,
-        resource: T,
+        resource: ResourceContract.DataResource,
         annotations: Annotations,
-        callback: Callback<Fhir4Record<T>>
+        callback: Callback<DataRecord<ResourceContract.DataResource>>
     ): Task = executeOperationFlow(
         { userId -> recordService.updateRecord(userId, recordId, resource, annotations) },
         callback
     )
 
-    override fun <T : Fhir4Resource> fetch(
+    override fun fetch(
         recordId: String,
-        callback: Callback<Fhir4Record<T>>
+        callback: Callback<DataRecord<ResourceContract.DataResource>>
     ): Task = executeOperationFlow(
-        { userId -> recordService.fetchFhir4Record(userId, recordId) },
+        { userId -> recordService.fetchDataRecord(userId, recordId) },
         callback
     )
 
-    override fun <T : Fhir4Resource> search(
-        resourceType: Class<T>,
+    override fun search(
         annotations: Annotations,
         startDate: LocalDate?,
         endDate: LocalDate?,
         pageSize: Int,
         offset: Int,
-        callback: Callback<List<Fhir4Record<T>>>
+        callback: Callback<List<DataRecord<ResourceContract.DataResource>>>
     ): Task = executeOperationFlow(
         { userId ->
-            recordService.fetchFhir4Records(
+            recordService.fetchDataRecords(
                 userId,
-                resourceType,
                 annotations,
                 startDate,
                 endDate,
@@ -94,20 +91,11 @@ internal class Fhir4RecordClient(
         callback
     )
 
-    override fun <T : Fhir4Resource> download(
-        recordId: String,
-        callback: Callback<Fhir4Record<T>>
-    ): Task = executeOperationFlow(
-        { userId -> recordService.downloadFhir4Record(recordId, userId) },
-        callback
-    )
-
-    override fun <T : Fhir4Resource> count(
-        resourceType: Class<T>,
+    override fun count(
         annotations: Annotations,
         callback: Callback<Int>
     ): Task = executeOperationFlow(
-        { userId -> recordService.countFhir4Records(resourceType, userId, annotations) },
+        { userId -> recordService.countDataRecords(DataResource::class.java, userId, annotations) },
         callback
     )
 
@@ -116,26 +104,6 @@ internal class Fhir4RecordClient(
         callback: Callback<Boolean>
     ): Task = executeOperationFlow(
         { userId -> recordService.deleteRecord(userId, recordId).toSingle { true } },
-        callback
-    )
-
-    override fun downloadAttachment(
-        recordId: String,
-        attachmentId: String,
-        type: DownloadType,
-        callback: Callback<Fhir4Attachment>
-    ): Task = executeOperationFlow(
-        { userId -> recordService.downloadFhir4Attachment(recordId, attachmentId, userId, type) },
-        callback
-    )
-
-    override fun downloadAttachments(
-        recordId: String,
-        attachmentIds: List<String>,
-        type: DownloadType,
-        callback: Callback<List<Fhir4Attachment>>
-    ): Task = executeOperationFlow(
-        { userId -> recordService.downloadFhir4Attachments(recordId, attachmentIds, userId, type) },
         callback
     )
 }

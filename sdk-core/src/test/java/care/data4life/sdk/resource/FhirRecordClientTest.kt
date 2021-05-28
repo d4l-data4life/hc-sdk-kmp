@@ -22,6 +22,7 @@ import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.call.Callback
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.call.Task
+import care.data4life.sdk.client.Fhir4RecordClient
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.Annotations

@@ -15,10 +15,10 @@
  */
 package care.data4life.sdk
 
+import care.data4life.sdk.call.CallContract
 import care.data4life.sdk.call.Callback
-import care.data4life.sdk.call.DataRecord
-import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.call.Task
+import care.data4life.sdk.client.ClientContract
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.resource.ResourceContract.DataResource
@@ -66,7 +66,10 @@ interface SdkContract {
     }
 
     // TODO: Split into 2 Client - Resource Client and Resource Client with Attachments
-    interface Fhir4RecordClient {
+    interface Fhir4RecordClient :
+        ClientContract.ResourceClient<Fhir4Resource>,
+        ClientContract.ResourceSearchClient<Fhir4Resource>,
+        ClientContract.AttachmentClient<Fhir4Resource, Fhir4Attachment> {
         /**
          * Creates a {@link Fhir4Record}
          *
@@ -75,10 +78,10 @@ interface SdkContract {
          * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun <T : Fhir4Resource> create(
+        override fun <T : Fhir4Resource> create(
             resource: T,
             annotations: Annotations,
-            callback: Callback<Fhir4Record<T>>
+            callback: Callback<CallContract.Record<T>>
         ): Task
 
         /**
@@ -90,11 +93,11 @@ interface SdkContract {
          * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun <T : Fhir4Resource> update(
+        override fun <T : Fhir4Resource> update(
             recordId: String,
             resource: T,
             annotations: Annotations,
-            callback: Callback<Fhir4Record<T>>
+            callback: Callback<CallContract.Record<T>>
         ): Task
 
         /**
@@ -106,7 +109,10 @@ interface SdkContract {
          * @throws IllegalArgumentException if {@param recordId} is not FHIR4
          * @throws care.data4life.sdk.config.DataRestrictionException if {@param resource} is DocumentReference and {@link Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
         </T> */
-        fun <T : Fhir4Resource> download(recordId: String, callback: Callback<Fhir4Record<T>>): Task
+        override fun <T : Fhir4Resource> download(
+            recordId: String,
+            callback: Callback<CallContract.Record<T>>
+        ): Task
 
         /**
          * Delete an {@link Fhir4Record}
@@ -115,7 +121,7 @@ interface SdkContract {
          * @param callback      either {@link Callback#onSuccess()} or {@link Callback#onError(D4LException)} will be called
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun delete(recordId: String, callback: Callback<Boolean>): Task
+        override fun delete(recordId: String, callback: Callback<Boolean>): Task
 
         /**
          * Fetch an {@link Fhir4Record} with given recordId
@@ -124,7 +130,10 @@ interface SdkContract {
          * @param callback          either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun <T : Fhir4Resource> fetch(recordId: String, callback: Callback<Fhir4Record<T>>): Task
+        override fun <T : Fhir4Resource> fetch(
+            recordId: String,
+            callback: Callback<CallContract.Record<T>>
+        ): Task
 
         /**
          * Search {@link Fhir4Record} with filters
@@ -138,14 +147,14 @@ interface SdkContract {
          * @param callback    either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun <T : Fhir4Resource> search(
+        override fun <T : Fhir4Resource> search(
             resourceType: Class<T>,
             annotations: Annotations,
             startDate: LocalDate?,
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int,
-            callback: Callback<List<Fhir4Record<T>>>
+            callback: Callback<List<CallContract.Record<T>>>
         ): Task
 
         /**
@@ -156,7 +165,7 @@ interface SdkContract {
          * @param callback    either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun <T : Fhir4Resource> count(
+        override fun <T : Fhir4Resource> count(
             resourceType: Class<T>,
             annotations: Annotations,
             callback: Callback<Int>
@@ -173,7 +182,7 @@ interface SdkContract {
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          * @throws IllegalArgumentException if {@param recordId} is not FHIR4
          */
-        fun downloadAttachment(
+        override fun downloadAttachment(
             recordId: String,
             attachmentId: String,
             type: DownloadType,
@@ -191,7 +200,7 @@ interface SdkContract {
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          * @throws IllegalArgumentException if {@param recordId} is not FHIR4
          */
-        fun downloadAttachments(
+        override fun downloadAttachments(
             recordId: String,
             attachmentIds: List<String>,
             type: DownloadType,
@@ -199,7 +208,9 @@ interface SdkContract {
         ): Task
     }
 
-    interface DataRecordClient {
+    interface DataRecordClient :
+        ClientContract.ResourceClient<DataResource>,
+        ClientContract.ResourcelessSearchClient<DataResource> {
         /**
          * Creates an {@link DataRecord}
          *
@@ -208,10 +219,10 @@ interface SdkContract {
          * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun create(
-            resource: DataResource,
+        override fun <T : DataResource> create(
+            resource: T,
             annotations: Annotations,
-            callback: Callback<DataRecord<DataResource>>
+            callback: Callback<CallContract.Record<T>>
         ): Task
 
         /**
@@ -223,11 +234,11 @@ interface SdkContract {
          * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun update(
+        override fun <T : DataResource> update(
             recordId: String,
-            resource: DataResource,
+            resource: T,
             annotations: Annotations,
-            callback: Callback<DataRecord<DataResource>>
+            callback: Callback<CallContract.Record<T>>
         ): Task
 
         /**
@@ -237,7 +248,7 @@ interface SdkContract {
          * @param callback    either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun count(
+        override fun count(
             annotations: Annotations,
             callback: Callback<Int>
         ): Task
@@ -249,7 +260,7 @@ interface SdkContract {
          * @param callback      either {@link Callback#onSuccess()} or {@link Callback#onError(D4LException)} will be called
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun delete(recordId: String, callback: Callback<Boolean>): Task
+        override fun delete(recordId: String, callback: Callback<Boolean>): Task
 
         /**
          * Fetch an {@link DataRecord} with given recordId
@@ -258,26 +269,18 @@ interface SdkContract {
          * @param callback          either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        fun fetch(recordId: String, callback: Callback<DataRecord<DataResource>>): Task
+        override fun <T : DataResource> fetch(
+            recordId: String,
+            callback: Callback<CallContract.Record<T>>
+        ): Task
 
-        /**
-         * Search {@link DataRecord} with filters
-         *
-         * @param annotations custom annotations added as tags to the record
-         * @param startDate   the filtered records have a creation date after the start date
-         * @param endDate     the filtered records have a creation date before the endDate
-         * @param pageSize    define the size page result
-         * @param offset      the offset of the records list
-         * @param callback    either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
-         * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
-         */
-        fun search(
+        override fun <T : DataResource> search(
             annotations: Annotations,
             startDate: LocalDate?,
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int,
-            callback: Callback<List<DataRecord<DataResource>>>
+            callback: Callback<List<CallContract.Record<T>>>
         ): Task
     }
 

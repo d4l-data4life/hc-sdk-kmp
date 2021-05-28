@@ -134,7 +134,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
             useStoredCommonKey
         )
 
-        val encryptedRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResource,
             encodedTags,

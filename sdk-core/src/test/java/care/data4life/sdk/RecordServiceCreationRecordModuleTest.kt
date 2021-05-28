@@ -150,6 +150,8 @@ class RecordServiceCreationRecordModuleTest {
                     (cryptoService as CryptoServiceFake).iteration = receivedIteration
                 }
             } else {
+
+                println(encryptedUploadRecord)
                 throw RuntimeException("Unexpected encrypted record\n${actualRecord.captured}")
             }
         }
@@ -245,7 +247,7 @@ class RecordServiceCreationRecordModuleTest {
         val encodedTags = flowHelper.prepareTags(tags)
         val encodedAnnotations = flowHelper.prepareAnnotations(annotations)
 
-        val encryptedUploadRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedUploadRecord = flowHelper.prepareEncryptedRecord(
             null,
             serializedResource,
             encodedTags,
@@ -292,7 +294,7 @@ class RecordServiceCreationRecordModuleTest {
         val encodedTags = flowHelper.prepareTags(tags)
         val encodedAnnotations = flowHelper.prepareAnnotations(annotations)
 
-        val encryptedUploadRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedUploadRecord = flowHelper.prepareEncryptedRecord(
             null,
             serializedResource,
             encodedTags,
@@ -345,7 +347,7 @@ class RecordServiceCreationRecordModuleTest {
         val encodedTags = flowHelper.prepareTags(tags)
         val encodedAnnotations = flowHelper.prepareAnnotations(annotations)
 
-        val encryptedUploadRecord = flowHelper.prepareEncryptedDataRecord(
+        val encryptedUploadRecord = flowHelper.prepareEncryptedRecord(
             null,
             serializedResource,
             encodedTags,

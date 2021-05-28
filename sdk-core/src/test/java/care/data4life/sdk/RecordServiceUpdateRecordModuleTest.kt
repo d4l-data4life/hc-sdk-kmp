@@ -275,7 +275,7 @@ class RecordServiceUpdateRecordModuleTest {
         val (encodedTags, allTags) = mergeTags(tags, oldTags)
         val encodedAnnotations = flowHelper.prepareAnnotations(annotations)
 
-        val encryptedUploadRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedUploadRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResourceOld,
             encodedTags,
@@ -287,7 +287,7 @@ class RecordServiceUpdateRecordModuleTest {
             updateDates.first
         )
 
-        val encryptedReceivedRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedReceivedRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResourceNew,
             encodedTags,
@@ -339,7 +339,7 @@ class RecordServiceUpdateRecordModuleTest {
         val encodedTags = flowHelper.prepareTags(tags)
         val encodedAnnotations = flowHelper.prepareAnnotations(annotations)
 
-        val encryptedUploadRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedUploadRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResourceOld,
             encodedTags,
@@ -351,7 +351,7 @@ class RecordServiceUpdateRecordModuleTest {
             updateDates.first
         )
 
-        val encryptedReceivedRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedReceivedRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResourceNew,
             encodedTags,
@@ -409,7 +409,7 @@ class RecordServiceUpdateRecordModuleTest {
         val encodedTags = flowHelper.prepareTags(tags)
         val encodedAnnotations = flowHelper.prepareAnnotations(annotations)
 
-        val encryptedUploadRecord = flowHelper.prepareEncryptedDataRecord(
+        val encryptedUploadRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResourceOld,
             encodedTags,
@@ -421,7 +421,7 @@ class RecordServiceUpdateRecordModuleTest {
             updateDates.first
         )
 
-        val encryptedReceivedRecord = flowHelper.prepareEncryptedDataRecord(
+        val encryptedReceivedRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResourceNew,
             encodedTags,

@@ -404,25 +404,7 @@ class RecordServiceModuleTestFlowHelper(
         keys
     )
 
-    private fun buildEncryptedRecordWithEncodedBody(
-        id: String?,
-        commonKeyId: String,
-        tags: List<String>,
-        annotations: Annotations,
-        body: String,
-        dates: Pair<String?, String?>,
-        keys: Pair<EncryptedKey, EncryptedKey?>
-    ): EncryptedRecord = createEncryptedRecord(
-        id,
-        commonKeyId,
-        tags,
-        annotations,
-        Base64.encodeToString(md5(body)),
-        dates,
-        keys
-    )
-
-    fun prepareEncryptedFhirRecord(
+    fun prepareEncryptedRecord(
         recordId: String?,
         resource: String,
         tags: List<String>,
@@ -433,26 +415,6 @@ class RecordServiceModuleTestFlowHelper(
         creationDate: String,
         updateDate: String?
     ): EncryptedRecord = buildEncryptedRecord(
-        recordId,
-        commonKeyId,
-        tags,
-        annotations,
-        resource,
-        Pair(creationDate, updateDate),
-        Pair(encryptedDataKey, encryptedAttachmentsKey)
-    )
-
-    fun prepareEncryptedDataRecord(
-        recordId: String?,
-        resource: String,
-        tags: List<String>,
-        annotations: Annotations,
-        commonKeyId: String,
-        encryptedDataKey: EncryptedKey,
-        encryptedAttachmentsKey: EncryptedKey?,
-        creationDate: String,
-        updateDate: String?
-    ): EncryptedRecord = buildEncryptedRecordWithEncodedBody(
         recordId,
         commonKeyId,
         tags,

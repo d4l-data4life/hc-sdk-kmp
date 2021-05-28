@@ -175,7 +175,7 @@ class RecordServiceFetchRecordsModuleTest {
         val encodedTags = flowHelper.prepareTags(tags)
         val encodedAnnotations = flowHelper.prepareAnnotations(annotations)
 
-        val encryptedRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResource,
             encodedTags,
@@ -221,7 +221,7 @@ class RecordServiceFetchRecordsModuleTest {
         val encodedTags = flowHelper.prepareTags(tags)
         val encodedAnnotations = flowHelper.prepareAnnotations(annotations)
 
-        val encryptedRecord = flowHelper.prepareEncryptedDataRecord(
+        val encryptedRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResource,
             encodedTags,
@@ -355,7 +355,7 @@ class RecordServiceFetchRecordsModuleTest {
             .seal()
             .tagGroups
 
-        val encryptedRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedRecord = flowHelper.prepareEncryptedRecord(
             recordIds.first,
             serializedResources.first,
             encodedTags,
@@ -367,7 +367,7 @@ class RecordServiceFetchRecordsModuleTest {
             updateDate
         )
 
-        val encryptedKMPLegacyRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedKMPLegacyRecord = flowHelper.prepareEncryptedRecord(
             recordIds.second,
             serializedResources.second,
             legacyKMPTags,
@@ -379,7 +379,7 @@ class RecordServiceFetchRecordsModuleTest {
             updateDate
         )
 
-        val encryptedJSLegacyRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedJSLegacyRecord = flowHelper.prepareEncryptedRecord(
             recordIds.third,
             serializedResources.third,
             legacyJSTags,
@@ -442,7 +442,7 @@ class RecordServiceFetchRecordsModuleTest {
             .seal()
             .tagGroups
 
-        val encryptedRecord = flowHelper.prepareEncryptedDataRecord(
+        val encryptedRecord = flowHelper.prepareEncryptedRecord(
             recordIds.first,
             serializedResources.first,
             encodedTags,
@@ -454,7 +454,7 @@ class RecordServiceFetchRecordsModuleTest {
             updateDate
         )
 
-        val encryptedKMPLegacyRecord = flowHelper.prepareEncryptedDataRecord(
+        val encryptedKMPLegacyRecord = flowHelper.prepareEncryptedRecord(
             recordIds.second,
             serializedResources.second,
             legacyKMPTags,
@@ -466,7 +466,7 @@ class RecordServiceFetchRecordsModuleTest {
             updateDate
         )
 
-        val encryptedJSLegacyRecord = flowHelper.prepareEncryptedDataRecord(
+        val encryptedJSLegacyRecord = flowHelper.prepareEncryptedRecord(
             recordIds.third,
             serializedResources.third,
             legacyJSTags,

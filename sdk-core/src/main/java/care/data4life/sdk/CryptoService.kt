@@ -140,9 +140,9 @@ open class CryptoService : CryptoProtocol, CryptoContract.Service {
     override fun encryptSymmetricKey(
         key: GCKey,
         keyType: KeyType,
-        gckey: GCKey
+        gcKey: GCKey
     ): Single<NetworkModelContract.EncryptedKey> {
-        return Single.fromCallable { createKey(KEY_VERSION, keyType, gckey.getKeyBase64()) }
+        return Single.fromCallable { createKey(KEY_VERSION, keyType, gcKey.getKeyBase64()) }
             .map { exchangeKey -> moshi.adapter(ExchangeKey::class.java).toJson(exchangeKey) }
             .flatMap { jsonKey -> encrypt(key, jsonKey.toByteArray()) }
             .map { encryptedKeyBase64 -> EncryptedKey.create(encryptedKeyBase64) }

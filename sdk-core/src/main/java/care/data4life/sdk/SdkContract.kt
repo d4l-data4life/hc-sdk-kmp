@@ -274,6 +274,17 @@ interface SdkContract {
             callback: Callback<CallContract.Record<T>>
         ): Task
 
+        /**
+         * Search {@link DataRecord} with filters
+         *
+         * @param annotations custom annotations added as tags to the record
+         * @param startDate   the filtered records have a creation date after the start date
+         * @param endDate     the filtered records have a creation date before the endDate
+         * @param pageSize    define the size page result
+         * @param offset      the offset of the records list
+         * @param callback    either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
+         * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
+         */
         override fun <T : DataResource> search(
             annotations: Annotations,
             startDate: LocalDate?,

@@ -18,10 +18,8 @@ package care.data4life.sdk.fhir
 import care.data4life.crypto.GCKey
 import care.data4life.crypto.error.CryptoException.DecryptionFailed
 import care.data4life.crypto.error.CryptoException.EncryptionFailed
-import care.data4life.fhir.Fhir
-import care.data4life.fhir.FhirParser
-import care.data4life.fhir.stu3.model.FhirElementFactory
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.data.DataContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_KEY
@@ -33,52 +31,15 @@ import care.data4life.sdk.wrapper.SdkFhirParser
 import care.data4life.sdk.wrapper.WrapperContract
 import io.reactivex.Single
 
-// TODO rename it in something like ResourceCryptoService
-// TODO remove @JvmOverloads when Data4LifeClient changed to Kotlin
 // TODO use of Single is not necessary as it's finalized with blockingGet()
 // TODO internal
-class ResourceCryptoService @JvmOverloads constructor(
-    private val cryptoService: CryptoContract.Service,
-    private val parserFhir3: FhirParser<Any> = Fhir().createStu3Parser()
+class ResourceCryptoService constructor(
+    private val cryptoService: CryptoContract.Service
 ) : FhirContract.CryptoService {
     private val parser: WrapperContract.FhirParser = SdkFhirParser
 
-    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
-    @Suppress("UNCHECKED_CAST")
-    fun <T : Fhir3Resource> decryptResource(
-        dataKey: GCKey,
-        resourceType: String,
-        encryptedResource: String
-    ): T {
-        return Single
-            .just(encryptedResource)
-            .filter { encResource: String -> encResource.isNotBlank() }
-            .map { encResource: String ->
-                cryptoService.decodeAndDecryptString(dataKey, encResource).blockingGet()
-            }
-            .map<Any> { decryptedResourceJson: String ->
-                parserFhir3.toFhir(
-                    FhirElementFactory.getClassForFhirType(resourceType),
-                    decryptedResourceJson
-                )
-            }
-            .toSingle()
-            .onErrorResumeNext { error ->
-                Single.error(
-                    DecryptionFailed("Failed to decrypt resource", error) as D4LException
-                )
-            }
-            .blockingGet() as T
-    }
-
-    @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
-    fun <T : Fhir3Resource> encryptResource(
-        dataKey: GCKey,
-        resource: T
-    ): String = _encryptResource(dataKey, resource)
-
-    override fun _encryptResource(dataKey: GCKey, resource: Any): String {
-        return if (resource is DataResource) {
+    override fun encryptResource(dataKey: GCKey, resource: Any): String {
+        return if (resource is DataContract.Resource) {
             encryptDataResource(dataKey, resource)
         } else {
             encryptFhirResource(dataKey, resource)
@@ -98,13 +59,18 @@ class ResourceCryptoService @JvmOverloads constructor(
             .blockingGet()
     }
 
-    private fun encryptDataResource(dataKey: GCKey, resource: DataResource): String {
-        return Base64.encodeToString(
-            cryptoService.encrypt(
+    private fun encryptDataResource(
+        dataKey: GCKey,
+        resource: DataContract.Resource
+    ): String {
+        return try {
+            cryptoService.encryptAndEncodeByteArray(
                 dataKey,
                 resource.asByteArray()
             ).blockingGet()
-        )
+        } catch (error: Exception) {
+            throw EncryptionFailed("Failed to encrypt resource", error)
+        }
     }
 
     override fun <T : Any> decryptResource(
@@ -155,10 +121,20 @@ class ResourceCryptoService @JvmOverloads constructor(
     private fun decryptData(
         dataKey: GCKey,
         encryptedResource: String
-    ): DataResource = DataResource(
-        cryptoService.decrypt(
-            dataKey,
-            Base64.decode(encryptedResource)
-        ).blockingGet()
-    )
+    ): DataContract.Resource {
+        if (encryptedResource.isBlank()) {
+            throw DecryptionFailed("Failed to decrypt resource")
+        }
+
+        return try {
+            DataResource(
+                cryptoService.decodeAndDecryptByteArray(
+                    dataKey,
+                    encryptedResource
+                ).blockingGet()
+            )
+        } catch (error: Exception) {
+            throw DecryptionFailed("Failed to decrypt resource", error)
+        }
+    }
 }

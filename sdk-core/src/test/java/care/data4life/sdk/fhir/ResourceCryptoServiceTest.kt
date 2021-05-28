@@ -16,13 +16,13 @@
 package care.data4life.sdk.fhir
 
 import care.data4life.crypto.GCKey
+import care.data4life.crypto.error.CryptoException
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_KEY
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_VALUE
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_FHIR_VERSION
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_RESOURCE_TYPE
-import care.data4life.sdk.util.Base64
 import care.data4life.sdk.wrapper.SdkFhirParser
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -30,6 +30,9 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.reactivex.Single
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertSame
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -46,7 +49,6 @@ class ResourceCryptoServiceTest {
     fun setUp() {
         clearAllMocks()
         mockkObject(SdkFhirParser)
-        mockkObject(Base64)
 
         resourceCryptoService = ResourceCryptoService(cryptoService)
     }
@@ -54,7 +56,6 @@ class ResourceCryptoServiceTest {
     @After
     fun tearDown() {
         unmockkObject(SdkFhirParser)
-        unmockkObject(Base64)
     }
 
     @Test
@@ -77,7 +78,7 @@ class ResourceCryptoServiceTest {
         // Then
         val error = assertFailsWith<RuntimeException> {
             // When
-            resourceCryptoService._encryptResource(dataKey, resource)
+            resourceCryptoService.encryptResource(dataKey, resource)
         }
 
         assertEquals(
@@ -99,7 +100,7 @@ class ResourceCryptoServiceTest {
         // Then
         val error = assertFailsWith<RuntimeException> {
             // When
-            resourceCryptoService._encryptResource(dataKey, resource)
+            resourceCryptoService.encryptResource(dataKey, resource)
         }
 
         assertEquals(
@@ -122,7 +123,7 @@ class ResourceCryptoServiceTest {
         } returns Single.just(encryptedResource)
 
         // When
-        val result = resourceCryptoService._encryptResource(dataKey, resource)
+        val result = resourceCryptoService.encryptResource(dataKey, resource)
 
         // Then
         assertEquals(
@@ -144,7 +145,7 @@ class ResourceCryptoServiceTest {
         // Then
         val error = assertFailsWith<RuntimeException> {
             // When
-            resourceCryptoService._encryptResource(dataKey, resource)
+            resourceCryptoService.encryptResource(dataKey, resource)
         }
 
         assertEquals(
@@ -166,7 +167,7 @@ class ResourceCryptoServiceTest {
         // Then
         val error = assertFailsWith<RuntimeException> {
             // When
-            resourceCryptoService._encryptResource(dataKey, resource)
+            resourceCryptoService.encryptResource(dataKey, resource)
         }
 
         assertEquals(
@@ -189,7 +190,7 @@ class ResourceCryptoServiceTest {
         } returns Single.just(encryptedResource)
 
         // When
-        val result = resourceCryptoService._encryptResource(dataKey, resource)
+        val result = resourceCryptoService.encryptResource(dataKey, resource)
 
         // Then
         assertEquals(
@@ -200,28 +201,47 @@ class ResourceCryptoServiceTest {
 
     // Arbitrary Data
     @Test
-    fun `Given encryptResource is called with a DataResource, it encrypts it`() {
-        val raw = ByteArray(1)
+    fun `Given, encryptResource is called with a DataResource and a DataKey, it propagates failures of the CryptoService`() {
+        // Given
+        val exception = RuntimeException("Happy failure")
+        val resource: DataResource = mockk()
         val dataKey: GCKey = mockk()
-        val resource = DataResource(raw)
-        val encrypted = ByteArray(23)
-        val encryptedAndEncodedResource = "encryptedAndEncodedResource"
 
+        every { resource.asByteArray() } returns "not important".toByteArray()
+        every { cryptoService.encryptAndEncodeByteArray(dataKey, any()) } throws exception
+
+        // Then
+        val error = assertFailsWith<CryptoException.EncryptionFailed> {
+            // When
+            resourceCryptoService.encryptResource(dataKey, resource)
+        }
+
+        assertEquals(
+            actual = error.message,
+            expected = "Failed to encrypt resource"
+        )
+    }
+
+    @Test
+    fun `Given encryptResource is called with a DataResource, it encrypts it`() {
+        // Given
+        val dataKey: GCKey = mockk()
+        val resource: DataResource = mockk()
+        val dataValue = "data".toByteArray()
+        val encryptedResource = "encryptedResource"
+
+        every { resource.asByteArray() } returns dataValue
         every {
-            cryptoService.encrypt(
-                dataKey,
-                raw
-            )
-        } returns Single.just(encrypted)
-        every { Base64.encodeToString(encrypted) } returns encryptedAndEncodedResource
+            cryptoService.encryptAndEncodeByteArray(dataKey, dataValue)
+        } returns Single.just(encryptedResource)
 
         // When
-        val result = resourceCryptoService._encryptResource(dataKey, resource)
+        val result = resourceCryptoService.encryptResource(dataKey, resource)
 
         // Then
         assertEquals(
             actual = result,
-            expected = encryptedAndEncodedResource
+            expected = encryptedResource
         )
     }
 
@@ -502,19 +522,72 @@ class ResourceCryptoServiceTest {
 
     // Arbitrary Data
     @Test
-    fun `Given, decryptResource is called with a encrypted DataResource, Tags and DataKey, it decrypts it`() {
+    fun `Given, decryptResource is called with a encrypted DataResource, Tags and DataKey, it filters blanks and fails`() {
         // Given
-        val decoded = ByteArray(23)
-        val resource = ByteArray(1)
         val dataKey: GCKey = mockk()
-        val encryptedResource = "encryptedResource"
-
         val tags = mapOf(
             TAG_APPDATA_KEY to TAG_APPDATA_VALUE
         )
 
-        every { Base64.decode(encryptedResource) } returns decoded
-        every { cryptoService.decrypt(dataKey, decoded) } returns Single.just(resource)
+        // Then
+        val error = assertFailsWith<CryptoException.DecryptionFailed> {
+            // When
+            resourceCryptoService.decryptResource<DataResource>(
+                dataKey,
+                tags,
+                "      "
+            )
+        }
+
+        assertEquals(
+            actual = error.message,
+            expected = "Failed to decrypt resource"
+        )
+    }
+
+    fun `Given, decryptResource is called with a encrypted DataResource, Tags and DataKey, it propagates CryptoService Errors`() {
+        // Given
+        val exception = RuntimeException("Happy failure")
+        val dataKey: GCKey = mockk()
+        val encryptedResource = "encryptedResource"
+        val tags = mapOf(
+            TAG_APPDATA_KEY to TAG_APPDATA_VALUE
+        )
+
+        every { cryptoService.decodeAndDecryptString(dataKey, encryptedResource) } throws exception
+
+        // Then
+        val error = assertFailsWith<CryptoException.DecryptionFailed> {
+            // When
+            resourceCryptoService.decryptResource<DataResource>(
+                dataKey,
+                tags,
+                encryptedResource
+            )
+        }
+
+        assertEquals(
+            actual = error.message,
+            expected = "Failed to decrypt resource"
+        )
+    }
+
+    @Test
+    fun `Given, decryptResource is called with a encrypted DataResource, Tags and DataKey, it decrypts the resource`() {
+        // Given
+        val resource = ByteArray(23)
+        val dataKey: GCKey = mockk()
+        val encryptedResource = "encryptedResource"
+        val tags = mapOf(
+            TAG_APPDATA_KEY to TAG_APPDATA_VALUE
+        )
+
+        every {
+            cryptoService.decodeAndDecryptByteArray(
+                dataKey,
+                encryptedResource
+            )
+        } returns Single.just(resource)
 
         // When
         val result = resourceCryptoService.decryptResource<DataResource>(

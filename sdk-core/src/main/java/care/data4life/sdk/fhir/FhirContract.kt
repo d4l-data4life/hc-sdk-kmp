@@ -24,7 +24,7 @@ import care.data4life.sdk.tag.Tags
 interface FhirContract {
 
     interface CryptoService {
-        fun _encryptResource(dataKey: GCKey, resource: Any): String
+        fun encryptResource(dataKey: GCKey, resource: Any): String
 
         fun <T : Any> decryptResource(
             dataKey: GCKey,

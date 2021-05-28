@@ -123,8 +123,8 @@ open class CryptoService : CryptoProtocol, CryptoContract.Service {
             }
     }
 
-    override fun encryptAndEncodeString(key: GCKey, data: String): Single<String> {
-        return encrypt(key, data.toByteArray())
+    override fun encryptAndEncodeByteArray(key: GCKey, data: ByteArray): Single<String> {
+        return encrypt(key, data)
             .map { dataArray -> base64.encodeToString(dataArray) }
             .onErrorResumeNext { error ->
                 Log.error(error, "Failed to encrypt string")
@@ -132,16 +132,10 @@ open class CryptoService : CryptoProtocol, CryptoContract.Service {
             }
     }
 
-    override fun decodeAndDecryptString(key: GCKey, dataBase64: String): Single<String> {
-        return Single
-            .fromCallable { base64.decode(dataBase64) }
-            .flatMap { decoded -> decrypt(key, decoded) }
-            .map { decrypted -> String(decrypted, Charsets.UTF_8) }
-            .onErrorResumeNext { error ->
-                Log.error(error, "Failed to decrypt string")
-                Single.error(CryptoException.DecryptionFailed("Failed to decrypt string") as D4LException)
-            }
-    }
+    override fun encryptAndEncodeString(
+        key: GCKey,
+        data: String
+    ): Single<String> = encryptAndEncodeByteArray(key, data.toByteArray())
 
     override fun encryptSymmetricKey(
         key: GCKey,
@@ -155,6 +149,25 @@ open class CryptoService : CryptoProtocol, CryptoContract.Service {
             .onErrorResumeNext { error ->
                 Log.error(error, "Failed to encrypt GcKey")
                 Single.error(CryptoException.KeyEncryptionFailed("Failed to encrypt GcKey") as D4LException)
+            }
+    }
+
+    override fun decodeAndDecryptString(key: GCKey, dataBase64: String): Single<String> {
+        return decodeAndDecryptByteArray(key, dataBase64)
+            .map { decrypted -> String(decrypted, Charsets.UTF_8) }
+            .onErrorResumeNext { error ->
+                Log.error(error, "Failed to decrypt string")
+                Single.error(CryptoException.DecryptionFailed("Failed to decrypt string") as D4LException)
+            }
+    }
+
+    override fun decodeAndDecryptByteArray(key: GCKey, dataBase64: String): Single<ByteArray> {
+        return Single
+            .fromCallable { base64.decode(dataBase64) }
+            .flatMap { decoded -> decrypt(key, decoded) }
+            .onErrorResumeNext { error ->
+                Log.error(error, "Failed to decrypt string")
+                Single.error(CryptoException.DecryptionFailed("Failed to decrypt string") as D4LException)
             }
     }
 

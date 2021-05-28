@@ -61,14 +61,18 @@ class CryptoContract {
 
         fun encrypt(key: GCKey, data: ByteArray): Single<ByteArray>
         fun decrypt(key: GCKey, data: ByteArray): Single<ByteArray>
-        // TODO Change interface so it Arbitrary Data can use it directly
+
         fun encryptAndEncodeString(key: GCKey, data: String): Single<String>
-        fun decodeAndDecryptString(key: GCKey, dataBase64: String): Single<String>
+        fun encryptAndEncodeByteArray(key: GCKey, data: ByteArray): Single<String>
+
         fun encryptSymmetricKey(
             key: GCKey,
             keyType: KeyType,
-            gckey: GCKey
+            gcKey: GCKey
         ): Single<NetworkModelContract.EncryptedKey>
+
+        fun decodeAndDecryptString(key: GCKey, dataBase64: String): Single<String>
+        fun decodeAndDecryptByteArray(key: GCKey, dataBase64: String): Single<ByteArray>
 
         fun symDecryptSymmetricKey(
             key: GCKey,

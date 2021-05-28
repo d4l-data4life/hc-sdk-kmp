@@ -163,7 +163,7 @@ class CryptoServiceTest {
     }
 
     @Test
-    fun encryptString_shouldCompleteWithoutErrors() {
+    fun encryptAndEncodeString_shouldCompleteWithoutErrors() {
         // given
         val input = "data"
 
@@ -178,13 +178,44 @@ class CryptoServiceTest {
     }
 
     @Test
-    fun decryptString_shouldCompleteWithoutErrors() {
+    fun encryptAndEncodeBytes_shouldCompleteWithoutErrors() {
+        // given
+        val input = "data"
+
+        // when
+        val testSubscriber = cryptoService.encryptAndEncodeByteArray(gcKey, input.toByteArray())
+            .test()
+
+        // then
+        testSubscriber
+            .assertNoErrors()
+            .assertComplete()
+    }
+
+    @Test
+    fun decodeAndDecryptString_shouldCompleteWithoutErrors() {
         // given
         val input = "data"
 
         // when
         val testSubscriber = cryptoService
             .decodeAndDecryptString(gcKey, input)
+            .test()
+
+        // then
+        testSubscriber
+            .assertNoErrors()
+            .assertComplete()
+    }
+
+    @Test
+    fun decodeAndDecryptByteArray_shouldCompleteWithoutErrors() {
+        // given
+        val input = "data"
+
+        // when
+        val testSubscriber = cryptoService
+            .decodeAndDecryptByteArray(gcKey, input)
             .test()
 
         // then

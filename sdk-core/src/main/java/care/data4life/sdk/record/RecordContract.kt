@@ -20,7 +20,7 @@ import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.Record
-import care.data4life.sdk.resource.DataResource
+import care.data4life.sdk.resource.ResourceContract.DataResource
 import care.data4life.sdk.resource.Fhir3Attachment
 import care.data4life.sdk.resource.Fhir3Resource
 import care.data4life.sdk.resource.Fhir4Attachment

@@ -63,6 +63,7 @@ import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.Callback;
 import care.data4life.sdk.listener.ResultListener;
 import care.data4life.sdk.model.Record;
+import care.data4life.sdk.resource.ResourceContract;
 
 public class DocumentsActivity extends AppCompatActivity {
 
@@ -413,19 +414,22 @@ public class DocumentsActivity extends AppCompatActivity {
         annotations.add("test2");
         annotations.add("test3");
 
-        client.getData().create(dataResource, annotations, new care.data4life.sdk.call.Callback<care.data4life.sdk.call.DataRecord<DataResource>>() {
+        client.getData().create(
+                dataResource,
+                annotations,
+                new care.data4life.sdk.call.Callback<DataRecord<ResourceContract.DataResource>>() {
+                    @Override
+                    public void onSuccess(DataRecord<ResourceContract.DataResource> result) {
+                        appdata = result;
+                        mDocumentsSRL.setRefreshing(false);
+                    }
 
-            @Override
-            public void onSuccess(DataRecord<DataResource> result) {
-                appdata = result;
-                mDocumentsSRL.setRefreshing(false);
-            }
-
-            @Override
-            public void onError(@NotNull D4LException exception) {
-                mDocumentsSRL.setRefreshing(false);
-            }
-        });
+                    @Override
+                    public void onError(@NotNull D4LException exception) {
+                        mDocumentsSRL.setRefreshing(false);
+                    }
+                }
+        );
     }
 
     private void fetchDataRecord() {
@@ -434,25 +438,28 @@ public class DocumentsActivity extends AppCompatActivity {
         }
         mDocumentsSRL.setRefreshing(true);
 
-        client.getData().fetch(appdata.getIdentifier(), new care.data4life.sdk.call.Callback<DataRecord<DataResource>>() {
-            @Override
-            public void onSuccess(DataRecord<DataResource> result) {
-                runOnUiThread(() -> {
-                    boolean equal = appdata.equals(result)
-                            && annotations.equals(result.getAnnotations());
-                    Toast.makeText(
-                            getApplicationContext(),
-                            "DonorKey test successful: " + equal, Toast.LENGTH_LONG
-                    ).show();
-                    mDocumentsSRL.setRefreshing(false);
-                });
-            }
+        client.getData().fetch(
+                appdata.getIdentifier(),
+                new care.data4life.sdk.call.Callback<DataRecord<ResourceContract.DataResource>>() {
+                    @Override
+                    public void onSuccess(DataRecord<ResourceContract.DataResource> result) {
+                        runOnUiThread(() -> {
+                            boolean equal = appdata.equals(result)
+                                    && annotations.equals(result.getAnnotations());
+                            Toast.makeText(
+                                    getApplicationContext(),
+                                    "DonorKey test successful: " + equal, Toast.LENGTH_LONG
+                            ).show();
+                            mDocumentsSRL.setRefreshing(false);
+                        });
+                    }
 
-            @Override
-            public void onError(@NotNull D4LException exception) {
-                Toast.makeText(getApplicationContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
-                mDocumentsSRL.setRefreshing(false);
-            }
-        });
+                    @Override
+                    public void onError(@NotNull D4LException exception) {
+                        Toast.makeText(getApplicationContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
+                        mDocumentsSRL.setRefreshing(false);
+                    }
+                }
+        );
     }
 }

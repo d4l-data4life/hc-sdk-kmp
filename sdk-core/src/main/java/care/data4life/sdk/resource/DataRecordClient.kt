@@ -42,9 +42,9 @@ internal class DataRecordClient(
     }
 
     override fun create(
-        resource: DataResource,
+        resource: ResourceContract.DataResource,
         annotations: Annotations,
-        callback: Callback<DataRecord<DataResource>>
+        callback: Callback<DataRecord<ResourceContract.DataResource>>
     ): Task = executeOperationFlow(
         { userId -> recordService.createRecord(userId, resource, annotations) },
         callback
@@ -52,9 +52,9 @@ internal class DataRecordClient(
 
     override fun update(
         recordId: String,
-        resource: DataResource,
+        resource: ResourceContract.DataResource,
         annotations: Annotations,
-        callback: Callback<DataRecord<DataResource>>
+        callback: Callback<DataRecord<ResourceContract.DataResource>>
     ): Task = executeOperationFlow(
         { userId -> recordService.updateRecord(userId, recordId, resource, annotations) },
         callback
@@ -62,7 +62,7 @@ internal class DataRecordClient(
 
     override fun fetch(
         recordId: String,
-        callback: Callback<DataRecord<DataResource>>
+        callback: Callback<DataRecord<ResourceContract.DataResource>>
     ): Task = executeOperationFlow(
         { userId -> recordService.fetchDataRecord(userId, recordId) },
         callback
@@ -74,7 +74,7 @@ internal class DataRecordClient(
         endDate: LocalDate?,
         pageSize: Int,
         offset: Int,
-        callback: Callback<List<DataRecord<DataResource>>>
+        callback: Callback<List<DataRecord<ResourceContract.DataResource>>>
     ): Task = executeOperationFlow(
         { userId ->
             recordService.fetchDataRecords(

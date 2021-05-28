@@ -21,7 +21,7 @@ import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.call.Task
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.model.DownloadType
-import care.data4life.sdk.resource.DataResource
+import care.data4life.sdk.resource.ResourceContract.DataResource
 import care.data4life.sdk.resource.Fhir4Attachment
 import care.data4life.sdk.resource.Fhir4Resource
 import care.data4life.sdk.tag.Annotations
@@ -105,7 +105,7 @@ interface SdkContract {
          * @return [Task] which can be used to cancel ongoing operation or to query operation status
          * @throws IllegalArgumentException if {@param recordId} is not FHIR4
          * @throws care.data4life.sdk.config.DataRestrictionException if {@param resource} is DocumentReference and {@link Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
-         </T> */
+        </T> */
         fun <T : Fhir4Resource> download(recordId: String, callback: Callback<Fhir4Record<T>>): Task
 
         /**

@@ -116,6 +116,7 @@ class DataResourceTest {
             DataResource(value)
         )
     }
+
     @Test
     fun `It equals if the values are equal and the given Resource is derived from Resource`() {
         @Suppress("ArrayInDataClass")

@@ -24,6 +24,7 @@ import care.data4life.crypto.KeyType
 import care.data4life.securestore.SecureStoreContract
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import io.mockk.clearAllMocks
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.just
@@ -31,10 +32,10 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.spyk
 import io.mockk.verify
-import junit.framework.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
+import kotlin.test.assertEquals
 
 class CryptoSecureStoreTest {
     private var secureStore: SecureStoreContract.SecureStore = mockk()
@@ -46,6 +47,7 @@ class CryptoSecureStoreTest {
 
     @Before
     fun setUp() {
+        clearAllMocks()
         every { moshi.adapter(ExchangeKey::class.java) } returns adapter
     }
 
@@ -151,7 +153,7 @@ class CryptoSecureStoreTest {
     fun storeGCKeyPair() {
         // Given
         val key = mockk<GCKeyPair>()
-        val algorithm = GCRSAKeyAlgorithm()
+        val algorithm = mockk<GCRSAKeyAlgorithm>()
         every { key.algorithm } returns algorithm
         every { key.getPrivateKeyBase64() } returns DATA
         every { key.getPublicKeyBase64() } returns DATA

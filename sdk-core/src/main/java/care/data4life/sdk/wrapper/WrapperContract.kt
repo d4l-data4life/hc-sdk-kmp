@@ -61,7 +61,7 @@ class WrapperContract {
         fun toFhir4(resourceType: String, source: String): Fhir4Resource?
 
         @Throws(FhirException::class)
-        fun fromResource(resource: Any): String?
+        fun fromResource(resource: Any): String
     }
 
     interface DateTimeFormatter {

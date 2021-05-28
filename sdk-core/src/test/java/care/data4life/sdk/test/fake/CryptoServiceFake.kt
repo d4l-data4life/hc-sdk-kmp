@@ -120,9 +120,9 @@ class CryptoServiceFake : CryptoContract.Service {
         } else {
             throw RuntimeException(
                 "Unable to fake resource decryption: \nKey: $key \nData: ${
-                    String(
-                        data
-                    )
+                String(
+                    data
+                )
                 }"
             )
         }

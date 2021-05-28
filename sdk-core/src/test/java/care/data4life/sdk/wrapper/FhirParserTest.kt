@@ -45,7 +45,7 @@ class FhirParserTest {
         assertTrue(resource is Fhir3Resource)
     }
 
-    @Test // Test is working, but the Constructor Mock causes flakyness
+    @Test
     fun `Given, toFhir4 is called with a ResourceType and a Source, it returns a Resource`() {
         // Given
         val type = "DocumentReference"

@@ -21,17 +21,13 @@ import care.data4life.crypto.error.CryptoException.EncryptionFailed
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataContract
 import care.data4life.sdk.data.DataResource
-import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_KEY
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_FHIR_VERSION
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_RESOURCE_TYPE
 import care.data4life.sdk.tag.Tags
-import care.data4life.sdk.util.Base64
 import care.data4life.sdk.wrapper.SdkFhirParser
 import care.data4life.sdk.wrapper.WrapperContract
-import io.reactivex.Single
 
-// TODO use of Single is not necessary as it's finalized with blockingGet()
 // TODO internal
 class ResourceCryptoService constructor(
     private val cryptoService: CryptoContract.Service
@@ -46,30 +42,34 @@ class ResourceCryptoService constructor(
         }
     }
 
+    private fun propagateEncryptionErrors(encryption: () -> String): String {
+        return try {
+            encryption()
+        } catch (error: Exception) {
+            throw EncryptionFailed("Failed to encrypt resource", error)
+        }
+    }
+
     private fun encryptFhirResource(dataKey: GCKey, resource: Any): String {
-        return Single
-            .just(resource)
-            .map { parser.fromResource(it) }
-            .flatMap { cryptoService.encryptAndEncodeString(dataKey, it) }
-            .onErrorResumeNext { error ->
-                Single.error(
-                    EncryptionFailed("Failed to encrypt resource", error) as D4LException
-                )
+        return propagateEncryptionErrors {
+            parser.fromResource(resource).let { serializedResource ->
+                cryptoService.encryptAndEncodeString(
+                    dataKey,
+                    serializedResource
+                ).blockingGet()
             }
-            .blockingGet()
+        }
     }
 
     private fun encryptDataResource(
         dataKey: GCKey,
         resource: DataContract.Resource
     ): String {
-        return try {
+        return propagateEncryptionErrors {
             cryptoService.encryptAndEncodeByteArray(
                 dataKey,
                 resource.asByteArray()
             ).blockingGet()
-        } catch (error: Exception) {
-            throw EncryptionFailed("Failed to encrypt resource", error)
         }
     }
 
@@ -78,10 +78,41 @@ class ResourceCryptoService constructor(
         tags: Tags,
         encryptedResource: String
     ): T {
+        validateEncryptedResource(encryptedResource)
+
         return if (tags.containsKey(TAG_APPDATA_KEY)) {
             decryptData(dataKey, encryptedResource) as T
         } else {
             decryptFhir(dataKey, tags[TAG_RESOURCE_TYPE]!!, tags, encryptedResource)
+        }
+    }
+
+    private fun validateEncryptedResource(encryptedResource: String) {
+        if (encryptedResource.isBlank()) {
+            throw DecryptionFailed("Failed to decrypt resource")
+        }
+    }
+
+    private fun <T> propagateDecryptionErrors(decryption: () -> T): T {
+        return try {
+            decryption()
+        } catch (error: Exception) {
+            throw DecryptionFailed("Failed to decrypt resource", error)
+        }
+    }
+
+    private fun <T : Any> decryptFhir(
+        dataKey: GCKey,
+        resourceType: String,
+        tags: Tags,
+        encryptedResource: String
+    ): T {
+        return propagateDecryptionErrors {
+            parseFhir(
+                cryptoService.decodeAndDecryptString(dataKey, encryptedResource).blockingGet(),
+                tags,
+                resourceType
+            )
         }
     }
 
@@ -97,35 +128,10 @@ class ResourceCryptoService constructor(
         } as T
     }
 
-    private fun <T : Any> decryptFhir(
-        dataKey: GCKey,
-        resourceType: String,
-        tags: Tags,
-        encryptedResource: String
-    ): T {
-        return Single
-            .just(encryptedResource)
-            .filter { it.isNotBlank() }
-            .map { cryptoService.decodeAndDecryptString(dataKey, it).blockingGet() }
-            .map { parseFhir<T>(it, tags, resourceType) }
-            .toSingle()
-            .onErrorResumeNext { error ->
-                Single.error(
-                    DecryptionFailed("Failed to decrypt resource", error) as D4LException
-                )
-            }
-            .blockingGet()
-    }
-
-    // TODO: merge this with Fhir
     private fun decryptData(
         dataKey: GCKey,
         encryptedResource: String
     ): DataContract.Resource {
-        if (encryptedResource.isBlank()) {
-            throw DecryptionFailed("Failed to decrypt resource")
-        }
-
         return try {
             DataResource(
                 cryptoService.decodeAndDecryptByteArray(

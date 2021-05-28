@@ -23,7 +23,7 @@ internal object SdkFhirParser : WrapperContract.FhirParser {
         return fhir4Parser.toFhir(clazz!!, source)
     }
 
-    override fun fromResource(resource: Any): String? {
+    override fun fromResource(resource: Any): String {
         return when (resource) {
             is Fhir3Resource -> fhir3Parser.fromFhir(resource)
             is Fhir4Resource -> fhir4Parser.fromFhir(resource)

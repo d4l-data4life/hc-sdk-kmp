@@ -30,9 +30,6 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.reactivex.Single
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertSame
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -76,14 +73,14 @@ class ResourceCryptoServiceTest {
         every { SdkFhirParser.fromResource(any()) } throws exception
 
         // Then
-        val error = assertFailsWith<RuntimeException> {
+        val error = assertFailsWith<CryptoException.EncryptionFailed> {
             // When
             resourceCryptoService.encryptResource(dataKey, resource)
         }
 
         assertEquals(
             actual = error.message,
-            expected = "care.data4life.crypto.error.CryptoException\$EncryptionFailed: Failed to encrypt resource"
+            expected = "Failed to encrypt resource"
         )
     }
 
@@ -98,14 +95,14 @@ class ResourceCryptoServiceTest {
         every { cryptoService.encryptAndEncodeString(dataKey, any()) } throws exception
 
         // Then
-        val error = assertFailsWith<RuntimeException> {
+        val error = assertFailsWith<CryptoException.EncryptionFailed> {
             // When
             resourceCryptoService.encryptResource(dataKey, resource)
         }
 
         assertEquals(
             actual = error.message,
-            expected = "care.data4life.crypto.error.CryptoException\$EncryptionFailed: Failed to encrypt resource"
+            expected = "Failed to encrypt resource"
         )
     }
 
@@ -143,14 +140,14 @@ class ResourceCryptoServiceTest {
         every { SdkFhirParser.fromResource(any()) } throws exception
 
         // Then
-        val error = assertFailsWith<RuntimeException> {
+        val error = assertFailsWith<CryptoException.EncryptionFailed> {
             // When
             resourceCryptoService.encryptResource(dataKey, resource)
         }
 
         assertEquals(
             actual = error.message,
-            expected = "care.data4life.crypto.error.CryptoException\$EncryptionFailed: Failed to encrypt resource"
+            expected = "Failed to encrypt resource"
         )
     }
 
@@ -165,14 +162,14 @@ class ResourceCryptoServiceTest {
         every { cryptoService.encryptAndEncodeString(dataKey, any()) } throws exception
 
         // Then
-        val error = assertFailsWith<RuntimeException> {
+        val error = assertFailsWith<CryptoException.EncryptionFailed> {
             // When
             resourceCryptoService.encryptResource(dataKey, resource)
         }
 
         assertEquals(
             actual = error.message,
-            expected = "care.data4life.crypto.error.CryptoException\$EncryptionFailed: Failed to encrypt resource"
+            expected = "Failed to encrypt resource"
         )
     }
 
@@ -257,7 +254,7 @@ class ResourceCryptoServiceTest {
         )
 
         // Then
-        val error = assertFailsWith<RuntimeException> {
+        val error = assertFailsWith<CryptoException.DecryptionFailed> {
             // When
             resourceCryptoService.decryptResource<Fhir3Resource>(
                 dataKey,
@@ -268,7 +265,7 @@ class ResourceCryptoServiceTest {
 
         assertEquals(
             actual = error.message,
-            expected = "care.data4life.crypto.error.CryptoException\$DecryptionFailed: Failed to decrypt resource"
+            expected = "Failed to decrypt resource"
         )
     }
 
@@ -286,7 +283,7 @@ class ResourceCryptoServiceTest {
         every { cryptoService.decodeAndDecryptString(dataKey, encryptedResource) } throws exception
 
         // Then
-        val error = assertFailsWith<RuntimeException> {
+        val error = assertFailsWith<CryptoException.DecryptionFailed> {
             // When
             resourceCryptoService.decryptResource<Fhir3Resource>(
                 dataKey,
@@ -297,7 +294,7 @@ class ResourceCryptoServiceTest {
 
         assertEquals(
             actual = error.message,
-            expected = "care.data4life.crypto.error.CryptoException\$DecryptionFailed: Failed to decrypt resource"
+            expected = "Failed to decrypt resource"
         )
     }
 
@@ -328,7 +325,7 @@ class ResourceCryptoServiceTest {
         } throws exception
 
         // Then
-        val error = assertFailsWith<RuntimeException> {
+        val error = assertFailsWith<CryptoException.DecryptionFailed> {
             // When
             resourceCryptoService.decryptResource<Fhir3Resource>(
                 dataKey,
@@ -339,7 +336,7 @@ class ResourceCryptoServiceTest {
 
         assertEquals(
             actual = error.message,
-            expected = "care.data4life.crypto.error.CryptoException\$DecryptionFailed: Failed to decrypt resource"
+            expected = "Failed to decrypt resource"
         )
     }
 
@@ -394,7 +391,7 @@ class ResourceCryptoServiceTest {
         )
 
         // Then
-        val error = assertFailsWith<RuntimeException> {
+        val error = assertFailsWith<CryptoException.DecryptionFailed> {
             // When
             resourceCryptoService.decryptResource<Fhir4Resource>(
                 dataKey,
@@ -405,7 +402,7 @@ class ResourceCryptoServiceTest {
 
         assertEquals(
             actual = error.message,
-            expected = "care.data4life.crypto.error.CryptoException\$DecryptionFailed: Failed to decrypt resource"
+            expected = "Failed to decrypt resource"
         )
     }
 
@@ -423,7 +420,7 @@ class ResourceCryptoServiceTest {
         every { cryptoService.decodeAndDecryptString(dataKey, encryptedResource) } throws exception
 
         // Then
-        val error = assertFailsWith<RuntimeException> {
+        val error = assertFailsWith<CryptoException.DecryptionFailed> {
             // When
             resourceCryptoService.decryptResource<Fhir4Resource>(
                 dataKey,
@@ -434,7 +431,7 @@ class ResourceCryptoServiceTest {
 
         assertEquals(
             actual = error.message,
-            expected = "care.data4life.crypto.error.CryptoException\$DecryptionFailed: Failed to decrypt resource"
+            expected = "Failed to decrypt resource"
         )
     }
 
@@ -465,7 +462,7 @@ class ResourceCryptoServiceTest {
         } throws exception
 
         // Then
-        val error = assertFailsWith<RuntimeException> {
+        val error = assertFailsWith<CryptoException.DecryptionFailed> {
             // When
             resourceCryptoService.decryptResource<Fhir4Resource>(
                 dataKey,
@@ -476,7 +473,7 @@ class ResourceCryptoServiceTest {
 
         assertEquals(
             actual = error.message,
-            expected = "care.data4life.crypto.error.CryptoException\$DecryptionFailed: Failed to decrypt resource"
+            expected = "Failed to decrypt resource"
         )
     }
 
@@ -545,6 +542,7 @@ class ResourceCryptoServiceTest {
         )
     }
 
+    @Test
     fun `Given, decryptResource is called with a encrypted DataResource, Tags and DataKey, it propagates CryptoService Errors`() {
         // Given
         val exception = RuntimeException("Happy failure")

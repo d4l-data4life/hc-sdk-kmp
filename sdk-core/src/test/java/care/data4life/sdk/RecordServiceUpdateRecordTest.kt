@@ -28,10 +28,10 @@ import care.data4life.sdk.network.model.DecryptedDataRecord
 import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.EncryptedRecord
-import care.data4life.sdk.resource.ResourceContract.DataResource
 import care.data4life.sdk.resource.Fhir3Resource
 import care.data4life.sdk.resource.Fhir4Resource
 import care.data4life.sdk.resource.ResourceContract
+import care.data4life.sdk.resource.ResourceContract.DataResource
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
@@ -308,7 +308,7 @@ class RecordServiceUpdateRecordTest {
         every { RecordMapper.getInstance(receivedDecryptedRecord) } returns record
 
         // When
-        val observer = recordService.updateRecord(
+        val observer = recordService.updateRecord<DataResource>(
             USER_ID,
             RECORD_ID,
             resource,
@@ -327,7 +327,12 @@ class RecordServiceUpdateRecordTest {
         )
 
         verifyOrder {
-            recordService.updateRecord(USER_ID, RECORD_ID, resource, defaultAnnotation)
+            recordService.updateRecord<DataResource>(
+                USER_ID,
+                RECORD_ID,
+                resource,
+                defaultAnnotation
+            )
             recordService.updateRecord(USER_ID, RECORD_ID, resource as Any, defaultAnnotation)
             recordService.checkDataRestrictions(resource)
             recordService.extractUploadData(resource)
@@ -575,7 +580,7 @@ class RecordServiceUpdateRecordTest {
         every { RecordMapper.getInstance(receivedDecryptedRecord) } returns record
 
         // When
-        val observer = recordService.updateRecord(
+        val observer = recordService.updateRecord<DataResource>(
             USER_ID,
             RECORD_ID,
             resource,
@@ -594,7 +599,7 @@ class RecordServiceUpdateRecordTest {
         )
 
         verifyOrder {
-            recordService.updateRecord(USER_ID, RECORD_ID, resource, annotations)
+            recordService.updateRecord<DataResource>(USER_ID, RECORD_ID, resource, annotations)
             recordService.updateRecord(USER_ID, RECORD_ID, resource as Any, annotations)
             recordService.checkDataRestrictions(resource)
             recordService.extractUploadData(resource)

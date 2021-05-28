@@ -28,6 +28,7 @@ import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.util.SearchTagsBuilder
 import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.resource.DataResource
 import care.data4life.sdk.resource.Fhir3Resource
 import care.data4life.sdk.resource.Fhir4Resource
 import care.data4life.sdk.resource.ResourceContract
@@ -740,7 +741,7 @@ class RecordServiceFetchRecordsModuleTest {
         )
 
         // When
-        val result = recordService.fetchDataRecord(
+        val result = recordService.fetchDataRecord<DataResource>(
             USER_ID,
             RECORD_ID
         ).blockingGet()
@@ -784,7 +785,7 @@ class RecordServiceFetchRecordsModuleTest {
         )
 
         // When
-        val result = recordService.fetchDataRecord(
+        val result = recordService.fetchDataRecord<DataResource>(
             USER_ID,
             RECORD_ID
         ).blockingGet()
@@ -1481,7 +1482,7 @@ class RecordServiceFetchRecordsModuleTest {
         )
 
         // When
-        val result = recordService.fetchDataRecords(
+        val result = recordService.fetchDataRecords<DataResource>(
             USER_ID,
             emptyList(),
             null,
@@ -1541,7 +1542,7 @@ class RecordServiceFetchRecordsModuleTest {
         )
 
         // When
-        val result = recordService.fetchDataRecords(
+        val result = recordService.fetchDataRecords<DataResource>(
             USER_ID,
             annotations,
             null,
@@ -1614,7 +1615,7 @@ class RecordServiceFetchRecordsModuleTest {
         )
 
         // When
-        val result = recordService.fetchDataRecords(
+        val result = recordService.fetchDataRecords<DataResource>(
             USER_ID,
             annotations,
             startDate,

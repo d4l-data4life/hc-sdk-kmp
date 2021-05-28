@@ -19,10 +19,10 @@ import care.data4life.sdk.auth.AuthClient
 import care.data4life.sdk.auth.AuthContract
 import care.data4life.sdk.auth.UserService
 import care.data4life.sdk.call.CallHandler
-import care.data4life.sdk.log.Log
-import care.data4life.sdk.log.Logger
 import care.data4life.sdk.client.DataRecordClient
 import care.data4life.sdk.client.Fhir4RecordClient
+import care.data4life.sdk.log.Log
+import care.data4life.sdk.log.Logger
 
 abstract class BaseClient(
     protected var alias: String,

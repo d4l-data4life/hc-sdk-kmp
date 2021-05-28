@@ -1488,7 +1488,7 @@ class RecordServiceUpdateRecordModuleTest {
         )
 
         // When
-        val result = recordService.updateRecord(
+        val result = recordService.updateRecord<DataResource>(
             USER_ID,
             RECORD_ID,
             resourceNew,
@@ -1538,7 +1538,7 @@ class RecordServiceUpdateRecordModuleTest {
         )
 
         // When
-        val result = recordService.updateRecord(
+        val result = recordService.updateRecord<DataResource>(
             USER_ID,
             RECORD_ID,
             resourceNew,

@@ -14,17 +14,18 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.resource
+package care.data4life.sdk.client
 
 import care.data4life.sdk.SdkContract
 import care.data4life.sdk.auth.AuthContract
+import care.data4life.sdk.call.CallContract
 import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.call.Callback
-import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.call.Task
-import care.data4life.sdk.client.Fhir4RecordClient
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.resource.Fhir4Attachment
+import care.data4life.sdk.resource.Fhir4Resource
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.test.util.GenericTestDataProvider.ATTACHMENT_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID
@@ -61,13 +62,13 @@ class FhirRecordClientTest {
         // Given
         val resource: Fhir4Resource = mockk()
         val annotations: Annotations = mockk()
-        val callback: Callback<Fhir4Record<Fhir4Resource>> = mockk()
+        val callback: Callback<CallContract.Record<Fhir4Resource>> = mockk()
 
         val userId = USER_ID
-        val expectedRecord: Fhir4Record<Fhir4Resource> = mockk()
-        val record: Single<Fhir4Record<Fhir4Resource>> = Single.just(expectedRecord)
+        val expectedRecord: CallContract.Record<Fhir4Resource> = mockk()
+        val record: Single<CallContract.Record<Fhir4Resource>> = Single.just(expectedRecord)
         val expected: Task = mockk()
-        val observer = slot<Single<Fhir4Record<Fhir4Resource>>>()
+        val observer = slot<Single<CallContract.Record<Fhir4Resource>>>()
 
         every { userService.finishLogin(true) } returns Single.just(true)
         every { userService.userID } returns Single.just(userId)
@@ -99,14 +100,14 @@ class FhirRecordClientTest {
         // Given
         val resource: Fhir4Resource = mockk()
         val annotations: Annotations = mockk()
-        val callback: Callback<Fhir4Record<Fhir4Resource>> = mockk()
+        val callback: Callback<CallContract.Record<Fhir4Resource>> = mockk()
         val recordId = RECORD_ID
 
         val userId = USER_ID
-        val expectedRecord: Fhir4Record<Fhir4Resource> = mockk()
-        val record: Single<Fhir4Record<Fhir4Resource>> = Single.just(expectedRecord)
+        val expectedRecord: CallContract.Record<Fhir4Resource> = mockk()
+        val record: Single<CallContract.Record<Fhir4Resource>> = Single.just(expectedRecord)
         val expected: Task = mockk()
-        val observer = slot<Single<Fhir4Record<Fhir4Resource>>>()
+        val observer = slot<Single<CallContract.Record<Fhir4Resource>>>()
 
         every { userService.finishLogin(true) } returns Single.just(true)
         every { userService.userID } returns Single.just(userId)
@@ -136,14 +137,14 @@ class FhirRecordClientTest {
     @Test
     fun `Given fetch is called, with a RecordId and a Callback it returns the corresponding Task`() {
         // Given
-        val callback: Callback<Fhir4Record<Fhir4Resource>> = mockk()
+        val callback: Callback<CallContract.Record<Fhir4Resource>> = mockk()
         val recordId = RECORD_ID
 
         val userId = USER_ID
-        val expectedRecord: Fhir4Record<Fhir4Resource> = mockk()
-        val record: Single<Fhir4Record<Fhir4Resource>> = Single.just(expectedRecord)
+        val expectedRecord: CallContract.Record<Fhir4Resource> = mockk()
+        val record: Single<CallContract.Record<Fhir4Resource>> = Single.just(expectedRecord)
         val expected: Task = mockk()
-        val observer = slot<Single<Fhir4Record<Fhir4Resource>>>()
+        val observer = slot<Single<CallContract.Record<Fhir4Resource>>>()
 
         every { userService.finishLogin(true) } returns Single.just(true)
         every { userService.userID } returns Single.just(userId)
@@ -173,7 +174,7 @@ class FhirRecordClientTest {
     @Test
     fun `Given search is called, with a ResourceType, Annotations, a Startdate, a Enddate, Pagesize, Offset and a Callback it returns the corresponding Task`() {
         // Given
-        val callback: Callback<List<Fhir4Record<Fhir4Resource>>> = mockk()
+        val callback: Callback<List<CallContract.Record<Fhir4Resource>>> = mockk()
         val resourceType = Fhir4Resource::class.java
         val annotations: Annotations = mockk()
         val startDate: LocalDate = mockk()
@@ -182,10 +183,10 @@ class FhirRecordClientTest {
         val offset = 42
 
         val userId = USER_ID
-        val expectedRecords: List<Fhir4Record<Fhir4Resource>> = mockk()
-        val records: Single<List<Fhir4Record<Fhir4Resource>>> = Single.just(expectedRecords)
+        val expectedRecords: List<CallContract.Record<Fhir4Resource>> = mockk()
+        val records: Single<List<CallContract.Record<Fhir4Resource>>> = Single.just(expectedRecords)
         val expected: Task = mockk()
-        val observer = slot<Single<List<Fhir4Record<Fhir4Resource>>>>()
+        val observer = slot<Single<List<CallContract.Record<Fhir4Resource>>>>()
 
         every { userService.finishLogin(true) } returns Single.just(true)
         every { userService.userID } returns Single.just(userId)
@@ -231,14 +232,14 @@ class FhirRecordClientTest {
     @Test
     fun `Given download is called, with a RecordId and a Callback, it returns the corresponding Task`() {
         // Given
-        val callback: Callback<Fhir4Record<Fhir4Resource>> = mockk()
+        val callback: Callback<CallContract.Record<Fhir4Resource>> = mockk()
 
         val recordId = RECORD_ID
         val userId = USER_ID
-        val record: Fhir4Record<Fhir4Resource> = mockk()
+        val record: CallContract.Record<Fhir4Resource> = mockk()
         val result = Single.just(record)
         val expected: Task = mockk()
-        val observer = slot<Single<Fhir4Record<Fhir4Resource>>>()
+        val observer = slot<Single<CallContract.Record<Fhir4Resource>>>()
 
         every { userService.finishLogin(true) } returns Single.just(true)
         every { userService.userID } returns Single.just(userId)

@@ -21,10 +21,10 @@ import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.network.NetworkingContract
-import care.data4life.sdk.resource.ResourceContract.DataResource
 import care.data4life.sdk.resource.Fhir3Resource
 import care.data4life.sdk.resource.Fhir4Resource
 import care.data4life.sdk.resource.ResourceContract
+import care.data4life.sdk.resource.ResourceContract.DataResource
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.Tags

@@ -28,10 +28,10 @@ import care.data4life.sdk.network.model.DecryptedDataRecord
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
-import care.data4life.sdk.resource.ResourceContract.DataResource
 import care.data4life.sdk.resource.Fhir3Resource
 import care.data4life.sdk.resource.Fhir4Resource
 import care.data4life.sdk.resource.ResourceContract
+import care.data4life.sdk.resource.ResourceContract.DataResource
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS

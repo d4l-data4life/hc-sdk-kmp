@@ -31,10 +31,10 @@ import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
-import care.data4life.sdk.resource.ResourceContract.DataResource
 import care.data4life.sdk.resource.Fhir3Resource
 import care.data4life.sdk.resource.Fhir4Resource
 import care.data4life.sdk.resource.ResourceContract
+import care.data4life.sdk.resource.ResourceContract.DataResource
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
@@ -185,8 +185,9 @@ class RecordServiceFetchRecordsTest {
 
         assertSame<Fhir4Record<Fhir4CarePlan>>(
             expected = expected as Fhir4Record<Fhir4CarePlan>,
-            actual = record
+            actual = record as Fhir4Record<Fhir4CarePlan>
         )
+
         verifyOrder {
             apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)
             recordService.decryptRecord<Fhir4Resource>(encryptedRecord, USER_ID)
@@ -213,7 +214,7 @@ class RecordServiceFetchRecordsTest {
         every { RecordMapper.getInstance(decrypted) } returns expected as BaseRecord<DataResource>
 
         // When
-        val observer = recordService.fetchDataRecord(USER_ID, RECORD_ID).test().await()
+        val observer = recordService.fetchDataRecord<DataResource>(USER_ID, RECORD_ID).test().await()
 
         // Then
         val record = observer
@@ -222,9 +223,9 @@ class RecordServiceFetchRecordsTest {
             .assertValueCount(1)
             .values()[0]
 
-        assertSame<DataRecord<DataResource>>(
+        assertSame(
             expected = expected,
-            actual = record
+            actual = record as DataRecord<DataResource>
         )
         verifyOrder {
             apiService.fetchRecord(ALIAS, USER_ID, RECORD_ID)

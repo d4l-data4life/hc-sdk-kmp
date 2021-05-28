@@ -16,15 +16,14 @@
 
 package care.data4life.sdk.record
 
-import care.data4life.sdk.call.DataRecord
-import care.data4life.sdk.call.Fhir4Record
+import care.data4life.sdk.call.CallContract
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.Record
-import care.data4life.sdk.resource.ResourceContract.DataResource
 import care.data4life.sdk.resource.Fhir3Attachment
 import care.data4life.sdk.resource.Fhir3Resource
 import care.data4life.sdk.resource.Fhir4Attachment
 import care.data4life.sdk.resource.Fhir4Resource
+import care.data4life.sdk.resource.ResourceContract.DataResource
 import care.data4life.sdk.tag.Annotations
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -32,11 +31,11 @@ import org.threeten.bp.LocalDate
 
 interface RecordContract {
     interface Service {
-        fun createRecord(
+        fun <T : DataResource> createRecord(
             userId: String,
-            resource: DataResource,
+            resource: T,
             annotations: Annotations
-        ): Single<DataRecord<DataResource>>
+        ): Single<CallContract.Record<T>>
 
         fun <T : Fhir3Resource> createRecord(
             userId: String,
@@ -48,14 +47,14 @@ interface RecordContract {
             userId: String,
             resource: T,
             annotations: Annotations
-        ): Single<Fhir4Record<T>>
+        ): Single<CallContract.Record<T>>
 
-        fun updateRecord(
+        fun <T : DataResource> updateRecord(
             userId: String,
             recordId: String,
             resource: DataResource,
             annotations: Annotations
-        ): Single<DataRecord<DataResource>>
+        ): Single<CallContract.Record<T>>
 
         fun <T : Fhir3Resource> updateRecord(
             userId: String,
@@ -69,11 +68,15 @@ interface RecordContract {
             recordId: String,
             resource: T,
             annotations: Annotations
-        ): Single<Fhir4Record<T>>
+        ): Single<CallContract.Record<T>>
 
         fun deleteRecord(userId: String, recordId: String): Completable
 
-        fun fetchDataRecord(userId: String, recordId: String): Single<DataRecord<DataResource>>
+        fun <T : DataResource> fetchDataRecord(
+            userId: String,
+            recordId: String
+        ): Single<CallContract.Record<T>>
+
         fun <T : Fhir3Resource> fetchFhir3Record(
             userId: String,
             recordId: String
@@ -82,16 +85,16 @@ interface RecordContract {
         fun <T : Fhir4Resource> fetchFhir4Record(
             userId: String,
             recordId: String
-        ): Single<Fhir4Record<T>>
+        ): Single<CallContract.Record<T>>
 
-        fun fetchDataRecords(
+        fun <T : DataResource> fetchDataRecords(
             userId: String,
             annotations: Annotations,
             startDate: LocalDate?,
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int
-        ): Single<List<DataRecord<DataResource>>>
+        ): Single<List<CallContract.Record<T>>>
 
         fun <T : Fhir3Resource> fetchFhir3Records(
             userId: String,
@@ -111,7 +114,7 @@ interface RecordContract {
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int
-        ): Single<List<Fhir4Record<T>>>
+        ): Single<List<CallContract.Record<T>>>
 
         fun countFhir3Records(
             type: Class<out Fhir3Resource>,
@@ -141,7 +144,7 @@ interface RecordContract {
         fun <T : Fhir4Resource> downloadFhir4Record(
             recordId: String,
             userId: String
-        ): Single<Fhir4Record<T>>
+        ): Single<CallContract.Record<T>>
 
         @Throws(IllegalArgumentException::class)
         fun downloadFhir3Attachment(

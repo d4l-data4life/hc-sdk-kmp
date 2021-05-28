@@ -54,6 +54,7 @@ import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.DocumentReference;
 import care.data4life.fhir.stu3.model.DomainResource;
 import care.data4life.sdk.Data4LifeClient;
+import care.data4life.sdk.call.CallContract;
 import care.data4life.sdk.call.DataRecord;
 import care.data4life.sdk.call.Task;
 import care.data4life.sdk.config.DataRestrictionException;
@@ -417,10 +418,10 @@ public class DocumentsActivity extends AppCompatActivity {
         client.getData().create(
                 dataResource,
                 annotations,
-                new care.data4life.sdk.call.Callback<DataRecord<ResourceContract.DataResource>>() {
+                new care.data4life.sdk.call.Callback<CallContract.Record<ResourceContract.DataResource>>() {
                     @Override
-                    public void onSuccess(DataRecord<ResourceContract.DataResource> result) {
-                        appdata = result;
+                    public void onSuccess(CallContract.Record<ResourceContract.DataResource> result) {
+                        appdata = (DataRecord) result;
                         mDocumentsSRL.setRefreshing(false);
                     }
 
@@ -440,9 +441,9 @@ public class DocumentsActivity extends AppCompatActivity {
 
         client.getData().fetch(
                 appdata.getIdentifier(),
-                new care.data4life.sdk.call.Callback<DataRecord<ResourceContract.DataResource>>() {
+                new care.data4life.sdk.call.Callback<CallContract.Record<ResourceContract.DataResource>>() {
                     @Override
-                    public void onSuccess(DataRecord<ResourceContract.DataResource> result) {
+                    public void onSuccess(CallContract.Record<ResourceContract.DataResource> result) {
                         runOnUiThread(() -> {
                             boolean equal = appdata.equals(result)
                                     && annotations.equals(result.getAnnotations());

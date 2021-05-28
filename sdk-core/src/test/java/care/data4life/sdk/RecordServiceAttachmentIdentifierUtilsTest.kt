@@ -26,7 +26,6 @@ import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_FMT
 import care.data4life.sdk.record.RecordContract.Service.Companion.PREVIEW_ID_POS
 import care.data4life.sdk.record.RecordContract.Service.Companion.THUMBNAIL_ID_POS
-import care.data4life.sdk.resource.ResourceContract.DataResource
 import care.data4life.sdk.resource.Fhir3Attachment
 import care.data4life.sdk.resource.Fhir3Identifier
 import care.data4life.sdk.resource.Fhir3Resource
@@ -34,6 +33,7 @@ import care.data4life.sdk.resource.Fhir4Attachment
 import care.data4life.sdk.resource.Fhir4Identifier
 import care.data4life.sdk.resource.Fhir4Resource
 import care.data4life.sdk.resource.ResourceContract
+import care.data4life.sdk.resource.ResourceContract.DataResource
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID

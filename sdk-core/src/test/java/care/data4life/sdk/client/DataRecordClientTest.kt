@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+ * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
  *
  * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
@@ -14,16 +14,17 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.resource
+package care.data4life.sdk.client
 
 import care.data4life.sdk.SdkContract
 import care.data4life.sdk.auth.AuthContract
+import care.data4life.sdk.call.CallContract
 import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.call.Callback
-import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Task
-import care.data4life.sdk.client.DataRecordClient
 import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.resource.DataResource
+import care.data4life.sdk.resource.ResourceContract
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.test.util.GenericTestDataProvider
 import io.mockk.every
@@ -58,13 +59,13 @@ class DataRecordClientTest {
         // Given
         val resource: DataResource = mockk()
         val annotations: Annotations = mockk()
-        val callback: Callback<DataRecord<ResourceContract.DataResource>> = mockk()
+        val callback: Callback<CallContract.Record<ResourceContract.DataResource>> = mockk()
 
         val userId = GenericTestDataProvider.USER_ID
-        val expectedRecord: DataRecord<ResourceContract.DataResource> = mockk()
-        val record: Single<DataRecord<ResourceContract.DataResource>> = Single.just(expectedRecord)
+        val expectedRecord: CallContract.Record<DataResource> = mockk()
+        val record: Single<CallContract.Record<DataResource>> = Single.just(expectedRecord)
         val expected: Task = mockk()
-        val observer = slot<Single<DataRecord<ResourceContract.DataResource>>>()
+        val observer = slot<Single<CallContract.Record<ResourceContract.DataResource>>>()
 
         every { userService.finishLogin(true) } returns Single.just(true)
         every { userService.userID } returns Single.just(userId)
@@ -74,8 +75,8 @@ class DataRecordClientTest {
         every {
             callHandler.executeSingle(capture(observer), callback)
         } answers {
-            assertEquals(
-                expected = expectedRecord,
+            assertEquals<CallContract.Record<ResourceContract.DataResource>>(
+                expected = expectedRecord as CallContract.Record<ResourceContract.DataResource>,
                 actual = observer.captured.blockingGet()
             )
             expected
@@ -96,25 +97,25 @@ class DataRecordClientTest {
         // Given
         val resource: DataResource = mockk()
         val annotations: Annotations = mockk()
-        val callback: Callback<DataRecord<ResourceContract.DataResource>> = mockk()
+        val callback: Callback<CallContract.Record<ResourceContract.DataResource>> = mockk()
         val recordId = GenericTestDataProvider.RECORD_ID
 
         val userId = GenericTestDataProvider.USER_ID
-        val expectedRecord: DataRecord<ResourceContract.DataResource> = mockk()
-        val record: Single<DataRecord<ResourceContract.DataResource>> = Single.just(expectedRecord)
+        val expectedRecord: CallContract.Record<DataResource> = mockk()
+        val record: Single<CallContract.Record<DataResource>> = Single.just(expectedRecord)
         val expected: Task = mockk()
-        val observer = slot<Single<DataRecord<ResourceContract.DataResource>>>()
+        val observer = slot<Single<CallContract.Record<ResourceContract.DataResource>>>()
 
         every { userService.finishLogin(true) } returns Single.just(true)
         every { userService.userID } returns Single.just(userId)
         every {
-            recordService.updateRecord(userId, recordId, resource, annotations)
+            recordService.updateRecord<DataResource>(userId, recordId, resource, annotations)
         } returns record
         every {
             callHandler.executeSingle(capture(observer), callback)
         } answers {
-            assertEquals(
-                expected = expectedRecord,
+            assertEquals<CallContract.Record<ResourceContract.DataResource>>(
+                expected = expectedRecord as CallContract.Record<ResourceContract.DataResource>,
                 actual = observer.captured.blockingGet()
             )
             expected
@@ -133,25 +134,25 @@ class DataRecordClientTest {
     @Test
     fun `Given fetch is called, with a RecordId and a Callback it returns the corresponding Task`() {
         // Given
-        val callback: Callback<DataRecord<ResourceContract.DataResource>> = mockk()
+        val callback: Callback<CallContract.Record<ResourceContract.DataResource>> = mockk()
         val recordId = GenericTestDataProvider.RECORD_ID
 
         val userId = GenericTestDataProvider.USER_ID
-        val expectedRecord: DataRecord<ResourceContract.DataResource> = mockk()
-        val record: Single<DataRecord<ResourceContract.DataResource>> = Single.just(expectedRecord)
+        val expectedRecord: CallContract.Record<DataResource> = mockk()
+        val record: Single<CallContract.Record<DataResource>> = Single.just(expectedRecord)
         val expected: Task = mockk()
-        val observer = slot<Single<DataRecord<ResourceContract.DataResource>>>()
+        val observer = slot<Single<CallContract.Record<ResourceContract.DataResource>>>()
 
         every { userService.finishLogin(true) } returns Single.just(true)
         every { userService.userID } returns Single.just(userId)
         every {
-            recordService.fetchDataRecord(userId, recordId)
+            recordService.fetchDataRecord<DataResource>(userId, recordId)
         } returns record
         every {
             callHandler.executeSingle(capture(observer), callback)
         } answers {
-            assertEquals(
-                expected = expectedRecord,
+            assertEquals<CallContract.Record<ResourceContract.DataResource>>(
+                expected = expectedRecord as CallContract.Record<ResourceContract.DataResource>,
                 actual = observer.captured.blockingGet()
             )
             expected
@@ -170,7 +171,7 @@ class DataRecordClientTest {
     @Test
     fun `Given search is called, with a ResourceType, Annotations, a Startdate, a Enddate, Pagesize, Offset and a Callback it returns the corresponding Task`() {
         // Given
-        val callback: Callback<List<DataRecord<ResourceContract.DataResource>>> = mockk()
+        val callback: Callback<List<CallContract.Record<ResourceContract.DataResource>>> = mockk()
         val annotations: Annotations = mockk()
         val startDate: LocalDate = mockk()
         val endDate: LocalDate = mockk()
@@ -178,15 +179,15 @@ class DataRecordClientTest {
         val offset = 42
 
         val userId = GenericTestDataProvider.USER_ID
-        val expectedRecords: List<DataRecord<ResourceContract.DataResource>> = mockk()
-        val records: Single<List<DataRecord<ResourceContract.DataResource>>> = Single.just(expectedRecords)
+        val expectedRecords: List<CallContract.Record<DataResource>> = mockk()
+        val records: Single<List<CallContract.Record<DataResource>>> = Single.just(expectedRecords)
         val expected: Task = mockk()
-        val observer = slot<Single<List<DataRecord<ResourceContract.DataResource>>>>()
+        val observer = slot<Single<List<CallContract.Record<ResourceContract.DataResource>>>>()
 
         every { userService.finishLogin(true) } returns Single.just(true)
         every { userService.userID } returns Single.just(userId)
         every {
-            recordService.fetchDataRecords(
+            recordService.fetchDataRecords<DataResource>(
                 userId,
                 annotations,
                 startDate,

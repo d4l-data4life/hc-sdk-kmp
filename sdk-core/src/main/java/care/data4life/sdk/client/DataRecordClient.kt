@@ -17,66 +17,58 @@
 package care.data4life.sdk.client
 
 import care.data4life.sdk.auth.AuthContract
+import care.data4life.sdk.call.CallContract
 import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.call.Callback
-import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Task
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.resource.DataResource
 import care.data4life.sdk.resource.ResourceContract
 import care.data4life.sdk.tag.Annotations
-import io.reactivex.Single
 import org.threeten.bp.LocalDate
 
 internal class DataRecordClient(
-    private val userService: AuthContract.UserService,
+    userService: AuthContract.UserService,
     private val recordService: RecordContract.Service,
-    private val handler: CallHandler
-) : ResourceContract.Client {
-    private fun <T> executeOperationFlow(
-        operation: (userId: String) -> Single<T>,
-        callback: Callback<T>
-    ): Task {
-        val flow = userService.finishLogin(true)
-            .flatMap { userService.userID }
-            .flatMap { userId -> operation(userId) }
-        return handler.executeSingle(flow, callback)
-    }
-
-    override fun create(
-        resource: ResourceContract.DataResource,
+    handler: CallHandler
+) : ResourceContract.Client, Client(
+    userService,
+    handler
+) {
+    override fun <T : ResourceContract.DataResource> create(
+        resource: T,
         annotations: Annotations,
-        callback: Callback<DataRecord<ResourceContract.DataResource>>
+        callback: Callback<CallContract.Record<T>>
     ): Task = executeOperationFlow(
         { userId -> recordService.createRecord(userId, resource, annotations) },
         callback
     )
 
-    override fun update(
+    override fun <T : ResourceContract.DataResource> update(
         recordId: String,
-        resource: ResourceContract.DataResource,
+        resource: T,
         annotations: Annotations,
-        callback: Callback<DataRecord<ResourceContract.DataResource>>
+        callback: Callback<CallContract.Record<T>>
     ): Task = executeOperationFlow(
         { userId -> recordService.updateRecord(userId, recordId, resource, annotations) },
         callback
     )
 
-    override fun fetch(
+    override fun <T : ResourceContract.DataResource> fetch(
         recordId: String,
-        callback: Callback<DataRecord<ResourceContract.DataResource>>
+        callback: Callback<CallContract.Record<T>>
     ): Task = executeOperationFlow(
         { userId -> recordService.fetchDataRecord(userId, recordId) },
         callback
     )
 
-    override fun search(
+    override fun <T : ResourceContract.DataResource> search(
         annotations: Annotations,
         startDate: LocalDate?,
         endDate: LocalDate?,
         pageSize: Int,
         offset: Int,
-        callback: Callback<List<DataRecord<ResourceContract.DataResource>>>
+        callback: Callback<List<CallContract.Record<T>>>
     ): Task = executeOperationFlow(
         { userId ->
             recordService.fetchDataRecords(

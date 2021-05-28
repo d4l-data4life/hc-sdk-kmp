@@ -18,38 +18,29 @@ package care.data4life.sdk.client
 
 import care.data4life.sdk.SdkContract
 import care.data4life.sdk.auth.AuthContract
+import care.data4life.sdk.call.CallContract
 import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.call.Callback
-import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.call.Task
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.resource.Fhir4Attachment
 import care.data4life.sdk.resource.Fhir4Resource
 import care.data4life.sdk.tag.Annotations
-import io.reactivex.Single
 import org.threeten.bp.LocalDate
 
 internal class Fhir4RecordClient(
-    private val userService: AuthContract.UserService,
+    userService: AuthContract.UserService,
     private val recordService: RecordContract.Service,
-    private val handler: CallHandler
-) : SdkContract.Fhir4RecordClient {
-
-    private fun <T> executeOperationFlow(
-        operation: (userId: String) -> Single<T>,
-        callback: Callback<T>
-    ): Task {
-        val flow = userService.finishLogin(true)
-            .flatMap { userService.userID }
-            .flatMap { userId -> operation(userId) }
-        return handler.executeSingle(flow, callback)
-    }
-
+    handler: CallHandler
+) : SdkContract.Fhir4RecordClient, Client(
+    userService,
+    handler
+) {
     override fun <T : Fhir4Resource> create(
         resource: T,
         annotations: Annotations,
-        callback: Callback<Fhir4Record<T>>
+        callback: Callback<CallContract.Record<T>>
     ): Task = executeOperationFlow(
         { userId -> recordService.createRecord(userId, resource, annotations) },
         callback
@@ -59,7 +50,7 @@ internal class Fhir4RecordClient(
         recordId: String,
         resource: T,
         annotations: Annotations,
-        callback: Callback<Fhir4Record<T>>
+        callback: Callback<CallContract.Record<T>>
     ): Task = executeOperationFlow(
         { userId -> recordService.updateRecord(userId, recordId, resource, annotations) },
         callback
@@ -67,7 +58,7 @@ internal class Fhir4RecordClient(
 
     override fun <T : Fhir4Resource> fetch(
         recordId: String,
-        callback: Callback<Fhir4Record<T>>
+        callback: Callback<CallContract.Record<T>>
     ): Task = executeOperationFlow(
         { userId -> recordService.fetchFhir4Record(userId, recordId) },
         callback
@@ -80,7 +71,7 @@ internal class Fhir4RecordClient(
         endDate: LocalDate?,
         pageSize: Int,
         offset: Int,
-        callback: Callback<List<Fhir4Record<T>>>
+        callback: Callback<List<CallContract.Record<T>>>
     ): Task = executeOperationFlow(
         { userId ->
             recordService.fetchFhir4Records(
@@ -98,7 +89,7 @@ internal class Fhir4RecordClient(
 
     override fun <T : Fhir4Resource> download(
         recordId: String,
-        callback: Callback<Fhir4Record<T>>
+        callback: Callback<CallContract.Record<T>>
     ): Task = executeOperationFlow(
         { userId -> recordService.downloadFhir4Record(recordId, userId) },
         callback

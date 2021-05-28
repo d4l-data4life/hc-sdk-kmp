@@ -21,8 +21,7 @@ import care.data4life.sdk.attachment.AttachmentGuardian
 import care.data4life.sdk.attachment.AttachmentHasher
 import care.data4life.sdk.attachment.ThumbnailService
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
-import care.data4life.sdk.call.DataRecord
-import care.data4life.sdk.call.Fhir4Record
+import care.data4life.sdk.call.CallContract
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.crypto.CryptoContract
@@ -56,12 +55,12 @@ import care.data4life.sdk.record.RecordContract.Service.Companion.EMPTY_RECORD_I
 import care.data4life.sdk.record.RecordContract.Service.Companion.FULL_ATTACHMENT_ID_POS
 import care.data4life.sdk.record.RecordContract.Service.Companion.PREVIEW_ID_POS
 import care.data4life.sdk.record.RecordContract.Service.Companion.THUMBNAIL_ID_POS
-import care.data4life.sdk.resource.ResourceContract.DataResource
 import care.data4life.sdk.resource.Fhir3Attachment
 import care.data4life.sdk.resource.Fhir3Resource
 import care.data4life.sdk.resource.Fhir4Attachment
 import care.data4life.sdk.resource.Fhir4Resource
 import care.data4life.sdk.resource.ResourceContract
+import care.data4life.sdk.resource.ResourceContract.DataResource
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.util.Base64.decode
@@ -176,26 +175,26 @@ class RecordService internal constructor(
     ) as Single<Record<T>>
 
     @Suppress("UNCHECKED_CAST")
-    override fun createRecord(
+    override fun <T : DataResource> createRecord(
         userId: String,
-        resource: DataResource,
+        resource: T,
         annotations: Annotations
-    ): Single<DataRecord<DataResource>> = createRecord(
+    ): Single<CallContract.Record<T>> = createRecord(
         userId,
         resource as Any,
         annotations
-    ) as Single<DataRecord<DataResource>>
+    ) as Single<CallContract.Record<T>>
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Fhir4Resource> createRecord(
         userId: String,
         resource: T,
         annotations: Annotations
-    ): Single<Fhir4Record<T>> = createRecord(
+    ): Single<CallContract.Record<T>> = createRecord(
         userId,
         resource as Any,
         annotations
-    ) as Single<Fhir4Record<T>>
+    ) as Single<CallContract.Record<T>>
 
     fun <T : Fhir3Resource> createRecords(
         resources: List<T>,
@@ -262,14 +261,19 @@ class RecordService internal constructor(
     override fun <T : Fhir4Resource> fetchFhir4Record(
         userId: String,
         recordId: String
-    ): Single<Fhir4Record<T>> = _fetchRecord<T>(recordId, userId) as Single<Fhir4Record<T>>
+    ): Single<CallContract.Record<T>> = _fetchRecord<T>(
+        recordId,
+        userId
+    ) as Single<CallContract.Record<T>>
 
     @Suppress("UNCHECKED_CAST")
-    override fun fetchDataRecord(
+    override fun <T : DataResource> fetchDataRecord(
         userId: String,
         recordId: String
-    ): Single<DataRecord<DataResource>> =
-        _fetchRecord<DataResource>(recordId, userId) as Single<DataRecord<DataResource>>
+    ): Single<CallContract.Record<T>> = _fetchRecord<T>(
+        recordId,
+        userId
+    ) as Single<CallContract.Record<T>>
 
     fun <T : Fhir3Resource> fetchFhir3Records(
         recordIds: List<String>,
@@ -373,7 +377,7 @@ class RecordService internal constructor(
         endDate: LocalDate?,
         pageSize: Int,
         offset: Int
-    ): Single<List<Fhir4Record<T>>> = searchRecords(
+    ): Single<List<CallContract.Record<T>>> = searchRecords(
         userId,
         resourceType,
         annotations,
@@ -381,17 +385,17 @@ class RecordService internal constructor(
         endDate,
         pageSize,
         offset
-    ) as Single<List<Fhir4Record<T>>>
+    ) as Single<List<CallContract.Record<T>>>
 
     @Suppress("UNCHECKED_CAST")
-    override fun fetchDataRecords(
+    override fun <T : DataResource> fetchDataRecords(
         userId: String,
         annotations: Annotations,
         startDate: LocalDate?,
         endDate: LocalDate?,
         pageSize: Int,
         offset: Int
-    ): Single<List<DataRecord<DataResource>>> = searchRecords(
+    ): Single<List<CallContract.Record<T>>> = searchRecords(
         userId,
         DataResource::class.java,
         annotations,
@@ -399,7 +403,7 @@ class RecordService internal constructor(
         endDate,
         pageSize,
         offset
-    ) as Single<List<DataRecord<DataResource>>>
+    ) as Single<List<CallContract.Record<T>>>
 
     @Throws(
         DataRestrictionException.UnsupportedFileType::class,
@@ -474,25 +478,25 @@ class RecordService internal constructor(
         recordId: String,
         resource: T,
         annotations: Annotations
-    ): Single<Fhir4Record<T>> = updateRecord(
+    ): Single<CallContract.Record<T>> = updateRecord(
         userId,
         recordId,
         resource as Any,
         annotations
-    ) as Single<Fhir4Record<T>>
+    ) as Single<CallContract.Record<T>>
 
     @Suppress("UNCHECKED_CAST")
-    override fun updateRecord(
+    override fun <T : DataResource> updateRecord(
         userId: String,
         recordId: String,
         resource: DataResource,
         annotations: Annotations
-    ): Single<DataRecord<DataResource>> = updateRecord(
+    ): Single<CallContract.Record<T>> = updateRecord(
         userId,
         recordId,
         resource as Any,
         annotations
-    ) as Single<DataRecord<DataResource>>
+    ) as Single<CallContract.Record<T>>
 
     fun <T : Fhir3Resource> updateRecords(
         resources: List<T>,
@@ -566,6 +570,7 @@ class RecordService internal constructor(
         annotations: Annotations
     ): Single<Int> = _countRecords(type, userId, annotations)
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T : Fhir3Resource> downloadFhir3Record(
         recordId: String,
         userId: String
@@ -575,14 +580,15 @@ class RecordService internal constructor(
         ::isFhir3
     ) as Single<Record<T>>
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T : Fhir4Resource> downloadFhir4Record(
         recordId: String,
         userId: String
-    ): Single<Fhir4Record<T>> = downloadRecord<T>(
+    ): Single<CallContract.Record<T>> = downloadRecord<T>(
         recordId,
         userId,
         ::isFhir4
-    ) as Single<Fhir4Record<T>>
+    ) as Single<CallContract.Record<T>>
 
     private fun <T : Any> downloadRecord(
         recordId: String,
@@ -703,6 +709,7 @@ class RecordService internal constructor(
             throw IllegalArgumentException("The given Record does not match the expected resource type.")
         }
     }
+
     @Deprecated("This is a test concern and should be removed once a proper DI/SL is in place.")
     internal fun <T : Any> fromResource(
         resource: T,
@@ -762,8 +769,7 @@ class RecordService internal constructor(
                 userId
             )
                 .flattenAsObservable { attachment -> attachment }
-                .map {
-                    attachment ->
+                .map { attachment ->
                     if (attachment.id!!.contains(SPLIT_CHAR)) {
                         updateAttachmentMeta(attachment)
                     } else {

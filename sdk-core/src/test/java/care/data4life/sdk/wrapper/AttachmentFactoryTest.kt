@@ -16,9 +16,9 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.sdk.fhir.Fhir3Attachment
-import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.lang.CoreRuntimeException
+import care.data4life.sdk.resource.Fhir3Attachment
+import care.data4life.sdk.resource.Fhir4Attachment
 import io.mockk.mockk
 import org.junit.Test
 import kotlin.test.assertFailsWith

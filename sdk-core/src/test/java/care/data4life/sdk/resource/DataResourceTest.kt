@@ -14,7 +14,7 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.data
+package care.data4life.sdk.resource
 
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -119,7 +119,8 @@ class DataResourceTest {
     @Test
     fun `It equals if the values are equal and the given Resource is derived from Resource`() {
         @Suppress("ArrayInDataClass")
-        data class ShallowResource(override val value: ByteArray) : DataContract.Resource {
+        data class ShallowDataResource(override val value: ByteArray) :
+            ResourceContract.DataResource {
             override fun asByteArray(): ByteArray = TODO("Not yet implemented")
         }
 
@@ -130,6 +131,6 @@ class DataResourceTest {
         val resource = DataResource(value.clone())
 
         // Then
-        assertTrue(resource.equals(ShallowResource(value)))
+        assertTrue(resource.equals(ShallowDataResource(value)))
     }
 }

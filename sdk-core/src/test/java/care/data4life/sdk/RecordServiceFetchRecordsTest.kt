@@ -20,10 +20,6 @@ import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.crypto.CryptoContract
-import care.data4life.sdk.data.DataResource
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.migration.MigrationContract
 import care.data4life.sdk.model.ModelContract.BaseRecord
@@ -35,6 +31,10 @@ import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
+import care.data4life.sdk.resource.DataResource
+import care.data4life.sdk.resource.Fhir3Resource
+import care.data4life.sdk.resource.Fhir4Resource
+import care.data4life.sdk.resource.ResourceContract
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
@@ -66,7 +66,7 @@ class RecordServiceFetchRecordsTest {
     private lateinit var recordService: RecordService
     private val apiService: NetworkingContract.Service = mockk()
     private val cryptoService: CryptoContract.Service = mockk()
-    private val resourceCryptoService: FhirContract.CryptoService = mockk()
+    private val resourceCryptoService: ResourceContract.CryptoService = mockk()
     private val tagCryptoService: TaggingContract.CryptoService = mockk()
     private val taggingService: TaggingContract.Service = mockk()
     private val attachmentService: AttachmentContract.Service = mockk()

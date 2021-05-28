@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.sdk.fhir.Fhir3Attachment
+import care.data4life.sdk.resource.Fhir3Attachment
 
 internal class SdkFhir3Attachment(
     private val attachment: Fhir3Attachment

@@ -17,12 +17,12 @@
 package care.data4life.sdk.wrapper
 
 import care.data4life.fhir.FhirException
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
+import care.data4life.sdk.resource.Fhir3Resource
+import care.data4life.sdk.resource.Fhir4Resource
+import care.data4life.sdk.resource.ResourceContract
 import org.threeten.bp.LocalDate
 
 // TODO restructure this
@@ -46,7 +46,7 @@ class WrapperContract {
         @Throws(CoreRuntimeException.InternalFailure::class)
         fun getFhirTypeForClass(resourceType: Class<out Any>): String?
 
-        fun resolveFhirVersion(resourceType: Class<out Any>): FhirContract.FhirVersion
+        fun resolveFhirVersion(resourceType: Class<out Any>): ResourceContract.FhirVersion
 
         fun getFhir3ClassForType(resourceType: String): Class<out Fhir3Resource>?
 

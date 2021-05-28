@@ -20,11 +20,11 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.crypto.CryptoContract
-import care.data4life.sdk.data.DataResource
-import care.data4life.sdk.fhir.ResourceCryptoService
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.util.SearchTagsBuilder
 import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.resource.DataResource
+import care.data4life.sdk.resource.ResourceCryptoService
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TagCryptoService
 import care.data4life.sdk.tag.TaggingService

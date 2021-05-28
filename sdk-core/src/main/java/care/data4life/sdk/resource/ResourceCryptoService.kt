@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+ * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
  *
  * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
@@ -13,14 +13,12 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
-package care.data4life.sdk.fhir
+package care.data4life.sdk.resource
 
 import care.data4life.crypto.GCKey
 import care.data4life.crypto.error.CryptoException.DecryptionFailed
 import care.data4life.crypto.error.CryptoException.EncryptionFailed
 import care.data4life.sdk.crypto.CryptoContract
-import care.data4life.sdk.data.DataContract
-import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_KEY
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_FHIR_VERSION
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_RESOURCE_TYPE
@@ -31,11 +29,11 @@ import care.data4life.sdk.wrapper.WrapperContract
 // TODO internal
 class ResourceCryptoService constructor(
     private val cryptoService: CryptoContract.Service
-) : FhirContract.CryptoService {
+) : ResourceContract.CryptoService {
     private val parser: WrapperContract.FhirParser = SdkFhirParser
 
     override fun encryptResource(dataKey: GCKey, resource: Any): String {
-        return if (resource is DataContract.Resource) {
+        return if (resource is ResourceContract.DataResource) {
             encryptDataResource(dataKey, resource)
         } else {
             encryptFhirResource(dataKey, resource)
@@ -63,7 +61,7 @@ class ResourceCryptoService constructor(
 
     private fun encryptDataResource(
         dataKey: GCKey,
-        resource: DataContract.Resource
+        resource: ResourceContract.DataResource
     ): String {
         return propagateEncryptionErrors {
             cryptoService.encryptAndEncodeByteArray(
@@ -119,7 +117,7 @@ class ResourceCryptoService constructor(
     private fun decryptData(
         dataKey: GCKey,
         encryptedResource: String
-    ): DataContract.Resource {
+    ): ResourceContract.DataResource {
         return propagateDecryptionErrors {
             DataResource(
                 cryptoService.decodeAndDecryptByteArray(

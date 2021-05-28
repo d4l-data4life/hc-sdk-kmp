@@ -16,10 +16,10 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.sdk.fhir.Fhir3Identifier
-import care.data4life.sdk.fhir.Fhir4Identifier
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.resource.Fhir3Identifier
+import care.data4life.sdk.resource.Fhir4Identifier
 
 internal object SdkIdentifierFactory : WrapperFactoryContract.IdentifierFactory {
     @Throws(DataValidationException.CustomDataLimitViolation::class)

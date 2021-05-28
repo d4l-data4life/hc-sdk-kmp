@@ -21,13 +21,6 @@ import care.data4life.sdk.attachment.AttachmentHasher
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.crypto.CryptoContract
-import care.data4life.sdk.fhir.Fhir3Attachment
-import care.data4life.sdk.fhir.Fhir3Identifier
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir4Attachment
-import care.data4life.sdk.fhir.Fhir4Identifier
-import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.Record
@@ -38,6 +31,13 @@ import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
 import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.resource.Fhir3Attachment
+import care.data4life.sdk.resource.Fhir3Identifier
+import care.data4life.sdk.resource.Fhir3Resource
+import care.data4life.sdk.resource.Fhir4Attachment
+import care.data4life.sdk.resource.Fhir4Identifier
+import care.data4life.sdk.resource.Fhir4Resource
+import care.data4life.sdk.resource.ResourceContract
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.ATTACHMENT_ID
@@ -71,7 +71,7 @@ class RecordServiceTest {
     private lateinit var recordService: RecordService
     private val apiService: NetworkingContract.Service = mockk()
     private val cryptoService: CryptoContract.Service = mockk()
-    private val resourceCryptoService: FhirContract.CryptoService = mockk()
+    private val resourceCryptoService: ResourceContract.CryptoService = mockk()
     private val tagCryptoService: TaggingContract.CryptoService = mockk()
     private val taggingService: TaggingContract.Service = mockk()
     private val attachmentService: AttachmentContract.Service = mockk()

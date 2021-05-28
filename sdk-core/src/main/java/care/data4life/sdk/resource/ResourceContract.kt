@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+ * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
  *
  * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
@@ -14,17 +14,34 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.data
+package care.data4life.sdk.resource
 
+import care.data4life.crypto.GCKey
 import care.data4life.sdk.SdkContract
+import care.data4life.sdk.tag.Tags
 
-// TODO: merge with FhirContract
-interface DataContract {
+interface ResourceContract {
+
+    interface CryptoService {
+        fun encryptResource(dataKey: GCKey, resource: Any): String
+
+        fun <T : Any> decryptResource(
+            dataKey: GCKey,
+            tags: Tags,
+            encryptedResource: String
+        ): T
+    }
 
     interface Client : SdkContract.DataRecordClient
 
-    interface Resource {
+    interface DataResource {
         val value: ByteArray
         fun asByteArray(): ByteArray
+    }
+
+    enum class FhirVersion(val version: String) {
+        FHIR_3("3.0.1"),
+        FHIR_4("4.0.1"),
+        UNKNOWN("unknown")
     }
 }

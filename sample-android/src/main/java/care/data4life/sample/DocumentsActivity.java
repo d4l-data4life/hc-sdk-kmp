@@ -57,7 +57,7 @@ import care.data4life.sdk.Data4LifeClient;
 import care.data4life.sdk.call.DataRecord;
 import care.data4life.sdk.call.Task;
 import care.data4life.sdk.config.DataRestrictionException;
-import care.data4life.sdk.data.DataResource;
+import care.data4life.sdk.resource.DataResource;
 import care.data4life.sdk.helpers.stu3.DocumentReferenceExtension;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.Callback;

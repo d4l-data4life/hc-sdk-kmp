@@ -16,10 +16,10 @@
 package care.data4life.sdk.tag
 
 import care.data4life.fhir.stu3.model.Patient
-import care.data4life.sdk.data.DataResource
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.FhirContract
+import care.data4life.sdk.resource.DataResource
+import care.data4life.sdk.resource.Fhir3Resource
+import care.data4life.sdk.resource.Fhir4Resource
+import care.data4life.sdk.resource.ResourceContract
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_KEY
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_VALUE
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_CLIENT
@@ -75,7 +75,7 @@ class TaggingServiceTest {
         assertEquals(PARTNER_ID, result[TAG_PARTNER])
         assertFalse(result.containsKey(TAG_APPDATA_KEY))
         assertTrue(result.containsKey(TAG_FHIR_VERSION))
-        assertEquals(FhirContract.FhirVersion.FHIR_3.version, result[TAG_FHIR_VERSION])
+        assertEquals(ResourceContract.FhirVersion.FHIR_3.version, result[TAG_FHIR_VERSION])
         assertFalse(result.containsKey(TAG_APPDATA_KEY))
     }
 
@@ -97,7 +97,7 @@ class TaggingServiceTest {
         assertEquals(PARTNER_ID, result[TAG_PARTNER])
         assertFalse(result.containsKey(TAG_APPDATA_KEY))
         assertTrue(result.containsKey(TAG_FHIR_VERSION))
-        assertEquals(FhirContract.FhirVersion.FHIR_4.version, result[TAG_FHIR_VERSION])
+        assertEquals(ResourceContract.FhirVersion.FHIR_4.version, result[TAG_FHIR_VERSION])
         assertFalse(result.containsKey(TAG_APPDATA_KEY))
     }
 
@@ -143,7 +143,7 @@ class TaggingServiceTest {
         assertTrue(result.containsKey(TAG_PARTNER))
         assertEquals(PARTNER_ID, result[TAG_PARTNER])
         assertTrue(result.containsKey(TAG_FHIR_VERSION))
-        assertEquals(FhirContract.FhirVersion.FHIR_3.version, result[TAG_FHIR_VERSION])
+        assertEquals(ResourceContract.FhirVersion.FHIR_3.version, result[TAG_FHIR_VERSION])
         assertFalse(result.containsKey(TAG_APPDATA_KEY))
     }
 
@@ -166,7 +166,7 @@ class TaggingServiceTest {
         assertTrue(result.containsKey(TAG_PARTNER))
         assertEquals(PARTNER_ID, result[TAG_PARTNER])
         assertTrue(result.containsKey(TAG_FHIR_VERSION))
-        assertEquals(FhirContract.FhirVersion.FHIR_3.version, result[TAG_FHIR_VERSION])
+        assertEquals(ResourceContract.FhirVersion.FHIR_3.version, result[TAG_FHIR_VERSION])
         assertFalse(result.containsKey(TAG_APPDATA_KEY))
     }
 
@@ -178,7 +178,7 @@ class TaggingServiceTest {
 
         mockkObject(SdkFhirElementFactory)
         every { SdkFhirElementFactory.getFhirTypeForClass(Patient::class.java) } returns resourceType
-        every { SdkFhirElementFactory.resolveFhirVersion(Patient::class.java) } returns FhirContract.FhirVersion.FHIR_3
+        every { SdkFhirElementFactory.resolveFhirVersion(Patient::class.java) } returns ResourceContract.FhirVersion.FHIR_3
         // When
         @Suppress("UNCHECKED_CAST")
         val result = taggingService.getTagsFromType(type::class.java as Class<Any>)
@@ -188,7 +188,7 @@ class TaggingServiceTest {
         assertTrue(result.containsKey(TAG_RESOURCE_TYPE))
         assertEquals(resourceType, result[TAG_RESOURCE_TYPE])
         assertTrue(result.containsKey(TAG_FHIR_VERSION))
-        assertEquals(FhirContract.FhirVersion.FHIR_3.version, result[TAG_FHIR_VERSION])
+        assertEquals(ResourceContract.FhirVersion.FHIR_3.version, result[TAG_FHIR_VERSION])
 
         verify(exactly = 1) { SdkFhirElementFactory.getFhirTypeForClass(Patient::class.java) }
         verify(exactly = 1) { SdkFhirElementFactory.resolveFhirVersion(Patient::class.java) }
@@ -204,7 +204,7 @@ class TaggingServiceTest {
 
         mockkObject(SdkFhirElementFactory)
         every { SdkFhirElementFactory.getFhirTypeForClass(Fhir3Resource::class.java) } returns resourceType
-        every { SdkFhirElementFactory.resolveFhirVersion(Fhir3Resource::class.java) } returns FhirContract.FhirVersion.FHIR_3
+        every { SdkFhirElementFactory.resolveFhirVersion(Fhir3Resource::class.java) } returns ResourceContract.FhirVersion.FHIR_3
         // When
         @Suppress("UNCHECKED_CAST")
         val result = taggingService.getTagsFromType(type::class.java as Class<Any>)
@@ -213,7 +213,7 @@ class TaggingServiceTest {
         assertEquals(1, result.size)
         assertFalse(result.containsKey(TAG_RESOURCE_TYPE))
         assertTrue(result.containsKey(TAG_FHIR_VERSION))
-        assertEquals(FhirContract.FhirVersion.FHIR_3.version, result[TAG_FHIR_VERSION])
+        assertEquals(ResourceContract.FhirVersion.FHIR_3.version, result[TAG_FHIR_VERSION])
 
         verify(exactly = 1) { SdkFhirElementFactory.getFhirTypeForClass(Fhir3Resource::class.java) }
         verify(exactly = 1) { SdkFhirElementFactory.resolveFhirVersion(Fhir3Resource::class.java) }
@@ -229,7 +229,7 @@ class TaggingServiceTest {
 
         mockkObject(SdkFhirElementFactory)
         every { SdkFhirElementFactory.getFhirTypeForClass(R4Patient::class.java) } returns resourceType
-        every { SdkFhirElementFactory.resolveFhirVersion(R4Patient::class.java) } returns FhirContract.FhirVersion.FHIR_4
+        every { SdkFhirElementFactory.resolveFhirVersion(R4Patient::class.java) } returns ResourceContract.FhirVersion.FHIR_4
         // When
         @Suppress("UNCHECKED_CAST")
         val result = taggingService.getTagsFromType(type::class.java as Class<Any>)
@@ -239,7 +239,7 @@ class TaggingServiceTest {
         assertTrue(result.containsKey(TAG_RESOURCE_TYPE))
         assertEquals(resourceType, result[TAG_RESOURCE_TYPE])
         assertTrue(result.containsKey(TAG_FHIR_VERSION))
-        assertEquals(FhirContract.FhirVersion.FHIR_4.version, result[TAG_FHIR_VERSION])
+        assertEquals(ResourceContract.FhirVersion.FHIR_4.version, result[TAG_FHIR_VERSION])
 
         verify(exactly = 1) { SdkFhirElementFactory.getFhirTypeForClass(R4Patient::class.java) }
         verify(exactly = 1) { SdkFhirElementFactory.resolveFhirVersion(R4Patient::class.java) }
@@ -255,7 +255,7 @@ class TaggingServiceTest {
 
         mockkObject(SdkFhirElementFactory)
         every { SdkFhirElementFactory.getFhirTypeForClass(Fhir4Resource::class.java) } returns resourceType
-        every { SdkFhirElementFactory.resolveFhirVersion(Fhir4Resource::class.java) } returns FhirContract.FhirVersion.FHIR_4
+        every { SdkFhirElementFactory.resolveFhirVersion(Fhir4Resource::class.java) } returns ResourceContract.FhirVersion.FHIR_4
         // When
         @Suppress("UNCHECKED_CAST")
         val result = taggingService.getTagsFromType(type::class.java as Class<Any>)
@@ -264,7 +264,7 @@ class TaggingServiceTest {
         assertEquals(1, result.size)
         assertFalse(result.containsKey(TAG_RESOURCE_TYPE))
         assertTrue(result.containsKey(TAG_FHIR_VERSION))
-        assertEquals(FhirContract.FhirVersion.FHIR_4.version, result[TAG_FHIR_VERSION])
+        assertEquals(ResourceContract.FhirVersion.FHIR_4.version, result[TAG_FHIR_VERSION])
 
         verify(exactly = 1) { SdkFhirElementFactory.getFhirTypeForClass(Fhir4Resource::class.java) }
         verify(exactly = 1) { SdkFhirElementFactory.resolveFhirVersion(Fhir4Resource::class.java) }
@@ -278,7 +278,7 @@ class TaggingServiceTest {
         val type: DataResource = mockk()
 
         mockkObject(SdkFhirElementFactory)
-        every { SdkFhirElementFactory.resolveFhirVersion(DataResource::class.java) } returns FhirContract.FhirVersion.UNKNOWN
+        every { SdkFhirElementFactory.resolveFhirVersion(DataResource::class.java) } returns ResourceContract.FhirVersion.UNKNOWN
         // When
         @Suppress("UNCHECKED_CAST")
         val result = taggingService.getTagsFromType(type::class.java as Class<Any>)

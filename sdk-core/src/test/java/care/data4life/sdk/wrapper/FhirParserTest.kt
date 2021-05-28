@@ -16,10 +16,10 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
+import care.data4life.sdk.resource.Fhir3Resource
+import care.data4life.sdk.resource.Fhir4Resource
+import care.data4life.sdk.resource.ResourceContract
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -48,7 +48,7 @@ class FhirParserTest {
         // When
         val resource: Any = SdkFhirParser.toFhir(
             type,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             source
         )
 
@@ -65,7 +65,7 @@ class FhirParserTest {
         // When
         val resource: Any = SdkFhirParser.toFhir(
             type,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             source
         )
 

@@ -16,8 +16,8 @@
 
 package care.data4life.sdk.attachment
 
-import care.data4life.sdk.fhir.Fhir3Attachment
-import care.data4life.sdk.fhir.Fhir3DateTimeParser
+import care.data4life.sdk.resource.Fhir3Attachment
+import care.data4life.sdk.resource.Fhir3DateTimeParser
 import care.data4life.sdk.wrapper.SdkFhir3Attachment
 import care.data4life.sdk.wrapper.WrapperContract
 import io.mockk.every

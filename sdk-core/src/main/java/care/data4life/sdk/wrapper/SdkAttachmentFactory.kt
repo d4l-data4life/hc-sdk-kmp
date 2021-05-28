@@ -16,10 +16,10 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.sdk.fhir.Fhir3Attachment
-import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.resource.Fhir3Attachment
+import care.data4life.sdk.resource.Fhir4Attachment
 
 internal object SdkAttachmentFactory : WrapperFactoryContract.AttachmentFactory {
     @Throws(DataValidationException.CustomDataLimitViolation::class)

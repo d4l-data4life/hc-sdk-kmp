@@ -2,10 +2,10 @@ package care.data4life.sdk.wrapper
 
 import care.data4life.fhir.Fhir
 import care.data4life.fhir.FhirParser
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
+import care.data4life.sdk.resource.Fhir3Resource
+import care.data4life.sdk.resource.Fhir4Resource
+import care.data4life.sdk.resource.ResourceContract
 
 internal object SdkFhirParser : WrapperContract.FhirParser {
     private val fhir3Parser: FhirParser<Any> = Fhir().createStu3Parser()
@@ -15,8 +15,8 @@ internal object SdkFhirParser : WrapperContract.FhirParser {
     // ToDo once KMP Fhir is in place replace any by the base fhir type
     override fun <T : Any> toFhir(resourceType: String, version: String, source: String): T {
         return when (version) {
-            FhirContract.FhirVersion.FHIR_3.version -> toFhir3(resourceType, source)
-            FhirContract.FhirVersion.FHIR_4.version -> toFhir4(resourceType, source)
+            ResourceContract.FhirVersion.FHIR_3.version -> toFhir3(resourceType, source)
+            ResourceContract.FhirVersion.FHIR_4.version -> toFhir4(resourceType, source)
             else -> throw CoreRuntimeException.UnsupportedOperation()
         } as T
     }

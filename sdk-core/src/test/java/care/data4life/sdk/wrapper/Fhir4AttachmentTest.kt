@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.sdk.fhir.Fhir4Attachment
+import care.data4life.sdk.resource.Fhir4Attachment
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame

@@ -20,17 +20,17 @@ import care.data4life.fhir.r4.model.Extension
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.crypto.CryptoContract
-import care.data4life.sdk.fhir.Fhir3Attachment
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir4Attachment
-import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
+import care.data4life.sdk.resource.Fhir3Attachment
+import care.data4life.sdk.resource.Fhir3Resource
+import care.data4life.sdk.resource.Fhir4Attachment
+import care.data4life.sdk.resource.Fhir4Resource
+import care.data4life.sdk.resource.ResourceContract
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ADDITIONAL_ID
@@ -87,7 +87,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
     private lateinit var recordService: RecordService
     private val apiService: NetworkingContract.Service = mockk()
     private val cryptoService: CryptoContract.Service = mockk()
-    private val resourceCryptoService: FhirContract.CryptoService = mockk()
+    private val resourceCryptoService: ResourceContract.CryptoService = mockk()
     private val tagCryptoService: TaggingContract.CryptoService = mockk()
     private val taggingService: TaggingContract.Service = mockk()
     private val attachmentService: AttachmentContract.Service = mockk()
@@ -315,7 +315,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -340,7 +340,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
         // When
@@ -366,7 +366,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(
                 determineFhir3Folder(resourcePrefixes),
                 "$resourceName-nulled-attachment"
@@ -394,7 +394,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(
                 determineFhir4Folder(resourcePrefixes),
                 "$resourceName-nulled-attachment"
@@ -415,7 +415,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -456,7 +456,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
@@ -494,7 +494,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val originalResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -544,7 +544,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val originalResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
@@ -654,7 +654,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -732,7 +732,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
@@ -759,7 +759,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -784,7 +784,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
@@ -803,7 +803,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -825,7 +825,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
@@ -842,7 +842,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -864,7 +864,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
@@ -883,7 +883,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -989,7 +989,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 
@@ -1095,7 +1095,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
@@ -1191,7 +1191,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
@@ -1297,7 +1297,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             TestResourceHelper.getJSONResource(determineFhir4Folder(resourcePrefixes), resourceName)
         )
 
@@ -1403,7 +1403,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
         // Given
         val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             TestResourceHelper.getJSONResource(determineFhir3Folder(resourcePrefixes), resourceName)
         )
 

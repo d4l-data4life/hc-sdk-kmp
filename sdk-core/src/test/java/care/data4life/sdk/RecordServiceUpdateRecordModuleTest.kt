@@ -24,19 +24,19 @@ import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.crypto.CryptoContract
-import care.data4life.sdk.data.DataResource
-import care.data4life.sdk.fhir.Fhir3Identifier
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir4Identifier
-import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.FhirContract
-import care.data4life.sdk.fhir.ResourceCryptoService
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.record.RecordContract
+import care.data4life.sdk.resource.DataResource
+import care.data4life.sdk.resource.Fhir3Identifier
+import care.data4life.sdk.resource.Fhir3Resource
+import care.data4life.sdk.resource.Fhir4Identifier
+import care.data4life.sdk.resource.Fhir4Resource
+import care.data4life.sdk.resource.ResourceContract
+import care.data4life.sdk.resource.ResourceCryptoService
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TagCryptoService
 import care.data4life.sdk.tag.TaggingService
@@ -477,13 +477,13 @@ class RecordServiceUpdateRecordModuleTest {
 
         val resourceNew = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         val resourceOld = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
@@ -546,13 +546,13 @@ class RecordServiceUpdateRecordModuleTest {
 
         val resourceNew = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         val resourceOld = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
@@ -626,19 +626,19 @@ class RecordServiceUpdateRecordModuleTest {
 
         val internalResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         val resourceNew = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         val resourceOld = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
@@ -755,19 +755,19 @@ class RecordServiceUpdateRecordModuleTest {
 
         val internalResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         val resourceNew = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         val resourceOld = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
@@ -874,19 +874,19 @@ class RecordServiceUpdateRecordModuleTest {
 
         val internalResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         val resourceNew = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         val resourceOld = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
@@ -941,19 +941,19 @@ class RecordServiceUpdateRecordModuleTest {
 
         val internalResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         val resourceNew = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         val resourceOld = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
@@ -1031,13 +1031,13 @@ class RecordServiceUpdateRecordModuleTest {
 
         val resourceNew = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         val resourceOld = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
@@ -1100,13 +1100,13 @@ class RecordServiceUpdateRecordModuleTest {
 
         val resourceNew = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         val resourceOld = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
@@ -1180,19 +1180,19 @@ class RecordServiceUpdateRecordModuleTest {
 
         val internalResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         val resourceNew = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         val resourceOld = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
@@ -1309,19 +1309,19 @@ class RecordServiceUpdateRecordModuleTest {
 
         val internalResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         val resourceNew = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         val resourceOld = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
@@ -1428,19 +1428,19 @@ class RecordServiceUpdateRecordModuleTest {
 
         val internalResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         val resourceNew = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         val resourceOld = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
@@ -1589,13 +1589,13 @@ class RecordServiceUpdateRecordModuleTest {
 
         val resourceNew = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         val resourceOld = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_3.version,
+            ResourceContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
@@ -1650,19 +1650,19 @@ class RecordServiceUpdateRecordModuleTest {
 
         val internalResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         val resourceNew = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         val resourceOld = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
-            FhirContract.FhirVersion.FHIR_4.version,
+            ResourceContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 

@@ -19,9 +19,6 @@ package care.data4life.sdk.model
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
-import care.data4life.sdk.data.DataResource
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.ModelContract.Fhir3Record
 import care.data4life.sdk.model.ModelContract.RecordFactory
@@ -29,6 +26,9 @@ import care.data4life.sdk.network.model.DecryptedDataRecord
 import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
+import care.data4life.sdk.resource.DataResource
+import care.data4life.sdk.resource.Fhir3Resource
+import care.data4life.sdk.resource.Fhir4Resource
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.wrapper.SdkDateTimeFormatter

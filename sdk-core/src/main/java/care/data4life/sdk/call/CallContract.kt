@@ -21,7 +21,6 @@ import care.data4life.sdk.model.ModelContract.BaseRecord
 import care.data4life.sdk.tag.Annotations
 
 class CallContract {
-
     interface Record<T> : BaseRecord<T> {
         override val identifier: String
         override val resource: T

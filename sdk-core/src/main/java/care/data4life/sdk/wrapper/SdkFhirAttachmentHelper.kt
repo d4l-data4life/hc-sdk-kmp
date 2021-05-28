@@ -16,15 +16,15 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.sdk.fhir.Fhir3Attachment
-import care.data4life.sdk.fhir.Fhir3AttachmentHelper
-import care.data4life.sdk.fhir.Fhir3Identifier
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir4Attachment
-import care.data4life.sdk.fhir.Fhir4AttachmentHelper
-import care.data4life.sdk.fhir.Fhir4Identifier
-import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
+import care.data4life.sdk.resource.Fhir3Attachment
+import care.data4life.sdk.resource.Fhir3AttachmentHelper
+import care.data4life.sdk.resource.Fhir3Identifier
+import care.data4life.sdk.resource.Fhir3Resource
+import care.data4life.sdk.resource.Fhir4Attachment
+import care.data4life.sdk.resource.Fhir4AttachmentHelper
+import care.data4life.sdk.resource.Fhir4Identifier
+import care.data4life.sdk.resource.Fhir4Resource
 
 internal object SdkFhirAttachmentHelper : HelperContract.FhirAttachmentHelper {
 

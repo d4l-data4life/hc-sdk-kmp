@@ -18,13 +18,13 @@ package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.crypto.CryptoContract
-import care.data4life.sdk.data.DataResource
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.network.NetworkingContract
+import care.data4life.sdk.resource.DataResource
+import care.data4life.sdk.resource.Fhir3Resource
+import care.data4life.sdk.resource.Fhir4Resource
+import care.data4life.sdk.resource.ResourceContract
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.Tags
@@ -50,7 +50,7 @@ class RecordCryptoServiceTest {
     private val cryptoService: CryptoContract.Service = mockk()
     private val taggingService: TaggingContract.Service = mockk()
     private val tagCryptoService: TaggingContract.CryptoService = mockk()
-    private val resourceCryptoService: FhirContract.CryptoService = mockk()
+    private val resourceCryptoService: ResourceContract.CryptoService = mockk()
     private val dateTimeFormatter: WrapperContract.DateTimeFormatter = mockk()
     private val limitGuard: NetworkModelContract.LimitGuard = mockk()
     private val modelVersion: ModelContract.ModelVersion = mockk()

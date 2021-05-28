@@ -14,7 +14,7 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.fhir
+package care.data4life.sdk.resource
 
 typealias Fhir3Resource = care.data4life.fhir.stu3.model.DomainResource
 typealias Fhir4Resource = care.data4life.fhir.r4.model.DomainResource

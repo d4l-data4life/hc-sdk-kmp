@@ -15,9 +15,9 @@
  */
 package care.data4life.sdk.tag
 
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.FhirContract
+import care.data4life.sdk.resource.Fhir3Resource
+import care.data4life.sdk.resource.Fhir4Resource
+import care.data4life.sdk.resource.ResourceContract
 import care.data4life.sdk.tag.TaggingContract.Companion.SEPARATOR
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_KEY
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_VALUE
@@ -69,11 +69,11 @@ class TaggingService(
             is Fhir3Resource -> appendCommonDefaultTags(
                 resource.resourceType,
                 oldTags
-            ).also { tags -> tagVersion(tags, FhirContract.FhirVersion.FHIR_3) }
+            ).also { tags -> tagVersion(tags, ResourceContract.FhirVersion.FHIR_3) }
             is Fhir4Resource -> appendCommonDefaultTags(
                 resource.resourceType,
                 oldTags
-            ).also { tags -> tagVersion(tags, FhirContract.FhirVersion.FHIR_4) }
+            ).also { tags -> tagVersion(tags, ResourceContract.FhirVersion.FHIR_4) }
             else -> appendCommonDefaultTags(
                 null,
                 oldTags
@@ -83,9 +83,9 @@ class TaggingService(
 
     private fun tagVersion(
         tags: MutableMap<String, String>,
-        version: FhirContract.FhirVersion
+        version: ResourceContract.FhirVersion
     ) {
-        if (version == FhirContract.FhirVersion.UNKNOWN) {
+        if (version == ResourceContract.FhirVersion.UNKNOWN) {
             tags[TAG_APPDATA_KEY] = TAG_APPDATA_VALUE
         } else {
             tags[TAG_FHIR_VERSION] = version.version
@@ -99,7 +99,7 @@ class TaggingService(
             val version = fhirElementFactory.resolveFhirVersion(resourceType)
             tagVersion(tags, version)
 
-            if (version != FhirContract.FhirVersion.UNKNOWN) {
+            if (version != ResourceContract.FhirVersion.UNKNOWN) {
                 fhirElementFactory.getFhirTypeForClass(resourceType).also { resourceTagValue ->
                     if (resourceTagValue is String) {
                         tags[TAG_RESOURCE_TYPE] = resourceTagValue

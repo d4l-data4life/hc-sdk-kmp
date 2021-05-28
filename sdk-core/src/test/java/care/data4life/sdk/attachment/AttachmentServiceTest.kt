@@ -19,10 +19,10 @@ package care.data4life.sdk.attachment
 import care.data4life.crypto.GCKey
 import care.data4life.fhir.stu3.util.FhirDateTimeParser
 import care.data4life.sdk.config.DataRestrictionException
-import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.helpers.stu3.AttachmentBuilder.buildWith
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException.InvalidAttachmentPayloadHash
+import care.data4life.sdk.resource.Fhir3Attachment
 import care.data4life.sdk.wrapper.SdkAttachmentFactory
 import care.data4life.sdk.wrapper.WrapperContract
 import com.google.common.truth.Truth

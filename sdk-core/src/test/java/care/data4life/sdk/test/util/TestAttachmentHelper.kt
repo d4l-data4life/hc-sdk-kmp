@@ -16,8 +16,8 @@
 
 package care.data4life.sdk.test.util
 
-import care.data4life.sdk.fhir.Fhir3Attachment
-import care.data4life.sdk.fhir.Fhir4Attachment
+import care.data4life.sdk.resource.Fhir3Attachment
+import care.data4life.sdk.resource.Fhir4Attachment
 
 object TestAttachmentHelper {
     @JvmStatic

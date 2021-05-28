@@ -16,12 +16,12 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.sdk.fhir.Fhir3ElementFactory
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir4ElementFactory
-import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
+import care.data4life.sdk.resource.Fhir3ElementFactory
+import care.data4life.sdk.resource.Fhir3Resource
+import care.data4life.sdk.resource.Fhir4ElementFactory
+import care.data4life.sdk.resource.Fhir4Resource
+import care.data4life.sdk.resource.ResourceContract
 
 internal object SdkFhirElementFactory : WrapperContract.FhirElementFactory {
     private val fhir3Indicator = Fhir3Resource::class.java.`package`
@@ -37,11 +37,11 @@ internal object SdkFhirElementFactory : WrapperContract.FhirElementFactory {
         }
     }
 
-    override fun resolveFhirVersion(resourceType: Class<out Any>): FhirContract.FhirVersion {
+    override fun resolveFhirVersion(resourceType: Class<out Any>): ResourceContract.FhirVersion {
         return when (resourceType.`package`) {
-            fhir3Indicator -> FhirContract.FhirVersion.FHIR_3
-            fhir4Indicator -> FhirContract.FhirVersion.FHIR_4
-            else -> FhirContract.FhirVersion.UNKNOWN
+            fhir3Indicator -> ResourceContract.FhirVersion.FHIR_3
+            fhir4Indicator -> ResourceContract.FhirVersion.FHIR_4
+            else -> ResourceContract.FhirVersion.UNKNOWN
         }
     }
 

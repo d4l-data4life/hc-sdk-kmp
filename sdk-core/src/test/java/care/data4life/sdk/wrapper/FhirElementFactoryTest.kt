@@ -16,8 +16,8 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
+import care.data4life.sdk.resource.ResourceContract
 import care.data4life.sdk.test.util.TestResourceHelper.buildDocumentReferenceFhir3
 import care.data4life.sdk.test.util.TestResourceHelper.buildDocumentReferenceFhir4
 import org.junit.Test
@@ -89,7 +89,7 @@ class FhirElementFactoryTest {
 
         assertEquals(
             actual = type,
-            expected = FhirContract.FhirVersion.FHIR_3
+            expected = ResourceContract.FhirVersion.FHIR_3
         )
     }
 
@@ -103,7 +103,7 @@ class FhirElementFactoryTest {
 
         assertEquals(
             actual = type,
-            expected = FhirContract.FhirVersion.FHIR_4
+            expected = ResourceContract.FhirVersion.FHIR_4
         )
     }
 
@@ -117,7 +117,7 @@ class FhirElementFactoryTest {
 
         assertEquals(
             actual = type,
-            expected = FhirContract.FhirVersion.UNKNOWN
+            expected = ResourceContract.FhirVersion.UNKNOWN
         )
     }
 

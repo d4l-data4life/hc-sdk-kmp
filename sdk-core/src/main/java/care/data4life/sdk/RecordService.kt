@@ -26,12 +26,6 @@ import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.crypto.CryptoContract
-import care.data4life.sdk.data.DataResource
-import care.data4life.sdk.fhir.Fhir3Attachment
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir4Attachment
-import care.data4life.sdk.fhir.Fhir4Resource
-import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
@@ -62,6 +56,12 @@ import care.data4life.sdk.record.RecordContract.Service.Companion.EMPTY_RECORD_I
 import care.data4life.sdk.record.RecordContract.Service.Companion.FULL_ATTACHMENT_ID_POS
 import care.data4life.sdk.record.RecordContract.Service.Companion.PREVIEW_ID_POS
 import care.data4life.sdk.record.RecordContract.Service.Companion.THUMBNAIL_ID_POS
+import care.data4life.sdk.resource.DataResource
+import care.data4life.sdk.resource.Fhir3Attachment
+import care.data4life.sdk.resource.Fhir3Resource
+import care.data4life.sdk.resource.Fhir4Attachment
+import care.data4life.sdk.resource.Fhir4Resource
+import care.data4life.sdk.resource.ResourceContract
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.util.Base64.decode
@@ -87,7 +87,7 @@ class RecordService internal constructor(
     private val apiService: NetworkingContract.Service,
     tagCryptoService: TaggingContract.CryptoService,
     private val taggingService: TaggingContract.Service,
-    resourceCryptoService: FhirContract.CryptoService,
+    resourceCryptoService: ResourceContract.CryptoService,
     private val attachmentService: AttachmentContract.Service,
     private val cryptoService: CryptoContract.Service,
     private val errorHandler: SdkContract.ErrorHandler,
@@ -100,7 +100,7 @@ class RecordService internal constructor(
         apiService: NetworkingContract.Service,
         tagCryptoService: TaggingContract.CryptoService,
         taggingService: TaggingContract.Service,
-        resourceCryptoService: FhirContract.CryptoService,
+        resourceCryptoService: ResourceContract.CryptoService,
         attachmentService: AttachmentContract.Service,
         cryptoService: CryptoContract.Service,
         errorHandler: SdkContract.ErrorHandler

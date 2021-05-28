@@ -19,11 +19,11 @@ import care.data4life.sdk.call.Callback
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.call.Task
-import care.data4life.sdk.data.DataResource
-import care.data4life.sdk.fhir.Fhir4Attachment
-import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.model.DownloadType
+import care.data4life.sdk.resource.DataResource
+import care.data4life.sdk.resource.Fhir4Attachment
+import care.data4life.sdk.resource.Fhir4Resource
 import care.data4life.sdk.tag.Annotations
 import org.threeten.bp.LocalDate
 import care.data4life.sdk.listener.Callback as LegacyCallback

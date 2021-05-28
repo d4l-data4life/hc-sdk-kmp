@@ -15,10 +15,10 @@
  */
 package care.data4life.sdk.call
 
-import care.data4life.sdk.data.DataContract
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.model.ModelContract
+import care.data4life.sdk.resource.Fhir3Resource
+import care.data4life.sdk.resource.Fhir4Resource
+import care.data4life.sdk.resource.ResourceContract
 import care.data4life.sdk.tag.Annotations
 
 sealed class Record
@@ -37,7 +37,7 @@ class Fhir4Record<T : Fhir4Resource>(
     override val annotations: Annotations
 ) : CallContract.Record<T>, Record()
 
-data class DataRecord<T : DataContract.Resource>(
+data class DataRecord<T : ResourceContract.DataResource>(
     override val identifier: String,
     override val resource: T,
     override val meta: ModelContract.Meta,

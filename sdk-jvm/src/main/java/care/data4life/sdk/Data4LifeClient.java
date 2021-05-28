@@ -30,7 +30,7 @@ import care.data4life.sdk.attachment.FileService;
 import care.data4life.sdk.auth.UserService;
 import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.config.SDKConfig;
-import care.data4life.sdk.fhir.ResourceCryptoService;
+import care.data4life.sdk.resource.ResourceCryptoService;
 import care.data4life.sdk.log.Log;
 import care.data4life.sdk.log.Logger;
 import care.data4life.sdk.network.ApiService;

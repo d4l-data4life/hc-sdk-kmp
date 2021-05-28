@@ -33,6 +33,7 @@ import care.data4life.fhir.stu3.model.DomainResource;
 import care.data4life.sdk.CryptoSecureStore;
 import care.data4life.sdk.CryptoService;
 import care.data4life.sdk.config.DataRestrictionException;
+import care.data4life.sdk.resource.ResourceCryptoService;
 import care.data4life.sdk.test.data.model.SymTestData;
 import care.data4life.sdk.test.util.AssetsHelper;
 import care.data4life.sdk.test.util.DocumentReferenceFactory;

@@ -18,4 +18,5 @@ package care.data4life.sdk.config
 
 object SDKConfig {
     const val version: String = "1.12.0-add-count-for-arbitrary-data-SNAPSHOT"
+
 }

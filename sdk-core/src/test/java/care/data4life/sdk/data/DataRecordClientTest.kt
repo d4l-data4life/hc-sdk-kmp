@@ -53,6 +53,13 @@ class DataRecordClientTest {
     }
 
     @Test
+    fun `it fulfils DataRecordClient`() {
+        val client: Any = DataRecordClient(mockk(), mockk(), mockk())
+
+        assertTrue(client is SdkContract.DataRecordClient)
+    }
+
+    @Test
     fun `Given create is called, with a Resource, Annotations and a Callback it returns the corresponding Task`() {
         // Given
         val resource: DataResource = mockk()

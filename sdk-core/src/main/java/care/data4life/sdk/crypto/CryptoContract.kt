@@ -61,14 +61,24 @@ class CryptoContract {
 
         fun encrypt(key: GCKey, data: ByteArray): Single<ByteArray>
         fun decrypt(key: GCKey, data: ByteArray): Single<ByteArray>
-        // TODO Change interface so it Arbitrary Data can use it directly
+
+        // TODO move this into a convenience layer
         fun encryptAndEncodeString(key: GCKey, data: String): Single<String>
-        fun decodeAndDecryptString(key: GCKey, dataBase64: String): Single<String>
+
+        // TODO move this into a convenience layer
+        fun encryptAndEncodeByteArray(key: GCKey, data: ByteArray): Single<String>
+
         fun encryptSymmetricKey(
             key: GCKey,
             keyType: KeyType,
-            gckey: GCKey
+            gcKey: GCKey
         ): Single<NetworkModelContract.EncryptedKey>
+
+        // TODO move this into a convenience layer
+        fun decodeAndDecryptString(key: GCKey, dataBase64: String): Single<String>
+
+        // TODO move this into a convenience layer
+        fun decodeAndDecryptByteArray(key: GCKey, dataBase64: String): Single<ByteArray>
 
         fun symDecryptSymmetricKey(
             key: GCKey,

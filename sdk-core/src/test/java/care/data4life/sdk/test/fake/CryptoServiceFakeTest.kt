@@ -331,6 +331,77 @@ class CryptoServiceFakeTest {
     }
 
     @Test
+    fun `Given, a CryptoServiceIteration is set and encryptAndEncodeByteArray is called, it fails, if the key does not match the Iterations dataKey`() {
+        // Given
+        val resource = "Just a test"
+
+        every { iteration.resources } returns listOf(resource)
+
+        // Then
+        val error = assertFailsWith<RuntimeException> {
+            // When
+            fake.iteration = iteration
+
+            fake.encryptAndEncodeByteArray(
+                mockk(),
+                resource.toByteArray()
+            )
+        }
+
+        assertTrue(error.message!!.startsWith("Unable to fake resource encryptAndEncodeString"))
+    }
+
+    @Test
+    fun `Given, a CryptoServiceIteration is set and encryptAndEncodeByteArray is called, it fails, if the data does not match the Iterations resource`() {
+        // Given
+        val dataKey: GCKey = mockk()
+
+        every { iteration.dataKey } returns dataKey
+        every { iteration.resources } returns listOf("Just a test")
+
+        // Then
+        val error = assertFailsWith<RuntimeException> {
+            // When
+            fake.iteration = iteration
+
+            fake.encryptAndEncodeByteArray(
+                dataKey,
+                "Nope".toByteArray()
+            )
+        }
+
+        assertTrue(error.message!!.startsWith("Unable to fake resource encryptAndEncodeString"))
+    }
+
+    @Test
+    fun `Given, a CryptoServiceIteration is set and encryptAndEncodeByteArray is called, it returns the encrypted resource, while using the hash function of the Iteration`() {
+        // Given
+        val dataKey: GCKey = mockk()
+        val resource = "Just a test"
+        val hashedResource = "Jo"
+
+        val hash = { _: String -> hashedResource }
+
+        every { iteration.dataKey } returns dataKey
+        every { iteration.resources } returns listOf(resource)
+        every { iteration.hashFunction } returns hash
+
+        // When
+        fake.iteration = iteration
+
+        val actual = fake.encryptAndEncodeByteArray(
+            dataKey,
+            resource.toByteArray()
+        ).blockingGet()
+
+        // Then
+        assertEquals(
+            actual = actual,
+            expected = hashedResource
+        )
+    }
+
+    @Test
     fun `Given, a CryptoServiceIteration is set and decodeAndDecryptString is called, it fails, if the key does not match the Iterations dataKey`() {
         // Given
         val resource = "Just a test"
@@ -403,6 +474,78 @@ class CryptoServiceFakeTest {
             actual = actual,
             expected = resource
         )
+    }
+
+    @Test
+    fun `Given, a CryptoServiceIteration is set and decodeAndDecryptByteArray is called, it fails, if the key does not match the Iterations dataKey`() {
+        // Given
+        val resource = "Just a test"
+
+        every { iteration.resources } returns listOf(resource)
+
+        // Then
+        val error = assertFailsWith<RuntimeException> {
+            // When
+            fake.iteration = iteration
+
+            fake.decodeAndDecryptByteArray(
+                mockk(),
+                resource
+            )
+        }
+
+        assertTrue(error.message!!.startsWith("Unable to fake resource decodeAndDecryptString"))
+    }
+
+    @Test
+    fun `Given, a CryptoServiceIteration is set and decodeAndDecryptByteArray is called, it fails, if the data does not match the hashed Iterations resource`() {
+        // Given
+        val dataKey: GCKey = mockk()
+        val resource = "Just a test"
+
+        val hash = { _: String -> "something" }
+
+        every { iteration.dataKey } returns dataKey
+        every { iteration.resources } returns listOf(resource)
+        every { iteration.hashFunction } returns hash
+
+        // Then
+        val error = assertFailsWith<RuntimeException> {
+            // When
+            fake.iteration = iteration
+
+            fake.decodeAndDecryptByteArray(
+                dataKey,
+                "nope"
+            )
+        }
+
+        assertTrue(error.message!!.startsWith("Unable to fake resource decodeAndDecryptString"))
+    }
+
+    @Test
+    fun `Given, a CryptoServiceIteration is set and decodeAndDecryptByteArray is called, it returns the Iterations resource`() {
+        // Given
+        val dataKey: GCKey = mockk()
+        val resource = "Just a test"
+        val hashedResource = "Jo"
+
+        val hash = { _: String -> hashedResource }
+
+        every { iteration.dataKey } returns dataKey
+        every { iteration.resources } returns listOf(resource)
+        every { iteration.hashFunction } returns hash
+
+        // When
+        fake.iteration = iteration
+
+        val actual = fake.decodeAndDecryptByteArray(
+            dataKey,
+            hashedResource
+        ).blockingGet()
+
+        // Then
+        assertTrue(actual.contentEquals(resource.toByteArray()))
     }
 
     @Test

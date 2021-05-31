@@ -26,7 +26,10 @@ import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Identifier
+import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Identifier
+import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.fhir.ResourceCryptoService
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.network.NetworkingContract
@@ -275,7 +278,7 @@ class RecordServiceUpdateRecordModuleTest {
         val (encodedTags, allTags) = mergeTags(tags, oldTags)
         val encodedAnnotations = flowHelper.prepareAnnotations(annotations)
 
-        val encryptedUploadRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedUploadRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResourceOld,
             encodedTags,
@@ -287,7 +290,7 @@ class RecordServiceUpdateRecordModuleTest {
             updateDates.first
         )
 
-        val encryptedReceivedRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedReceivedRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResourceNew,
             encodedTags,
@@ -339,7 +342,7 @@ class RecordServiceUpdateRecordModuleTest {
         val encodedTags = flowHelper.prepareTags(tags)
         val encodedAnnotations = flowHelper.prepareAnnotations(annotations)
 
-        val encryptedUploadRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedUploadRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResourceOld,
             encodedTags,
@@ -351,7 +354,7 @@ class RecordServiceUpdateRecordModuleTest {
             updateDates.first
         )
 
-        val encryptedReceivedRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedReceivedRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResourceNew,
             encodedTags,
@@ -409,7 +412,7 @@ class RecordServiceUpdateRecordModuleTest {
         val encodedTags = flowHelper.prepareTags(tags)
         val encodedAnnotations = flowHelper.prepareAnnotations(annotations)
 
-        val encryptedUploadRecord = flowHelper.prepareEncryptedDataRecord(
+        val encryptedUploadRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResourceOld,
             encodedTags,
@@ -421,7 +424,7 @@ class RecordServiceUpdateRecordModuleTest {
             updateDates.first
         )
 
-        val encryptedReceivedRecord = flowHelper.prepareEncryptedDataRecord(
+        val encryptedReceivedRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResourceNew,
             encodedTags,
@@ -472,21 +475,23 @@ class RecordServiceUpdateRecordModuleTest {
 
         val now = SdkDateTimeFormatter.now()
 
-        val resourceNew = SdkFhirParser.toFhir3(
+        val resourceNew = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val resourceOld = SdkFhirParser.toFhir3(
+        val resourceOld = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         resourceOld.description = "A outdated mock"
 
         runFhirFlow(
-            serializedResourceOld = SdkFhirParser.fromResource(resourceOld)!!,
-            serializedResourceNew = SdkFhirParser.fromResource(resourceNew)!!,
+            serializedResourceOld = SdkFhirParser.fromResource(resourceOld),
+            serializedResourceNew = SdkFhirParser.fromResource(resourceNew),
             tags = tags,
             updateDates = Pair(now, UPDATE_DATE)
         )
@@ -539,21 +544,23 @@ class RecordServiceUpdateRecordModuleTest {
             PARTNER_ID
         )
 
-        val resourceNew = SdkFhirParser.toFhir3(
+        val resourceNew = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val resourceOld = SdkFhirParser.toFhir3(
+        val resourceOld = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         resourceOld.description = "A outdated mock"
 
         runFhirFlow(
-            serializedResourceOld = SdkFhirParser.fromResource(resourceOld)!!,
-            serializedResourceNew = SdkFhirParser.fromResource(resourceNew)!!,
+            serializedResourceOld = SdkFhirParser.fromResource(resourceOld),
+            serializedResourceNew = SdkFhirParser.fromResource(resourceNew),
             tags = tags,
             annotations = annotations,
             updateDates = Pair(SdkDateTimeFormatter.now(), UPDATE_DATE)
@@ -617,18 +624,21 @@ class RecordServiceUpdateRecordModuleTest {
             "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
         )
 
-        val internalResource = SdkFhirParser.toFhir3(
+        val internalResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val resourceNew = SdkFhirParser.toFhir3(
+        val resourceNew = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val resourceOld = SdkFhirParser.toFhir3(
+        val resourceOld = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
@@ -662,8 +672,8 @@ class RecordServiceUpdateRecordModuleTest {
         internalResource.content[0].attachment.data = null
 
         runFhirFlowWithAttachment(
-            serializedResourceOld = SdkFhirParser.fromResource(resourceOld)!!,
-            serializedResourceNew = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResourceOld = SdkFhirParser.fromResource(resourceOld),
+            serializedResourceNew = SdkFhirParser.fromResource(internalResource),
             tags = tags,
             annotations = annotations,
             updateDates = Pair(SdkDateTimeFormatter.now(), UPDATE_DATE),
@@ -743,18 +753,21 @@ class RecordServiceUpdateRecordModuleTest {
             attachment
         )
 
-        val internalResource = SdkFhirParser.toFhir3(
+        val internalResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val resourceNew = SdkFhirParser.toFhir3(
+        val resourceNew = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val resourceOld = SdkFhirParser.toFhir3(
+        val resourceOld = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
@@ -776,8 +789,8 @@ class RecordServiceUpdateRecordModuleTest {
         val thumbnail = Pair(ByteArray(1), THUMBNAIL_ID)
 
         runFhirFlowWithAttachment(
-            serializedResourceOld = SdkFhirParser.fromResource(resourceOld)!!,
-            serializedResourceNew = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResourceOld = SdkFhirParser.fromResource(resourceOld),
+            serializedResourceNew = SdkFhirParser.fromResource(internalResource),
             tags = tags,
             annotations = annotations,
             updateDates = Pair(SdkDateTimeFormatter.now(), UPDATE_DATE),
@@ -859,24 +872,27 @@ class RecordServiceUpdateRecordModuleTest {
             attachment
         )
 
-        val internalResource = SdkFhirParser.toFhir3(
+        val internalResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val resourceNew = SdkFhirParser.toFhir3(
+        val resourceNew = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val resourceOld = SdkFhirParser.toFhir3(
+        val resourceOld = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         runFhirFlowWithAttachment(
-            serializedResourceOld = SdkFhirParser.fromResource(resourceOld)!!,
-            serializedResourceNew = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResourceOld = SdkFhirParser.fromResource(resourceOld),
+            serializedResourceNew = SdkFhirParser.fromResource(internalResource),
             tags = tags,
             annotations = annotations,
             updateDates = Pair(SdkDateTimeFormatter.now(), UPDATE_DATE),
@@ -923,26 +939,29 @@ class RecordServiceUpdateRecordModuleTest {
             PARTNER_ID
         )
 
-        val internalResource = SdkFhirParser.toFhir3(
+        val internalResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val resourceNew = SdkFhirParser.toFhir3(
+        val resourceNew = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val resourceOld = SdkFhirParser.toFhir3(
+        val resourceOld = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         resourceOld.description = "A outdated mock"
 
         runFhirFlow(
-            serializedResourceOld = SdkFhirParser.fromResource(resourceOld)!!,
-            serializedResourceNew = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResourceOld = SdkFhirParser.fromResource(resourceOld),
+            serializedResourceNew = SdkFhirParser.fromResource(internalResource),
             tags = tags,
             annotations = annotations,
             updateDates = Pair(SdkDateTimeFormatter.now(), UPDATE_DATE)
@@ -1010,21 +1029,23 @@ class RecordServiceUpdateRecordModuleTest {
 
         val now = SdkDateTimeFormatter.now()
 
-        val resourceNew = SdkFhirParser.toFhir4(
+        val resourceNew = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val resourceOld = SdkFhirParser.toFhir4(
+        val resourceOld = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         resourceOld.description = "A outdated mock"
 
         runFhirFlow(
-            serializedResourceOld = SdkFhirParser.fromResource(resourceOld)!!,
-            serializedResourceNew = SdkFhirParser.fromResource(resourceNew)!!,
+            serializedResourceOld = SdkFhirParser.fromResource(resourceOld),
+            serializedResourceNew = SdkFhirParser.fromResource(resourceNew),
             tags = tags,
             updateDates = Pair(now, UPDATE_DATE)
         )
@@ -1077,21 +1098,23 @@ class RecordServiceUpdateRecordModuleTest {
             PARTNER_ID
         )
 
-        val resourceNew = SdkFhirParser.toFhir4(
+        val resourceNew = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val resourceOld = SdkFhirParser.toFhir4(
+        val resourceOld = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         resourceOld.description = "A outdated mock"
 
         runFhirFlow(
-            serializedResourceOld = SdkFhirParser.fromResource(resourceOld)!!,
-            serializedResourceNew = SdkFhirParser.fromResource(resourceNew)!!,
+            serializedResourceOld = SdkFhirParser.fromResource(resourceOld),
+            serializedResourceNew = SdkFhirParser.fromResource(resourceNew),
             tags = tags,
             annotations = annotations,
             updateDates = Pair(SdkDateTimeFormatter.now(), UPDATE_DATE)
@@ -1155,18 +1178,21 @@ class RecordServiceUpdateRecordModuleTest {
             "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
         )
 
-        val internalResource = SdkFhirParser.toFhir4(
+        val internalResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val resourceNew = SdkFhirParser.toFhir4(
+        val resourceNew = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val resourceOld = SdkFhirParser.toFhir4(
+        val resourceOld = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
@@ -1200,8 +1226,8 @@ class RecordServiceUpdateRecordModuleTest {
         internalResource.content[0].attachment.data = null
 
         runFhirFlowWithAttachment(
-            serializedResourceOld = SdkFhirParser.fromResource(resourceOld)!!,
-            serializedResourceNew = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResourceOld = SdkFhirParser.fromResource(resourceOld),
+            serializedResourceNew = SdkFhirParser.fromResource(internalResource),
             tags = tags,
             annotations = annotations,
             updateDates = Pair(SdkDateTimeFormatter.now(), UPDATE_DATE),
@@ -1281,18 +1307,21 @@ class RecordServiceUpdateRecordModuleTest {
             attachment
         )
 
-        val internalResource = SdkFhirParser.toFhir4(
+        val internalResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val resourceNew = SdkFhirParser.toFhir4(
+        val resourceNew = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val resourceOld = SdkFhirParser.toFhir4(
+        val resourceOld = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
@@ -1314,8 +1343,8 @@ class RecordServiceUpdateRecordModuleTest {
         val thumbnail = Pair(ByteArray(1), THUMBNAIL_ID)
 
         runFhirFlowWithAttachment(
-            serializedResourceOld = SdkFhirParser.fromResource(resourceOld)!!,
-            serializedResourceNew = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResourceOld = SdkFhirParser.fromResource(resourceOld),
+            serializedResourceNew = SdkFhirParser.fromResource(internalResource),
             tags = tags,
             annotations = annotations,
             updateDates = Pair(SdkDateTimeFormatter.now(), UPDATE_DATE),
@@ -1397,24 +1426,27 @@ class RecordServiceUpdateRecordModuleTest {
             attachment
         )
 
-        val internalResource = SdkFhirParser.toFhir4(
+        val internalResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val resourceNew = SdkFhirParser.toFhir4(
+        val resourceNew = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val resourceOld = SdkFhirParser.toFhir4(
+        val resourceOld = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         runFhirFlowWithAttachment(
-            serializedResourceOld = SdkFhirParser.fromResource(resourceOld)!!,
-            serializedResourceNew = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResourceOld = SdkFhirParser.fromResource(resourceOld),
+            serializedResourceNew = SdkFhirParser.fromResource(internalResource),
             tags = tags,
             annotations = annotations,
             updateDates = Pair(SdkDateTimeFormatter.now(), UPDATE_DATE),
@@ -1555,21 +1587,23 @@ class RecordServiceUpdateRecordModuleTest {
             PARTNER_ID
         )
 
-        val resourceNew = SdkFhirParser.toFhir4(
+        val resourceNew = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val resourceOld = SdkFhirParser.toFhir3(
+        val resourceOld = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         resourceOld.description = "A outdated mock"
 
         runFhirFlow(
-            serializedResourceOld = SdkFhirParser.fromResource(resourceOld)!!,
-            serializedResourceNew = SdkFhirParser.fromResource(resourceNew)!!,
+            serializedResourceOld = SdkFhirParser.fromResource(resourceOld),
+            serializedResourceNew = SdkFhirParser.fromResource(resourceNew),
             tags = tags,
             updateDates = Pair(SdkDateTimeFormatter.now(), UPDATE_DATE),
             oldTags = oldTags
@@ -1614,26 +1648,29 @@ class RecordServiceUpdateRecordModuleTest {
             PARTNER_ID
         )
 
-        val internalResource = SdkFhirParser.toFhir4(
+        val internalResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val resourceNew = SdkFhirParser.toFhir4(
+        val resourceNew = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val resourceOld = SdkFhirParser.toFhir4(
+        val resourceOld = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         resourceOld.description = "A outdated mock"
 
         runFhirFlow(
-            serializedResourceOld = SdkFhirParser.fromResource(resourceOld)!!,
-            serializedResourceNew = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResourceOld = SdkFhirParser.fromResource(resourceOld),
+            serializedResourceNew = SdkFhirParser.fromResource(internalResource),
             tags = tags,
             annotations = annotations,
             updateDates = Pair(SdkDateTimeFormatter.now(), UPDATE_DATE)

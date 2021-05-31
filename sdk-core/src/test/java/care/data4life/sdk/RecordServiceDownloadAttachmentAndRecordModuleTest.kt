@@ -23,7 +23,10 @@ import care.data4life.sdk.attachment.FileService
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.fhir.Fhir3Identifier
+import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Identifier
+import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.fhir.ResourceCryptoService
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.Record
@@ -134,7 +137,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
             useStoredCommonKey
         )
 
-        val encryptedRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResource,
             encodedTags,
@@ -210,8 +213,9 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
             attachment
         )
 
-        val internalResource = SdkFhirParser.toFhir3(
+        val internalResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
@@ -228,7 +232,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
             Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
 
         runAttachmentDownloadFlow(
-            serializedResource = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResource = SdkFhirParser.fromResource(internalResource),
             rawAttachment = rawAttachment,
             tags = tags,
             attachmentId = ATTACHMENT_ID
@@ -273,8 +277,9 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
             attachment
         )
 
-        val internalResource = SdkFhirParser.toFhir3(
+        val internalResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
@@ -290,7 +295,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
         internalResource.content[0].attachment.hash = Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
 
         runAttachmentDownloadFlow(
-            serializedResource = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResource = SdkFhirParser.fromResource(internalResource),
             rawAttachment = rawAttachment,
             tags = tags,
             attachmentId = ATTACHMENT_ID
@@ -333,8 +338,9 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
             attachment
         )
 
-        val internalResource = SdkFhirParser.toFhir4(
+        val internalResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
@@ -350,7 +356,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
         internalResource.content[0].attachment.hash = Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
 
         runAttachmentDownloadFlow(
-            serializedResource = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResource = SdkFhirParser.fromResource(internalResource),
             rawAttachment = rawAttachment,
             tags = tags,
             attachmentId = ATTACHMENT_ID
@@ -395,8 +401,9 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
             attachment
         )
 
-        val internalResource = SdkFhirParser.toFhir3(
+        val internalResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
@@ -413,7 +420,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
             Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
 
         runAttachmentDownloadFlow(
-            serializedResource = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResource = SdkFhirParser.fromResource(internalResource),
             rawAttachment = rawAttachment,
             tags = tags,
             attachmentId = ATTACHMENT_ID
@@ -457,13 +464,15 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
             attachment
         )
 
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val internalResource = SdkFhirParser.toFhir3(
+        val internalResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
@@ -491,7 +500,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
             Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
 
         runAttachmentDownloadFlow(
-            serializedResource = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResource = SdkFhirParser.fromResource(internalResource),
             rawAttachment = rawAttachment,
             tags = tags,
             attachmentId = ATTACHMENT_ID
@@ -557,13 +566,14 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
             attachment
         )
 
-        val internalResource = SdkFhirParser.toFhir4(
+        val internalResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         runAttachmentDownloadFlow(
-            serializedResource = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResource = SdkFhirParser.fromResource(internalResource),
             rawAttachment = rawAttachment,
             tags = tags,
             attachmentId = ATTACHMENT_ID
@@ -603,13 +613,15 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
             attachment
         )
 
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val internalResource = SdkFhirParser.toFhir4(
+        val internalResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
@@ -635,7 +647,7 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
         internalResource.content[0].attachment.hash = Base64.encodeToString(HashUtil.sha1(String(rawAttachment).toByteArray()))
 
         runAttachmentDownloadFlow(
-            serializedResource = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResource = SdkFhirParser.fromResource(internalResource),
             rawAttachment = rawAttachment,
             tags = tags,
             attachmentId = ATTACHMENT_ID
@@ -701,13 +713,14 @@ class RecordServiceDownloadAttachmentAndRecordModuleTest {
             attachment
         )
 
-        val internalResource = SdkFhirParser.toFhir3(
+        val internalResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         runAttachmentDownloadFlow(
-            serializedResource = SdkFhirParser.fromResource(internalResource)!!,
+            serializedResource = SdkFhirParser.fromResource(internalResource),
             rawAttachment = rawAttachment,
             tags = tags,
             attachmentId = ATTACHMENT_ID

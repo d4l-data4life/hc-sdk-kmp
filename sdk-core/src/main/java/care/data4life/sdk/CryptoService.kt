@@ -123,8 +123,8 @@ open class CryptoService : CryptoProtocol, CryptoContract.Service {
             }
     }
 
-    override fun encryptAndEncodeString(key: GCKey, data: String): Single<String> {
-        return encrypt(key, data.toByteArray())
+    override fun encryptAndEncodeByteArray(key: GCKey, data: ByteArray): Single<String> {
+        return encrypt(key, data)
             .map { dataArray -> base64.encodeToString(dataArray) }
             .onErrorResumeNext { error ->
                 Log.error(error, "Failed to encrypt string")
@@ -132,10 +132,28 @@ open class CryptoService : CryptoProtocol, CryptoContract.Service {
             }
     }
 
+    override fun encryptAndEncodeString(
+        key: GCKey,
+        data: String
+    ): Single<String> = encryptAndEncodeByteArray(key, data.toByteArray())
+
+    override fun encryptSymmetricKey(
+        key: GCKey,
+        keyType: KeyType,
+        gcKey: GCKey
+    ): Single<NetworkModelContract.EncryptedKey> {
+        return Single.fromCallable { createKey(KEY_VERSION, keyType, gcKey.getKeyBase64()) }
+            .map { exchangeKey -> moshi.adapter(ExchangeKey::class.java).toJson(exchangeKey) }
+            .flatMap { jsonKey -> encrypt(key, jsonKey.toByteArray()) }
+            .map { encryptedKeyBase64 -> EncryptedKey.create(encryptedKeyBase64) }
+            .onErrorResumeNext { error ->
+                Log.error(error, "Failed to encrypt GcKey")
+                Single.error(CryptoException.KeyEncryptionFailed("Failed to encrypt GcKey") as D4LException)
+            }
+    }
+
     override fun decodeAndDecryptString(key: GCKey, dataBase64: String): Single<String> {
-        return Single
-            .fromCallable { base64.decode(dataBase64) }
-            .flatMap { decoded -> decrypt(key, decoded) }
+        return decodeAndDecryptByteArray(key, dataBase64)
             .map { decrypted -> String(decrypted, Charsets.UTF_8) }
             .onErrorResumeNext { error ->
                 Log.error(error, "Failed to decrypt string")
@@ -143,18 +161,13 @@ open class CryptoService : CryptoProtocol, CryptoContract.Service {
             }
     }
 
-    override fun encryptSymmetricKey(
-        key: GCKey,
-        keyType: KeyType,
-        gckey: GCKey
-    ): Single<NetworkModelContract.EncryptedKey> {
-        return Single.fromCallable { createKey(KEY_VERSION, keyType, gckey.getKeyBase64()) }
-            .map { exchangeKey -> moshi.adapter(ExchangeKey::class.java).toJson(exchangeKey) }
-            .flatMap { jsonKey -> encrypt(key, jsonKey.toByteArray()) }
-            .map { encryptedKeyBase64 -> EncryptedKey.create(encryptedKeyBase64) }
+    override fun decodeAndDecryptByteArray(key: GCKey, dataBase64: String): Single<ByteArray> {
+        return Single
+            .fromCallable { base64.decode(dataBase64) }
+            .flatMap { decoded -> decrypt(key, decoded) }
             .onErrorResumeNext { error ->
-                Log.error(error, "Failed to encrypt GcKey")
-                Single.error(CryptoException.KeyEncryptionFailed("Failed to encrypt GcKey") as D4LException)
+                Log.error(error, "Failed to decrypt string")
+                Single.error(CryptoException.DecryptionFailed("Failed to decrypt string") as D4LException)
             }
     }
 
@@ -179,13 +192,13 @@ open class CryptoService : CryptoProtocol, CryptoContract.Service {
 
     private fun convertExchangeKeyToGCKey(exchangeKey: ExchangeKey): Single<GCKey> {
         return Single.fromCallable { exchangeKey }
-            .map { exchKey ->
-                if (exchKey.getVersion() !== KeyVersion.VERSION_1) {
-                    throw (CryptoException.InvalidKeyVersion(exchKey.getVersion().value))
-                } else if (exchKey.type === KeyType.APP_PUBLIC_KEY || exchKey.type === KeyType.APP_PRIVATE_KEY) {
+            .map { exchangeKey ->
+                if (exchangeKey.getVersion() !== KeyVersion.VERSION_1) {
+                    throw (CryptoException.InvalidKeyVersion(exchangeKey.getVersion().value))
+                } else if (exchangeKey.type === KeyType.APP_PUBLIC_KEY || exchangeKey.type === KeyType.APP_PRIVATE_KEY) {
                     throw (CryptoException.KeyDecryptionFailed("can't decrypt asymmetric to symmetric key"))
                 }
-                keyFactory.createGCKey(exchKey)
+                keyFactory.createGCKey(exchangeKey)
             }
             .onErrorResumeNext { error ->
                 Log.error(error, "Failed to decrypt exchangeKey")

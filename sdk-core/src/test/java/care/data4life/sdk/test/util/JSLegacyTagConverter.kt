@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.test.util
 
-import care.data4life.sdk.migration.MigrationContract.CompatibilityEncoder.Companion.JS_LEGACY_ENCODING_REPLACEMENTS
+import care.data4life.sdk.migration.MigrationInternalContract.CompatibilityEncoder.Companion.JS_LEGACY_ENCODING_REPLACEMENTS
 import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern

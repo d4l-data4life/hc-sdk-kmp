@@ -18,6 +18,7 @@ package care.data4life.sdk.network.util
 
 import care.data4life.sdk.network.HealthCloudApi
 import care.data4life.sdk.network.NetworkingContract
+import care.data4life.sdk.network.NetworkingInternalContract
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter
 import com.squareup.moshi.Moshi
 import io.mockk.every
@@ -41,7 +42,7 @@ class HealthCloudApiFactoryTest {
     fun `It fulfils HealthCloudApiFactory`() {
         val factory: Any = HealthCloudApiFactory
 
-        assertTrue(factory is NetworkingContract.HealthCloudApiFactory)
+        assertTrue(factory is NetworkingInternalContract.HealthCloudApiFactory)
     }
 
     @Test

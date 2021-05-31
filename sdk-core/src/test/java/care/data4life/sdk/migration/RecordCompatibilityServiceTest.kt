@@ -32,7 +32,7 @@ import kotlin.test.assertTrue
 class RecordCompatibilityServiceTest {
     private val cryptoService: CryptoContract.Service = mockk()
     private val tagCryptoService: TaggingContract.CryptoService = mockk()
-    private val compatibilityEncoder: MigrationContract.CompatibilityEncoder = mockk()
+    private val compatibilityEncoder: MigrationInternalContract.CompatibilityEncoder = mockk()
     private val searchTagsBuilderFactory: NetworkingContract.SearchTagsBuilderFactory = mockk()
     private val searchTagsPipe: NetworkingContract.SearchTagsBuilder = mockk()
     private lateinit var service: MigrationContract.CompatibilityService

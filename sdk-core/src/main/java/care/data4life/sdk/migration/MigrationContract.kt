@@ -24,26 +24,11 @@ import care.data4life.sdk.tag.Tags
 @MustBeDocumented
 annotation class Migration(val message: String)
 
-class MigrationContract {
+interface MigrationContract {
     interface CompatibilityService {
         fun resolveSearchTags(
             tags: Tags,
             annotation: Annotations
         ): NetworkingContract.SearchTags
-    }
-
-    internal interface CompatibilityEncoder {
-        fun encode(tagValue: String): Triple<String, String, String>
-        fun normalize(tagValue: String): String
-
-        companion object {
-            val JS_LEGACY_ENCODING_REPLACEMENTS = mapOf(
-                "%2A" to "%2a",
-                "%2D" to "%2d",
-                "%2E" to "%2e",
-                "%5F" to "%5f",
-                "%7E" to "%7e"
-            )
-        }
     }
 }

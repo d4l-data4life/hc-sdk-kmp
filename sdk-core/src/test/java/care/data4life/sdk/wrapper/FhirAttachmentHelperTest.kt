@@ -59,7 +59,7 @@ class FhirAttachmentHelperTest {
     @Test
     fun `It fulfils FhirAttachmentHelper`() {
         val helper: Any = SdkFhirAttachmentHelper
-        assertTrue(helper is HelperContract.FhirAttachmentHelper)
+        assertTrue(helper is WrapperInternalContract.FhirAttachmentHelper)
     }
 
     @Test

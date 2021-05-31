@@ -37,7 +37,7 @@ private data class OrGroupEntry(
 class RecordCompatibilityService internal constructor(
     private val cryptoService: CryptoContract.Service,
     private val tagCryptoService: TaggingContract.CryptoService,
-    private val compatibilityEncoder: MigrationContract.CompatibilityEncoder = CompatibilityEncoder,
+    private val compatibilityEncoder: MigrationInternalContract.CompatibilityEncoder = CompatibilityEncoder,
     private val searchTagsBuilderFactory: NetworkingContract.SearchTagsBuilderFactory = SearchTagsBuilder
 ) : MigrationContract.CompatibilityService {
     private fun encryptTags(

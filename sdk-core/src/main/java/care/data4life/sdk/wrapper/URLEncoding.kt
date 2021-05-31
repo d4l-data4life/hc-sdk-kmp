@@ -29,7 +29,7 @@ object UrlEncoding : WrapperContract.UrlEncoding {
     private fun replaceSpecial(char: Char): String {
         return when (char) {
             '+' -> "%20"
-            in specialChars -> "%${char.toInt().toHex() }"
+            in specialChars -> "%${char.toInt().toHex()}"
             else -> char.toString()
         }
     }

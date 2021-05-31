@@ -26,7 +26,7 @@ class Fhir3IdentifierTest {
     @Test
     fun `It fulfils Identifier`() {
         val wrapper: Any = SdkFhir3Identifier(Fhir3Identifier())
-        assertTrue(wrapper is WrapperContract.Identifier)
+        assertTrue(wrapper is WrapperInternalContract.Identifier)
     }
 
     @Test

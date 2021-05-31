@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+ * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
  *
  * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
@@ -17,10 +17,25 @@
 package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.lang.CoreRuntimeException
+import care.data4life.sdk.lang.DataValidationException
 
-internal class HelperContract {
+internal class WrapperInternalContract {
+    interface Identifier {
+        var value: String?
+        fun <T : Any> unwrap(): T
+    }
 
-    internal interface FhirAttachmentHelper {
+    interface AttachmentFactory {
+        @Throws(DataValidationException.CustomDataLimitViolation::class)
+        fun wrap(attachment: Any): WrapperContract.Attachment
+    }
+
+    interface IdentifierFactory {
+        @Throws(DataValidationException.CustomDataLimitViolation::class)
+        fun wrap(identifier: Any): Identifier
+    }
+
+    interface FhirAttachmentHelper {
         @Throws(CoreRuntimeException.InternalFailure::class)
         fun hasAttachment(resource: Any): Boolean
 

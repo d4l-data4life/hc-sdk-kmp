@@ -29,7 +29,7 @@ class EncryptedKeyTest {
     @Test
     fun `It fulfils EncryptedKeyMaker`() {
         val factory: Any = EncryptedKey
-        assertTrue(factory is NetworkModelContract.EncryptedKeyMaker)
+        assertTrue(factory is NetworkModelInternalContract.EncryptedKeyMaker)
     }
 
     @Test

@@ -26,7 +26,7 @@ typealias Tags = Map<String, String>
 typealias Annotations = List<String>
 typealias EncryptedTagsAndAnnotations = List<String>
 
-class TaggingContract {
+interface TaggingContract {
 
     interface Service {
         fun appendDefaultTags(resource: Any, oldTags: Tags?): Tags

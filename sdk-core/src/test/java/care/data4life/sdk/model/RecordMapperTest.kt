@@ -24,7 +24,7 @@ import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.ModelContract.Fhir3Record
-import care.data4life.sdk.model.ModelContract.RecordFactory
+import care.data4life.sdk.model.ModelInternalContract.RecordFactory
 import care.data4life.sdk.network.model.DecryptedDataRecord
 import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord

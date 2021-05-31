@@ -56,6 +56,13 @@ class FhirRecordClientTest {
     }
 
     @Test
+    fun `it fulfils Fhir4RecordClient`() {
+        val client: Any = Fhir4RecordClient(mockk(), mockk(), mockk())
+
+        assertTrue(client is SdkContract.Fhir4RecordClient)
+    }
+
+    @Test
     fun `Given create is called, with a Resource, Annotations and a Callback it returns the corresponding Task`() {
         // Given
         val resource: Fhir4Resource = mockk()

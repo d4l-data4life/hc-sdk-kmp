@@ -24,6 +24,9 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import care.data4life.crypto.GCKey;
 import care.data4life.fhir.stu3.model.DocumentReference;
 import care.data4life.fhir.stu3.model.DomainResource;
@@ -38,6 +41,8 @@ import care.data4life.securestore.SecureStore;
 import care.data4life.securestore.SecureStoreCryptor;
 import care.data4life.securestore.SecureStoreStorage;
 
+import static care.data4life.sdk.tag.TaggingContract.TAG_FHIR_VERSION;
+import static care.data4life.sdk.tag.TaggingContract.TAG_RESOURCE_TYPE;
 import static com.google.common.truth.Truth.assertThat;
 
 @Ignore("Ignored until deep copy of fhir resource is implemented")
@@ -67,10 +72,17 @@ public class ResourceCryptoServiceInstrumentedTest {
     public void encryptAndDecryptFhirResource_shouldCompleteWithoutErrors() throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
         // given
         DocumentReference dummyDocRef = DocumentReferenceFactory.buildDocument();
-
+        Map<String, String> tags = new HashMap<String, String>() {{
+                put(TAG_FHIR_VERSION, FhirContract.FhirVersion.FHIR_3.getVersion());
+                put(TAG_RESOURCE_TYPE, "documentreference");
+        }};
         // when
         String encryptedResource = resourceCryptoService.encryptResource(dataKey, dummyDocRef);
-        DomainResource decryptedResource = resourceCryptoService.decryptResource(dataKey, DocumentReference.resourceType, encryptedResource);
+        DomainResource decryptedResource = resourceCryptoService.decryptResource(
+                dataKey,
+                tags,
+                encryptedResource
+        );
 
         assertThat(decryptedResource).isInstanceOf(DocumentReference.class);
         DocumentReference docRef = (DocumentReference) decryptedResource;

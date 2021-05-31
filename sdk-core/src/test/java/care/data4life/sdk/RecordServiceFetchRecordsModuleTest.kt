@@ -22,6 +22,9 @@ import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.fhir.ResourceCryptoService
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.network.NetworkingContract
@@ -175,7 +178,7 @@ class RecordServiceFetchRecordsModuleTest {
         val encodedTags = flowHelper.prepareTags(tags)
         val encodedAnnotations = flowHelper.prepareAnnotations(annotations)
 
-        val encryptedRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResource,
             encodedTags,
@@ -221,7 +224,7 @@ class RecordServiceFetchRecordsModuleTest {
         val encodedTags = flowHelper.prepareTags(tags)
         val encodedAnnotations = flowHelper.prepareAnnotations(annotations)
 
-        val encryptedRecord = flowHelper.prepareEncryptedDataRecord(
+        val encryptedRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResource,
             encodedTags,
@@ -355,7 +358,7 @@ class RecordServiceFetchRecordsModuleTest {
             .seal()
             .tagGroups
 
-        val encryptedRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedRecord = flowHelper.prepareEncryptedRecord(
             recordIds.first,
             serializedResources.first,
             encodedTags,
@@ -367,7 +370,7 @@ class RecordServiceFetchRecordsModuleTest {
             updateDate
         )
 
-        val encryptedKMPLegacyRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedKMPLegacyRecord = flowHelper.prepareEncryptedRecord(
             recordIds.second,
             serializedResources.second,
             legacyKMPTags,
@@ -379,7 +382,7 @@ class RecordServiceFetchRecordsModuleTest {
             updateDate
         )
 
-        val encryptedJSLegacyRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedJSLegacyRecord = flowHelper.prepareEncryptedRecord(
             recordIds.third,
             serializedResources.third,
             legacyJSTags,
@@ -442,7 +445,7 @@ class RecordServiceFetchRecordsModuleTest {
             .seal()
             .tagGroups
 
-        val encryptedRecord = flowHelper.prepareEncryptedDataRecord(
+        val encryptedRecord = flowHelper.prepareEncryptedRecord(
             recordIds.first,
             serializedResources.first,
             encodedTags,
@@ -454,7 +457,7 @@ class RecordServiceFetchRecordsModuleTest {
             updateDate
         )
 
-        val encryptedKMPLegacyRecord = flowHelper.prepareEncryptedDataRecord(
+        val encryptedKMPLegacyRecord = flowHelper.prepareEncryptedRecord(
             recordIds.second,
             serializedResources.second,
             legacyKMPTags,
@@ -466,7 +469,7 @@ class RecordServiceFetchRecordsModuleTest {
             updateDate
         )
 
-        val encryptedJSLegacyRecord = flowHelper.prepareEncryptedDataRecord(
+        val encryptedJSLegacyRecord = flowHelper.prepareEncryptedRecord(
             recordIds.third,
             serializedResources.third,
             legacyJSTags,
@@ -519,13 +522,14 @@ class RecordServiceFetchRecordsModuleTest {
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         runFhirFetchFlow(
-            serializedResource = SdkFhirParser.fromResource(resource)!!,
+            serializedResource = SdkFhirParser.fromResource(resource),
             tags = tags
         )
 
@@ -574,13 +578,14 @@ class RecordServiceFetchRecordsModuleTest {
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         runFhirFetchFlow(
-            serializedResource = SdkFhirParser.fromResource(resource)!!,
+            serializedResource = SdkFhirParser.fromResource(resource),
             tags = tags,
             annotations = annotations,
             useStoredCommonKey = false
@@ -627,13 +632,14 @@ class RecordServiceFetchRecordsModuleTest {
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         runFhirFetchFlow(
-            serializedResource = SdkFhirParser.fromResource(resource)!!,
+            serializedResource = SdkFhirParser.fromResource(resource),
             tags = tags
         )
 
@@ -682,13 +688,14 @@ class RecordServiceFetchRecordsModuleTest {
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         runFhirFetchFlow(
-            serializedResource = SdkFhirParser.fromResource(resource)!!,
+            serializedResource = SdkFhirParser.fromResource(resource),
             tags = tags,
             annotations = annotations,
             useStoredCommonKey = false
@@ -832,18 +839,21 @@ class RecordServiceFetchRecordsModuleTest {
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val legacyKMPResource = SdkFhirParser.toFhir3(
+        val legacyKMPResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template2
         ) as Fhir3DocumentReference
 
-        val legacyJSResource = SdkFhirParser.toFhir3(
+        val legacyJSResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template3
         ) as Fhir3DocumentReference
 
@@ -852,9 +862,9 @@ class RecordServiceFetchRecordsModuleTest {
 
         runFhirBatchFlow(
             serializedResources = Triple(
-                SdkFhirParser.fromResource(resource)!!,
-                SdkFhirParser.fromResource(legacyKMPResource)!!,
-                SdkFhirParser.fromResource(legacyJSResource)!!
+                SdkFhirParser.fromResource(resource),
+                SdkFhirParser.fromResource(legacyKMPResource),
+                SdkFhirParser.fromResource(legacyJSResource)
             ),
             tags = tags,
             useStoredCommonKey = false
@@ -933,18 +943,21 @@ class RecordServiceFetchRecordsModuleTest {
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val legacyKMPResource = SdkFhirParser.toFhir3(
+        val legacyKMPResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template2
         ) as Fhir3DocumentReference
 
-        val legacyJSResource = SdkFhirParser.toFhir3(
+        val legacyJSResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template3
         ) as Fhir3DocumentReference
 
@@ -953,9 +966,9 @@ class RecordServiceFetchRecordsModuleTest {
 
         runFhirBatchFlow(
             serializedResources = Triple(
-                SdkFhirParser.fromResource(resource)!!,
-                SdkFhirParser.fromResource(legacyKMPResource)!!,
-                SdkFhirParser.fromResource(legacyJSResource)!!
+                SdkFhirParser.fromResource(resource),
+                SdkFhirParser.fromResource(legacyKMPResource),
+                SdkFhirParser.fromResource(legacyJSResource)
             ),
             tags = tags,
             annotations = annotations
@@ -1046,18 +1059,21 @@ class RecordServiceFetchRecordsModuleTest {
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val legacyKMPResource = SdkFhirParser.toFhir3(
+        val legacyKMPResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template2
         ) as Fhir3DocumentReference
 
-        val legacyJSResource = SdkFhirParser.toFhir3(
+        val legacyJSResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template3
         ) as Fhir3DocumentReference
 
@@ -1066,9 +1082,9 @@ class RecordServiceFetchRecordsModuleTest {
 
         runFhirBatchFlow(
             serializedResources = Triple(
-                SdkFhirParser.fromResource(resource)!!,
-                SdkFhirParser.fromResource(legacyKMPResource)!!,
-                SdkFhirParser.fromResource(legacyJSResource)!!,
+                SdkFhirParser.fromResource(resource),
+                SdkFhirParser.fromResource(legacyKMPResource),
+                SdkFhirParser.fromResource(legacyJSResource),
             ),
             tags = tags,
             annotations = annotations,
@@ -1152,18 +1168,21 @@ class RecordServiceFetchRecordsModuleTest {
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val legacyKMPResource = SdkFhirParser.toFhir4(
+        val legacyKMPResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template2
         ) as Fhir4DocumentReference
 
-        val legacyJSResource = SdkFhirParser.toFhir4(
+        val legacyJSResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template3
         ) as Fhir4DocumentReference
 
@@ -1172,9 +1191,9 @@ class RecordServiceFetchRecordsModuleTest {
 
         runFhirBatchFlow(
             serializedResources = Triple(
-                SdkFhirParser.fromResource(resource)!!,
-                SdkFhirParser.fromResource(legacyKMPResource)!!,
-                SdkFhirParser.fromResource(legacyJSResource)!!
+                SdkFhirParser.fromResource(resource),
+                SdkFhirParser.fromResource(legacyKMPResource),
+                SdkFhirParser.fromResource(legacyJSResource)
             ),
             tags = tags,
             useStoredCommonKey = false
@@ -1253,18 +1272,21 @@ class RecordServiceFetchRecordsModuleTest {
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val legacyKMPResource = SdkFhirParser.toFhir4(
+        val legacyKMPResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template2
         ) as Fhir4DocumentReference
 
-        val legacyJSResource = SdkFhirParser.toFhir4(
+        val legacyJSResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template3
         ) as Fhir4DocumentReference
 
@@ -1273,9 +1295,9 @@ class RecordServiceFetchRecordsModuleTest {
 
         runFhirBatchFlow(
             serializedResources = Triple(
-                SdkFhirParser.fromResource(resource)!!,
-                SdkFhirParser.fromResource(legacyKMPResource)!!,
-                SdkFhirParser.fromResource(legacyJSResource)!!
+                SdkFhirParser.fromResource(resource),
+                SdkFhirParser.fromResource(legacyKMPResource),
+                SdkFhirParser.fromResource(legacyJSResource)
             ),
             tags = tags,
             annotations = annotations
@@ -1366,18 +1388,21 @@ class RecordServiceFetchRecordsModuleTest {
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val legacyKMPResource = SdkFhirParser.toFhir4(
+        val legacyKMPResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template2
         ) as Fhir4DocumentReference
 
-        val legacyJSResource = SdkFhirParser.toFhir4(
+        val legacyJSResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template3
         ) as Fhir4DocumentReference
 
@@ -1386,9 +1411,9 @@ class RecordServiceFetchRecordsModuleTest {
 
         runFhirBatchFlow(
             serializedResources = Triple(
-                SdkFhirParser.fromResource(resource)!!,
-                SdkFhirParser.fromResource(legacyKMPResource)!!,
-                SdkFhirParser.fromResource(legacyJSResource)!!,
+                SdkFhirParser.fromResource(resource),
+                SdkFhirParser.fromResource(legacyKMPResource),
+                SdkFhirParser.fromResource(legacyJSResource),
             ),
             tags = tags,
             annotations = annotations,

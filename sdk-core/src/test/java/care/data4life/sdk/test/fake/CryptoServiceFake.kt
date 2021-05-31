@@ -96,11 +96,7 @@ class CryptoServiceFake : CryptoContract.Service {
             Single.just(hashedResources[idx].toByteArray())
         } else {
             throw RuntimeException(
-                "Unable to fake resource encryption: \nKey: $key \nData: ${
-                String(
-                    data
-                )
-                }"
+                "Unable to fake resource encryption: \nKey: $key \nData: ${String(data)}"
             )
         }
     }
@@ -123,14 +119,15 @@ class CryptoServiceFake : CryptoContract.Service {
             Single.just(currentIteration.resources[idx].toByteArray())
         } else {
             throw RuntimeException(
-                "Unable to fake resource decryption: \nKey: $key \nData: ${
-                String(
-                    data
-                )
-                }"
+                "Unable to fake resource decryption: \nKey: $key \nData: ${String(data)}"
             )
         }
     }
+
+    override fun encryptAndEncodeByteArray(
+        key: GCKey,
+        data: ByteArray
+    ): Single<String> = encryptAndEncodeString(key, String(data)).also { println(String(data)) }
 
     override fun encryptAndEncodeString(key: GCKey, data: String): Single<String> {
         val idx = findResource(key, data)
@@ -141,6 +138,14 @@ class CryptoServiceFake : CryptoContract.Service {
                 "Unable to fake resource encryptAndEncodeString: \nKey: $key \nData: $data"
             )
         }
+    }
+
+    override fun decodeAndDecryptByteArray(
+        key: GCKey,
+        dataBase64: String
+    ): Single<ByteArray> {
+        return decodeAndDecryptString(key, dataBase64)
+            .map { string -> string.toByteArray() }
     }
 
     override fun decodeAndDecryptString(key: GCKey, dataBase64: String): Single<String> {

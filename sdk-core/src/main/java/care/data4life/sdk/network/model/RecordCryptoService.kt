@@ -237,7 +237,7 @@ class RecordCryptoService(
                 decryptedRecord.tags,
                 decryptedRecord.annotations
             ),
-            resourceCryptoService._encryptResource(dataKey, decryptedRecord.resource),
+            resourceCryptoService.encryptResource(dataKey, decryptedRecord.resource),
             decryptedRecord.customCreationDate,
             encryptedDataKey,
             encryptedAttachmentKey,

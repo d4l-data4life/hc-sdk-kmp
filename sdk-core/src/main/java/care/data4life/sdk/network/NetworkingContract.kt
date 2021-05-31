@@ -31,6 +31,7 @@ import okhttp3.Response
 
 class NetworkingContract {
     // TODO: Break this down
+    // TODO: Decouple ReturnValues
     interface Service {
         // TODO: move into a key route
         fun fetchCommonKey(

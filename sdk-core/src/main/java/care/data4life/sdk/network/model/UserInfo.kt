@@ -22,13 +22,13 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class UserInfo(
     @field:Json(name = "sub")
-    override val uid: String,
+    override val userId: String,
     @field:Json(name = "common_key")
-    override val commonKey: EncryptedKey,
+    override val encryptedCommonKey: EncryptedKey,
     @field:Json(name = "common_key_id")
     internal var _commonKeyId: String?,
     @field:Json(name = "tag_encryption_key")
-    override val tagEncryptionKey: EncryptedKey
+    override val encryptedTagEncryptionKey: EncryptedKey
 ) : NetworkModelContract.UserInfo {
 
     init {

@@ -30,6 +30,6 @@ interface AuthContract {
         fun finishLogin(isAuthorized: Boolean): Single<Boolean>
         fun isLoggedIn(alias: String): Single<Boolean>
         fun logout(): Completable
-        fun getSessionToken(alias: String): Single<String>
+        fun refreshSessionToken(alias: String): Single<String>
     }
 }

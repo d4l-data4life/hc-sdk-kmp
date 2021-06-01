@@ -39,7 +39,7 @@ class AuthClientTest {
 
         val token = Single.just("token")
 
-        every { userService.getSessionToken(ALIAS) } returns token
+        every { userService.refreshSessionToken(ALIAS) } returns token
         every { callHandler.executeSingle(token, listener) } returns expected
 
         // When

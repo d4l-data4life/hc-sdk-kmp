@@ -12,7 +12,21 @@ and this project adheres to http://semver.org/spec/v2.0.0.html[Semantic Versioni
 ==== Versions
 toc::[]
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.12.0...main[Unreleased]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.13.0...main[Unreleased]
+
+=== Added
+
+=== Changed
+
+=== Removed
+
+=== Fixed
+
+=== Bumped
+
+=== Migration
+
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.12.0...v1.13.0
 
 === Added
 
@@ -21,11 +35,7 @@ toc::[]
 === Changed
 
 * ApiService is now in Kotlin.
-* Errors, which occure during encryption or decryption of a resource are now D4LRuntimeExceptions.
-
-=== Removed
-
-=== Fixed
+* Errors, which occurred during encryption or decryption of a resource, are now D4LRuntimeExceptions.
 
 === Bumped
 

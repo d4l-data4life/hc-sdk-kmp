@@ -1,5 +1,5 @@
 = Data4Life SDK
-:library_version: 1.11.0
+:library_version: 1.13.0
 :doctype: article
 :!showtitle:
 :toc: macro
@@ -84,8 +84,8 @@ The SDK has the following dependencies:
 
 **Notes:**
 
-\* The SDK ships with BouncyCastle 1.64 and will replace the BouncyCastle version provided by the Android system.Ensure that if you're using or depend on BouncyCastle CryptoProvider, you're still compatible. <br />
-\** The SDK ships with a forked version of the AppAuth lib which includes a compatibility fix for working with `androidx` libs and a synchronous token refresh call for better thread handling.
+* The SDK ships with BouncyCastle 1.64 and will replace the BouncyCastle version provided by the Android system.Ensure that if you're using or depend on BouncyCastle CryptoProvider, you're still compatible. <br />
+* The SDK ships with a forked version of the AppAuth lib which includes a compatibility fix for working with `androidx` libs and a synchronous token refresh call for better thread handling.
 
 
 == Install Gradle

@@ -75,7 +75,7 @@ internal class NetworkingInternalContract {
         ): OkHttpClient
     }
 
-    internal interface HealthCloudApiFactory {
+    interface HealthCloudApiFactory {
         fun getInstance(
             client: OkHttpClient,
             platform: String,

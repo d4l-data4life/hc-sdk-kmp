@@ -61,10 +61,10 @@ class NetworkModelContract {
     }
 
     internal interface UserInfo {
-        val uid: String
-        val commonKey: EncryptedKey
+        val userId: String
+        val encryptedCommonKey: EncryptedKey
         val commonKeyId: String
-        val tagEncryptionKey: EncryptedKey
+        val encryptedTagEncryptionKey: EncryptedKey
     }
 
     // TODO: internal
@@ -105,7 +105,10 @@ class NetworkModelContract {
     internal interface CryptoService {
         fun <T : Any> fromResource(resource: T, annotations: Annotations): DecryptedBaseRecord<T>
         fun <T : Any> encrypt(decryptedRecord: DecryptedBaseRecord<T>): EncryptedRecord
-        fun <T : Any> decrypt(encryptedRecord: EncryptedRecord, userId: String): DecryptedBaseRecord<T>
+        fun <T : Any> decrypt(
+            encryptedRecord: EncryptedRecord,
+            userId: String
+        ): DecryptedBaseRecord<T>
     }
 
     interface LimitGuard {

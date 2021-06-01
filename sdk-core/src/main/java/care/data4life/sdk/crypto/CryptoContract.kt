@@ -56,6 +56,7 @@ class CryptoContract {
         operator fun contains(alias: String): Boolean
     }
 
+    // TODO: Split into CommonKey/KeyChain/KeyState for common and tagEncryption; KeyCrypto
     interface Service {
         val currentCommonKeyId: String
 

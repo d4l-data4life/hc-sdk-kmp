@@ -28,7 +28,7 @@ class AuthClient(
 ) : AuthContract.Client {
 
     override fun getUserSessionToken(listener: ResultListener<String>): Task {
-        val operation = userService.getSessionToken(alias)
+        val operation = userService.refreshSessionToken(alias)
         return handler.executeSingle(operation, listener)
     }
 

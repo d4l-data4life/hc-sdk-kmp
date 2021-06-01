@@ -20,11 +20,12 @@ import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.network.NetworkingContract
-import care.data4life.sdk.network.model.UserInfo
+import care.data4life.sdk.network.model.NetworkModelContract
 import io.reactivex.Completable
 import io.reactivex.Single
 
-// TODO internal
+// TODO: internal
+// TODO: This is the main state management -> might worth to label it like it
 class UserService(
     private val alias: String,
     private val authService: AuthorizationContract.Service,
@@ -32,6 +33,7 @@ class UserService(
     private val secureStore: CryptoContract.SecureStore,
     private val cryptoService: CryptoContract.Service
 ) : AuthContract.UserService {
+    // TODO: No Single needed
     override val userID: Single<String>
         get() = Single.fromCallable {
             secureStore.getSecret(
@@ -41,29 +43,37 @@ class UserService(
         }
 
     // TODO: Refactor this, so it calls the API only on demand
+    // TODO: No Single needed
+    // TODO: make sure sides effects are independent of the order of calls
     override fun finishLogin(isAuthorized: Boolean): Single<Boolean> {
         return Single.just(isAuthorized)
             .flatMap { apiService.fetchUserInfo(alias) }
-            .map { userInfo: UserInfo ->
-                secureStore.storeSecret("${alias}_user_id", userInfo.uid)
+            .map { userInfo: NetworkModelContract.UserInfo ->
+                secureStore.storeSecret("${alias}_user_id", userInfo.userId)
+
                 val gcKeyPair = cryptoService
                     .fetchGCKeyPair()
                     .blockingGet()
                 val commonKey = cryptoService
-                    .asymDecryptSymetricKey(gcKeyPair, userInfo.commonKey)
+                    .asymDecryptSymetricKey(gcKeyPair, userInfo.encryptedCommonKey)
                     .blockingGet()
-                val commonKeyId = userInfo.commonKeyId
-                cryptoService.storeCommonKey(commonKeyId, commonKey)
-                cryptoService.storeCurrentCommonKeyId(commonKeyId)
-                val tek = cryptoService
-                    .symDecryptSymmetricKey(commonKey, userInfo.tagEncryptionKey)
+
+                cryptoService.storeCommonKey(userInfo.commonKeyId, commonKey)
+                cryptoService.storeCurrentCommonKeyId(userInfo.commonKeyId)
+
+                val tagEncryptionKey = cryptoService
+                    .symDecryptSymmetricKey(commonKey, userInfo.encryptedTagEncryptionKey)
                     .blockingGet()
-                cryptoService.storeTagEncryptionKey(tek)
+
+                cryptoService.storeTagEncryptionKey(tagEncryptionKey)
+
                 true
             }
             .doOnError { Log.error(it, "Failed to finish login") }
     }
 
+    // TODO: No Single needed
+    // TODO: This could be a property
     override fun isLoggedIn(alias: String): Single<Boolean> {
         return Single.fromCallable { authService.isAuthorized(alias) }
             .onErrorReturnItem(false)
@@ -76,7 +86,9 @@ class UserService(
             .doOnComplete { secureStore.clear() }
     }
 
-    override fun getSessionToken(alias: String): Single<String> {
+    // TODO: No Single needed
+    // TODO: This could be a property
+    override fun refreshSessionToken(alias: String): Single<String> {
         return Single.fromCallable { authService.refreshAccessToken(alias) }
     }
 }

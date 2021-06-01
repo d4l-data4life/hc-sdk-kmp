@@ -16,8 +16,8 @@
 
 package care.data4life.sdk.migration
 
-class MigrationInternalContract {
-    internal interface CompatibilityEncoder {
+internal class MigrationInternalContract {
+    interface CompatibilityEncoder {
         fun encode(tagValue: String): Triple<String, String, String>
         fun normalize(tagValue: String): String
 

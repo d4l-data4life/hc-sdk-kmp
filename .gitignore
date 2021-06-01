@@ -30,6 +30,9 @@ captures/
 
 .DS_Store
 
+# generated
+sdk-core/src-gen/main/java/care/data4life/sdk/config/SDKConfig.kt
+
 # Editors
 *.suo
 *.ntvs*

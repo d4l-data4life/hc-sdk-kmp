@@ -30,9 +30,11 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-val compileKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
-
-compileKotlin.kotlinOptions.jvmTarget = "1.8"
+kotlin {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions.jvmTarget = "1.8"
+    }
+}
 
 dependencies {
     api(Dependencies.Multiplatform.D4L.utilJvm)

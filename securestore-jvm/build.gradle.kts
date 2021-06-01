@@ -31,6 +31,12 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+kotlin {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions.jvmTarget = "1.8"
+    }
+}
+
 dependencies {
     expectedBy(project(":securestore-common"))
 

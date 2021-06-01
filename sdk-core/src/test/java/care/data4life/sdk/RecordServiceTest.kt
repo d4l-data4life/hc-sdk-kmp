@@ -429,7 +429,7 @@ class RecordServiceTest {
             expected = "Expected a record of a type that has attachment"
         )
 
-        verify { SdkFhirAttachmentHelper.getAttachment(resource)!!.wasNot(Called) }
+        verify(exactly = 0) { SdkFhirAttachmentHelper.getAttachment(resource) }
         unmockkObject(SdkFhirAttachmentHelper)
     }
 
@@ -801,7 +801,7 @@ class RecordServiceTest {
             expected = "Expected a record of a type that has attachment"
         )
 
-        verify { SdkFhirAttachmentHelper.getAttachment(resource)!!.wasNot(Called) }
+        verify(exactly = 0) { SdkFhirAttachmentHelper.getAttachment(resource) }
         unmockkObject(SdkFhirAttachmentHelper)
     }
 

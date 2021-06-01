@@ -24,6 +24,8 @@ toc::[]
 
 === Bumped
 
+* mockk 1.10.0 -> 1.10.6
+
 === Migration
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.12.0...v1.13.0[1.13.0]

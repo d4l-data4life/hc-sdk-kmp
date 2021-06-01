@@ -91,12 +91,15 @@ val provideConfig: Task by tasks.creating {
         val templates = File(templatesPath)
         val configs = File(configPath)
 
-        if (!templates.exists()) templates.mkdirs()
         val config = File(templates, "SDKConfig.tmpl")
             .readText()
             .replace("SDK_VERSION", version.toString())
 
-        if (!configs.exists()) templates.mkdirs()
+        if (!configs.exists()) {
+            if(!configs.mkdir()) {
+                System.err.println("The script not able to create the config directory")
+            }
+        }
         File(configPath, "SDKConfig.kt").writeText(config)
     }
 }

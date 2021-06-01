@@ -17,5 +17,5 @@
 package care.data4life.sdk.config
 
 object SDKConfig {
-    const val version: String = "1.12.0-change-user-service-tests-SNAPSHOT"
+    const val version: String = "1.12.0-change-fileservice-tests-SNAPSHOT"
 }

@@ -43,7 +43,7 @@ object AttachmentDownloadHelper : AttachmentInternalContract.DownloadHelper {
             CompatibilityValidator.isHashable(attachment) &&
             attachment.hash != newHash
         ) {
-            throw DataValidationException.InvalidAttachmentPayloadHash("Attachment.hash is not valid")
+            throw DataValidationException.InvalidAttachmentPayloadHash("Attachment hash is invalid")
         } else {
             attachment.also {
                 it.data = Base64.encodeToString(data)

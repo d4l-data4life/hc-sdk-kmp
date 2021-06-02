@@ -107,7 +107,7 @@ class AttachmentDownloadHelperTest {
 
         assertEquals(
             actual = error.message,
-            expected = "Attachment.hash is not valid"
+            expected = "Attachment hash is invalid"
         )
 
         verify(exactly = 0) { attachment.data = any() }

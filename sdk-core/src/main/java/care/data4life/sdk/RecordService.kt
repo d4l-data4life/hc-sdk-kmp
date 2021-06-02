@@ -1067,11 +1067,6 @@ class RecordService internal constructor(
         }
     }
 
-    /*
-     *   TODO: This function makes a false assumption. It claims, that the output of the attachmentService.upload
-     *    matches List<String?>?, but it is actually List<String?>. This means the claim of the former author that second (the list)
-     *    is a indicator for a type is wrong.
-     */
     internal fun updateFhirResourceIdentifier(
         resource: Any,
         result: List<Pair<WrapperContract.Attachment, List<String?>?>>
@@ -1130,6 +1125,7 @@ class RecordService internal constructor(
         return null // Attachment is not of image type
     }
 
+    // TODO: Move to AttachmentService
     @Throws(
         DataRestrictionException.MaxDataSizeViolation::class,
         DataRestrictionException.UnsupportedFileType::class

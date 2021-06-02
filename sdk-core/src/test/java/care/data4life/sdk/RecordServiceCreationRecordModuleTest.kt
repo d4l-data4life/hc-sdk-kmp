@@ -153,8 +153,6 @@ class RecordServiceCreationRecordModuleTest {
                     (cryptoService as CryptoServiceFake).iteration = receivedIteration
                 }
             } else {
-
-                println(encryptedUploadRecord)
                 throw RuntimeException("Unexpected encrypted record\n${actualRecord.captured}")
             }
         }
@@ -758,6 +756,111 @@ class RecordServiceCreationRecordModuleTest {
         }
     }
 
+    @Test
+    fun `Given, createFhir3Record is called with the appropriate payload with Annotations and Attachments, it creates a Record for Fhir3, while resizing the attachment once`() {
+        // Given
+        val resourceType = "DocumentReference"
+        val tags = mapOf(
+            "partner" to PARTNER_ID,
+            "client" to CLIENT_ID,
+            "fhirversion" to "3.0.1",
+            "resourcetype" to resourceType
+        )
+
+        val annotations = listOf(
+            "wow",
+            "it",
+            "works",
+            "and",
+            "like_a_duracell_häsi"
+        )
+
+        val rawAttachment = TestResourceHelper.getByteResource("attachments", "sample.png")
+        val attachment = Base64.encodeToString(rawAttachment)
+
+        val template = loadTemplateWithAttachments(
+            "common",
+            "documentReference-with-attachment-template",
+            RECORD_ID,
+            PARTNER_ID,
+            "Sample PNG",
+            "image/png",
+            attachment
+        )
+
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
+            resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
+            template
+        ) as Fhir3DocumentReference
+
+        val internalResource = SdkFhirParser.toFhir<Fhir3Resource>(
+            resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
+            template
+        ) as Fhir3DocumentReference
+
+        internalResource.identifier!!.add(
+            Fhir3Identifier().also {
+                it.assigner = Fhir3Reference().also { ref -> ref.reference = PARTNER_ID }
+                it.value = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$ATTACHMENT_ID"
+            }
+        )
+
+        internalResource.content[0].attachment.id = ATTACHMENT_ID
+        internalResource.content[0].attachment.data = null
+
+        val preview = Pair(PREVIEW, PREVIEW_ID)
+
+        runFhirFlowWithAttachment(
+            serializedResource = SdkFhirParser.fromResource(internalResource),
+            attachmentData = rawAttachment,
+            tags = tags,
+            annotations = annotations,
+            attachmentId = ATTACHMENT_ID,
+            resizedImages = Pair(preview, null)
+        )
+
+        // When
+        val result = recordService.createRecord(
+            USER_ID,
+            resource,
+            annotations = annotations
+        ).blockingGet()
+
+        // Then
+        assertTrue(result is Record)
+        assertTrue(result.resource.identifier!!.isNotEmpty())
+        assertEquals(
+            expected = flowHelper.buildMeta(CREATION_DATE, UPDATE_DATE),
+            actual = result.meta
+        )
+        assertEquals(
+            actual = result.annotations,
+            expected = annotations
+        )
+        assertEquals(
+            expected = resource,
+            actual = result.resource
+        )
+        assertEquals(
+            actual = result.resource.content.size,
+            expected = 1
+        )
+        assertEquals(
+            actual = result.resource.content[0].attachment.data,
+            expected = attachment
+        )
+        assertEquals(
+            actual = result.resource.content[0].attachment.id,
+            expected = ATTACHMENT_ID
+        )
+        assertEquals(
+            actual = result.resource.identifier?.get(1)?.value,
+            expected = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$ATTACHMENT_ID"
+        )
+    }
+
     // FHIR4
     @Test
     fun `Given, createFhir4Record is called with the appropriate payload without Annotations or Attachments, it creates a Record for Fhir4`() {
@@ -1079,6 +1182,111 @@ class RecordServiceCreationRecordModuleTest {
         assertEquals(
             actual = result.resource.identifier?.get(1)?.value,
             expected = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$THUMBNAIL_ID"
+        )
+    }
+
+    @Test
+    fun `Given, createFhir4Record is called with the appropriate payload with Annotations and Attachments, it creates a Record for Fhir4, while resizing the attachment once`() {
+        // Given
+        val resourceType = "DocumentReference"
+        val tags = mapOf(
+            "partner" to PARTNER_ID,
+            "client" to CLIENT_ID,
+            "fhirversion" to "4.0.1",
+            "resourcetype" to resourceType
+        )
+
+        val annotations = listOf(
+            "wow",
+            "it",
+            "works",
+            "and",
+            "like_a_duracell_häsi"
+        )
+
+        val rawAttachment = TestResourceHelper.getByteResource("attachments", "sample.png")
+        val attachment = Base64.encodeToString(rawAttachment)
+
+        val template = loadTemplateWithAttachments(
+            "common",
+            "documentReference-with-attachment-template",
+            RECORD_ID,
+            PARTNER_ID,
+            "Sample PNG",
+            "image/png",
+            attachment
+        )
+
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
+            resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
+            template
+        ) as Fhir4DocumentReference
+
+        val internalResource = SdkFhirParser.toFhir<Fhir4Resource>(
+            resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
+            template
+        ) as Fhir4DocumentReference
+
+        internalResource.identifier!!.add(
+            Fhir4Identifier().also {
+                it.assigner = Fhir4Reference().also { ref -> ref.reference = PARTNER_ID }
+                it.value = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$ATTACHMENT_ID"
+            }
+        )
+
+        internalResource.content[0].attachment.id = ATTACHMENT_ID
+        internalResource.content[0].attachment.data = null
+
+        val preview = Pair(PREVIEW, PREVIEW_ID)
+
+        runFhirFlowWithAttachment(
+            serializedResource = SdkFhirParser.fromResource(internalResource),
+            attachmentData = rawAttachment,
+            tags = tags,
+            annotations = annotations,
+            attachmentId = ATTACHMENT_ID,
+            resizedImages = Pair(preview, null)
+        )
+
+        // When
+        val result = recordService.createRecord(
+            USER_ID,
+            resource,
+            annotations = annotations
+        ).blockingGet()
+
+        // Then
+        assertTrue(result is Fhir4Record)
+        assertTrue(result.resource.identifier!!.isNotEmpty())
+        assertEquals(
+            expected = flowHelper.buildMeta(CREATION_DATE, UPDATE_DATE),
+            actual = result.meta
+        )
+        assertEquals(
+            actual = result.annotations,
+            expected = annotations
+        )
+        assertEquals(
+            expected = resource,
+            actual = result.resource
+        )
+        assertEquals(
+            actual = result.resource.content.size,
+            expected = 1
+        )
+        assertEquals(
+            actual = result.resource.content[0].attachment.data,
+            expected = attachment
+        )
+        assertEquals(
+            actual = result.resource.content[0].attachment.id,
+            expected = ATTACHMENT_ID
+        )
+        assertEquals(
+            actual = result.resource.identifier?.get(1)?.value,
+            expected = "d4l_f_p_t#$ATTACHMENT_ID#$PREVIEW_ID#$ATTACHMENT_ID"
         )
     }
 

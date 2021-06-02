@@ -703,6 +703,7 @@ class RecordService internal constructor(
             throw IllegalArgumentException("The given Record does not match the expected resource type.")
         }
     }
+
     @Deprecated("This is a test concern and should be removed once a proper DI/SL is in place.")
     internal fun <T : Any> fromResource(
         resource: T,

@@ -188,7 +188,7 @@ object Versions {
     /**
      * [mockk](http://mockk.io)
      */
-    const val testMockk = "1.10.0"
+    const val testMockk = "1.10.6"
 
     const val testTruth = "0.44"
     const val testTruthAndroid = "0.44"

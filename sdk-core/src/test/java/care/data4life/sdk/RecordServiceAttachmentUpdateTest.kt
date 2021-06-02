@@ -171,7 +171,7 @@ class RecordServiceAttachmentUpdateTest {
         }
 
         verify { attachmentService.upload(any(), any(), any()) wasNot Called }
-        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
+        verify(exactly = 0) { SdkFhirAttachmentHelper.getAttachment(any()) }
     }
 
     @Test

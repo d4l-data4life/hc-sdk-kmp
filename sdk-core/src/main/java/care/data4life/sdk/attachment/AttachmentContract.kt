@@ -98,6 +98,7 @@ interface AttachmentContract {
     }
 
     companion object {
+        val INVALID_DOWNSCALED_IMAGE = ByteArray(0)
         internal const val DOWNSCALED_ATTACHMENT_ID_POS = 1
         internal const val POSITION_PREVIEW = 0
         internal const val SPLIT_CHAR = "#"

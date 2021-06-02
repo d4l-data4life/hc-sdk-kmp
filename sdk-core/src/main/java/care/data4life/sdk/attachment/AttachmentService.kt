@@ -19,12 +19,10 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_JPEG_QUALITY_PERCENT
 import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_PREVIEW_SIZE_PX
 import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_THUMBNAIL_SIZE_PX
-import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.lang.ImageResizeException
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.util.Base64.decode
-import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.wrapper.WrapperContract
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -74,31 +72,15 @@ class AttachmentService internal constructor(
             .flatMapIterable { it }
             .filter { it.id != null }
             .map { attachment ->
-                var attachmentId = attachment.id!!
-                var isPreview = false
-                if (attachmentId.contains(SPLIT_CHAR)) {
-                    attachmentId = attachmentId.split(SPLIT_CHAR)[DOWNSCALED_ATTACHMENT_ID_POS]
-                    isPreview = true
-                }
+                val attachmentId = AttachmentDownloadHelper.deriveAttachmentId(attachment)
 
                 val data = fileService.downloadFile(
                     attachmentsKey,
                     userId,
                     attachmentId
                 ).blockingGet()
-                val newHash = hasher.hash(data)
 
-                if (!isPreview &&
-                    CompatibilityValidator.isHashable(attachment) &&
-                    attachment.hash != newHash
-                ) {
-                    throw DataValidationException.InvalidAttachmentPayloadHash()
-                } else {
-                    attachment.also {
-                        it.data = encodeToString(data)
-                        it.hash = newHash
-                    }
-                }
+                AttachmentDownloadHelper.addAttachmentPayload(attachment, data)
             }
             .toList()
     }
@@ -160,7 +142,6 @@ class AttachmentService internal constructor(
     }
 
     companion object {
-        private const val DOWNSCALED_ATTACHMENT_ID_POS = 1
         private const val POSITION_PREVIEW = 0
     }
 }

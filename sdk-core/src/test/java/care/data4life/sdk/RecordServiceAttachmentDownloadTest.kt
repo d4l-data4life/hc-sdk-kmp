@@ -133,7 +133,7 @@ class RecordServiceAttachmentDownloadTest {
         )
 
         verify { attachmentService.download(any(), any(), any()) wasNot Called }
-        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
+        verify(exactly = 0) { SdkFhirAttachmentHelper.getAttachment(any()) }
     }
 
     @Test
@@ -362,7 +362,7 @@ class RecordServiceAttachmentDownloadTest {
         )
 
         verify { attachmentService.download(any(), any(), any()) wasNot Called }
-        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
+        verify(exactly = 0) { SdkFhirAttachmentHelper.getAttachment(any()) }
     }
 
     @Test

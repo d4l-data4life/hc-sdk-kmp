@@ -25,7 +25,6 @@ import care.data4life.sdk.lang.ImageResizeException
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.Base64.encodeToString
-import care.data4life.sdk.util.HashUtil.sha1
 import care.data4life.sdk.wrapper.WrapperContract
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -36,11 +35,13 @@ class AttachmentService internal constructor(
     // TODO move imageResizer to thumbnail service
     private val imageResizer: AttachmentContract.ImageResizer
 ) : AttachmentContract.Service {
+    private val hasher: AttachmentContract.Hasher = AttachmentHasher
+
     override fun upload(
         attachments: List<WrapperContract.Attachment>,
         attachmentsKey: GCKey,
         userId: String
-    ): Single<List<Pair<WrapperContract.Attachment, List<String>>>> {
+    ): Single<List<Pair<WrapperContract.Attachment, List<String>?>>> {
         return Observable.fromIterable(attachments)
             .filter { it.data != null }
             .map { attachment ->
@@ -50,6 +51,7 @@ class AttachmentService internal constructor(
                     userId,
                     originalData
                 ).blockingGet()
+
                 val additionalIds = uploadDownscaledImages(
                     attachmentsKey,
                     userId,
@@ -58,7 +60,6 @@ class AttachmentService internal constructor(
                 )
                 Pair(attachment, additionalIds)
             }
-            .filter { (first) -> first.id != null }
             .toList()
     }
 
@@ -85,7 +86,7 @@ class AttachmentService internal constructor(
                     userId,
                     attachmentId
                 ).blockingGet()
-                val newHash = encodeToString(sha1(data))
+                val newHash = hasher.hash(data)
 
                 if (!isPreview &&
                     CompatibilityValidator.isHashable(attachment) &&
@@ -112,7 +113,7 @@ class AttachmentService internal constructor(
         userId: String,
         attachment: WrapperContract.Attachment,
         originalData: ByteArray
-    ): List<String> {
+    ): List<String>? {
         var additionalIds = mutableListOf<String>()
         if (imageResizer.isResizable(originalData)) {
             additionalIds = ArrayList()
@@ -125,8 +126,10 @@ class AttachmentService internal constructor(
                     originalData,
                     if (position == POSITION_PREVIEW) DEFAULT_PREVIEW_SIZE_PX else DEFAULT_THUMBNAIL_SIZE_PX
                 )
-                if (downscaledId != null)
-                    additionalIds.add(downscaledId)
+
+                if (downscaledId == null) return null
+
+                additionalIds.add(downscaledId)
             }
         }
         return additionalIds
@@ -150,6 +153,7 @@ class AttachmentService internal constructor(
             Log.error(exception, exception.message)
             return null
         }
+
         return if (downscaledImage == null) { // currentSizePx <= targetSizePx
             attachment.id // nothing to upload
         } else fileService.uploadFile(attachmentsKey, userId, downscaledImage).blockingGet()

@@ -53,7 +53,7 @@ class CompatibilityValidatorTest {
         // Given
         val fhirAttachment = Fhir3Attachment()
         val fhirDateTime: Fhir3DateTime = mockk()
-        
+
         every { fhirDateTime.date } returns null
         fhirAttachment.creation = fhirDateTime
 
@@ -70,7 +70,7 @@ class CompatibilityValidatorTest {
         val fhirAttachment = Fhir3Attachment()
         val fhirDateTime: Fhir3DateTime = mockk()
         val fhirDate: Fhir3Date = mockk()
-        
+
         every { fhirDate.toDate() } returns null
         every { fhirDateTime.date } returns fhirDate
         fhirAttachment.creation = fhirDateTime

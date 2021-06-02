@@ -29,7 +29,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class AttachmentAttachmentGuardianTest {
+class AttachmentGuardianTest {
     @Test
     fun `It fulfils AttachmentGuardian`() {
         val guard: Any = AttachmentGuardian

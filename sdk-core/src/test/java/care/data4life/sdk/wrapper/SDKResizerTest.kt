@@ -17,7 +17,6 @@
 package care.data4life.sdk.wrapper
 
 import care.data4life.sdk.attachment.AttachmentContract
-import care.data4life.sdk.attachment.AttachmentContract.Companion.INVALID_DOWNSCALED_IMAGE
 import care.data4life.sdk.lang.ImageResizeException
 import care.data4life.sdk.log.Log
 import io.mockk.every
@@ -113,7 +112,7 @@ class SDKResizerTest {
         // Then
         assertSame(
             actual = result,
-            expected = INVALID_DOWNSCALED_IMAGE
+            expected = payload
         )
 
         verify(exactly = 1) { Log.error(error, error.message) }

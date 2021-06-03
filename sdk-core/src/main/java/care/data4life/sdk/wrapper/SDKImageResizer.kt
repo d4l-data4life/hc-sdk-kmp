@@ -37,7 +37,7 @@ class SDKImageResizer(
             )
         } catch (exception: ImageResizeException.JpegWriterMissing) {
             Log.error(exception, exception.message)
-            AttachmentContract.INVALID_DOWNSCALED_IMAGE
+            data
         }
     }
 }

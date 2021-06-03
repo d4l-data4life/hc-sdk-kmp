@@ -16,7 +16,6 @@
 package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.attachment.AttachmentContract.Companion.INVALID_DOWNSCALED_IMAGE
 import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_PREVIEW_SIZE_PX
 import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_THUMBNAIL_SIZE_PX
 import care.data4life.sdk.lang.DataValidationException
@@ -32,6 +31,35 @@ class AttachmentService internal constructor(
     resizer: AttachmentContract.ImageResizer
 ) : AttachmentContract.Service {
     private val imageResizer = SDKImageResizer(resizer)
+
+    override fun delete(
+        attachmentId: String,
+        userId: String
+    ): Single<Boolean> = fileService.deleteFile(userId, attachmentId)
+
+    @Throws(DataValidationException.InvalidAttachmentPayloadHash::class)
+    override fun download(
+        attachments: List<WrapperContract.Attachment>,
+        attachmentsKey: GCKey,
+        userId: String
+    ): Single<List<WrapperContract.Attachment>> {
+        return Observable
+            .fromCallable { attachments }
+            .flatMapIterable { it }
+            .filter { it.id != null }
+            .map { attachment ->
+                val attachmentId = AttachmentDownloadHelper.deriveAttachmentId(attachment)
+
+                val data = fileService.downloadFile(
+                    attachmentsKey,
+                    userId,
+                    attachmentId
+                ).blockingGet()
+
+                AttachmentDownloadHelper.addAttachmentPayload(attachment, data)
+            }
+            .toList()
+    }
 
     override fun upload(
         attachments: List<WrapperContract.Attachment>,
@@ -55,34 +83,6 @@ class AttachmentService internal constructor(
                     originalData
                 )
                 Pair(attachment, additionalIds)
-            }
-            .toList()
-    }
-
-    override fun delete(attachmentId: String, userId: String): Single<Boolean> {
-        return fileService.deleteFile(userId, attachmentId)
-    }
-
-    @Throws(DataValidationException.InvalidAttachmentPayloadHash::class)
-    override fun download(
-        attachments: List<WrapperContract.Attachment>,
-        attachmentsKey: GCKey,
-        userId: String
-    ): Single<List<WrapperContract.Attachment>> {
-        return Observable
-            .fromCallable { attachments }
-            .flatMapIterable { it }
-            .filter { it.id != null }
-            .map { attachment ->
-                val attachmentId = AttachmentDownloadHelper.deriveAttachmentId(attachment)
-
-                val data = fileService.downloadFile(
-                    attachmentsKey,
-                    userId,
-                    attachmentId
-                ).blockingGet()
-
-                AttachmentDownloadHelper.addAttachmentPayload(attachment, data)
             }
             .toList()
     }
@@ -159,7 +159,7 @@ class AttachmentService internal constructor(
         targetHeight: Int
     ): String? {
         return when (val downscaledImage = imageResizer.resize(originalData, targetHeight)) {
-            INVALID_DOWNSCALED_IMAGE -> null
+            originalData -> null
             is ByteArray -> fileService.uploadFile(
                 attachmentsKey,
                 userId,

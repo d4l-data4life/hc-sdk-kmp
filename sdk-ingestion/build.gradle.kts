@@ -34,6 +34,12 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+kotlin {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions.jvmTarget = "1.8"
+    }
+}
+
 dependencies {
     api(project(":sdk-core")) {
         exclude(group = "care.data4life", module = "securestore-android")

@@ -21,6 +21,7 @@ import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.reactivex.Single
@@ -38,6 +39,8 @@ class FileServiceTest {
 
     @Before
     fun setUp() {
+        clearAllMocks()
+
         service = FileService(ALIAS, apiService, cryptoService)
     }
 

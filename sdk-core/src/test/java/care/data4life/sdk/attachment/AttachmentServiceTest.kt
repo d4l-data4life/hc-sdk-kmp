@@ -24,6 +24,7 @@ import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.util.Base64.encodeToString
 import care.data4life.sdk.wrapper.WrapperContract
 import io.mockk.Runs
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -46,6 +47,8 @@ class AttachmentServiceTest {
 
     @Before
     fun setUp() {
+        clearAllMocks()
+
         service = AttachmentService(fileService, resizer)
     }
 

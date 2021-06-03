@@ -16,10 +16,10 @@
 
 package care.data4life.sdk.network.util.interceptor
 
-import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.NetworkingContract.Companion.BASIC_AUTH_MARKER
 import care.data4life.sdk.network.NetworkingContract.Companion.FORMAT_BASIC_AUTH
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
+import care.data4life.sdk.network.NetworkingInternalContract
 import care.data4life.sdk.util.Base64
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -28,7 +28,7 @@ import java.io.IOException
 
 internal class BasicAuthorizationInterceptor private constructor(
     private val credentials: String
-) : NetworkingContract.Interceptor {
+) : NetworkingInternalContract.Interceptor {
     private fun modifyRequest(request: Request): Request {
         return request.newBuilder()
             .replaceHeader(HEADER_AUTHORIZATION, credentials)
@@ -58,7 +58,7 @@ internal class BasicAuthorizationInterceptor private constructor(
         }
     }
 
-    companion object Factory : NetworkingContract.InterceptorFactory<Pair<String, String>> {
+    companion object Factory : NetworkingInternalContract.InterceptorFactory<Pair<String, String>> {
         private fun prepareCredentials(credentials: Pair<String, String>): String {
             val (user, secret) = credentials
             return String.format(
@@ -67,7 +67,7 @@ internal class BasicAuthorizationInterceptor private constructor(
             )
         }
 
-        override fun getInstance(payload: Pair<String, String>): NetworkingContract.Interceptor {
+        override fun getInstance(payload: Pair<String, String>): NetworkingInternalContract.Interceptor {
             return BasicAuthorizationInterceptor(prepareCredentials(payload))
         }
     }

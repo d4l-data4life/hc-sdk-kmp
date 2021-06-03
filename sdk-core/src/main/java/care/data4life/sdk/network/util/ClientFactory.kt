@@ -18,6 +18,7 @@ package care.data4life.sdk.network.util
 
 import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.network.NetworkingContract
+import care.data4life.sdk.network.NetworkingInternalContract
 import care.data4life.sdk.network.util.interceptor.BasicAuthorizationInterceptor
 import care.data4life.sdk.network.util.interceptor.LoggingInterceptor
 import care.data4life.sdk.network.util.interceptor.OAuthAuthorizationInterceptor
@@ -27,7 +28,7 @@ import care.data4life.sdk.network.util.interceptor.VersionInterceptor
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
-object ClientFactory : NetworkingContract.ClientFactory {
+object ClientFactory : NetworkingInternalContract.ClientFactory {
     private fun setCertificationPinner(
         builder: OkHttpClient.Builder,
         environment: NetworkingContract.Environment,

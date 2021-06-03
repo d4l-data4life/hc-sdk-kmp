@@ -18,6 +18,7 @@ package care.data4life.sdk.network.util.interceptor
 
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_SDK_VERSION
+import care.data4life.sdk.network.NetworkingInternalContract
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -33,7 +34,7 @@ class VersionInterceptorTest {
     fun `It fulfils InterceptorFactory`() {
         val factory: Any = VersionInterceptor
 
-        assertTrue(factory is NetworkingContract.InterceptorFactory<*>)
+        assertTrue(factory is NetworkingInternalContract.InterceptorFactory<*>)
     }
 
     @Test
@@ -50,7 +51,7 @@ class VersionInterceptorTest {
         )
 
         // Then
-        assertTrue(interceptor is NetworkingContract.Interceptor)
+        assertTrue(interceptor is NetworkingInternalContract.Interceptor)
     }
 
     @Test

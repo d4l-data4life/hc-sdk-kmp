@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+ * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
  *
  * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
@@ -14,19 +14,14 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.wrapper
+package care.data4life.sdk.model
 
-import care.data4life.sdk.fhir.Fhir4Identifier
+import care.data4life.sdk.lang.CoreRuntimeException
+import care.data4life.sdk.network.model.NetworkModelContract
 
-internal class SdkFhir4Identifier(
-    private val identifier: Fhir4Identifier
-) : WrapperInternalContract.Identifier {
-    override var value: String?
-        get() = identifier.value
-        set(value) {
-            identifier.value = value
-        }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : Any> unwrap(): T = identifier as T
+internal class ModelInternalContract {
+    interface RecordFactory {
+        @Throws(CoreRuntimeException.InternalFailure::class)
+        fun <T : Any> getInstance(record: NetworkModelContract.DecryptedBaseRecord<T>): ModelContract.BaseRecord<T>
+    }
 }

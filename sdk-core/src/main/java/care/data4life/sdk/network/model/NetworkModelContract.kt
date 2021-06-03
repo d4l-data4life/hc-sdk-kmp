@@ -17,54 +17,47 @@
 package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.data.DataResource
-import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
 import care.data4life.sdk.tag.Tags
 
 class NetworkModelContract {
-    internal interface Version {
-        val code: Int
-        val name: String
-        val status: String
-    }
-
     enum class VersionStatus {
         DEPRECATED,
         SUPPORTED,
         UNSUPPORTED
     }
 
-    internal interface VersionList {
+    interface VersionList {
         val versions: List<Version>
         fun resolveSupportStatus(version: String): VersionStatus
     }
 
-    internal interface DocumentUploadResponse {
-        var documentId: String
+    interface Version {
+        val code: Int
+        val name: String
+        val status: String
     }
 
-    internal interface CommonKeyResponse {
+    interface UserInfo {
+        val userId: String
+        val encryptedCommonKey: EncryptedKey
+        val commonKeyId: String
+        val encryptedTagEncryptionKey: EncryptedKey
+    }
+
+    interface CommonKeyResponse {
         val commonKey: EncryptedKey
+    }
+
+    interface DocumentUploadResponse {
+        var documentId: String
     }
 
     interface EncryptedKey {
         val base64Key: String
         fun decode(): ByteArray
-    }
-
-    internal interface EncryptedKeyMaker {
-        fun create(key: ByteArray): EncryptedKey
-    }
-
-    internal interface UserInfo {
-        val userId: String
-        val encryptedCommonKey: EncryptedKey
-        val commonKeyId: String
-        val encryptedTagEncryptionKey: EncryptedKey
     }
 
     // TODO: internal
@@ -93,17 +86,13 @@ class NetworkModelContract {
         var modelVersion: Int
     }
 
-    // FIXME remove nullable type
-    internal interface DecryptedFhir3Record<T : Fhir3Resource?> : DecryptedBaseRecord<T>
-    internal interface DecryptedFhir4Record<T : Fhir4Resource> : DecryptedBaseRecord<T>
-    internal interface DecryptedCustomDataRecord : DecryptedBaseRecord<DataResource> {
-        override var attachmentsKey: GCKey?
-            get() = null
-            set(_) {}
-    }
+    // TODO: This should be internal
+    interface CryptoService {
+        fun <T : Any> fromResource(
+            resource: T,
+            annotations: Annotations
+        ): DecryptedBaseRecord<T>
 
-    internal interface CryptoService {
-        fun <T : Any> fromResource(resource: T, annotations: Annotations): DecryptedBaseRecord<T>
         fun <T : Any> encrypt(decryptedRecord: DecryptedBaseRecord<T>): EncryptedRecord
         fun <T : Any> decrypt(
             encryptedRecord: EncryptedRecord,

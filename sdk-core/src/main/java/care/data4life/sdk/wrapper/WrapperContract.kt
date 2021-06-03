@@ -36,11 +36,6 @@ class WrapperContract {
         fun <T : Any> unwrap(): T
     }
 
-    internal interface Identifier {
-        var value: String?
-        fun <T : Any> unwrap(): T
-    }
-
     interface FhirElementFactory {
 
         @Throws(CoreRuntimeException.InternalFailure::class)

@@ -13,11 +13,9 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
+package care.data4life.sdk.model
 
-package care.data4life.sdk.model;
-
-public enum DownloadType {
-    Full,
-    Medium,
-    Small
+// TODO: Move to Attachment or into SDKContract
+enum class DownloadType {
+    Full, Medium, Small
 }

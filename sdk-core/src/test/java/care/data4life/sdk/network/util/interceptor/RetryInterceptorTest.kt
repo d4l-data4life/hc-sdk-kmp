@@ -18,6 +18,7 @@ package care.data4life.sdk.network.util.interceptor
 
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.network.NetworkingContract
+import care.data4life.sdk.network.NetworkingInternalContract
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -35,7 +36,7 @@ class RetryInterceptorTest {
     fun `It fulfils InterceptorFactory`() {
         val factory: Any = RetryInterceptor
 
-        assertTrue(factory is NetworkingContract.InterceptorFactory<*>)
+        assertTrue(factory is NetworkingInternalContract.InterceptorFactory<*>)
     }
 
     @Test
@@ -47,7 +48,7 @@ class RetryInterceptorTest {
         val interceptor: Any = RetryInterceptor.getInstance(service)
 
         // Then
-        assertTrue(interceptor is NetworkingContract.Interceptor)
+        assertTrue(interceptor is NetworkingInternalContract.Interceptor)
     }
 
     @Test

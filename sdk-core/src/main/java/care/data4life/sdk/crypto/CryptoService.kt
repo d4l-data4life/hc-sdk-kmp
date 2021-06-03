@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+ * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
  *
  * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
@@ -13,7 +13,7 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
-package care.data4life.sdk
+package care.data4life.sdk.crypto
 
 import care.data4life.crypto.CryptoProtocol
 import care.data4life.crypto.ExchangeKey
@@ -28,13 +28,10 @@ import care.data4life.crypto.KeyType
 import care.data4life.crypto.KeyVersion
 import care.data4life.crypto.convertPrivateKeyPemStringToGCKeyPair
 import care.data4life.crypto.error.CryptoException
-import care.data4life.sdk.crypto.CommonKeyService
-import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.crypto.CryptoContract.Service.Companion.GC_KEYPAIR
 import care.data4life.sdk.crypto.CryptoContract.Service.Companion.IV_SIZE
 import care.data4life.sdk.crypto.CryptoContract.Service.Companion.KEY_VERSION
 import care.data4life.sdk.crypto.CryptoContract.Service.Companion.TEK_KEY
-import care.data4life.sdk.crypto.KeyFactory
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.D4LRuntimeException
 import care.data4life.sdk.log.Log
@@ -57,10 +54,10 @@ open class CryptoService : CryptoProtocol, CryptoContract.Service {
     private var rng: SecureRandom
     private var base64: Base64
     private var keyFactory: KeyFactory
-    private var commonKeyService: CryptoContract.CommonKeyService
+    private var commonKeyService: CryptoInternalContract.CommonKeyService
 
     // for testing only
-    constructor(
+    internal constructor(
         alias: String,
         storage: CryptoSecureStore,
         moshi: Moshi,

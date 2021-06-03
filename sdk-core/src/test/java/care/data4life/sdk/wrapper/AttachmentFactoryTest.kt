@@ -28,7 +28,7 @@ class AttachmentFactoryTest {
     @Test
     fun `It fulfils AttachmentFactory`() {
         val factory: Any = SdkAttachmentFactory
-        assertTrue(factory is WrapperFactoryContract.AttachmentFactory)
+        assertTrue(factory is WrapperInternalContract.AttachmentFactory)
     }
 
     @Test

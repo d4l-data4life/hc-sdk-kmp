@@ -41,6 +41,7 @@ import care.data4life.sdk.wrapper.SdkAttachmentFactory
 import care.data4life.sdk.wrapper.SdkFhirAttachmentHelper
 import care.data4life.sdk.wrapper.SdkIdentifierFactory
 import care.data4life.sdk.wrapper.WrapperContract
+import care.data4life.sdk.wrapper.WrapperInternalContract
 import io.mockk.Runs
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -103,7 +104,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     @Test
     fun `Given, splitAdditionalAttachmentId is called, with a WrappedIdentifier, it returns null, if the Identifiers value is null`() {
         // Given
-        val additionalIdentifier: WrapperContract.Identifier = mockk()
+        val additionalIdentifier: WrapperInternalContract.Identifier = mockk()
 
         every { additionalIdentifier.value } returns null
 
@@ -117,7 +118,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     @Test
     fun `Given, splitAdditionalAttachmentId is called, with a WrappedIdentifier, it returns null, if the Identifiers value does not start with DOWNSCALED_ATTACHMENT_IDS_FMT`() {
         // Given
-        val additionalIdentifier: WrapperContract.Identifier = mockk()
+        val additionalIdentifier: WrapperInternalContract.Identifier = mockk()
 
         every { additionalIdentifier.value } returns "potato"
 
@@ -131,7 +132,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     @Test
     fun `Given, splitAdditionalAttachmentId is called, with a WrappedIdentifier, it fails, if the parts of the Identifiers value does not match DOWNSCALED_ATTACHMENT_IDS_SIZE`() {
         // Given
-        val additionalIdentifier: WrapperContract.Identifier = mockk()
+        val additionalIdentifier: WrapperInternalContract.Identifier = mockk()
 
         every { additionalIdentifier.value } returns DOWNSCALED_ATTACHMENT_IDS_FMT
 
@@ -150,7 +151,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
     @Test
     fun `Given, splitAdditionalAttachmentId is called, with a WrappedIdentifier, it splits the Identifiers value`() {
         // Given
-        val additionalIdentifier: WrapperContract.Identifier = mockk()
+        val additionalIdentifier: WrapperInternalContract.Identifier = mockk()
         val value = listOf(
             DOWNSCALED_ATTACHMENT_IDS_FMT,
             "potato",
@@ -273,7 +274,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val identifiers: MutableList<Fhir3Identifier> = mutableListOf(
             mockk()
         )
-        val wrappedIdentifier: WrapperContract.Identifier = mockk()
+        val wrappedIdentifier: WrapperInternalContract.Identifier = mockk()
 
         every { wrappedAttachment.id } returns attachmentId
         every { wrappedIdentifier.unwrap<Fhir3Identifier>() } returns identifiers[0]
@@ -315,7 +316,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val identifiers: MutableList<Fhir3Identifier> = mutableListOf(
             mockk()
         )
-        val wrappedIdentifier: WrapperContract.Identifier = mockk()
+        val wrappedIdentifier: WrapperInternalContract.Identifier = mockk()
         val splittedIdentifier = listOf("any", attachmentId)
 
         every { wrappedAttachment.id } returns attachmentId
@@ -358,7 +359,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val identifiers: MutableList<Fhir3Identifier> = mutableListOf(
             mockk()
         )
-        val wrappedIdentifier: WrapperContract.Identifier = mockk()
+        val wrappedIdentifier: WrapperInternalContract.Identifier = mockk()
         val splittedIdentifier = listOf("any", "any")
 
         every { wrappedAttachment.id } returns attachmentId
@@ -402,7 +403,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val identifiers: MutableList<Fhir3Identifier> = mutableListOf(
             mockk()
         )
-        val wrappedIdentifier: WrapperContract.Identifier = mockk()
+        val wrappedIdentifier: WrapperInternalContract.Identifier = mockk()
         val splittedIdentifier = listOf("any", attachmentId)
 
         every { wrappedAttachment.id } returns attachmentId
@@ -523,7 +524,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val identifiers: MutableList<Fhir4Identifier> = mutableListOf(
             mockk()
         )
-        val wrappedIdentifier: WrapperContract.Identifier = mockk()
+        val wrappedIdentifier: WrapperInternalContract.Identifier = mockk()
 
         every { wrappedAttachment.id } returns attachmentId
         every { wrappedIdentifier.unwrap<Fhir4Identifier>() } returns identifiers[0]
@@ -565,7 +566,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val identifiers: MutableList<Fhir4Identifier> = mutableListOf(
             mockk()
         )
-        val wrappedIdentifier: WrapperContract.Identifier = mockk()
+        val wrappedIdentifier: WrapperInternalContract.Identifier = mockk()
         val splittedIdentifier = listOf("any", attachmentId)
 
         every { wrappedAttachment.id } returns attachmentId
@@ -608,7 +609,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val identifiers: MutableList<Fhir4Identifier> = mutableListOf(
             mockk()
         )
-        val wrappedIdentifier: WrapperContract.Identifier = mockk()
+        val wrappedIdentifier: WrapperInternalContract.Identifier = mockk()
         val splittedIdentifier = listOf("any", "any")
 
         every { wrappedAttachment.id } returns attachmentId
@@ -652,7 +653,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val identifiers: MutableList<Fhir4Identifier> = mutableListOf(
             mockk()
         )
-        val wrappedIdentifier: WrapperContract.Identifier = mockk()
+        val wrappedIdentifier: WrapperInternalContract.Identifier = mockk()
         val splittedIdentifier = listOf("any", attachmentId)
 
         every { wrappedAttachment.id } returns attachmentId
@@ -695,7 +696,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val identifiers: List<Fhir3Identifier> = listOf(
             mockk()
         )
-        val wrappedIdentifier: WrapperContract.Identifier = mockk()
+        val wrappedIdentifier: WrapperInternalContract.Identifier = mockk()
 
         val attachmentId = "id"
 
@@ -715,7 +716,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val identifiers: List<Fhir3Identifier> = listOf(
             mockk()
         )
-        val wrappedIdentifier: WrapperContract.Identifier = mockk()
+        val wrappedIdentifier: WrapperInternalContract.Identifier = mockk()
 
         val attachmentId = "id"
         val parts = listOf("tomato", "soup")
@@ -736,7 +737,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val identifiers: List<Fhir3Identifier> = listOf(
             mockk()
         )
-        val wrappedIdentifier: WrapperContract.Identifier = mockk()
+        val wrappedIdentifier: WrapperInternalContract.Identifier = mockk()
 
         val attachmentId = "id"
         val parts = listOf("tomato", attachmentId)
@@ -760,7 +761,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val identifiers: List<Fhir4Identifier> = listOf(
             mockk()
         )
-        val wrappedIdentifier: WrapperContract.Identifier = mockk()
+        val wrappedIdentifier: WrapperInternalContract.Identifier = mockk()
 
         val attachmentId = "id"
 
@@ -780,7 +781,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val identifiers: List<Fhir4Identifier> = listOf(
             mockk()
         )
-        val wrappedIdentifier: WrapperContract.Identifier = mockk()
+        val wrappedIdentifier: WrapperInternalContract.Identifier = mockk()
 
         val attachmentId = "id"
         val parts = listOf("tomato", "soup")
@@ -801,7 +802,7 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         val identifiers: List<Fhir4Identifier> = listOf(
             mockk()
         )
-        val wrappedIdentifier: WrapperContract.Identifier = mockk()
+        val wrappedIdentifier: WrapperInternalContract.Identifier = mockk()
 
         val attachmentId = "id"
         val parts = listOf("tomato", attachmentId)

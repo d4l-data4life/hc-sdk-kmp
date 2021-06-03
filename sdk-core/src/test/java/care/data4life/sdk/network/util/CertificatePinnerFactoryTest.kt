@@ -17,6 +17,7 @@
 package care.data4life.sdk.network.util
 
 import care.data4life.sdk.network.NetworkingContract
+import care.data4life.sdk.network.NetworkingInternalContract
 import io.mockk.every
 import io.mockk.mockk
 import okhttp3.CertificatePinner
@@ -29,7 +30,7 @@ class CertificatePinnerFactoryTest {
     fun `It fulfils CertificatePinnerFactory`() {
         val factory: Any = CertificatePinnerFactory
 
-        assertTrue(factory is NetworkingContract.CertificatePinnerFactory)
+        assertTrue(factory is NetworkingInternalContract.CertificatePinnerFactory)
     }
 
     @Test

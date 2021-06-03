@@ -16,13 +16,13 @@
 
 package care.data4life.sdk.migration
 
-import care.data4life.sdk.migration.MigrationContract.CompatibilityEncoder.Companion.JS_LEGACY_ENCODING_REPLACEMENTS
+import care.data4life.sdk.migration.MigrationInternalContract.CompatibilityEncoder.Companion.JS_LEGACY_ENCODING_REPLACEMENTS
 import care.data4life.sdk.tag.TagEncoding
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.wrapper.UrlEncoding
 import care.data4life.sdk.wrapper.WrapperContract
 
-internal object CompatibilityEncoder : MigrationContract.CompatibilityEncoder {
+internal object CompatibilityEncoder : MigrationInternalContract.CompatibilityEncoder {
     private val tagEncoding: TaggingContract.Encoding = TagEncoding
     private val urlEncoding: WrapperContract.UrlEncoding = UrlEncoding
 

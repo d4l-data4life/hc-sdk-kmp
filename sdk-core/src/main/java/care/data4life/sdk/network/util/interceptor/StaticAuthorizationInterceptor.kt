@@ -19,13 +19,14 @@ package care.data4life.sdk.network.util.interceptor
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
+import care.data4life.sdk.network.NetworkingInternalContract
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
 
 internal class StaticAuthorizationInterceptor private constructor(
     token: String
-) : NetworkingContract.Interceptor {
+) : NetworkingInternalContract.Interceptor {
     private val authHeader = String.format(NetworkingContract.FORMAT_BEARER_TOKEN, token)
 
     /**
@@ -49,8 +50,8 @@ internal class StaticAuthorizationInterceptor private constructor(
         return chain.proceed(request)
     }
 
-    companion object Factory : NetworkingContract.InterceptorFactory<String> {
-        override fun getInstance(payload: String): NetworkingContract.Interceptor {
+    companion object Factory : NetworkingInternalContract.InterceptorFactory<String> {
+        override fun getInstance(payload: String): NetworkingInternalContract.Interceptor {
             return StaticAuthorizationInterceptor(payload)
         }
     }

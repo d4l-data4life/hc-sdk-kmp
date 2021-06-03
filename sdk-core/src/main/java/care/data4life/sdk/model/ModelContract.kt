@@ -17,19 +17,12 @@
 package care.data4life.sdk.model
 
 import care.data4life.fhir.stu3.model.DomainResource
-import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.tag.Annotations
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import java.io.Serializable
 
-class ModelContract {
-    internal interface RecordFactory {
-        @Throws(CoreRuntimeException.InternalFailure::class)
-        fun <T : Any> getInstance(record: DecryptedBaseRecord<T>): BaseRecord<T>
-    }
-
+interface ModelContract {
     interface BaseRecord<T> {
         val identifier: String
         val resource: T

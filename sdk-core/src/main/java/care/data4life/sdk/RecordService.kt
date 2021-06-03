@@ -43,7 +43,7 @@ import care.data4life.sdk.model.DownloadResult
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.FetchResult
 import care.data4life.sdk.model.ModelContract.BaseRecord
-import care.data4life.sdk.model.ModelContract.RecordFactory
+import care.data4life.sdk.model.ModelInternalContract.RecordFactory
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
@@ -52,8 +52,8 @@ import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
-import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
-import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
+import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedFhir3Record
+import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedFhir4Record
 import care.data4life.sdk.network.model.RecordCryptoService
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_FMT
@@ -67,13 +67,12 @@ import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.MimeType
 import care.data4life.sdk.util.MimeType.Companion.recognizeMimeType
-import care.data4life.sdk.wrapper.HelperContract
 import care.data4life.sdk.wrapper.SdkAttachmentFactory
 import care.data4life.sdk.wrapper.SdkDateTimeFormatter
 import care.data4life.sdk.wrapper.SdkFhirAttachmentHelper
 import care.data4life.sdk.wrapper.SdkIdentifierFactory
 import care.data4life.sdk.wrapper.WrapperContract
-import care.data4life.sdk.wrapper.WrapperFactoryContract
+import care.data4life.sdk.wrapper.WrapperInternalContract
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -129,9 +128,9 @@ class RecordService internal constructor(
         ModelVersion
     )
     private val recordFactory: RecordFactory = RecordMapper
-    private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper = SdkFhirAttachmentHelper
-    private val attachmentFactory: WrapperFactoryContract.AttachmentFactory = SdkAttachmentFactory
-    private val identifierFactory: WrapperFactoryContract.IdentifierFactory = SdkIdentifierFactory
+    private val fhirAttachmentHelper: WrapperInternalContract.FhirAttachmentHelper = SdkFhirAttachmentHelper
+    private val attachmentFactory: WrapperInternalContract.AttachmentFactory = SdkAttachmentFactory
+    private val identifierFactory: WrapperInternalContract.IdentifierFactory = SdkIdentifierFactory
     private val dateTimeFormatter: WrapperContract.DateTimeFormatter = SdkDateTimeFormatter
     private val attachmentGuardian: AttachmentContract.Guardian = AttachmentGuardian
     private val attachmentHash: AttachmentContract.Hasher = AttachmentHasher
@@ -1158,7 +1157,7 @@ class RecordService internal constructor(
     }
 
     @Throws(DataValidationException.IdUsageViolation::class)
-    internal fun splitAdditionalAttachmentId(identifier: WrapperContract.Identifier): List<String>? {
+    internal fun splitAdditionalAttachmentId(identifier: WrapperInternalContract.Identifier): List<String>? {
         if (identifier.value == null || !identifier.value!!.startsWith(DOWNSCALED_ATTACHMENT_IDS_FMT)) {
             return null
         }

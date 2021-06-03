@@ -16,7 +16,6 @@
 
 package care.data4life.sdk.network
 
-import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.network.model.CommonKeyResponse
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract
@@ -25,11 +24,8 @@ import care.data4life.sdk.network.model.VersionList
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import okhttp3.CertificatePinner
-import okhttp3.OkHttpClient
-import okhttp3.Response
 
-class NetworkingContract {
+interface NetworkingContract {
     // TODO: Break this down
     // TODO: Decouple ReturnValues
     interface Service {
@@ -91,25 +87,6 @@ class NetworkingContract {
         fun fetchVersionInfo(): Single<VersionList>
     }
 
-    internal interface CertificatePinnerFactory {
-        fun getInstance(platform: String, environment: Environment): CertificatePinner
-    }
-
-    internal interface Interceptor : okhttp3.Interceptor {
-        override fun intercept(chain: okhttp3.Interceptor.Chain): Response
-    }
-
-    internal interface PartialInterceptor<T : Any> {
-        fun intercept(
-            payload: T,
-            chain: okhttp3.Interceptor.Chain
-        ): Response
-    }
-
-    internal interface InterceptorFactory<T : Any> {
-        fun getInstance(payload: T): Interceptor
-    }
-
     enum class Clients(val identifier: String) {
         ANDROID("android"),
         JAVA("jvm"),
@@ -120,22 +97,6 @@ class NetworkingContract {
         fun isConnected(): Boolean
     }
 
-    internal enum class Data4LifeURI(val uri: String) {
-        SANDBOX("https://api-phdp-sandbox.hpsgc.de"),
-        DEVELOPMENT("https://api-phdp-dev.hpsgc.de"),
-        STAGING("https://api-staging.data4life.care"),
-        LOCAL("https://api.data4life.local"),
-        PRODUCTION("https://api.data4life.care")
-    }
-
-    internal enum class Smart4HealthURI(val uri: String) {
-        SANDBOX("https://api-sandbox.smart4health.eu"),
-        DEVELOPMENT("https://api-dev.smart4health.eu"),
-        STAGING("https://api-staging.smart4health.eu"),
-        LOCAL("https://api.smart4health.local"),
-        PRODUCTION("https://api.smart4health.eu")
-    }
-
     interface Environment {
         fun getApiBaseURL(platform: String): String
         fun getCertificatePin(platform: String): String
@@ -143,29 +104,6 @@ class NetworkingContract {
 
     interface EnvironmentFactory {
         fun fromName(name: String?): Environment
-    }
-
-    internal interface ClientFactory {
-        fun getInstance(
-            authService: AuthorizationContract.Service,
-            environment: Environment,
-            clientId: String,
-            clientSecret: String,
-            platform: String,
-            connectivityService: NetworkConnectivityService,
-            clientName: Clients,
-            clientVersion: String,
-            staticAccessToken: ByteArray?,
-            debugFlag: Boolean
-        ): OkHttpClient
-    }
-
-    internal interface HealthCloudApiFactory {
-        fun getInstance(
-            client: OkHttpClient,
-            platform: String,
-            environment: Environment
-        ): HealthCloudApi
     }
 
     interface SearchTagsBuilder {

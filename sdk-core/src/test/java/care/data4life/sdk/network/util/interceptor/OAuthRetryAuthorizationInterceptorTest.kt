@@ -20,6 +20,7 @@ import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.NetworkingContract.Companion.HTTP_401_UNAUTHORIZED
+import care.data4life.sdk.network.NetworkingInternalContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.AUTH_TOKEN
 import io.mockk.Called
@@ -50,7 +51,7 @@ class OAuthRetryAuthorizationInterceptorTest {
     fun `It fulfils PartialInterceptor`() {
         val interceptor: Any = OAuthRetryTokenAuthorizationInterceptor(service)
 
-        assertTrue(interceptor is NetworkingContract.PartialInterceptor<*>)
+        assertTrue(interceptor is NetworkingInternalContract.PartialInterceptor<*>)
     }
 
     @Test

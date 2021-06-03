@@ -19,6 +19,7 @@ package care.data4life.sdk.network.util
 import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.NetworkingContract.Companion.REQUEST_TIMEOUT
+import care.data4life.sdk.network.NetworkingInternalContract
 import care.data4life.sdk.network.util.interceptor.BasicAuthorizationInterceptor
 import care.data4life.sdk.network.util.interceptor.LoggingInterceptor
 import care.data4life.sdk.network.util.interceptor.OAuthAuthorizationInterceptor
@@ -71,7 +72,7 @@ class ClientFactoryTest {
     fun `It fulfils ClientFactory`() {
         val factory: Any = ClientFactory
 
-        assertTrue(factory is NetworkingContract.ClientFactory)
+        assertTrue(factory is NetworkingInternalContract.ClientFactory)
     }
 
     @Test
@@ -84,11 +85,11 @@ class ClientFactoryTest {
         val staticAccessToken = null
         val flag = false
 
-        val loggingInterceptor: NetworkingContract.Interceptor = mockk()
-        val retryInterceptor: NetworkingContract.Interceptor = mockk()
-        val versionInterceptor: NetworkingContract.Interceptor = mockk()
-        val oAuthInterceptor: NetworkingContract.Interceptor = mockk()
-        val basicInterceptor: NetworkingContract.Interceptor = mockk()
+        val loggingInterceptor: NetworkingInternalContract.Interceptor = mockk()
+        val retryInterceptor: NetworkingInternalContract.Interceptor = mockk()
+        val versionInterceptor: NetworkingInternalContract.Interceptor = mockk()
+        val oAuthInterceptor: NetworkingInternalContract.Interceptor = mockk()
+        val basicInterceptor: NetworkingInternalContract.Interceptor = mockk()
         val pinner: CertificatePinner = mockk(relaxed = true)
 
         every { LoggingInterceptor.getInstance(flag) } returns loggingInterceptor
@@ -167,10 +168,10 @@ class ClientFactoryTest {
         val staticAccessToken = AUTH_TOKEN
         val flag = false
 
-        val loggingInterceptor: NetworkingContract.Interceptor = mockk()
-        val retryInterceptor: NetworkingContract.Interceptor = mockk()
-        val versionInterceptor: NetworkingContract.Interceptor = mockk()
-        val staticAuthorizationInterceptor: NetworkingContract.Interceptor = mockk()
+        val loggingInterceptor: NetworkingInternalContract.Interceptor = mockk()
+        val retryInterceptor: NetworkingInternalContract.Interceptor = mockk()
+        val versionInterceptor: NetworkingInternalContract.Interceptor = mockk()
+        val staticAuthorizationInterceptor: NetworkingInternalContract.Interceptor = mockk()
         val pinner: CertificatePinner = mockk(relaxed = true)
 
         every { LoggingInterceptor.getInstance(flag) } returns loggingInterceptor

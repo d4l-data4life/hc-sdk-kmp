@@ -35,7 +35,7 @@ import javax.crypto.BadPaddingException
 import javax.crypto.IllegalBlockSizeException
 import javax.crypto.NoSuchPaddingException
 
-class CryptoContract {
+interface CryptoContract {
     interface SecureStore {
         fun clear()
         fun storeSecret(alias: String, secret: CharArray)
@@ -151,30 +151,5 @@ class CryptoContract {
             val KEY_VERSION = KeyVersion.VERSION_1
             const val IV_SIZE = 12
         }
-    }
-
-    internal interface CommonKeyService {
-
-        fun fetchCurrentCommonKeyId(): String
-
-        @Throws(IOException::class)
-        fun fetchCurrentCommonKey(): GCKey
-
-        fun fetchCommonKey(commonKeyId: String): GCKey
-
-        fun storeCurrentCommonKeyId(commonKeyId: String)
-
-        fun storeCommonKey(commonKeyId: String, commonKey: GCKey)
-
-        fun hasCommonKey(commonKeyId: String): Boolean
-
-        companion object {
-            const val DEFAULT_COMMON_KEY_ID = "00000000-0000-0000-0000-000000000000"
-        }
-    }
-
-    internal interface KeyFactory {
-        fun createGCKey(exchangeKey: ExchangeKey): GCKey
-        fun createGCKeyPair(exchangeKey: ExchangeKey): GCKeyPair
     }
 }

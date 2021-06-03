@@ -29,7 +29,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class CompatibilityEncoderTest {
-    private lateinit var compatibilityEncoder: MigrationContract.CompatibilityEncoder
+    private lateinit var compatibilityEncoder: MigrationInternalContract.CompatibilityEncoder
 
     @Before
     fun setUp() {
@@ -49,7 +49,7 @@ class CompatibilityEncoderTest {
     fun `It fulfils CompatibilityEncoder`() {
         val encoder: Any = CompatibilityEncoder
 
-        assertTrue(encoder is MigrationContract.CompatibilityEncoder)
+        assertTrue(encoder is MigrationInternalContract.CompatibilityEncoder)
     }
 
     @Test

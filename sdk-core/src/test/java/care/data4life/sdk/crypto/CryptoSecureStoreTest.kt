@@ -14,7 +14,7 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk
+package care.data4life.sdk.crypto
 
 import care.data4life.crypto.ExchangeKey
 import care.data4life.crypto.GCKey

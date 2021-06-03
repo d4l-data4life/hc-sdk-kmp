@@ -17,9 +17,10 @@
 package care.data4life.sdk.network.util
 
 import care.data4life.sdk.network.NetworkingContract
+import care.data4life.sdk.network.NetworkingInternalContract
 import okhttp3.CertificatePinner
 
-object CertificatePinnerFactory : NetworkingContract.CertificatePinnerFactory {
+object CertificatePinnerFactory : NetworkingInternalContract.CertificatePinnerFactory {
     private fun extractHostname(apiBaseURL: String): String {
         return apiBaseURL.replaceFirst("https://", "")
     }

@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.network.util.interceptor
 
-import care.data4life.sdk.network.NetworkingContract
+import care.data4life.sdk.network.NetworkingInternalContract
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkConstructor
@@ -46,7 +46,7 @@ class LoggingInterceptorTest {
     fun `It fulfils InterceptorFactory`() {
         val factory: Any = LoggingInterceptor
 
-        assertTrue(factory is NetworkingContract.InterceptorFactory<*>)
+        assertTrue(factory is NetworkingInternalContract.InterceptorFactory<*>)
     }
 
     @Test
@@ -61,7 +61,7 @@ class LoggingInterceptorTest {
         val interceptor: Any = LoggingInterceptor.getInstance(false)
 
         // Then
-        assertTrue(interceptor is NetworkingContract.Interceptor)
+        assertTrue(interceptor is NetworkingInternalContract.Interceptor)
 
         verify(exactly = 1) {
             anyConstructed<HttpLoggingInterceptor>()
@@ -81,7 +81,7 @@ class LoggingInterceptorTest {
         val interceptor: Any = LoggingInterceptor.getInstance(true)
 
         // Then
-        assertTrue(interceptor is NetworkingContract.Interceptor)
+        assertTrue(interceptor is NetworkingInternalContract.Interceptor)
 
         verify(exactly = 1) {
             anyConstructed<HttpLoggingInterceptor>()

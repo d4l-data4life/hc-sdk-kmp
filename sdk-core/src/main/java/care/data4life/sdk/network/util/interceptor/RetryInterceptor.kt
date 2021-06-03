@@ -18,6 +18,7 @@ package care.data4life.sdk.network.util.interceptor
 
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.network.NetworkingContract
+import care.data4life.sdk.network.NetworkingInternalContract
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
@@ -25,7 +26,7 @@ import java.net.SocketTimeoutException
 
 internal class RetryInterceptor private constructor(
     private val connection: NetworkingContract.NetworkConnectivityService
-) : NetworkingContract.Interceptor {
+) : NetworkingInternalContract.Interceptor {
     private fun retry(request: Request, chain: Interceptor.Chain): Response {
         return if (connection.isConnected()) {
             chain.proceed(request)
@@ -43,10 +44,11 @@ internal class RetryInterceptor private constructor(
         }
     }
 
-    companion object Factory : NetworkingContract.InterceptorFactory<NetworkingContract.NetworkConnectivityService> {
+    companion object Factory :
+        NetworkingInternalContract.InterceptorFactory<NetworkingContract.NetworkConnectivityService> {
         override fun getInstance(
             payload: NetworkingContract.NetworkConnectivityService
-        ): NetworkingContract.Interceptor {
+        ): NetworkingInternalContract.Interceptor {
             return RetryInterceptor(payload)
         }
     }

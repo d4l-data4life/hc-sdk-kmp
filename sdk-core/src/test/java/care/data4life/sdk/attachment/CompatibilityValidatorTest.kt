@@ -34,7 +34,7 @@ class CompatibilityValidatorTest {
     @Test
     fun `It fulfils FhirDateValidator`() {
         val validator: Any = CompatibilityValidator
-        assertTrue(validator is AttachmentContract.CompatibilityValidator)
+        assertTrue(validator is AttachmentInternalContract.CompatibilityValidator)
     }
 
     @Test

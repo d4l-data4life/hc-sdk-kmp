@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+ * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
  *
  * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
@@ -13,23 +13,27 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
+
 package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
+import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
-import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedFhir3Record
-import care.data4life.sdk.tag.Annotations
-import care.data4life.sdk.tag.Tags
-import java.io.Serializable
+import care.data4life.sdk.fhir.Fhir4Resource
 
-internal data class DecryptedRecord<T : Fhir3Resource?>(
-    override var identifier: String?,
-    override var resource: T,
-    override var tags: Tags,
-    override var annotations: Annotations,
-    override var customCreationDate: String?,
-    override var updatedDate: String?,
-    override var dataKey: GCKey,
-    override var attachmentsKey: GCKey?,
-    override var modelVersion: Int
-) : DecryptedFhir3Record<T>, Serializable
+internal class NetworkModelInternalContract {
+    interface EncryptedKeyMaker {
+        fun create(key: ByteArray): NetworkModelContract.EncryptedKey
+    }
+
+    // FIXME remove nullable type
+    interface DecryptedFhir3Record<T : Fhir3Resource?> : NetworkModelContract.DecryptedBaseRecord<T>
+
+    interface DecryptedFhir4Record<T : Fhir4Resource> : NetworkModelContract.DecryptedBaseRecord<T>
+
+    interface DecryptedCustomDataRecord : NetworkModelContract.DecryptedBaseRecord<DataResource> {
+        override var attachmentsKey: GCKey?
+            get() = null
+            set(_) {}
+    }
+}

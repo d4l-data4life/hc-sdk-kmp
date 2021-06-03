@@ -30,6 +30,7 @@ import care.data4life.crypto.GCAsymmetricKey;
 import care.data4life.crypto.GCKeyPair;
 import care.data4life.sdk.auth.UserService;
 import care.data4life.sdk.call.CallHandler;
+import care.data4life.sdk.crypto.CryptoService;
 import io.reactivex.Single;
 
 import static com.google.common.truth.Truth.assertThat;

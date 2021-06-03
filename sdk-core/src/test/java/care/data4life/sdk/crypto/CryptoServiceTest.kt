@@ -14,7 +14,7 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk
+package care.data4life.sdk.crypto
 
 import care.data4life.crypto.ExchangeKey
 import care.data4life.crypto.ExchangeKeyFactory.createKey
@@ -30,8 +30,6 @@ import care.data4life.crypto.KeyVersion
 import care.data4life.crypto.error.CryptoException.InvalidKeyVersion
 import care.data4life.crypto.error.CryptoException.KeyDecryptionFailed
 import care.data4life.crypto.error.CryptoException.KeyFetchingFailed
-import care.data4life.sdk.crypto.CommonKeyService
-import care.data4life.sdk.crypto.KeyFactory
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.util.Base64
 import com.squareup.moshi.JsonAdapter
@@ -571,7 +569,7 @@ class CryptoServiceTest {
         verify { mockStorage.getExchangeKey(PREFIX + TEK_KEY) }
     }
 
-    inner class MockCryptoService(
+    internal inner class MockCryptoService(
         alias: String?,
         storage: CryptoSecureStore?,
         moshi: Moshi?,

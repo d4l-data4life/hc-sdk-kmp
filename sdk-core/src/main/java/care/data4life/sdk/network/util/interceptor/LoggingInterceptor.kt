@@ -16,19 +16,19 @@
 
 package care.data4life.sdk.network.util.interceptor
 
-import care.data4life.sdk.network.NetworkingContract
+import care.data4life.sdk.network.NetworkingInternalContract
 import okhttp3.Interceptor
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 
 internal class LoggingInterceptor private constructor(
     private val interceptor: HttpLoggingInterceptor
-) : NetworkingContract.Interceptor {
+) : NetworkingInternalContract.Interceptor {
     override fun intercept(
         chain: Interceptor.Chain
     ): Response = interceptor.intercept(chain)
 
-    companion object Factory : NetworkingContract.InterceptorFactory<Boolean> {
+    companion object Factory : NetworkingInternalContract.InterceptorFactory<Boolean> {
         private fun determineDebugLevel(flag: Boolean): HttpLoggingInterceptor.Level {
             return if (flag) {
                 HttpLoggingInterceptor.Level.HEADERS
@@ -37,7 +37,7 @@ internal class LoggingInterceptor private constructor(
             }
         }
 
-        override fun getInstance(payload: Boolean): NetworkingContract.Interceptor {
+        override fun getInstance(payload: Boolean): NetworkingInternalContract.Interceptor {
             val interceptor = HttpLoggingInterceptor()
                 .setLevel(determineDebugLevel(payload))
 

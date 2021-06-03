@@ -22,9 +22,7 @@ import care.data4life.sdk.lang.ImageResizeException
 import care.data4life.sdk.wrapper.WrapperContract.Attachment
 import io.reactivex.Single
 
-// TODO change to internal
-class AttachmentContract {
-
+interface AttachmentContract {
     interface Service {
         fun upload(
             attachments: List<Attachment>,
@@ -40,10 +38,6 @@ class AttachmentContract {
         ): Single<List<Attachment>>
 
         fun delete(attachmentId: String, userId: String): Single<Boolean>
-    }
-
-    internal interface CompatibilityValidator {
-        fun isHashable(attachment: Attachment): Boolean
     }
 
     interface FileService {
@@ -77,10 +71,12 @@ class AttachmentContract {
         }
     }
 
+    // TODO: This should be internal of Attachments
     fun interface Hasher {
         fun hash(data: ByteArray): String
     }
 
+    // TODO: This should be internal of Attachments
     interface Guardian {
         @Throws(DataValidationException.IdUsageViolation::class)
         fun guardId(attachment: Attachment)

@@ -18,8 +18,8 @@ package care.data4life.sdk.network.util.interceptor
 
 import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.lang.D4LException
-import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
+import care.data4life.sdk.network.NetworkingInternalContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -45,7 +45,7 @@ class OAuthFetchTokenAuthorizationInterceptorTest {
     fun `It fulfils PartialInterceptor`() {
         val interceptor: Any = OAuthFetchTokenAuthorizationInterceptor(service)
 
-        assertTrue(interceptor is NetworkingContract.PartialInterceptor<*>)
+        assertTrue(interceptor is NetworkingInternalContract.PartialInterceptor<*>)
     }
 
     @Test

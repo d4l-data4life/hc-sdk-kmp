@@ -32,7 +32,7 @@ import care.data4life.fhir.stu3.model.FhirDateTime as Fhir3DateTime
 
 class CompatibilityValidatorTest {
     @Test
-    fun `it fulfils FhirDateValidator`() {
+    fun `It fulfils FhirDateValidator`() {
         val validator: Any = CompatibilityValidator
         assertTrue(validator is AttachmentContract.CompatibilityValidator)
     }

@@ -18,16 +18,16 @@ package care.data4life.sdk.network.util.interceptor
 
 import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.lang.D4LException
-import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.NetworkingContract.Companion.FORMAT_BEARER_TOKEN
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
+import care.data4life.sdk.network.NetworkingInternalContract
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
 
 class OAuthFetchTokenAuthorizationInterceptor internal constructor(
     private val authService: AuthorizationContract.Service
-) : NetworkingContract.PartialInterceptor<Pair<String, Request>> {
+) : NetworkingInternalContract.PartialInterceptor<Pair<String, Request>> {
     private fun modifyRequest(request: Request, alias: String): Request {
         val token = authService.getAccessToken(alias)
         return request.newBuilder()

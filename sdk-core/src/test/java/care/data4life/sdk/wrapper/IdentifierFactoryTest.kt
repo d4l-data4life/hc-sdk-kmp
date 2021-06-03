@@ -27,7 +27,7 @@ class IdentifierFactoryTest {
     @Test
     fun `It fulfils AttachmentFactory`() {
         val factory: Any = SdkIdentifierFactory
-        assertTrue(factory is WrapperFactoryContract.IdentifierFactory)
+        assertTrue(factory is WrapperInternalContract.IdentifierFactory)
     }
 
     @Test
@@ -46,7 +46,7 @@ class IdentifierFactoryTest {
         val wrapped: Any = SdkIdentifierFactory.wrap(givenIdentifier)
 
         // Then
-        assertTrue(wrapped is WrapperContract.Identifier)
+        assertTrue(wrapped is WrapperInternalContract.Identifier)
     }
 
     @Test
@@ -55,6 +55,6 @@ class IdentifierFactoryTest {
         val wrapped: Any = SdkIdentifierFactory.wrap(Fhir4Identifier())
 
         // Then
-        assertTrue(wrapped is WrapperContract.Identifier)
+        assertTrue(wrapped is WrapperInternalContract.Identifier)
     }
 }

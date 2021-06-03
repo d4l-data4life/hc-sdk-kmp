@@ -26,7 +26,7 @@ import care.data4life.sdk.fhir.Fhir4Identifier
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
 
-internal object SdkFhirAttachmentHelper : HelperContract.FhirAttachmentHelper {
+internal object SdkFhirAttachmentHelper : WrapperInternalContract.FhirAttachmentHelper {
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun hasAttachment(resource: Any): Boolean {

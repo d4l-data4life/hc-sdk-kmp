@@ -18,19 +18,19 @@ package care.data4life.sdk.network.util.interceptor
 
 import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.NetworkingContract.Companion.ACCESS_TOKEN_MARKER
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
+import care.data4life.sdk.network.NetworkingInternalContract
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
 
 internal class OAuthAuthorizationInterceptor private constructor(
-    private val fetchInterceptor: NetworkingContract.PartialInterceptor<Pair<String, Request>>,
-    private val retryInterceptor: NetworkingContract.PartialInterceptor<Triple<String, Request, Response>>,
-) : NetworkingContract.Interceptor {
+    private val fetchInterceptor: NetworkingInternalContract.PartialInterceptor<Pair<String, Request>>,
+    private val retryInterceptor: NetworkingInternalContract.PartialInterceptor<Triple<String, Request, Response>>,
+) : NetworkingInternalContract.Interceptor {
 
     private fun purgeAlias(request: Request): Request {
         return request.newBuilder()
@@ -75,8 +75,9 @@ internal class OAuthAuthorizationInterceptor private constructor(
         }
     }
 
-    companion object Factory : NetworkingContract.InterceptorFactory<AuthorizationContract.Service> {
-        override fun getInstance(payload: AuthorizationContract.Service): NetworkingContract.Interceptor {
+    companion object Factory :
+        NetworkingInternalContract.InterceptorFactory<AuthorizationContract.Service> {
+        override fun getInstance(payload: AuthorizationContract.Service): NetworkingInternalContract.Interceptor {
             return OAuthAuthorizationInterceptor(
                 OAuthFetchTokenAuthorizationInterceptor(payload),
                 OAuthRetryTokenAuthorizationInterceptor(payload)

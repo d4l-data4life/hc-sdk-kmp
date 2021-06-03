@@ -37,11 +37,11 @@ enum class Environment : NetworkingContract.Environment {
     }
 
     private fun d4lBaseUrl(): String {
-        return NetworkingContract.Data4LifeURI.valueOf(this.name).uri
+        return NetworkingInternalContract.Data4LifeURI.valueOf(this.name).uri
     }
 
     private fun s4hBaseUrl(): String {
-        return NetworkingContract.Smart4HealthURI.valueOf(this.name).uri
+        return NetworkingInternalContract.Smart4HealthURI.valueOf(this.name).uri
     }
 
     override fun getCertificatePin(platform: String): String {

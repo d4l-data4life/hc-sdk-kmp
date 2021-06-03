@@ -133,7 +133,7 @@ class RecordCryptoServiceTest {
         val record = service.fromResource(resource, annotations)
 
         // Then
-        assertTrue(record is NetworkModelContract.DecryptedFhir3Record)
+        assertTrue(record is NetworkModelInternalContract.DecryptedFhir3Record)
     }
 
     @Test
@@ -308,7 +308,7 @@ class RecordCryptoServiceTest {
         val record = service.fromResource(resource, annotations)
 
         // Then
-        assertTrue(record is NetworkModelContract.DecryptedFhir4Record)
+        assertTrue(record is NetworkModelInternalContract.DecryptedFhir4Record)
     }
 
     @Test
@@ -483,7 +483,7 @@ class RecordCryptoServiceTest {
         val record = service.fromResource(resource, annotations)
 
         // Then
-        assertTrue(record is NetworkModelContract.DecryptedCustomDataRecord)
+        assertTrue(record is NetworkModelInternalContract.DecryptedCustomDataRecord)
     }
 
     @Test

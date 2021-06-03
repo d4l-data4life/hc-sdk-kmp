@@ -18,10 +18,10 @@ package care.data4life.sdk.network.util.interceptor
 
 import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.NetworkingContract.Companion.ACCESS_TOKEN_MARKER
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
+import care.data4life.sdk.network.NetworkingInternalContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -50,7 +50,7 @@ class OAuthAuthorizationInterceptorTest {
     fun `It fulfils InterceptorFactory`() {
         val factory: Any = OAuthAuthorizationInterceptor
 
-        assertTrue(factory is NetworkingContract.InterceptorFactory<*>)
+        assertTrue(factory is NetworkingInternalContract.InterceptorFactory<*>)
     }
 
     @Test
@@ -59,7 +59,7 @@ class OAuthAuthorizationInterceptorTest {
         val interceptor: Any = OAuthAuthorizationInterceptor.getInstance(service)
 
         // Then
-        assertTrue(interceptor is NetworkingContract.Interceptor)
+        assertTrue(interceptor is NetworkingInternalContract.Interceptor)
     }
 
     @Test

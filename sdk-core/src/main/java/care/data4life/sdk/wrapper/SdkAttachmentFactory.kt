@@ -21,7 +21,7 @@ import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.lang.DataValidationException
 
-internal object SdkAttachmentFactory : WrapperFactoryContract.AttachmentFactory {
+internal object SdkAttachmentFactory : WrapperInternalContract.AttachmentFactory {
     @Throws(DataValidationException.CustomDataLimitViolation::class)
     override fun wrap(attachment: Any): WrapperContract.Attachment {
         return when (attachment) {

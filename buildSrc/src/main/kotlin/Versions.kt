@@ -68,7 +68,7 @@ object Versions {
 
     // Java
     const val javaXAnnotation = "3.0.2"
-    const val jacocoVersion = "0.8.3"
+    const val jacocoVersion = "0.8.7"
 
     // Android
     const val androidDesugar = "1.0.5"

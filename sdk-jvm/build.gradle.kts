@@ -18,6 +18,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "4.0.1"
     id("java-library")
     id("maven-publish")
+    id("jacoco")
 }
 
 apply(from = "${project.rootDir}/gradle/jacoco-java.gradle")
@@ -61,5 +62,11 @@ dependencies {
 tasks {
     named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
         exclude("bcprov-jdk15on-1.64.jar")
+    }
+}
+
+tasks.jacocoTestReport {
+    reports {
+        html.destination = layout.buildDirectory.dir("reports/jacoco/test/${project.name}").get().asFile
     }
 }

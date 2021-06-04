@@ -20,6 +20,7 @@ plugins {
     id("application")
 
     id("com.github.johnrengelman.shadow") version "5.2.0"
+    id("jacoco")
 }
 
 apply(from = "${project.rootDir}/gradle/jacoco-java.gradle")
@@ -91,5 +92,11 @@ tasks.named("clean") {
     doLast {
         delete("${androidTestAssetsPath}/client_config.json")
         delete("${assetsPath}/client_config.json")
+    }
+}
+
+tasks.jacocoTestReport {
+    reports {
+        html.destination = layout.buildDirectory.dir("reports/jacoco/test/${project.name}").get().asFile
     }
 }

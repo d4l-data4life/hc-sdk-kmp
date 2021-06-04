@@ -20,6 +20,7 @@ plugins {
     id("maven-publish")
     id("kotlin")
     kotlin("kapt")
+    id("jacoco")
 }
 
 apply(from = "${project.rootDir}/gradle/jacoco-java.gradle")
@@ -78,5 +79,11 @@ dependencies {
 tasks {
     named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
         exclude("bcprov-jdk15on-1.64.jar")
+    }
+}
+
+tasks.jacocoTestReport {
+    reports {
+        html.destination = layout.buildDirectory.dir("reports/jacoco/test/${project.name}").get().asFile
     }
 }

@@ -18,6 +18,7 @@ plugins {
     id("kotlin-platform-jvm")
     id("java-library")
     kotlin("kapt")
+    id("jacoco")
 }
 
 apply(from = "${project.rootDir}/gradle/jacoco-java.gradle")
@@ -45,4 +46,10 @@ dependencies {
     testImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvm)
     testImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvmJunit)
     testImplementation(Dependencies.Multiplatform.Test.MockK.jdk)
+}
+
+tasks.jacocoTestReport {
+    reports {
+        html.destination = layout.buildDirectory.dir("reports/jacoco/test/${project.name}").get().asFile
+    }
 }

@@ -17,6 +17,7 @@ plugins {
     id("java-library")
     id("kotlin")
     kotlin("kapt")
+    id("jacoco")
 }
 
 apply(from = "${project.rootDir}/gradle/jacoco-java.gradle")
@@ -111,5 +112,11 @@ tasks.named("compileKotlin") {
 tasks.named("clean") {
     doLast {
         delete("${configPath}/SDKConfig.kt")
+    }
+}
+
+tasks.jacocoTestReport {
+    reports {
+        html.destination = layout.buildDirectory.dir("reports/jacoco/test/${project.name}").get().asFile
     }
 }

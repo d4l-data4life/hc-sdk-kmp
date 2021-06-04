@@ -24,6 +24,7 @@ toc::[]
 
 === Bumped
 
+* JaCoCo 0.8.3 -> 0.8.7
 * mockk 1.10.0 -> 1.10.6
 
 === Migration

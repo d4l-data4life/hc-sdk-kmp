@@ -18,7 +18,6 @@ plugins {
     id("com.github.johnrengelman.shadow") version "4.0.1"
     id("java-library")
     id("maven-publish")
-    id("jacoco")
 }
 
 apply(from = "${project.rootDir}/gradle/jacoco-java.gradle.kts")

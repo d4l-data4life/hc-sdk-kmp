@@ -17,7 +17,6 @@
 plugins {
     id("java-library")
     id("kotlin-platform-jvm")
-    id("jacoco")
 }
 
 apply(from = "${project.rootDir}/gradle/jacoco-java.gradle.kts")

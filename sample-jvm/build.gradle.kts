@@ -23,7 +23,7 @@ plugins {
     id("jacoco")
 }
 
-apply(from = "${project.rootDir}/gradle/jacoco-java.gradle")
+apply(from = "${project.rootDir}/gradle/jacoco-java.gradle.kts")
 
 val d4lClientConfig = D4LConfigHelper.loadClientConfigAndroid("$rootDir")
 val d4LTestConfig = D4LConfigHelper.loadTestConfigAndroid("$rootDir")
@@ -92,17 +92,5 @@ tasks.named("clean") {
     doLast {
         delete("${androidTestAssetsPath}/client_config.json")
         delete("${assetsPath}/client_config.json")
-    }
-}
-
-tasks.jacocoTestReport {
-    reports {
-        html.isEnabled = true
-        xml.isEnabled = true
-        csv.isEnabled = true
-
-        html.destination = layout.buildDirectory.dir("reports/jacoco/test/${project.name}").get().asFile
-        csv.destination = layout.buildDirectory.file("reports/jacoco/test/${project.name}.csv").get().asFile
-        xml.destination = layout.buildDirectory.file("reports/jacoco/test/${project.name}.xml").get().asFile
     }
 }

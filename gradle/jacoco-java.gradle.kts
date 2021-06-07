@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+ * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
  *
  * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
@@ -13,20 +13,24 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
+apply(plugin = "jacoco")
 
-apply plugin: 'jacoco'
-
-test {
+tasks.named<Test>("test") {
     testLogging {
-        events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+        events("passed", "skipped", "failed", "standardOut", "standardError")
     }
 }
 
-jacocoTestReport {
+tasks.named<JacocoReport>("jacocoTestReport") {
+    dependsOn(tasks.named("test"))
+
     reports {
-        xml.enabled true
-        csv.enabled false
+        html.isEnabled = true
+        xml.isEnabled = true
+        csv.isEnabled = true
+
+        html.destination = layout.buildDirectory.dir("reports/jacoco/test/${project.name}").get().asFile
+        csv.destination = layout.buildDirectory.file("reports/jacoco/test/${project.name}.csv").get().asFile
+        xml.destination = layout.buildDirectory.file("reports/jacoco/test/${project.name}.xml").get().asFile
     }
 }
-
-jacocoTestReport.dependsOn('test')

@@ -20,7 +20,7 @@ plugins {
     id("jacoco")
 }
 
-apply(from = "${project.rootDir}/gradle/jacoco-java.gradle")
+apply(from = "${project.rootDir}/gradle/jacoco-java.gradle.kts")
 apply(from = "${project.rootDir}/gradle/deploy-java.gradle")
 
 
@@ -50,16 +50,4 @@ dependencies {
     testImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvm)
     testImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvmJunit)
     testImplementation(Dependencies.Multiplatform.Test.MockK.jdk)
-}
-
-tasks.jacocoTestReport {
-    reports {
-        html.isEnabled = true
-        xml.isEnabled = true
-        csv.isEnabled = true
-
-        html.destination = layout.buildDirectory.dir("reports/jacoco/test/${project.name}").get().asFile
-        csv.destination = layout.buildDirectory.file("reports/jacoco/test/${project.name}.csv").get().asFile
-        xml.destination = layout.buildDirectory.file("reports/jacoco/test/${project.name}.xml").get().asFile
-    }
 }

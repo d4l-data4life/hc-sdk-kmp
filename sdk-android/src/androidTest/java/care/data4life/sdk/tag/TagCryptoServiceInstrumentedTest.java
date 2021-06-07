@@ -16,27 +16,11 @@
 
 package care.data4life.sdk.tag;
 
-import android.content.Context;
+import org.junit.Ignore;
 
-import androidx.test.InstrumentationRegistry;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.IOException;
-
-import care.data4life.sdk.CryptoSecureStore;
-import care.data4life.sdk.CryptoService;
-import care.data4life.sdk.test.data.model.SymTestData;
-import care.data4life.sdk.test.util.AssetsHelper;
-import care.data4life.securestore.SecureStore;
-import care.data4life.securestore.SecureStoreCryptor;
-import care.data4life.securestore.SecureStoreStorage;
-
-import static junit.framework.Assert.assertEquals;
-
+@Ignore
 public class TagCryptoServiceInstrumentedTest {
-
+    /*
     private static final String PATH = "design-documents/crypto/test-fixture/v1/";
     private static final String DEFAULT_ALIAS = "data4life_android";
 
@@ -93,5 +77,5 @@ public class TagCryptoServiceInstrumentedTest {
 
     private SymTestData loadSymDecryptTestData() throws IOException {
         return AssetsHelper.loadJson(context, PATH + "symTagDecrypt.json", SymTestData.class);
-    }
+    }*/
 }

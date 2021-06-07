@@ -17,6 +17,7 @@
 plugins {
     id("com.android.library")
     id("kotlin-platform-android")
+    id("scripts.jacoco-android")
     kotlin("kapt")
 }
 
@@ -36,19 +37,15 @@ android {
                 "clearPackageData" to "true"
             )
         )
-
-        buildTypes {
-            buildTypes {
-                getByName("debug") {
-                    setMatchingFallbacks("debug", "release")
-                }
-            }
-        }
     }
 
     resourcePrefix("d4l_crypto_")
 
     buildTypes {
+        getByName("debug") {
+            setMatchingFallbacks("debug", "release")
+        }
+
         getByName("release") {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
@@ -56,15 +53,15 @@ android {
     }
 
     testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
         animationsDisabled = true
 
-        unitTests.all {
-            it.testLogging {
-                events("passed", "skipped", "failed", "standardOut", "standardError")
+        unitTests {all {
+                it.testLogging {
+                    events("passed", "skipped", "failed", "standardOut", "standardError")
+                }
             }
         }
-
-        execution = "ANDROID_TEST_ORCHESTRATOR"
     }
 
     lintOptions {

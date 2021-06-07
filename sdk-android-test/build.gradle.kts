@@ -31,7 +31,7 @@ android {
 
         applicationId = "care.data4life.sdk.e2e"
         versionCode = 1
-        versionName = "1.0"
+        versionName = "${project.version}"
 
         multiDexEnabled = true
 
@@ -49,17 +49,18 @@ android {
                 "redirectScheme" to d4lClientConfig[Environment.DEVELOPMENT].redirectScheme,
                 "environment" to "${Environment.DEVELOPMENT}",
                 "platform" to d4lClientConfig.platform,
-                "debug" to "true"
+                "debug" to "false"
             )
         )
     }
 
+    resourcePrefix("d4l_e2e_")
+
     buildTypes {
-        buildTypes {
-            getByName("debug") {
-                setMatchingFallbacks("debug", "release")
-            }
+        getByName("debug") {
+            setMatchingFallbacks("debug", "release")
         }
+
         getByName("release") {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
@@ -83,15 +84,16 @@ android {
     }
 
     testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
         animationsDisabled = true
 
-        unitTests.all {
-            it.testLogging {
-                events("passed", "skipped", "failed", "standardOut", "standardError")
+        unitTests {
+            all {
+                it.testLogging {
+                    events("passed", "skipped", "failed", "standardOut", "standardError")
+                }
             }
         }
-
-        execution = "ANDROID_TEST_ORCHESTRATOR"
     }
 }
 
@@ -106,6 +108,8 @@ dependencies {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
         exclude(group = "care.data4life.hc-fhir-helper-sdk-kmp", module = "fhir-helper-jvm")
     }
+
+    implementation(Dependencies.Multiplatform.D4L.fhirSdk)
 
     implementation(Dependencies.Android.threeTenABP)
 
@@ -147,6 +151,10 @@ dependencies {
 
     androidTestImplementation(Dependencies.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
+        exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
+    }
+
+    testImplementation(Dependencies.Multiplatform.D4L.fhirHelperJvm) {
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
 }

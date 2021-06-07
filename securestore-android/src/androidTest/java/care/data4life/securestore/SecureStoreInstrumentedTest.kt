@@ -16,17 +16,15 @@
 
 package care.data4life.securestore
 
-import androidx.test.InstrumentationRegistry
-import androidx.test.runner.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
-import org.junit.runner.RunWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-@RunWith(AndroidJUnit4::class)
 class SecureStoreInstrumentedTest {
 
     private lateinit var cryptor: SecureStoreCryptor
@@ -37,7 +35,7 @@ class SecureStoreInstrumentedTest {
 
     @Before
     fun setup() {
-        val context = InstrumentationRegistry.getTargetContext()
+        val context = InstrumentationRegistry.getInstrumentation().context
 
         cryptor = SecureStoreCryptor(context)
         storage = SecureStoreStorage(context)

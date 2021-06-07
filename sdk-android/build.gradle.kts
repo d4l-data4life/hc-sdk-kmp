@@ -17,11 +17,9 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
-    id("com.vanniktech.android.junit.jacoco")
     id("me.champeau.gradle.japicmp")
+    // id("scripts.jacoco-android")
 }
-
-apply(from = "${project.rootDir}/gradle/deploy-android-sdk.gradle")
 
 group = LibraryConfig.group
 
@@ -46,6 +44,17 @@ android {
                 "clearPackageData" to "true"
             )
         )
+
+        manifestPlaceholders(
+            mapOf<String, Any>(
+                "clientId" to d4lClientConfig[Environment.DEVELOPMENT].id,
+                "clientSecret" to d4lClientConfig[Environment.DEVELOPMENT].secret,
+                "redirectScheme" to d4lClientConfig[Environment.DEVELOPMENT].redirectScheme,
+                "environment" to "${Environment.DEVELOPMENT}",
+                "platform" to d4lClientConfig.platform,
+                "debug" to "false"
+            )
+        )
     }
 
     buildTypes {
@@ -61,15 +70,17 @@ android {
     resourcePrefix("d4l_sdk_")
 
     testOptions {
+        // execution = "ANDROIDX_TEST_ORCHESTRATOR"
         animationsDisabled = true
 
-        unitTests.all {
-            it.testLogging {
-                events("passed", "skipped", "failed", "standardOut", "standardError")
+        unitTests {
+
+            all {
+                it.testLogging {
+                    events("passed", "skipped", "failed", "standardOut", "standardError")
+                }
             }
         }
-
-        execution = "ANDROID_TEST_ORCHESTRATOR"
     }
 
     lintOptions {
@@ -83,6 +94,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
+
+apply(from = "${project.rootDir}/gradle/deploy-android-sdk.gradle")
 
 val compatibilityBase by configurations.creating {
     description =
@@ -129,7 +142,7 @@ dependencies {
     testImplementation(Dependencies.Android.Test.junit)
     testImplementation(Dependencies.Android.Test.truth)
 
-    testImplementation("org.mockito:mockito-inline:2.9.0")
+    testImplementation("org.mockito:mockito-inline:2.27.0")
     testImplementation("org.powermock:powermock-core:1.7.3")
     testImplementation("org.powermock:powermock-module-junit4:1.7.3")
     testImplementation("org.powermock:powermock-api-mockito2:1.7.3")
@@ -139,6 +152,10 @@ dependencies {
 
     testImplementation(Dependencies.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
+        exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
+    }
+
+    testImplementation(Dependencies.Multiplatform.D4L.fhirHelperJvm) {
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
 

@@ -21,9 +21,15 @@ plugins {
 repositories {
     gradlePluginPortal()
     mavenCentral()
+    google()
 }
 
 dependencies {
+    // coverage
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.32")
+    implementation("com.android.tools.build:gradle:4.2.1")
+    implementation("org.jacoco:org.jacoco.core:0.8.7")
+
     implementation("com.google.code.gson:gson:2.8.6")
 
     // dependency check
@@ -37,6 +43,8 @@ dependencies {
     implementation("com.pinterest:ktlint:0.41.0")
     // versioning.gradle.kts
     implementation("com.palantir.gradle.gitversion:gradle-git-version:0.12.3")
+
+
 }
 
 kotlinDslPluginOptions {

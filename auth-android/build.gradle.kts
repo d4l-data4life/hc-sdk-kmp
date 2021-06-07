@@ -17,6 +17,7 @@
 plugins {
     id("com.android.library")
     id("kotlin-platform-android")
+    id("scripts.jacoco-android")
 }
 
 val d4lClientConfig = D4LConfigHelper.loadClientConfigAndroid("$rootDir")
@@ -39,26 +40,33 @@ android {
             )
         )
 
-        buildTypes {
-            buildTypes {
-                getByName("debug") {
-                    setMatchingFallbacks("debug", "release")
-                }
-            }
-        }
-
+        manifestPlaceholders(
+            mapOf<String, Any>(
+                "clientId" to d4lClientConfig[Environment.DEVELOPMENT].id,
+                "clientSecret" to d4lClientConfig[Environment.DEVELOPMENT].secret,
+                "redirectScheme" to d4lClientConfig[Environment.DEVELOPMENT].redirectScheme,
+                "environment" to "${Environment.DEVELOPMENT}",
+                "platform" to d4lClientConfig.platform,
+                "debug" to "false"
+            )
+        )
     }
 
-    resourcePrefix("d4l_auth_")
-
     buildTypes {
+        getByName("debug") {
+            setMatchingFallbacks("debug", "release")
+        }
+
         getByName("release") {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
 
+    resourcePrefix("d4l_auth_")
+
     testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
         animationsDisabled = true
 
         unitTests.all {
@@ -66,8 +74,6 @@ android {
                 events("passed", "skipped", "failed", "standardOut", "standardError")
             }
         }
-
-        execution = "ANDROID_TEST_ORCHESTRATOR"
     }
 
     compileOptions {
@@ -89,7 +95,6 @@ android {
     lintOptions {
         isAbortOnError = false
     }
-
 }
 
 dependencies {

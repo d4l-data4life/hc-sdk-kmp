@@ -23,18 +23,14 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import care.data4life.fhir.stu3.model.Attachment;
-import care.data4life.fhir.stu3.model.CodeSystems;
 import care.data4life.fhir.stu3.model.CodeableConcept;
 import care.data4life.fhir.stu3.model.Coding;
-import care.data4life.fhir.stu3.model.DocumentReference;
 import care.data4life.fhir.stu3.model.FhirDateTime;
-import care.data4life.fhir.stu3.model.FhirInstant;
 import care.data4life.fhir.stu3.model.Practitioner;
 import care.data4life.fhir.stu3.util.FhirDateTimeParser;
 import care.data4life.sdk.config.DataRestrictionException;
-import care.data4life.sdk.helpers.AttachmentBuilder;
-import care.data4life.sdk.helpers.DocumentReferenceBuilder;
-import care.data4life.sdk.helpers.PractitionerBuilder;
+import care.data4life.sdk.helpers.stu3.AttachmentBuilder;
+import care.data4life.sdk.helpers.stu3.PractitionerBuilder;
 import care.data4life.sdk.util.MimeType;
 
 public class DocumentReferenceFactory {
@@ -88,6 +84,7 @@ public class DocumentReferenceFactory {
         return AttachmentBuilder.buildWith("MRI", fhirDateTimeNow, MimeType.PDF.name(), new byte[]{0x25, 0x50, 0x44, 0x46, 0x2d});
     }
 
+    /*
     public static DocumentReference buildDocument() throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
         String indexedString = DATE_TIME_FORMATTER.format(ZonedDateTime.now());
         FhirInstant indexed = FhirDateTimeParser.parseInstant(indexedString);
@@ -99,5 +96,5 @@ public class DocumentReferenceFactory {
                 buildDocumentReferenceType(),
                 buildPractitioner(),
                 buildPracticeSpeciality());
-    }
+    }*/
 }

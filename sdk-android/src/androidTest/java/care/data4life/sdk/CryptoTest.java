@@ -16,44 +16,11 @@
 
 package care.data4life.sdk;
 
+import org.junit.Ignore;
 
-import androidx.test.InstrumentationRegistry;
-
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.security.ProviderInstaller;
-import com.squareup.moshi.Moshi;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
-import java.security.Security;
-import java.util.Arrays;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-
-import care.data4life.crypto.GCAESKeyAlgorithm;
-import care.data4life.crypto.GCKey;
-import care.data4life.crypto.GCSymmetricKey;
-import care.data4life.sdk.crypto.KeyFactory;
-import care.data4life.sdk.util.Base64;
-
-import static org.junit.Assert.assertEquals;
-
+@Ignore
 public class CryptoTest {
-
+    /*
     private static final String commonKeyString = "Ak3iW3W6skJGNLj4KVD1y12kRTyupIIpsYXjyX7D2h8=";
     private static final String encryptedKeyString = "oQFZ/GJ++4+Rc/tIl6nraL7KKmGE5vXtJpsXyQXHkhuKduEDAZhmngAum1uTiOfpTYUJmfCSAGediSltbrfuktwiX5WAH2Pp4GHX6S5WOYImG57UwMBNZWPFpeUjKb+CHVuSo53C";
     private static final String expectedKeyJson = "{\"t\":\"tek\",\"v\":1,\"sym\":\"Zvcoyl8eJMOmj9i6KLV4ANrvboYDWT1IXU7igXTV7BU=\"}";
@@ -118,4 +85,5 @@ public class CryptoTest {
         cipher.init(Cipher.DECRYPT_MODE, key.getSymmetricKey().getValue(), spec);
         return cipher.doFinal(data);
     }
+    */
 }

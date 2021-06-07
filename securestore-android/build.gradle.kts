@@ -18,6 +18,7 @@ plugins {
     id("com.android.library")
     id("kotlin-platform-android")
     id("com.github.dcendents.android-maven")
+    id("scripts.jacoco-android")
 }
 
 android {
@@ -31,18 +32,22 @@ android {
         versionName = "${project.version}"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
         testInstrumentationRunnerArguments(
             mapOf(
                 "clearPackageData" to "true"
             )
         )
-    }
 
-    resourcePrefix("d4l_securestore_")
+        manifestPlaceholders(
+            mapOf(
+                "debug" to "false"
+            )
+        )
+    }
 
     buildTypes {
         getByName("debug") {
-            isTestCoverageEnabled = false
             setMatchingFallbacks("debug", "release")
         }
         getByName("release") {
@@ -51,16 +56,19 @@ android {
         }
     }
 
+    resourcePrefix("d4l_securestore_")
+
     testOptions {
+        // execution = "ANDROIDX_TEST_ORCHESTRATOR"
         animationsDisabled = true
 
-        unitTests.all {
-            it.testLogging {
-                events("passed", "skipped", "failed", "standardOut", "standardError")
+        unitTests {
+            all {
+                it.testLogging {
+                    events("passed", "skipped", "failed", "standardOut", "standardError")
+                }
             }
         }
-
-        execution = "ANDROID_TEST_ORCHESTRATOR"
     }
 
     lintOptions {

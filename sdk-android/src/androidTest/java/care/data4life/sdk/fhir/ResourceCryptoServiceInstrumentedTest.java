@@ -30,9 +30,8 @@ import java.util.Map;
 import care.data4life.crypto.GCKey;
 import care.data4life.fhir.stu3.model.DocumentReference;
 import care.data4life.fhir.stu3.model.DomainResource;
-import care.data4life.sdk.CryptoSecureStore;
-import care.data4life.sdk.CryptoService;
 import care.data4life.sdk.config.DataRestrictionException;
+import care.data4life.sdk.crypto.CryptoSecureStore;
 import care.data4life.sdk.test.data.model.SymTestData;
 import care.data4life.sdk.test.util.AssetsHelper;
 import care.data4life.sdk.test.util.DocumentReferenceFactory;
@@ -47,7 +46,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 @Ignore("Ignored until deep copy of fhir resource is implemented")
 public class ResourceCryptoServiceInstrumentedTest {
-
+    /*
     private static final String PATH = "design-documents/crypto/test-fixture/v1/";
     private static final String DEFAULT_ALIAS = "defaultAlias";
 
@@ -88,5 +87,5 @@ public class ResourceCryptoServiceInstrumentedTest {
         DocumentReference docRef = (DocumentReference) decryptedResource;
         //TODO uncomment when deep copy and equals are implemented
         assertThat(docRef).isEqualTo(dummyDocRef);
-    }
+    }*/
 }

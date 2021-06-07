@@ -51,7 +51,7 @@ android {
                 "redirectScheme" to d4lClientConfig[Environment.DEVELOPMENT].redirectScheme,
                 "environment" to "${Environment.DEVELOPMENT}",
                 "platform" to d4lClientConfig.platform,
-                "debug" to "true"
+                "debug" to "false"
             )
         )
     }

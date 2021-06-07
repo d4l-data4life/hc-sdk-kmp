@@ -22,7 +22,7 @@ tasks.named<Test>("test") {
 }
 
 tasks.named<JacocoReport>("jacocoTestReport") {
-    dependsOn(tasks.named("test"))
+    dependsOn(tasks.withType<Test>(Test::class.java))
 
     reports {
         html.isEnabled = true

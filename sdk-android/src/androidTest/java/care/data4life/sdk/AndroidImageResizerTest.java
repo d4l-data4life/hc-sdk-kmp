@@ -22,6 +22,7 @@ import android.graphics.BitmapFactory;
 import androidx.test.InstrumentationRegistry;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -36,6 +37,7 @@ import static care.data4life.sdk.attachment.AttachmentContract.ImageResizer.DEFA
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
 
+@Ignore
 public class AndroidImageResizerTest {
     private static final String TEST_IMAGE = "consent_document_1920x2487.jpg";
     private static final String FAILED_TO_LOAD_IMG_MSG = "Failed to load image!";

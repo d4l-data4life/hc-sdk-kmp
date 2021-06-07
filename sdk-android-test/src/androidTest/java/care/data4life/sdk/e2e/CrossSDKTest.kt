@@ -29,6 +29,10 @@ import care.data4life.fhir.stu3.util.FhirDateTimeParser
 import care.data4life.sdk.helpers.stu3.AttachmentBuilder
 import care.data4life.sdk.helpers.stu3.DocumentReferenceBuilder
 import care.data4life.sdk.helpers.stu3.PractitionerBuilder
+import care.data4life.sdk.helpers.stu3.addAdditionalId
+import care.data4life.sdk.helpers.stu3.getAdditionalIds
+import care.data4life.sdk.helpers.stu3.getAttachments
+import care.data4life.sdk.helpers.stu3.getPractitioner
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.listener.Callback
 import care.data4life.sdk.listener.ResultListener
@@ -48,7 +52,7 @@ import kotlin.test.assertNotNull
 
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@Ignore
+@Ignore("Login does not work currently")
 class CrossSDKTest : BaseTestLogin() {
     //region document properties
     private val attachmentTitle = "Brain MRI"

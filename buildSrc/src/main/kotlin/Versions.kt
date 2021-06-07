@@ -203,7 +203,7 @@ object Versions {
     /**
      * [robolectric](http://robolectric.org/)
      */
-    const val robolectric = "4.3.1"
+    const val robolectric = "4.5.1"
 
     // Android Test
     const val androidXTestCore = "1.3.0"

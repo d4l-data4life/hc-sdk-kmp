@@ -18,6 +18,7 @@ package care.data4life.sdk.network.util
 
 import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.network.NetworkingContract
+import care.data4life.sdk.network.NetworkingContract.Companion.PLATFORM_S4H
 import care.data4life.sdk.network.NetworkingContract.Companion.REQUEST_TIMEOUT
 import care.data4life.sdk.network.NetworkingInternalContract
 import care.data4life.sdk.network.util.interceptor.BasicAuthorizationInterceptor
@@ -32,6 +33,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
+import io.mockk.verify
 import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
 import org.junit.After
@@ -76,7 +78,7 @@ class ClientFactoryTest {
     }
 
     @Test
-    fun `Given, getInstance is called with it appropriate parameter, which does not include a static token it builds a Client, with the OAuthInterceptor`() {
+    fun `Given, getInstance is called with its appropriate parameter, which does not include a static token it builds a Client, with the OAuthInterceptor`() {
         // Given
         val clientID = CLIENT_ID
         val clientVersion = "1.2.3"
@@ -94,9 +96,23 @@ class ClientFactoryTest {
 
         every { LoggingInterceptor.getInstance(flag) } returns loggingInterceptor
         every { RetryInterceptor.getInstance(connectivityService) } returns retryInterceptor
-        every { VersionInterceptor.getInstance(Pair(clientName, clientVersion)) } returns versionInterceptor
+        every {
+            VersionInterceptor.getInstance(
+                Pair(
+                    clientName,
+                    clientVersion
+                )
+            )
+        } returns versionInterceptor
         every { OAuthAuthorizationInterceptor.getInstance(authService) } returns oAuthInterceptor
-        every { BasicAuthorizationInterceptor.getInstance(Pair(clientID, secret)) } returns basicInterceptor
+        every {
+            BasicAuthorizationInterceptor.getInstance(
+                Pair(
+                    clientID,
+                    secret
+                )
+            )
+        } returns basicInterceptor
 
         every { CertificatePinnerFactory.getInstance(platform, environment) } returns pinner
 
@@ -156,10 +172,101 @@ class ClientFactoryTest {
                 .replace("CertificatePinner(#", "")
                 .trim(')')
         )
+
+        verify(exactly = 1) { CertificatePinnerFactory.getInstance(platform, environment) }
     }
 
     @Test
-    fun `Given, getInstance is called with it appropriate parameter, which includes a static token it builds a Client, with the StaticAuthInterceptor`() {
+    fun `Given, getInstance is called with its appropriate parameter, which does not include a static token and S4H as target, it builds a Client, with the OAuthInterceptor and without a Certificatepin`() {
+        // Given
+        val clientID = CLIENT_ID
+        val clientVersion = "1.2.3"
+        val secret = "geheim"
+        val platform = PLATFORM_S4H
+        val staticAccessToken = null
+        val flag = false
+
+        val loggingInterceptor: NetworkingInternalContract.Interceptor = mockk()
+        val retryInterceptor: NetworkingInternalContract.Interceptor = mockk()
+        val versionInterceptor: NetworkingInternalContract.Interceptor = mockk()
+        val oAuthInterceptor: NetworkingInternalContract.Interceptor = mockk()
+        val basicInterceptor: NetworkingInternalContract.Interceptor = mockk()
+        val pinner: CertificatePinner = mockk(relaxed = true)
+
+        every { LoggingInterceptor.getInstance(flag) } returns loggingInterceptor
+        every { RetryInterceptor.getInstance(connectivityService) } returns retryInterceptor
+        every {
+            VersionInterceptor.getInstance(
+                Pair(
+                    clientName,
+                    clientVersion
+                )
+            )
+        } returns versionInterceptor
+        every { OAuthAuthorizationInterceptor.getInstance(authService) } returns oAuthInterceptor
+        every {
+            BasicAuthorizationInterceptor.getInstance(
+                Pair(
+                    clientID,
+                    secret
+                )
+            )
+        } returns basicInterceptor
+
+        every { CertificatePinnerFactory.getInstance(platform, environment) } returns pinner
+
+        // When
+        val client: Any = ClientFactory.getInstance(
+            authService,
+            environment,
+            clientID,
+            secret,
+            platform,
+            connectivityService,
+            clientName,
+            clientVersion,
+            staticAccessToken,
+            flag
+        )
+
+        // Then
+        assertTrue(client is OkHttpClient)
+
+        val expectedInterceptors = listOf(
+            loggingInterceptor,
+            retryInterceptor,
+            versionInterceptor,
+            oAuthInterceptor,
+            basicInterceptor
+        )
+
+        expectedInterceptors.forEach {
+            assertTrue(it in client.interceptors)
+        }
+
+        assertEquals(
+            actual = client.interceptors.size,
+            expected = expectedInterceptors.size
+        )
+
+        assertEquals(
+            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            expected = REQUEST_TIMEOUT
+        )
+        assertEquals(
+            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            expected = REQUEST_TIMEOUT
+        )
+        assertEquals(
+            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            expected = REQUEST_TIMEOUT
+        )
+
+        verify(exactly = 0) { CertificatePinnerFactory.getInstance(platform, environment) }
+    }
+
+    @Test
+    fun `Given, getInstance is called with its appropriate parameter, which includes a static token it builds a Client, with the StaticAuthInterceptor`() {
         // Given
         val clientID = CLIENT_ID
         val clientVersion = "1.2.3"
@@ -176,7 +283,14 @@ class ClientFactoryTest {
 
         every { LoggingInterceptor.getInstance(flag) } returns loggingInterceptor
         every { RetryInterceptor.getInstance(connectivityService) } returns retryInterceptor
-        every { VersionInterceptor.getInstance(Pair(clientName, clientVersion)) } returns versionInterceptor
+        every {
+            VersionInterceptor.getInstance(
+                Pair(
+                    clientName,
+                    clientVersion
+                )
+            )
+        } returns versionInterceptor
         every { StaticAuthorizationInterceptor.getInstance(staticAccessToken) } returns staticAuthorizationInterceptor
 
         every { CertificatePinnerFactory.getInstance(platform, environment) } returns pinner

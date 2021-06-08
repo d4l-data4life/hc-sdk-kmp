@@ -22,7 +22,7 @@ toc::[]
 
 === Fixed
 
-* S4H certificate pinning. 
+* S4H certificate pinning.
 
 === Bumped
 

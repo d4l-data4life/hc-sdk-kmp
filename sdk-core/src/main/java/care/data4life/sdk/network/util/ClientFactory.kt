@@ -18,6 +18,7 @@ package care.data4life.sdk.network.util
 
 import care.data4life.auth.AuthorizationContract
 import care.data4life.sdk.network.NetworkingContract
+import care.data4life.sdk.network.NetworkingContract.Companion.PLATFORM_S4H
 import care.data4life.sdk.network.NetworkingInternalContract
 import care.data4life.sdk.network.util.interceptor.BasicAuthorizationInterceptor
 import care.data4life.sdk.network.util.interceptor.LoggingInterceptor
@@ -34,10 +35,14 @@ object ClientFactory : NetworkingInternalContract.ClientFactory {
         environment: NetworkingContract.Environment,
         platform: String,
     ): OkHttpClient.Builder {
-        return builder
-            .certificatePinner(
-                CertificatePinnerFactory.getInstance(platform, environment)
-            )
+        return if (platform == PLATFORM_S4H) {
+            builder // do nothing for S4H
+        } else {
+            builder
+                .certificatePinner(
+                    CertificatePinnerFactory.getInstance(platform, environment)
+                )
+        }
     }
 
     private fun addAuthorizationInterceptor(

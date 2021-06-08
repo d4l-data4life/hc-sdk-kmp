@@ -12,7 +12,7 @@ and this project adheres to http://semver.org/spec/v2.0.0.html[Semantic Versioni
 ==== Versions
 toc::[]
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.13.1...main[Unreleased]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.13.2...main[Unreleased]
 
 === Added
 
@@ -25,9 +25,18 @@ toc::[]
 === Bumped
 
 * JaCoCo 0.8.3 -> 0.8.7
-* mockk 1.10.0 -> 1.10.6
 
 === Migration
+
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.13.1...v1.13.2[1.13.2]
+
+=== Fixed
+
+* S4H certificate pinning.
+
+=== Bumped
+
+* mockk 1.10.0 -> 1.10.6
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.13.0...v1.13.1[1.13.1]
 Re release of 1.13.0 due to some publishing issues.

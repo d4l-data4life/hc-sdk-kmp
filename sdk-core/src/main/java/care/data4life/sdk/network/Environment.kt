@@ -19,7 +19,6 @@ import care.data4life.sdk.network.NetworkingContract.Companion.DATA4LIFE_CARE
 import care.data4life.sdk.network.NetworkingContract.Companion.HPSGC_DE
 import care.data4life.sdk.network.NetworkingContract.Companion.PLATFORM_D4L
 import care.data4life.sdk.network.NetworkingContract.Companion.PLATFORM_S4H
-import care.data4life.sdk.network.NetworkingContract.Companion.SMART4HEALTH_EU
 
 enum class Environment : NetworkingContract.Environment {
     LOCAL,
@@ -47,7 +46,6 @@ enum class Environment : NetworkingContract.Environment {
     override fun getCertificatePin(platform: String): String {
         return when {
             PLATFORM_D4L.equals(platform, ignoreCase = true) -> d4lCertificatePin()
-            PLATFORM_S4H.equals(platform, ignoreCase = true) -> sh4CertificatePin()
             else -> throw IllegalArgumentException("No supported platform found for value($platform)")
         }
     }
@@ -56,12 +54,6 @@ enum class Environment : NetworkingContract.Environment {
         return when (this) {
             SANDBOX, DEVELOPMENT, LOCAL -> HPSGC_DE
             STAGING, PRODUCTION -> DATA4LIFE_CARE
-        }
-    }
-
-    private fun sh4CertificatePin(): String {
-        return when (this) {
-            SANDBOX, DEVELOPMENT, LOCAL, STAGING, PRODUCTION -> SMART4HEALTH_EU
         }
     }
 

@@ -20,7 +20,7 @@ plugins {
     kotlin("kapt")
 }
 
-apply(from = "${project.rootDir}/gradle/jacoco-java.gradle")
+apply(from = "${project.rootDir}/gradle/jacoco-java.gradle.kts")
 apply(from = "${project.rootDir}/gradle/deploy-java.gradle")
 
 java {

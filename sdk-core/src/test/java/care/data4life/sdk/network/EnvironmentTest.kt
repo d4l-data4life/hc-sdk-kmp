@@ -145,6 +145,7 @@ class EnvironmentTest {
             expected = "No supported platform found for value($platform)"
         )
     }
+
     // D4L
     @Test
     fun `Given, getApiBaseURL is called with a d4l platform on production, it returns the appropriate URI`() {
@@ -217,97 +218,6 @@ class EnvironmentTest {
         // Then
         assertEquals(
             actual = uri,
-            expected = "https://api-phdp-sandbox.hpsgc.de"
-        )
-    }
-
-    // SH4
-    @Test
-    fun `Given, getApiBaseURL is called with a s4h platform on production, it returns the appropriate URI`() {
-        // Given
-        val env = Environment.fromName("production")
-
-        // When
-        val uri = env.getApiBaseURL("s4h")
-
-        // Then
-        assertEquals(
-            actual = uri,
-            expected = "https://api.smart4health.eu"
-        )
-    }
-
-    @Test
-    fun `Given, getApiBaseURL is called with a s4h platform on local, it returns the appropriate URI`() {
-        // Given
-        val env = Environment.fromName("local")
-
-        // When
-        val uri = env.getApiBaseURL("s4h")
-
-        // Then
-        assertEquals(
-            actual = uri,
-            expected = "https://api.smart4health.local"
-        )
-    }
-
-    @Test
-    fun `Given, getApiBaseURL is called with a s4h platform on staging, it returns the appropriate URI`() {
-        // Given
-        val env = Environment.fromName("staging")
-
-        // When
-        val uri = env.getApiBaseURL("s4h")
-
-        // Then
-        assertEquals(
-            actual = uri,
-            expected = "https://api-staging.smart4health.eu"
-        )
-    }
-
-    @Test
-    fun `Given, getApiBaseURL is called with a s4h platform on development, it returns the appropriate URI`() {
-        // Given
-        val env = Environment.fromName("development")
-
-        // When
-        val uri = env.getApiBaseURL("s4h")
-
-        // Then
-        assertEquals(
-            actual = uri,
-            expected = "https://api-dev.smart4health.eu"
-        )
-    }
-
-    @Test
-    fun `Given, getApiBaseURL is called with a s4h platform on sandbox, it returns the appropriate URI`() {
-        // Given
-        val env = Environment.fromName("sandbox")
-
-        // When
-        val uri = env.getApiBaseURL("s4h")
-
-        // Then
-        assertEquals(
-            actual = uri,
-            expected = "https://api-sandbox.smart4health.eu"
-        )
-    }
-
-    @Test
-    fun `Given, getApiBaseURL is called with a s4h platform on sandbox, it ignores the casing of the string`() {
-        val env = Environment.fromName("sandbox")
-
-        assertEquals(
-            actual = env.getApiBaseURL("S4h"),
-            expected = "https://api-sandbox.smart4health.eu"
-        )
-
-        assertEquals(
-            actual = env.getApiBaseURL("d4L"),
             expected = "https://api-phdp-sandbox.hpsgc.de"
         )
     }
@@ -405,82 +315,6 @@ class EnvironmentTest {
         assertEquals(
             actual = cert,
             expected = "sha256/3f81qEv2rjHvcrwof2egbKo5MjjSHaN/4DOl7R+pH0E="
-        )
-    }
-
-    // S4H
-    @Test
-    fun `Given, getCertificatePin is called with a s4h platform on production, it returns the appropriate Certificate`() {
-        // Given
-        val env = Environment.fromName("production")
-
-        // When
-        val cert = env.getCertificatePin("s4h")
-
-        // Then
-        assertEquals(
-            actual = cert,
-            expected = "sha256/yPBKbgJMVnMeovGKbAtuz65sfy/gpDu0WTiuB8bE5G0="
-        )
-    }
-
-    @Test
-    fun `Given, getCertificatePin is called with a s4h platform on local, it returns the appropriate Certificate`() {
-        // Given
-        val env = Environment.fromName("local")
-
-        // When
-        val cert = env.getCertificatePin("s4h")
-
-        // Then
-        assertEquals(
-            actual = cert,
-            expected = "sha256/yPBKbgJMVnMeovGKbAtuz65sfy/gpDu0WTiuB8bE5G0="
-        )
-    }
-
-    @Test
-    fun `Given, getCertificatePin is called with a s4h platform on staging, it returns the appropriate Certificate`() {
-        // Given
-        val env = Environment.fromName("staging")
-
-        // When
-        val cert = env.getCertificatePin("s4h")
-
-        // Then
-        assertEquals(
-            actual = cert,
-            expected = "sha256/yPBKbgJMVnMeovGKbAtuz65sfy/gpDu0WTiuB8bE5G0="
-        )
-    }
-
-    @Test
-    fun `Given, getCertificatePin is called with a s4h platform on development, it returns the appropriate Certificate`() {
-        // Given
-        val env = Environment.fromName("development")
-
-        // When
-        val cert = env.getCertificatePin("s4h")
-
-        // Then
-        assertEquals(
-            actual = cert,
-            expected = "sha256/yPBKbgJMVnMeovGKbAtuz65sfy/gpDu0WTiuB8bE5G0="
-        )
-    }
-
-    @Test
-    fun `Given, getCertificatePin is called with a s4h platform on sandbox, it returns the appropriate Certificate`() {
-        // Given
-        val env = Environment.fromName("sandbox")
-
-        // When
-        val cert = env.getCertificatePin("s4h")
-
-        // Then
-        assertEquals(
-            actual = cert,
-            expected = "sha256/yPBKbgJMVnMeovGKbAtuz65sfy/gpDu0WTiuB8bE5G0="
         )
     }
 }

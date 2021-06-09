@@ -22,7 +22,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "5.2.0"
 }
 
-apply(from = "${project.rootDir}/gradle/jacoco-java.gradle")
+apply(from = "${project.rootDir}/gradle/jacoco-java.gradle.kts")
 
 val d4lClientConfig = D4LConfigHelper.loadClientConfigAndroid("$rootDir")
 val d4LTestConfig = D4LConfigHelper.loadTestConfigAndroid("$rootDir")

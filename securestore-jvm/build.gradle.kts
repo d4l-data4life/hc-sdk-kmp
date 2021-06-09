@@ -19,7 +19,7 @@ plugins {
     id("kotlin-platform-jvm")
 }
 
-apply(from = "${project.rootDir}/gradle/jacoco-java.gradle")
+apply(from = "${project.rootDir}/gradle/jacoco-java.gradle.kts")
 apply(from = "${project.rootDir}/gradle/deploy-java.gradle")
 
 
@@ -50,5 +50,3 @@ dependencies {
     testImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvmJunit)
     testImplementation(Dependencies.Multiplatform.Test.MockK.jdk)
 }
-
-

@@ -43,7 +43,7 @@ class CertificatePinnerFactoryTest {
         every { env.getApiBaseURL(platform) } returns "https://idonotcare.com"
 
         // When
-        val pinner = CertificatePinnerFactory.getInstance(platform, env)
+        val pinner: Any = CertificatePinnerFactory.getInstance(platform, env)
 
         // Then
 

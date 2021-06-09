@@ -200,10 +200,6 @@ class RecordServiceModuleTestFlowHelper(
         return plain
     }
 
-    fun hashAndEncodeTagsAndAnnotations(
-        tagsAndAnnotations: List<String>
-    ): List<String> = tagsAndAnnotations.map { Base64.encodeToString(md5(it)) }
-
     fun mapAttachments(
         payload: ByteArray,
         resized: Pair<Pair<ByteArray, String>, Pair<ByteArray, String>?>? = null

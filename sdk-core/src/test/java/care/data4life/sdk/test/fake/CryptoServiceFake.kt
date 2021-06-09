@@ -127,7 +127,7 @@ class CryptoServiceFake : CryptoContract.Service {
     override fun encryptAndEncodeByteArray(
         key: GCKey,
         data: ByteArray
-    ): Single<String> = encryptAndEncodeString(key, String(data)).also { println(String(data)) }
+    ): Single<String> = encryptAndEncodeString(key, String(data))
 
     override fun encryptAndEncodeString(key: GCKey, data: String): Single<String> {
         val idx = findResource(key, data)

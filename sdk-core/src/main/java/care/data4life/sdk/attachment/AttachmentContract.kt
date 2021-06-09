@@ -28,7 +28,7 @@ interface AttachmentContract {
             attachments: List<Attachment>,
             attachmentsKey: GCKey,
             userId: String
-        ): Single<List<Pair<Attachment, List<String>>>>
+        ): Single<List<Pair<Attachment, List<String>?>>>
 
         @Throws(DataValidationException.InvalidAttachmentPayloadHash::class)
         fun download(

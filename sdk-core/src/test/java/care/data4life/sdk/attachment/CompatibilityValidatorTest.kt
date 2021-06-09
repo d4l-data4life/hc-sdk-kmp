@@ -18,11 +18,12 @@ package care.data4life.sdk.attachment
 
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3DateTimeParser
+import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.wrapper.SdkFhir3Attachment
-import care.data4life.sdk.wrapper.WrapperContract
+import care.data4life.sdk.wrapper.SdkFhir4Attachment
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkClass
+import io.mockk.spyk
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -31,8 +32,9 @@ import care.data4life.fhir.stu3.model.FhirDateTime as Fhir3DateTime
 
 class CompatibilityValidatorTest {
     @Test
-    fun `it is a FhirDateValidator`() {
-        assertTrue((CompatibilityValidator as Any) is AttachmentInternalContract.CompatibilityValidator)
+    fun `It fulfils FhirDateValidator`() {
+        val validator: Any = CompatibilityValidator
+        assertTrue(validator is AttachmentInternalContract.CompatibilityValidator)
     }
 
     @Test
@@ -50,30 +52,34 @@ class CompatibilityValidatorTest {
     fun `Given, isHashable is called with a Attachment, which contains a null as Fhir3Date, it returns true`() {
         // Given
         val fhirAttachment = Fhir3Attachment()
-        val fhirDateTime = mockkClass(Fhir3DateTime::class)
+        val fhirDateTime: Fhir3DateTime = mockk()
 
         every { fhirDateTime.date } returns null
-
         fhirAttachment.creation = fhirDateTime
 
+        // When
+        val result = CompatibilityValidator.isHashable(SdkFhir3Attachment(fhirAttachment))
+
         // Then
-        assertTrue(CompatibilityValidator.isHashable(SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(result)
     }
 
     @Test
     fun `Given, isHashable is called with a Attachment, which contains a null as Date, it returns true`() {
         // Given
         val fhirAttachment = Fhir3Attachment()
-        val fhirDateTime = mockkClass(Fhir3DateTime::class)
-        val fhirDate = mockkClass(Fhir3Date::class)
+        val fhirDateTime: Fhir3DateTime = mockk()
+        val fhirDate: Fhir3Date = mockk()
 
-        every { fhirDateTime.date } returns fhirDate
         every { fhirDate.toDate() } returns null
-
+        every { fhirDateTime.date } returns fhirDate
         fhirAttachment.creation = fhirDateTime
 
+        // When
+        val result = CompatibilityValidator.isHashable(SdkFhir3Attachment(fhirAttachment))
+
         // Then
-        assertTrue(CompatibilityValidator.isHashable(SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(result)
     }
 
     @Test
@@ -86,8 +92,11 @@ class CompatibilityValidatorTest {
 
         fhirAttachment.creation = fhirDateTime
 
+        // When
+        val result = CompatibilityValidator.isHashable(SdkFhir3Attachment(fhirAttachment))
+
         // Then
-        assertFalse(CompatibilityValidator.isHashable(SdkFhir3Attachment(fhirAttachment)))
+        assertFalse(result)
     }
 
     @Test
@@ -100,16 +109,22 @@ class CompatibilityValidatorTest {
 
         fhirAttachment.creation = fhirDateTime
 
+        // When
+        val result = CompatibilityValidator.isHashable(SdkFhir3Attachment(fhirAttachment))
+
         // Then
-        assertTrue(CompatibilityValidator.isHashable(SdkFhir3Attachment(fhirAttachment)))
+        assertTrue(result)
     }
 
     @Test
     fun `Given, isHashable is called with a Attachment, which does contain a non Fhir3Attachment, it returns true`() {
-        val attachment = mockk<WrapperContract.Attachment>()
+        // Given
+        val fhirAttachment: Fhir4Attachment = spyk()
 
-        every { attachment.unwrap<String>() } returns "not Fhir3"
+        // When
+        val result = CompatibilityValidator.isHashable(SdkFhir4Attachment(fhirAttachment))
 
-        assertTrue(CompatibilityValidator.isHashable(attachment))
+        // Then
+        assertTrue(result)
     }
 }

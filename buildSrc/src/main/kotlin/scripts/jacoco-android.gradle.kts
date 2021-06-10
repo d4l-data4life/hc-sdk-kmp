@@ -81,7 +81,7 @@ project.afterEvaluate {
 
         val task by tasks.register("jacoco${capName}TestReport", JacocoReport::class) {
             group = "Verification"
-            description = "Run Jacoco coverage reports for the ${variantName.capitalize()}."
+            description = "Generate coverage reports for the ${variantName.capitalize()}."
             this.prepareCoverage(
                 variant,
                 variantName,
@@ -129,7 +129,7 @@ fun JacocoReport.prepareCoverage(
     )
 
     val javaClasses = fileTree(variant.javaCompileProvider.get().destinationDir) {
-        exclude(excludes)
+        exclude(filter)
     }
     val kotlinClasses = fileTree(
         mapOf(

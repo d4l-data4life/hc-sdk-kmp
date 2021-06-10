@@ -19,7 +19,6 @@ package care.data4life.securestore
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertNull

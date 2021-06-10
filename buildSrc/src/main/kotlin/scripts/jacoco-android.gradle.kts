@@ -162,12 +162,7 @@ fun JacocoReport.prepareCoverage(
                 "includes" to listOf(
                     "**/tmp/kotlin-classes",
                     "**/classes/**/main",
-                    "**/intermediates/classes",
-                    // include mockk
-                    "**/io/mockk/APIKt.class",
-                    "**/io/mockk/CapturingSlot.class",
-                    "**/io/mockk/LambdaArgs.class",
-                    "**/io/mockk/MockK**Scope**.class"
+                    "**/intermediates/classes"
                 )
             )
         )

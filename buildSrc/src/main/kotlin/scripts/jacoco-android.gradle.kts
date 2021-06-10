@@ -79,7 +79,7 @@ project.afterEvaluate {
         val unitTests = "test${capName}UnitTest"
         val instrumentedTests = "create${capName}CoverageReport"
 
-        val task by tasks.register("jacoco${capName}TestReport", JacocoReport::class) {
+        tasks.register("jacoco${capName}TestReport", JacocoReport::class) {
             group = "Verification"
             description = "Generate coverage reports for ${variantName.capitalize()}."
             this.prepareCoverage(

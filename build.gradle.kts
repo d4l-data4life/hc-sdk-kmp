@@ -56,6 +56,7 @@ plugins {
     id("scripts.versioning")
     id("scripts.quality-spotless")
     id("scripts.publishing")
+    id("scripts.jacoco-aggregate")
 }
 
 allprojects {

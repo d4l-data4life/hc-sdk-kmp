@@ -74,7 +74,6 @@ android {
         animationsDisabled = true
 
         unitTests {
-
             all {
                 it.testLogging {
                     events("passed", "skipped", "failed", "standardOut", "standardError")

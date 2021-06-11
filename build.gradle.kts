@@ -20,15 +20,16 @@ buildscript {
         google()
         mavenCentral()
         jcenter()
+        maven {
+            url = uri("https://plugins.gradle.org/m2/")
+        }
     }
 
     dependencies {
         classpath(GradlePlugins.android)
         classpath(GradlePlugins.kotlin)
         classpath(GradlePlugins.kapt)
-
-        // https://github.com/vanniktech/gradle-android-junit-jacoco-plugin
-        classpath("com.vanniktech:gradle-android-junit-jacoco-plugin:0.16.0")
+        classpath(GradlePlugins.sonar)
 
         classpath("org.codehaus.groovy:groovy-all:2.4.15")
 
@@ -57,6 +58,7 @@ plugins {
     id("scripts.quality-spotless")
     id("scripts.publishing")
     id("scripts.jacoco-aggregate")
+    id("org.sonarqube") version Versions.GradlePlugins.sonar
 }
 
 allprojects {
@@ -123,4 +125,37 @@ tasks.withType<JavaCompile> {
 tasks.named<Wrapper>("wrapper") {
     gradleVersion = "6.8.3"
     distributionType = Wrapper.DistributionType.ALL
+}
+
+sonarqube {
+    properties {
+        property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.sourceEncoding", "UTF-8")
+        property("sonar.projectKey", "d4l-data4life_hc-sdk-kmp")
+        property("sonar.projectName", "hc-sdk-kmp")
+        property("sonar.organization", "d4l-data4life")
+        property("sonar.sources", listOf("**/*jvm/**/main/**", "**/*common/**/main/**"))
+        property("sonar.tests", listOf("**/*jvm/**/test/**", "**/*common/**/test/**"))
+        property("sonar.java.coveragePlugin", "jacoco")
+        // property("sonar.coverage.exclusions", androidCoverageExclusion.join(","))
+        // property("sonar.exclusions", androidCodeExclusion.join(","))
+        property("sonar.tags", "jvm")
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            "${project.buildDir}/reports/jacoco/**/jvm/${project.name}.xml"
+        )
+        property("sonar.junit.reportsPath", "${project.buildDir}/**/test-results/*.xml")
+        property(
+            "sonar.java.binaries",
+            listOf(
+                "${project.buildDir}/**/tmp/kotlin-classes",
+                "${project.buildDir}/**/classes/**/main",
+                "${project.buildDir}/**/intermediates/classes"
+            )
+        )
+    }
+}
+
+tasks.sonarqube {
+    dependsOn("jacocoProjectJvmReport")
 }

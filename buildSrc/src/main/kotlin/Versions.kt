@@ -41,6 +41,11 @@ object Versions {
         const val android = "4.2.1"
 
         /**
+         * https://plugins.gradle.org/plugin/org.sonarqube
+         */
+        const val sonar = "3.3"
+
+        /**
          * [Dexcount](https://github.com/KeepSafe/dexcount-gradle-plugin)
          */
         const val dexcount = "1.0.2"

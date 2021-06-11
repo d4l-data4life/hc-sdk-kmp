@@ -23,6 +23,8 @@ object GradlePlugins {
 
     const val kapt = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.GradlePlugins.kotlin}"
 
+    const val sonar = "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:${Versions.GradlePlugins.sonar}"
+
     const val dexcount = "com.getkeepsafe.dexcount:dexcount-gradle-plugin:${Versions.GradlePlugins.dexcount}"
 
     const val downloadTask = "de.undercouch:gradle-download-task:${Versions.GradlePlugins.downloadTask}"
@@ -44,3 +46,6 @@ fun PluginDependenciesSpec.androidLibrary(): PluginDependencySpec =
 
 fun PluginDependenciesSpec.androidKotlin(): PluginDependencySpec =
     id("kotlin-android")
+
+fun PluginDependenciesSpec.sonar(): PluginDependencySpec =
+    id("org.sonarqube").version(Versions.GradlePlugins.sonar)

@@ -41,6 +41,8 @@ jobs:
         run: ./gradlew :sdk-android:test
       - name: Run tests with code coverage
         run: ./gradlew jacocoTestReport
+      - name: SonarCloud
+        run: ./gradlew sonarqube
       - name: Publish Feature to Maven Repo
         run: ./gradlew publishFeature
 

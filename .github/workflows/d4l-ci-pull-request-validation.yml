@@ -42,7 +42,7 @@ jobs:
       - name: Run tests with code coverage
         run: ./gradlew jacocoTestReport
       - name: SonarCloud
-        run: ./gradlew sonarqube
+        run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_TOKEN }}
       - name: Publish Feature to Maven Repo
         run: ./gradlew publishFeature
 

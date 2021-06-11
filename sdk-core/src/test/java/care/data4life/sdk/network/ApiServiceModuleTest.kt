@@ -505,7 +505,7 @@ class ApiServiceModuleTest {
         )
     }
 
-    //@Ignore("Ignored due to some flakiness during coverage")
+    // @Ignore("Ignored due to some flakiness during coverage")
     @Test
     fun `Given, deleteRecord is called with an Alias, UserId and a RecordId, it returns a completable action`() {
         // Given

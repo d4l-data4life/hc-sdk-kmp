@@ -96,4 +96,9 @@ interface AttachmentContract {
         @Throws(DataValidationException.ExpectedFieldViolation::class)
         fun guardSize(attachment: Attachment)
     }
+
+    companion object {
+        internal const val DOWNSCALED_ATTACHMENT_ID_POS = 1
+        internal const val SPLIT_CHAR = "#"
+    }
 }

@@ -22,11 +22,15 @@ import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.fhir.Fhir3Resource
+import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.fhir.ResourceCryptoService
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
+import care.data4life.sdk.network.util.SearchTagsBuilder
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TagCryptoService
@@ -43,7 +47,8 @@ import care.data4life.sdk.test.util.GenericTestDataProvider.OFFSET
 import care.data4life.sdk.test.util.GenericTestDataProvider.PAGE_SIZE
 import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID
-import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID_COMPATIBILITY
+import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID_LEGACY_JS
+import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID_LEGACY_KMP
 import care.data4life.sdk.test.util.GenericTestDataProvider.UPDATE_DATE
 import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.test.util.TestResourceHelper
@@ -173,7 +178,7 @@ class RecordServiceFetchRecordsModuleTest {
         val encodedTags = flowHelper.prepareTags(tags)
         val encodedAnnotations = flowHelper.prepareAnnotations(annotations)
 
-        val encryptedRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResource,
             encodedTags,
@@ -219,7 +224,7 @@ class RecordServiceFetchRecordsModuleTest {
         val encodedTags = flowHelper.prepareTags(tags)
         val encodedAnnotations = flowHelper.prepareAnnotations(annotations)
 
-        val encryptedRecord = flowHelper.prepareEncryptedDataRecord(
+        val encryptedRecord = flowHelper.prepareEncryptedRecord(
             recordId,
             serializedResource,
             encodedTags,
@@ -248,14 +253,11 @@ class RecordServiceFetchRecordsModuleTest {
     }
 
     private fun runBatchFlow(
-        serializedResources: Pair<String, String>,
-        encryptedRecord: EncryptedRecord,
-        encryptedLegacyRecord: EncryptedRecord,
-        searchTags: Map<String, String>,
+        serializedResources: Triple<String, String, String>,
+        encryptedRecords: List<EncryptedRecord>,
+        searchTags: String,
         encodedTags: List<String>,
         encodedAnnotations: List<String>,
-        legacyTags: List<String>,
-        legacyAnnotations: List<String>,
         tagEncryptionKeyCalls: Int,
         useStoredCommonKey: Boolean,
         commonKey: Pair<String, GCKey>,
@@ -269,16 +271,6 @@ class RecordServiceFetchRecordsModuleTest {
         pageSize: Int,
         offset: Int
     ) {
-        val (encodedSearchTags, legacySearchTags) = flowHelper.prepareCompatibilityTags(searchTags)
-
-        val encryptedTagsAndAnnotations = flowHelper.hashAndEncodeTagsAndAnnotations(
-            flowHelper.mergeTags(encodedSearchTags, encodedAnnotations)
-        )
-
-        val encryptedLegacyTagsAndAnnotations = flowHelper.hashAndEncodeTagsAndAnnotations(
-            flowHelper.mergeTags(legacySearchTags, legacyAnnotations)
-        )
-
         val encryptedCommonKey = flowHelper.prepareStoredOrUnstoredCommonKeyRun(
             alias,
             userId,
@@ -299,12 +291,12 @@ class RecordServiceFetchRecordsModuleTest {
             tagEncryptionKey = tagEncryptionKey,
             tagEncryptionKeyCalls = tagEncryptionKeyCalls,
             resources = serializedResources.toList(),
-            tags = flowHelper.mergeTags(encodedTags, legacyTags),
-            annotations = flowHelper.mergeTags(encodedAnnotations, legacyAnnotations),
+            tags = encodedTags,
+            annotations = encodedAnnotations,
             hashFunction = { value -> flowHelper.md5(value) }
         )
 
-        val search = slot<String>()
+        val search = slot<NetworkingContract.SearchTags>()
 
         (cryptoService as CryptoServiceFake).iteration = receivedIteration
 
@@ -319,31 +311,33 @@ class RecordServiceFetchRecordsModuleTest {
                 capture(search)
             )
         } answers {
-            val actual = search.captured
-            val record = when {
-                flowHelper.compareSerialisedTags(actual, encryptedTagsAndAnnotations) -> encryptedRecord
-                flowHelper.compareSerialisedTags(actual, encryptedLegacyTagsAndAnnotations) -> encryptedLegacyRecord
-                else -> throw RuntimeException(
-                    "Unexpected tags and annotations:\n$actual"
+            val actual = flowHelper.decryptSerializedTags(
+                search.captured.tagGroups,
+                cryptoService,
+                tagEncryptionKey
+            )
+
+            if (searchTags == actual) {
+                Observable.fromCallable { encryptedRecords }
+            } else {
+                throw RuntimeException(
+                    "Unexpected tags and annotations - \nexpected: $searchTags\ngot: $actual"
                 )
             }
-
-            Observable.fromCallable { listOf(record) }
         }
     }
 
     private fun runFhirBatchFlow(
-        serializedResources: Pair<String, String>,
+        serializedResources: Triple<String, String, String>,
         tags: Tags,
-        searchTags: Map<String, String>,
         annotations: Annotations = emptyList(),
-        tagEncryptionKeyCalls: Int = 3,
+        tagEncryptionKeyCalls: Int = 4,
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,
         dataKey: Pair<GCKey, EncryptedKey> = this.dataKey to encryptedDataKey,
         attachmentKey: Pair<GCKey, EncryptedKey>? = this.attachmentKey to encryptedAttachmentKey,
         tagEncryptionKey: GCKey = this.tagEncryptionKey,
-        recordIds: Pair<String, String> = RECORD_ID to RECORD_ID_COMPATIBILITY,
+        recordIds: Triple<String, String, String> = Triple(RECORD_ID, RECORD_ID_LEGACY_KMP, RECORD_ID_LEGACY_JS),
         userId: String = USER_ID,
         alias: String = ALIAS,
         creationDate: String = CREATION_DATE,
@@ -353,12 +347,18 @@ class RecordServiceFetchRecordsModuleTest {
         pageSize: Int = PAGE_SIZE,
         offset: Int = OFFSET
     ) {
-        val (encodedTags, legacyTags) = flowHelper.prepareCompatibilityTags(tags)
-        val (encodedAnnotations, legacyAnnotations) = flowHelper.prepareCompatibilityAnnotations(
+        val (encodedTags, legacyKMPTags, legacyJSTags) = flowHelper.prepareCompatibilityTags(tags)
+        val (encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations) = flowHelper.prepareCompatibilityAnnotations(
             annotations
         )
 
-        val encryptedRecord = flowHelper.prepareEncryptedFhirRecord(
+        val searchTags = SearchTagsBuilder.newBuilder()
+            .let { flowHelper.buildExpectedTagGroups(it, encodedTags, legacyKMPTags, legacyJSTags) }
+            .let { flowHelper.buildExpectedTagGroups(it, encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations) }
+            .seal()
+            .tagGroups
+
+        val encryptedRecord = flowHelper.prepareEncryptedRecord(
             recordIds.first,
             serializedResources.first,
             encodedTags,
@@ -370,11 +370,23 @@ class RecordServiceFetchRecordsModuleTest {
             updateDate
         )
 
-        val encryptedLegacyRecord = flowHelper.prepareEncryptedFhirRecord(
+        val encryptedKMPLegacyRecord = flowHelper.prepareEncryptedRecord(
             recordIds.second,
             serializedResources.second,
-            legacyTags,
-            legacyAnnotations,
+            legacyKMPTags,
+            legacyKMPAnnotations,
+            commonKey.first,
+            dataKey.second,
+            attachmentKey?.second,
+            creationDate,
+            updateDate
+        )
+
+        val encryptedJSLegacyRecord = flowHelper.prepareEncryptedRecord(
+            recordIds.third,
+            serializedResources.third,
+            legacyJSTags,
+            legacyJSAnnotations,
             commonKey.first,
             dataKey.second,
             attachmentKey?.second,
@@ -384,13 +396,10 @@ class RecordServiceFetchRecordsModuleTest {
 
         runBatchFlow(
             serializedResources,
-            encryptedRecord,
-            encryptedLegacyRecord,
+            listOf(encryptedRecord, encryptedKMPLegacyRecord, encryptedJSLegacyRecord),
             searchTags,
-            encodedTags,
-            encodedAnnotations,
-            legacyTags,
-            legacyAnnotations,
+            flowHelper.mergeTags(encodedTags, legacyKMPTags, legacyJSTags),
+            flowHelper.mergeTags(encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations),
             tagEncryptionKeyCalls,
             useStoredCommonKey,
             commonKey,
@@ -407,17 +416,16 @@ class RecordServiceFetchRecordsModuleTest {
     }
 
     private fun runDataBatchFlow(
-        serializedResources: Pair<String, String>,
+        serializedResources: Triple<String, String, String>,
         tags: Tags,
-        searchTags: Map<String, String>,
         annotations: Annotations = emptyList(),
-        tagEncryptionKeyCalls: Int = 3,
+        tagEncryptionKeyCalls: Int = 4,
         useStoredCommonKey: Boolean = true,
         commonKey: Pair<String, GCKey> = COMMON_KEY_ID to this.commonKey,
         dataKey: Pair<GCKey, EncryptedKey> = this.dataKey to encryptedDataKey,
         attachmentKey: Pair<GCKey, EncryptedKey>? = this.attachmentKey to encryptedAttachmentKey,
         tagEncryptionKey: GCKey = this.tagEncryptionKey,
-        recordIds: Pair<String, String> = RECORD_ID to RECORD_ID_COMPATIBILITY,
+        recordIds: Triple<String, String, String> = Triple(RECORD_ID, RECORD_ID_LEGACY_KMP, RECORD_ID_LEGACY_JS),
         userId: String = USER_ID,
         alias: String = ALIAS,
         creationDate: String = CREATION_DATE,
@@ -427,12 +435,17 @@ class RecordServiceFetchRecordsModuleTest {
         pageSize: Int = PAGE_SIZE,
         offset: Int = OFFSET
     ) {
-        val (encodedTags, legacyTags) = flowHelper.prepareCompatibilityTags(tags)
-        val (encodedAnnotations, legacyAnnotations) = flowHelper.prepareCompatibilityAnnotations(
+        val (encodedTags, legacyKMPTags, legacyJSTags) = flowHelper.prepareCompatibilityTags(tags)
+        val (encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations) = flowHelper.prepareCompatibilityAnnotations(
             annotations
         )
+        val searchTags = SearchTagsBuilder.newBuilder()
+            .let { flowHelper.buildExpectedTagGroups(it, encodedTags, legacyKMPTags, legacyJSTags) }
+            .let { flowHelper.buildExpectedTagGroups(it, encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations) }
+            .seal()
+            .tagGroups
 
-        val encryptedRecord = flowHelper.prepareEncryptedDataRecord(
+        val encryptedRecord = flowHelper.prepareEncryptedRecord(
             recordIds.first,
             serializedResources.first,
             encodedTags,
@@ -444,11 +457,23 @@ class RecordServiceFetchRecordsModuleTest {
             updateDate
         )
 
-        val encryptedLegacyRecord = flowHelper.prepareEncryptedDataRecord(
+        val encryptedKMPLegacyRecord = flowHelper.prepareEncryptedRecord(
             recordIds.second,
             serializedResources.second,
-            legacyTags,
-            legacyAnnotations,
+            legacyKMPTags,
+            legacyKMPAnnotations,
+            commonKey.first,
+            dataKey.second,
+            attachmentKey?.second,
+            creationDate,
+            updateDate
+        )
+
+        val encryptedJSLegacyRecord = flowHelper.prepareEncryptedRecord(
+            recordIds.third,
+            serializedResources.third,
+            legacyJSTags,
+            legacyJSAnnotations,
             commonKey.first,
             dataKey.second,
             attachmentKey?.second,
@@ -458,13 +483,10 @@ class RecordServiceFetchRecordsModuleTest {
 
         runBatchFlow(
             serializedResources,
-            encryptedRecord,
-            encryptedLegacyRecord,
+            listOf(encryptedRecord, encryptedKMPLegacyRecord, encryptedJSLegacyRecord),
             searchTags,
-            encodedTags,
-            encodedAnnotations,
-            legacyTags,
-            legacyAnnotations,
+            flowHelper.mergeTags(encodedTags, legacyKMPTags, legacyJSTags),
+            flowHelper.mergeTags(encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations),
             tagEncryptionKeyCalls,
             useStoredCommonKey,
             commonKey,
@@ -500,13 +522,14 @@ class RecordServiceFetchRecordsModuleTest {
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         runFhirFetchFlow(
-            serializedResource = SdkFhirParser.fromResource(resource)!!,
+            serializedResource = SdkFhirParser.fromResource(resource),
             tags = tags
         )
 
@@ -555,13 +578,14 @@ class RecordServiceFetchRecordsModuleTest {
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir3(
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
         runFhirFetchFlow(
-            serializedResource = SdkFhirParser.fromResource(resource)!!,
+            serializedResource = SdkFhirParser.fromResource(resource),
             tags = tags,
             annotations = annotations,
             useStoredCommonKey = false
@@ -608,13 +632,14 @@ class RecordServiceFetchRecordsModuleTest {
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         runFhirFetchFlow(
-            serializedResource = SdkFhirParser.fromResource(resource)!!,
+            serializedResource = SdkFhirParser.fromResource(resource),
             tags = tags
         )
 
@@ -663,13 +688,14 @@ class RecordServiceFetchRecordsModuleTest {
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir4(
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
         runFhirFetchFlow(
-            serializedResource = SdkFhirParser.fromResource(resource)!!,
+            serializedResource = SdkFhirParser.fromResource(resource),
             tags = tags,
             annotations = annotations,
             useStoredCommonKey = false
@@ -792,11 +818,6 @@ class RecordServiceFetchRecordsModuleTest {
             "resourcetype" to resourceType
         )
 
-        val searchTags = mapOf(
-            "fhirversion" to "3.0.1",
-            "resourcetype" to resourceType
-        )
-
         val template = TestResourceHelper.loadTemplate(
             "common",
             "documentReference-without-attachment-template",
@@ -807,28 +828,45 @@ class RecordServiceFetchRecordsModuleTest {
         val template2 = TestResourceHelper.loadTemplate(
             "common",
             "documentReference-without-attachment-template",
-            RECORD_ID_COMPATIBILITY,
+            RECORD_ID_LEGACY_KMP,
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir3(
+        val template3 = TestResourceHelper.loadTemplate(
+            "common",
+            "documentReference-without-attachment-template",
+            RECORD_ID_LEGACY_JS,
+            PARTNER_ID
+        )
+
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val legacyResource = SdkFhirParser.toFhir3(
+        val legacyKMPResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template2
         ) as Fhir3DocumentReference
 
-        legacyResource.description = "legacyRecord"
+        val legacyJSResource = SdkFhirParser.toFhir<Fhir3Resource>(
+            resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
+            template3
+        ) as Fhir3DocumentReference
+
+        legacyKMPResource.description = "legacyKMPRecord"
+        legacyJSResource.description = "legacyKMPRecord"
 
         runFhirBatchFlow(
-            serializedResources = SdkFhirParser.fromResource(resource)!! to SdkFhirParser.fromResource(
-                legacyResource
-            )!!,
+            serializedResources = Triple(
+                SdkFhirParser.fromResource(resource),
+                SdkFhirParser.fromResource(legacyKMPResource),
+                SdkFhirParser.fromResource(legacyJSResource)
+            ),
             tags = tags,
-            searchTags = searchTags,
             useStoredCommonKey = false
         )
 
@@ -845,7 +883,7 @@ class RecordServiceFetchRecordsModuleTest {
 
         // Then
         assertEquals(
-            expected = 2,
+            expected = 3,
             actual = result.size
         )
         assertEquals(
@@ -854,10 +892,15 @@ class RecordServiceFetchRecordsModuleTest {
         )
         assertEquals(
             actual = SdkFhirParser.fromResource(result[1].resource),
-            expected = SdkFhirParser.fromResource(legacyResource)
+            expected = SdkFhirParser.fromResource(legacyKMPResource)
+        )
+        assertEquals(
+            actual = SdkFhirParser.fromResource(result[2].resource),
+            expected = SdkFhirParser.fromResource(legacyJSResource)
         )
         assertTrue(result[0].annotations.isNullOrEmpty())
         assertTrue(result[1].annotations.isNullOrEmpty())
+        assertTrue(result[2].annotations.isNullOrEmpty())
     }
 
     @Test
@@ -867,11 +910,6 @@ class RecordServiceFetchRecordsModuleTest {
         val tags = mapOf(
             "partner" to PARTNER_ID,
             "client" to CLIENT_ID,
-            "fhirversion" to "3.0.1",
-            "resourcetype" to resourceType
-        )
-
-        val searchTags = mapOf(
             "fhirversion" to "3.0.1",
             "resourcetype" to resourceType
         )
@@ -894,29 +932,46 @@ class RecordServiceFetchRecordsModuleTest {
         val template2 = TestResourceHelper.loadTemplate(
             "common",
             "documentReference-without-attachment-template",
-            RECORD_ID_COMPATIBILITY,
+            RECORD_ID_LEGACY_KMP,
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir3(
+        val template3 = TestResourceHelper.loadTemplate(
+            "common",
+            "documentReference-without-attachment-template",
+            RECORD_ID_LEGACY_JS,
+            PARTNER_ID
+        )
+
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val legacyResource = SdkFhirParser.toFhir3(
+        val legacyKMPResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template2
         ) as Fhir3DocumentReference
 
-        legacyResource.description = "legacyRecord"
+        val legacyJSResource = SdkFhirParser.toFhir<Fhir3Resource>(
+            resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
+            template3
+        ) as Fhir3DocumentReference
+
+        legacyKMPResource.description = "legacyRecord"
+        legacyJSResource.description = "legacyRecord"
 
         runFhirBatchFlow(
-            serializedResources = SdkFhirParser.fromResource(resource)!! to SdkFhirParser.fromResource(
-                legacyResource
-            )!!,
+            serializedResources = Triple(
+                SdkFhirParser.fromResource(resource),
+                SdkFhirParser.fromResource(legacyKMPResource),
+                SdkFhirParser.fromResource(legacyJSResource)
+            ),
             tags = tags,
-            annotations = annotations,
-            searchTags = searchTags
+            annotations = annotations
         )
 
         // When
@@ -932,7 +987,7 @@ class RecordServiceFetchRecordsModuleTest {
 
         // Then
         assertEquals(
-            expected = 2,
+            expected = 3,
             actual = result.size
         )
         assertEquals(
@@ -941,7 +996,11 @@ class RecordServiceFetchRecordsModuleTest {
         )
         assertEquals(
             actual = SdkFhirParser.fromResource(result[1].resource),
-            expected = SdkFhirParser.fromResource(legacyResource)
+            expected = SdkFhirParser.fromResource(legacyKMPResource)
+        )
+        assertEquals(
+            actual = SdkFhirParser.fromResource(result[2].resource),
+            expected = SdkFhirParser.fromResource(legacyJSResource)
         )
         assertEquals(
             actual = result[0].annotations,
@@ -949,6 +1008,10 @@ class RecordServiceFetchRecordsModuleTest {
         )
         assertEquals(
             actual = result[1].annotations,
+            expected = annotations
+        )
+        assertEquals(
+            actual = result[2].annotations,
             expected = annotations
         )
     }
@@ -960,11 +1023,6 @@ class RecordServiceFetchRecordsModuleTest {
         val tags = mapOf(
             "partner" to PARTNER_ID,
             "client" to CLIENT_ID,
-            "fhirversion" to "3.0.1",
-            "resourcetype" to resourceType
-        )
-
-        val searchTags = mapOf(
             "fhirversion" to "3.0.1",
             "resourcetype" to resourceType
         )
@@ -990,29 +1048,46 @@ class RecordServiceFetchRecordsModuleTest {
         val template2 = TestResourceHelper.loadTemplate(
             "common",
             "documentReference-without-attachment-template",
-            RECORD_ID_COMPATIBILITY,
+            RECORD_ID_LEGACY_KMP,
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir3(
+        val template3 = TestResourceHelper.loadTemplate(
+            "common",
+            "documentReference-without-attachment-template",
+            RECORD_ID_LEGACY_JS,
+            PARTNER_ID
+        )
+
+        val resource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template
         ) as Fhir3DocumentReference
 
-        val legacyResource = SdkFhirParser.toFhir3(
+        val legacyKMPResource = SdkFhirParser.toFhir<Fhir3Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
             template2
         ) as Fhir3DocumentReference
 
-        legacyResource.description = "legacyRecord"
+        val legacyJSResource = SdkFhirParser.toFhir<Fhir3Resource>(
+            resourceType,
+            FhirContract.FhirVersion.FHIR_3.version,
+            template3
+        ) as Fhir3DocumentReference
+
+        legacyKMPResource.description = "legacyRecord"
+        legacyJSResource.description = "legacyRecord"
 
         runFhirBatchFlow(
-            serializedResources = SdkFhirParser.fromResource(resource)!! to SdkFhirParser.fromResource(
-                legacyResource
-            )!!,
+            serializedResources = Triple(
+                SdkFhirParser.fromResource(resource),
+                SdkFhirParser.fromResource(legacyKMPResource),
+                SdkFhirParser.fromResource(legacyJSResource),
+            ),
             tags = tags,
             annotations = annotations,
-            searchTags = searchTags,
             startDate = startDate.toString(),
             endDate = endDate.toString()
         )
@@ -1030,7 +1105,7 @@ class RecordServiceFetchRecordsModuleTest {
 
         // Then
         assertEquals(
-            expected = 2,
+            expected = 3,
             actual = result.size
         )
         assertEquals(
@@ -1039,7 +1114,11 @@ class RecordServiceFetchRecordsModuleTest {
         )
         assertEquals(
             actual = SdkFhirParser.fromResource(result[1].resource),
-            expected = SdkFhirParser.fromResource(legacyResource)
+            expected = SdkFhirParser.fromResource(legacyKMPResource)
+        )
+        assertEquals(
+            actual = SdkFhirParser.fromResource(result[2].resource),
+            expected = SdkFhirParser.fromResource(legacyJSResource)
         )
         assertEquals(
             actual = result[0].annotations,
@@ -1047,6 +1126,11 @@ class RecordServiceFetchRecordsModuleTest {
         )
         assertEquals(
             actual = result[1].annotations,
+            expected = annotations
+        )
+
+        assertEquals(
+            actual = result[2].annotations,
             expected = annotations
         )
     }
@@ -1063,11 +1147,6 @@ class RecordServiceFetchRecordsModuleTest {
             "resourcetype" to resourceType
         )
 
-        val searchTags = mapOf(
-            "fhirversion" to "4.0.1",
-            "resourcetype" to resourceType
-        )
-
         val template = TestResourceHelper.loadTemplate(
             "common",
             "documentReference-without-attachment-template",
@@ -1078,28 +1157,45 @@ class RecordServiceFetchRecordsModuleTest {
         val template2 = TestResourceHelper.loadTemplate(
             "common",
             "documentReference-without-attachment-template",
-            RECORD_ID_COMPATIBILITY,
+            RECORD_ID_LEGACY_KMP,
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir4(
+        val template3 = TestResourceHelper.loadTemplate(
+            "common",
+            "documentReference-without-attachment-template",
+            RECORD_ID_LEGACY_JS,
+            PARTNER_ID
+        )
+
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val legacyResource = SdkFhirParser.toFhir4(
+        val legacyKMPResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template2
         ) as Fhir4DocumentReference
 
-        legacyResource.description = "legacyRecord"
+        val legacyJSResource = SdkFhirParser.toFhir<Fhir4Resource>(
+            resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
+            template3
+        ) as Fhir4DocumentReference
+
+        legacyKMPResource.description = "legacyKMPRecord"
+        legacyJSResource.description = "legacyJSRecord"
 
         runFhirBatchFlow(
-            serializedResources = SdkFhirParser.fromResource(resource)!! to SdkFhirParser.fromResource(
-                legacyResource
-            )!!,
+            serializedResources = Triple(
+                SdkFhirParser.fromResource(resource),
+                SdkFhirParser.fromResource(legacyKMPResource),
+                SdkFhirParser.fromResource(legacyJSResource)
+            ),
             tags = tags,
-            searchTags = searchTags,
             useStoredCommonKey = false
         )
 
@@ -1116,7 +1212,7 @@ class RecordServiceFetchRecordsModuleTest {
 
         // Then
         assertEquals(
-            expected = 2,
+            expected = 3,
             actual = result.size
         )
         assertEquals(
@@ -1125,10 +1221,15 @@ class RecordServiceFetchRecordsModuleTest {
         )
         assertEquals(
             actual = SdkFhirParser.fromResource(result[1].resource),
-            expected = SdkFhirParser.fromResource(legacyResource)
+            expected = SdkFhirParser.fromResource(legacyKMPResource)
+        )
+        assertEquals(
+            actual = SdkFhirParser.fromResource(result[2].resource),
+            expected = SdkFhirParser.fromResource(legacyJSResource)
         )
         assertTrue(result[0].annotations.isNullOrEmpty())
         assertTrue(result[1].annotations.isNullOrEmpty())
+        assertTrue(result[2].annotations.isNullOrEmpty())
     }
 
     @Test
@@ -1138,11 +1239,6 @@ class RecordServiceFetchRecordsModuleTest {
         val tags = mapOf(
             "partner" to PARTNER_ID,
             "client" to CLIENT_ID,
-            "fhirversion" to "4.0.1",
-            "resourcetype" to resourceType
-        )
-
-        val searchTags = mapOf(
             "fhirversion" to "4.0.1",
             "resourcetype" to resourceType
         )
@@ -1165,29 +1261,46 @@ class RecordServiceFetchRecordsModuleTest {
         val template2 = TestResourceHelper.loadTemplate(
             "common",
             "documentReference-without-attachment-template",
-            RECORD_ID_COMPATIBILITY,
+            RECORD_ID_LEGACY_KMP,
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir4(
+        val template3 = TestResourceHelper.loadTemplate(
+            "common",
+            "documentReference-without-attachment-template",
+            RECORD_ID_LEGACY_JS,
+            PARTNER_ID
+        )
+
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val legacyResource = SdkFhirParser.toFhir4(
+        val legacyKMPResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template2
         ) as Fhir4DocumentReference
 
-        legacyResource.description = "legacyRecord"
+        val legacyJSResource = SdkFhirParser.toFhir<Fhir4Resource>(
+            resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
+            template3
+        ) as Fhir4DocumentReference
+
+        legacyKMPResource.description = "legacyKMPRecord"
+        legacyJSResource.description = "legacyJSRecord"
 
         runFhirBatchFlow(
-            serializedResources = SdkFhirParser.fromResource(resource)!! to SdkFhirParser.fromResource(
-                legacyResource
-            )!!,
+            serializedResources = Triple(
+                SdkFhirParser.fromResource(resource),
+                SdkFhirParser.fromResource(legacyKMPResource),
+                SdkFhirParser.fromResource(legacyJSResource)
+            ),
             tags = tags,
-            annotations = annotations,
-            searchTags = searchTags
+            annotations = annotations
         )
 
         // When
@@ -1203,7 +1316,7 @@ class RecordServiceFetchRecordsModuleTest {
 
         // Then
         assertEquals(
-            expected = 2,
+            expected = 3,
             actual = result.size
         )
         assertEquals(
@@ -1212,7 +1325,11 @@ class RecordServiceFetchRecordsModuleTest {
         )
         assertEquals(
             actual = SdkFhirParser.fromResource(result[1].resource),
-            expected = SdkFhirParser.fromResource(legacyResource)
+            expected = SdkFhirParser.fromResource(legacyKMPResource)
+        )
+        assertEquals(
+            actual = SdkFhirParser.fromResource(result[2].resource),
+            expected = SdkFhirParser.fromResource(legacyJSResource)
         )
         assertEquals(
             actual = result[0].annotations,
@@ -1220,6 +1337,10 @@ class RecordServiceFetchRecordsModuleTest {
         )
         assertEquals(
             actual = result[1].annotations,
+            expected = annotations
+        )
+        assertEquals(
+            actual = result[2].annotations,
             expected = annotations
         )
     }
@@ -1235,11 +1356,6 @@ class RecordServiceFetchRecordsModuleTest {
             "resourcetype" to resourceType
         )
 
-        val searchTags = mapOf(
-            "fhirversion" to "4.0.1",
-            "resourcetype" to resourceType
-        )
-
         val annotations = listOf(
             "wow",
             "it",
@@ -1261,29 +1377,46 @@ class RecordServiceFetchRecordsModuleTest {
         val template2 = TestResourceHelper.loadTemplate(
             "common",
             "documentReference-without-attachment-template",
-            RECORD_ID_COMPATIBILITY,
+            RECORD_ID_LEGACY_KMP,
             PARTNER_ID
         )
 
-        val resource = SdkFhirParser.toFhir4(
+        val template3 = TestResourceHelper.loadTemplate(
+            "common",
+            "documentReference-without-attachment-template",
+            RECORD_ID_LEGACY_JS,
+            PARTNER_ID
+        )
+
+        val resource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template
         ) as Fhir4DocumentReference
 
-        val legacyResource = SdkFhirParser.toFhir4(
+        val legacyKMPResource = SdkFhirParser.toFhir<Fhir4Resource>(
             resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
             template2
         ) as Fhir4DocumentReference
 
-        legacyResource.description = "legacyRecord"
+        val legacyJSResource = SdkFhirParser.toFhir<Fhir4Resource>(
+            resourceType,
+            FhirContract.FhirVersion.FHIR_4.version,
+            template3
+        ) as Fhir4DocumentReference
+
+        legacyKMPResource.description = "legacyKMPRecord"
+        legacyJSResource.description = "legacyJSRecord"
 
         runFhirBatchFlow(
-            serializedResources = SdkFhirParser.fromResource(resource)!! to SdkFhirParser.fromResource(
-                legacyResource
-            )!!,
+            serializedResources = Triple(
+                SdkFhirParser.fromResource(resource),
+                SdkFhirParser.fromResource(legacyKMPResource),
+                SdkFhirParser.fromResource(legacyJSResource),
+            ),
             tags = tags,
             annotations = annotations,
-            searchTags = searchTags,
             startDate = startDate.toString(),
             endDate = endDate.toString()
         )
@@ -1301,7 +1434,7 @@ class RecordServiceFetchRecordsModuleTest {
 
         // Then
         assertEquals(
-            expected = 2,
+            expected = 3,
             actual = result.size
         )
         assertEquals(
@@ -1310,7 +1443,11 @@ class RecordServiceFetchRecordsModuleTest {
         )
         assertEquals(
             actual = SdkFhirParser.fromResource(result[1].resource),
-            expected = SdkFhirParser.fromResource(legacyResource)
+            expected = SdkFhirParser.fromResource(legacyKMPResource)
+        )
+        assertEquals(
+            actual = SdkFhirParser.fromResource(result[2].resource),
+            expected = SdkFhirParser.fromResource(legacyJSResource)
         )
         assertEquals(
             actual = result[0].annotations,
@@ -1318,6 +1455,10 @@ class RecordServiceFetchRecordsModuleTest {
         )
         assertEquals(
             actual = result[1].annotations,
+            expected = annotations
+        )
+        assertEquals(
+            actual = result[2].annotations,
             expected = annotations
         )
     }
@@ -1333,14 +1474,9 @@ class RecordServiceFetchRecordsModuleTest {
             "client" to CLIENT_ID
         )
 
-        val searchTags = mapOf(
-            "flag" to ARBITRARY_DATA_KEY
-        )
-
         runDataBatchFlow(
-            serializedResources = resource to resource,
+            serializedResources = Triple(resource, resource, resource),
             tags = tags,
-            searchTags = searchTags,
             useStoredCommonKey = false
         )
 
@@ -1356,30 +1492,38 @@ class RecordServiceFetchRecordsModuleTest {
 
         // Then
         assertEquals(
-            expected = 1,
+            expected = 3,
             actual = result.size
         )
         assertEquals(
             actual = String(result[0].resource.value),
             expected = resource
         )
+        assertEquals(
+            actual = String(result[1].resource.value),
+            expected = resource
+        )
+        assertEquals(
+            actual = String(result[2].resource.value),
+            expected = resource
+        )
+
         assertTrue(result[0].annotations.isNullOrEmpty())
+        assertTrue(result[1].annotations.isNullOrEmpty())
+        assertTrue(result[2].annotations.isNullOrEmpty())
     }
 
     @Test
     fun `Given, fetchDataRecords is called, with its appropriate payloads, it returns a List of Records filtered by Annotations`() {
         // Given
         val resource = "The never ending story."
-        val legacyResource = "Completely new design, ey."
+        val legacyKMPResource = "Completely new design, ey."
+        val legacyJSResource = "And another bug, ey."
 
         val tags = mapOf(
             "flag" to ARBITRARY_DATA_KEY,
             "partner" to PARTNER_ID,
             "client" to CLIENT_ID
-        )
-
-        val searchTags = mapOf(
-            "flag" to ARBITRARY_DATA_KEY
         )
 
         val annotations = listOf(
@@ -1391,10 +1535,9 @@ class RecordServiceFetchRecordsModuleTest {
         )
 
         runDataBatchFlow(
-            serializedResources = resource to legacyResource,
+            serializedResources = Triple(resource, legacyKMPResource, legacyJSResource),
             tags = tags,
-            annotations = annotations,
-            searchTags = searchTags
+            annotations = annotations
         )
 
         // When
@@ -1409,7 +1552,7 @@ class RecordServiceFetchRecordsModuleTest {
 
         // Then
         assertEquals(
-            expected = 2,
+            expected = 3,
             actual = result.size
         )
         assertEquals(
@@ -1418,7 +1561,11 @@ class RecordServiceFetchRecordsModuleTest {
         )
         assertEquals(
             actual = String(result[1].resource.value),
-            expected = legacyResource
+            expected = legacyKMPResource
+        )
+        assertEquals(
+            actual = String(result[2].resource.value),
+            expected = legacyJSResource
         )
         assertEquals(
             actual = result[0].annotations,
@@ -1428,22 +1575,23 @@ class RecordServiceFetchRecordsModuleTest {
             actual = result[1].annotations,
             expected = annotations
         )
+        assertEquals(
+            actual = result[2].annotations,
+            expected = annotations
+        )
     }
 
     @Test
     fun `Given, fetchDataRecords is called, with its appropriate payloads, it returns a List of Records filtered by the provided date parameter and Annotations`() {
         // Given
         val resource = "The never ending story."
-        val legacyResource = "Completely new design, ey."
+        val legacyKMPResource = "Completely new design, ey."
+        val legacyJSResource = "And another bug, ey."
 
         val tags = mapOf(
             "flag" to ARBITRARY_DATA_KEY,
             "partner" to PARTNER_ID,
             "client" to CLIENT_ID
-        )
-
-        val searchTags = mapOf(
-            "flag" to ARBITRARY_DATA_KEY
         )
 
         val annotations = listOf(
@@ -1458,10 +1606,9 @@ class RecordServiceFetchRecordsModuleTest {
         val endDate = LocalDate.of(2020, 12, 1)
 
         runDataBatchFlow(
-            serializedResources = resource to legacyResource,
+            serializedResources = Triple(resource, legacyKMPResource, legacyJSResource),
             tags = tags,
             annotations = annotations,
-            searchTags = searchTags,
             startDate = startDate.toString(),
             endDate = endDate.toString()
         )
@@ -1478,7 +1625,7 @@ class RecordServiceFetchRecordsModuleTest {
 
         // Then
         assertEquals(
-            expected = 2,
+            expected = 3,
             actual = result.size
         )
         assertEquals(
@@ -1487,7 +1634,11 @@ class RecordServiceFetchRecordsModuleTest {
         )
         assertEquals(
             actual = String(result[1].resource.value),
-            expected = legacyResource
+            expected = legacyKMPResource
+        )
+        assertEquals(
+            actual = String(result[2].resource.value),
+            expected = legacyJSResource
         )
         assertEquals(
             actual = result[0].annotations,
@@ -1495,6 +1646,10 @@ class RecordServiceFetchRecordsModuleTest {
         )
         assertEquals(
             actual = result[1].annotations,
+            expected = annotations
+        )
+        assertEquals(
+            actual = result[2].annotations,
             expected = annotations
         )
     }

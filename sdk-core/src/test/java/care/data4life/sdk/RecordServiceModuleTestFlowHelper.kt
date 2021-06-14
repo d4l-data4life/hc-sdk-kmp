@@ -21,6 +21,7 @@ import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_JPEG_QUALITY_PERCENT
 import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_PREVIEW_SIZE_PX
 import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_THUMBNAIL_SIZE_PX
+import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.model.Meta
 import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.network.NetworkingContract
@@ -29,9 +30,11 @@ import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.tag.Annotations
+import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.util.GenericTestDataProvider.DATE_FORMATTER
 import care.data4life.sdk.test.util.GenericTestDataProvider.DATE_TIME_FORMATTER
+import care.data4life.sdk.test.util.JSLegacyTagConverter
 import care.data4life.sdk.util.Base64
 import io.mockk.every
 import io.mockk.mockk
@@ -77,21 +80,31 @@ class RecordServiceModuleTestFlowHelper(
         return encodedTags
     }
 
-    private fun prepareLegacyTag(
+    private fun prepareAndroidLegacyTag(
         key: String,
         value: String
     ): String = "${key.toLowerCase()}=${value.toLowerCase()}"
 
-    fun prepareCompatibilityTags(
-        tags: Tags
-    ): Pair<List<String>, List<String>> {
-        val encodedTags = prepareTags(tags)
-        val legacyTags = tags.map { (key, value) -> prepareLegacyTag(key, value) }
+    private fun prepareJSLegacyTags(tags: Tags): List<String> {
+        val encodedTags = mutableListOf<String>()
+        tags.forEach { (key, value) ->
+            encodedTags.add("${key.toLowerCase()}=${JSLegacyTagConverter.convertTag(encode(value))}")
+        }
 
-        return Pair(encodedTags, legacyTags)
+        return encodedTags
     }
 
-    private fun prepareLegacyAnnotations(
+    fun prepareCompatibilityTags(
+        tags: Tags
+    ): Triple<List<String>, List<String>, List<String>> {
+        val encodedTags = prepareTags(tags)
+        val androidLegacyTag = tags.map { (key, value) -> prepareAndroidLegacyTag(key, value) }
+        val jsLegacyTags = prepareJSLegacyTags(tags)
+
+        return Triple(encodedTags, androidLegacyTag, jsLegacyTags)
+    }
+
+    private fun prepareAndroidLegacyAnnotations(
         annotations: Annotations
     ): List<String> = annotations.map { "custom=${it.toLowerCase()}" }
 
@@ -99,26 +112,93 @@ class RecordServiceModuleTestFlowHelper(
         annotations: Annotations
     ): List<String> = annotations.map { "custom=${encode(it)}" }
 
+    private fun prepareJSLegacyAnnotations(
+        annotations: Annotations
+    ): List<String> = annotations.map { "custom=${JSLegacyTagConverter.convertTag(encode(it))}" }
+
     fun prepareCompatibilityAnnotations(
         annotations: Annotations
-    ): Pair<List<String>, List<String>> {
+    ): Triple<List<String>, List<String>, List<String>> {
         val encodedAnnotations = prepareAnnotations(annotations)
-        val legacyAnnotations = prepareLegacyAnnotations(annotations)
+        val legacyAndroidAnnotations = prepareAndroidLegacyAnnotations(annotations)
+        val legacyJSAnnotations = prepareJSLegacyAnnotations(annotations)
 
-        return Pair(encodedAnnotations, legacyAnnotations)
+        return Triple(encodedAnnotations, legacyAndroidAnnotations, legacyJSAnnotations)
     }
 
     fun mergeTags(
         set1: List<String>,
-        set2: List<String>
+        set2: List<String>,
+        set3: List<String>? = null
     ): List<String> = mutableListOf<String>().also {
         it.addAll(set1)
         it.addAll(set2)
+        if (set3 is List<*>) {
+            it.addAll(set3)
+        }
     }
 
-    fun hashAndEncodeTagsAndAnnotations(
-        tagsAndAnnotations: List<String>
-    ): List<String> = tagsAndAnnotations.map { Base64.encodeToString(md5(it)) }
+    fun buildExpectedTagGroups(
+        builder: NetworkingContract.SearchTagsBuilder,
+        validGroup: List<String>,
+        kmpLegacyGroup: List<String>,
+        jsLegacyGroup: List<String>
+    ): NetworkingContract.SearchTagsBuilder {
+        validGroup.indices.forEach { idx ->
+            if (!validGroup[idx].startsWith("client") && !validGroup[idx].startsWith("partner")) {
+                builder.addOrTuple(
+                    listOf(
+                        validGroup[idx],
+                        kmpLegacyGroup[idx],
+                        jsLegacyGroup[idx]
+                    )
+                )
+            }
+        }
+
+        return builder
+    }
+
+    private fun decryptAndMapTags(
+        tags: String,
+        cryptoService: CryptoContract.Service,
+        tagEncryptionKey: GCKey
+    ): Map<String, String> {
+        val unOrderedTags = tags.replace("(", "")
+            .replace(")", "")
+            .split(",")
+
+        val mappedTags = mutableMapOf<String, String>()
+
+        unOrderedTags.forEach { tag ->
+            Base64.decode(tag)
+                .let { encrypted ->
+                    cryptoService.symDecrypt(
+                        tagEncryptionKey,
+                        encrypted,
+                        TaggingContract.CryptoService.IV
+                    )
+                }
+                .let { decrypted -> String(decrypted, StandardCharsets.UTF_8) }
+                .also { mappedTags[tag] = it }
+        }
+
+        return mappedTags
+    }
+
+    fun decryptSerializedTags(
+        tags: String,
+        cryptoService: CryptoContract.Service,
+        tagEncryptionKey: GCKey
+    ): String {
+        val mappedTags = decryptAndMapTags(tags, cryptoService, tagEncryptionKey)
+        var plain = tags
+        mappedTags.forEach { tag ->
+            plain = plain.replace(tag.key, tag.value)
+        }
+
+        return plain
+    }
 
     fun mapAttachments(
         payload: ByteArray,
@@ -320,25 +400,7 @@ class RecordServiceModuleTestFlowHelper(
         keys
     )
 
-    private fun buildEncryptedRecordWithEncodedBody(
-        id: String?,
-        commonKeyId: String,
-        tags: List<String>,
-        annotations: Annotations,
-        body: String,
-        dates: Pair<String?, String?>,
-        keys: Pair<EncryptedKey, EncryptedKey?>
-    ): EncryptedRecord = createEncryptedRecord(
-        id,
-        commonKeyId,
-        tags,
-        annotations,
-        Base64.encodeToString(md5(body)),
-        dates,
-        keys
-    )
-
-    fun prepareEncryptedFhirRecord(
+    fun prepareEncryptedRecord(
         recordId: String?,
         resource: String,
         tags: List<String>,
@@ -349,26 +411,6 @@ class RecordServiceModuleTestFlowHelper(
         creationDate: String,
         updateDate: String?
     ): EncryptedRecord = buildEncryptedRecord(
-        recordId,
-        commonKeyId,
-        tags,
-        annotations,
-        resource,
-        Pair(creationDate, updateDate),
-        Pair(encryptedDataKey, encryptedAttachmentsKey)
-    )
-
-    fun prepareEncryptedDataRecord(
-        recordId: String?,
-        resource: String,
-        tags: List<String>,
-        annotations: Annotations,
-        commonKeyId: String,
-        encryptedDataKey: EncryptedKey,
-        encryptedAttachmentsKey: EncryptedKey?,
-        creationDate: String,
-        updateDate: String?
-    ): EncryptedRecord = buildEncryptedRecordWithEncodedBody(
         recordId,
         commonKeyId,
         tags,

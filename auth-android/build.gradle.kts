@@ -77,6 +77,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
     packagingOptions {
         exclude("META-INF/DEPENDENCIES")
         exclude("META-INF/*.kotlin_module")
@@ -85,6 +89,7 @@ android {
     lintOptions {
         isAbortOnError = false
     }
+
 }
 
 dependencies {

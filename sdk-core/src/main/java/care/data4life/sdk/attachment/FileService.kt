@@ -42,7 +42,8 @@ class FileService(
             .onErrorResumeNext { error -> Single.error(FileException.UploadFailed(error)) }
     }
 
-    override fun deleteFile(userId: String, fileId: String): Single<Boolean> {
-        return apiService.deleteDocument(alias, userId, fileId)
-    }
+    override fun deleteFile(
+        userId: String,
+        fileId: String
+    ): Single<Boolean> = apiService.deleteDocument(alias, userId, fileId)
 }

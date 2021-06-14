@@ -29,11 +29,16 @@ import care.data4life.sdk.attachment.AttachmentService;
 import care.data4life.sdk.attachment.FileService;
 import care.data4life.sdk.auth.UserService;
 import care.data4life.sdk.call.CallHandler;
+import care.data4life.sdk.config.SDKConfig;
+import care.data4life.sdk.crypto.CryptoSecureStore;
+import care.data4life.sdk.crypto.CryptoService;
 import care.data4life.sdk.fhir.ResourceCryptoService;
 import care.data4life.sdk.log.Log;
 import care.data4life.sdk.log.Logger;
+import care.data4life.sdk.network.ApiService;
 import care.data4life.sdk.network.Environment;
 import care.data4life.sdk.tag.TagCryptoService;
+import care.data4life.sdk.network.NetworkingContract;
 import care.data4life.sdk.tag.TaggingService;
 import care.data4life.securestore.SecureStore;
 import care.data4life.securestore.SecureStoreContract;
@@ -41,8 +46,6 @@ import care.data4life.securestore.SecureStoreCryptor;
 import care.data4life.securestore.SecureStoreStorage;
 
 public final class Data4LifeClient extends BaseClient {
-
-    private static final String CLIENT_NAME = "SDK";
     private static final boolean DEBUG = true;
 
 
@@ -123,9 +126,19 @@ public final class Data4LifeClient extends BaseClient {
                 authorizationStore
         );
 
-        NetworkConnectivityService networkConnectivityService = () -> true;
+        NetworkingContract.NetworkConnectivityService networkConnectivityService = () -> true;
 
-        ApiService apiService = new ApiService(authorizationService, environment, clientId, clientSecret, platform, networkConnectivityService, CLIENT_NAME, DEBUG);
+        ApiService apiService = new ApiService(
+                authorizationService,
+                environment,
+                clientId,
+                clientSecret,
+                platform,
+                networkConnectivityService,
+                NetworkingContract.Clients.JAVA,
+                SDKConfig.version,
+                DEBUG
+        );
 
         CryptoSecureStore cryptoSecureStore = new CryptoSecureStore(secureStore);
         CryptoService cryptoService = new CryptoService(alias, cryptoSecureStore);

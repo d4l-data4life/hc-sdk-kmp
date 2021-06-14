@@ -12,7 +12,7 @@ and this project adheres to http://semver.org/spec/v2.0.0.html[Semantic Versioni
 ==== Versions
 toc::[]
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.11.0...main[Unreleased]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.13.2...main[Unreleased]
 
 === Added
 
@@ -26,7 +26,58 @@ toc::[]
 
 === Bumped
 
+* JaCoCo 0.8.3 -> 0.8.7
+
 === Migration
+
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.13.1...v1.13.2[1.13.2]
+
+=== Fixed
+
+* S4H certificate pinning.
+
+=== Bumped
+
+* mockk 1.10.0 -> 1.10.6
+
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.13.0...v1.13.1[1.13.1]
+Re release of 1.13.0 due to some publishing issues.
+
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.12.0...v1.13.0[1.13.0]
+
+=== Added
+
+* Enable count for arbitrary data.
+
+=== Changed
+
+* ApiService is now in Kotlin.
+* Errors, which occurred during encryption or decryption of a resource, are now D4LRuntimeExceptions.
+
+=== Bumped
+
+* OkHTTP 4.7.2 -> 4.9.1
+* FHIR SDK 1.4.0 -> 1.5.0
+
+=== Migration
+
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.11.0...v1.12.0[1.12.0]
+
+=== Added
+
+* LegacyEncoding for Javascript.
+
+=== Changed
+
+* The clients sending now the correct version of the SDK.
+
+=== Fixed
+
+* Nullpointer occurred while uploading a Records, which does not alter Attachments.
+
+=== Bumped
+
+* Android Gradle Plugin 4.1.3 -> 4.2.1
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.10.0...v1.11.0[1.11.0]
 

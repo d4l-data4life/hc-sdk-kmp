@@ -33,12 +33,17 @@ import care.data4life.sdk.attachment.AttachmentService;
 import care.data4life.sdk.attachment.FileService;
 import care.data4life.sdk.auth.UserService;
 import care.data4life.sdk.call.CallHandler;
+import care.data4life.sdk.config.SDKConfig;
+import care.data4life.sdk.crypto.CryptoSecureStore;
+import care.data4life.sdk.crypto.CryptoService;
 import care.data4life.sdk.fhir.ResourceCryptoService;
 import care.data4life.sdk.lang.CoreRuntimeException;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.Callback;
+import care.data4life.sdk.network.ApiService;
 import care.data4life.sdk.network.Environment;
 import care.data4life.sdk.tag.TagCryptoService;
+import care.data4life.sdk.network.NetworkingContract;
 import care.data4life.sdk.tag.TaggingService;
 import care.data4life.securestore.SecureStore;
 import care.data4life.securestore.SecureStoreCryptor;
@@ -168,9 +173,19 @@ public final class Data4LifeClient extends BaseClient {
 
         CryptoSecureStore store = new CryptoSecureStore(secureStore);
 
-        NetworkConnectivityService connectivityService = new NetworkConnectivityServiceAndroid(context);
+        NetworkingContract.NetworkConnectivityService connectivityService = new NetworkConnectivityServiceAndroid(context);
 
-        ApiService apiService = new ApiService(authorizationService, environment, clientId, clientSecret, platform, connectivityService, BuildConfig.VERSION_NAME, debug);
+        ApiService apiService = new ApiService(
+                authorizationService,
+                environment,
+                clientId,
+                clientSecret,
+                platform,
+                connectivityService,
+                NetworkingContract.Clients.ANDROID,
+                SDKConfig.version,
+                debug
+        );
         CryptoService cryptoService = new CryptoService(initConfig.getAlias(), store);
         TagCryptoService tagEncryptionService = new TagCryptoService(cryptoService);
         //noinspection KotlinInternalInJava

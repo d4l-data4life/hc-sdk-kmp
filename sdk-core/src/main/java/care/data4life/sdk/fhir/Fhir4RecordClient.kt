@@ -48,8 +48,7 @@ internal class Fhir4RecordClient(
         resource: T,
         annotations: Annotations,
         callback: Callback<Fhir4Record<T>>
-    ):
-        Task = executeOperationFlow(
+    ): Task = executeOperationFlow(
         { userId -> recordService.createRecord(userId, resource, annotations) },
         callback
     )

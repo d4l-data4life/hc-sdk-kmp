@@ -25,7 +25,7 @@ import org.junit.Test
 class KeyFactoryTest {
 
     // SUT
-    lateinit var keyFactory: KeyFactory
+    private lateinit var keyFactory: KeyFactory
 
     @Before
     fun test() {

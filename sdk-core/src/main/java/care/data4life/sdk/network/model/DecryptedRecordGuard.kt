@@ -22,22 +22,22 @@ import care.data4life.sdk.network.model.NetworkModelContract.LimitGuard.Companio
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.Tags
 
-internal object DecryptedRecordGuard : NetworkModelContract.LimitGuard {
+object DecryptedRecordGuard : NetworkModelContract.LimitGuard {
     override fun checkTagsAndAnnotationsLimits(
         tags: Tags,
         annotations: Annotations
     ) {
-        var acutal = 0
+        var actual = 0
         tags.forEach { entry ->
-            acutal += entry.key.length
-            acutal += entry.value.length
+            actual += entry.key.length
+            actual += entry.value.length
         }
 
         annotations.forEach {
-            acutal += it.length
+            actual += it.length
         }
 
-        if (acutal >= MAX_LENGTH_TAGS_AND_ANNOTATIONS) {
+        if (actual >= MAX_LENGTH_TAGS_AND_ANNOTATIONS) {
             throw DataValidationException.TagsAndAnnotationsLimitViolation()
         }
     }

@@ -18,15 +18,15 @@ package care.data4life.sdk.crypto
 
 import care.data4life.crypto.GCKey
 import care.data4life.crypto.KeyType
-import care.data4life.sdk.crypto.CryptoContract.CommonKeyService.Companion.DEFAULT_COMMON_KEY_ID
+import care.data4life.sdk.crypto.CryptoInternalContract.CommonKeyService.Companion.DEFAULT_COMMON_KEY_ID
 import care.data4life.sdk.lang.D4LException
 import java.io.IOException
 
-class CommonKeyService(
+internal class CommonKeyService(
     private val alias: String,
     private val storage: CryptoContract.SecureStore,
     private val keyFactory: KeyFactory
-) : CryptoContract.CommonKeyService {
+) : CryptoInternalContract.CommonKeyService {
 
     override fun fetchCurrentCommonKeyId(): String {
         var commonKeyId: String? = null

@@ -17,7 +17,6 @@
 package care.data4life.auth
 
 import care.data4life.auth.storage.InMemoryAuthStorage
-import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.util.Base64
 import com.github.scribejava.core.builder.ServiceBuilder
 import com.github.scribejava.core.builder.api.DefaultApi20
@@ -50,7 +49,7 @@ actual class AuthorizationService @JvmOverloads constructor(
         .callback(configuration.callbackUrl)
         .build(AuthorizationApi(configuration))
 
-    @Throws(D4LException::class)
+    @Throws(AuthorizationException.FailedToRestoreAccessToken::class)
     actual override fun getAccessToken(alias: String): String {
         val state = readTokenState(alias)
 
@@ -61,7 +60,7 @@ actual class AuthorizationService @JvmOverloads constructor(
         throw AuthorizationException.FailedToRestoreAccessToken()
     }
 
-    @Throws(D4LException::class)
+    @Throws(AuthorizationException.FailedToRestoreRefreshToken::class)
     actual override fun getRefreshToken(alias: String): String {
         val tokenState = readTokenState(alias)
 
@@ -72,7 +71,7 @@ actual class AuthorizationService @JvmOverloads constructor(
         throw AuthorizationException.FailedToRestoreRefreshToken()
     }
 
-    @Throws(D4LException::class)
+    @Throws(AuthorizationException.FailedToRefreshAccessToken::class)
     actual override fun refreshAccessToken(alias: String): String {
         val state = readTokenState(alias)
 

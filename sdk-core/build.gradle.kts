@@ -19,7 +19,7 @@ plugins {
     kotlin("kapt")
 }
 
-apply(from = "${project.rootDir}/gradle/jacoco-java.gradle")
+apply(from = "${project.rootDir}/gradle/jacoco-java.gradle.kts")
 apply(from = "${project.rootDir}/gradle/deploy-java.gradle")
 
 group = LibraryConfig.group
@@ -28,6 +28,12 @@ group = LibraryConfig.group
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+kotlin {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions.jvmTarget = "1.8"
+    }
 }
 
 dependencies {
@@ -70,4 +76,41 @@ dependencies {
 
     testImplementation(Dependencies.Java.Test.okHttpMockWebServer)
     testImplementation(Dependencies.Java.Test.jsonAssert)
+}
+
+configure<SourceSetContainer> {
+    main {
+        java.srcDirs("src/main/java", "src-gen/main/java")
+    }
+}
+
+val templatesPath = "${projectDir}/src/main/resources/templates"
+val configPath = "${projectDir}/src-gen/main/java/care/data4life/sdk/config"
+
+val provideConfig: Task by tasks.creating {
+    doFirst {
+        val templates = File(templatesPath)
+        val configs = File(configPath)
+
+        val config = File(templates, "SDKConfig.tmpl")
+            .readText()
+            .replace("SDK_VERSION", version.toString())
+
+        if (!configs.exists()) {
+            if(!configs.mkdir()) {
+                System.err.println("The script not able to create the config directory")
+            }
+        }
+        File(configPath, "SDKConfig.kt").writeText(config)
+    }
+}
+
+tasks.named("compileKotlin") {
+    dependsOn(provideConfig)
+}
+
+tasks.named("clean") {
+    doLast {
+        delete("${configPath}/SDKConfig.kt")
+    }
 }

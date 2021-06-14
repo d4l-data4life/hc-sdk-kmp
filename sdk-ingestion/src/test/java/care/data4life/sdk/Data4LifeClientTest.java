@@ -23,6 +23,7 @@ import org.junit.Test;
 import care.data4life.auth.AuthorizationService;
 import care.data4life.sdk.auth.UserService;
 import care.data4life.sdk.call.CallHandler;
+import care.data4life.sdk.crypto.CryptoService;
 import care.data4life.sdk.test.util.TestSchedulerRule;
 import io.reactivex.Single;
 

@@ -21,7 +21,7 @@ object Versions {
     /**
      * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)
      */
-    const val fhirSdk = "1.4.0"
+    const val fhirSdk = "1.5.0"
 
     /**
      * [hc-fhir-helper-sdk-kmp](https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp)
@@ -44,7 +44,7 @@ object Versions {
 
     object GradlePlugins {
         const val kotlin = Versions.kotlin
-        const val android = "4.1.3"
+        const val android = "4.2.1"
 
         /**
          * [Dexcount](https://github.com/KeepSafe/dexcount-gradle-plugin)
@@ -62,11 +62,6 @@ object Versions {
         const val dokka = "0.10.1"
 
         /**
-         * [jGitVer](https://github.com/jgitver/gradle-jgitver-plugin)
-         */
-        const val gitVersioning = "0.10.0-rc03"
-
-        /**
          * [Git-Version](https://github.com/palantir/gradle-git-version)
          */
         const val gitVersion = "0.12.3"
@@ -79,7 +74,7 @@ object Versions {
 
     // Java
     const val javaXAnnotation = "3.0.2"
-    const val jacocoVersion = "0.8.3"
+    const val jacocoVersion = "0.8.7"
 
     // Android
     const val androidDesugar = "1.0.5"
@@ -129,7 +124,7 @@ object Versions {
     /**
      * [okHttp](https://github.com/square/okhttp)
      */
-    const val okHttp = "4.7.2"
+    const val okHttp = "4.9.1"
 
     /**
      *
@@ -199,7 +194,7 @@ object Versions {
     /**
      * [mockk](http://mockk.io)
      */
-    const val testMockk = "1.10.0"
+    const val testMockk = "1.10.6"
 
     const val testTruth = "0.44"
     const val testTruthAndroid = "0.44"

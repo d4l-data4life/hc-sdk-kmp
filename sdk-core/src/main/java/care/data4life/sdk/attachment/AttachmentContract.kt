@@ -19,32 +19,25 @@ package care.data4life.sdk.attachment
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.lang.ImageResizeException
-import care.data4life.sdk.wrapper.WrapperContract
+import care.data4life.sdk.wrapper.WrapperContract.Attachment
 import io.reactivex.Single
 
-// TODO change to internal
-class AttachmentContract {
-
+interface AttachmentContract {
     interface Service {
-
         fun upload(
-            attachments: List<WrapperContract.Attachment>,
+            attachments: List<Attachment>,
             attachmentsKey: GCKey,
             userId: String
-        ): Single<List<Pair<WrapperContract.Attachment, List<String>>>>
+        ): Single<List<Pair<Attachment, List<String>?>>>
 
         @Throws(DataValidationException.InvalidAttachmentPayloadHash::class)
         fun download(
-            attachments: List<WrapperContract.Attachment>,
+            attachments: List<Attachment>,
             attachmentsKey: GCKey,
             userId: String
-        ): Single<List<WrapperContract.Attachment>>
+        ): Single<List<Attachment>>
 
         fun delete(attachmentId: String, userId: String): Single<Boolean>
-    }
-
-    internal interface CompatibilityValidator {
-        fun isHashable(attachment: WrapperContract.Attachment): Boolean
     }
 
     interface FileService {
@@ -55,7 +48,6 @@ class AttachmentContract {
 
     // FIXME check internal use against Java and Kotlin Clients
     interface ImageResizer {
-
         @Throws(ImageResizeException.JpegWriterMissing::class)
         fun resizeToWidth(
             originalImage: ByteArray,
@@ -77,5 +69,36 @@ class AttachmentContract {
             const val DEFAULT_PREVIEW_SIZE_PX = 1000
             const val DEFAULT_JPEG_QUALITY_PERCENT = 80
         }
+    }
+
+    // TODO: This should be internal of Attachments
+    fun interface Hasher {
+        fun hash(data: ByteArray): String
+    }
+
+    // TODO: This should be internal of Attachments
+    interface Guardian {
+        @Throws(DataValidationException.IdUsageViolation::class)
+        fun guardId(attachment: Attachment)
+
+        @Throws(DataValidationException.IdUsageViolation::class)
+        fun guardNonNullId(attachment: Attachment)
+
+        @Throws(DataValidationException.IdUsageViolation::class)
+        fun guardIdAgainstExistingIds(attachment: Attachment, referenceIds: Set<String>)
+
+        @Throws(
+            DataValidationException.ExpectedFieldViolation::class,
+            DataValidationException.InvalidAttachmentPayloadHash::class
+        )
+        fun guardHash(attachment: Attachment, reference: Attachment? = null): Boolean
+
+        @Throws(DataValidationException.ExpectedFieldViolation::class)
+        fun guardSize(attachment: Attachment)
+    }
+
+    companion object {
+        internal const val DOWNSCALED_ATTACHMENT_ID_POS = 1
+        internal const val SPLIT_CHAR = "#"
     }
 }

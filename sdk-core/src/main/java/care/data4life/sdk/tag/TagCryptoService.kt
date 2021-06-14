@@ -21,6 +21,7 @@ import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.tag.TaggingContract.Companion.ANNOTATION_KEY
 import care.data4life.sdk.tag.TaggingContract.Companion.DELIMITER
+import care.data4life.sdk.tag.TaggingContract.CryptoService.Companion.IV
 import care.data4life.sdk.util.Base64
 import java.io.IOException
 import java.nio.charset.StandardCharsets
@@ -29,7 +30,8 @@ import java.nio.charset.StandardCharsets
 class TagCryptoService @JvmOverloads constructor(
     private val cryptoService: CryptoContract.Service,
     private val base64: Base64 = Base64,
-    private val tagHelper: TaggingContract.Helper = TagCryptoHelper
+    private val tagEncoding: TaggingContract.Encoding = TagEncoding,
+    private val tagConverter: TaggingContract.Converter = TagConverter
 ) : TaggingContract.CryptoService {
     @Throws(D4LException::class)
     override fun encryptTagsAndAnnotations(
@@ -55,7 +57,7 @@ class TagCryptoService @JvmOverloads constructor(
         encryptionKey: GCKey
     ): MutableList<String> {
         return tags
-            .map { entry -> entry.key + DELIMITER + tagHelper.encode(entry.value) }
+            .map { entry -> entry.key + DELIMITER + tagEncoding.encode(entry.value) }
             .let { encodedTags -> encryptList(encodedTags, encryptionKey) }
     }
 
@@ -65,7 +67,7 @@ class TagCryptoService @JvmOverloads constructor(
         encryptionKey: GCKey
     ): MutableList<String> {
         return annotations
-            .map { annotation -> tagHelper.encode(annotation) }
+            .map { annotation -> tagEncoding.encode(annotation) }
             .let { validAnnotations ->
                 encryptList(
                     validAnnotations,
@@ -95,7 +97,7 @@ class TagCryptoService @JvmOverloads constructor(
         encryptedTags,
         encryptionKey,
         { decrypted -> !decrypted.startsWith(ANNOTATION_KEY) && decrypted.contains(DELIMITER) },
-        { tagList: List<String> -> tagHelper.convertToTagMap(tagList) }
+        { tagList: List<String> -> tagConverter.toTags(tagList) }
     )
 
     @Throws(IOException::class)
@@ -142,7 +144,7 @@ class TagCryptoService @JvmOverloads constructor(
     ): T {
         return encryptedList
             .map { encryptedTag -> decryptItem(encryptionKey, encryptedTag) }
-            .map { encodedTag -> tagHelper.decode(encodedTag) }
+            .map { encodedTag -> tagEncoding.decode(encodedTag) }
             .filter { decryptedItem -> condition(decryptedItem) }
             .let { decryptedList -> transform(decryptedList.toMutableList()) }
     }
@@ -159,8 +161,6 @@ class TagCryptoService @JvmOverloads constructor(
     }
 
     companion object {
-        private val IV = ByteArray(16)
-
         @JvmStatic
         private fun removeAnnotationKey(
             list: MutableList<String>

@@ -107,7 +107,7 @@ class RecordCryptoServiceEncryptionTest {
         every { decryptedRecord.attachmentsKey } returns attachmentKey
         every { decryptedRecord.resource } returns resource
 
-        every { resourceCryptoService._encryptResource(dataKey, resource) } returns encryptedResource
+        every { resourceCryptoService.encryptResource(dataKey, resource) } returns encryptedResource
 
         every {
             cryptoService.encryptSymmetricKey(
@@ -317,7 +317,7 @@ class RecordCryptoServiceEncryptionTest {
             expected = encryptedResource
         )
 
-        verify(exactly = 1) { resourceCryptoService._encryptResource(dataKey, resource) }
+        verify(exactly = 1) { resourceCryptoService.encryptResource(dataKey, resource) }
     }
 
     @Test
@@ -602,7 +602,7 @@ class RecordCryptoServiceEncryptionTest {
             expected = encryptedResource
         )
 
-        verify(exactly = 1) { resourceCryptoService._encryptResource(dataKey, resource) }
+        verify(exactly = 1) { resourceCryptoService.encryptResource(dataKey, resource) }
     }
 
     @Test
@@ -887,7 +887,7 @@ class RecordCryptoServiceEncryptionTest {
             expected = encryptedResource
         )
 
-        verify(exactly = 1) { resourceCryptoService._encryptResource(dataKey, resource) }
+        verify(exactly = 1) { resourceCryptoService.encryptResource(dataKey, resource) }
     }
 
     @Test

@@ -17,6 +17,7 @@ package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.AttachmentContract
+import care.data4life.sdk.attachment.AttachmentHasher
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.crypto.CryptoContract
@@ -34,8 +35,8 @@ import care.data4life.sdk.model.RecordMapper
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.EncryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
-import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
-import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
+import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedFhir3Record
+import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedFhir4Record
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
@@ -103,37 +104,30 @@ class RecordServiceTest {
     }
 
     @Test
-    fun `Given, getValidHash is called with a WrappedAttachment, which contains data, it returns a hash`() {
-        // Given
-        val attachment: WrapperContract.Attachment = mockk()
-
-        every { attachment.data } returns "dGVzdA==" // == test
-
-        // When
-        val hash = recordService.getValidHash(attachment)
-
-        //
-        assertEquals(
-            actual = hash,
-            expected = "qUqP5cyxm6YcTAhz05Hph5gvu9M="
-        )
-    }
-
-    @Test
     fun `Given, updateAttachmentMeta is called, with a Fhir3Attachment, it updates its meta information`() {
         // Given
+        mockkObject(AttachmentHasher)
+        val hash = "qUqP5cyxm6YcTAhz05Hph5gvu9M"
+        val plainData = "test".toByteArray()
+
         val attachment: WrapperContract.Attachment = mockk()
 
         every { attachment.data } returns "dGVzdA==" // == test
-        every { attachment.size = "test".toByteArray().size } just Runs
-        every { attachment.hash = "qUqP5cyxm6YcTAhz05Hph5gvu9M=" } just Runs
+        every { attachment.size = plainData.size } just Runs
+
+        every { AttachmentHasher.hash(plainData) } returns hash
+
+        every { attachment.hash = hash } just Runs
 
         // When
         recordService.updateAttachmentMeta(attachment)
 
         // Then
-        verify(exactly = 1) { attachment.size = "test".toByteArray().size }
-        verify(exactly = 1) { attachment.hash = "qUqP5cyxm6YcTAhz05Hph5gvu9M=" }
+        verify(exactly = 1) { AttachmentHasher.hash(plainData) }
+        verify(exactly = 1) { attachment.size = plainData.size }
+        verify(exactly = 1) { attachment.hash = hash }
+
+        unmockkObject(AttachmentHasher)
     }
 
     @Test
@@ -435,7 +429,7 @@ class RecordServiceTest {
             expected = "Expected a record of a type that has attachment"
         )
 
-        verify { SdkFhirAttachmentHelper.getAttachment(resource)!!.wasNot(Called) }
+        verify(exactly = 0) { SdkFhirAttachmentHelper.getAttachment(resource) }
         unmockkObject(SdkFhirAttachmentHelper)
     }
 
@@ -807,7 +801,7 @@ class RecordServiceTest {
             expected = "Expected a record of a type that has attachment"
         )
 
-        verify { SdkFhirAttachmentHelper.getAttachment(resource)!!.wasNot(Called) }
+        verify(exactly = 0) { SdkFhirAttachmentHelper.getAttachment(resource) }
         unmockkObject(SdkFhirAttachmentHelper)
     }
 

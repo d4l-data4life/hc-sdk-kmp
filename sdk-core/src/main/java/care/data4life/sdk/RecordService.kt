@@ -17,6 +17,8 @@ package care.data4life.sdk
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.AttachmentContract
+import care.data4life.sdk.attachment.AttachmentGuardian
+import care.data4life.sdk.attachment.AttachmentHasher
 import care.data4life.sdk.attachment.ThumbnailService
 import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.call.DataRecord
@@ -41,7 +43,7 @@ import care.data4life.sdk.model.DownloadResult
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.model.FetchResult
 import care.data4life.sdk.model.ModelContract.BaseRecord
-import care.data4life.sdk.model.ModelContract.RecordFactory
+import care.data4life.sdk.model.ModelInternalContract.RecordFactory
 import care.data4life.sdk.model.ModelVersion
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.model.RecordMapper
@@ -50,8 +52,8 @@ import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.DecryptedRecordGuard
 import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
-import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir3Record
-import care.data4life.sdk.network.model.NetworkModelContract.DecryptedFhir4Record
+import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedFhir3Record
+import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedFhir4Record
 import care.data4life.sdk.network.model.RecordCryptoService
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_FMT
@@ -63,17 +65,14 @@ import care.data4life.sdk.record.RecordContract.Service.Companion.THUMBNAIL_ID_P
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.util.Base64.decode
-import care.data4life.sdk.util.Base64.encodeToString
-import care.data4life.sdk.util.HashUtil.sha1
 import care.data4life.sdk.util.MimeType
 import care.data4life.sdk.util.MimeType.Companion.recognizeMimeType
-import care.data4life.sdk.wrapper.HelperContract
 import care.data4life.sdk.wrapper.SdkAttachmentFactory
 import care.data4life.sdk.wrapper.SdkDateTimeFormatter
 import care.data4life.sdk.wrapper.SdkFhirAttachmentHelper
 import care.data4life.sdk.wrapper.SdkIdentifierFactory
 import care.data4life.sdk.wrapper.WrapperContract
-import care.data4life.sdk.wrapper.WrapperFactoryContract
+import care.data4life.sdk.wrapper.WrapperInternalContract
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -114,11 +113,7 @@ class RecordService internal constructor(
         attachmentService,
         cryptoService,
         errorHandler,
-        RecordCompatibilityService(
-            apiService,
-            tagCryptoService,
-            cryptoService
-        )
+        RecordCompatibilityService(cryptoService, tagCryptoService)
     )
 
     private val recordCryptoService: NetworkModelContract.CryptoService = RecordCryptoService(
@@ -133,10 +128,12 @@ class RecordService internal constructor(
         ModelVersion
     )
     private val recordFactory: RecordFactory = RecordMapper
-    private val fhirAttachmentHelper: HelperContract.FhirAttachmentHelper = SdkFhirAttachmentHelper
-    private val attachmentFactory: WrapperFactoryContract.AttachmentFactory = SdkAttachmentFactory
-    private val identifierFactory: WrapperFactoryContract.IdentifierFactory = SdkIdentifierFactory
+    private val fhirAttachmentHelper: WrapperInternalContract.FhirAttachmentHelper = SdkFhirAttachmentHelper
+    private val attachmentFactory: WrapperInternalContract.AttachmentFactory = SdkAttachmentFactory
+    private val identifierFactory: WrapperInternalContract.IdentifierFactory = SdkIdentifierFactory
     private val dateTimeFormatter: WrapperContract.DateTimeFormatter = SdkDateTimeFormatter
+    private val attachmentGuardian: AttachmentContract.Guardian = AttachmentGuardian
+    private val attachmentHash: AttachmentContract.Hasher = AttachmentHasher
 
     private fun isFhir3(resource: Any?): Boolean = resource is Fhir3Resource
     private fun isFhir4(resource: Any?): Boolean = resource is Fhir4Resource
@@ -306,24 +303,28 @@ class RecordService internal constructor(
         val endTime = if (endDate != null) dateTimeFormatter.formatDate(endDate) else null
 
         return Observable
-            .fromCallable { taggingService.getTagsFromType(resourceType) }
+            .fromCallable {
+                compatibilityService.resolveSearchTags(
+                    taggingService.getTagsFromType(resourceType),
+                    annotations
+                )
+            }
             .flatMap { tags ->
-                compatibilityService.searchRecords(
+                apiService.searchRecords(
                     alias,
                     userId,
                     startTime,
                     endTime,
                     pageSize,
                     offset,
-                    tags,
-                    annotations
+                    tags
                 )
             }
             .flatMapIterable { it }
             .map { encryptedRecord -> decryptRecord<T>(encryptedRecord, userId) }
             .map { decryptedRecord -> assignResourceId(decryptedRecord) }
             .map { decryptedRecord -> recordFactory.getInstance(decryptedRecord) }
-            .toList() as Single<List<BaseRecord<T>>>
+            .toList()
     }
 
     fun <T : Fhir3Resource> fetchFhir3Records(
@@ -514,12 +515,18 @@ class RecordService internal constructor(
         type: Class<out Any>,
         userId: String,
         annotations: Annotations
-    ): Single<Int> = compatibilityService.countRecords(
-        alias,
-        userId,
-        taggingService.getTagsFromType(type),
-        annotations
-    )
+    ): Single<Int> {
+        val searchTags = compatibilityService.resolveSearchTags(
+            taggingService.getTagsFromType(type),
+            annotations
+        )
+
+        return apiService.countRecords(
+            alias,
+            userId,
+            searchTags
+        )
+    }
 
     @JvmOverloads
     @Deprecated("Deprecated with version v1.9.0 and will be removed in version v2.0.0")
@@ -551,6 +558,12 @@ class RecordService internal constructor(
         userId: String,
         annotations: Annotations
     ): Single<Int> = countFhir3Records(Fhir3Resource::class.java, userId, annotations)
+
+    override fun countDataRecords(
+        type: Class<out DataResource>,
+        userId: String,
+        annotations: Annotations
+    ): Single<Int> = _countRecords(type, userId, annotations)
 
     override fun <T : Fhir3Resource> downloadFhir3Record(
         recordId: String,
@@ -689,6 +702,7 @@ class RecordService internal constructor(
             throw IllegalArgumentException("The given Record does not match the expected resource type.")
         }
     }
+
     @Deprecated("This is a test concern and should be removed once a proper DI/SL is in place.")
     internal fun <T : Any> fromResource(
         resource: T,
@@ -826,7 +840,7 @@ class RecordService internal constructor(
             return record
         }
 
-        // ToDo: This should not be done here, also should this not also resign Fhir onto Arbitrary Data?
+        // ToDo: This should not be done here
         record.resource = originalResource
 
         return if (attachmentData == null || !fhirAttachmentHelper.hasAttachment(record.resource)) {
@@ -865,6 +879,23 @@ class RecordService internal constructor(
         }
     }
 
+    private fun determineUploadableAttachment(
+        rawAttachments: List<Any?>,
+        validAttachments: MutableList<WrapperContract.Attachment>
+    ) {
+        for (rawAttachment in rawAttachments) {
+            if (rawAttachment != null) {
+
+                val attachment = attachmentFactory.wrap(rawAttachment)
+                attachmentGuardian.guardId(attachment)
+                attachmentGuardian.guardSize(attachment)
+                attachmentGuardian.guardHash(attachment)
+
+                validAttachments.add(attachment)
+            }
+        }
+    }
+
     @Throws(
         DataValidationException.IdUsageViolation::class,
         DataValidationException.ExpectedFieldViolation::class,
@@ -885,30 +916,34 @@ class RecordService internal constructor(
             ?: return record
 
         val validAttachments: MutableList<WrapperContract.Attachment> = arrayListOf()
-        for (rawAttachment in attachments) {
-            if (rawAttachment != null) {
 
-                val attachment = attachmentFactory.wrap(rawAttachment)
+        determineUploadableAttachment(attachments, validAttachments)
+        uploadAttachmentsOnDemand(record, resource, validAttachments, userId)
+        return record
+    }
 
-                when {
-                    attachment.id != null ->
-                        throw DataValidationException.IdUsageViolation("Attachment.id should be null")
+    private fun determineUpdateableAttachment(
+        rawNewAttachments: List<Any?>,
+        oldAttachments: MutableMap<String, WrapperContract.Attachment>,
+        validAttachments: MutableList<WrapperContract.Attachment>
+    ) {
+        for (rawNewAttachment in rawNewAttachments) {
+            if (rawNewAttachment != null) {
+                val newAttachment = attachmentFactory.wrap(rawNewAttachment)
+                attachmentGuardian.guardSize(newAttachment)
 
-                    attachment.hash == null || attachment.size == null ->
-                        throw DataValidationException.ExpectedFieldViolation(
-                            "Attachment.hash and Attachment.size expected"
-                        )
-                    getValidHash(attachment) != attachment.hash ->
-                        throw DataValidationException.InvalidAttachmentPayloadHash(
-                            "Attachment.hash is not valid"
-                        )
-                    else -> validAttachments.add(attachment)
+                val oldAttachment = if (newAttachment.id == null) {
+                    null
+                } else {
+                    attachmentGuardian.guardIdAgainstExistingIds(newAttachment, oldAttachments.keys)
+                    oldAttachments[newAttachment.id]
+                }
+
+                if (attachmentGuardian.guardHash(newAttachment, oldAttachment)) {
+                    validAttachments.add(newAttachment)
                 }
             }
         }
-
-        uploadAttachmentsOnDemand(record, resource, validAttachments, userId)
-        return record
     }
 
     @Throws(
@@ -930,54 +965,29 @@ class RecordService internal constructor(
             throw CoreRuntimeException.UnsupportedOperation()
         }
 
-        var resource = record.resource
-        if (!fhirAttachmentHelper.hasAttachment(resource)) return record
-        val attachments = fhirAttachmentHelper.getAttachment(resource) ?: listOf<Any>()
+        if (!fhirAttachmentHelper.hasAttachment(record.resource)) return record
+        val attachments = fhirAttachmentHelper.getAttachment(record.resource) ?: listOf<Any>()
 
         val validAttachments: MutableList<WrapperContract.Attachment> = mutableListOf()
-        val oldAttachments: HashMap<String?, WrapperContract.Attachment> = hashMapOf()
+        val oldAttachments: MutableMap<String, WrapperContract.Attachment> = mutableMapOf()
 
         for (rawAttachment in attachments) {
             if (rawAttachment != null) {
                 val attachment = attachmentFactory.wrap(rawAttachment)
 
                 if (attachment.id != null) {
-                    oldAttachments[attachment.id] = attachment
+                    oldAttachments[attachment.id!!] = attachment
                 }
             }
         }
 
-        resource = newResource
-        val newAttachments = fhirAttachmentHelper.getAttachment(newResource) ?: listOf<Any>()
+        determineUpdateableAttachment(
+            fhirAttachmentHelper.getAttachment(newResource) ?: listOf<Any>(),
+            oldAttachments,
+            validAttachments
+        )
 
-        for (rawNewAttachment in newAttachments) {
-            if (rawNewAttachment != null) {
-                val newAttachment = attachmentFactory.wrap(rawNewAttachment)
-
-                when {
-                    newAttachment.hash == null || newAttachment.size == null ->
-                        throw DataValidationException.ExpectedFieldViolation(
-                            "Attachment.hash and Attachment.size expected"
-                        )
-                    getValidHash(newAttachment) != newAttachment.hash ->
-                        throw DataValidationException.InvalidAttachmentPayloadHash(
-                            "Attachment.hash is not valid"
-                        )
-                    newAttachment.id == null -> validAttachments.add(newAttachment)
-                    else -> {
-                        val oldAttachment = oldAttachments[newAttachment.id]
-                            ?: throw DataValidationException.IdUsageViolation(
-                                "Valid Attachment.id expected"
-                            )
-                        if (oldAttachment.hash == null || newAttachment.hash != oldAttachment.hash) {
-                            validAttachments.add(newAttachment)
-                        }
-                    }
-                }
-            }
-        }
-
-        uploadAttachmentsOnDemand(record, resource, validAttachments, userId)
+        uploadAttachmentsOnDemand(record, newResource, validAttachments, userId)
         return record
     }
 
@@ -1004,8 +1014,7 @@ class RecordService internal constructor(
             if (rawAttachment != null) {
                 val attachment = attachmentFactory.wrap(rawAttachment)
 
-                attachment.id
-                    ?: throw DataValidationException.IdUsageViolation("Attachment.id expected")
+                attachmentGuardian.guardNonNullId(attachment)
 
                 attachments.add(attachment)
             }
@@ -1058,11 +1067,6 @@ class RecordService internal constructor(
         }
     }
 
-    /*
-     *   TODO: This function makes a false assumption. It claims, that the output of the attachmentService.upload
-     *    matches List<String?>?, but it is actually List<String?>. This means the claim of the former author that second (the list)
-     *    is a indicator for a type is wrong.
-     */
     internal fun updateFhirResourceIdentifier(
         resource: Any,
         result: List<Pair<WrapperContract.Attachment, List<String?>?>>
@@ -1121,6 +1125,7 @@ class RecordService internal constructor(
         return null // Attachment is not of image type
     }
 
+    // TODO: Move to AttachmentService
     @Throws(
         DataRestrictionException.MaxDataSizeViolation::class,
         DataRestrictionException.UnsupportedFileType::class
@@ -1148,7 +1153,7 @@ class RecordService internal constructor(
     }
 
     @Throws(DataValidationException.IdUsageViolation::class)
-    internal fun splitAdditionalAttachmentId(identifier: WrapperContract.Identifier): List<String>? {
+    internal fun splitAdditionalAttachmentId(identifier: WrapperInternalContract.Identifier): List<String>? {
         if (identifier.value == null || !identifier.value!!.startsWith(DOWNSCALED_ATTACHMENT_IDS_FMT)) {
             return null
         }
@@ -1160,20 +1165,12 @@ class RecordService internal constructor(
         return parts
     }
 
-    private fun hashAttachmentData(data: ByteArray): String = encodeToString(sha1(data))
-
     // TODO move to AttachmentService
     fun updateAttachmentMeta(attachment: WrapperContract.Attachment): WrapperContract.Attachment {
         val data = decode(attachment.data!!)
         attachment.size = data.size
-        attachment.hash = hashAttachmentData(data)
+        attachment.hash = attachmentHash.hash(data)
         return attachment
-    }
-
-    // TODO move to AttachmentService
-    internal fun getValidHash(attachment: WrapperContract.Attachment): String {
-        val data = decode(attachment.data!!)
-        return hashAttachmentData(data)
     }
 
     // TODO: make it private

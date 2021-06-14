@@ -27,7 +27,7 @@
 :pub-version: 1.00
 :pub-status: draft
 :pub-title: {software-name} {pub-type}
-:copyright-year: 2020
+:copyright-year: 2021
 :copyright-statement: (C) {copyright-year} {compname-legal}. All rights reserved.
 
 

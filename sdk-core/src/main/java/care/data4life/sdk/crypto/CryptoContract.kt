@@ -35,7 +35,7 @@ import javax.crypto.BadPaddingException
 import javax.crypto.IllegalBlockSizeException
 import javax.crypto.NoSuchPaddingException
 
-class CryptoContract {
+interface CryptoContract {
     interface SecureStore {
         fun clear()
         fun storeSecret(alias: String, secret: CharArray)
@@ -56,19 +56,30 @@ class CryptoContract {
         operator fun contains(alias: String): Boolean
     }
 
+    // TODO: Split into CommonKey/KeyChain/KeyState for common and tagEncryption; KeyCrypto
     interface Service {
         val currentCommonKeyId: String
 
         fun encrypt(key: GCKey, data: ByteArray): Single<ByteArray>
         fun decrypt(key: GCKey, data: ByteArray): Single<ByteArray>
-        // TODO Change interface so it Arbitrary Data can use it directly
+
+        // TODO move this into a convenience layer
         fun encryptAndEncodeString(key: GCKey, data: String): Single<String>
-        fun decodeAndDecryptString(key: GCKey, dataBase64: String): Single<String>
+
+        // TODO move this into a convenience layer
+        fun encryptAndEncodeByteArray(key: GCKey, data: ByteArray): Single<String>
+
         fun encryptSymmetricKey(
             key: GCKey,
             keyType: KeyType,
-            gckey: GCKey
+            gcKey: GCKey
         ): Single<NetworkModelContract.EncryptedKey>
+
+        // TODO move this into a convenience layer
+        fun decodeAndDecryptString(key: GCKey, dataBase64: String): Single<String>
+
+        // TODO move this into a convenience layer
+        fun decodeAndDecryptByteArray(key: GCKey, dataBase64: String): Single<ByteArray>
 
         fun symDecryptSymmetricKey(
             key: GCKey,
@@ -140,30 +151,5 @@ class CryptoContract {
             val KEY_VERSION = KeyVersion.VERSION_1
             const val IV_SIZE = 12
         }
-    }
-
-    internal interface CommonKeyService {
-
-        fun fetchCurrentCommonKeyId(): String
-
-        @Throws(IOException::class)
-        fun fetchCurrentCommonKey(): GCKey
-
-        fun fetchCommonKey(commonKeyId: String): GCKey
-
-        fun storeCurrentCommonKeyId(commonKeyId: String)
-
-        fun storeCommonKey(commonKeyId: String, commonKey: GCKey)
-
-        fun hasCommonKey(commonKeyId: String): Boolean
-
-        companion object {
-            const val DEFAULT_COMMON_KEY_ID = "00000000-0000-0000-0000-000000000000"
-        }
-    }
-
-    internal interface KeyFactory {
-        fun createGCKey(exchangeKey: ExchangeKey): GCKey
-        fun createGCKeyPair(exchangeKey: ExchangeKey): GCKeyPair
     }
 }

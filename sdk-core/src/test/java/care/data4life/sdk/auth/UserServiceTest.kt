@@ -16,206 +16,327 @@
 
 package care.data4life.sdk.auth
 
-import care.data4life.auth.AuthorizationService
+import care.data4life.auth.AuthorizationContract
 import care.data4life.crypto.GCKey
 import care.data4life.crypto.GCKeyPair
-import care.data4life.crypto.GCSymmetricKey
-import care.data4life.sdk.ApiService
-import care.data4life.sdk.CryptoSecureStore
-import care.data4life.sdk.CryptoService
+import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.log.Log
+import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.UserInfo
-import io.mockk.Called
+import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
+import care.data4life.sdk.test.util.GenericTestDataProvider.COMMON_KEY_ID
+import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
-import io.mockk.spyk
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
 import io.mockk.verify
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
 
 class UserServiceTest {
-
-    companion object {
-        private const val AUTH_STATE = "authState"
-        private const val USER_ALIAS = "userAlias"
-        private const val KEY_USER_ID = "user_id"
-        private const val AUTH_TOKEN = "authToken"
-        private const val CURRENT_VERSION = "1.9.0-config"
-    }
-
-    private lateinit var apiService: ApiService
-    private lateinit var storage: CryptoSecureStore
-    private lateinit var userService: UserService
-    private lateinit var cryptoService: CryptoService
-    private lateinit var authService: AuthorizationService
+    private lateinit var service: AuthContract.UserService
+    private val authService: AuthorizationContract.Service = mockk()
+    private val apiService: NetworkingContract.Service = mockk()
+    private val secureStore: CryptoContract.SecureStore = mockk()
+    private val cryptoService: CryptoContract.Service = mockk()
 
     @Before
     fun setUp() {
-        authService = mockk()
-        userService = mockk()
-        storage = mockk()
-        apiService = mockk()
-        cryptoService = mockk()
-        userService = spyk(UserService(USER_ALIAS, authService, apiService, storage, cryptoService))
+        service = UserService(
+            ALIAS,
+            authService,
+            apiService,
+            secureStore,
+            cryptoService
+        )
     }
 
     @Test
-    fun `isLoggedIn_shouldReturnTrue`() {
-        // given
-        every { authService.isAuthorized(USER_ALIAS) } returns true
-        every { storage.getSecret(AUTH_STATE) } answers {
-            "auth_state".toCharArray()
-        }
-        val mockGCKey = mockk<GCKey>()
-        every { mockGCKey.getSymmetricKey() } returns mockk<GCSymmetricKey>()
-        every { cryptoService.fetchTagEncryptionKey() } returns mockGCKey
-        every { cryptoService.fetchCurrentCommonKey() } returns mockGCKey
-        // when
-        val testSubscriber = userService.isLoggedIn(USER_ALIAS)
-            .test()
+    fun `it fulfils UserService`() {
+        val service: Any = UserService(ALIAS, mockk(), mockk(), mockk(), mockk())
 
-        // then
-        testSubscriber
-            .assertNoErrors()
-            .assertValue(true)
+        assertTrue(service is AuthContract.UserService)
     }
 
     @Test
-    fun `isLoggedIn_shouldReturnFalse`() {
-        // given
-        every { storage.getSecret(AUTH_STATE) } answers {
-            "auth_state".toCharArray()
-        }
-        val mockGCKey = mockk<GCKey>()
-        every { mockGCKey.getSymmetricKey() } returns mockk<GCSymmetricKey>()
-        every { cryptoService.fetchTagEncryptionKey() } returns mockGCKey
-        every { cryptoService.fetchCurrentCommonKey() } returns mockGCKey
-        // when
-        val testSubscriber = userService.isLoggedIn(USER_ALIAS)
-            .test()
+    fun `it resolves the current userId if userId is referenced`() {
+        // Given
+        val userId = USER_ID
 
-        // then
-        testSubscriber
-            .assertNoErrors()
-            .assertValue(false)
+        every {
+            secureStore.getSecret(
+                "${ALIAS}_user_id",
+                String::class.java
+            )
+        } returns USER_ID
+
+        // When
+        val currentId = service.userID.blockingGet()
+
+        // Then
+        assertEquals(
+            actual = currentId,
+            expected = userId
+        )
     }
 
     @Test
-    fun `getSessionToken should Return True`() {
-        // given
-        every { authService.refreshAccessToken(USER_ALIAS) } returns AUTH_TOKEN
-        // when
-        val testSubscriber = userService.getSessionToken(USER_ALIAS)
-            .test()
+    fun `Given isLoggedIn is called with an Alias it returns if the user is logged in`() {
+        // Given
+        val isLoggedIn = true
+        val alias = ALIAS
 
-        // then
-        testSubscriber
-            .assertNoErrors()
-            .assertValue(AUTH_TOKEN)
-    }
+        every { authService.isAuthorized(alias) } returns isLoggedIn
 
-    @Ignore
-    @Test
-    fun `getSessionToken should Throws Error`() {
-        // given
-        every { authService.refreshAccessToken(USER_ALIAS) } returns mockk<String>()
-        // when
-        val testSubscriber = userService.getSessionToken(USER_ALIAS)
-            .test()
-            .await()
+        // When
+        val loggedInState = service.isLoggedIn(alias).blockingGet()
 
-        // then
-        testSubscriber
-            .assertNoValues()
+        // Then
+        assertEquals(
+            actual = loggedInState,
+            expected = isLoggedIn
+        )
     }
 
     @Test
-    fun `logout should Return Success`() {
-        // given
-        every { apiService.logout(USER_ALIAS) } returns Completable.complete()
-        every { storage.clear() } just Runs
-        // when
-        val testSubscriber = userService.logout()
-            .test()
-            .await()
+    fun `Given isLoggedIn is called with an Alias, it returns false if the authService call fails`() {
+        // Given
+        val alias = ALIAS
 
-        // then
-        testSubscriber
-            .assertNoErrors()
-            .assertComplete()
-        verify(exactly = 1) { storage.clear() }
+        every { authService.isAuthorized(alias) } throws RuntimeException("Does not matter")
+
+        // When
+        val loggedInState = service.isLoggedIn(alias).blockingGet()
+
+        // Then
+        assertFalse(loggedInState)
     }
 
     @Test
-    fun `logout should Return Exception`() {
-        // given
-        every { apiService.logout(USER_ALIAS) } returns Completable.error(Exception())
-        // when
-        val testSubscriber = userService.logout()
-            .test()
-            .await()
+    fun `Given logout is called, it returns a Completable while clearing the SecureStore`() {
+        // Given
+        every { apiService.logout(ALIAS) } returns Completable.fromAction { /* noop */ }
+        every { secureStore.clear() } just Runs
 
-        // then
-        testSubscriber
-            .assertError(Exception::class.java)
-            .assertNotComplete()
-        verify { storage wasNot Called }
+        // When
+        val loggedInState = service.logout().blockingGet()
+
+        // Then
+        assertNull(loggedInState)
+        verify(exactly = 1) { secureStore.clear() }
     }
 
     @Test
-    fun `finish Login should Return Boolean Success`() {
-        // given
-        val userInfo = mockk<UserInfo>()
-        val commonKey = mockk<EncryptedKey>()
-        val key = mockk<GCKey>()
-        val encryptedKey = mockk<EncryptedKey>()
-        val keyPair = mockk<GCKeyPair>()
-        val symKey: GCKey = mockk()
-        every { userInfo.commonKey } returns commonKey
-        every { userInfo.commonKeyId } returns "mockedCommonKeyId"
-        every { userInfo.tagEncryptionKey } returns encryptedKey
-        every { userInfo.uid } returns "mockedUid"
-        every { apiService.fetchUserInfo(USER_ALIAS) } returns Single.just(userInfo)
-        every { storage.storeSecret("userAlias_user_id", "mockedUid") } just Runs
-        every { cryptoService.storeCommonKey("mockedCommonKeyId", key) } just Runs
-        every { cryptoService.storeCurrentCommonKeyId("mockedCommonKeyId") } just Runs
-        every { cryptoService.storeTagEncryptionKey(any()) } just Runs
+    fun `Given logout is called, it returns and logs errors while not clearing the SecureStore if the logout fails`() {
+        // Given
+        mockkObject(Log)
+        val error = RuntimeException("Does not matter")
+
+        every { apiService.logout(ALIAS) } returns Completable.fromAction { throw error }
+        every { secureStore.clear() } just Runs
+        every { Log.error(error, "Failed to logout") } just Runs
+
+        // When
+        val loggedInState = service.logout().blockingGet()
+
+        // Then
+        assertSame(
+            actual = loggedInState,
+            expected = error
+        )
+        verify(exactly = 0) { secureStore.clear() }
+        verify(exactly = 1) { Log.error(error, "Failed to logout") }
+
+        unmockkObject(Log)
+    }
+
+    @Test
+    fun `Given refreshSessionToken with an Alias, it delegates to call to the AuthService and returns its result`() {
+        // Given
+        val alias = ALIAS
+        val expectedToken = "token"
+
+        every { authService.refreshAccessToken(alias) } returns expectedToken
+
+        // When
+        val token = service.refreshSessionToken(alias).blockingGet()
+
+        // Then
+        assertEquals(
+            actual = token,
+            expected = expectedToken
+        )
+    }
+
+    @Test
+    fun `Given finishLogin is called with a Boolean, it returns true`() {
+        // Given
+        val userInfo: UserInfo = mockk()
+        val encryptedCommonKey: EncryptedKey = mockk()
+        val encryptedTagEncryptionKey: EncryptedKey = mockk()
+        val commonKeyId = COMMON_KEY_ID
+        val userId = USER_ID
+
+        val keyPair: GCKeyPair = mockk()
+        val commonKey: GCKey = mockk()
+        val tagEncryptionKey: GCKey = mockk()
+
+        every { userInfo.userId } returns userId
+        every { userInfo.commonKeyId } returns commonKeyId
+        every { userInfo.encryptedCommonKey } returns encryptedCommonKey
+        every { userInfo.encryptedTagEncryptionKey } returns encryptedTagEncryptionKey
+
+        every { apiService.fetchUserInfo(ALIAS) } returns Single.just(userInfo)
         every { cryptoService.fetchGCKeyPair() } returns Single.just(keyPair)
-        every {
-            cryptoService.asymDecryptSymetricKey(keyPair, commonKey)
-        } returns Single.just(key)
-        every {
-            cryptoService.symDecryptSymmetricKey(key, encryptedKey)
-        } returns Single.just(symKey)
-        every { cryptoService.storeTagEncryptionKey(symKey) } just Runs
-        // when
-        val testSubscriber = userService.finishLogin(true)
-            .test()
 
-        // then
-        testSubscriber
-            .assertValue { it }
-            .assertComplete()
+        every { secureStore.storeSecret("${ALIAS}_user_id", userId) } just Runs
+
+        every {
+            cryptoService.asymDecryptSymetricKey(
+                keyPair,
+                encryptedCommonKey
+            )
+        } returns Single.just(commonKey)
+        every { cryptoService.storeCommonKey(commonKeyId, commonKey) } just Runs
+        every { cryptoService.storeCurrentCommonKeyId(commonKeyId) } just Runs
+
+        every {
+            cryptoService.symDecryptSymmetricKey(
+                commonKey,
+                encryptedTagEncryptionKey
+            )
+        } returns Single.just(tagEncryptionKey)
+        every { cryptoService.storeTagEncryptionKey(tagEncryptionKey) } just Runs
+
+        // When
+        val result = service.finishLogin(true).blockingGet()
+
+        // Then
+        assertTrue(result)
+
+        verify(exactly = 1) { apiService.fetchUserInfo(ALIAS) }
+        verify(exactly = 1) { cryptoService.fetchGCKeyPair() }
+
+        verify(exactly = 1) { secureStore.storeSecret("${ALIAS}_user_id", userId) }
+
+        verify(exactly = 1) {
+            cryptoService.asymDecryptSymetricKey(
+                keyPair,
+                encryptedCommonKey
+            )
+        }
+        verify(exactly = 1) {
+            cryptoService.storeCommonKey(commonKeyId, commonKey)
+        }
+        verify(exactly = 1) {
+            cryptoService.storeCurrentCommonKeyId(commonKeyId)
+        }
+
+        verify(exactly = 1) {
+            cryptoService.symDecryptSymmetricKey(
+                commonKey,
+                encryptedTagEncryptionKey
+            )
+        }
+        verify(exactly = 1) { cryptoService.storeTagEncryptionKey(tagEncryptionKey) }
     }
 
     @Test
-    fun `getUID should Return String`() {
-        // given
-        val uid = "mock-uid"
-        every { storage.getSecret(USER_ALIAS + "_" + KEY_USER_ID, String::class.java) } answers {
-            uid
-        }
-        // when
-        val testObserver = userService.userID.test()
+    fun `Given finishLogin is called with a Boolean and any operation fails, it returns true while logging the Error`() {
+        // Given
+        mockkObject(Log)
 
-        // then
-        testObserver
-            .assertNoErrors()
-            .assertValue(uid)
+        val error = RuntimeException("not important")
+
+        val userInfo: UserInfo = mockk()
+        val encryptedCommonKey: EncryptedKey = mockk()
+        val encryptedTagEncryptionKey: EncryptedKey = mockk()
+        val commonKeyId = COMMON_KEY_ID
+        val userId = USER_ID
+
+        val keyPair: GCKeyPair = mockk()
+        val commonKey: GCKey = mockk()
+        val tagEncryptionKey: GCKey = mockk()
+
+        every { userInfo.userId } returns userId
+        every { userInfo.commonKeyId } returns commonKeyId
+        every { userInfo.encryptedCommonKey } returns encryptedCommonKey
+        every { userInfo.encryptedTagEncryptionKey } returns encryptedTagEncryptionKey
+
+        every { apiService.fetchUserInfo(ALIAS) } returns Single.just(userInfo)
+        every { cryptoService.fetchGCKeyPair() } returns Single.just(keyPair)
+
+        every { secureStore.storeSecret("${ALIAS}_user_id", userId) } just Runs
+
+        every {
+            cryptoService.asymDecryptSymetricKey(
+                keyPair,
+                encryptedCommonKey
+            )
+        } returns Single.error(error)
+        every { cryptoService.storeCommonKey(commonKeyId, commonKey) } just Runs
+        every { cryptoService.storeCurrentCommonKeyId(commonKeyId) } just Runs
+
+        every {
+            cryptoService.symDecryptSymmetricKey(
+                commonKey,
+                encryptedTagEncryptionKey
+            )
+        } returns Single.just(tagEncryptionKey)
+        every { cryptoService.storeTagEncryptionKey(tagEncryptionKey) } just Runs
+
+        every { Log.error(error, "Failed to finish login") } just Runs
+
+        // Then
+        val result = assertFailsWith<RuntimeException> {
+            // When
+            service.finishLogin(true).blockingGet()
+        }
+
+        assertSame(
+            actual = result,
+            expected = error
+        )
+
+        verify(exactly = 1) { apiService.fetchUserInfo(ALIAS) }
+        verify(exactly = 1) { cryptoService.fetchGCKeyPair() }
+
+        verify(exactly = 1) { secureStore.storeSecret("${ALIAS}_user_id", userId) }
+
+        verify(exactly = 1) {
+            cryptoService.asymDecryptSymetricKey(
+                keyPair,
+                encryptedCommonKey
+            )
+        }
+        verify(exactly = 0) {
+            cryptoService.storeCommonKey(commonKeyId, commonKey)
+        }
+        verify(exactly = 0) {
+            cryptoService.storeCurrentCommonKeyId(commonKeyId)
+        }
+
+        verify(exactly = 0) {
+            cryptoService.symDecryptSymmetricKey(
+                commonKey,
+                encryptedTagEncryptionKey
+            )
+        }
+        verify(exactly = 0) { cryptoService.storeTagEncryptionKey(tagEncryptionKey) }
+        verify(exactly = 1) { Log.error(error, "Failed to finish login") }
+
+        mockkObject(Log)
     }
 }

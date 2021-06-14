@@ -16,7 +16,6 @@
 
 package care.data4life.sdk.crypto
 
-import care.data4life.sdk.CryptoSecureStore
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk

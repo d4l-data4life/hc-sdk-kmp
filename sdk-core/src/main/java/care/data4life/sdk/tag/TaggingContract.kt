@@ -20,12 +20,13 @@ import care.data4life.crypto.GCKey
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.migration.Migration
 import java.io.IOException
+import java.util.Locale
 
 typealias Tags = Map<String, String>
 typealias Annotations = List<String>
 typealias EncryptedTagsAndAnnotations = List<String>
 
-class TaggingContract {
+interface TaggingContract {
 
     interface Service {
         fun appendDefaultTags(resource: Any, oldTags: Tags?): Tags
@@ -51,16 +52,23 @@ class TaggingContract {
             encryptionKey: GCKey,
             prefix: String = ""
         ): MutableList<String>
+
+        companion object {
+            internal val IV = ByteArray(16)
+        }
     }
 
     // TODO: make this package internal
-    interface Helper {
-        fun convertToTagMap(tagList: List<String>): Tags
+    fun interface Converter {
+        @Throws(D4LException::class)
+        fun toTags(tagList: List<String>): Tags
+    }
 
+    // TODO: make this package internal
+    interface Encoding {
         @Throws(D4LException::class)
         fun encode(tag: String): String
 
-        @Throws(D4LException::class)
         @Migration("This method should only be used for migration purpose.")
         fun normalize(tag: String): String
 
@@ -78,6 +86,7 @@ class TaggingContract {
         const val TAG_FHIR_VERSION = "fhirversion"
         const val TAG_APPDATA_KEY = "flag"
         const val TAG_APPDATA_VALUE = "appdata"
+        val LOCALE: Locale = Locale.US
         const val SEPARATOR = "#"
     }
 }

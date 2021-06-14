@@ -24,7 +24,7 @@ data class EncryptedKey internal constructor(
 ) : NetworkModelContract.EncryptedKey {
     override fun decode(): ByteArray = Base64.decode(base64Key)
 
-    companion object Factory : NetworkModelContract.EncryptedKeyMaker {
+    companion object Factory : NetworkModelInternalContract.EncryptedKeyMaker {
         @JvmStatic
         override fun create(key: ByteArray): NetworkModelContract.EncryptedKey {
             return EncryptedKey(

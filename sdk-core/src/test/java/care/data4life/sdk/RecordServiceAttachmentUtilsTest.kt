@@ -41,7 +41,6 @@ import care.data4life.sdk.wrapper.SdkAttachmentFactory
 import care.data4life.sdk.wrapper.SdkFhirAttachmentHelper
 import care.data4life.sdk.wrapper.SdkFhirParser
 import care.data4life.sdk.wrapper.WrapperContract
-import io.mockk.Called
 import io.mockk.Runs
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -143,7 +142,7 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertTrue(true)
-        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
+        verify(exactly = 0) { SdkFhirAttachmentHelper.getAttachment(any()) }
     }
 
     @Test
@@ -334,7 +333,7 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertTrue(true)
-        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
+        verify(exactly = 0) { SdkFhirAttachmentHelper.getAttachment(any()) }
     }
 
     @Test
@@ -520,7 +519,11 @@ class RecordServiceAttachmentUtilsTest {
             "s4h-patient-example.patient"
         )
 
-        val doc = SdkFhirParser.toFhir4("Patient", resourceStr)
+        val doc = SdkFhirParser.toFhir<Fhir4Resource>(
+            "Patient",
+            FhirContract.FhirVersion.FHIR_4.version,
+            resourceStr
+        )
 
         // When
         recordService.checkDataRestrictions(doc)
@@ -550,7 +553,7 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertNull(data)
-        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
+        verify(exactly = 0) { SdkFhirAttachmentHelper.getAttachment(any()) }
     }
 
     @Test
@@ -670,7 +673,7 @@ class RecordServiceAttachmentUtilsTest {
 
         // Then
         assertNull(data)
-        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
+        verify(exactly = 0) { SdkFhirAttachmentHelper.getAttachment(any()) }
     }
 
     @Test
@@ -818,7 +821,7 @@ class RecordServiceAttachmentUtilsTest {
         )
 
         verify(exactly = 0) { SdkFhirAttachmentHelper.updateAttachmentData(any(), any()) }
-        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
+        verify(exactly = 0) { SdkFhirAttachmentHelper.getAttachment(any()) }
     }
 
     @Test
@@ -915,7 +918,7 @@ class RecordServiceAttachmentUtilsTest {
         )
 
         verify(exactly = 0) { SdkFhirAttachmentHelper.updateAttachmentData(any(), any()) }
-        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
+        verify(exactly = 0) { SdkFhirAttachmentHelper.getAttachment(any()) }
     }
 
     @Test
@@ -1202,7 +1205,7 @@ class RecordServiceAttachmentUtilsTest {
 
         verify(exactly = 1) { decryptedRecord.resource = originalResource }
         verify(exactly = 0) { SdkFhirAttachmentHelper.updateAttachmentData(any(), any()) }
-        verify { SdkFhirAttachmentHelper.getAttachment(any())!!.wasNot(Called) }
+        verify(exactly = 0) { SdkFhirAttachmentHelper.getAttachment(any()) }
     }
 
     @Test

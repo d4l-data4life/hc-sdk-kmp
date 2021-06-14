@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Danger
-        uses: docker://ghcr.io/danger/danger-kotlin:1.0.0-beta
+        uses: docker://ghcr.io/danger/danger-kotlin:1.0.0-beta.2
         with:
           args: --failOnErrors --no-publish-check
         env:

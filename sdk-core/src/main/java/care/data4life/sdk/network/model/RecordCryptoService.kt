@@ -54,7 +54,7 @@ class RecordCryptoService(
         dataKey: GCKey,
         attachmentKey: GCKey?,
         modelVersion: Int
-    ): NetworkModelContract.DecryptedFhir3Record<T> {
+    ): NetworkModelInternalContract.DecryptedFhir3Record<T> {
         return DecryptedRecord(
             identifier,
             resource,
@@ -78,7 +78,7 @@ class RecordCryptoService(
         dataKey: GCKey,
         attachmentKey: GCKey?,
         modelVersion: Int
-    ): NetworkModelContract.DecryptedFhir4Record<T> {
+    ): NetworkModelInternalContract.DecryptedFhir4Record<T> {
         return DecryptedR4Record(
             identifier,
             resource,
@@ -101,7 +101,7 @@ class RecordCryptoService(
         updateDate: String?,
         dataKey: GCKey,
         modelVersion: Int
-    ): NetworkModelContract.DecryptedCustomDataRecord {
+    ): NetworkModelInternalContract.DecryptedCustomDataRecord {
         guard.checkDataLimit(resource.value)
 
         return DecryptedDataRecord(
@@ -237,7 +237,7 @@ class RecordCryptoService(
                 decryptedRecord.tags,
                 decryptedRecord.annotations
             ),
-            resourceCryptoService._encryptResource(dataKey, decryptedRecord.resource),
+            resourceCryptoService.encryptResource(dataKey, decryptedRecord.resource),
             decryptedRecord.customCreationDate,
             encryptedDataKey,
             encryptedAttachmentKey,

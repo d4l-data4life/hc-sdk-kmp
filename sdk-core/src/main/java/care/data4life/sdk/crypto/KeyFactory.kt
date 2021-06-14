@@ -29,9 +29,9 @@ import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import javax.crypto.spec.SecretKeySpec
 
-class KeyFactory(
+internal class KeyFactory(
     private val base64: Base64
-) : CryptoContract.KeyFactory {
+) : CryptoInternalContract.KeyFactory {
 
     override fun createGCKey(exchangeKey: ExchangeKey): GCKey {
         val algorithm: GCAESKeyAlgorithm = if (exchangeKey.type === KeyType.TAG_KEY) {

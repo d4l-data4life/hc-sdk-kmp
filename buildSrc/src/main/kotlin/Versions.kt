@@ -31,8 +31,7 @@ object Versions {
     /**
      * [hc-securestore-kmp](https://github.com/d4l-data4life/hc-securestore-kmp)
      */
-    // const val securestore = "1.11.0"
-    const val securestore = "0.0.1-add-securestore-implementation-SNAPSHOT"
+    const val securestore = "1.13.2"
 
     // kotlin
     const val kotlin = "1.4.32"

@@ -27,7 +27,6 @@ apply(from = "${project.rootDir}/gradle/jacoco-java.gradle.kts")
 val d4lClientConfig = D4LConfigHelper.loadClientConfigAndroid("$rootDir")
 val d4LTestConfig = D4LConfigHelper.loadTestConfigAndroid("$rootDir")
 
-
 group = LibraryConfig.group
 
 application {
@@ -50,12 +49,11 @@ dependencies {
     implementation(project(":sdk-jvm")) {
         exclude(group = "care.data4life", module = "securestore-android")
         exclude(group = "care.data4life", module = "crypto-android")
-        exclude(group = "care.data4life", module = "auth-android")
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
     }
     implementation(project(":crypto-jvm"))
-    implementation(project(":auth-jvm"))
 
+    implementation(Dependencies.Multiplatform.D4L.authJvm)
     implementation(Dependencies.Multiplatform.D4L.securestoreJvm)
     implementation(Dependencies.Multiplatform.D4L.fhirHelperJvm) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
@@ -71,7 +69,6 @@ dependencies {
     implementation(Dependencies.Java.moshi)
     implementation(Dependencies.Java.cmdClickt)
     implementation(Dependencies.Java.threeTenBP)
-
 
     testImplementation(Dependencies.Java.Test.koin)
 }

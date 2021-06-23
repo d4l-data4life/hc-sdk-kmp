@@ -41,8 +41,8 @@ dependencies {
     implementation(Dependencies.Multiplatform.Kotlin.stdlib)
 
     implementation(project(":crypto-jvm"))
-    implementation(project(":auth-jvm"))
 
+    implementation(Dependencies.Multiplatform.D4L.authJvm)
     implementation(Dependencies.Multiplatform.D4L.securestoreJvm)
     implementation(Dependencies.Multiplatform.D4L.fhirSdk)
     implementation(Dependencies.Java.threeTenBP)

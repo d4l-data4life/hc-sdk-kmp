@@ -29,6 +29,11 @@ object Versions {
     const val fhirHelper = "1.4.1"
 
     /**
+     * [hc-auth-kmp](https://github.com/d4l-data4life/hc-auth-kmp)
+     */
+    const val auth = "1.13.2"
+
+    /**
      * [hc-securestore-kmp](https://github.com/d4l-data4life/hc-securestore-kmp)
      */
     const val securestore = "1.13.2"
@@ -113,12 +118,6 @@ object Versions {
      * [appAuthPatch](https://github.com/gesundheitscloud/AppAuth-Android)
      */
     const val appAuthPatch = "9e3cc033ff"
-
-    /**
-     * [scribe](https://github.com/scribejava/scribejava)
-     */
-    const val scribe = "6.1.0"
-
     // Network
     /**
      * [okHttp](https://github.com/square/okhttp)

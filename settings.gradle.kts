@@ -1,3 +1,4 @@
+
 rootProject.name = "hc-sdk-kmp"
 
 include(
@@ -9,7 +10,5 @@ include(
 
     ":sdk-doc",
 
-    ":crypto-common", ":crypto-android", ":crypto-jvm",
-
-    ":auth-common", ":auth-android", ":auth-jvm"
+    ":crypto-common", ":crypto-android", ":crypto-jvm"
 )

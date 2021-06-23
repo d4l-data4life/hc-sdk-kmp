@@ -87,13 +87,6 @@ allprojects {
         from(dokka)
         dependsOn(dokka)
     }
-
-    configurations.all {
-        resolutionStrategy.dependencySubstitution {
-            substitute(module("care.data4life:securestore-android:${Versions.securestore}"))
-                .using(module(Dependencies.Multiplatform.D4L.securestoreAndroid))
-        }
-    }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

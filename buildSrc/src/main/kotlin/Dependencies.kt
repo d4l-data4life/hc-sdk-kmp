@@ -43,6 +43,10 @@ object Dependencies {
             const val fhirHelperAndroid = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-android:${Versions.fhirHelper}"
             const val fhirHelperJvm = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-jvm:${Versions.fhirHelper}"
 
+            const val auth = "care.data4life.hc-auth-kmp:auth:${Versions.auth}"
+            const val authAndroid = "care.data4life.hc-auth-kmp:auth-android:${Versions.auth}"
+            const val authJvm = "care.data4life.hc-auth-kmp:auth-jvm:${Versions.auth}"
+
             const val securestore = "care.data4life.hc-securestore-kmp:securestore:${Versions.securestore}"
             const val securestoreAndroid = "care.data4life.hc-securestore-kmp:securestore-android:${Versions.securestore}"
             const val securestoreJvm = "care.data4life.hc-securestore-kmp:securestore-jvm:${Versions.securestore}"
@@ -172,9 +176,6 @@ object Dependencies {
 
         // Crypto
         const val bouncyCastleJdk15 = "org.bouncycastle:bcprov-jdk15on:${Versions.bouncyCastle}"
-
-        // Authorization
-        const val scribeCore = "com.github.scribejava:scribejava-core:${Versions.scribe}"
 
         // Data
         const val moshi = "com.squareup.moshi:moshi:${Versions.moshi}"

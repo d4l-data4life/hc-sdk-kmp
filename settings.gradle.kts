@@ -8,7 +8,5 @@ include(
 
     ":sdk-android-test",
 
-    ":sdk-doc",
-
-    ":crypto-common", ":crypto-android", ":crypto-jvm"
+    ":sdk-doc"
 )

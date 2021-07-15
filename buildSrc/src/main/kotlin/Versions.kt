@@ -29,12 +29,17 @@ object Versions {
     const val fhirHelper = "1.4.1"
 
     /**
-     * [hc-auth-kmp](https://github.com/d4l-data4life/hc-auth-kmp)
+     * [hc-auth-sdk-kmp](https://github.com/d4l-data4life/hc-auth-sdk-kmp)
      */
     const val auth = "1.13.2"
 
     /**
-     * [hc-securestore-kmp](https://github.com/d4l-data4life/hc-securestore-kmp)
+     * [hc-crypto-sdk-kmp](https://github.com/d4l-data4life/hc-crypto-sdk-kmp)
+     */
+    const val crypto = "1.13.2"
+
+    /**
+     * [hc-securestore-sdk-kmp](https://github.com/d4l-data4life/hc-securestore-sdk-kmp)
      */
     const val securestore = "1.13.2"
 

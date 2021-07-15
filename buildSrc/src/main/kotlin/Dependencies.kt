@@ -43,13 +43,17 @@ object Dependencies {
             const val fhirHelperAndroid = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-android:${Versions.fhirHelper}"
             const val fhirHelperJvm = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-jvm:${Versions.fhirHelper}"
 
-            const val auth = "care.data4life.hc-auth-kmp:auth:${Versions.auth}"
-            const val authAndroid = "care.data4life.hc-auth-kmp:auth-android:${Versions.auth}"
-            const val authJvm = "care.data4life.hc-auth-kmp:auth-jvm:${Versions.auth}"
+            const val auth = "care.data4life.hc-auth-sdk-kmp:auth:${Versions.auth}"
+            const val authAndroid = "care.data4life.hc-auth-sdk-kmp:auth-android:${Versions.auth}"
+            const val authJvm = "care.data4life.hc-auth-sdk-kmp:auth-jvm:${Versions.auth}"
 
-            const val securestore = "care.data4life.hc-securestore-kmp:securestore:${Versions.securestore}"
-            const val securestoreAndroid = "care.data4life.hc-securestore-kmp:securestore-android:${Versions.securestore}"
-            const val securestoreJvm = "care.data4life.hc-securestore-kmp:securestore-jvm:${Versions.securestore}"
+            const val crypto = "care.data4life.hc-crypto-sdk-kmp:crypto:${Versions.crypto}"
+            const val cryptoAndroid = "care.data4life.hc-crypto-sdk-kmp:crypto-android:${Versions.crypto}"
+            const val cryptoJvm = "care.data4life.hc-crypto-sdk-kmp:crypto-jvm:${Versions.crypto}"
+
+            const val securestore = "care.data4life.hc-securestore-sdk-kmp:securestore:${Versions.securestore}"
+            const val securestoreAndroid = "care.data4life.hc-securestore-sdk-kmp:securestore-android:${Versions.securestore}"
+            const val securestoreJvm = "care.data4life.hc-securestore-sdk-kmp:securestore-jvm:${Versions.securestore}"
         }
 
         object Test {

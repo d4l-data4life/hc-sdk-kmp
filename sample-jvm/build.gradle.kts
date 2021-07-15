@@ -48,12 +48,11 @@ tasks.withType<Jar> {
 dependencies {
     implementation(project(":sdk-jvm")) {
         exclude(group = "care.data4life", module = "securestore-android")
-        exclude(group = "care.data4life", module = "crypto-android")
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
     }
-    implementation(project(":crypto-jvm"))
 
     implementation(Dependencies.Multiplatform.D4L.authJvm)
+    implementation(Dependencies.Multiplatform.D4L.cryptoJvm)
     implementation(Dependencies.Multiplatform.D4L.securestoreJvm)
     implementation(Dependencies.Multiplatform.D4L.fhirHelperJvm) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")

@@ -24,7 +24,6 @@ apply(from = "${project.rootDir}/gradle/deploy-java.gradle")
 
 group = LibraryConfig.group
 
-
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
@@ -40,9 +39,8 @@ dependencies {
     api(Dependencies.Multiplatform.D4L.utilJvm)
     implementation(Dependencies.Multiplatform.Kotlin.stdlib)
 
-    implementation(project(":crypto-jvm"))
-
     implementation(Dependencies.Multiplatform.D4L.authJvm)
+    implementation(Dependencies.Multiplatform.D4L.cryptoJvm)
     implementation(Dependencies.Multiplatform.D4L.securestoreJvm)
     implementation(Dependencies.Multiplatform.D4L.fhirSdk)
     implementation(Dependencies.Java.threeTenBP)

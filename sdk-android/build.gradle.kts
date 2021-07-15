@@ -94,12 +94,11 @@ dependencies {
 
     api(project(":sdk-core")) {
         exclude(group = "org.threeten", module = "threetenbp")
-        exclude(module = "crypto-jvm")
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
     }
-    implementation(project(":crypto-android"))
 
     implementation(Dependencies.Multiplatform.D4L.authAndroid)
+    implementation(Dependencies.Multiplatform.D4L.cryptoAndroid)
     implementation(Dependencies.Multiplatform.D4L.securestoreAndroid)
     api(Dependencies.Multiplatform.D4L.utilAndroid)
 

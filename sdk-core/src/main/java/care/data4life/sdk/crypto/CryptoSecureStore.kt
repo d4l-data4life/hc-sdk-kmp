@@ -15,13 +15,9 @@
  */
 package care.data4life.sdk.crypto
 
-import care.data4life.crypto.ExchangeKey
-import care.data4life.crypto.GCKey
-import care.data4life.crypto.GCKeyPair
-import care.data4life.crypto.KeyType
-import care.data4life.crypto.error.CryptoException
+import care.data4life.sdk.crypto.error.CryptoException
 import care.data4life.sdk.lang.D4LException
-import care.data4life.securestore.SecureStoreContract
+import care.data4life.sdk.securestore.SecureStoreContract
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import java.io.IOException

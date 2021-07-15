@@ -15,7 +15,6 @@
  */
 package care.data4life.sdk
 
-import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.AttachmentGuardian
 import care.data4life.sdk.attachment.AttachmentHasher
@@ -26,6 +25,7 @@ import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3Resource

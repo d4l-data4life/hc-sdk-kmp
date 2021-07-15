@@ -16,7 +16,7 @@
 
 object Versions {
     // D4L
-    const val sdkUtil = "1.6.1"
+    const val sdkUtil = "1.8.0"
 
     /**
      * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)

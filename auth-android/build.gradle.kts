@@ -97,7 +97,7 @@ dependencies {
 
     expectedBy(project(":auth-common"))
 
-    api(Dependencies.Multiplatform.D4L.utilAndroid)
+    api(Dependencies.Multiplatform.D4L.util)
 
     implementation(project(":securestore-android")) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")

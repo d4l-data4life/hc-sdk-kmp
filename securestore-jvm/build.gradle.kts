@@ -40,7 +40,7 @@ kotlin {
 dependencies {
     expectedBy(project(":securestore-common"))
 
-    implementation(Dependencies.Multiplatform.D4L.utilJvm)
+    implementation(Dependencies.Multiplatform.D4L.util)
 
     implementation(Dependencies.Multiplatform.Kotlin.stdlibJdk8)
 

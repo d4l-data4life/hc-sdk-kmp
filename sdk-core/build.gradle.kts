@@ -37,7 +37,7 @@ kotlin {
 }
 
 dependencies {
-    api(Dependencies.Multiplatform.D4L.utilJvm)
+    api(Dependencies.Multiplatform.D4L.util)
     implementation(Dependencies.Multiplatform.Kotlin.stdlib)
 
     implementation(project(":securestore-jvm"))

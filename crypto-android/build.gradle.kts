@@ -85,7 +85,7 @@ dependencies {
 
     expectedBy(project(":crypto-common"))
 
-    implementation(Dependencies.Multiplatform.D4L.utilAndroid)
+    implementation(Dependencies.Multiplatform.D4L.util)
     implementation(Dependencies.Multiplatform.Kotlin.stdlibAndroid)
     implementation(Dependencies.Android.AndroidX.appCompat)
     implementation(Dependencies.Android.bouncyCastleJdk15)

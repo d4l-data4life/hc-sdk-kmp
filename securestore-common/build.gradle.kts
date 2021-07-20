@@ -31,7 +31,7 @@ kotlin {
 dependencies {
     implementation(Dependencies.Multiplatform.Kotlin.stdlibCommon)
 
-    api(Dependencies.Multiplatform.D4L.utilCommon)
+    api(Dependencies.Multiplatform.D4L.util)
 
     testImplementation(Dependencies.Multiplatform.Test.Kotlin.testCommon)
     testImplementation(Dependencies.Multiplatform.Test.Kotlin.testAnnotationsCommon)

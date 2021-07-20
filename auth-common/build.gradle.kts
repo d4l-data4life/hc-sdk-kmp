@@ -32,7 +32,7 @@ kotlin {
 dependencies {
     implementation(project(":securestore-common"))
 
-    api(Dependencies.Multiplatform.D4L.utilCommon)
+    api(Dependencies.Multiplatform.D4L.util)
 
     implementation(Dependencies.Multiplatform.Kotlin.stdlibCommon)
 

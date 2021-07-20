@@ -103,7 +103,7 @@ dependencies {
     implementation(project(":crypto-android"))
     implementation(project(":auth-android"))
 
-    api(Dependencies.Multiplatform.D4L.utilAndroid)
+    api(Dependencies.Multiplatform.D4L.util)
 
     implementation(Dependencies.Multiplatform.D4L.fhirSdk)
     implementation(Dependencies.Android.threeTenABP)

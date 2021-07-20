@@ -17,25 +17,26 @@
 package care.data4life.sdk.attachment
 
 import care.data4life.crypto.GCKey
-import care.data4life.sdk.lang.ImageResizeException
-import care.data4life.sdk.log.Log
 import care.data4life.sdk.test.util.GenericTestDataProvider.ATTACHMENT_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.util.Base64.encodeToString
+import care.data4life.sdk.wrapper.SDKImageResizer
 import care.data4life.sdk.wrapper.WrapperContract
 import io.mockk.Runs
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
+import io.mockk.mockkConstructor
 import io.mockk.mockkObject
+import io.mockk.slot
 import io.mockk.unmockkObject
 import io.mockk.verify
+import io.mockk.verifyOrder
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
@@ -48,6 +49,7 @@ class AttachmentServiceTest {
     @Before
     fun setUp() {
         clearAllMocks()
+        mockkConstructor(SDKImageResizer::class)
 
         service = AttachmentService(fileService, resizer)
     }
@@ -104,172 +106,52 @@ class AttachmentServiceTest {
     }
 
     @Test
-    fun `Given download is called with a List of Attachments, the AttachmentKey and the UserId, it fails if the Attachment contains not a preview and it is hashable and the new and old hash do not match`() {
+    fun `Given download is called with a List of Attachments, the AttachmentKey and the UserId, it returns a list of Attachments with data`() {
         // Given
-        mockkObject(CompatibilityValidator)
-        mockkObject(AttachmentHasher)
+        mockkObject(AttachmentDownloadHelper)
 
         val userID = USER_ID
+        val attachmentId = "id1"
+        val derivedId = "id2"
         val attachment: WrapperContract.Attachment = mockk()
         val attachmentKey: GCKey = mockk()
         val downloadedAttachment = ByteArray(23)
 
-        every { attachment.id } returns ATTACHMENT_ID
-        every { attachment.hash } returns "not a match"
+        every { attachment.id } returns attachmentId
 
         every {
-            fileService.downloadFile(attachmentKey, userID, ATTACHMENT_ID)
+            fileService.downloadFile(attachmentKey, userID, derivedId)
         } returns Single.just(downloadedAttachment)
-        every { AttachmentHasher.hash(downloadedAttachment) } returns "hash"
-        every { CompatibilityValidator.isHashable(attachment) } returns true
+
+        every { AttachmentDownloadHelper.deriveAttachmentId(attachment) } returns derivedId
+        every {
+            AttachmentDownloadHelper.addAttachmentPayload(attachment, downloadedAttachment)
+        } returns attachment
+
+        // When
+        val downloadedAttachments = service.download(
+            listOf(attachment),
+            attachmentKey,
+            userID
+        ).blockingGet()
 
         // Then
-        val error = assertFailsWith<RuntimeException> {
-            // When
-            service.download(listOf(attachment), attachmentKey, userID).blockingGet()
+        assertEquals(
+            expected = 1,
+            actual = downloadedAttachments.size
+        )
+        assertSame(
+            actual = downloadedAttachments[0],
+            expected = attachment
+        )
+
+        verifyOrder {
+            AttachmentDownloadHelper.deriveAttachmentId(attachment)
+            fileService.downloadFile(attachmentKey, userID, derivedId)
+            AttachmentDownloadHelper.addAttachmentPayload(attachment, downloadedAttachment)
         }
 
-        assertEquals(
-            actual = error.message,
-            expected = "care.data4life.sdk.lang.DataValidationException\$InvalidAttachmentPayloadHash: Attachment hash is invalid"
-        )
-
-        unmockkObject(CompatibilityValidator)
-        unmockkObject(AttachmentHasher)
-    }
-
-    @Test
-    fun `Given download  is called with a List of Attachments, the AttachmentKey and the UserId, it returns a list of Attachments with data if the Attachment do not contain a preview and are hashable and the hashes`() {
-        // Given
-        mockkObject(CompatibilityValidator)
-        mockkObject(AttachmentHasher)
-
-        val userID = USER_ID
-        val hash = "hash"
-        val attachment: WrapperContract.Attachment = mockk()
-        val attachmentKey: GCKey = mockk()
-        val downloadedAttachment = ByteArray(23)
-        val decodedAttachment = encodeToString(downloadedAttachment)
-
-        every { attachment.id } returns ATTACHMENT_ID
-        every { attachment.hash } returns hash
-
-        every { attachment.data = decodedAttachment } just Runs
-        every { attachment.hash = hash } just Runs
-
-        every {
-            fileService.downloadFile(attachmentKey, userID, ATTACHMENT_ID)
-        } returns Single.just(downloadedAttachment)
-        every { CompatibilityValidator.isHashable(attachment) } returns true
-        every { AttachmentHasher.hash(downloadedAttachment) } returns hash
-
-        // When
-        val downloadedAttachments = service.download(
-            listOf(attachment),
-            attachmentKey,
-            userID
-        ).blockingGet()
-
-        // Then
-        assertEquals(
-            expected = 1,
-            actual = downloadedAttachments.size
-        )
-
-        verify(exactly = 1) { attachment.data = decodedAttachment }
-        verify(exactly = 1) { attachment.hash = hash }
-
-        unmockkObject(CompatibilityValidator)
-        unmockkObject(AttachmentHasher)
-    }
-
-    @Test
-    fun `Given download  is called with a List of Attachments, the AttachmentKey and the UserId, it returns a list of Attachments with data if the Attachment do not contain a preview and are not hashable`() {
-        // Given
-        mockkObject(CompatibilityValidator)
-        mockkObject(AttachmentHasher)
-
-        val userID = USER_ID
-        val hash = "hash"
-        val attachment: WrapperContract.Attachment = mockk()
-        val attachmentKey: GCKey = mockk()
-        val downloadedAttachment = ByteArray(23)
-        val decodedAttachment = encodeToString(downloadedAttachment)
-
-        every { attachment.id } returns ATTACHMENT_ID
-        every { attachment.hash } returns "not important"
-
-        every { attachment.data = decodedAttachment } just Runs
-        every { attachment.hash = hash } just Runs
-
-        every {
-            fileService.downloadFile(attachmentKey, userID, ATTACHMENT_ID)
-        } returns Single.just(downloadedAttachment)
-        every { CompatibilityValidator.isHashable(attachment) } returns false
-        every { AttachmentHasher.hash(downloadedAttachment) } returns hash
-
-        // When
-        val downloadedAttachments = service.download(
-            listOf(attachment),
-            attachmentKey,
-            userID
-        ).blockingGet()
-
-        // Then
-        assertEquals(
-            expected = 1,
-            actual = downloadedAttachments.size
-        )
-
-        verify(exactly = 1) { attachment.data = decodedAttachment }
-        verify(exactly = 1) { attachment.hash = hash }
-
-        unmockkObject(CompatibilityValidator)
-        unmockkObject(AttachmentHasher)
-    }
-
-    @Test
-    fun `Given download  is called with a List of Attachments, the AttachmentKey and the UserId, it returns a list of Attachments with data if the Attachment contains a preview`() {
-        // Given
-        mockkObject(CompatibilityValidator)
-        mockkObject(AttachmentHasher)
-
-        val userID = USER_ID
-        val hash = "hash"
-        val attachment: WrapperContract.Attachment = mockk()
-        val attachmentKey: GCKey = mockk()
-        val downloadedAttachment = ByteArray(23)
-        val decodedAttachment = encodeToString(downloadedAttachment)
-
-        every { attachment.id } returns "not important#$ATTACHMENT_ID"
-        every { attachment.hash } returns "not important"
-
-        every { attachment.data = decodedAttachment } just Runs
-        every { attachment.hash = hash } just Runs
-
-        every {
-            fileService.downloadFile(attachmentKey, userID, ATTACHMENT_ID)
-        } returns Single.just(downloadedAttachment)
-        every { AttachmentHasher.hash(downloadedAttachment) } returns hash
-
-        // When
-        val downloadedAttachments = service.download(
-            listOf(attachment),
-            attachmentKey,
-            userID
-        ).blockingGet()
-
-        // Then
-        assertEquals(
-            expected = 1,
-            actual = downloadedAttachments.size
-        )
-
-        verify(exactly = 1) { attachment.data = decodedAttachment }
-        verify(exactly = 1) { attachment.hash = hash }
-
-        unmockkObject(CompatibilityValidator)
-        unmockkObject(AttachmentHasher)
+        unmockkObject(AttachmentDownloadHelper)
     }
 
     @Test
@@ -315,7 +197,7 @@ class AttachmentServiceTest {
             fileService.uploadFile(attachmentKey, userId, data)
         } returns Single.just(receivedId)
 
-        every { resizer.isResizable(data) } returns false
+        every { anyConstructed<SDKImageResizer>().isResizable(data) } returns false
 
         // When
         val uploaded = service.upload(listOf(attachment), attachmentKey, userId).blockingGet()
@@ -344,16 +226,15 @@ class AttachmentServiceTest {
     @Test
     fun `Given upload is called with a list of Attachments, which contain data, the AttachmentKey and the UserId, it returns the uploaded attachments and null for AdditionalIds if the Attachment is resizeable, but the resizing fails`() {
         // Given
-        mockkObject(Log)
-
         val userId = USER_ID
         val receivedId = "newId"
         val attachment: WrapperContract.Attachment = mockk()
         val data = "test".toByteArray()
         val encodedData = encodeToString(data)
         val attachmentKey: GCKey = mockk()
-        val error = ImageResizeException.JpegWriterMissing()
+        val originalData = slot<ByteArray>()
 
+        every { attachment.id } returns receivedId
         every { attachment.id = receivedId } just Runs
 
         every { attachment.data } returns encodedData
@@ -361,8 +242,10 @@ class AttachmentServiceTest {
             fileService.uploadFile(attachmentKey, userId, data)
         } returns Single.just(receivedId)
 
-        every { resizer.isResizable(data) } returns true
-        every { resizer.resizeToHeight(any(), any(), any()) } throws error
+        every { anyConstructed<SDKImageResizer>().isResizable(data) } returns true
+        every {
+            anyConstructed<SDKImageResizer>().resize(capture(originalData), any())
+        } answers { originalData.captured }
 
         // When
         val uploaded = service.upload(listOf(attachment), attachmentKey, userId).blockingGet()
@@ -380,11 +263,8 @@ class AttachmentServiceTest {
             expected = attachment
         )
 
-        verify(exactly = 1) { Log.error(error, error.message) }
         verify(exactly = 1) { attachment.id = receivedId }
         verify(exactly = 1) { fileService.uploadFile(any(), any(), any()) }
-
-        unmockkObject(Log)
     }
 
     @Test
@@ -403,6 +283,7 @@ class AttachmentServiceTest {
         val previewId = "prev"
         val thumbnailId = "thumb"
 
+        every { attachment.id } returns receivedId
         every { attachment.id = receivedId } just Runs
 
         every { attachment.data } returns encodedData
@@ -410,12 +291,11 @@ class AttachmentServiceTest {
             fileService.uploadFile(attachmentKey, userId, data)
         } returns Single.just(receivedId)
 
-        every { resizer.isResizable(data) } returns true
+        every { anyConstructed<SDKImageResizer>().isResizable(data) } returns true
         every {
-            resizer.resizeToHeight(
+            anyConstructed<SDKImageResizer>().resize(
                 data,
                 AttachmentContract.ImageResizer.DEFAULT_PREVIEW_SIZE_PX,
-                AttachmentContract.ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT
             )
         } returns preview
 
@@ -424,10 +304,9 @@ class AttachmentServiceTest {
         } returns Single.just(previewId)
 
         every {
-            resizer.resizeToHeight(
+            anyConstructed<SDKImageResizer>().resize(
                 data,
                 AttachmentContract.ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX,
-                AttachmentContract.ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT
             )
         } returns thumbnail
 
@@ -466,5 +345,85 @@ class AttachmentServiceTest {
 
         verify(exactly = 1) { attachment.id = receivedId }
         verify(exactly = 3) { fileService.uploadFile(any(), any(), any()) }
+    }
+
+    @Test
+    fun `Given upload is called with a list of Attachments, which contain data, the AttachmentKey and the UserId, it returns the uploaded attachments and AdditionalIds with a duplicate of the AttachmentId, if the image is too small`() {
+        // Given
+        val userId = USER_ID
+        val receivedId = "newId"
+        val attachment: WrapperContract.Attachment = mockk()
+        val data = "test".toByteArray()
+        val encodedData = encodeToString(data)
+        val attachmentKey: GCKey = mockk()
+
+        val preview = ByteArray(23)
+        val thumbnail = ByteArray(42)
+
+        val previewId = "prev"
+        val thumbnailId = "thumb"
+
+        every { attachment.id } returns receivedId
+        every { attachment.id = receivedId } just Runs
+
+        every { attachment.data } returns encodedData
+        every {
+            fileService.uploadFile(attachmentKey, userId, data)
+        } returns Single.just(receivedId)
+
+        every { anyConstructed<SDKImageResizer>().isResizable(data) } returns true
+        every {
+            anyConstructed<SDKImageResizer>().resize(
+                data,
+                AttachmentContract.ImageResizer.DEFAULT_PREVIEW_SIZE_PX,
+            )
+        } returns preview
+
+        every {
+            fileService.uploadFile(attachmentKey, userId, preview)
+        } returns Single.just(previewId)
+
+        every {
+            anyConstructed<SDKImageResizer>().resize(
+                data,
+                AttachmentContract.ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX,
+            )
+        } returns null
+
+        every {
+            fileService.uploadFile(attachmentKey, userId, thumbnail)
+        } returns Single.just(thumbnailId)
+
+        // When
+        val uploaded = service.upload(listOf(attachment), attachmentKey, userId).blockingGet()
+
+        // Then
+        assertEquals(
+            actual = uploaded.size,
+            expected = 1
+        )
+
+        val (modifiedAttachment, additionalIds) = uploaded[0]
+        assertTrue(additionalIds is List<*>)
+        assertEquals(
+            actual = additionalIds.size,
+            expected = 2
+        )
+        assertEquals(
+            actual = additionalIds[0],
+            expected = previewId
+        )
+        assertEquals(
+            actual = additionalIds[1],
+            expected = receivedId
+        )
+
+        assertSame(
+            actual = modifiedAttachment,
+            expected = attachment
+        )
+
+        verify(exactly = 1) { attachment.id = receivedId }
+        verify(exactly = 2) { fileService.uploadFile(any(), any(), any()) }
     }
 }

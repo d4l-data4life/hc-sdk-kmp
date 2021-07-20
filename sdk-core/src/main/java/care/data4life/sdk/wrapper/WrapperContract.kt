@@ -72,4 +72,13 @@ class WrapperContract {
         fun encode(str: String): String
         fun decode(str: String): String
     }
+
+    interface SDKImageResizer {
+        fun isResizable(data: ByteArray): Boolean
+
+        fun resize(
+            data: ByteArray,
+            targetHeight: Int
+        ): ByteArray?
+    }
 }

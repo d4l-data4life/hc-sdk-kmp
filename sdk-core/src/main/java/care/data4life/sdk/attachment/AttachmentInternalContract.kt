@@ -22,4 +22,12 @@ internal class AttachmentInternalContract {
     interface CompatibilityValidator {
         fun isHashable(attachment: WrapperContract.Attachment): Boolean
     }
+
+    interface DownloadHelper {
+        fun deriveAttachmentId(attachment: WrapperContract.Attachment): String
+        fun addAttachmentPayload(
+            attachment: WrapperContract.Attachment,
+            data: ByteArray
+        ): WrapperContract.Attachment
+    }
 }

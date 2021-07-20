@@ -15,6 +15,7 @@
  */
 
 package care.data4life.crypto
+import care.data4life.crypto.util.Serializable
 
 expect class GCKeyPair(
     algorithm: GCRSAKeyAlgorithm,

@@ -14,7 +14,7 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.crypto
+package care.data4life.crypto.util
 
 import java.io.Serializable
 

@@ -113,7 +113,7 @@ dependencies {
     }
     implementation(Dependencies.Multiplatform.D4L.fhirSdk)
 
-    implementation(Dependencies.Multiplatform.D4L.util)
+    implementation(Dependencies.Multiplatform.D4L.sdkUtil)
 
     implementation(Dependencies.Android.threeTenABP)
 

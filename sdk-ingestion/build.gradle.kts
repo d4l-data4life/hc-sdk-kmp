@@ -53,7 +53,7 @@ dependencies {
     implementation(project(":securestore-jvm"))
     implementation(project(":crypto-jvm"))
     implementation(project(":auth-jvm"))
-    implementation(Dependencies.Multiplatform.D4L.util)
+    implementation(Dependencies.Multiplatform.D4L.sdkUtil)
     implementation(Dependencies.Multiplatform.D4L.fhirHelperJvm) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")

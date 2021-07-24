@@ -84,7 +84,7 @@ dependencies {
 
     expectedBy(project(":securestore-common"))
 
-    api(Dependencies.Multiplatform.D4L.util)
+    api(Dependencies.Multiplatform.D4L.sdkUtil)
     implementation(Dependencies.Multiplatform.Kotlin.stdlibAndroid)
     implementation(Dependencies.Android.AndroidX.appCompat)
     compileOnly(Dependencies.Java.javaXAnnotation)

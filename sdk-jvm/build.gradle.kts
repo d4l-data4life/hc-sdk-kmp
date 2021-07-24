@@ -43,7 +43,7 @@ dependencies {
     implementation(project(":securestore-jvm"))
     implementation(project(":crypto-jvm"))
     implementation(project(":auth-jvm"))
-    implementation(Dependencies.Multiplatform.D4L.util)
+    implementation(Dependencies.Multiplatform.D4L.sdkUtil)
     implementation(Dependencies.Multiplatform.D4L.fhirSdk)
 
     implementation(Dependencies.Java.threeTenBP)

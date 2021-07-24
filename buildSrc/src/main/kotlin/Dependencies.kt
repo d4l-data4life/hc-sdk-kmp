@@ -33,7 +33,7 @@ object Dependencies {
         }
 
         object D4L {
-            const val util = "care.data4life.hc-util-sdk-kmp:util:${Versions.sdkUtil}"
+            const val sdkUtil = "care.data4life.hc-util-sdk-kmp:util:${Versions.sdkUtil}"
 
             const val fhirSdk = "care.data4life.hc-fhir-sdk-java:fhir-java:${Versions.fhirSdk}"
 

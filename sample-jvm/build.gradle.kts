@@ -61,7 +61,7 @@ dependencies {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
-    implementation(Dependencies.Multiplatform.D4L.util)
+    implementation(Dependencies.Multiplatform.D4L.sdkUtil)
     implementation(Dependencies.Multiplatform.D4L.fhirSdk)
 
     implementation(Dependencies.Java.kotlinStdlibJdk8)

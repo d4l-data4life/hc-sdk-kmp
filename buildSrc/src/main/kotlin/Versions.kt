@@ -16,7 +16,7 @@
 
 object Versions {
     // D4L
-    const val sdkUtil = "1.8.1"
+    const val sdkUtil = "1.8.1-bump-android-SNAPSHOT"
 
     /**
      * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)
@@ -38,7 +38,7 @@ object Versions {
 
     object GradlePlugins {
         const val kotlin = Versions.kotlin
-        const val android = "4.2.1"
+        const val android = "4.2.2"
 
         /**
          * [Dexcount](https://github.com/KeepSafe/dexcount-gradle-plugin)

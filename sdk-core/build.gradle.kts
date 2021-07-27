@@ -37,7 +37,7 @@ kotlin {
 }
 
 dependencies {
-    api(Dependencies.Multiplatform.D4L.utilJvm)
+    api(Dependencies.Multiplatform.D4L.sdkUtil)
     implementation(Dependencies.Multiplatform.Kotlin.stdlib)
 
     implementation(project(":securestore-jvm"))
@@ -62,7 +62,7 @@ dependencies {
     kapt(Dependencies.Java.moshiCodeGen)
     kaptTest(Dependencies.Java.moshiCodeGen)
 
-    testImplementation(Dependencies.Multiplatform.D4L.fhirHelperJvm) {
+    testImplementation(Dependencies.Multiplatform.D4L.fhirHelper) {
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
     testImplementation(Dependencies.Java.Test.junit)

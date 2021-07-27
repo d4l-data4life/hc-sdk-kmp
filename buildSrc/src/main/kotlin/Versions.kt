@@ -16,7 +16,10 @@
 
 object Versions {
     // D4L
-    const val sdkUtil = "1.6.1"
+    /**
+     * [hc-sdk-util-kmp](https://github.com/d4l-data4life/hc-util-sdk-kmp)
+     **/
+    const val sdkUtil = "1.9.0"
 
     /**
      * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)
@@ -26,7 +29,7 @@ object Versions {
     /**
      * [hc-fhir-helper-sdk-kmp](https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp)
      */
-    const val fhirHelper = "1.4.1"
+    const val fhirHelper = "1.6.0"
 
     // kotlin
     const val kotlin = "1.4.32"
@@ -38,7 +41,7 @@ object Versions {
 
     object GradlePlugins {
         const val kotlin = Versions.kotlin
-        const val android = "4.2.1"
+        const val android = "4.2.2"
 
         /**
          * [Dexcount](https://github.com/KeepSafe/dexcount-gradle-plugin)

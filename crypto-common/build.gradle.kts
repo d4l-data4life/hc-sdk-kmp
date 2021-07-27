@@ -30,7 +30,7 @@ kotlin {
 }
 
 dependencies {
-    implementation(Dependencies.Multiplatform.D4L.utilCommon)
+    implementation(Dependencies.Multiplatform.D4L.sdkUtil)
 
     implementation(Dependencies.Multiplatform.Kotlin.stdlibCommon)
 

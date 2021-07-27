@@ -16,8 +16,8 @@
 
 package care.data4life.crypto
 
+import care.data4life.crypto.util.Serializable
 import care.data4life.sdk.util.Base64
-import care.data4life.sdk.util.Serializable
 import org.bouncycastle.asn1.pkcs.RSAPublicKey
 import java.security.KeyFactory
 import java.security.spec.PKCS8EncodedKeySpec

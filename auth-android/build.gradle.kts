@@ -97,10 +97,10 @@ dependencies {
 
     expectedBy(project(":auth-common"))
 
-    api(Dependencies.Multiplatform.D4L.utilAndroid)
+    api(Dependencies.Multiplatform.D4L.sdkUtil)
 
     implementation(project(":securestore-android")) {
-        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util")
     }
     implementation(Dependencies.Multiplatform.Kotlin.stdlibAndroid)
     implementation(Dependencies.Multiplatform.Coroutines.android)

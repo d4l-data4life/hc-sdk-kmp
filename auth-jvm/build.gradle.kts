@@ -38,7 +38,7 @@ dependencies {
     expectedBy(project(":auth-common"))
 
     implementation(project(":securestore-jvm"))
-    implementation(Dependencies.Multiplatform.D4L.utilJvm)
+    implementation(Dependencies.Multiplatform.D4L.sdkUtil)
 
     implementation(Dependencies.Multiplatform.Kotlin.stdlibJdk8)
 

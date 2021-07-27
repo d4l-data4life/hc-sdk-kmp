@@ -24,7 +24,10 @@ toc::[]
 
 === Bumped
 
+* Android Gradle Plugin 4.2.1 -> 4.2.2
 * JaCoCo 0.8.3 -> 0.8.7
+* SDK-Util 1.6.1 -> 1.9.0
+* FHIR-Helper-SDK 1.4.1 -> 1.6.0
 
 === Migration
 

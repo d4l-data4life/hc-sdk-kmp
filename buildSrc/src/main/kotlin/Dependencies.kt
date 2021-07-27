@@ -37,9 +37,7 @@ object Dependencies {
 
             const val fhirSdk = "care.data4life.hc-fhir-sdk-java:fhir-java:${Versions.fhirSdk}"
 
-            const val fhirHelperCommon = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-metadata:${Versions.fhirHelper}"
-            const val fhirHelperAndroid = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-android:${Versions.fhirHelper}"
-            const val fhirHelperJvm = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-jvm:${Versions.fhirHelper}"
+            const val fhirHelper = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper:${Versions.fhirHelper}"
         }
 
         object Test {

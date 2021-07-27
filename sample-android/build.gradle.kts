@@ -103,12 +103,12 @@ dependencies {
         exclude(group = "care.data4life", module = "securestore-jvm")
         exclude(group = "care.data4life", module = "crypto-jvm")
         exclude(group = "care.data4life", module = "auth-jvm")
-        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
-        exclude(group = "care.data4life.hc-fhir-helper-sdk-kmp", module = "fhir-helper-jvm")
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util")
+        exclude(group = "care.data4life.hc-fhir-helper-sdk-kmp", module = "fhir-helper")
     }
 
-    implementation(Dependencies.Multiplatform.D4L.fhirHelperAndroid) {
-        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
+    implementation(Dependencies.Multiplatform.D4L.fhirHelper) {
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
     implementation(Dependencies.Multiplatform.D4L.fhirSdk)

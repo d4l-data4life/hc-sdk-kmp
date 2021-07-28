@@ -36,12 +36,18 @@ For more information about the platform, visit our website <a href="https://www.
         ·
         <a href="https://github.com/d4l-data4life/hc-sdk-kmp/issues">Request Feature</a>
     </p>
-    <p><!-- PROJECT BADGES -->
-        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/actions">
-            <img src="https://github.com/d4l-data4life/hc-sdk-kmp/workflows/D4L%20CI%20KMP/badge.svg" alt="Build Status"/>
+    <p><!-- PROJECT BADGES see badges.adoc how to change them -->
+        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/releases">
+            <img src="assets/images/badge-release-latest.svg" alt="Latest version"/>
         </a>
-        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/blob/main/LICENSE">
-            <img src="https://img.shields.io/badge/license-PRIVATE-blue.svg"/>
+        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/actions">
+            <img src="https://github.com/d4l-data4life/hc-sdk-kmp/actions/workflows/d4l-ci-latest-version.yml/badge.svg" alt="Build Status"/>
+        </a>
+        <a>
+            <img src="assets/images/badge-platform-support.svg" alt="Platform"/>
+        </a>
+        <a href="LICENSE">
+            <img src="assets/images/badge-license.svg" alt="License"/>
         </a>
     </p>
 </div>
@@ -256,7 +262,7 @@ There are several requirements for building the SDK.
 * Kotlin 1.4.32
 * Java 8 link:https://developer.android.com/studio/write/java8-support[Limitations] link:https://jakewharton.com/d8-library-desugaring/[Desugaring]
 * Gradle 6.8.3
-* link:https://developer.android.com/studio#downloads[Android Studio 4.2.1]
+* link:https://developer.android.com/studio#downloads[Android Studio 4.2.2]
 * Android Emulator 23 - 30
 
 **Note:** Disable Instant Run in Android Studio, or the project fails to compile.

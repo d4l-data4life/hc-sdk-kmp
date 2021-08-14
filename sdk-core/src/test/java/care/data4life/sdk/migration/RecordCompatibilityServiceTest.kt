@@ -18,6 +18,7 @@ package care.data4life.sdk.migration
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.migration.MigrationInternalContract.CompatibilityTag
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.tag.TaggingContract
 import io.mockk.clearAllMocks
@@ -130,9 +131,24 @@ class RecordCompatibilityServiceTest {
             "tag3" to "tag3Value"
         )
         val encodedTags = listOf(
-            Triple("encodedTag1Value", "encodedAndroidLegacyTag1Value", "encodedJSLegacyTag1Value"),
-            Triple("encodedTag2Value", "encodedAndroidLegacyTag2Value", "encodedJSLegacyTag2Value"),
-            Triple("encodedTag3Value", "encodedAndroidLegacyTag3Value", "encodedJSLegacyTag3Value")
+            CompatibilityTag(
+                "encodedTag1Value",
+                "encodedAndroidLegacyTag1Value",
+                "encodedJSLegacyTag1Value",
+                "encodedIOSLegacyTag1Value"
+            ),
+            CompatibilityTag(
+                "encodedTag2Value",
+                "encodedAndroidLegacyTag2Value",
+                "encodedJSLegacyTag2Value",
+                "encodedIOSLegacyTag2Value"
+            ),
+            CompatibilityTag(
+                "encodedTag3Value",
+                "encodedAndroidLegacyTag3Value",
+                "encodedJSLegacyTag3Value",
+                "encodedIOSLegacyTag3Value"
+            ),
         )
 
         every { compatibilityEncoder.encode(tags["tag1"]!!) } returns encodedTags[0]
@@ -145,7 +161,12 @@ class RecordCompatibilityServiceTest {
 
         every {
             tagCryptoService.encryptList(
-                encodedTags[0].toList(),
+                listOf(
+                    encodedTags[0].validEncoding,
+                    encodedTags[0].kmpLegacyEncoding,
+                    encodedTags[0].jsLegacyEncoding,
+                    encodedTags[0].iosLegacyEncoding
+                ),
                 tagEncryptionKey,
                 "${tags.keys.toList()[0]}${TaggingContract.DELIMITER}"
             )
@@ -153,7 +174,12 @@ class RecordCompatibilityServiceTest {
 
         every {
             tagCryptoService.encryptList(
-                encodedTags[1].toList(),
+                listOf(
+                    encodedTags[1].validEncoding,
+                    encodedTags[1].kmpLegacyEncoding,
+                    encodedTags[1].jsLegacyEncoding,
+                    encodedTags[1].iosLegacyEncoding
+                ),
                 tagEncryptionKey,
                 "${tags.keys.toList()[1]}${TaggingContract.DELIMITER}"
             )
@@ -161,7 +187,12 @@ class RecordCompatibilityServiceTest {
 
         every {
             tagCryptoService.encryptList(
-                encodedTags[2].toList(),
+                listOf(
+                    encodedTags[2].validEncoding,
+                    encodedTags[2].kmpLegacyEncoding,
+                    encodedTags[2].jsLegacyEncoding,
+                    encodedTags[2].iosLegacyEncoding
+                ),
                 tagEncryptionKey,
                 "${tags.keys.toList()[2]}${TaggingContract.DELIMITER}"
             )
@@ -173,7 +204,12 @@ class RecordCompatibilityServiceTest {
         // Then
         verify(atMost = 1) {
             tagCryptoService.encryptList(
-                encodedTags[0].toList(),
+                listOf(
+                    encodedTags[0].validEncoding,
+                    encodedTags[0].kmpLegacyEncoding,
+                    encodedTags[0].jsLegacyEncoding,
+                    encodedTags[0].iosLegacyEncoding
+                ),
                 tagEncryptionKey,
                 "${tags.keys.toList()[0]}${TaggingContract.DELIMITER}"
             )
@@ -181,7 +217,12 @@ class RecordCompatibilityServiceTest {
 
         verify(atMost = 1) {
             tagCryptoService.encryptList(
-                encodedTags[1].toList(),
+                listOf(
+                    encodedTags[1].validEncoding,
+                    encodedTags[1].kmpLegacyEncoding,
+                    encodedTags[1].jsLegacyEncoding,
+                    encodedTags[1].iosLegacyEncoding
+                ),
                 tagEncryptionKey,
                 "${tags.keys.toList()[1]}${TaggingContract.DELIMITER}"
             )
@@ -189,7 +230,12 @@ class RecordCompatibilityServiceTest {
 
         verify(atMost = 1) {
             tagCryptoService.encryptList(
-                encodedTags[2].toList(),
+                listOf(
+                    encodedTags[2].validEncoding,
+                    encodedTags[2].kmpLegacyEncoding,
+                    encodedTags[2].jsLegacyEncoding,
+                    encodedTags[2].iosLegacyEncoding
+                ),
                 tagEncryptionKey,
                 "${tags.keys.toList()[2]}${TaggingContract.DELIMITER}"
             )
@@ -205,9 +251,24 @@ class RecordCompatibilityServiceTest {
             "tag3" to "tag3Value"
         )
         val encodedTags = listOf(
-            Triple("encodedTag1Value", "encodedAndroidLegacyTag1Value", "encodedJSLegacyTag1Value"),
-            Triple("encodedTag2Value", "encodedAndroidLegacyTag2Value", "encodedJSLegacyTag2Value"),
-            Triple("encodedTag3Value", "encodedAndroidLegacyTag3Value", "encodedJSLegacyTag3Value")
+            CompatibilityTag(
+                "encodedTag1Value",
+                "encodedAndroidLegacyTag1Value",
+                "encodedJSLegacyTag1Value",
+                "encodedIOSLegacyTag1Value"
+            ),
+            CompatibilityTag(
+                "encodedTag2Value",
+                "encodedAndroidLegacyTag2Value",
+                "encodedJSLegacyTag2Value",
+                "encodedIOSLegacyTag2Value"
+            ),
+            CompatibilityTag(
+                "encodedTag3Value",
+                "encodedAndroidLegacyTag3Value",
+                "encodedJSLegacyTag3Value",
+                "encodedIOSLegacyTag3Value"
+            ),
         )
         val encryptedGroups = listOf<MutableList<String>>(mockk(), mockk(), mockk())
 
@@ -218,15 +279,42 @@ class RecordCompatibilityServiceTest {
         every { compatibilityEncoder.encode(tags["tag3"]!!) } returns encodedTags[2]
 
         every {
-            tagCryptoService.encryptList(encodedTags[0].toList(), any(), any())
+            tagCryptoService.encryptList(
+                listOf(
+                    encodedTags[0].validEncoding,
+                    encodedTags[0].kmpLegacyEncoding,
+                    encodedTags[0].jsLegacyEncoding,
+                    encodedTags[0].iosLegacyEncoding
+                ),
+                any(),
+                any()
+            )
         } returns encryptedGroups[0]
 
         every {
-            tagCryptoService.encryptList(encodedTags[1].toList(), any(), any())
+            tagCryptoService.encryptList(
+                listOf(
+                    encodedTags[1].validEncoding,
+                    encodedTags[1].kmpLegacyEncoding,
+                    encodedTags[1].jsLegacyEncoding,
+                    encodedTags[1].iosLegacyEncoding
+                ),
+                any(),
+                any()
+            )
         } returns encryptedGroups[1]
 
         every {
-            tagCryptoService.encryptList(encodedTags[2].toList(), any(), any())
+            tagCryptoService.encryptList(
+                listOf(
+                    encodedTags[2].validEncoding,
+                    encodedTags[2].kmpLegacyEncoding,
+                    encodedTags[2].jsLegacyEncoding,
+                    encodedTags[2].iosLegacyEncoding
+                ),
+                any(),
+                any()
+            )
         } returns encryptedGroups[2]
 
         every { searchTagsBuilderFactory.newBuilder() } returns searchTagsPipe
@@ -286,9 +374,24 @@ class RecordCompatibilityServiceTest {
             "annotation3Value"
         )
         val encodedTags = listOf(
-            Triple("encodedTag1Value", "encodedAndroidLegacyTag1Value", "encodedJSLegacyTag1Value"),
-            Triple("encodedTag2Value", "encodedAndroidLegacyTag2Value", "encodedJSLegacyTag2Value"),
-            Triple("encodedTag3Value", "encodedAndroidLegacyTag3Value", "encodedJSLegacyTag3Value")
+            CompatibilityTag(
+                "encodedTag1Value",
+                "encodedAndroidLegacyTag1Value",
+                "encodedJSLegacyTag1Value",
+                "encodedIOSLegacyTag1Value"
+            ),
+            CompatibilityTag(
+                "encodedTag2Value",
+                "encodedAndroidLegacyTag2Value",
+                "encodedJSLegacyTag2Value",
+                "encodedIOSLegacyTag2Value"
+            ),
+            CompatibilityTag(
+                "encodedTag3Value",
+                "encodedAndroidLegacyTag3Value",
+                "encodedJSLegacyTag3Value",
+                "encodedIOSLegacyTag3Value"
+            ),
         )
 
         every { compatibilityEncoder.encode(annotations[0]) } returns encodedTags[0]
@@ -301,7 +404,12 @@ class RecordCompatibilityServiceTest {
 
         every {
             tagCryptoService.encryptList(
-                encodedTags[0].copy(second = annotations[0]).toList(),
+                listOf(
+                    encodedTags[0].validEncoding,
+                    annotations[0],
+                    encodedTags[0].jsLegacyEncoding,
+                    encodedTags[0].iosLegacyEncoding
+                ),
                 tagEncryptionKey,
                 "${TaggingContract.ANNOTATION_KEY}${TaggingContract.DELIMITER}"
             )
@@ -309,7 +417,12 @@ class RecordCompatibilityServiceTest {
 
         every {
             tagCryptoService.encryptList(
-                encodedTags[1].copy(second = annotations[1]).toList(),
+                listOf(
+                    encodedTags[1].validEncoding,
+                    annotations[1],
+                    encodedTags[1].jsLegacyEncoding,
+                    encodedTags[1].iosLegacyEncoding
+                ),
                 tagEncryptionKey,
                 "${TaggingContract.ANNOTATION_KEY}${TaggingContract.DELIMITER}"
             )
@@ -317,7 +430,12 @@ class RecordCompatibilityServiceTest {
 
         every {
             tagCryptoService.encryptList(
-                encodedTags[2].copy(second = annotations[2]).toList(),
+                listOf(
+                    encodedTags[2].validEncoding,
+                    annotations[2],
+                    encodedTags[2].jsLegacyEncoding,
+                    encodedTags[2].iosLegacyEncoding
+                ),
                 tagEncryptionKey,
                 "${TaggingContract.ANNOTATION_KEY}${TaggingContract.DELIMITER}"
             )
@@ -329,7 +447,12 @@ class RecordCompatibilityServiceTest {
         // Then
         verify(atMost = 1) {
             tagCryptoService.encryptList(
-                encodedTags[0].copy(second = annotations[0]).toList(),
+                listOf(
+                    encodedTags[0].validEncoding,
+                    annotations[0],
+                    encodedTags[0].jsLegacyEncoding,
+                    encodedTags[0].iosLegacyEncoding
+                ),
                 tagEncryptionKey,
                 "${TaggingContract.ANNOTATION_KEY}${TaggingContract.DELIMITER}"
             )
@@ -337,7 +460,12 @@ class RecordCompatibilityServiceTest {
 
         verify(atMost = 1) {
             tagCryptoService.encryptList(
-                encodedTags[1].copy(second = annotations[1]).toList(),
+                listOf(
+                    encodedTags[1].validEncoding,
+                    annotations[1],
+                    encodedTags[1].jsLegacyEncoding,
+                    encodedTags[1].iosLegacyEncoding
+                ),
                 tagEncryptionKey,
                 "${TaggingContract.ANNOTATION_KEY}${TaggingContract.DELIMITER}"
             )
@@ -345,7 +473,12 @@ class RecordCompatibilityServiceTest {
 
         verify(atMost = 1) {
             tagCryptoService.encryptList(
-                encodedTags[2].copy(second = annotations[2]).toList(),
+                listOf(
+                    encodedTags[2].validEncoding,
+                    annotations[2],
+                    encodedTags[2].jsLegacyEncoding,
+                    encodedTags[2].iosLegacyEncoding
+                ),
                 tagEncryptionKey,
                 "${TaggingContract.ANNOTATION_KEY}${TaggingContract.DELIMITER}"
             )
@@ -361,9 +494,24 @@ class RecordCompatibilityServiceTest {
             "annotation3Value"
         )
         val encodedTags = listOf(
-            Triple("encodedTag1Value", "encodedAndroidLegacyTag1Value", "encodedJSLegacyTag1Value"),
-            Triple("encodedTag2Value", "encodedAndroidLegacyTag2Value", "encodedJSLegacyTag2Value"),
-            Triple("encodedTag3Value", "encodedAndroidLegacyTag3Value", "encodedJSLegacyTag3Value")
+            CompatibilityTag(
+                "encodedTag1Value",
+                "encodedAndroidLegacyTag1Value",
+                "encodedJSLegacyTag1Value",
+                "encodedIOSLegacyTag1Value"
+            ),
+            CompatibilityTag(
+                "encodedTag2Value",
+                "encodedAndroidLegacyTag2Value",
+                "encodedJSLegacyTag2Value",
+                "encodedIOSLegacyTag2Value"
+            ),
+            CompatibilityTag(
+                "encodedTag3Value",
+                "encodedAndroidLegacyTag3Value",
+                "encodedJSLegacyTag3Value",
+                "encodedIOSLegacyTag3Value"
+            ),
         )
         val encryptedGroups = listOf<MutableList<String>>(mockk(), mockk(), mockk())
 
@@ -375,7 +523,12 @@ class RecordCompatibilityServiceTest {
 
         every {
             tagCryptoService.encryptList(
-                encodedTags[0].copy(second = annotations[0]).toList(),
+                listOf(
+                    encodedTags[0].validEncoding,
+                    annotations[0],
+                    encodedTags[0].jsLegacyEncoding,
+                    encodedTags[0].iosLegacyEncoding
+                ),
                 any(),
                 any()
             )
@@ -383,7 +536,12 @@ class RecordCompatibilityServiceTest {
 
         every {
             tagCryptoService.encryptList(
-                encodedTags[1].copy(second = annotations[1]).toList(),
+                listOf(
+                    encodedTags[1].validEncoding,
+                    annotations[1],
+                    encodedTags[1].jsLegacyEncoding,
+                    encodedTags[1].iosLegacyEncoding
+                ),
                 any(),
                 any()
             )
@@ -391,7 +549,12 @@ class RecordCompatibilityServiceTest {
 
         every {
             tagCryptoService.encryptList(
-                encodedTags[2].copy(second = annotations[2]).toList(),
+                listOf(
+                    encodedTags[2].validEncoding,
+                    annotations[2],
+                    encodedTags[2].jsLegacyEncoding,
+                    encodedTags[2].iosLegacyEncoding
+                ),
                 any(),
                 any()
             )

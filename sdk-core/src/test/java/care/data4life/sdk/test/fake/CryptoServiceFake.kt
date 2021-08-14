@@ -165,13 +165,13 @@ class CryptoServiceFake : CryptoContract.Service {
 
     private fun matchEncryptSymKey(
         keyType: KeyType,
-        gckey: GCKey
+        gcKey: GCKey
     ): NetworkModelContract.EncryptedKey {
         return when {
-            keyType == KeyType.DATA_KEY && isDataKey(gckey) -> currentIteration.encryptedDataKey
-            keyType == KeyType.ATTACHMENT_KEY && isAttachmentKey(gckey) -> currentIteration.encryptedAttachmentKey!!
+            keyType == KeyType.DATA_KEY && isDataKey(gcKey) -> currentIteration.encryptedDataKey
+            keyType == KeyType.ATTACHMENT_KEY && isAttachmentKey(gcKey) -> currentIteration.encryptedAttachmentKey!!
             else -> throw RuntimeException(
-                "Unexpected payload for encryptSymmetricKey: $keyType (KeyType) and $gckey (Key)."
+                "Unexpected payload for encryptSymmetricKey: $keyType (KeyType) and $gcKey (Key)."
             )
         }
     }

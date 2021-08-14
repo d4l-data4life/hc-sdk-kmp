@@ -19,6 +19,7 @@ package care.data4life.sdk.migration
 import care.data4life.sdk.migration.MigrationInternalContract.CompatibilityEncoder.Companion.JS_LEGACY_ENCODING_REPLACEMENTS
 import care.data4life.sdk.tag.TagEncoding
 import care.data4life.sdk.tag.TaggingContract
+import care.data4life.sdk.tag.TaggingContract.Companion.LOCALE
 import care.data4life.sdk.wrapper.UrlEncoding
 import care.data4life.sdk.wrapper.WrapperContract
 
@@ -36,17 +37,16 @@ internal object CompatibilityEncoder : MigrationInternalContract.CompatibilityEn
         return result
     }
 
-    override fun encode(tagValue: String): Triple<String, String, String> {
-        val validEncoding = tagEncoding.encode(tagValue)
+    override fun encode(tagValue: String): MigrationInternalContract.CompatibilityTag {
         val kmpLegacyEncoding = tagEncoding.normalize(tagValue)
-        val jsLegacyEncoding = mapJSExceptions(
-            urlEncoding.encode(kmpLegacyEncoding)
-        )
 
-        return Triple(
-            validEncoding,
-            kmpLegacyEncoding, // aka KMPLegacyTags
-            jsLegacyEncoding
+        return MigrationInternalContract.CompatibilityTag(
+            validEncoding = tagEncoding.encode(tagValue),
+            kmpLegacyEncoding = kmpLegacyEncoding,
+            jsLegacyEncoding = mapJSExceptions(
+                urlEncoding.encode(kmpLegacyEncoding)
+            ),
+            iosLegacyEncoding = urlEncoding.encode(tagValue).toUpperCase(LOCALE)
         )
     }
 

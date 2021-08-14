@@ -47,6 +47,13 @@ import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import javax.xml.bind.DatatypeConverter
 
+data class CompatibilityTags(
+    val validEncoding: List<String>,
+    val kmpLegacyEncoding: List<String>,
+    val jsLegacyEncoding: List<String>,
+    val iosLegacyEncoding: List<String>
+)
+
 class RecordServiceModuleTestFlowHelper(
     private val apiService: NetworkingContract.Service,
     private val imageResizer: AttachmentContract.ImageResizer
@@ -94,14 +101,24 @@ class RecordServiceModuleTestFlowHelper(
         return encodedTags
     }
 
+    private fun prepareIOSLegacyTags(tags: Tags): List<String> {
+        val encodedTags = mutableListOf<String>()
+        tags.forEach { (key, value) ->
+            encodedTags.add("${key.toLowerCase()}=${encode(value).toUpperCase()}")
+        }
+
+        return encodedTags
+    }
+
     fun prepareCompatibilityTags(
         tags: Tags
-    ): Triple<List<String>, List<String>, List<String>> {
-        val encodedTags = prepareTags(tags)
-        val androidLegacyTag = tags.map { (key, value) -> prepareAndroidLegacyTag(key, value) }
-        val jsLegacyTags = prepareJSLegacyTags(tags)
-
-        return Triple(encodedTags, androidLegacyTag, jsLegacyTags)
+    ): CompatibilityTags {
+        return CompatibilityTags(
+            validEncoding = prepareTags(tags),
+            kmpLegacyEncoding = tags.map { (key, value) -> prepareAndroidLegacyTag(key, value) },
+            jsLegacyEncoding = prepareJSLegacyTags(tags),
+            iosLegacyEncoding = prepareIOSLegacyTags(tags)
+        )
     }
 
     private fun prepareAndroidLegacyAnnotations(
@@ -116,25 +133,34 @@ class RecordServiceModuleTestFlowHelper(
         annotations: Annotations
     ): List<String> = annotations.map { "custom=${JSLegacyTagConverter.convertTag(encode(it))}" }
 
+    private fun prepareIOSLegacyAnnotations(
+        annotations: Annotations
+    ): List<String> = annotations.map { "custom=${encode(it).toUpperCase()}" }
+
     fun prepareCompatibilityAnnotations(
         annotations: Annotations
-    ): Triple<List<String>, List<String>, List<String>> {
-        val encodedAnnotations = prepareAnnotations(annotations)
-        val legacyAndroidAnnotations = prepareAndroidLegacyAnnotations(annotations)
-        val legacyJSAnnotations = prepareJSLegacyAnnotations(annotations)
-
-        return Triple(encodedAnnotations, legacyAndroidAnnotations, legacyJSAnnotations)
+    ): CompatibilityTags {
+        return CompatibilityTags(
+            validEncoding = prepareAnnotations(annotations),
+            kmpLegacyEncoding = prepareAndroidLegacyAnnotations(annotations),
+            jsLegacyEncoding = prepareJSLegacyAnnotations(annotations),
+            iosLegacyEncoding = prepareIOSLegacyAnnotations(annotations)
+        )
     }
 
     fun mergeTags(
         set1: List<String>,
         set2: List<String>,
-        set3: List<String>? = null
+        set3: List<String>? = null,
+        set4: List<String>? = null
     ): List<String> = mutableListOf<String>().also {
         it.addAll(set1)
         it.addAll(set2)
         if (set3 is List<*>) {
             it.addAll(set3)
+        }
+        if (set4 is List<*>) {
+            it.addAll(set4)
         }
     }
 
@@ -142,7 +168,8 @@ class RecordServiceModuleTestFlowHelper(
         builder: NetworkingContract.SearchTagsBuilder,
         validGroup: List<String>,
         kmpLegacyGroup: List<String>,
-        jsLegacyGroup: List<String>
+        jsLegacyGroup: List<String>,
+        iosLegacyGroup: List<String>,
     ): NetworkingContract.SearchTagsBuilder {
         validGroup.indices.forEach { idx ->
             if (!validGroup[idx].startsWith("client") && !validGroup[idx].startsWith("partner")) {
@@ -150,7 +177,8 @@ class RecordServiceModuleTestFlowHelper(
                     listOf(
                         validGroup[idx],
                         kmpLegacyGroup[idx],
-                        jsLegacyGroup[idx]
+                        jsLegacyGroup[idx],
+                        iosLegacyGroup[idx]
                     )
                 )
             }

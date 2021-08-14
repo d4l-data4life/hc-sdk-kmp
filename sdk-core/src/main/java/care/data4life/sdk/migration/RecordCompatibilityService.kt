@@ -18,6 +18,7 @@ package care.data4life.sdk.migration
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.migration.MigrationInternalContract.CompatibilityTag
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.util.SearchTagsBuilder
 import care.data4life.sdk.tag.Annotations
@@ -28,11 +29,12 @@ import care.data4life.sdk.tag.Tags
 
 private data class OrGroupEntry(
     val key: String,
-    val orGroup: Triple<String, String, String>
+    val orGroup: CompatibilityTag
 )
 
 // see: https://gesundheitscloud.atlassian.net/browse/SDK-572
 // see: https://gesundheitscloud.atlassian.net/browse/SDK-525
+// see: https://gesundheitscloud.atlassian.net/browse/SDK-631
 @Migration("This class should only be used due to migration purpose.")
 class RecordCompatibilityService internal constructor(
     private val cryptoService: CryptoContract.Service,
@@ -40,12 +42,21 @@ class RecordCompatibilityService internal constructor(
     private val compatibilityEncoder: MigrationInternalContract.CompatibilityEncoder = CompatibilityEncoder,
     private val searchTagsBuilderFactory: NetworkingContract.SearchTagsBuilderFactory = SearchTagsBuilder
 ) : MigrationContract.CompatibilityService {
+    private fun compatibilityTagsToList(tag: CompatibilityTag): List<String> {
+        return listOf(
+            tag.validEncoding,
+            tag.kmpLegacyEncoding,
+            tag.jsLegacyEncoding,
+            tag.iosLegacyEncoding
+        )
+    }
+
     private fun encryptTags(
         tagEncryptionKey: GCKey,
         tagGroupEntry: OrGroupEntry
     ): List<String> {
         return tagCryptoService.encryptList(
-            tagGroupEntry.orGroup.toList(),
+            compatibilityTagsToList(tagGroupEntry.orGroup),
             tagEncryptionKey,
             tagGroupEntry.key
         )
@@ -75,7 +86,7 @@ class RecordCompatibilityService internal constructor(
         return annotations.map { annotation ->
             OrGroupEntry(
                 ANNOTATION_KEY + DELIMITER,
-                compatibilityEncoder.encode(annotation).copy(second = annotation)
+                compatibilityEncoder.encode(annotation).copy(kmpLegacyEncoding = annotation)
             )
         }.map { encodedTagGroup ->
             encryptTags(

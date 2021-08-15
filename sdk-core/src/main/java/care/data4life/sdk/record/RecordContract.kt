@@ -92,7 +92,7 @@ interface RecordContract {
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int,
-            timeSearchParameter: SdkContract.TimeSearchParameter? = null
+            creationDateRange: SdkContract.CreationDateRange? = null
         ): Single<List<DataRecord<DataResource>>>
 
         fun <T : Fhir3Resource> fetchFhir3Records(
@@ -103,7 +103,7 @@ interface RecordContract {
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int,
-            timeSearchParameter: SdkContract.TimeSearchParameter? = null
+            creationDateRange: SdkContract.CreationDateRange? = null
         ): Single<List<Record<T>>>
 
         fun <T : Fhir4Resource> fetchFhir4Records(
@@ -114,7 +114,7 @@ interface RecordContract {
             endDate: LocalDate?,
             pageSize: Int,
             offset: Int,
-            timeSearchParameter: SdkContract.TimeSearchParameter? = null
+            creationDateRange: SdkContract.CreationDateRange? = null
         ): Single<List<Fhir4Record<T>>>
 
         fun countFhir3Records(

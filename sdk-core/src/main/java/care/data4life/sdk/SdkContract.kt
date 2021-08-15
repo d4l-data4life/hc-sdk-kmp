@@ -32,11 +32,14 @@ import care.data4life.sdk.listener.ResultListener as LegacyListener
 
 interface SdkContract {
 
-    data class TimeSearchParameter(
+    data class CreationDateRange(
         val startDate: LocalDate?,
         val endDate: LocalDate?,
-        val startUpdatedDate: LocalDateTime?,
-        val endUpdatedDate: LocalDateTime?
+    )
+
+    data class UpdateDateTimeRange(
+        val startDateTime: LocalDateTime?,
+        val endDateTime: LocalDateTime?
     )
 
     interface Client {

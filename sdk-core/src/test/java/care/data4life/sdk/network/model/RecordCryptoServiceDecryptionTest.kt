@@ -20,6 +20,7 @@ import care.data4life.crypto.GCKey
 import care.data4life.crypto.GCKeyPair
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.date.DateHelperContract
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
@@ -34,7 +35,6 @@ import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
-import care.data4life.sdk.wrapper.WrapperContract
 import io.mockk.Runs
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -57,7 +57,7 @@ class RecordCryptoServiceDecryptionTest {
     private val taggingService: TaggingContract.Service = mockk()
     private val tagCryptoService: TaggingContract.CryptoService = mockk()
     private val resourceCryptoService: FhirContract.CryptoService = mockk()
-    private val dateTimeFormatter: WrapperContract.DateTimeFormatter = mockk()
+    private val dateTimeFormatter: DateHelperContract.DateTimeFormatter = mockk()
     private val limitGuard: NetworkModelContract.LimitGuard = mockk()
     private val modelVersion: ModelContract.ModelVersion = mockk()
 

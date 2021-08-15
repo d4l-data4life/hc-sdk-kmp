@@ -27,6 +27,7 @@ import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.date.DateHelperContract
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Attachment
@@ -68,7 +69,7 @@ import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.MimeType
 import care.data4life.sdk.util.MimeType.Companion.recognizeMimeType
 import care.data4life.sdk.wrapper.SdkAttachmentFactory
-import care.data4life.sdk.wrapper.SdkDateTimeFormatter
+import care.data4life.sdk.date.SdkDateTimeFormatter
 import care.data4life.sdk.wrapper.SdkFhirAttachmentHelper
 import care.data4life.sdk.wrapper.SdkIdentifierFactory
 import care.data4life.sdk.wrapper.WrapperContract
@@ -131,7 +132,7 @@ class RecordService internal constructor(
     private val fhirAttachmentHelper: WrapperInternalContract.FhirAttachmentHelper = SdkFhirAttachmentHelper
     private val attachmentFactory: WrapperInternalContract.AttachmentFactory = SdkAttachmentFactory
     private val identifierFactory: WrapperInternalContract.IdentifierFactory = SdkIdentifierFactory
-    private val dateTimeFormatter: WrapperContract.DateTimeFormatter = SdkDateTimeFormatter
+    private val dateTimeFormatter: DateHelperContract.DateTimeFormatter = SdkDateTimeFormatter
     private val attachmentGuardian: AttachmentContract.Guardian = AttachmentGuardian
     private val attachmentHash: AttachmentContract.Hasher = AttachmentHasher
 
@@ -356,7 +357,7 @@ class RecordService internal constructor(
         endDate: LocalDate?,
         pageSize: Int,
         offset: Int,
-        timeSearchParameter: SdkContract.TimeSearchParameter?
+        creationDateRange: SdkContract.CreationDateRange?
     ): Single<List<Record<T>>> = searchRecords(
         userId,
         resourceType,
@@ -376,7 +377,7 @@ class RecordService internal constructor(
         endDate: LocalDate?,
         pageSize: Int,
         offset: Int,
-        timeSearchParameter: SdkContract.TimeSearchParameter?
+        creationDateRange: SdkContract.CreationDateRange?
     ): Single<List<Fhir4Record<T>>> = searchRecords(
         userId,
         resourceType,
@@ -395,7 +396,7 @@ class RecordService internal constructor(
         endDate: LocalDate?,
         pageSize: Int,
         offset: Int,
-        timeSearchParameter: SdkContract.TimeSearchParameter?
+        creationDateRange: SdkContract.CreationDateRange?
     ): Single<List<DataRecord<DataResource>>> = searchRecords(
         userId,
         DataResource::class.java,

@@ -21,13 +21,9 @@ import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
-import care.data4life.sdk.model.ModelContract
-import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
-import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalDateTime
 
 // TODO restructure this
-class WrapperContract {
+interface WrapperContract {
 
     interface Attachment {
         var id: String?
@@ -55,18 +51,6 @@ class WrapperContract {
 
         @Throws(FhirException::class)
         fun fromResource(resource: Any): String
-    }
-
-    interface DateTimeFormatter {
-        fun now(): String
-        fun formatDate(date: LocalDate): String
-        fun formatDateTime(dateTime: LocalDateTime): String
-        fun buildMeta(record: DecryptedBaseRecord<*>): ModelContract.Meta
-
-        companion object {
-            const val DATE_FORMAT = "yyyy-MM-dd"
-            const val DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss[.SSS]"
-        }
     }
 
     // TODO: Move that to kmp utils repo

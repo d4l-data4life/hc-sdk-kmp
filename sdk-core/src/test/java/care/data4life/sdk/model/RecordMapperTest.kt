@@ -31,7 +31,7 @@ import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.Tags
-import care.data4life.sdk.wrapper.SdkDateTimeFormatter
+import care.data4life.sdk.date.SdkDateTimeFormatter
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject

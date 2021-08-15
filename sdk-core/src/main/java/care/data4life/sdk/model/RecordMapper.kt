@@ -27,7 +27,7 @@ import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedCustomDataRecord
 import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedFhir3Record
 import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedFhir4Record
-import care.data4life.sdk.wrapper.SdkDateTimeFormatter
+import care.data4life.sdk.date.SdkDateTimeFormatter
 
 internal object RecordMapper : RecordFactory {
 

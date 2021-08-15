@@ -41,7 +41,7 @@ import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.PARTNER_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.RECORD_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
-import care.data4life.sdk.wrapper.SdkDateTimeFormatter
+import care.data4life.sdk.date.SdkDateTimeFormatter
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk

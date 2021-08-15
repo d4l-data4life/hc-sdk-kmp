@@ -20,6 +20,7 @@ import care.data4life.crypto.GCKey
 import care.data4life.crypto.KeyType
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.date.DateHelperContract
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
@@ -31,7 +32,6 @@ import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.Tags
-import care.data4life.sdk.wrapper.WrapperContract
 
 class RecordCryptoService(
     private val alias: String,
@@ -41,7 +41,7 @@ class RecordCryptoService(
     private val guard: NetworkModelContract.LimitGuard,
     private val cryptoService: CryptoContract.Service,
     private val resourceCryptoService: FhirContract.CryptoService,
-    private val dateTimeFormatter: WrapperContract.DateTimeFormatter,
+    private val dateTimeFormatter: DateHelperContract.DateTimeFormatter,
     private val modelVersion: ModelContract.ModelVersion
 ) : NetworkModelContract.CryptoService {
     private fun <T : Fhir3Resource> buildFhir3Record(

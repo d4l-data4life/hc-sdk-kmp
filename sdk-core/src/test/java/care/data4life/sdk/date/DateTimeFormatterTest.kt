@@ -14,7 +14,7 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sdk.wrapper
+package care.data4life.sdk.date
 
 import care.data4life.sdk.network.model.DecryptedDataRecord
 import care.data4life.sdk.network.model.DecryptedR4Record
@@ -48,7 +48,7 @@ class DateTimeFormatterTest {
     @Test
     fun `It fulfills DateTimeFormatter`() {
         val formatter: Any = SdkDateTimeFormatter
-        assertTrue(formatter is WrapperContract.DateTimeFormatter)
+        assertTrue(formatter is DateHelperContract.DateTimeFormatter)
     }
 
     @Test

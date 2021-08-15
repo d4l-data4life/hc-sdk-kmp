@@ -96,6 +96,7 @@ interface HealthCloudApi {
         @Query("end_date") endDate: String?,
         @Query("start_updated_date") startUpdatedDate: String?,
         @Query("end_updated_date") endUpdatedDate: String?,
+        @Query("include_deleted") includeDeletedRecords: Boolean?,
         @Query("limit") pageSize: Int,
         @Query("offset") offset: Int,
         @Query("tags") tags: String

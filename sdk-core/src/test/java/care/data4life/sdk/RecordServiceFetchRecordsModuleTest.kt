@@ -308,6 +308,7 @@ class RecordServiceFetchRecordsModuleTest {
                 endDate,
                 null,
                 null,
+                false,
                 pageSize,
                 offset,
                 capture(search)

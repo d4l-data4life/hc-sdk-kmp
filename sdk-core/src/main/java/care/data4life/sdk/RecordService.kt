@@ -317,6 +317,7 @@ class RecordService internal constructor(
                     endTime,
                     null,
                     null,
+                    false,
                     pageSize,
                     offset,
                     tags

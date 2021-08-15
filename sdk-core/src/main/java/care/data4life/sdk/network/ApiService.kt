@@ -131,6 +131,7 @@ class ApiService @JvmOverloads constructor(
         endDate: String?,
         startUpdateDate: String?,
         endUpdateDate: String?,
+        includeDeletedRecords: Boolean?,
         pageSize: Int,
         offset: Int,
         tags: NetworkingContract.SearchTags
@@ -142,6 +143,7 @@ class ApiService @JvmOverloads constructor(
             endDate,
             startUpdateDate,
             endUpdateDate,
+            includeDeletedRecords,
             pageSize,
             offset,
             tags.tagGroups

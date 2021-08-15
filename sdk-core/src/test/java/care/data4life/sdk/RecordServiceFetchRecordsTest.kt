@@ -358,6 +358,7 @@ class RecordServiceFetchRecordsTest {
                 null,
                 null,
                 null,
+                false,
                 pageSize,
                 offset,
                 searchTags
@@ -421,6 +422,7 @@ class RecordServiceFetchRecordsTest {
                 null,
                 null,
                 null,
+                false,
                 pageSize,
                 offset,
                 searchTags
@@ -495,6 +497,7 @@ class RecordServiceFetchRecordsTest {
                 end,
                 null,
                 null,
+                false,
                 pageSize,
                 offset,
                 searchTags
@@ -561,6 +564,7 @@ class RecordServiceFetchRecordsTest {
                 end,
                 null,
                 null,
+                false,
                 pageSize,
                 offset,
                 searchTags
@@ -624,6 +628,7 @@ class RecordServiceFetchRecordsTest {
                 null,
                 null,
                 null,
+                false,
                 pageSize,
                 offset,
                 searchTags
@@ -681,6 +686,7 @@ class RecordServiceFetchRecordsTest {
                 null,
                 null,
                 null,
+                false,
                 pageSize,
                 offset,
                 searchTags
@@ -755,6 +761,7 @@ class RecordServiceFetchRecordsTest {
                 end,
                 null,
                 null,
+                false,
                 pageSize,
                 offset,
                 searchTags
@@ -822,6 +829,7 @@ class RecordServiceFetchRecordsTest {
                 end,
                 null,
                 null,
+                false,
                 pageSize,
                 offset,
                 searchTags

@@ -268,6 +268,7 @@ class ApiServiceTest {
         val endDate = "somewhen else"
         val startUpdateDate = "range start"
         val endUpdateDate = "range end"
+        val deletionFlag = true
         val pageSize = 23
         val offset = 42
         val formattedTags = "tags"
@@ -282,6 +283,7 @@ class ApiServiceTest {
                 endDate,
                 startUpdateDate,
                 endUpdateDate,
+                deletionFlag,
                 pageSize,
                 offset,
                 formattedTags
@@ -298,6 +300,7 @@ class ApiServiceTest {
             endDate,
             startUpdateDate,
             endUpdateDate,
+            deletionFlag,
             pageSize,
             offset,
             tags
@@ -317,6 +320,7 @@ class ApiServiceTest {
                 endDate,
                 startUpdateDate,
                 endUpdateDate,
+                deletionFlag,
                 pageSize,
                 offset,
                 formattedTags

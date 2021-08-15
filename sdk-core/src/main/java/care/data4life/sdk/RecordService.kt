@@ -315,6 +315,8 @@ class RecordService internal constructor(
                     userId,
                     startTime,
                     endTime,
+                    null,
+                    null,
                     pageSize,
                     offset,
                     tags
@@ -352,7 +354,8 @@ class RecordService internal constructor(
         startDate: LocalDate?,
         endDate: LocalDate?,
         pageSize: Int,
-        offset: Int
+        offset: Int,
+        timeSearchParameter: SdkContract.TimeSearchParameter?
     ): Single<List<Record<T>>> = searchRecords(
         userId,
         resourceType,
@@ -371,7 +374,8 @@ class RecordService internal constructor(
         startDate: LocalDate?,
         endDate: LocalDate?,
         pageSize: Int,
-        offset: Int
+        offset: Int,
+        timeSearchParameter: SdkContract.TimeSearchParameter?
     ): Single<List<Fhir4Record<T>>> = searchRecords(
         userId,
         resourceType,
@@ -389,7 +393,8 @@ class RecordService internal constructor(
         startDate: LocalDate?,
         endDate: LocalDate?,
         pageSize: Int,
-        offset: Int
+        offset: Int,
+        timeSearchParameter: SdkContract.TimeSearchParameter?
     ): Single<List<DataRecord<DataResource>>> = searchRecords(
         userId,
         DataResource::class.java,

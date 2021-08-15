@@ -356,6 +356,8 @@ class RecordServiceFetchRecordsTest {
                 USER_ID,
                 null,
                 null,
+                null,
+                null,
                 pageSize,
                 offset,
                 searchTags
@@ -415,6 +417,8 @@ class RecordServiceFetchRecordsTest {
             apiService.searchRecords(
                 ALIAS,
                 USER_ID,
+                null,
+                null,
                 null,
                 null,
                 pageSize,
@@ -489,6 +493,8 @@ class RecordServiceFetchRecordsTest {
                 USER_ID,
                 start,
                 end,
+                null,
+                null,
                 pageSize,
                 offset,
                 searchTags
@@ -553,6 +559,8 @@ class RecordServiceFetchRecordsTest {
                 USER_ID,
                 start,
                 end,
+                null,
+                null,
                 pageSize,
                 offset,
                 searchTags
@@ -614,6 +622,8 @@ class RecordServiceFetchRecordsTest {
                 USER_ID,
                 null,
                 null,
+                null,
+                null,
                 pageSize,
                 offset,
                 searchTags
@@ -667,6 +677,8 @@ class RecordServiceFetchRecordsTest {
             apiService.searchRecords(
                 ALIAS,
                 USER_ID,
+                null,
+                null,
                 null,
                 null,
                 pageSize,
@@ -741,6 +753,8 @@ class RecordServiceFetchRecordsTest {
                 USER_ID,
                 start,
                 end,
+                null,
+                null,
                 pageSize,
                 offset,
                 searchTags
@@ -806,6 +820,8 @@ class RecordServiceFetchRecordsTest {
                 USER_ID,
                 start,
                 end,
+                null,
+                null,
                 pageSize,
                 offset,
                 searchTags

@@ -59,6 +59,8 @@ interface NetworkingContract {
             userId: String,
             startDate: String?,
             endDate: String?,
+            startUpdateDate: String?,
+            endUpdateDate: String?,
             pageSize: Int,
             offset: Int,
             tags: SearchTags

@@ -306,6 +306,8 @@ class RecordServiceFetchRecordsModuleTest {
                 USER_ID,
                 startDate,
                 endDate,
+                null,
+                null,
                 pageSize,
                 offset,
                 capture(search)

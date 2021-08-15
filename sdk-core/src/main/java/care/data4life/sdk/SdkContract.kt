@@ -26,10 +26,18 @@ import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.tag.Annotations
 import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 import care.data4life.sdk.listener.Callback as LegacyCallback
 import care.data4life.sdk.listener.ResultListener as LegacyListener
 
 interface SdkContract {
+
+    data class TimeSearchParameter(
+        val startDate: LocalDate?,
+        val endDate: LocalDate?,
+        val startUpdatedDate: LocalDateTime?,
+        val endUpdatedDate: LocalDateTime?
+    )
 
     interface Client {
         val userId: String

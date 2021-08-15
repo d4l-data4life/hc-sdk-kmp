@@ -370,6 +370,8 @@ class ApiServiceModuleTest {
         val userId = USER_ID
         val startDate = "somewhen"
         val endDate = "somewhen else"
+        val startUpdateDate = "range start"
+        val endUpdateDate = "range end"
         val pageSize = 23
         val offset = 42
         val formattedTags = "tag1,tag2,tag3"
@@ -404,6 +406,8 @@ class ApiServiceModuleTest {
             userId,
             startDate,
             endDate,
+            startUpdateDate,
+            endUpdateDate,
             pageSize,
             offset,
             tags
@@ -437,6 +441,14 @@ class ApiServiceModuleTest {
         assertEquals(
             actual = request.requestUrl?.queryParameter("end_date"),
             expected = endDate
+        )
+        assertEquals(
+            actual = request.requestUrl?.queryParameter("start_updated_date"),
+            expected = startUpdateDate
+        )
+        assertEquals(
+            actual = request.requestUrl?.queryParameter("end_updated_date"),
+            expected = endUpdateDate
         )
         assertEquals(
             actual = request.requestUrl?.queryParameter("limit"),

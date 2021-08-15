@@ -16,6 +16,7 @@
 
 package care.data4life.sdk.record
 
+import care.data4life.sdk.SdkContract
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.data.DataResource
@@ -90,7 +91,8 @@ interface RecordContract {
             startDate: LocalDate?,
             endDate: LocalDate?,
             pageSize: Int,
-            offset: Int
+            offset: Int,
+            timeSearchParameter: SdkContract.TimeSearchParameter? = null
         ): Single<List<DataRecord<DataResource>>>
 
         fun <T : Fhir3Resource> fetchFhir3Records(
@@ -100,7 +102,8 @@ interface RecordContract {
             startDate: LocalDate?,
             endDate: LocalDate?,
             pageSize: Int,
-            offset: Int
+            offset: Int,
+            timeSearchParameter: SdkContract.TimeSearchParameter? = null
         ): Single<List<Record<T>>>
 
         fun <T : Fhir4Resource> fetchFhir4Records(
@@ -110,7 +113,8 @@ interface RecordContract {
             startDate: LocalDate?,
             endDate: LocalDate?,
             pageSize: Int,
-            offset: Int
+            offset: Int,
+            timeSearchParameter: SdkContract.TimeSearchParameter? = null
         ): Single<List<Fhir4Record<T>>>
 
         fun countFhir3Records(

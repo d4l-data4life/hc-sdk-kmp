@@ -129,6 +129,8 @@ class ApiService @JvmOverloads constructor(
         userId: String,
         startDate: String?,
         endDate: String?,
+        startUpdateDate: String?,
+        endUpdateDate: String?,
         pageSize: Int,
         offset: Int,
         tags: NetworkingContract.SearchTags
@@ -138,6 +140,8 @@ class ApiService @JvmOverloads constructor(
             userId,
             startDate,
             endDate,
+            startUpdateDate,
+            endUpdateDate,
             pageSize,
             offset,
             tags.tagGroups

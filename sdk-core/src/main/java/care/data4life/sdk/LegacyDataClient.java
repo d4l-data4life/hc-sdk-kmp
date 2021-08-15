@@ -193,7 +193,8 @@ public class LegacyDataClient implements SdkContract.LegacyDataClient {
                         startDate,
                         endDate,
                         pageSize,
-                        offset
+                        offset,
+                        null
                 ));
         return handler.executeSingle(operation, listener);
     }

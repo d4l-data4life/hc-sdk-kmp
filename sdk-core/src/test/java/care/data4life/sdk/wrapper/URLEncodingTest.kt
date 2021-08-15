@@ -20,7 +20,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class UrlEncodingTest {
+class URLEncodingTest {
     @Test
     fun `It fulfils URLEncoding`() {
         val encoding: Any = UrlEncoding

@@ -24,6 +24,7 @@ import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 
 // TODO restructure this
 class WrapperContract {
@@ -58,7 +59,8 @@ class WrapperContract {
 
     interface DateTimeFormatter {
         fun now(): String
-        fun formatDate(dateTime: LocalDate): String
+        fun formatDate(date: LocalDate): String
+        fun formatDateTime(dateTime: LocalDateTime): String
         fun buildMeta(record: DecryptedBaseRecord<*>): ModelContract.Meta
 
         companion object {

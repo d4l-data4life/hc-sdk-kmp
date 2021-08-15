@@ -34,11 +34,16 @@ internal object SdkDateTimeFormatter : WrapperContract.DateTimeFormatter {
         .parseLenient()
         .appendPattern(DATE_TIME_FORMAT)
         .toFormatter(Locale.US)
-    val UTC_ZONE_ID = ZoneId.of("UTC")
+    val UTC_ZONE_ID: ZoneId = ZoneId.of("UTC")
+    private val UTC_DATE_TIME_FORMATTING: DateTimeFormatter = DATE_TIME_FORMATTER.withZone(UTC_ZONE_ID)
 
     override fun now(): String = formatDate(LocalDate.now(UTC_ZONE_ID))
 
-    override fun formatDate(dateTime: LocalDate): String = DATE_FORMATTER.format(dateTime)
+    override fun formatDate(date: LocalDate): String = DATE_FORMATTER.format(date)
+
+    override fun formatDateTime(
+        dateTime: LocalDateTime
+    ): String = "${UTC_DATE_TIME_FORMATTING.format(dateTime)}Z"
 
     override fun buildMeta(
         record: DecryptedBaseRecord<*>

@@ -67,6 +67,29 @@ class DateTimeFormatterTest {
     }
 
     @Test
+    fun `Given, formatDateTime is called with a LocalDateTime, it serializes the given date in a preset pattern`() {
+        // Given
+        val dateTime = LocalDateTime.of(
+            2020,
+            2,
+            4,
+            11,
+            34,
+            2,
+            278000000
+        )
+
+        // When
+        val actual = SdkDateTimeFormatter.formatDateTime(dateTime)
+
+        // Then
+        assertEquals(
+            expected = "2020-02-04T11:34:02.278Z",
+            actual = actual
+        )
+    }
+
+    @Test
     fun `Given now is called, it returns the formatted date for now`() {
         // Given
         every {

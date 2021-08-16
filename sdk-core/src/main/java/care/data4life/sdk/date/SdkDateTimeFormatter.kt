@@ -18,9 +18,6 @@ package care.data4life.sdk.date
 
 import care.data4life.sdk.date.DateHelperContract.DateTimeFormatter.Companion.DATE_FORMAT
 import care.data4life.sdk.date.DateHelperContract.DateTimeFormatter.Companion.DATE_TIME_FORMAT
-import care.data4life.sdk.model.Meta
-import care.data4life.sdk.model.ModelContract
-import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
@@ -52,11 +49,4 @@ internal object SdkDateTimeFormatter : DateHelperContract.DateTimeFormatter {
     override fun parseDateTime(
         dateTime: String
     ): LocalDateTime = LocalDateTime.parse(dateTime, DATE_TIME_FORMATTER)
-
-    override fun buildMeta(
-        record: DecryptedBaseRecord<*>
-    ): ModelContract.Meta = Meta(
-        LocalDate.parse(record.customCreationDate, DATE_FORMATTER),
-        LocalDateTime.parse(record.updatedDate, DATE_TIME_FORMATTER)
-    )
 }

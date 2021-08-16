@@ -17,8 +17,6 @@
 package care.data4life.sdk.date
 
 import care.data4life.sdk.SdkContract
-import care.data4life.sdk.model.ModelContract
-import care.data4life.sdk.network.model.NetworkModelContract
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 
@@ -34,8 +32,6 @@ interface DateHelperContract {
         fun formatDateTime(dateTime: LocalDateTime): String
         fun parseDate(date: String): LocalDate
         fun parseDateTime(dateTime: String): LocalDateTime
-
-        fun buildMeta(record: NetworkModelContract.DecryptedBaseRecord<*>): ModelContract.Meta
 
         companion object {
             const val DATE_FORMAT = "yyyy-MM-dd"

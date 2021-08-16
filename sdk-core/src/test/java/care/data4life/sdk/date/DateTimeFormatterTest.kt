@@ -16,11 +16,7 @@
 
 package care.data4life.sdk.date
 
-import care.data4life.sdk.network.model.DecryptedDataRecord
-import care.data4life.sdk.network.model.DecryptedR4Record
-import care.data4life.sdk.network.model.DecryptedRecord
 import io.mockk.every
-import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
 import io.mockk.verify
@@ -109,69 +105,6 @@ class DateTimeFormatterTest {
     }
 
     @Test
-    fun `Given, buildMeta is called with a DecryptedFhir3Record, it returns a Meta object`() {
-        // Given
-        val creationDate = "2020-05-03"
-        val updateDate = "2020-05-03T07:45:08.234123"
-        val record: DecryptedRecord<*> = mockk()
-
-        every { record.customCreationDate } returns creationDate
-        every { record.updatedDate } returns updateDate
-
-        // When
-        val actual = SdkDateTimeFormatter.buildMeta(record)
-
-        // Then
-        assertEquals(
-            expected = LocalDate.of(2020, 5, 3),
-            actual = actual.createdDate
-        )
-
-        assertEquals(
-            expected = LocalDateTime.of(2020, 5, 3, 7, 45, 8, 234123000),
-            actual = actual.updatedDate
-        )
-    }
-
-    @Test
-    fun `Given, buildMeta is called with a DecryptedFhir43Record, it returns a Meta object`() {
-        // Given
-        val creationDate = "2020-05-03"
-        val updateDate = "2020-05-03T07:45:08.234123"
-        val record: DecryptedR4Record<*> = mockk()
-
-        every { record.customCreationDate } returns creationDate
-        every { record.updatedDate } returns updateDate
-
-        // When
-        val actual = SdkDateTimeFormatter.buildMeta(record)
-
-        // Then
-        assertEquals(
-            expected = LocalDate.of(2020, 5, 3),
-            actual = actual.createdDate
-        )
-
-        assertEquals(
-            expected = LocalDateTime.of(2020, 5, 3, 7, 45, 8, 234123000),
-            actual = actual.updatedDate
-        )
-
-        verify(exactly = 1) {
-            LocalDate.parse(
-                creationDate,
-                SdkDateTimeFormatter.DATE_FORMATTER
-            )
-        }
-        verify(exactly = 1) {
-            LocalDateTime.parse(
-                updateDate,
-                SdkDateTimeFormatter.DATE_TIME_FORMATTER
-            )
-        }
-    }
-
-    @Test
     fun `Given, parseDate is called with a String, it returns a LocalDate`() {
         // Given
         val date = "2020-05-03"
@@ -210,44 +143,6 @@ class DateTimeFormatterTest {
         verify(exactly = 1) {
             LocalDateTime.parse(
                 dateTime,
-                SdkDateTimeFormatter.DATE_TIME_FORMATTER
-            )
-        }
-    }
-
-    @Test
-    fun `Given, buildMeta is called with a DecryptedDataRecord, it returns a Meta object`() {
-        // Given
-        val creationDate = "2020-05-03"
-        val updateDate = "2020-05-03T07:45:08.234123"
-        val record: DecryptedDataRecord = mockk()
-
-        every { record.customCreationDate } returns creationDate
-        every { record.updatedDate } returns updateDate
-
-        // When
-        val actual = SdkDateTimeFormatter.buildMeta(record)
-
-        // Then
-        assertEquals(
-            expected = LocalDate.of(2020, 5, 3),
-            actual = actual.createdDate
-        )
-
-        assertEquals(
-            expected = LocalDateTime.of(2020, 5, 3, 7, 45, 8, 234123000),
-            actual = actual.updatedDate
-        )
-
-        verify(exactly = 1) {
-            LocalDate.parse(
-                creationDate,
-                SdkDateTimeFormatter.DATE_FORMATTER
-            )
-        }
-        verify(exactly = 1) {
-            LocalDateTime.parse(
-                updateDate,
                 SdkDateTimeFormatter.DATE_TIME_FORMATTER
             )
         }

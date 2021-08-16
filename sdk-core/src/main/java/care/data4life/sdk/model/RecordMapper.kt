@@ -30,6 +30,12 @@ import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedFh
 import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedFhir4Record
 
 internal object RecordMapper : RecordFactory {
+    private fun buildMeta(record: DecryptedBaseRecord<*>): Meta {
+        return Meta(
+            SdkDateTimeFormatter.parseDate(record.customCreationDate!!),
+            SdkDateTimeFormatter.parseDateTime(record.updatedDate!!)
+        )
+    }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun <T : Any> getInstance(record: DecryptedBaseRecord<T>): BaseRecord<T> {
@@ -37,19 +43,19 @@ internal object RecordMapper : RecordFactory {
         return when (record) {
             is DecryptedFhir3Record -> Record(
                 record.resource as Fhir3Resource,
-                SdkDateTimeFormatter.buildMeta(record),
+                buildMeta(record),
                 record.annotations
             )
             is DecryptedFhir4Record -> Fhir4Record(
                 record.identifier ?: "", // FIXME
                 record.resource as Fhir4Resource,
-                SdkDateTimeFormatter.buildMeta(record),
+                buildMeta(record),
                 record.annotations
             )
             is DecryptedCustomDataRecord -> DataRecord(
                 record.identifier ?: "", // FIXME
                 record.resource,
-                SdkDateTimeFormatter.buildMeta(record),
+                buildMeta(record),
                 record.annotations
             )
             else -> throw CoreRuntimeException.InternalFailure()

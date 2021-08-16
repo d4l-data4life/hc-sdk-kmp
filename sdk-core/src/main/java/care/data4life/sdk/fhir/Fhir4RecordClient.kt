@@ -26,7 +26,6 @@ import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.Annotations
 import io.reactivex.Single
-import org.threeten.bp.LocalDate
 
 internal class Fhir4RecordClient(
     private val userService: AuthContract.UserService,
@@ -74,19 +73,19 @@ internal class Fhir4RecordClient(
     override fun <T : Fhir4Resource> search(
         resourceType: Class<T>,
         annotations: Annotations,
-        startDate: LocalDate?,
-        endDate: LocalDate?,
+        creationDateRange: SdkContract.CreationDateRange,
+        updateDateTimeRange: SdkContract.UpdateDateTimeRange,
         pageSize: Int,
         offset: Int,
         callback: Callback<List<Fhir4Record<T>>>
     ): Task = executeOperationFlow(
         { userId ->
-            recordService.fetchFhir4Records(
+            recordService.searchFhir4Records(
                 userId,
                 resourceType,
                 annotations,
-                startDate,
-                endDate,
+                creationDateRange,
+                updateDateTimeRange,
                 pageSize,
                 offset
             )

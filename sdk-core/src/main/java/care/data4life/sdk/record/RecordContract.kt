@@ -29,7 +29,6 @@ import care.data4life.sdk.model.Record
 import care.data4life.sdk.tag.Annotations
 import io.reactivex.Completable
 import io.reactivex.Single
-import org.threeten.bp.LocalDate
 
 interface RecordContract {
     interface Service {
@@ -74,7 +73,6 @@ interface RecordContract {
 
         fun deleteRecord(userId: String, recordId: String): Completable
 
-        fun fetchDataRecord(userId: String, recordId: String): Single<DataRecord<DataResource>>
         fun <T : Fhir3Resource> fetchFhir3Record(
             userId: String,
             recordId: String
@@ -85,37 +83,36 @@ interface RecordContract {
             recordId: String
         ): Single<Fhir4Record<T>>
 
-        fun fetchDataRecords(
-            userId: String,
-            annotations: Annotations,
-            startDate: LocalDate?,
-            endDate: LocalDate?,
-            pageSize: Int,
-            offset: Int,
-            creationDateRange: SdkContract.CreationDateRange? = null
-        ): Single<List<DataRecord<DataResource>>>
+        fun fetchDataRecord(userId: String, recordId: String): Single<DataRecord<DataResource>>
 
-        fun <T : Fhir3Resource> fetchFhir3Records(
+        fun <T : Fhir3Resource> searchFhir3Records(
             userId: String,
             resourceType: Class<T>,
             annotations: Annotations,
-            startDate: LocalDate?,
-            endDate: LocalDate?,
+            creationDateRange: SdkContract.CreationDateRange?,
+            updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
             pageSize: Int,
             offset: Int,
-            creationDateRange: SdkContract.CreationDateRange? = null
         ): Single<List<Record<T>>>
 
-        fun <T : Fhir4Resource> fetchFhir4Records(
+        fun <T : Fhir4Resource> searchFhir4Records(
             userId: String,
             resourceType: Class<T>,
             annotations: Annotations,
-            startDate: LocalDate?,
-            endDate: LocalDate?,
+            creationDateRange: SdkContract.CreationDateRange?,
+            updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
             pageSize: Int,
             offset: Int,
-            creationDateRange: SdkContract.CreationDateRange? = null
         ): Single<List<Fhir4Record<T>>>
+
+        fun searchDataRecords(
+            userId: String,
+            annotations: Annotations,
+            creationDateRange: SdkContract.CreationDateRange?,
+            updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
+            pageSize: Int,
+            offset: Int,
+        ): Single<List<DataRecord<DataResource>>>
 
         fun countFhir3Records(
             type: Class<out Fhir3Resource>,

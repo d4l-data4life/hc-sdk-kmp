@@ -28,6 +28,7 @@ import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.date.DateHelperContract
+import care.data4life.sdk.date.DateResolver
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Attachment
@@ -77,7 +78,6 @@ import care.data4life.sdk.wrapper.WrapperInternalContract
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import org.threeten.bp.LocalDate
 
 // TODO internal
 // TODO add Factory
@@ -132,7 +132,7 @@ class RecordService internal constructor(
     private val fhirAttachmentHelper: WrapperInternalContract.FhirAttachmentHelper = SdkFhirAttachmentHelper
     private val attachmentFactory: WrapperInternalContract.AttachmentFactory = SdkAttachmentFactory
     private val identifierFactory: WrapperInternalContract.IdentifierFactory = SdkIdentifierFactory
-    private val dateTimeFormatter: DateHelperContract.DateTimeFormatter = SdkDateTimeFormatter
+    private val dateResolver: DateHelperContract.DateResolver = DateResolver
     private val attachmentGuardian: AttachmentContract.Guardian = AttachmentGuardian
     private val attachmentHash: AttachmentContract.Hasher = AttachmentHasher
 
@@ -295,13 +295,13 @@ class RecordService internal constructor(
         userId: String,
         resourceType: Class<T>,
         annotations: Annotations,
-        startDate: LocalDate?,
-        endDate: LocalDate?,
+        creationDate: SdkContract.CreationDateRange?,
+        updateDateTime: SdkContract.UpdateDateTimeRange?,
         pageSize: Int,
         offset: Int
     ): Single<List<BaseRecord<T>>> {
-        val startTime = if (startDate != null) dateTimeFormatter.formatDate(startDate) else null
-        val endTime = if (endDate != null) dateTimeFormatter.formatDate(endDate) else null
+        val (startCreationDate, endCreationDate) = dateResolver.resolveCreationDate(creationDate)
+        val (startUpdateDate, endUpdateDate) = dateResolver.resolveUpdateDate(updateDateTime)
 
         return Observable
             .fromCallable {
@@ -314,10 +314,10 @@ class RecordService internal constructor(
                 apiService.searchRecords(
                     alias,
                     userId,
-                    startTime,
-                    endTime,
-                    null,
-                    null,
+                    startCreationDate,
+                    endCreationDate,
+                    startUpdateDate,
+                    endUpdateDate,
                     false,
                     pageSize,
                     offset,
@@ -331,78 +331,58 @@ class RecordService internal constructor(
             .toList()
     }
 
-    fun <T : Fhir3Resource> fetchFhir3Records(
-        userId: String,
-        resourceType: Class<T>,
-        startDate: LocalDate?,
-        endDate: LocalDate?,
-        pageSize: Int,
-        offset: Int
-    ): Single<List<Record<T>>> = fetchFhir3Records(
-        userId,
-        resourceType,
-        emptyList(),
-        startDate,
-        endDate,
-        pageSize,
-        offset
-    )
-
     @Suppress("UNCHECKED_CAST")
-    override fun <T : Fhir3Resource> fetchFhir3Records(
+    override fun <T : Fhir3Resource> searchFhir3Records(
         userId: String,
         resourceType: Class<T>,
         annotations: Annotations,
-        startDate: LocalDate?,
-        endDate: LocalDate?,
+        creationDateRange: SdkContract.CreationDateRange?,
+        updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
         pageSize: Int,
         offset: Int,
-        creationDateRange: SdkContract.CreationDateRange?
     ): Single<List<Record<T>>> = searchRecords(
         userId,
         resourceType,
         annotations,
-        startDate,
-        endDate,
+        creationDateRange,
+        updateDateTimeRange,
         pageSize,
         offset
     ) as Single<List<Record<T>>>
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T : Fhir4Resource> fetchFhir4Records(
+    override fun <T : Fhir4Resource> searchFhir4Records(
         userId: String,
         resourceType: Class<T>,
         annotations: Annotations,
-        startDate: LocalDate?,
-        endDate: LocalDate?,
+        creationDateRange: SdkContract.CreationDateRange?,
+        updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
         pageSize: Int,
         offset: Int,
-        creationDateRange: SdkContract.CreationDateRange?
     ): Single<List<Fhir4Record<T>>> = searchRecords(
         userId,
         resourceType,
         annotations,
-        startDate,
-        endDate,
+        creationDateRange,
+        updateDateTimeRange,
         pageSize,
         offset
     ) as Single<List<Fhir4Record<T>>>
 
     @Suppress("UNCHECKED_CAST")
-    override fun fetchDataRecords(
+    override fun searchDataRecords(
         userId: String,
         annotations: Annotations,
-        startDate: LocalDate?,
-        endDate: LocalDate?,
+        creationDateRange: SdkContract.CreationDateRange?,
+        updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
         pageSize: Int,
         offset: Int,
-        creationDateRange: SdkContract.CreationDateRange?
     ): Single<List<DataRecord<DataResource>>> = searchRecords(
         userId,
         DataResource::class.java,
         annotations,
-        startDate,
-        endDate,
+        creationDateRange,
+        updateDateTimeRange,
         pageSize,
         offset
     ) as Single<List<DataRecord<DataResource>>>
@@ -769,8 +749,7 @@ class RecordService internal constructor(
                 userId
             )
                 .flattenAsObservable { attachment -> attachment }
-                .map {
-                    attachment ->
+                .map { attachment ->
                     if (attachment.id!!.contains(SPLIT_CHAR)) {
                         updateAttachmentMeta(attachment)
                     } else {

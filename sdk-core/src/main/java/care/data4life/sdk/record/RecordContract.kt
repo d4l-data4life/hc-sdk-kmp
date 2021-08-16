@@ -91,6 +91,7 @@ interface RecordContract {
             annotations: Annotations,
             creationDateRange: SdkContract.CreationDateRange?,
             updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
+            includeDeletedRecords: Boolean,
             pageSize: Int,
             offset: Int,
         ): Single<List<Record<T>>>
@@ -101,6 +102,7 @@ interface RecordContract {
             annotations: Annotations,
             creationDateRange: SdkContract.CreationDateRange?,
             updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
+            includeDeletedRecords: Boolean,
             pageSize: Int,
             offset: Int,
         ): Single<List<Fhir4Record<T>>>
@@ -110,6 +112,7 @@ interface RecordContract {
             annotations: Annotations,
             creationDateRange: SdkContract.CreationDateRange?,
             updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
+            includeDeletedRecords: Boolean,
             pageSize: Int,
             offset: Int,
         ): Single<List<DataRecord<DataResource>>>

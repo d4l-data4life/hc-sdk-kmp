@@ -72,6 +72,7 @@ internal class DataRecordClient(
         annotations: Annotations,
         creationDateRange: SdkContract.CreationDateRange,
         updateDateTimeRange: SdkContract.UpdateDateTimeRange,
+        includeDeletedRecords: Boolean,
         pageSize: Int,
         offset: Int,
         callback: Callback<List<DataRecord<DataResource>>>
@@ -82,6 +83,7 @@ internal class DataRecordClient(
                 annotations,
                 creationDateRange,
                 updateDateTimeRange,
+                includeDeletedRecords,
                 pageSize,
                 offset
             )

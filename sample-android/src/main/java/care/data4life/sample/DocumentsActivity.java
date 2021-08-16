@@ -276,6 +276,7 @@ public class DocumentsActivity extends AppCompatActivity {
                     toDate
                 ),
                 null,
+                false,
                 20,
                 offset,
                 new ResultListener<List<Record<DomainResource>>>() {

@@ -123,6 +123,7 @@ class RecordServiceSearchRecordsModuleTest {
         alias: String = ALIAS,
         creationDate: Pair<String?, String?>,
         updateDate: Pair<String?, String?>,
+        includeDeletedRecords: Boolean,
         pageSize: Int,
         offset: Int
     ) {
@@ -163,7 +164,7 @@ class RecordServiceSearchRecordsModuleTest {
                 creationDate.second,
                 updateDate.first,
                 updateDate.second,
-                false,
+                includeDeletedRecords,
                 pageSize,
                 offset,
                 capture(search)
@@ -206,6 +207,7 @@ class RecordServiceSearchRecordsModuleTest {
         updateDate: String = UPDATE_DATE,
         creationDateRange: Pair<String?, String?>? = null,
         updateDateRange: Pair<String?, String?>? = null,
+        includeDeletedRecords: Boolean = false,
         pageSize: Int = PAGE_SIZE,
         offset: Int = OFFSET
     ) {
@@ -279,6 +281,7 @@ class RecordServiceSearchRecordsModuleTest {
             alias,
             creationDateRange ?: Pair(null, null),
             updateDateRange ?: Pair(null, null),
+            includeDeletedRecords,
             pageSize,
             offset
         )
@@ -305,6 +308,7 @@ class RecordServiceSearchRecordsModuleTest {
         updateDate: String = UPDATE_DATE,
         creationDateRange: Pair<String?, String?>? = null,
         updateDateRange: Pair<String?, String?>? = null,
+        includeDeletedRecords: Boolean = false,
         pageSize: Int = PAGE_SIZE,
         offset: Int = OFFSET
     ) {
@@ -377,6 +381,7 @@ class RecordServiceSearchRecordsModuleTest {
             alias,
             creationDateRange ?: Pair(null, null),
             updateDateRange ?: Pair(null, null),
+            includeDeletedRecords,
             pageSize,
             offset
         )
@@ -436,6 +441,8 @@ class RecordServiceSearchRecordsModuleTest {
         legacyKMPResource.description = "legacyKMPRecord"
         legacyJSResource.description = "legacyKMPRecord"
 
+        val includeDeletedRecords = false
+
         runFhirSearchFlow(
             serializedResources = Triple(
                 SdkFhirParser.fromResource(resource),
@@ -443,7 +450,8 @@ class RecordServiceSearchRecordsModuleTest {
                 SdkFhirParser.fromResource(legacyJSResource)
             ),
             tags = tags,
-            useStoredCommonKey = false
+            useStoredCommonKey = false,
+            includeDeletedRecords = includeDeletedRecords
         )
 
         // When
@@ -453,6 +461,7 @@ class RecordServiceSearchRecordsModuleTest {
             emptyList(),
             null,
             null,
+            includeDeletedRecords,
             PAGE_SIZE,
             OFFSET
         ).blockingGet()
@@ -540,6 +549,8 @@ class RecordServiceSearchRecordsModuleTest {
         legacyKMPResource.description = "legacyRecord"
         legacyJSResource.description = "legacyRecord"
 
+        val includeDeletedRecords = false
+
         runFhirSearchFlow(
             serializedResources = Triple(
                 SdkFhirParser.fromResource(resource),
@@ -547,7 +558,8 @@ class RecordServiceSearchRecordsModuleTest {
                 SdkFhirParser.fromResource(legacyJSResource)
             ),
             tags = tags,
-            annotations = annotations
+            annotations = annotations,
+            includeDeletedRecords = includeDeletedRecords
         )
 
         // When
@@ -557,6 +569,7 @@ class RecordServiceSearchRecordsModuleTest {
             annotations,
             null,
             null,
+            includeDeletedRecords,
             PAGE_SIZE,
             OFFSET
         ).blockingGet()
@@ -659,6 +672,8 @@ class RecordServiceSearchRecordsModuleTest {
         legacyKMPResource.description = "legacyRecord"
         legacyJSResource.description = "legacyRecord"
 
+        val includeDeletedRecords = false
+
         runFhirSearchFlow(
             serializedResources = Triple(
                 SdkFhirParser.fromResource(resource),
@@ -674,7 +689,8 @@ class RecordServiceSearchRecordsModuleTest {
             updateDateRange = Pair(
                 "2021-01-01T00:00:00.000Z",
                 "2021-12-01T00:00:00.000Z"
-            )
+            ),
+            includeDeletedRecords = includeDeletedRecords
         )
 
         // When
@@ -684,6 +700,7 @@ class RecordServiceSearchRecordsModuleTest {
             annotations,
             SdkContract.CreationDateRange(startCreationDate, endCreationDate),
             SdkContract.UpdateDateTimeRange(startUpdateDate, endUpdateDate),
+            includeDeletedRecords,
             PAGE_SIZE,
             OFFSET
         ).blockingGet()
@@ -774,6 +791,8 @@ class RecordServiceSearchRecordsModuleTest {
         legacyKMPResource.description = "legacyKMPRecord"
         legacyJSResource.description = "legacyJSRecord"
 
+        val includeDeletedRecords = false
+
         runFhirSearchFlow(
             serializedResources = Triple(
                 SdkFhirParser.fromResource(resource),
@@ -781,7 +800,8 @@ class RecordServiceSearchRecordsModuleTest {
                 SdkFhirParser.fromResource(legacyJSResource)
             ),
             tags = tags,
-            useStoredCommonKey = false
+            useStoredCommonKey = false,
+            includeDeletedRecords = includeDeletedRecords
         )
 
         // When
@@ -791,6 +811,7 @@ class RecordServiceSearchRecordsModuleTest {
             emptyList(),
             null,
             null,
+            includeDeletedRecords,
             PAGE_SIZE,
             OFFSET
         ).blockingGet()
@@ -878,6 +899,8 @@ class RecordServiceSearchRecordsModuleTest {
         legacyKMPResource.description = "legacyKMPRecord"
         legacyJSResource.description = "legacyJSRecord"
 
+        val includeDeletedRecords = false
+
         runFhirSearchFlow(
             serializedResources = Triple(
                 SdkFhirParser.fromResource(resource),
@@ -885,7 +908,8 @@ class RecordServiceSearchRecordsModuleTest {
                 SdkFhirParser.fromResource(legacyJSResource)
             ),
             tags = tags,
-            annotations = annotations
+            annotations = annotations,
+            includeDeletedRecords = includeDeletedRecords
         )
 
         // When
@@ -895,6 +919,7 @@ class RecordServiceSearchRecordsModuleTest {
             annotations,
             null,
             null,
+            includeDeletedRecords,
             PAGE_SIZE,
             OFFSET
         ).blockingGet()
@@ -997,6 +1022,8 @@ class RecordServiceSearchRecordsModuleTest {
         legacyKMPResource.description = "legacyKMPRecord"
         legacyJSResource.description = "legacyJSRecord"
 
+        val includeDeletedRecords = false
+
         runFhirSearchFlow(
             serializedResources = Triple(
                 SdkFhirParser.fromResource(resource),
@@ -1012,7 +1039,8 @@ class RecordServiceSearchRecordsModuleTest {
             updateDateRange = Pair(
                 "2021-01-01T00:00:00.000Z",
                 "2021-12-01T00:00:00.000Z"
-            )
+            ),
+            includeDeletedRecords = includeDeletedRecords
         )
 
         // When
@@ -1022,6 +1050,7 @@ class RecordServiceSearchRecordsModuleTest {
             annotations,
             SdkContract.CreationDateRange(startCreationDate, endCreationDate),
             SdkContract.UpdateDateTimeRange(startUpdateDate, endUpdateDate),
+            includeDeletedRecords,
             PAGE_SIZE,
             OFFSET
         ).blockingGet()
@@ -1068,10 +1097,13 @@ class RecordServiceSearchRecordsModuleTest {
             "client" to CLIENT_ID
         )
 
+        val includeDeletedRecords = false
+
         runDataSearchFlow(
             serializedResources = Triple(resource, resource, resource),
             tags = tags,
-            useStoredCommonKey = false
+            useStoredCommonKey = false,
+            includeDeletedRecords = includeDeletedRecords
         )
 
         // When
@@ -1080,6 +1112,7 @@ class RecordServiceSearchRecordsModuleTest {
             emptyList(),
             null,
             null,
+            includeDeletedRecords,
             PAGE_SIZE,
             OFFSET
         ).blockingGet()
@@ -1128,10 +1161,13 @@ class RecordServiceSearchRecordsModuleTest {
             "like_a_duracell_häsi"
         )
 
+        val includeDeletedRecords = false
+
         runDataSearchFlow(
             serializedResources = Triple(resource, legacyKMPResource, legacyJSResource),
             tags = tags,
-            annotations = annotations
+            annotations = annotations,
+            includeDeletedRecords = includeDeletedRecords
         )
 
         // When
@@ -1140,6 +1176,7 @@ class RecordServiceSearchRecordsModuleTest {
             annotations,
             null,
             null,
+            includeDeletedRecords,
             PAGE_SIZE,
             OFFSET
         ).blockingGet()
@@ -1202,6 +1239,8 @@ class RecordServiceSearchRecordsModuleTest {
         val startUpdateDate = LocalDateTime.of(2021, 1, 1, 0, 0, 0)
         val endUpdateDate = LocalDateTime.of(2021, 12, 1, 0, 0, 0)
 
+        val includeDeletedRecords = false
+
         runDataSearchFlow(
             serializedResources = Triple(resource, legacyKMPResource, legacyJSResource),
             tags = tags,
@@ -1213,7 +1252,8 @@ class RecordServiceSearchRecordsModuleTest {
             updateDateRange = Pair(
                 "2021-01-01T00:00:00.000Z",
                 "2021-12-01T00:00:00.000Z"
-            )
+            ),
+            includeDeletedRecords = includeDeletedRecords
         )
 
         // When
@@ -1222,6 +1262,7 @@ class RecordServiceSearchRecordsModuleTest {
             annotations,
             SdkContract.CreationDateRange(startCreationDate, endCreationDate),
             SdkContract.UpdateDateTimeRange(startUpdateDate, endUpdateDate),
+            includeDeletedRecords,
             PAGE_SIZE,
             OFFSET
         ).blockingGet()

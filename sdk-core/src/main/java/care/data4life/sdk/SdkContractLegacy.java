@@ -143,6 +143,7 @@ public interface SdkContractLegacy {
          * @param resourceType The class type of the record to fetch
          * @param creationDateRange the filtered records have a creation date after the start date or before the endDate
          * @param updateDateTimeRange the filtered records have a update dateTime after the start date or before the endDateTime
+         * @param includeDeletedRecords includes deleted records into the query
          * @param pageSize     define the size page result
          * @param offset       the offset of the records list
          * @param listener     either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
@@ -153,6 +154,7 @@ public interface SdkContractLegacy {
                 Class<T> resourceType,
                 @Nullable SdkContract.CreationDateRange creationDateRange,
                 @Nullable SdkContract.UpdateDateTimeRange updateDateTimeRange,
+                Boolean includeDeletedRecords,
                 Integer pageSize,
                 Integer offset,
                 ResultListener<List<Record<T>>> listener
@@ -165,6 +167,7 @@ public interface SdkContractLegacy {
          * @param annotations  custom annotations added as tags to the record
          * @param creationDateRange the filtered records have a creation date after the start date or before the endDate
          * @param updateDateTimeRange the filtered records have a update dateTime after the start date or before the endDateTime
+         * @param includeDeletedRecords includes deleted records into the query
          * @param pageSize     define the size page result
          * @param offset       the offset of the records list
          * @param listener     either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
@@ -176,6 +179,7 @@ public interface SdkContractLegacy {
                 List<String> annotations,
                 @Nullable SdkContract.CreationDateRange creationDateRange,
                 @Nullable SdkContract.UpdateDateTimeRange updateDateTimeRange,
+                Boolean includeDeletedRecords,
                 Integer pageSize,
                 Integer offset,
                 ResultListener<List<Record<T>>> listener

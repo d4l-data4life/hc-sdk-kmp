@@ -297,6 +297,7 @@ class RecordService internal constructor(
         annotations: Annotations,
         creationDate: SdkContract.CreationDateRange?,
         updateDateTime: SdkContract.UpdateDateTimeRange?,
+        includeDeletedRecords: Boolean,
         pageSize: Int,
         offset: Int
     ): Single<List<BaseRecord<T>>> {
@@ -318,7 +319,7 @@ class RecordService internal constructor(
                     endCreationDate,
                     startUpdateDate,
                     endUpdateDate,
-                    false,
+                    includeDeletedRecords,
                     pageSize,
                     offset,
                     tags
@@ -338,6 +339,7 @@ class RecordService internal constructor(
         annotations: Annotations,
         creationDateRange: SdkContract.CreationDateRange?,
         updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
+        includeDeletedRecords: Boolean,
         pageSize: Int,
         offset: Int,
     ): Single<List<Record<T>>> = searchRecords(
@@ -346,6 +348,7 @@ class RecordService internal constructor(
         annotations,
         creationDateRange,
         updateDateTimeRange,
+        includeDeletedRecords,
         pageSize,
         offset
     ) as Single<List<Record<T>>>
@@ -357,6 +360,7 @@ class RecordService internal constructor(
         annotations: Annotations,
         creationDateRange: SdkContract.CreationDateRange?,
         updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
+        includeDeletedRecords: Boolean,
         pageSize: Int,
         offset: Int,
     ): Single<List<Fhir4Record<T>>> = searchRecords(
@@ -365,6 +369,7 @@ class RecordService internal constructor(
         annotations,
         creationDateRange,
         updateDateTimeRange,
+        includeDeletedRecords,
         pageSize,
         offset
     ) as Single<List<Fhir4Record<T>>>
@@ -375,6 +380,7 @@ class RecordService internal constructor(
         annotations: Annotations,
         creationDateRange: SdkContract.CreationDateRange?,
         updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
+        includeDeletedRecords: Boolean,
         pageSize: Int,
         offset: Int,
     ): Single<List<DataRecord<DataResource>>> = searchRecords(
@@ -383,6 +389,7 @@ class RecordService internal constructor(
         annotations,
         creationDateRange,
         updateDateTimeRange,
+        includeDeletedRecords,
         pageSize,
         offset
     ) as Single<List<DataRecord<DataResource>>>

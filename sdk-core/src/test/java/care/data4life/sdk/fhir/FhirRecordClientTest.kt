@@ -183,6 +183,7 @@ class FhirRecordClientTest {
         val annotations: Annotations = mockk()
         val creationDate = SdkContract.CreationDateRange(null, null)
         val updateDateTime = SdkContract.UpdateDateTimeRange(null, null)
+        val includeDeletedRecords = true
         val pageSize = 23
         val offset = 42
 
@@ -201,6 +202,7 @@ class FhirRecordClientTest {
                 annotations,
                 creationDate,
                 updateDateTime,
+                includeDeletedRecords,
                 pageSize,
                 offset
             )
@@ -221,6 +223,7 @@ class FhirRecordClientTest {
             annotations,
             creationDate,
             updateDateTime,
+            includeDeletedRecords,
             pageSize,
             offset,
             callback

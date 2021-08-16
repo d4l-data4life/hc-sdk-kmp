@@ -173,6 +173,7 @@ public class LegacyDataClient implements SdkContract.LegacyDataClient {
             Class<T> resourceType,
             @Nullable SdkContract.CreationDateRange creationDateRange,
             @Nullable SdkContract.UpdateDateTimeRange updateDateTimeRange,
+            Boolean includeDeletedRecords,
             Integer pageSize,
             Integer offset,
             ResultListener<List<Record<T>>> listener
@@ -182,9 +183,10 @@ public class LegacyDataClient implements SdkContract.LegacyDataClient {
                         recordService.searchFhir3Records(
                                 uid,
                                 resourceType,
-                                new ArrayList<String>(),
+                                new ArrayList<>(),
                                 creationDateRange,
                                 updateDateTimeRange,
+                                includeDeletedRecords,
                                 pageSize,
                                 offset
                         )
@@ -198,6 +200,7 @@ public class LegacyDataClient implements SdkContract.LegacyDataClient {
             List<String> annotations,
             @Nullable SdkContract.CreationDateRange creationDateRange,
             @Nullable SdkContract.UpdateDateTimeRange updateDateTimeRange,
+            Boolean includeDeletedRecords,
             Integer pageSize,
             Integer offset,
             ResultListener<List<Record<T>>> listener
@@ -209,6 +212,7 @@ public class LegacyDataClient implements SdkContract.LegacyDataClient {
                         annotations,
                         creationDateRange,
                         updateDateTimeRange,
+                        includeDeletedRecords,
                         pageSize,
                         offset
                 ));

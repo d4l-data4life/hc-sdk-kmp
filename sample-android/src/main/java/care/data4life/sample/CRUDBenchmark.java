@@ -267,6 +267,7 @@ public class CRUDBenchmark {
                         null
                     ),
                     null,
+                    false,
                     recordsNum,
                     0,
                     fetchListener

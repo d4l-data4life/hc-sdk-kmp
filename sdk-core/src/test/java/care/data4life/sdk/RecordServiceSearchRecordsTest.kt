@@ -105,6 +105,7 @@ class RecordServiceSearchRecordsTest {
         val resource2: Fhir3CarePlan = mockk()
         val id2 = "id2"
 
+        val includeDeletedRecords = true
         val offset = 42
         val pageSize = 23
 
@@ -145,7 +146,7 @@ class RecordServiceSearchRecordsTest {
                 null,
                 null,
                 null,
-                false,
+                includeDeletedRecords,
                 pageSize,
                 offset,
                 searchTags
@@ -167,6 +168,7 @@ class RecordServiceSearchRecordsTest {
             emptyList(),
             null,
             null,
+            includeDeletedRecords,
             pageSize,
             offset
         ).test().await()
@@ -198,6 +200,7 @@ class RecordServiceSearchRecordsTest {
                 emptyList(),
                 null,
                 null,
+                includeDeletedRecords,
                 pageSize,
                 offset
             )
@@ -212,7 +215,7 @@ class RecordServiceSearchRecordsTest {
                 null,
                 null,
                 null,
-                false,
+                includeDeletedRecords,
                 pageSize,
                 offset,
                 searchTags
@@ -247,6 +250,7 @@ class RecordServiceSearchRecordsTest {
         val update = Pair("updateStart", "updateEnd")
         val offset = 42
         val pageSize = 23
+        val includeDeletedRecords = true
 
         val encryptedRecord1: EncryptedRecord = mockk()
         val encryptedRecord2: EncryptedRecord = mockk()
@@ -286,7 +290,7 @@ class RecordServiceSearchRecordsTest {
                 creation.second,
                 update.first,
                 update.second,
-                false,
+                includeDeletedRecords,
                 pageSize,
                 offset,
                 searchTags
@@ -309,6 +313,7 @@ class RecordServiceSearchRecordsTest {
             emptyList(),
             creationDate,
             updateDate,
+            includeDeletedRecords,
             pageSize,
             offset
         ).test().await()
@@ -340,6 +345,7 @@ class RecordServiceSearchRecordsTest {
                 emptyList(),
                 creationDate,
                 updateDate,
+                includeDeletedRecords,
                 pageSize,
                 offset
             )
@@ -354,7 +360,7 @@ class RecordServiceSearchRecordsTest {
                 creation.second,
                 update.first,
                 update.second,
-                false,
+                includeDeletedRecords,
                 pageSize,
                 offset,
                 searchTags
@@ -385,6 +391,7 @@ class RecordServiceSearchRecordsTest {
 
         val offset = 42
         val pageSize = 23
+        val includeDeletedRecords = true
 
         val encryptedRecord1: EncryptedRecord = mockk()
         val encryptedRecord2: EncryptedRecord = mockk()
@@ -421,7 +428,7 @@ class RecordServiceSearchRecordsTest {
                 null,
                 null,
                 null,
-                false,
+                includeDeletedRecords,
                 pageSize,
                 offset,
                 searchTags
@@ -445,6 +452,7 @@ class RecordServiceSearchRecordsTest {
             emptyList(),
             null,
             null,
+            includeDeletedRecords,
             pageSize,
             offset
         ).test().await()
@@ -481,7 +489,7 @@ class RecordServiceSearchRecordsTest {
                 null,
                 null,
                 null,
-                false,
+                includeDeletedRecords,
                 pageSize,
                 offset,
                 searchTags
@@ -516,6 +524,7 @@ class RecordServiceSearchRecordsTest {
         val update = Pair("updateStart", "updateEnd")
         val offset = 42
         val pageSize = 23
+        val includeDeletedRecords = true
 
         val encryptedRecord1: EncryptedRecord = mockk()
         val encryptedRecord2: EncryptedRecord = mockk()
@@ -555,7 +564,7 @@ class RecordServiceSearchRecordsTest {
                 creation.second,
                 update.first,
                 update.second,
-                false,
+                includeDeletedRecords,
                 pageSize,
                 offset,
                 searchTags
@@ -578,6 +587,7 @@ class RecordServiceSearchRecordsTest {
             emptyList(),
             creationDate,
             updateDate,
+            includeDeletedRecords,
             pageSize,
             offset
         ).test().await()
@@ -609,6 +619,7 @@ class RecordServiceSearchRecordsTest {
                 emptyList(),
                 creationDate,
                 updateDate,
+                includeDeletedRecords,
                 pageSize,
                 offset
             )
@@ -623,7 +634,7 @@ class RecordServiceSearchRecordsTest {
                 creation.second,
                 update.first,
                 update.second,
-                false,
+                includeDeletedRecords,
                 pageSize,
                 offset,
                 searchTags
@@ -654,6 +665,7 @@ class RecordServiceSearchRecordsTest {
 
         val offset = 42
         val pageSize = 23
+        val includeDeletedRecords = true
 
         val encryptedRecord1: EncryptedRecord = mockk()
         val encryptedRecord2: EncryptedRecord = mockk()
@@ -688,7 +700,7 @@ class RecordServiceSearchRecordsTest {
                 null,
                 null,
                 null,
-                false,
+                includeDeletedRecords,
                 pageSize,
                 offset,
                 searchTags
@@ -711,6 +723,7 @@ class RecordServiceSearchRecordsTest {
             emptyList(),
             null,
             null,
+            includeDeletedRecords,
             pageSize,
             offset
         ).test().await()
@@ -747,7 +760,7 @@ class RecordServiceSearchRecordsTest {
                 null,
                 null,
                 null,
-                false,
+                includeDeletedRecords,
                 pageSize,
                 offset,
                 searchTags
@@ -780,6 +793,7 @@ class RecordServiceSearchRecordsTest {
         val update = Pair("updateStart", "updateEnd")
         val offset = 42
         val pageSize = 23
+        val includeDeletedRecords = true
 
         val encryptedRecord1: EncryptedRecord = mockk()
         val encryptedRecord2: EncryptedRecord = mockk()
@@ -817,7 +831,7 @@ class RecordServiceSearchRecordsTest {
                 creation.second,
                 update.first,
                 update.second,
-                false,
+                includeDeletedRecords,
                 pageSize,
                 offset,
                 searchTags
@@ -839,6 +853,7 @@ class RecordServiceSearchRecordsTest {
             emptyList(),
             creationDate,
             updateDate,
+            includeDeletedRecords,
             pageSize,
             offset
         ).test().await()
@@ -869,6 +884,7 @@ class RecordServiceSearchRecordsTest {
                 emptyList(),
                 creationDate,
                 updateDate,
+                includeDeletedRecords,
                 pageSize,
                 offset
             )
@@ -883,7 +899,7 @@ class RecordServiceSearchRecordsTest {
                 creation.second,
                 update.first,
                 update.second,
-                false,
+                includeDeletedRecords,
                 pageSize,
                 offset,
                 searchTags

@@ -75,6 +75,7 @@ internal class Fhir4RecordClient(
         annotations: Annotations,
         creationDateRange: SdkContract.CreationDateRange,
         updateDateTimeRange: SdkContract.UpdateDateTimeRange,
+        includeDeletedRecords: Boolean,
         pageSize: Int,
         offset: Int,
         callback: Callback<List<Fhir4Record<T>>>
@@ -86,6 +87,7 @@ internal class Fhir4RecordClient(
                 annotations,
                 creationDateRange,
                 updateDateTimeRange,
+                includeDeletedRecords,
                 pageSize,
                 offset
             )

@@ -25,6 +25,7 @@ import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.date.SdkDateTimeFormatter
 import care.data4life.sdk.fhir.Fhir3Identifier
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Identifier
@@ -63,7 +64,6 @@ import care.data4life.sdk.test.util.TestResourceHelper
 import care.data4life.sdk.test.util.TestResourceHelper.loadTemplate
 import care.data4life.sdk.test.util.TestResourceHelper.loadTemplateWithAttachments
 import care.data4life.sdk.util.Base64
-import care.data4life.sdk.date.SdkDateTimeFormatter
 import care.data4life.sdk.wrapper.SdkFhirParser
 import io.mockk.clearAllMocks
 import io.mockk.every

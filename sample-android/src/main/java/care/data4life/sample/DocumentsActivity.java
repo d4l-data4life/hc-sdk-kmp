@@ -54,6 +54,7 @@ import care.data4life.fhir.stu3.model.Attachment;
 import care.data4life.fhir.stu3.model.DocumentReference;
 import care.data4life.fhir.stu3.model.DomainResource;
 import care.data4life.sdk.Data4LifeClient;
+import care.data4life.sdk.SdkContract;
 import care.data4life.sdk.call.DataRecord;
 import care.data4life.sdk.call.Task;
 import care.data4life.sdk.config.DataRestrictionException;
@@ -270,8 +271,11 @@ public class DocumentsActivity extends AppCompatActivity {
 
         fetchTask = client.fetchRecords(
                 DomainResource.class,
-                fromDate,
-                toDate,
+                new SdkContract.CreationDateRange(
+                    fromDate,
+                    toDate
+                ),
+                null,
                 20,
                 offset,
                 new ResultListener<List<Record<DomainResource>>>() {

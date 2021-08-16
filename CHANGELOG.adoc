@@ -16,6 +16,9 @@ toc::[]
 
 === Added
 
+* *_BREAKING_* new Parameter (creationDate, updateDateTime) for search/fetch Records
+* CreationDateRange and UpdateDateTimeRange
+
 === Changed
 
 === Removed

@@ -43,6 +43,7 @@ import care.data4life.fhir.stu3.model.DomainResource;
 import care.data4life.fhir.stu3.model.FhirElementFactory;
 import care.data4life.fhir.stu3.model.Observation;
 import care.data4life.sdk.Data4LifeClient;
+import care.data4life.sdk.SdkContract;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.ResultListener;
 import care.data4life.sdk.model.CreateResult;
@@ -259,7 +260,17 @@ public class CRUDBenchmark {
         public boolean crudCall(DomainResource resource) {
             fetchedRecords = null;
             Class clazz = FhirElementFactory.getClassForFhirType(resource.getResourceType());
-            client.fetchRecords(clazz, LocalDate.now(), null, recordsNum, 0, fetchListener);
+            client.fetchRecords(
+                    clazz,
+                    new SdkContract.CreationDateRange(
+                        LocalDate.now(),
+                        null
+                    ),
+                    null,
+                    recordsNum,
+                    0,
+                    fetchListener
+            );
             if (!pauseCurrentThread("FetchJob")) return false;
 
             if (resource instanceof DocumentReference && fetchedRecords != null) {

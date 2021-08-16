@@ -21,11 +21,11 @@ import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 import org.junit.Test
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class DateResolverTest {
     @Test

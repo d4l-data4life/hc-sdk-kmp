@@ -29,6 +29,7 @@ import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.date.DateHelperContract
 import care.data4life.sdk.date.DateResolver
+import care.data4life.sdk.date.SdkDateTimeFormatter
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Attachment
@@ -70,7 +71,6 @@ import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.util.MimeType
 import care.data4life.sdk.util.MimeType.Companion.recognizeMimeType
 import care.data4life.sdk.wrapper.SdkAttachmentFactory
-import care.data4life.sdk.date.SdkDateTimeFormatter
 import care.data4life.sdk.wrapper.SdkFhirAttachmentHelper
 import care.data4life.sdk.wrapper.SdkIdentifierFactory
 import care.data4life.sdk.wrapper.WrapperContract

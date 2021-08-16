@@ -104,7 +104,7 @@ class RecordServiceSearchRecordsTest {
         val id1 = "id1"
         val resource2: Fhir3CarePlan = mockk()
         val id2 = "id2"
-        
+
         val offset = 42
         val pageSize = 23
 
@@ -114,7 +114,7 @@ class RecordServiceSearchRecordsTest {
         val decryptedRecord2: DecryptedFhir3Record<Fhir3CarePlan> = mockk(relaxed = true)
         val record1: Record<Fhir3CarePlan> = mockk()
         val record2: Record<Fhir3CarePlan> = mockk()
-        
+
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
         val searchTags: NetworkingContract.SearchTags = mockk()
 
@@ -254,7 +254,7 @@ class RecordServiceSearchRecordsTest {
         val decryptedRecord2: DecryptedFhir3Record<Fhir3CarePlan> = mockk(relaxed = true)
         val record1: Record<Fhir3CarePlan> = mockk()
         val record2: Record<Fhir3CarePlan> = mockk()
-        
+
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
         val searchTags: NetworkingContract.SearchTags = mockk()
 
@@ -382,7 +382,7 @@ class RecordServiceSearchRecordsTest {
         val id1 = "id1"
         val resource2: Fhir4CarePlan = mockk()
         val id2 = "id2"
-        
+
         val offset = 42
         val pageSize = 23
 
@@ -392,7 +392,7 @@ class RecordServiceSearchRecordsTest {
         val decryptedRecord2: DecryptedFhir4Record<Fhir4CarePlan> = mockk(relaxed = true)
         val record1: Fhir4Record<Fhir4CarePlan> = mockk()
         val record2: Fhir4Record<Fhir4CarePlan> = mockk()
-        
+
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
         val searchTags: NetworkingContract.SearchTags = mockk()
 
@@ -509,7 +509,7 @@ class RecordServiceSearchRecordsTest {
         val id1 = "id1"
         val resource2: Fhir4CarePlan = mockk()
         val id2 = "id2"
-        
+
         val creationDate = SdkContract.CreationDateRange(null, null)
         val creation = Pair("creationStart", "creationEnd")
         val updateDate = SdkContract.UpdateDateTimeRange(null, null)
@@ -523,7 +523,7 @@ class RecordServiceSearchRecordsTest {
         val decryptedRecord2: DecryptedFhir4Record<Fhir4CarePlan> = mockk(relaxed = true)
         val record1: Fhir4Record<Fhir4CarePlan> = mockk()
         val record2: Fhir4Record<Fhir4CarePlan> = mockk()
-        
+
         val encryptedRecords = listOf(encryptedRecord1, encryptedRecord2)
         val searchTags: NetworkingContract.SearchTags = mockk()
 

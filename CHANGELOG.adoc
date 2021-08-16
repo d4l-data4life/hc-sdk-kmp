@@ -18,6 +18,8 @@ toc::[]
 
 * *_BREAKING_* new Parameter (creationDate, updateDateTime and includeDeletedRecords) for search/fetch Records
 * CreationDateRange and UpdateDateTimeRange
+* status field for Meta
+* RecordStatus
 
 === Changed
 

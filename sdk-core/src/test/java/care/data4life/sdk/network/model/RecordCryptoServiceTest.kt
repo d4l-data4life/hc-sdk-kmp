@@ -276,6 +276,27 @@ class RecordCryptoServiceTest {
     }
 
     @Test
+    fun `Given, fromResource is called with a Fhir3 resource and Annotations, it sets the status to Active`() {
+        // Given
+        val annotations: Annotations = mockk()
+        val resource: Fhir3Resource = mockk()
+
+        runFromResourceFlow(
+            resource,
+            annotations
+        )
+
+        // When
+        val record = service.fromResource(resource, annotations)
+
+        // Then
+        assertEquals(
+            actual = record.status,
+            expected = ModelContract.RecordStatus.Active
+        )
+    }
+
+    @Test
     fun `Given, fromResource is called with a Fhir3 resource and Annotations, it sets the Identifier, AttachmentKey and UpdateDate null at the DecryptedFhir3Record`() {
         // Given
         val annotations: Annotations = mockk()
@@ -447,6 +468,27 @@ class RecordCryptoServiceTest {
         assertEquals(
             actual = record.modelVersion,
             expected = ModelContract.ModelVersion.CURRENT
+        )
+    }
+
+    @Test
+    fun `Given, fromResource is called with a Fhir4 resource and Annotations, it sets the status to Active`() {
+        // Given
+        val annotations: Annotations = mockk()
+        val resource: Fhir4Resource = mockk()
+
+        runFromResourceFlow(
+            resource,
+            annotations
+        )
+
+        // When
+        val record = service.fromResource(resource, annotations)
+
+        // Then
+        assertEquals(
+            actual = record.status,
+            expected = ModelContract.RecordStatus.Active
         )
     }
 
@@ -642,6 +684,27 @@ class RecordCryptoServiceTest {
         assertEquals(
             actual = record.modelVersion,
             expected = ModelContract.ModelVersion.CURRENT
+        )
+    }
+
+    @Test
+    fun `Given, fromResource is called with a DataResource and Annotations, it sets the status to Active`() {
+        // Given
+        val annotations: Annotations = mockk()
+        val resource: DataResource = mockk()
+
+        runFromResourceArbitraryDataFlow(
+            resource,
+            annotations
+        )
+
+        // When
+        val record = service.fromResource(resource, annotations)
+
+        // Then
+        assertEquals(
+            actual = record.status,
+            expected = ModelContract.RecordStatus.Active
         )
     }
 

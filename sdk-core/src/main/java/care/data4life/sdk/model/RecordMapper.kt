@@ -33,7 +33,8 @@ internal object RecordMapper : RecordFactory {
     private fun buildMeta(record: DecryptedBaseRecord<*>): Meta {
         return Meta(
             SdkDateTimeFormatter.parseDate(record.customCreationDate!!),
-            SdkDateTimeFormatter.parseDateTime(record.updatedDate!!)
+            SdkDateTimeFormatter.parseDateTime(record.updatedDate!!),
+            record.status
         )
     }
 

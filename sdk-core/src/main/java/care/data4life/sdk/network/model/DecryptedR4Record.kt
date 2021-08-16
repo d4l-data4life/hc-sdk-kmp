@@ -18,6 +18,7 @@ package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.fhir.Fhir4Resource
+import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedFhir4Record
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.Tags
@@ -31,5 +32,6 @@ data class DecryptedR4Record<T : Fhir4Resource>(
     override var updatedDate: String?,
     override var dataKey: GCKey,
     override var attachmentsKey: GCKey?,
-    override var modelVersion: Int
+    override var modelVersion: Int,
+    override var status: ModelContract.RecordStatus
 ) : DecryptedFhir4Record<T>

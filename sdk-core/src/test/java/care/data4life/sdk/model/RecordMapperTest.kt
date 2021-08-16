@@ -36,14 +36,14 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
-import org.threeten.bp.LocalDate
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
-import org.threeten.bp.LocalDateTime
 
 class RecordMapperTest {
     private lateinit var id: String
@@ -85,6 +85,7 @@ class RecordMapperTest {
 
         val expectedCreationDate = LocalDate.of(2020, 5, 3)
         val expectedUpdateDate = LocalDateTime.of(2019, 2, 28, 21, 8, 23, 4123000)
+        val status = ModelContract.RecordStatus.Active
 
         val resource: Fhir3Resource = mockk()
 
@@ -97,7 +98,8 @@ class RecordMapperTest {
             givenUpdateDate,
             dataKey,
             attachmentKey,
-            modelVersion
+            modelVersion,
+            status
         )
 
         every { SdkDateTimeFormatter.parseDate(givenCreationDate) } returns expectedCreationDate
@@ -120,7 +122,8 @@ class RecordMapperTest {
             actual = record.meta,
             expected = Meta(
                 expectedCreationDate,
-                expectedUpdateDate
+                expectedUpdateDate,
+                status
             )
         )
         assertEquals(
@@ -137,6 +140,7 @@ class RecordMapperTest {
 
         val expectedCreationDate = LocalDate.of(2020, 5, 3)
         val expectedUpdateDate = LocalDateTime.of(2019, 2, 28, 21, 8, 23, 4123000)
+        val status = ModelContract.RecordStatus.Active
 
         val resource: Fhir4Resource = mockk()
 
@@ -149,7 +153,8 @@ class RecordMapperTest {
             givenUpdateDate,
             dataKey,
             attachmentKey,
-            modelVersion
+            modelVersion,
+            status
         )
 
         every { SdkDateTimeFormatter.parseDate(givenCreationDate) } returns expectedCreationDate
@@ -172,7 +177,8 @@ class RecordMapperTest {
             actual = record.meta,
             expected = Meta(
                 expectedCreationDate,
-                expectedUpdateDate
+                expectedUpdateDate,
+                status
             )
         )
         assertEquals(
@@ -189,6 +195,7 @@ class RecordMapperTest {
 
         val expectedCreationDate = LocalDate.of(2020, 5, 3)
         val expectedUpdateDate = LocalDateTime.of(2019, 2, 28, 21, 8, 23, 4123000)
+        val status = ModelContract.RecordStatus.Active
 
         val resource: DataResource = mockk()
 
@@ -200,7 +207,8 @@ class RecordMapperTest {
             givenCreationDate,
             givenUpdateDate,
             dataKey,
-            modelVersion
+            modelVersion,
+            status
         )
 
         every { SdkDateTimeFormatter.parseDate(givenCreationDate) } returns expectedCreationDate
@@ -223,7 +231,8 @@ class RecordMapperTest {
             actual = record.meta,
             expected = Meta(
                 expectedCreationDate,
-                expectedUpdateDate
+                expectedUpdateDate,
+                status
             )
         )
         assertEquals(
@@ -240,6 +249,7 @@ class RecordMapperTest {
 
         val expectedCreationDate = LocalDate.of(2020, 5, 3)
         val expectedUpdateDate = LocalDateTime.of(2019, 2, 28, 21, 8, 23, 4123000)
+        val status = ModelContract.RecordStatus.Active
 
         val decryptedRecord = DecryptedUnknownRecord(
             id,
@@ -250,7 +260,8 @@ class RecordMapperTest {
             givenUpdateDate,
             dataKey,
             attachmentKey,
-            modelVersion
+            modelVersion,
+            status
         )
 
         every { SdkDateTimeFormatter.parseDate(givenCreationDate) } returns expectedCreationDate
@@ -273,6 +284,7 @@ class RecordMapperTest {
         override var updatedDate: String?,
         override var dataKey: GCKey,
         override var attachmentsKey: GCKey?,
-        override var modelVersion: Int
+        override var modelVersion: Int,
+        override var status: ModelContract.RecordStatus
     ) : DecryptedBaseRecord<T>
 }

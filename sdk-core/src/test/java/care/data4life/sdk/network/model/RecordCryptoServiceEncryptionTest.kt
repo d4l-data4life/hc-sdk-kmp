@@ -88,11 +88,13 @@ class RecordCryptoServiceEncryptionTest {
         resource: T = mockk(),
         encryptedResource: String = "what so ever",
         encryptedDataKey: EncryptedKey = mockk(),
-        encryptedAttachmentKey: EncryptedKey? = null
+        encryptedAttachmentKey: EncryptedKey? = null,
+        status: ModelContract.RecordStatus = ModelContract.RecordStatus.Active
     ) {
         every { decryptedRecord.identifier } returns identifier
         every { decryptedRecord.customCreationDate } returns creationDate
         every { decryptedRecord.modelVersion } returns modelVersion
+        every { decryptedRecord.status } returns status
 
         every { decryptedRecord.tags } returns tags
         every { decryptedRecord.annotations } returns annotations
@@ -237,6 +239,27 @@ class RecordCryptoServiceEncryptionTest {
         assertEquals(
             expected = version,
             actual = encryptedRecord.modelVersion
+        )
+    }
+
+    @Test
+    fun `Given, encrypt is called with a DecryptedRecord, which contains a Fhir3 resource and a UserId, it sets the given Status in the EncryptedRecord`() {
+        // Given
+        val decryptedRecord: DecryptedBaseRecord<Fhir3Resource> = mockk()
+        val status = ModelContract.RecordStatus.Deleted
+
+        encryptionFlow(
+            decryptedRecord,
+            status = status
+        )
+
+        // When
+        val encryptedRecord = service.encrypt(decryptedRecord)
+
+        // Then
+        assertEquals(
+            expected = status,
+            actual = encryptedRecord.status
         )
     }
 
@@ -526,6 +549,27 @@ class RecordCryptoServiceEncryptionTest {
     }
 
     @Test
+    fun `Given, encrypt is called with a DecryptedRecord, which contains a Fhir4 resource and a UserId, it sets the given Status in the EncryptedRecord`() {
+        // Given
+        val decryptedRecord: DecryptedBaseRecord<Fhir4Resource> = mockk()
+        val status = ModelContract.RecordStatus.Pending
+
+        encryptionFlow(
+            decryptedRecord,
+            status = status
+        )
+
+        // When
+        val encryptedRecord = service.encrypt(decryptedRecord)
+
+        // Then
+        assertEquals(
+            expected = status,
+            actual = encryptedRecord.status
+        )
+    }
+
+    @Test
     fun `Given, encrypt is called with a DecryptedRecord, which contains a Fhir4 resource and a UserId, it encrypts the given Tags and Annotation, and includes them in the EncryptedRecord`() {
         // Given
         val decryptedRecord: DecryptedBaseRecord<Fhir4Resource> = mockk()
@@ -807,6 +851,27 @@ class RecordCryptoServiceEncryptionTest {
         assertEquals(
             expected = version,
             actual = encryptedRecord.modelVersion
+        )
+    }
+
+    @Test
+    fun `Given, encrypt is called with a DecryptedRecord, which contains a DataResource and a UserId, it sets the given Status in the EncryptedRecord`() {
+        // Given
+        val decryptedRecord: DecryptedBaseRecord<DataResource> = mockk()
+        val status = ModelContract.RecordStatus.Active
+
+        encryptionFlow(
+            decryptedRecord,
+            status = status
+        )
+
+        // When
+        val encryptedRecord = service.encrypt(decryptedRecord)
+
+        // Then
+        assertEquals(
+            expected = status,
+            actual = encryptedRecord.status
         )
     }
 

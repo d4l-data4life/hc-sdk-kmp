@@ -26,6 +26,7 @@ import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.model.DownloadType
+import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.DecryptedR4Record
 import care.data4life.sdk.network.model.DecryptedRecord
@@ -428,7 +429,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             null,
             mockk(),
             null,
-            modelVersion
+            modelVersion,
+            ModelContract.RecordStatus.Active
         )
 
         // When
@@ -469,7 +471,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             null,
             mockk(),
             null,
-            modelVersion
+            modelVersion,
+            ModelContract.RecordStatus.Active
         )
 
         // When
@@ -510,7 +513,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             null,
             mockk(),
             null,
-            modelVersion
+            modelVersion,
+            ModelContract.RecordStatus.Active
         )
 
         val stripedRecord = recordService.removeUploadData(decryptedRecord)
@@ -560,7 +564,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             null,
             mockk(),
             null,
-            modelVersion
+            modelVersion,
+            ModelContract.RecordStatus.Active
         )
 
         val stripedRecord = recordService.removeUploadData(decryptedRecord)
@@ -929,7 +934,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             null,
             mockk(),
             attachmentKey,
-            modelVersion
+            modelVersion,
+            ModelContract.RecordStatus.Active
         )
 
         every {
@@ -1035,7 +1041,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             null,
             mockk(),
             attachmentKey,
-            modelVersion
+            modelVersion,
+            ModelContract.RecordStatus.Active
         )
 
         every {
@@ -1141,7 +1148,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             null,
             mockk(),
             attachmentKey,
-            modelVersion
+            modelVersion,
+            ModelContract.RecordStatus.Active
         )
 
         every {
@@ -1237,7 +1245,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             null,
             mockk(),
             attachmentKey,
-            modelVersion
+            modelVersion,
+            ModelContract.RecordStatus.Active
         )
 
         every {
@@ -1343,7 +1352,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             null,
             mockk(),
             attachmentKey,
-            modelVersion
+            modelVersion,
+            ModelContract.RecordStatus.Active
         )
 
         every {
@@ -1449,7 +1459,8 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             null,
             mockk(),
             attachmentKey,
-            modelVersion
+            modelVersion,
+            ModelContract.RecordStatus.Active
         )
 
         every {

@@ -18,11 +18,12 @@ package care.data4life.sdk.network.model
 
 import care.data4life.crypto.GCKey
 import care.data4life.sdk.lang.DataValidationException
+import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.EncryptedTagsAndAnnotations
 import care.data4life.sdk.tag.Tags
 
-class NetworkModelContract {
+interface NetworkModelContract {
     enum class VersionStatus {
         DEPRECATED,
         SUPPORTED,
@@ -72,6 +73,7 @@ class NetworkModelContract {
         val modelVersion: Int
         val updatedDate: String?
         val version: Int
+        val status: ModelContract.RecordStatus
     }
 
     interface DecryptedBaseRecord<T> {
@@ -84,6 +86,7 @@ class NetworkModelContract {
         var dataKey: GCKey
         var attachmentsKey: GCKey?
         var modelVersion: Int
+        var status: ModelContract.RecordStatus
     }
 
     // TODO: This should be internal

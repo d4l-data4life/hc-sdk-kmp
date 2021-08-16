@@ -32,6 +32,9 @@ interface DateHelperContract {
         fun now(): String
         fun formatDate(date: LocalDate): String
         fun formatDateTime(dateTime: LocalDateTime): String
+        fun parseDate(date: String): LocalDate
+        fun parseDateTime(dateTime: String): LocalDateTime
+
         fun buildMeta(record: NetworkModelContract.DecryptedBaseRecord<*>): ModelContract.Meta
 
         companion object {

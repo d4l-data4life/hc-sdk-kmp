@@ -172,6 +172,50 @@ class DateTimeFormatterTest {
     }
 
     @Test
+    fun `Given, parseDate is called with a String, it returns a LocalDate`() {
+        // Given
+        val date = "2020-05-03"
+
+        // When
+        val actual = SdkDateTimeFormatter.parseDate(date)
+
+        // Then
+        assertEquals(
+            expected = LocalDate.of(2020, 5, 3),
+            actual = actual
+        )
+
+        verify(exactly = 1) {
+            LocalDate.parse(
+                date,
+                SdkDateTimeFormatter.DATE_FORMATTER
+            )
+        }
+    }
+
+    @Test
+    fun `Given, parseDateTime is called with a String, it returns a LocalDateTime`() {
+        // Given
+        val dateTime = "2020-05-03T07:45:08.234123"
+
+        // When
+        val actual = SdkDateTimeFormatter.parseDateTime(dateTime)
+
+        // Then
+        assertEquals(
+            expected = LocalDateTime.of(2020, 5, 3, 7, 45, 8, 234123000),
+            actual = actual
+        )
+
+        verify(exactly = 1) {
+            LocalDateTime.parse(
+                dateTime,
+                SdkDateTimeFormatter.DATE_TIME_FORMATTER
+            )
+        }
+    }
+
+    @Test
     fun `Given, buildMeta is called with a DecryptedDataRecord, it returns a Meta object`() {
         // Given
         val creationDate = "2020-05-03"

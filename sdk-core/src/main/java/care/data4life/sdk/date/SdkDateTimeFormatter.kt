@@ -47,6 +47,12 @@ internal object SdkDateTimeFormatter : DateHelperContract.DateTimeFormatter {
         dateTime: LocalDateTime
     ): String = "${UTC_DATE_TIME_FORMATTING.format(dateTime)}Z"
 
+    override fun parseDate(date: String): LocalDate = LocalDate.parse(date, DATE_FORMATTER)
+
+    override fun parseDateTime(
+        dateTime: String
+    ): LocalDateTime = LocalDateTime.parse(dateTime, DATE_TIME_FORMATTER)
+
     override fun buildMeta(
         record: DecryptedBaseRecord<*>
     ): ModelContract.Meta = Meta(

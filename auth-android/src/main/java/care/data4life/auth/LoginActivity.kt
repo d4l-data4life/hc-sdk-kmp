@@ -46,6 +46,8 @@ class LoginActivity : AppCompatActivity() {
                 if (authorizationListener == null) return
 
                 val authException = net.openid.appauth.AuthorizationException.fromIntent(data)
+                println("MYLITTLELOGGER - authException: $authException")
+                authException?.printStackTrace()
                 authorizationListener =
                     if (authException != null && net.openid.appauth.AuthorizationException.GeneralErrors.USER_CANCELED_AUTH_FLOW == authException) {
                         authorizationListener?.onError(
@@ -81,6 +83,8 @@ class LoginActivity : AppCompatActivity() {
             if (error is AuthorizationException.Canceled) {
                 result.putExtra(KEY_CANCELED, error.message)
             } else {
+                println("MYLITTLELOGGER - error: $error")
+                error.printStackTrace()
                 result.putExtra(KEY_ERROR, error.message)
             }
             setResult(Activity.RESULT_CANCELED, result)

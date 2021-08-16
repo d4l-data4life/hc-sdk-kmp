@@ -41,7 +41,9 @@ class CryptoSecureStore @JvmOverloads constructor(
     @Throws(D4LException::class)
     override fun getSecret(alias: String): CharArray {
         return secureStore.getData(alias)
-            ?: throw CryptoException.DecryptionFailed("Failed to decrypt data")
+            ?: throw CryptoException.DecryptionFailed(
+                "Failed to decrypt data - getSecret(1)"
+            )
     }
 
     override fun <T : Any> storeSecret(alias: String, crate: T) {
@@ -53,12 +55,16 @@ class CryptoSecureStore @JvmOverloads constructor(
     @Throws(D4LException::class)
     override fun <T> getSecret(alias: String, type: Class<T>): T? {
         val data: CharArray = secureStore.getData(alias)
-            ?: throw CryptoException.DecryptionFailed("Failed to decrypt data")
+            ?: throw CryptoException.DecryptionFailed(
+                "Failed to decrypt data - getSecret(2)"
+            )
 
         return try {
             moshi.adapter(type).fromJson(String(data))
         } catch (e: IOException) {
-            throw CryptoException.DecryptionFailed("Failed to decrypt data")
+            throw CryptoException.DecryptionFailed(
+                "Failed to decrypt data - getSecret(3)"
+            )
         }
     }
 
@@ -72,8 +78,12 @@ class CryptoSecureStore @JvmOverloads constructor(
             key.getKeyBase64(),
             key.keyVersion
         )
-        val json = moshi.adapter(ExchangeKey::class.java).toJson(exchangeKey)
-        secureStore.addData(alias, json.toCharArray())
+        try {
+            val json = moshi.adapter(ExchangeKey::class.java).toJson(exchangeKey)
+            secureStore.addData(alias, json.toCharArray())
+        } catch (e: Exception) {
+            println("ExchangeKey did not work (1)")
+        }
     }
 
     override fun storeKey(alias: String, key: GCKeyPair) {
@@ -84,17 +94,25 @@ class CryptoSecureStore @JvmOverloads constructor(
             null,
             key.keyVersion
         )
-        val json = moshi.adapter(ExchangeKey::class.java).toJson(exchangeKey)
-        secureStore.addData(alias, json.toCharArray())
+        try {
+            val json = moshi.adapter(ExchangeKey::class.java).toJson(exchangeKey)
+            secureStore.addData(alias, json.toCharArray())
+        } catch (e: Exception) {
+            println("ExchangeKey did not work (2)")
+        }
     }
 
     @Throws(IOException::class)
     override fun getExchangeKey(alias: String): ExchangeKey {
         val data = secureStore.getData(alias)
-            ?: throw (CryptoException.DecryptionFailed("Failed to decrypt data"))
+            ?: throw (CryptoException.DecryptionFailed(
+                "Failed to decrypt data - getExchangeKey(1)"
+            ))
 
         return moshi.adapter(ExchangeKey::class.java).fromJson(String(data))
-            ?: throw (CryptoException.DecryptionFailed("Failed to decrypt data"))
+            ?: throw (CryptoException.DecryptionFailed(
+                "Failed to decrypt data"
+            ))
     }
 
     override operator fun contains(alias: String): Boolean = secureStore.containsData(alias)

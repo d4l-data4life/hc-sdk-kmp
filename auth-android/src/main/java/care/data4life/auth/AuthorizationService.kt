@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import care.data4life.auth.storage.InMemoryAuthStorage
+import care.data4life.sdk.log.Log
 import kotlinx.coroutines.runBlocking
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationRequest
@@ -57,6 +58,7 @@ actual class AuthorizationService internal constructor(
     ): Intent {
         val loginIntent = Intent(context, LoginActivity::class.java)
         val authIntent = authorizationIntent(context, scopes?.toTypedArray(), publicKey)
+        Log.info("Start login")
         loginIntent.putExtra(LoginActivity.AUTHORIZATION_INTENT, authIntent)
         LoginActivity.authorizationListener = authListener
         return loginIntent
@@ -71,6 +73,7 @@ actual class AuthorizationService internal constructor(
 
         val additionalParameters = HashMap<String, String>()
         additionalParameters[PARAMETER_PUBLIC_KEY] = publicKey
+        Log.info("Build request")
         val authRequest = AuthorizationRequest.Builder(
             appAuthServiceConfig,
             configuration.clientId,
@@ -86,6 +89,9 @@ actual class AuthorizationService internal constructor(
     fun finishLogin(authData: Intent, callback: Callback) {
         val authResponse = AuthorizationResponse.fromIntent(authData)
         val authException = net.openid.appauth.AuthorizationException.fromIntent(authData)
+        Log.info("Fins login")
+        Log.info("Response: $authResponse")
+        Log.info("Error: $authException")
         if (authResponse != null) {
             val authState = AuthState(authResponse, authException)
             val request = authResponse.createTokenExchangeRequest()
@@ -109,6 +115,8 @@ actual class AuthorizationService internal constructor(
     actual override fun getAccessToken(alias: String): String {
         val state = readAuthState()
 
+        Log.info("getAccessToken")
+        Log.info("Token - ${state?.accessToken}")
         state?.accessToken?.let {
             return it
         }
@@ -120,6 +128,8 @@ actual class AuthorizationService internal constructor(
     actual override fun getRefreshToken(alias: String): String {
         val state = readAuthState()
 
+        Log.info("getRefreshToken")
+        Log.info("Token - ${state?.refreshToken}")
         state?.refreshToken?.let {
             return it
         }
@@ -132,10 +142,16 @@ actual class AuthorizationService internal constructor(
         var accessToken: String? = null
         runBlocking {
             val state = requestAccessToken()
+
+            Log.info("refreshAccessToken - coroutine")
+            Log.info("Token - ${state.accessToken}")
+
             writeAuthState(state)
             accessToken = state.accessToken
         }
 
+        Log.info("refreshAccessToken - coroutine")
+        Log.info("Outer Token - $accessToken")
         accessToken?.let {
             return it
         }
@@ -149,6 +165,9 @@ actual class AuthorizationService internal constructor(
         val clientAuth: ClientAuthentication = ClientSecretBasic(configuration.clientSecret)
         request?.let {
             val result = appAuthService.performSynchronousTokenRequest(request, clientAuth)
+            Log.info("requestAccessToken ")
+            Log.info("Result - ${result.response}")
+            Log.info("Error - ${result.exception}")
             state.update(result.response, result.exception)
             result.exception?.let { throw it }
             return@requestAccessToken state
@@ -159,6 +178,10 @@ actual class AuthorizationService internal constructor(
 
     private fun readAuthState(): AuthState? {
         val authStateJson = storage.readAuthState(USER_ALIAS)
+
+        Log.info("readAuthState ")
+        Log.info("State - $authStateJson")
+
         try {
             return authStateJson?.let { AuthState.jsonDeserialize(it) }
         } catch (e: JSONException) {

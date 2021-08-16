@@ -17,6 +17,7 @@
 package care.data4life.auth.storage
 
 import care.data4life.auth.AuthorizationContract
+import care.data4life.sdk.log.Log
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -26,6 +27,7 @@ class InMemoryAuthStorage : AuthorizationContract.Storage {
     private val lock = ReentrantLock()
 
     override fun clear() {
+        Log.info("SharedPref#clear")
         lock.withLock {
             store.clear()
         }
@@ -33,24 +35,28 @@ class InMemoryAuthStorage : AuthorizationContract.Storage {
 
     override fun readAuthState(alias: String): String? {
         lock.withLock {
+            Log.info("SharedPref#readAuthState $alias - ${store[alias]}")
             return store[alias]
         }
     }
 
     override fun writeAuthState(alias: String, authState: String) {
         lock.withLock {
+            Log.info("SharedPref#writeAuthState $alias - $authState")
             store[alias] = authState
         }
     }
 
     override fun containsAuthState(alias: String): Boolean {
         lock.withLock {
+            Log.info("SharedPref#containsAuthState $alias - ${store.containsKey(alias)}")
             return store.containsKey(alias)
         }
     }
 
     override fun removeAuthState(alias: String) {
         lock.withLock {
+            Log.info("SharedPref#removeAuthState $alias")
             store.remove(alias)
         }
     }

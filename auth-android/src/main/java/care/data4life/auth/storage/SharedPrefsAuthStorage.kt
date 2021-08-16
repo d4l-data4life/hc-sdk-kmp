@@ -17,6 +17,7 @@
 package care.data4life.auth.storage
 
 import care.data4life.auth.AuthorizationContract
+import care.data4life.sdk.log.Log
 import care.data4life.securestore.SecureStoreContract
 
 class SharedPrefsAuthStorage(
@@ -24,22 +25,27 @@ class SharedPrefsAuthStorage(
 ) : AuthorizationContract.Storage {
 
     override fun readAuthState(alias: String): String? {
+        Log.info("SharedPref#readAuthState $alias: ${key(alias)}")
         return store.getData(key(alias))?.let { String(it) }
     }
 
     override fun writeAuthState(alias: String, authState: String) {
+        Log.info("SharedPref#writeAuthState $alias:  ${key(alias)} with $authState")
         store.addData(key(alias), authState.toCharArray())
     }
 
     override fun containsAuthState(alias: String): Boolean {
+        Log.info("SharedPref#containsAuthState $alias:  ${key(alias)}")
         return store.containsData(key(alias))
     }
 
     override fun removeAuthState(alias: String) {
+        Log.info("SharedPref#SharedPref#removeAuthState $alias:  ${key(alias)}")
         store.removeData(key(alias))
     }
 
     override fun clear() {
+        Log.info("SharedPref#clear")
         store.clear()
     }
 

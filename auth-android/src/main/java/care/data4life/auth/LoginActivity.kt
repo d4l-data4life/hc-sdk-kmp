@@ -20,6 +20,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import care.data4life.sdk.log.Log
 
 class LoginActivity : AppCompatActivity() {
     private var isAuthIntentCalled = false
@@ -43,11 +44,12 @@ class LoginActivity : AppCompatActivity() {
 
         if (requestCode == D4L_AUTH_CODE) {
             if (resultCode == Activity.RESULT_CANCELED) {
-                if (authorizationListener == null) return
+                if (authorizationListener == null) { Log.info("no listener"); return }
 
                 val authException = net.openid.appauth.AuthorizationException.fromIntent(data)
                 authorizationListener =
                     if (authException != null && net.openid.appauth.AuthorizationException.GeneralErrors.USER_CANCELED_AUTH_FLOW == authException) {
+                        Log.info("no authException")
                         authorizationListener?.onError(
                             AuthorizationException.Canceled(),
                             loginFinishedCbk
@@ -63,6 +65,7 @@ class LoginActivity : AppCompatActivity() {
             } else if (resultCode == Activity.RESULT_OK) {
                 if (authorizationListener == null) throw RuntimeException("authorizationListener not set!")
 
+                Log.info("done with $loginFinishedCbk")
                 authorizationListener?.onSuccess(data, loginFinishedCbk)
                 authorizationListener = null
             }
@@ -78,6 +81,7 @@ class LoginActivity : AppCompatActivity() {
         override fun onError(error: Throwable) {
             val result = Intent()
 
+            Log.info("done with error ${error.message}")
             if (error is AuthorizationException.Canceled) {
                 result.putExtra(KEY_CANCELED, error.message)
             } else {

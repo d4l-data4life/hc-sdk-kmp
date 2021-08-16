@@ -111,7 +111,7 @@ class CryptoSecureStore @JvmOverloads constructor(
 
         return moshi.adapter(ExchangeKey::class.java).fromJson(String(data))
             ?: throw (CryptoException.DecryptionFailed(
-                "Failed to decrypt data"
+                "Failed to decrypt data - getExchangeKey(1)"
             ))
     }
 

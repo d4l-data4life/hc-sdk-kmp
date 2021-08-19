@@ -34,7 +34,7 @@ object Versions {
     /**
      * [hc-fhir-helper-sdk-kmp](https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp)
      */
-    const val fhirHelper = "1.4.1"
+    const val fhirHelper = "1.6.0"
 
     /**
      * [hc-auth-sdk-kmp](https://github.com/d4l-data4life/hc-auth-sdk-kmp)
@@ -61,7 +61,7 @@ object Versions {
 
     object GradlePlugins {
         const val kotlin = Versions.kotlin
-        const val android = "4.2.1"
+        const val android = "4.2.2"
 
         /**
          * [Dexcount](https://github.com/KeepSafe/dexcount-gradle-plugin)
@@ -131,6 +131,7 @@ object Versions {
      * [appAuthPatch](https://github.com/gesundheitscloud/AppAuth-Android)
      */
     const val appAuthPatch = "9e3cc033ff"
+
     // Network
     /**
      * [okHttp](https://github.com/square/okhttp)

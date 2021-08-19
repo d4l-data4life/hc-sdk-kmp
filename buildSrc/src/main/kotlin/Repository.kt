@@ -38,7 +38,9 @@ object Repository {
         "care.data4life.hc-result-sdk-kmp",
         "care.data4life.hc-auth-sdk-kmp",
         "care.data4life.hc-crypto-sdk-kmp",
-        "care.data4life.hc-securestore-sdk-kmp"
+        "care.data4life.hc-securestore-sdk-kmp",
+        "care.data4life.hc-fhir-sdk-java",
+        "hc-fhir-helper-sdk-kmp"
     )
 }
 
@@ -60,21 +62,21 @@ fun RepositoryHandler.gitHub(project: Project) {
 }
 
 fun RepositoryHandler.d4l() {
-    maven("https://raw.github.com/d4l-data4life/maven-repository/main/releases") {
+    maven("https://raw.github.com/d4l-data4life/maven-releases/main/releases") {
         content {
             Repository.d4l.forEach { group ->
                 includeGroup(group)
             }
         }
     }
-    maven("https://raw.github.com/d4l-data4life/maven-repository/main/snapshots") {
+    maven("https://raw.github.com/d4l-data4life/maven-snapshots/main/snapshots") {
         content {
             Repository.d4l.forEach { group ->
                 includeGroup(group)
             }
         }
     }
-    maven("https://raw.github.com/d4l-data4life/maven-repository/main/features") {
+    maven("https://raw.github.com/d4l-data4life/maven-features/main/features") {
         content {
             Repository.d4l.forEach { group ->
                 includeGroup(group)

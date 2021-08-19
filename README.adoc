@@ -1,5 +1,5 @@
 = Data4Life SDK
-:library_version: 1.13.2
+:library_version: 1.14.0
 :doctype: article
 :!showtitle:
 :toc: macro
@@ -184,7 +184,7 @@ dependencies {
             exclude group: 'care.data4life.hc-sdk-kmp', module: 'securestore-android'
             exclude group: 'care.data4life.hc-sdk-kmp', module: 'crypto-android'
             exclude group: 'care.data4life.hc-sdk-kmp', module: 'auth-android'
-            exclude group: 'care.data4life.hc-util-sdk-kmp', module: 'util-android'
+            exclude group: 'care.data4life.hc-util-sdk-kmp', module: 'util'
     }
 }
 ----
@@ -198,7 +198,7 @@ dependencies {
         exclude group: 'care.data4life.hc-sdk-kmp', module: 'securestore-jvm'
         exclude group: 'care.data4life.hc-sdk-kmp', module: 'crypto-jvm'
         exclude group: 'care.data4life.hc-sdk-kmp', module: 'auth-jvm'
-        exclude group: 'care.data4life.hc-util-sdk-kmp', module: 'util-jvm'
+        exclude group: 'care.data4life.hc-util-sdk-kmp', module: 'util'
     }
 }
 ----

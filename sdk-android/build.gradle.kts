@@ -55,7 +55,6 @@ android {
         getByName("release") {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
-            setMatchingFallbacks("release")
         }
     }
 
@@ -94,7 +93,11 @@ dependencies {
     coreLibraryDesugaring(Dependencies.Android.androidDesugar)
 
     api(project(":sdk-core")) {
+        // TODO
         exclude(group = "org.threeten", module = "threetenbp")
+        exclude(module = "securestore-jvm")
+        exclude(module = "crypto-jvm")
+        exclude(module = "auth-jvm")
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
     }
 

@@ -42,6 +42,9 @@ kotlin {
 
 dependencies {
     api(project(":sdk-core")) {
+        exclude(group = "care.data4life", module = "securestore-android")
+        exclude(group = "care.data4life", module = "crypto-android")
+        exclude(group = "care.data4life", module = "auth-android")
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }

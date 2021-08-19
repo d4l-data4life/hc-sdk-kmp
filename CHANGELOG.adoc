@@ -12,7 +12,7 @@ and this project adheres to http://semver.org/spec/v2.0.0.html[Semantic Versioni
 ==== Versions
 toc::[]
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.13.2...main[Unreleased]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.14.0...main[Unreleased]
 
 === Added
 
@@ -26,9 +26,16 @@ toc::[]
 
 === Bumped
 
-* JaCoCo 0.8.3 -> 0.8.7
-
 === Migration
+
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.13.2...v1.14.0[1.14.0]
+
+=== Bumped
+
+* Android Gradle Plugin 4.2.1 -> 4.2.2
+* JaCoCo 0.8.3 -> 0.8.7
+* SDK-Util 1.6.1 -> 1.9.0
+* FHIR-Helper-SDK 1.4.1 -> 1.6.0
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.13.1...v1.13.2[1.13.2]
 

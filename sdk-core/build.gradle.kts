@@ -37,6 +37,7 @@ kotlin {
 
 dependencies {
     api(Dependencies.Multiplatform.D4L.utilJvm)
+    api(Dependencies.Multiplatform.D4L.resultErrorJvm)
     implementation(Dependencies.Multiplatform.Kotlin.stdlib)
 
     implementation(Dependencies.Multiplatform.D4L.authJvm)

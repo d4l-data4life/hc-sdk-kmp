@@ -102,6 +102,7 @@ dependencies {
     implementation(Dependencies.Multiplatform.D4L.cryptoAndroid)
     implementation(Dependencies.Multiplatform.D4L.securestoreAndroid)
     api(Dependencies.Multiplatform.D4L.utilAndroid)
+    api(Dependencies.Multiplatform.D4L.resultErrorAndroid)
 
     implementation(Dependencies.Multiplatform.D4L.fhirSdk)
     implementation(Dependencies.Android.threeTenABP)

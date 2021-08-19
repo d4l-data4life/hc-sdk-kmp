@@ -16,7 +16,15 @@
 
 object Versions {
     // D4L
+    /**
+     * [hc-util-sdk-kmp](https://github.com/d4l-data4life/hc-util-sdk-kmp)
+     */
     const val sdkUtil = "1.10.0"
+
+    /**
+     * [hc-result-sdk-kmp](https://github.com/d4l-data4life/hc-result-sdk-kmp)
+     */
+    const val resultSdk = "0.1.1"
 
     /**
      * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)

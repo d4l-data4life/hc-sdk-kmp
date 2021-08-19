@@ -131,9 +131,7 @@ dependencies {
 
     implementation(Dependencies.Android.moshi)
 
-
     testImplementation(Dependencies.Android.Test.junit)
-
 
     androidTestImplementation(Dependencies.Android.AndroidTest.runner)
 }

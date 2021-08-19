@@ -35,10 +35,10 @@ import care.data4life.fhir.stu3.model.FhirDateTime;
 import care.data4life.fhir.stu3.model.FhirInstant;
 import care.data4life.fhir.stu3.model.Practitioner;
 import care.data4life.fhir.stu3.util.FhirDateTimeParser;
-import care.data4life.sdk.config.DataRestrictionException;
 import care.data4life.sdk.helpers.stu3.AttachmentBuilder;
 import care.data4life.sdk.helpers.stu3.DocumentReferenceBuilder;
 import care.data4life.sdk.helpers.stu3.PractitionerBuilder;
+import care.data4life.sdk.lang.DataRestrictionException;
 
 final class FHIRUtils {
     private static final String TAG = FHIRUtils.class.getSimpleName();

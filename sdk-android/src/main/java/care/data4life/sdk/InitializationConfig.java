@@ -18,7 +18,7 @@ package care.data4life.sdk;
 
 import java.util.Set;
 
-import care.data4life.auth.Authorization;
+import care.data4life.sdk.auth.Authorization;
 import care.data4life.fhir.util.Preconditions;
 
 public final class InitializationConfig {

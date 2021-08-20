@@ -16,8 +16,8 @@
 
 package care.data4life.sdk.attachment
 
-import care.data4life.crypto.GCKey
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
 import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID

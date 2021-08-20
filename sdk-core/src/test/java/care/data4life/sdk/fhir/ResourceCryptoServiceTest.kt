@@ -15,9 +15,9 @@
  */
 package care.data4life.sdk.fhir
 
-import care.data4life.crypto.GCKey
-import care.data4life.crypto.error.CryptoException
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.crypto.GCKey
+import care.data4life.sdk.crypto.error.CryptoException
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_KEY
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_VALUE

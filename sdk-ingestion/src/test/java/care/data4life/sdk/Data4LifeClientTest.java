@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import care.data4life.auth.AuthorizationService;
+import care.data4life.sdk.auth.AuthorizationService;
 import care.data4life.sdk.auth.UserService;
 import care.data4life.sdk.call.CallHandler;
 import care.data4life.sdk.crypto.CryptoService;

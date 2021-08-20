@@ -15,16 +15,16 @@
  */
 package care.data4life.sdk
 
-import care.data4life.crypto.GCKey
 import care.data4life.fhir.r4.model.Extension
 import care.data4life.sdk.attachment.AttachmentContract
-import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
+import care.data4life.sdk.lang.DataRestrictionException
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.DecryptedR4Record

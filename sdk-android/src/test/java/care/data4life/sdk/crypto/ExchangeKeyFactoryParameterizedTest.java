@@ -22,10 +22,10 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 
-import care.data4life.crypto.ExchangeKey;
-import care.data4life.crypto.ExchangeKeyFactory;
-import care.data4life.crypto.KeyType;
-import care.data4life.crypto.KeyVersion;
+import care.data4life.sdk.crypto.ExchangeKey;
+import care.data4life.sdk.crypto.ExchangeKeyFactory;
+import care.data4life.sdk.crypto.KeyType;
+import care.data4life.sdk.crypto.KeyVersion;
 
 import static org.junit.Assert.assertEquals;
 

@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.network.util
 
-import care.data4life.auth.AuthorizationContract
+import care.data4life.sdk.auth.AuthorizationContract
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.NetworkingContract.Companion.PLATFORM_S4H
 import care.data4life.sdk.network.NetworkingContract.Companion.REQUEST_TIMEOUT

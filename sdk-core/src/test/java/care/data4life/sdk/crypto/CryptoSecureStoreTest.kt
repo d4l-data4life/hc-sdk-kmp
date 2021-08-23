@@ -16,12 +16,7 @@
 
 package care.data4life.sdk.crypto
 
-import care.data4life.crypto.ExchangeKey
-import care.data4life.crypto.GCKey
-import care.data4life.crypto.GCKeyPair
-import care.data4life.crypto.GCRSAKeyAlgorithm
-import care.data4life.crypto.KeyType
-import care.data4life.securestore.SecureStoreContract
+import care.data4life.sdk.securestore.SecureStoreContract
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import io.mockk.clearAllMocks

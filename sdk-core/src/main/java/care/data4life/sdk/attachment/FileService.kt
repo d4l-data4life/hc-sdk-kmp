@@ -15,8 +15,8 @@
  */
 package care.data4life.sdk.attachment
 
-import care.data4life.crypto.GCKey
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.lang.FileException
 import care.data4life.sdk.network.NetworkingContract
 import io.reactivex.Single

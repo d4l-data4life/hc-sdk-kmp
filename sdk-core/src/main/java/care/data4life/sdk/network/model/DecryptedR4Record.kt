@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.network.model
 
-import care.data4life.crypto.GCKey
+import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedFhir4Record
 import care.data4life.sdk.tag.Annotations

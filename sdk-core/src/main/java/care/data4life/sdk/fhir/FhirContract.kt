@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.fhir
 
-import care.data4life.crypto.GCKey
+import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.tag.Tags
 
 // TODO: make internal

@@ -17,9 +17,14 @@
 object Versions {
     // D4L
     /**
-     * [hc-sdk-util-kmp](https://github.com/d4l-data4life/hc-util-sdk-kmp)
-     **/
-    const val sdkUtil = "1.9.0"
+     * [hc-util-sdk-kmp](https://github.com/d4l-data4life/hc-util-sdk-kmp)
+     */
+    const val sdkUtil = "1.10.0"
+
+    /**
+     * [hc-result-sdk-kmp](https://github.com/d4l-data4life/hc-result-sdk-kmp)
+     */
+    const val resultSdk = "0.1.1"
 
     /**
      * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)
@@ -30,6 +35,21 @@ object Versions {
      * [hc-fhir-helper-sdk-kmp](https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp)
      */
     const val fhirHelper = "1.6.0"
+
+    /**
+     * [hc-auth-sdk-kmp](https://github.com/d4l-data4life/hc-auth-sdk-kmp)
+     */
+    const val auth = "1.13.2"
+
+    /**
+     * [hc-crypto-sdk-kmp](https://github.com/d4l-data4life/hc-crypto-sdk-kmp)
+     */
+    const val crypto = "1.13.2"
+
+    /**
+     * [hc-securestore-sdk-kmp](https://github.com/d4l-data4life/hc-securestore-sdk-kmp)
+     */
+    const val securestore = "1.13.2"
 
     // kotlin
     const val kotlin = "1.4.32"
@@ -111,11 +131,6 @@ object Versions {
      * [appAuthPatch](https://github.com/gesundheitscloud/AppAuth-Android)
      */
     const val appAuthPatch = "9e3cc033ff"
-
-    /**
-     * [scribe](https://github.com/scribejava/scribejava)
-     */
-    const val scribe = "6.1.0"
 
     // Network
     /**

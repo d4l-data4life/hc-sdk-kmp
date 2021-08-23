@@ -24,7 +24,6 @@ apply(from = "${project.rootDir}/gradle/deploy-java.gradle")
 
 group = LibraryConfig.group
 
-
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
@@ -37,12 +36,13 @@ kotlin {
 }
 
 dependencies {
-    api(Dependencies.Multiplatform.D4L.sdkUtil)
+    api(Dependencies.Multiplatform.D4L.utilJvm)
+    api(Dependencies.Multiplatform.D4L.resultErrorJvm)
     implementation(Dependencies.Multiplatform.Kotlin.stdlib)
 
-    implementation(project(":securestore-jvm"))
-    implementation(project(":crypto-jvm"))
-    implementation(project(":auth-jvm"))
+    implementation(Dependencies.Multiplatform.D4L.authJvm)
+    implementation(Dependencies.Multiplatform.D4L.cryptoJvm)
+    implementation(Dependencies.Multiplatform.D4L.securestoreJvm)
     implementation(Dependencies.Multiplatform.D4L.fhirSdk)
     implementation(Dependencies.Java.threeTenBP)
 
@@ -62,7 +62,7 @@ dependencies {
     kapt(Dependencies.Java.moshiCodeGen)
     kaptTest(Dependencies.Java.moshiCodeGen)
 
-    testImplementation(Dependencies.Multiplatform.D4L.fhirHelper) {
+    testImplementation(Dependencies.Multiplatform.D4L.fhirHelperJvm) {
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
     testImplementation(Dependencies.Java.Test.junit)

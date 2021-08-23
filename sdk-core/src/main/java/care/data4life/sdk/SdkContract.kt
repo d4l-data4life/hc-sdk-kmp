@@ -104,7 +104,7 @@ interface SdkContract {
          * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          * @return [Task] which can be used to cancel ongoing operation or to query operation status
          * @throws IllegalArgumentException if {@param recordId} is not FHIR4
-         * @throws care.data4life.sdk.config.DataRestrictionException if {@param resource} is DocumentReference and {@link Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
+         * @throws care.data4life.sdk.config.DataValidationException if {@param resource} is DocumentReference and {@link Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
          </T> */
         fun <T : Fhir4Resource> download(recordId: String, callback: Callback<Fhir4Record<T>>): Task
 

@@ -34,10 +34,6 @@ crypto:
   - crypto-android/**/*
   - crypto-common/**/*
   - crypto-jvm/**/*
-securestore:
-  - securestore-android/**/*
-  - securestore-common/**/*
-  - securestore-jvm/**/*
 
 # Sample Apps
 sample-android:

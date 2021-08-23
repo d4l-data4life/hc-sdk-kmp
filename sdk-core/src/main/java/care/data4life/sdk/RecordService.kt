@@ -15,7 +15,6 @@
  */
 package care.data4life.sdk
 
-import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.AttachmentGuardian
 import care.data4life.sdk.attachment.AttachmentHasher
@@ -24,8 +23,8 @@ import care.data4life.sdk.attachment.ThumbnailService.Companion.SPLIT_CHAR
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_BYTES
-import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3Resource
@@ -161,8 +160,8 @@ class RecordService internal constructor(
 
     @Suppress("UNCHECKED_CAST")
     @Throws(
-        DataRestrictionException.UnsupportedFileType::class,
-        DataRestrictionException.MaxDataSizeViolation::class
+        DataValidationException.UnsupportedFileType::class,
+        DataValidationException.MaxDataSizeViolation::class
     )
     override fun <T : Fhir3Resource> createRecord(
         userId: String,
@@ -401,8 +400,8 @@ class RecordService internal constructor(
     ) as Single<List<DataRecord<DataResource>>>
 
     @Throws(
-        DataRestrictionException.UnsupportedFileType::class,
-        DataRestrictionException.MaxDataSizeViolation::class
+        DataValidationException.UnsupportedFileType::class,
+        DataValidationException.MaxDataSizeViolation::class
     )
     internal fun <T : Any> updateRecord(
         userId: String,
@@ -448,8 +447,8 @@ class RecordService internal constructor(
 
     @Suppress("UNCHECKED_CAST")
     @Throws(
-        DataRestrictionException.UnsupportedFileType::class,
-        DataRestrictionException.MaxDataSizeViolation::class
+        DataValidationException.UnsupportedFileType::class,
+        DataValidationException.MaxDataSizeViolation::class
     )
     override fun <T : Fhir3Resource> updateRecord(
         userId: String,
@@ -465,8 +464,8 @@ class RecordService internal constructor(
 
     @Suppress("UNCHECKED_CAST")
     @Throws(
-        DataRestrictionException.UnsupportedFileType::class,
-        DataRestrictionException.MaxDataSizeViolation::class
+        DataValidationException.UnsupportedFileType::class,
+        DataValidationException.MaxDataSizeViolation::class
     )
     override fun <T : Fhir4Resource> updateRecord(
         userId: String,
@@ -1127,8 +1126,8 @@ class RecordService internal constructor(
 
     // TODO: Move to AttachmentService
     @Throws(
-        DataRestrictionException.MaxDataSizeViolation::class,
-        DataRestrictionException.UnsupportedFileType::class
+        DataValidationException.MaxDataSizeViolation::class,
+        DataValidationException.UnsupportedFileType::class
     )
     fun <T : Any> checkDataRestrictions(resource: T) {
         if (isFhirWithPossibleAttachments(resource)) {
@@ -1142,10 +1141,10 @@ class RecordService internal constructor(
                 if (attachment.data is String) {
                     val data = decode(attachment.data!!)
                     if (recognizeMimeType(data) == MimeType.UNKNOWN) {
-                        throw DataRestrictionException.UnsupportedFileType()
+                        throw DataValidationException.UnsupportedFileType()
                     }
                     if (data.size > DATA_SIZE_MAX_BYTES) {
-                        throw DataRestrictionException.MaxDataSizeViolation()
+                        throw DataValidationException.MaxDataSizeViolation()
                     }
                 }
             }

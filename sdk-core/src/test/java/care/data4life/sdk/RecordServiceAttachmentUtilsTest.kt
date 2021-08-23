@@ -17,7 +17,6 @@
 package care.data4life.sdk
 
 import care.data4life.sdk.attachment.AttachmentContract
-import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Attachment
@@ -25,6 +24,7 @@ import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
+import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.tag.TaggingContract
@@ -182,7 +182,7 @@ class RecordServiceAttachmentUtilsTest {
         every { Base64.decode(encodedPayload) } returns decodedPayload
 
         // Then
-        assertFailsWith<DataRestrictionException.UnsupportedFileType> {
+        assertFailsWith<DataValidationException.UnsupportedFileType> {
             // When
             recordService.checkDataRestrictions(resource)
         }
@@ -212,7 +212,7 @@ class RecordServiceAttachmentUtilsTest {
         every { Base64.decode(encodedPayload) } returns decodedPayload
 
         // Then
-        assertFailsWith<DataRestrictionException.MaxDataSizeViolation> {
+        assertFailsWith<DataValidationException.MaxDataSizeViolation> {
             // When
             recordService.checkDataRestrictions(resource)
         }
@@ -373,7 +373,7 @@ class RecordServiceAttachmentUtilsTest {
         every { Base64.decode(encodedPayload) } returns decodedPayload
 
         // Then
-        assertFailsWith<DataRestrictionException.UnsupportedFileType> {
+        assertFailsWith<DataValidationException.UnsupportedFileType> {
             // When
             recordService.checkDataRestrictions(resource)
         }
@@ -403,7 +403,7 @@ class RecordServiceAttachmentUtilsTest {
         every { Base64.decode(encodedPayload) } returns decodedPayload
 
         // Then
-        assertFailsWith<DataRestrictionException.MaxDataSizeViolation> {
+        assertFailsWith<DataValidationException.MaxDataSizeViolation> {
             // When
             recordService.checkDataRestrictions(resource)
         }

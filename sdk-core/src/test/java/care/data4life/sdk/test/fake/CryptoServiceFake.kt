@@ -16,11 +16,11 @@
 
 package care.data4life.sdk.test.fake
 
-import care.data4life.crypto.GCAsymmetricKey
-import care.data4life.crypto.GCKey
-import care.data4life.crypto.GCKeyPair
-import care.data4life.crypto.KeyType
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.crypto.GCAsymmetricKey
+import care.data4life.sdk.crypto.GCKey
+import care.data4life.sdk.crypto.GCKeyPair
+import care.data4life.sdk.crypto.KeyType
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.network.model.NetworkModelContract
 import care.data4life.sdk.tag.Annotations

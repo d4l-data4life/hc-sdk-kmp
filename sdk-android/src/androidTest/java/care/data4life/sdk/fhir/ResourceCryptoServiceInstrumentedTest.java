@@ -27,19 +27,19 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import care.data4life.crypto.GCKey;
 import care.data4life.fhir.stu3.model.DocumentReference;
 import care.data4life.fhir.stu3.model.DomainResource;
-import care.data4life.sdk.CryptoSecureStore;
-import care.data4life.sdk.CryptoService;
-import care.data4life.sdk.config.DataRestrictionException;
+import care.data4life.sdk.crypto.CryptoSecureStore;
+import care.data4life.sdk.crypto.CryptoService;
+import care.data4life.sdk.crypto.GCKey;
+import care.data4life.sdk.lang.DataValidationException;
+import care.data4life.sdk.securestore.SecureStore;
+import care.data4life.sdk.securestore.SecureStoreCryptor;
+import care.data4life.sdk.securestore.SecureStoreStorage;
 import care.data4life.sdk.test.data.model.SymTestData;
 import care.data4life.sdk.test.util.AssetsHelper;
 import care.data4life.sdk.test.util.DocumentReferenceFactory;
 import care.data4life.sdk.util.Base64;
-import care.data4life.securestore.SecureStore;
-import care.data4life.securestore.SecureStoreCryptor;
-import care.data4life.securestore.SecureStoreStorage;
 
 import static care.data4life.sdk.tag.TaggingContract.TAG_FHIR_VERSION;
 import static care.data4life.sdk.tag.TaggingContract.TAG_RESOURCE_TYPE;
@@ -69,7 +69,7 @@ public class ResourceCryptoServiceInstrumentedTest {
     }
 
     @Test
-    public void encryptAndDecryptFhirResource_shouldCompleteWithoutErrors() throws DataRestrictionException.UnsupportedFileType, DataRestrictionException.MaxDataSizeViolation {
+    public void encryptAndDecryptFhirResource_shouldCompleteWithoutErrors() throws DataValidationException.UnsupportedFileType, DataValidationException.MaxDataSizeViolation {
         // given
         DocumentReference dummyDocRef = DocumentReferenceFactory.buildDocument();
         Map<String, String> tags = new HashMap<String, String>() {{

@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.tag
 
-import care.data4life.crypto.GCKey
+import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.migration.Migration
 import java.io.IOException

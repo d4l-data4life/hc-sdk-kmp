@@ -16,9 +16,6 @@
 
 package care.data4life.sdk.crypto
 
-import care.data4life.crypto.ExchangeKey
-import care.data4life.crypto.GCKey
-import care.data4life.crypto.GCKeyPair
 import java.io.IOException
 
 internal class CryptoInternalContract {

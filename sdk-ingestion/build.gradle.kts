@@ -45,17 +45,17 @@ dependencies {
         exclude(group = "care.data4life", module = "securestore-android")
         exclude(group = "care.data4life", module = "crypto-android")
         exclude(group = "care.data4life", module = "auth-android")
-        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util")
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
     implementation(Dependencies.Multiplatform.Kotlin.stdlib)
 
-    implementation(project(":securestore-jvm"))
-    implementation(project(":crypto-jvm"))
-    implementation(project(":auth-jvm"))
-    implementation(Dependencies.Multiplatform.D4L.sdkUtil)
-    implementation(Dependencies.Multiplatform.D4L.fhirHelper) {
-        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util")
+    implementation(Dependencies.Multiplatform.D4L.authJvm)
+    implementation(Dependencies.Multiplatform.D4L.cryptoJvm)
+    implementation(Dependencies.Multiplatform.D4L.securestoreJvm)
+    implementation(Dependencies.Multiplatform.D4L.utilJvm)
+    implementation(Dependencies.Multiplatform.D4L.fhirHelperJvm) {
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
     implementation(Dependencies.Multiplatform.D4L.fhirSdk)

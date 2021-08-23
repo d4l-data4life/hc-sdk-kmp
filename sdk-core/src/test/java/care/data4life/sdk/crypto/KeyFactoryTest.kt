@@ -16,8 +16,6 @@
 
 package care.data4life.sdk.crypto
 
-import care.data4life.crypto.ExchangeKey
-import care.data4life.crypto.KeyType
 import care.data4life.sdk.util.Base64
 import org.junit.Before
 import org.junit.Test

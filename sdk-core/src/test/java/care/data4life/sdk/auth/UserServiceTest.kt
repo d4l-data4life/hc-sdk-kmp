@@ -16,10 +16,9 @@
 
 package care.data4life.sdk.auth
 
-import care.data4life.auth.AuthorizationContract
-import care.data4life.crypto.GCKey
-import care.data4life.crypto.GCKeyPair
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.crypto.GCKey
+import care.data4life.sdk.crypto.GCKeyPair
 import care.data4life.sdk.log.Log
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.EncryptedKey

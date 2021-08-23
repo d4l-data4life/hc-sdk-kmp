@@ -58,7 +58,7 @@ android {
 
     buildTypes {
         getByName("debug") {
-            setMatchingFallbacks("release")
+            setMatchingFallbacks("debug", "release")
         }
         getByName("release") {
             isMinifyEnabled = false
@@ -100,20 +100,22 @@ dependencies {
 
     implementation(project(":sdk-android")) {
         exclude(group = "org.threeten", module = "threetenbp")
-        exclude(group = "care.data4life", module = "securestore-jvm")
-        exclude(group = "care.data4life", module = "crypto-jvm")
-        exclude(group = "care.data4life", module = "auth-jvm")
-        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util")
-        exclude(group = "care.data4life.hc-fhir-helper-sdk-kmp", module = "fhir-helper")
+        exclude(group = "care.data4life.hc-securestore-sdk-kmp", module = "securestore-jvm")
+        exclude(group = "care.data4life.hc-crypto-sdk-kmp", module = "crypto-jvm")
+        exclude(group = "care.data4life.hc-auth-sdk-kmp", module = "auth-jvm")
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
+        exclude(group = "care.data4life.hc-result-sdk-kmp", module = "error-jvm")
+        exclude(group = "care.data4life.hc-fhir-helper-sdk-kmp", module = "fhir-helper-jvm")
     }
 
-    implementation(Dependencies.Multiplatform.D4L.fhirHelper) {
-        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util")
+    implementation(Dependencies.Multiplatform.D4L.fhirHelperAndroid) {
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
     implementation(Dependencies.Multiplatform.D4L.fhirSdk)
 
-    implementation(Dependencies.Multiplatform.D4L.sdkUtil)
+    implementation(Dependencies.Multiplatform.D4L.utilAndroid)
+    implementation(Dependencies.Multiplatform.D4L.resultErrorAndroid)
 
     implementation(Dependencies.Android.threeTenABP)
 
@@ -129,9 +131,7 @@ dependencies {
 
     implementation(Dependencies.Android.moshi)
 
-
     testImplementation(Dependencies.Android.Test.junit)
-
 
     androidTestImplementation(Dependencies.Android.AndroidTest.runner)
 }

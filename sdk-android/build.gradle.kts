@@ -93,17 +93,19 @@ dependencies {
     coreLibraryDesugaring(Dependencies.Android.androidDesugar)
 
     api(project(":sdk-core")) {
+        // TODO
         exclude(group = "org.threeten", module = "threetenbp")
         exclude(module = "securestore-jvm")
         exclude(module = "crypto-jvm")
         exclude(module = "auth-jvm")
-        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util")
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
     }
-    implementation(project(":securestore-android"))
-    implementation(project(":crypto-android"))
-    implementation(project(":auth-android"))
 
-    api(Dependencies.Multiplatform.D4L.sdkUtil)
+    implementation(Dependencies.Multiplatform.D4L.authAndroid)
+    implementation(Dependencies.Multiplatform.D4L.cryptoAndroid)
+    implementation(Dependencies.Multiplatform.D4L.securestoreAndroid)
+    api(Dependencies.Multiplatform.D4L.utilAndroid)
+    api(Dependencies.Multiplatform.D4L.resultErrorAndroid)
 
     implementation(Dependencies.Multiplatform.D4L.fhirSdk)
     implementation(Dependencies.Android.threeTenABP)
@@ -137,8 +139,8 @@ dependencies {
     testImplementation(Dependencies.Android.Test.okHttpMockWebServer)
     testImplementation(Dependencies.Android.Test.jsonAssert)
 
-    testImplementation(Dependencies.Multiplatform.D4L.fhirHelper) {
-        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util")
+    testImplementation(Dependencies.Multiplatform.D4L.fhirHelperAndroid) {
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
 
@@ -148,8 +150,8 @@ dependencies {
     androidTestImplementation(Dependencies.Multiplatform.Kotlin.stdlibAndroid)
     androidTestImplementation(Dependencies.Multiplatform.Coroutines.android)
 
-    androidTestImplementation(Dependencies.Multiplatform.D4L.fhirHelper) {
-        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util")
+    androidTestImplementation(Dependencies.Multiplatform.D4L.fhirHelperAndroid) {
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
 

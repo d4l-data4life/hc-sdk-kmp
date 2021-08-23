@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.network.util.interceptor
 
-import care.data4life.auth.AuthorizationContract
+import care.data4life.sdk.auth.AuthorizationContract
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.network.NetworkingContract.Companion.ACCESS_TOKEN_MARKER
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS

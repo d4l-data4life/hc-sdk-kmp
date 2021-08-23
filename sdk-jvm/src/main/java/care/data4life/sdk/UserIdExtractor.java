@@ -21,7 +21,7 @@ import com.squareup.moshi.Moshi;
 
 import java.io.IOException;
 
-import care.data4life.auth.AuthState;
+import care.data4life.sdk.auth.AuthState;
 import care.data4life.sdk.util.Base64;
 
 /**

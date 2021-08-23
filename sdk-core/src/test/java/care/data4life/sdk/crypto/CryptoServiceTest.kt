@@ -16,20 +16,11 @@
 
 package care.data4life.sdk.crypto
 
-import care.data4life.crypto.ExchangeKey
-import care.data4life.crypto.ExchangeKeyFactory.createKey
-import care.data4life.crypto.GCAESKeyAlgorithm
-import care.data4life.crypto.GCAESKeyAlgorithm.Companion.createDataAlgorithm
-import care.data4life.crypto.GCAsymmetricKey
-import care.data4life.crypto.GCKey
-import care.data4life.crypto.GCKeyPair
-import care.data4life.crypto.GCRSAKeyAlgorithm
-import care.data4life.crypto.GCSymmetricKey
-import care.data4life.crypto.KeyType
-import care.data4life.crypto.KeyVersion
-import care.data4life.crypto.error.CryptoException.InvalidKeyVersion
-import care.data4life.crypto.error.CryptoException.KeyDecryptionFailed
-import care.data4life.crypto.error.CryptoException.KeyFetchingFailed
+import care.data4life.sdk.crypto.ExchangeKeyFactory.createKey
+import care.data4life.sdk.crypto.GCAESKeyAlgorithm.Companion.createDataAlgorithm
+import care.data4life.sdk.crypto.error.CryptoException.InvalidKeyVersion
+import care.data4life.sdk.crypto.error.CryptoException.KeyDecryptionFailed
+import care.data4life.sdk.crypto.error.CryptoException.KeyFetchingFailed
 import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.util.Base64
 import com.squareup.moshi.JsonAdapter

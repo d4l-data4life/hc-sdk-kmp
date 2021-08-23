@@ -24,11 +24,11 @@ import android.content.pm.PackageManager;
 
 import java.util.Set;
 
-import care.data4life.auth.AuthorizationConfiguration;
-import care.data4life.auth.AuthorizationService;
-import care.data4life.auth.AuthorizationService.AuthorizationListener;
-import care.data4life.auth.storage.SharedPrefsAuthStorage;
-import care.data4life.crypto.GCKeyPair;
+import care.data4life.sdk.auth.AuthorizationConfiguration;
+import care.data4life.sdk.auth.AuthorizationService;
+import care.data4life.sdk.auth.AuthorizationService.AuthorizationListener;
+import care.data4life.sdk.auth.storage.SharedPrefsAuthStorage;
+import care.data4life.sdk.crypto.GCKeyPair;
 import care.data4life.sdk.attachment.AttachmentService;
 import care.data4life.sdk.attachment.FileService;
 import care.data4life.sdk.auth.UserService;
@@ -45,9 +45,9 @@ import care.data4life.sdk.network.Environment;
 import care.data4life.sdk.tag.TagCryptoService;
 import care.data4life.sdk.network.NetworkingContract;
 import care.data4life.sdk.tag.TaggingService;
-import care.data4life.securestore.SecureStore;
-import care.data4life.securestore.SecureStoreCryptor;
-import care.data4life.securestore.SecureStoreStorage;
+import care.data4life.sdk.securestore.SecureStore;
+import care.data4life.sdk.securestore.SecureStoreCryptor;
+import care.data4life.sdk.securestore.SecureStoreStorage;
 import io.reactivex.schedulers.Schedulers;
 
 public final class Data4LifeClient extends BaseClient {

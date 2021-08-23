@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.attachment
 
-import care.data4life.crypto.GCKey
+import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.test.util.GenericTestDataProvider.ATTACHMENT_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.util.Base64.encodeToString

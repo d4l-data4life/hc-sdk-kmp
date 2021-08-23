@@ -15,9 +15,9 @@
  */
 package care.data4life.sdk.attachment
 
-import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_PREVIEW_SIZE_PX
 import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.DEFAULT_THUMBNAIL_SIZE_PX
+import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.util.Base64.decode
 import care.data4life.sdk.wrapper.SDKImageResizer

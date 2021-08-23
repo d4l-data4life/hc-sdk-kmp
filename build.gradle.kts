@@ -60,11 +60,15 @@ plugins {
 allprojects {
     repositories {
         google()
-        jcenter()
-        maven("https://jitpack.io")
+        mavenCentral()
 
         gitHub(project)
+
         d4l()
+
+        jitPack()
+
+        bintray()
     }
 
     apply(plugin = "org.owasp.dependencycheck")
@@ -83,6 +87,11 @@ allprojects {
         from(dokka)
         dependsOn(dokka)
     }
+
+    configurations.all {
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android-debug")
+        exclude(group = "care.data4life.hc-securestore-sdk-kmp", module = "securestore-android-debug")
+    }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -95,6 +104,6 @@ tasks.withType<JavaCompile> {
 }
 
 tasks.named<Wrapper>("wrapper") {
-    gradleVersion = "6.8.3"
+    gradleVersion = "6.9.1"
     distributionType = Wrapper.DistributionType.ALL
 }

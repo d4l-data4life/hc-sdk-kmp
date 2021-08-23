@@ -154,7 +154,7 @@ dependencies {
 
     androidTestImplementation(Dependencies.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
-        exclude(group = "care.data4life.hc-fhir-sdk-java", module = "error-java")
+        exclude(group = "care.data4life.hc-fhir-sdk-java", module = "error-android")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
 

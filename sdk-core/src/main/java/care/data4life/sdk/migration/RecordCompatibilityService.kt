@@ -18,7 +18,7 @@ package care.data4life.sdk.migration
 
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.crypto.GCKey
-import care.data4life.sdk.migration.MigrationInternalContract.CompatibilityTag
+import care.data4life.sdk.migration.MigrationInternalContract.QueryCompatibilityTag
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.util.SearchTagsBuilder
 import care.data4life.sdk.tag.Annotations
@@ -29,7 +29,7 @@ import care.data4life.sdk.tag.Tags
 
 private data class OrGroupEntry(
     val key: String,
-    val orGroup: CompatibilityTag
+    val orGroup: QueryCompatibilityTag
 )
 
 // see: https://gesundheitscloud.atlassian.net/browse/SDK-572
@@ -42,7 +42,7 @@ class RecordCompatibilityService internal constructor(
     private val compatibilityEncoder: MigrationInternalContract.CompatibilityEncoder = CompatibilityEncoder,
     private val searchTagsBuilderFactory: NetworkingContract.SearchTagsBuilderFactory = SearchTagsBuilder
 ) : MigrationContract.CompatibilityService {
-    private fun compatibilityTagsToList(tag: CompatibilityTag): List<String> {
+    private fun compatibilityTagsToList(tag: QueryCompatibilityTag): List<String> {
         return listOf(
             tag.validEncoding,
             tag.kmpLegacyEncoding,

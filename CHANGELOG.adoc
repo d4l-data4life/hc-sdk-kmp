@@ -16,7 +16,7 @@ toc::[]
 
 === Added
 
-* LegacyEncoding for iOS.
+* LegacyEncoding for iOS - the SDK now able to filter by tags created by older iOS Core SDK versions.
 
 === Changed
 

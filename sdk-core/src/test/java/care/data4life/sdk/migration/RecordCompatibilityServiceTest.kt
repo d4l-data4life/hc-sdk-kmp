@@ -18,7 +18,7 @@ package care.data4life.sdk.migration
 
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.crypto.GCKey
-import care.data4life.sdk.migration.MigrationInternalContract.CompatibilityTag
+import care.data4life.sdk.migration.MigrationInternalContract.QueryCompatibilityTag
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.tag.TaggingContract
 import io.mockk.clearAllMocks
@@ -131,19 +131,19 @@ class RecordCompatibilityServiceTest {
             "tag3" to "tag3Value"
         )
         val encodedTags = listOf(
-            CompatibilityTag(
+            QueryCompatibilityTag(
                 "encodedTag1Value",
                 "encodedAndroidLegacyTag1Value",
                 "encodedJSLegacyTag1Value",
                 "encodedIOSLegacyTag1Value"
             ),
-            CompatibilityTag(
+            QueryCompatibilityTag(
                 "encodedTag2Value",
                 "encodedAndroidLegacyTag2Value",
                 "encodedJSLegacyTag2Value",
                 "encodedIOSLegacyTag2Value"
             ),
-            CompatibilityTag(
+            QueryCompatibilityTag(
                 "encodedTag3Value",
                 "encodedAndroidLegacyTag3Value",
                 "encodedJSLegacyTag3Value",
@@ -251,19 +251,19 @@ class RecordCompatibilityServiceTest {
             "tag3" to "tag3Value"
         )
         val encodedTags = listOf(
-            CompatibilityTag(
+            QueryCompatibilityTag(
                 "encodedTag1Value",
                 "encodedAndroidLegacyTag1Value",
                 "encodedJSLegacyTag1Value",
                 "encodedIOSLegacyTag1Value"
             ),
-            CompatibilityTag(
+            QueryCompatibilityTag(
                 "encodedTag2Value",
                 "encodedAndroidLegacyTag2Value",
                 "encodedJSLegacyTag2Value",
                 "encodedIOSLegacyTag2Value"
             ),
-            CompatibilityTag(
+            QueryCompatibilityTag(
                 "encodedTag3Value",
                 "encodedAndroidLegacyTag3Value",
                 "encodedJSLegacyTag3Value",
@@ -374,19 +374,19 @@ class RecordCompatibilityServiceTest {
             "annotation3Value"
         )
         val encodedTags = listOf(
-            CompatibilityTag(
+            QueryCompatibilityTag(
                 "encodedTag1Value",
                 "encodedAndroidLegacyTag1Value",
                 "encodedJSLegacyTag1Value",
                 "encodedIOSLegacyTag1Value"
             ),
-            CompatibilityTag(
+            QueryCompatibilityTag(
                 "encodedTag2Value",
                 "encodedAndroidLegacyTag2Value",
                 "encodedJSLegacyTag2Value",
                 "encodedIOSLegacyTag2Value"
             ),
-            CompatibilityTag(
+            QueryCompatibilityTag(
                 "encodedTag3Value",
                 "encodedAndroidLegacyTag3Value",
                 "encodedJSLegacyTag3Value",
@@ -494,19 +494,19 @@ class RecordCompatibilityServiceTest {
             "annotation3Value"
         )
         val encodedTags = listOf(
-            CompatibilityTag(
+            QueryCompatibilityTag(
                 "encodedTag1Value",
                 "encodedAndroidLegacyTag1Value",
                 "encodedJSLegacyTag1Value",
                 "encodedIOSLegacyTag1Value"
             ),
-            CompatibilityTag(
+            QueryCompatibilityTag(
                 "encodedTag2Value",
                 "encodedAndroidLegacyTag2Value",
                 "encodedJSLegacyTag2Value",
                 "encodedIOSLegacyTag2Value"
             ),
-            CompatibilityTag(
+            QueryCompatibilityTag(
                 "encodedTag3Value",
                 "encodedAndroidLegacyTag3Value",
                 "encodedJSLegacyTag3Value",

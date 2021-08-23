@@ -18,7 +18,7 @@ package care.data4life.sdk.migration
 
 internal class MigrationInternalContract {
     interface CompatibilityEncoder {
-        fun encode(tagValue: String): CompatibilityTag
+        fun encode(tagValue: String): QueryCompatibilityTag
         fun normalize(tagValue: String): String
 
         companion object {
@@ -32,7 +32,7 @@ internal class MigrationInternalContract {
         }
     }
 
-    data class CompatibilityTag(
+    data class QueryCompatibilityTag(
         val validEncoding: String,
         val kmpLegacyEncoding: String,
         val jsLegacyEncoding: String,

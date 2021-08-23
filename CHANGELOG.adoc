@@ -30,6 +30,7 @@ toc::[]
 === Bumped
 
 * Gradle 6.9 -> 6.9.1
+* HC Util SDK 1.9.0 -> 1.10.0
 
 === Migration
 
@@ -39,7 +40,7 @@ toc::[]
 
 * Android Gradle Plugin 4.2.1 -> 4.2.2
 * JaCoCo 0.8.3 -> 0.8.7
-* SDK-Util 1.6.1 -> 1.9.0
+* HC Util SDK 1.6.1 -> 1.9.0
 * FHIR-Helper-SDK 1.4.1 -> 1.6.0
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.13.1...v1.13.2[1.13.2]

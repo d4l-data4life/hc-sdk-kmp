@@ -23,7 +23,8 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import care.data4life.fhir.stu3.model.Attachment;
-import care.data4life.fhir.stu3.model.CodeSystems;
+import care.data4life.fhir.stu3.model.CodeSystem;
+import care.data4life.fhir.stu3.model.CodeSystemDocumentReferenceStatus;
 import care.data4life.fhir.stu3.model.CodeableConcept;
 import care.data4life.fhir.stu3.model.Coding;
 import care.data4life.fhir.stu3.model.DocumentReference;
@@ -31,10 +32,10 @@ import care.data4life.fhir.stu3.model.FhirDateTime;
 import care.data4life.fhir.stu3.model.FhirInstant;
 import care.data4life.fhir.stu3.model.Practitioner;
 import care.data4life.fhir.stu3.util.FhirDateTimeParser;
-import care.data4life.sdk.config.DataRestrictionException;
-import care.data4life.sdk.helpers.AttachmentBuilder;
-import care.data4life.sdk.helpers.DocumentReferenceBuilder;
-import care.data4life.sdk.helpers.PractitionerBuilder;
+import care.data4life.sdk.helpers.stu3.AttachmentBuilder;
+import care.data4life.sdk.helpers.stu3.DocumentReferenceBuilder;
+import care.data4life.sdk.helpers.stu3.PractitionerBuilder;
+import care.data4life.sdk.lang.DataRestrictionException;
 import care.data4life.sdk.util.MimeType;
 
 public class DocumentReferenceFactory {
@@ -94,7 +95,7 @@ public class DocumentReferenceFactory {
         return DocumentReferenceBuilder.buildWith(
                 "Head MRI",
                 indexed,
-                CodeSystems.DocumentReferenceStatus.CURRENT,
+                CodeSystemDocumentReferenceStatus.CURRENT,
                 Arrays.asList(buildAttachment()),
                 buildDocumentReferenceType(),
                 buildPractitioner(),

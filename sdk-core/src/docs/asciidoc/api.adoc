@@ -61,9 +61,9 @@ For FHIR `Attachment.data`, the SDK supports these file formats for attachments:
 
 The SDK checks the following when users create resources:
 
-- *File format*: When users provide an unsupported file format for attachment content, the SDK throws an `DataRestrictionException.UnsupportedFileType` exception.
+- *File format*: When users provide an unsupported file format for attachment content, the SDK throws an `DataValidationException.UnsupportedFileType` exception.
 
-- *File size*: When the `Attachment.data` is larger than 20 MB, the SDK throws a `DataRestrictionException.MaxDataSizeViolation` exception.
+- *File size*: When the `Attachment.data` is larger than 20 MB, the SDK throws a `DataValidationException.MaxDataSizeViolation` exception.
 
 [source,java]
 ----

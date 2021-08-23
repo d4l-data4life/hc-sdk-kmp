@@ -170,7 +170,9 @@ public class DocumentsActivity extends AppCompatActivity {
                 try {
                     attachment = FHIRUtils.buildAttachmentFromUri(uri, this);
                 } catch (DataRestrictionException.UnsupportedFileType unsupportedFileType) {
+                    /* Do nothing */
                 } catch (DataRestrictionException.MaxDataSizeViolation maxDataSizeViolation) {
+                    /* Do nothing */
                 }
                 if (attachment == null) continue;
                 attachments.add(attachment);

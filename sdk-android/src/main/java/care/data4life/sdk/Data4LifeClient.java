@@ -22,6 +22,8 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 
+import androidx.annotation.NonNull;
+
 import java.util.Set;
 
 import care.data4life.sdk.auth.AuthorizationConfiguration;
@@ -65,8 +67,8 @@ public final class Data4LifeClient extends BaseClient {
     public static final int GC_AUTH = D4L_AUTH;
 
     private static Data4LifeClient instance;
-    private CryptoService cryptoService;
-    private AuthorizationService authorizationService;
+    private final CryptoService cryptoService;
+    private final AuthorizationService authorizationService;
 
     Data4LifeClient(
             String alias,
@@ -216,9 +218,9 @@ public final class Data4LifeClient extends BaseClient {
         return authorizationService.loginIntent(context, scopes, publicKey, authListener);
     }
 
-    private AuthorizationListener authListener = new AuthorizationListener() {
+    private final AuthorizationListener authListener = new AuthorizationListener() {
         @Override
-        public void onSuccess(Intent authData, AuthorizationService.Callback loginFinishedCbk) { //callback is called from the main thread
+        public void onSuccess(Intent authData, @NonNull AuthorizationService.Callback loginFinishedCbk) { //callback is called from the main thread
             finishLogin(authData, new Callback() {
                 @Override
                 public void onSuccess() {
@@ -226,14 +228,14 @@ public final class Data4LifeClient extends BaseClient {
                 }
 
                 @Override
-                public void onError(D4LException exception) {
+                public void onError(@NonNull D4LException exception) {
                     loginFinishedCbk.onError(exception);
                 }
             });
         }
 
         @Override
-        public void onError(Throwable error, AuthorizationService.Callback callback) {
+        public void onError(@NonNull Throwable error, AuthorizationService.Callback callback) {
             callback.onError(error);
         }
     };
@@ -253,7 +255,7 @@ public final class Data4LifeClient extends BaseClient {
             }
 
             @Override
-            public void onError(Throwable error) {
+            public void onError(@NonNull Throwable error) {
                 listener.onError(getHandler().getErrorHandler().handleError(error));
             }
         });

@@ -198,7 +198,7 @@ dependencies {
         exclude group: 'care.data4life.hc-sdk-kmp', module: 'securestore-jvm'
         exclude group: 'care.data4life.hc-sdk-kmp', module: 'crypto-jvm'
         exclude group: 'care.data4life.hc-sdk-kmp', module: 'auth-jvm'
-        exclude group: 'care.data4life.hc-util-sdk-kmp', module: 'util'
+        exclude group: 'care.data4life.hc-util-sdk-kmp', module: 'util-jvm'
     }
 }
 ----

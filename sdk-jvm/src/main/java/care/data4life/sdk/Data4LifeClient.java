@@ -48,7 +48,6 @@ import care.data4life.sdk.securestore.SecureStoreStorage;
 public final class Data4LifeClient extends BaseClient {
     private static final boolean DEBUG = true;
 
-
     private AuthorizationService authorizationService;
     private CryptoService cryptoService;
 

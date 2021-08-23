@@ -23,6 +23,7 @@ import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -41,8 +42,6 @@ import care.data4life.sdk.helpers.stu3.PractitionerBuilder;
 import care.data4life.sdk.lang.DataRestrictionException;
 
 final class FHIRUtils {
-    private static final String TAG = FHIRUtils.class.getSimpleName();
-
     private static final String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss[XXX]";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT, Locale.US);
 
@@ -66,7 +65,7 @@ final class FHIRUtils {
         coding.system = "http://www.ihe.net/xds/connectathon/practiceSettingCodes";
 
         CodeableConcept concept = new CodeableConcept();
-        concept.coding = Arrays.asList(coding);
+        concept.coding = Collections.singletonList(coding);
         return concept;
     }
 
@@ -77,7 +76,7 @@ final class FHIRUtils {
         coding.system = "http://loinc.org";
 
         CodeableConcept concept = new CodeableConcept();
-        concept.coding = Arrays.asList(coding);
+        concept.coding = Collections.singletonList(coding);
         return concept;
     }
 

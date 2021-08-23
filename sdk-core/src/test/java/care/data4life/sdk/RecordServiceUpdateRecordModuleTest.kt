@@ -30,7 +30,7 @@ import care.data4life.sdk.fhir.Fhir4Identifier
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.fhir.ResourceCryptoService
-import care.data4life.sdk.lang.DataRestrictionException
+import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.EncryptedKey
@@ -901,7 +901,7 @@ class RecordServiceUpdateRecordModuleTest {
         )
 
         // Then
-        assertFailsWith<DataRestrictionException.MaxDataSizeViolation> {
+        assertFailsWith<DataValidationException.MaxDataSizeViolation> {
             // When
             recordService.updateRecord(
                 USER_ID,
@@ -1455,7 +1455,7 @@ class RecordServiceUpdateRecordModuleTest {
         )
 
         // Then
-        assertFailsWith<DataRestrictionException.MaxDataSizeViolation> {
+        assertFailsWith<DataValidationException.MaxDataSizeViolation> {
             // When
             recordService.updateRecord(
                 USER_ID,

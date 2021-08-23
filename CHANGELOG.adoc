@@ -21,6 +21,7 @@ toc::[]
 * Change Auth to an external dependency link:https://github.com/d4l-data4life/hc-auth-sdk-kmp/[Data4Life Auth]
 * Change Crypto to an external dependency link:https://github.com/d4l-data4life/hc-crypto-sdk-kmp/[Data4Life Crypto]
 * Change Securestore to an external dependency link:https://github.com/d4l-data4life/hc-securestore-sdk-kmp/[Data4Life Securestore]
+* DataRestrictionException is now a domain error of this SDK and got merged into DataValidationException
 
 === Removed
 

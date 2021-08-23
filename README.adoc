@@ -97,6 +97,7 @@ The SDK has the following dependencies:
 == Install Gradle
 
 === Setup maven repositories
+
 Add the following maven repository url to your root build.gradle:
 
 Please take a look over at Github https://docs.github.com/en/packages/publishing-and-managing-packages/about-github-packages#about-tokens[about-github-packages#tokens, window="_blank"] on how to generate your private token for accessing the Github Package Registry.
@@ -142,6 +143,42 @@ gpr.user=github-username
 gpr.key=github-token
 ----
 
+==== Setup Maven Repository
+
+We use GitHub Packages to distribute the SDK. In order to consume our dependencies you need to generate a GitHub Personal Access Token. Please follow the how to  link:https://docs.github.com/en/packages/learn-github-packages/introduction-to-github-packages#authenticating-to-github-packages[authenticate to GitHub Packages, window="_blank"].
+
+NOTICE:: You need to have _read_ access to this repository and generate a https://github.com/settings/tokens/new/[personal access token] with `repo` and `read:packages` scope.
+
+The token needs to be made available:
+
+1. Add `gpr.user = {GitHub username}` and `gpr.key = {GitHub Personal Access Token}` to your global Gradle properties `~/.gradle/gradle.properties`
+
+    ----
+    gpr.user=github-username
+    gpr.key=github-token
+    ----
+
+2. Or add following environment variables `PACKAGE_REGISTRY_USERNAME={GitHub username}` and `PACKAGE_REGISTRY_TOKEN={GitHub Personal Access Token}`
+
+Then add the following maven repository configuration to your root build.gradle:
+
+----
+
+allprojects {
+    repositories {
+        ...
+        maven {
+            url = URI("https://maven.pkg.github.com/d4l-data4life/hc-fhir-sdk-kmp")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+            }
+        }
+    }
+}
+
+----
+
 === Java SDK dependency
 
 Add the following dependencies to your app `build.gradle` file.
@@ -167,7 +204,7 @@ dependencies {
         exclude group: 'care.data4life.hc-sdk-kmp', module: 'securestore-jvm'
         exclude group: 'care.data4life.hc-sdk-kmp', module: 'crypto-jvm'
         exclude group: 'care.data4life.hc-sdk-kmp', module: 'auth-jvm'
-        exclude group: 'care.data4life.hc-util-sdk-kmp', module: 'util'
+        exclude group: 'care.data4life.hc-util-sdk-kmp', module: 'util-jvm'
     }
 }
 ----

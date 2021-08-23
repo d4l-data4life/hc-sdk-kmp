@@ -16,6 +16,8 @@
 
 package care.data4life.sdk.lang
 
+import care.data4life.sdk.config.DataRestriction.DATA_SIZE_MAX_MB
+
 /**
  * Exception class that will be thrown in case of data validation violations.
  */
@@ -47,4 +49,10 @@ sealed class DataValidationException(
         DataValidationException(message = message)
 
     class AnnotationViolation(message: String) : DataValidationException(message = message)
+
+    class MaxDataSizeViolation :
+        DataValidationException(message = "The file size has to be smaller or equal to ${DATA_SIZE_MAX_MB}MB!")
+
+    class UnsupportedFileType :
+        DataValidationException(message = "Only this file types are supported: JPEG, PNG, TIFF, PDF and DCM!")
 }

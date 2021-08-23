@@ -16,17 +16,17 @@
 
 package care.data4life.sdk.sample
 
-import care.data4life.auth.Authorization
-import care.data4life.auth.AuthorizationContract
-import care.data4life.auth.storage.InMemoryAuthStorage
 import care.data4life.sdk.Data4LifeClient
+import care.data4life.sdk.auth.Authorization
+import care.data4life.sdk.auth.AuthorizationContract
+import care.data4life.sdk.auth.storage.InMemoryAuthStorage
 import care.data4life.sdk.log.Logger
 import care.data4life.sdk.network.Environment
 import care.data4life.sdk.sample.util.ClientConfigLoader
-import care.data4life.securestore.SecureStore
-import care.data4life.securestore.SecureStoreContract
-import care.data4life.securestore.SecureStoreCryptor
-import care.data4life.securestore.SecureStoreStorage
+import care.data4life.sdk.securestore.SecureStore
+import care.data4life.sdk.securestore.SecureStoreContract
+import care.data4life.sdk.securestore.SecureStoreCryptor
+import care.data4life.sdk.securestore.SecureStoreStorage
 import org.koin.dsl.module
 import java.util.concurrent.ConcurrentHashMap
 

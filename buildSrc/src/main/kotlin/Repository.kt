@@ -24,13 +24,21 @@ object Repository {
     val github = listOf(
         // GitHub organization, GitHub repository name, Maven dependency group
         listOf(gitHubOrgD4l, "hc-util-sdk-kmp", "care.data4life.hc-util-sdk-kmp"),
+        listOf(gitHubOrgD4l, "hc-result-sdk-kmp", "care.data4life.hc-result-sdk-kmp"),
         listOf(gitHubOrgD4l, "hc-fhir-sdk-java", "care.data4life.hc-fhir-sdk-java"),
-        listOf(gitHubOrgD4l, "hc-fhir-helper-sdk-kmp", "care.data4life.hc-fhir-helper-sdk-kmp")
+        listOf(gitHubOrgD4l, "hc-fhir-helper-sdk-kmp", "care.data4life.hc-fhir-helper-sdk-kmp"),
+        listOf(gitHubOrgD4l, "hc-auth-sdk-kmp", "care.data4life.hc-auth-sdk-kmp"),
+        listOf(gitHubOrgD4l, "hc-crypto-sdk-kmp", "care.data4life.hc-crypto-sdk-kmp"),
+        listOf(gitHubOrgD4l, "hc-securestore-sdk-kmp", "care.data4life.hc-securestore-sdk-kmp")
     )
 
     val d4l = listOf(
         // Maven dependency group
         "care.data4life.hc-util-sdk-kmp",
+        "care.data4life.hc-result-sdk-kmp",
+        "care.data4life.hc-auth-sdk-kmp",
+        "care.data4life.hc-crypto-sdk-kmp",
+        "care.data4life.hc-securestore-sdk-kmp",
         "care.data4life.hc-fhir-sdk-java",
         "hc-fhir-helper-sdk-kmp"
     )
@@ -73,6 +81,28 @@ fun RepositoryHandler.d4l() {
             Repository.d4l.forEach { group ->
                 includeGroup(group)
             }
+        }
+    }
+}
+
+@Deprecated(message = "Should not be used if possible")
+fun RepositoryHandler.jitPack() {
+    maven("https://jitpack.io") {
+        content {
+            includeGroup("com.github.gesundheitscloud") // AppAuth
+            includeGroup("com.github.chrisbanes") // PhotoView 2.0.0
+            includeGroup("com.github.wmontwe") // Kakao 1.4.0-androidx
+        }
+    }
+}
+
+@Deprecated("Warning: this repository is going to shut down soon")
+fun RepositoryHandler.bintray() {
+    jcenter() {
+        content {
+            includeGroup("com.linkedin.dexmaker") // required by mockK 1.10.0
+            includeGroup("com.github.barteksc") // android-pdf-viewer 3.1.0-beta.1
+            includeGroup("org.koin") // koin 2.0.1
         }
     }
 }

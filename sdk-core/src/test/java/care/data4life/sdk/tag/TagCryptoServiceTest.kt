@@ -15,8 +15,8 @@
  */
 package care.data4life.sdk.tag
 
-import care.data4life.crypto.GCKey
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.tag.TaggingContract.Companion.ANNOTATION_KEY
 import care.data4life.sdk.tag.TaggingContract.Companion.DELIMITER

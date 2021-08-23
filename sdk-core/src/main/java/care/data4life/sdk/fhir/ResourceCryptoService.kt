@@ -15,10 +15,10 @@
  */
 package care.data4life.sdk.fhir
 
-import care.data4life.crypto.GCKey
-import care.data4life.crypto.error.CryptoException.DecryptionFailed
-import care.data4life.crypto.error.CryptoException.EncryptionFailed
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.crypto.GCKey
+import care.data4life.sdk.crypto.error.CryptoException.DecryptionFailed
+import care.data4life.sdk.crypto.error.CryptoException.EncryptionFailed
 import care.data4life.sdk.data.DataContract
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.tag.TaggingContract.Companion.TAG_APPDATA_KEY

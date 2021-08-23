@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.attachment
 
-import care.data4life.crypto.GCKey
+import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.lang.ImageResizeException
 import care.data4life.sdk.wrapper.WrapperContract.Attachment

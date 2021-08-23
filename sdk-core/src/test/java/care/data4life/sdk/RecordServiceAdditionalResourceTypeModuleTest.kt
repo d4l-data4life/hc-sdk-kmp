@@ -15,16 +15,16 @@
  */
 package care.data4life.sdk
 
-import care.data4life.crypto.GCKey
 import care.data4life.fhir.r4.model.Extension
 import care.data4life.sdk.attachment.AttachmentContract
-import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
+import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.DecryptedR4Record
@@ -814,7 +814,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             resource.valueAttachment!!.data = payload
         }
 
-        assertFailsWith<DataRestrictionException.UnsupportedFileType> {
+        assertFailsWith<DataValidationException.UnsupportedFileType> {
             recordService.checkDataRestrictions(resource)
         }
     }
@@ -831,7 +831,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         selectFhir4Attachment(resource).data = Base64.encodeToString(byteArrayOf(0))
 
-        assertFailsWith<DataRestrictionException.UnsupportedFileType> {
+        assertFailsWith<DataValidationException.UnsupportedFileType> {
             recordService.checkDataRestrictions(resource)
         }
     }
@@ -853,7 +853,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
             resource.valueAttachment!!.data = payload
         }
 
-        assertFailsWith<DataRestrictionException.MaxDataSizeViolation> {
+        assertFailsWith<DataValidationException.MaxDataSizeViolation> {
             recordService.checkDataRestrictions(resource)
         }
     }
@@ -870,7 +870,7 @@ class RecordServiceAdditionalResourceTypeModuleTest {
 
         selectFhir4Attachment(resource).data = PDF_OVERSIZED_ENCODED
 
-        assertFailsWith<DataRestrictionException.MaxDataSizeViolation> {
+        assertFailsWith<DataValidationException.MaxDataSizeViolation> {
             recordService.checkDataRestrictions(resource)
         }
     }

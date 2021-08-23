@@ -14,14 +14,12 @@ local.properties
 .idea/*
 
 # IDEA/Android Studio includes
-!.idea/vcs.xml
 !.idea/fileTemplates/
 !.idea/inspectionProfiles/
 !.idea/scopes/
 !.idea/codeStyles/
 !.idea/encoding.xml
 !.idea/copyright/
-!.idea/compiler.xml
 
 # Others
 captures/

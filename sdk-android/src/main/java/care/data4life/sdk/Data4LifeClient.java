@@ -22,13 +22,15 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 
+import androidx.annotation.NonNull;
+
 import java.util.Set;
 
-import care.data4life.auth.AuthorizationConfiguration;
-import care.data4life.auth.AuthorizationService;
-import care.data4life.auth.AuthorizationService.AuthorizationListener;
-import care.data4life.auth.storage.SharedPrefsAuthStorage;
-import care.data4life.crypto.GCKeyPair;
+import care.data4life.sdk.auth.AuthorizationConfiguration;
+import care.data4life.sdk.auth.AuthorizationService;
+import care.data4life.sdk.auth.AuthorizationService.AuthorizationListener;
+import care.data4life.sdk.auth.storage.SharedPrefsAuthStorage;
+import care.data4life.sdk.crypto.GCKeyPair;
 import care.data4life.sdk.attachment.AttachmentService;
 import care.data4life.sdk.attachment.FileService;
 import care.data4life.sdk.auth.UserService;
@@ -45,9 +47,9 @@ import care.data4life.sdk.network.Environment;
 import care.data4life.sdk.tag.TagCryptoService;
 import care.data4life.sdk.network.NetworkingContract;
 import care.data4life.sdk.tag.TaggingService;
-import care.data4life.securestore.SecureStore;
-import care.data4life.securestore.SecureStoreCryptor;
-import care.data4life.securestore.SecureStoreStorage;
+import care.data4life.sdk.securestore.SecureStore;
+import care.data4life.sdk.securestore.SecureStoreCryptor;
+import care.data4life.sdk.securestore.SecureStoreStorage;
 import io.reactivex.schedulers.Schedulers;
 
 public final class Data4LifeClient extends BaseClient {
@@ -65,8 +67,8 @@ public final class Data4LifeClient extends BaseClient {
     public static final int GC_AUTH = D4L_AUTH;
 
     private static Data4LifeClient instance;
-    private CryptoService cryptoService;
-    private AuthorizationService authorizationService;
+    private final CryptoService cryptoService;
+    private final AuthorizationService authorizationService;
 
     Data4LifeClient(
             String alias,
@@ -216,9 +218,9 @@ public final class Data4LifeClient extends BaseClient {
         return authorizationService.loginIntent(context, scopes, publicKey, authListener);
     }
 
-    private AuthorizationListener authListener = new AuthorizationListener() {
+    private final AuthorizationListener authListener = new AuthorizationListener() {
         @Override
-        public void onSuccess(Intent authData, AuthorizationService.Callback loginFinishedCbk) { //callback is called from the main thread
+        public void onSuccess(Intent authData, @NonNull AuthorizationService.Callback loginFinishedCbk) { //callback is called from the main thread
             finishLogin(authData, new Callback() {
                 @Override
                 public void onSuccess() {
@@ -226,14 +228,14 @@ public final class Data4LifeClient extends BaseClient {
                 }
 
                 @Override
-                public void onError(D4LException exception) {
+                public void onError(@NonNull D4LException exception) {
                     loginFinishedCbk.onError(exception);
                 }
             });
         }
 
         @Override
-        public void onError(Throwable error, AuthorizationService.Callback callback) {
+        public void onError(@NonNull Throwable error, AuthorizationService.Callback callback) {
             callback.onError(error);
         }
     };
@@ -253,7 +255,7 @@ public final class Data4LifeClient extends BaseClient {
             }
 
             @Override
-            public void onError(Throwable error) {
+            public void onError(@NonNull Throwable error) {
                 listener.onError(getHandler().getErrorHandler().handleError(error));
             }
         });

@@ -70,18 +70,17 @@ class RecordServiceModuleTestFlowHelper(
 
     private fun encode(tag: String): String {
         return URLEncoder.encode(tag, StandardCharsets.UTF_8.displayName())
-            .replace(".", "%2e")
+            .replace(".", "%2E")
             .replace("+", "%20")
-            .replace("*", "%2a")
-            .replace("-", "%2d")
-            .replace("_", "%5f")
-            .toLowerCase()
+            .replace("*", "%2A")
+            .replace("-", "%2D")
+            .replace("_", "%5F")
     }
 
     fun prepareTags(tags: Tags): List<String> {
         val encodedTags = mutableListOf<String>()
         tags.forEach { (key, value) ->
-            encodedTags.add("$key=${encode(value)}")
+            encodedTags.add("$key=${encode(value).toLowerCase()}")
         }
 
         return encodedTags
@@ -95,7 +94,7 @@ class RecordServiceModuleTestFlowHelper(
     private fun prepareJSLegacyTags(tags: Tags): List<String> {
         val encodedTags = mutableListOf<String>()
         tags.forEach { (key, value) ->
-            encodedTags.add("${key.toLowerCase()}=${JSLegacyTagConverter.convertTag(encode(value))}")
+            encodedTags.add("${key.toLowerCase()}=${JSLegacyTagConverter.convertTag(encode(value).toLowerCase())}")
         }
 
         return encodedTags
@@ -104,7 +103,7 @@ class RecordServiceModuleTestFlowHelper(
     private fun prepareIOSLegacyTags(tags: Tags): List<String> {
         val encodedTags = mutableListOf<String>()
         tags.forEach { (key, value) ->
-            encodedTags.add("${key.toLowerCase()}=${encode(value).toUpperCase()}")
+            encodedTags.add("${key.toLowerCase()}=${encode(value.toLowerCase())}")
         }
 
         return encodedTags
@@ -127,15 +126,15 @@ class RecordServiceModuleTestFlowHelper(
 
     fun prepareAnnotations(
         annotations: Annotations
-    ): List<String> = annotations.map { "custom=${encode(it)}" }
+    ): List<String> = annotations.map { "custom=${encode(it).toLowerCase()}" }
 
     private fun prepareJSLegacyAnnotations(
         annotations: Annotations
-    ): List<String> = annotations.map { "custom=${JSLegacyTagConverter.convertTag(encode(it))}" }
+    ): List<String> = annotations.map { "custom=${JSLegacyTagConverter.convertTag(encode(it).toLowerCase())}" }
 
     private fun prepareIOSLegacyAnnotations(
         annotations: Annotations
-    ): List<String> = annotations.map { "custom=${encode(it).toUpperCase()}" }
+    ): List<String> = annotations.map { "custom=${encode(it.toLowerCase())}" }
 
     fun prepareCompatibilityAnnotations(
         annotations: Annotations

@@ -17,8 +17,8 @@
 package care.data4life.sdk.migration
 
 import care.data4life.sdk.crypto.CryptoContract
-import care.data4life.sdk.migration.MigrationInternalContract.CompatibilityTag
 import care.data4life.sdk.crypto.GCKey
+import care.data4life.sdk.migration.MigrationInternalContract.CompatibilityTag
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.tag.TaggingContract
 import io.mockk.clearAllMocks

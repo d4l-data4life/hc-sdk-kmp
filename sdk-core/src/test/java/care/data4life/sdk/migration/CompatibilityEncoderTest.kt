@@ -117,7 +117,7 @@ class CompatibilityEncoderTest {
         )
 
         verify(exactly = 1) { TagEncoding.normalize(tagValue) }
-        verify(atMost = 1) { UrlEncoding.encode(normalized) }
+        verify(atLeast = 1) { UrlEncoding.encode(normalized) }
     }
 
     @Test
@@ -129,7 +129,7 @@ class CompatibilityEncoderTest {
 
         every { TagEncoding.encode(tagValue) } returns "notImportant"
         every { TagEncoding.normalize(tagValue) } returns kmpTagValue
-        every { UrlEncoding.encode(tagValue) } returns expected.toUpperCase()
+        every { UrlEncoding.encode(kmpTagValue) } returns expected.toUpperCase()
 
         // When
         val (_, _, encoded, _) = compatibilityEncoder.encode(tagValue)
@@ -141,29 +141,31 @@ class CompatibilityEncoderTest {
         )
 
         verify(exactly = 1) { TagEncoding.normalize(tagValue) }
-        verify(atMost = 1) { UrlEncoding.encode(kmpTagValue) }
+        verify(atLeast = 1) { UrlEncoding.encode(kmpTagValue) }
     }
 
     @Test
     fun `Given encode is called with a String, it maps iOS legacy encoding uppercased`() {
         // Given
-        val tagValue = "!'()*-_.~"
+        val nonCased = "Test"
+        val tagValue = "!'()*-_.~$nonCased"
         val expected = "%21%27%28%29%2a%2d%5f%2e%7e"
 
         every { TagEncoding.encode(tagValue) } returns "notImportant"
-        every { TagEncoding.normalize(tagValue) } returns "notImportant"
-        every { UrlEncoding.encode(tagValue) } returns expected
+        every { TagEncoding.normalize(tagValue) } returns tagValue
+        every { UrlEncoding.encode(tagValue) } returns expected.toUpperCase() + nonCased.toLowerCase()
 
         // When
         val (_, _, _, encoded) = compatibilityEncoder.encode(tagValue)
 
         // Then
         assertEquals(
-            expected = expected.toUpperCase(),
+            expected = expected.toUpperCase() + nonCased.toLowerCase(),
             actual = encoded
         )
 
-        verify(atMost = 1) { UrlEncoding.encode(tagValue) }
+        verify(exactly = 1) { TagEncoding.normalize(tagValue) }
+        verify(atLeast = 1) { UrlEncoding.encode(tagValue) }
     }
 
     @Test

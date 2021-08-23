@@ -19,7 +19,6 @@ package care.data4life.sdk.migration
 import care.data4life.sdk.migration.MigrationInternalContract.CompatibilityEncoder.Companion.JS_LEGACY_ENCODING_REPLACEMENTS
 import care.data4life.sdk.tag.TagEncoding
 import care.data4life.sdk.tag.TaggingContract
-import care.data4life.sdk.tag.TaggingContract.Companion.LOCALE
 import care.data4life.sdk.wrapper.UrlEncoding
 import care.data4life.sdk.wrapper.WrapperContract
 
@@ -46,7 +45,7 @@ internal object CompatibilityEncoder : MigrationInternalContract.CompatibilityEn
             jsLegacyEncoding = mapJSExceptions(
                 urlEncoding.encode(kmpLegacyEncoding)
             ),
-            iosLegacyEncoding = urlEncoding.encode(tagValue).toUpperCase(LOCALE)
+            iosLegacyEncoding = urlEncoding.encode(kmpLegacyEncoding)
         )
     }
 

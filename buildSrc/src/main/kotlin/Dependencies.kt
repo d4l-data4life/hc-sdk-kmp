@@ -107,6 +107,7 @@ object Dependencies {
 
         // Authorization
         const val appAuth = "net.openid:appauth:${Version.appAuth}"
+        const val appAuthPatch = "com.github.gesundheitscloud:AppAuth-Android:${Version.appAuthPatch}"
 
         // Data
         const val moshi = "com.squareup.moshi:moshi:${Version.moshi}"

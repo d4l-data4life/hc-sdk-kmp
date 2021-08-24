@@ -40,7 +40,8 @@ object Repository {
         "care.data4life.hc-crypto-sdk-kmp",
         "care.data4life.hc-securestore-sdk-kmp",
         "care.data4life.hc-fhir-sdk-java",
-        "hc-fhir-helper-sdk-kmp"
+        "hc-fhir-helper-sdk-kmp",
+        "care.data4life.gradle.gitversion"
     )
 }
 

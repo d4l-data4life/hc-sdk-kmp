@@ -17,21 +17,21 @@
 import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
 
-object GradlePlugins {
-    const val android = "com.android.tools.build:gradle:${Version.GradlePlugins.android}"
-    const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Version.GradlePlugins.kotlin}"
+object GradlePlugin {
+    const val android = "com.android.tools.build:gradle:${Version.GradlePlugin.android}"
+    const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Version.GradlePlugin.kotlin}"
 
-    const val kapt = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Version.GradlePlugins.kotlin}"
+    const val kapt = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Version.GradlePlugin.kotlin}"
 
-    const val dexcount = "com.getkeepsafe.dexcount:dexcount-gradle-plugin:${Version.GradlePlugins.dexcount}"
+    const val dexcount = "com.getkeepsafe.dexcount:dexcount-gradle-plugin:${Version.GradlePlugin.dexcount}"
 
-    const val downloadTask = "de.undercouch:gradle-download-task:${Version.GradlePlugins.downloadTask}"
+    const val downloadTask = "de.undercouch:gradle-download-task:${Version.GradlePlugin.downloadTask}"
 
-    const val dokka = "org.jetbrains.dokka:dokka-gradle-plugin:${Version.GradlePlugins.dokka}"
+    const val dokka = "org.jetbrains.dokka:dokka-gradle-plugin:${Version.GradlePlugin.dokka}"
 }
 
 fun PluginDependenciesSpec.kotlinMultiplatform(apply: Boolean = true): PluginDependencySpec =
-    id("org.jetbrains.kotlin.multiplatform").version(Version.GradlePlugins.kotlin).apply(apply)
+    id("org.jetbrains.kotlin.multiplatform").version(Version.GradlePlugin.kotlin).apply(apply)
 
 fun PluginDependenciesSpec.kotlinMultiplatform(): PluginDependencySpec =
     id("org.jetbrains.kotlin.multiplatform")

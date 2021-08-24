@@ -59,7 +59,7 @@ object Version {
      */
     const val kotlinCoroutines = "1.3.3"
 
-    object GradlePlugins {
+    object GradlePlugin {
         const val kotlin = Version.kotlin
         const val android = "4.2.2"
 

@@ -14,7 +14,7 @@
  * contact D4L by email to help@data4life.care.
  */
 
-object Dependencies {
+object Dependency {
 
     object Multiplatform {
         object Kotlin {

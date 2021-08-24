@@ -36,45 +36,45 @@ kotlin {
 }
 
 dependencies {
-    api(Dependencies.Multiplatform.D4L.utilJvm)
-    api(Dependencies.Multiplatform.D4L.resultErrorJvm)
-    implementation(Dependencies.Multiplatform.Kotlin.stdlib)
+    api(Dependency.Multiplatform.D4L.utilJvm)
+    api(Dependency.Multiplatform.D4L.resultErrorJvm)
+    implementation(Dependency.Multiplatform.Kotlin.stdlib)
 
-    implementation(Dependencies.Multiplatform.D4L.authJvm)
-    implementation(Dependencies.Multiplatform.D4L.cryptoJvm)
-    implementation(Dependencies.Multiplatform.D4L.securestoreJvm)
-    implementation(Dependencies.Multiplatform.D4L.fhirSdk)
-    implementation(Dependencies.Java.threeTenBP)
+    implementation(Dependency.Multiplatform.D4L.authJvm)
+    implementation(Dependency.Multiplatform.D4L.cryptoJvm)
+    implementation(Dependency.Multiplatform.D4L.securestoreJvm)
+    implementation(Dependency.Multiplatform.D4L.fhirSdk)
+    implementation(Dependency.Java.threeTenBP)
 
-    compileOnly(Dependencies.Java.javaXAnnotation)
+    compileOnly(Dependency.Java.javaXAnnotation)
 
-    implementation(Dependencies.Java.rxJava)
+    implementation(Dependency.Java.rxJava)
 
-    implementation(Dependencies.Java.okHttp)
-    implementation(Dependencies.Java.okHttpLoggingInterceptor)
+    implementation(Dependency.Java.okHttp)
+    implementation(Dependency.Java.okHttpLoggingInterceptor)
 
-    implementation(Dependencies.Java.retrofit)
-    implementation(Dependencies.Java.retrofitConverterMoshi)
-    implementation(Dependencies.Java.retrofitAdapterRxJava)
+    implementation(Dependency.Java.retrofit)
+    implementation(Dependency.Java.retrofitConverterMoshi)
+    implementation(Dependency.Java.retrofitAdapterRxJava)
 
-    implementation(Dependencies.Java.moshi)
+    implementation(Dependency.Java.moshi)
 
-    kapt(Dependencies.Java.moshiCodeGen)
-    kaptTest(Dependencies.Java.moshiCodeGen)
+    kapt(Dependency.Java.moshiCodeGen)
+    kaptTest(Dependency.Java.moshiCodeGen)
 
-    testImplementation(Dependencies.Multiplatform.D4L.fhirHelperJvm) {
+    testImplementation(Dependency.Multiplatform.D4L.fhirHelperJvm) {
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
-    testImplementation(Dependencies.Java.Test.junit)
-    testImplementation(Dependencies.Java.Test.kotlinTest)
+    testImplementation(Dependency.Java.Test.junit)
+    testImplementation(Dependency.Java.Test.kotlinTest)
 
-    testImplementation(Dependencies.Java.Test.mockitoInline)
-    testImplementation(Dependencies.Java.Test.truth)
+    testImplementation(Dependency.Java.Test.mockitoInline)
+    testImplementation(Dependency.Java.Test.truth)
 
-    testImplementation(Dependencies.Multiplatform.Test.MockK.jdk)
+    testImplementation(Dependency.Multiplatform.Test.MockK.jdk)
 
-    testImplementation(Dependencies.Java.Test.okHttpMockWebServer)
-    testImplementation(Dependencies.Java.Test.jsonAssert)
+    testImplementation(Dependency.Java.Test.okHttpMockWebServer)
+    testImplementation(Dependency.Java.Test.jsonAssert)
 }
 
 configure<SourceSetContainer> {

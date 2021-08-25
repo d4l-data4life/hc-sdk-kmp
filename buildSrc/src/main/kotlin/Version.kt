@@ -98,8 +98,8 @@ object Version {
 
     // AndroidX
     const val androidXKtx = "1.2.0"
-    const val androidXAppCompat = "1.1.0"
-    const val androidXBrowser = "1.2.0"
+    const val androidXAppCompat = "1.3.1"
+    const val androidXBrowser = "1.3.0"
 
     const val androidXConstraintLayout = "1.1.3"
 

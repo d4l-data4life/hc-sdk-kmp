@@ -93,19 +93,28 @@ class RecordServiceCountRecordsModuleTest {
         userId: String = USER_ID,
         tagEncryptionKey: GCKey = this.tagEncryptionKey
     ) {
-        val (encodedTags, legacyKMPTags, legacyJSTags) = flowHelper.prepareCompatibilityTags(tags)
-        val (encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations) = flowHelper.prepareCompatibilityAnnotations(
+        val (encodedTags, legacyKMPTags, legacyJSTags, legacyIOSTags) = flowHelper.prepareCompatibilityTags(tags)
+        val (encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations, legacyIOSAnnotations) = flowHelper.prepareCompatibilityAnnotations(
             annotations
         )
 
         val searchTags = SearchTagsBuilder.newBuilder()
-            .let { flowHelper.buildExpectedTagGroups(it, encodedTags, legacyKMPTags, legacyJSTags) }
+            .let {
+                flowHelper.buildExpectedTagGroups(
+                    it,
+                    encodedTags,
+                    legacyKMPTags,
+                    legacyJSTags,
+                    legacyIOSTags
+                )
+            }
             .let {
                 flowHelper.buildExpectedTagGroups(
                     it,
                     encodedAnnotations,
                     legacyKMPAnnotations,
-                    legacyJSAnnotations
+                    legacyJSAnnotations,
+                    legacyIOSAnnotations
                 )
             }
             .seal()
@@ -125,11 +134,17 @@ class RecordServiceCountRecordsModuleTest {
             tagEncryptionKey = tagEncryptionKey,
             tagEncryptionKeyCalls = 1,
             resources = emptyList(),
-            tags = flowHelper.mergeTags(encodedTags, legacyKMPTags, legacyJSTags),
+            tags = flowHelper.mergeTags(
+                encodedTags,
+                legacyKMPTags,
+                legacyJSTags,
+                legacyIOSTags
+            ),
             annotations = flowHelper.mergeTags(
                 encodedAnnotations,
                 legacyKMPAnnotations,
-                legacyJSAnnotations
+                legacyJSAnnotations,
+                legacyIOSAnnotations
             ),
             hashFunction = { value -> flowHelper.md5(value) }
         )

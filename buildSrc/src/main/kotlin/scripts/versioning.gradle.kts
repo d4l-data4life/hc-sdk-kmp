@@ -15,13 +15,15 @@
  */
 package scripts
 
+import care.data4life.gradle.gitversion.VersionDetails
+
 /**
  * Usage:
  *
  * You need to add following dependencies to the buildSrc/build.gradle.kts
  *
  * dependencies {
- *     implementation("com.palantir.gradle.gitversion:gradle-git-version:0.12.3")
+ *     implementation("care.data4life.gradle.gitversion:gradle-git-version:0.12.3")
  * }
  *
  * and ensure that the gradlePluginPortal is available
@@ -48,10 +50,10 @@ package scripts
  *
  */
 plugins {
-    id("com.palantir.git-version")
+    id("care.data4life.git-version")
 }
 
-val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
+val versionDetails: groovy.lang.Closure<VersionDetails> by extra
 val patternNoQualifierBranch = "main|release/.*".toRegex()
 val patternFeatureBranch = "feature/(.*)".toRegex()
 val patternTicketNumber = "[A-Z]{2,8}-.*/(.*)".toRegex()
@@ -67,7 +69,7 @@ fun versionName(): String {
     }
 }
 
-fun versionNameFeature(details: com.palantir.gradle.gitversion.VersionDetails): String {
+fun versionNameFeature(details: VersionDetails): String {
     var featureName = patternFeatureBranch.matchEntire(details.branchName)!!.groups[1]!!.value
 
     if (patternTicketNumber.matches(featureName)) {
@@ -78,7 +80,7 @@ fun versionNameFeature(details: com.palantir.gradle.gitversion.VersionDetails): 
 }
 
 fun versionNameWithQualifier(
-    details: com.palantir.gradle.gitversion.VersionDetails,
+    details: VersionDetails,
     name: String = ""
 ): String {
     val version = if (!details.isCleanTag) {

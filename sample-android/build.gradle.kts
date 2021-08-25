@@ -96,7 +96,7 @@ android {
 }
 
 dependencies {
-    coreLibraryDesugaring(Dependencies.Android.androidDesugar)
+    coreLibraryDesugaring(Dependency.Android.androidDesugar)
 
     implementation(project(":sdk-android")) {
         exclude(group = "org.threeten", module = "threetenbp")
@@ -108,30 +108,30 @@ dependencies {
         exclude(group = "care.data4life.hc-fhir-helper-sdk-kmp", module = "fhir-helper-jvm")
     }
 
-    implementation(Dependencies.Multiplatform.D4L.fhirHelperAndroid) {
+    implementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
-    implementation(Dependencies.Multiplatform.D4L.fhirSdk)
+    implementation(Dependency.Multiplatform.D4L.fhirSdk)
 
-    implementation(Dependencies.Multiplatform.D4L.utilAndroid)
-    implementation(Dependencies.Multiplatform.D4L.resultErrorAndroid)
+    implementation(Dependency.Multiplatform.D4L.utilAndroid)
+    implementation(Dependency.Multiplatform.D4L.resultErrorAndroid)
 
-    implementation(Dependencies.Android.threeTenABP)
+    implementation(Dependency.Android.threeTenABP)
 
-    implementation(Dependencies.Android.kotlinStdLib)
+    implementation(Dependency.Android.kotlinStdLib)
 
-    implementation(Dependencies.Android.AndroidX.appCompat)
-    implementation(Dependencies.Android.AndroidX.constraintLayout)
-    implementation(Dependencies.Android.material)
-    implementation(Dependencies.Android.photoView)
-    implementation(Dependencies.Android.pdfView)
+    implementation(Dependency.Android.AndroidX.appCompat)
+    implementation(Dependency.Android.AndroidX.constraintLayout)
+    implementation(Dependency.Android.material)
+    implementation(Dependency.Android.photoView)
+    implementation(Dependency.Android.pdfView)
 
-    implementation(Dependencies.Android.googlePlayServicesBase)
+    implementation(Dependency.Android.googlePlayServicesBase)
 
-    implementation(Dependencies.Android.moshi)
+    implementation(Dependency.Android.moshi)
 
-    testImplementation(Dependencies.Android.Test.junit)
+    testImplementation(Dependency.Android.Test.junit)
 
-    androidTestImplementation(Dependencies.Android.AndroidTest.runner)
+    androidTestImplementation(Dependency.Android.AndroidTest.runner)
 }

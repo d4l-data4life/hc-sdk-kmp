@@ -14,7 +14,7 @@
  * contact D4L by email to help@data4life.care.
  */
 
-object Versions {
+object Version {
     // D4L
     /**
      * [hc-util-sdk-kmp](https://github.com/d4l-data4life/hc-util-sdk-kmp)
@@ -59,8 +59,8 @@ object Versions {
      */
     const val kotlinCoroutines = "1.3.3"
 
-    object GradlePlugins {
-        const val kotlin = Versions.kotlin
+    object GradlePlugin {
+        const val kotlin = Version.kotlin
         const val android = "4.2.2"
 
         /**

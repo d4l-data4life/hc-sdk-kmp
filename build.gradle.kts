@@ -22,9 +22,9 @@ buildscript {
     }
 
     dependencies {
-        classpath(GradlePlugins.android)
-        classpath(GradlePlugins.kotlin)
-        classpath(GradlePlugins.kapt)
+        classpath(GradlePlugin.android)
+        classpath(GradlePlugin.kotlin)
+        classpath(GradlePlugin.kapt)
 
         // https://github.com/vanniktech/gradle-android-junit-jacoco-plugin
         classpath("com.vanniktech:gradle-android-junit-jacoco-plugin:0.16.0")
@@ -34,15 +34,15 @@ buildscript {
         // https://github.com/dcendents/android-maven-gradle-plugin
         classpath("com.github.dcendents:android-maven-gradle-plugin:2.1")
 
-        classpath(GradlePlugins.dexcount)
+        classpath(GradlePlugin.dexcount)
 
         // https://github.com/melix/japicmp-gradle-plugin
         classpath("me.champeau.gradle:japicmp-gradle-plugin:0.2.9")
 
-        classpath(GradlePlugins.downloadTask)
+        classpath(GradlePlugin.downloadTask)
         classpath("org.apache.httpcomponents:httpclient:4.5.11")
 
-        classpath(GradlePlugins.dokka)
+        classpath(GradlePlugin.dokka)
 
         // https://github.com/jeremylong/dependency-check-gradle
         classpath("org.owasp:dependency-check-gradle:5.3.0")

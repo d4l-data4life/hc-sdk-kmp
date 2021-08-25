@@ -53,25 +53,25 @@ dependencies {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
     }
 
-    implementation(Dependencies.Multiplatform.D4L.authJvm)
-    implementation(Dependencies.Multiplatform.D4L.cryptoJvm)
-    implementation(Dependencies.Multiplatform.D4L.securestoreJvm)
-    implementation(Dependencies.Multiplatform.D4L.fhirHelperJvm) {
+    implementation(Dependency.Multiplatform.D4L.authJvm)
+    implementation(Dependency.Multiplatform.D4L.cryptoJvm)
+    implementation(Dependency.Multiplatform.D4L.securestoreJvm)
+    implementation(Dependency.Multiplatform.D4L.fhirHelperJvm) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
-    implementation(Dependencies.Multiplatform.D4L.utilJvm)
-    implementation(Dependencies.Multiplatform.D4L.fhirSdk)
+    implementation(Dependency.Multiplatform.D4L.utilJvm)
+    implementation(Dependency.Multiplatform.D4L.fhirSdk)
 
-    implementation(Dependencies.Java.kotlinStdlibJdk8)
-    implementation(Dependencies.Multiplatform.Coroutines.jdk)
+    implementation(Dependency.Java.kotlinStdlibJdk8)
+    implementation(Dependency.Multiplatform.Coroutines.jdk)
 
-    implementation(Dependencies.Java.koinCore)
-    implementation(Dependencies.Java.moshi)
-    implementation(Dependencies.Java.cmdClickt)
-    implementation(Dependencies.Java.threeTenBP)
+    implementation(Dependency.Java.koinCore)
+    implementation(Dependency.Java.moshi)
+    implementation(Dependency.Java.cmdClickt)
+    implementation(Dependency.Java.threeTenBP)
 
-    testImplementation(Dependencies.Java.Test.koin)
+    testImplementation(Dependency.Java.Test.koin)
 }
 
 val androidTestAssetsPath = "${projectDir}/src/androidTest/assets"

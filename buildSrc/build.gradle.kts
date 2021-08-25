@@ -21,6 +21,11 @@ plugins {
 repositories {
     gradlePluginPortal()
     mavenCentral()
+    maven("https://raw.github.com/d4l-data4life/maven-releases/main/releases") {
+        content {
+            includeGroup("care.data4life.gradle.gitversion")
+        }
+    }
 }
 
 dependencies {
@@ -36,7 +41,7 @@ dependencies {
     implementation("com.diffplug.spotless:spotless-plugin-gradle:5.10.2")
     implementation("com.pinterest:ktlint:0.41.0")
     // versioning.gradle.kts
-    implementation("com.palantir.gradle.gitversion:gradle-git-version:0.12.3")
+    implementation("care.data4life.gradle.gitversion:gradle-git-version:0.12.4-d4l")
 }
 
 kotlinDslPluginOptions {

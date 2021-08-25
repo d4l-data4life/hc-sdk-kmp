@@ -90,7 +90,7 @@ val compatibilityBase by configurations.creating {
 }
 
 dependencies {
-    coreLibraryDesugaring(Dependencies.Android.androidDesugar)
+    coreLibraryDesugaring(Dependency.Android.androidDesugar)
 
     api(project(":sdk-core")) {
         // TODO
@@ -102,78 +102,78 @@ dependencies {
         exclude(group = "care.data4life.hc-result-sdk-kmp", module = "error-jvm")
     }
 
-    implementation(Dependencies.Multiplatform.D4L.authAndroid)
-    implementation(Dependencies.Multiplatform.D4L.cryptoAndroid)
-    implementation(Dependencies.Multiplatform.D4L.securestoreAndroid)
-    api(Dependencies.Multiplatform.D4L.utilAndroid)
-    api(Dependencies.Multiplatform.D4L.resultErrorAndroid)
+    implementation(Dependency.Multiplatform.D4L.authAndroid)
+    implementation(Dependency.Multiplatform.D4L.cryptoAndroid)
+    implementation(Dependency.Multiplatform.D4L.securestoreAndroid)
+    api(Dependency.Multiplatform.D4L.utilAndroid)
+    api(Dependency.Multiplatform.D4L.resultErrorAndroid)
 
-    implementation(Dependencies.Multiplatform.D4L.fhirSdk)
-    implementation(Dependencies.Android.threeTenABP)
+    implementation(Dependency.Multiplatform.D4L.fhirSdk)
+    implementation(Dependency.Android.threeTenABP)
 
-    implementation(Dependencies.Android.AndroidX.appCompat)
-    implementation(Dependencies.Android.AndroidX.browser)
+    implementation(Dependency.Android.AndroidX.appCompat)
+    implementation(Dependency.Android.AndroidX.browser)
 
-    implementation(Dependencies.Android.rxJava2)
+    implementation(Dependency.Android.rxJava2)
 
-    implementation(Dependencies.Android.okHttp)
-    implementation(Dependencies.Android.okHttpLoggingInterceptor)
+    implementation(Dependency.Android.okHttp)
+    implementation(Dependency.Android.okHttpLoggingInterceptor)
 
-    implementation(Dependencies.Android.retrofit)
-    implementation(Dependencies.Android.retrofitConverterMoshi)
-    implementation(Dependencies.Android.retrofitAdapterRxJava)
+    implementation(Dependency.Android.retrofit)
+    implementation(Dependency.Android.retrofitConverterMoshi)
+    implementation(Dependency.Android.retrofitAdapterRxJava)
 
-    implementation(Dependencies.Android.appAuthPatch)
+    implementation(Dependency.Android.appAuthPatch)
 
-    implementation(Dependencies.Android.bouncyCastleJdk15)
+    implementation(Dependency.Android.bouncyCastleJdk15)
 
-    compileOnly(Dependencies.Java.javaXAnnotation)
+    compileOnly(Dependency.Java.javaXAnnotation)
 
-    testImplementation(Dependencies.Android.Test.junit)
-    testImplementation(Dependencies.Android.Test.truth)
+    testImplementation(Dependency.Android.Test.junit)
+    testImplementation(Dependency.Android.Test.truth)
 
     testImplementation("org.mockito:mockito-inline:2.9.0")
     testImplementation("org.powermock:powermock-core:1.7.3")
     testImplementation("org.powermock:powermock-module-junit4:1.7.3")
     testImplementation("org.powermock:powermock-api-mockito2:1.7.3")
 
-    testImplementation(Dependencies.Android.Test.okHttpMockWebServer)
-    testImplementation(Dependencies.Android.Test.jsonAssert)
+    testImplementation(Dependency.Android.Test.okHttpMockWebServer)
+    testImplementation(Dependency.Android.Test.jsonAssert)
 
-    testImplementation(Dependencies.Multiplatform.D4L.fhirHelperAndroid) {
+    testImplementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "error-java")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
 
-    androidTestImplementation(Dependencies.Android.AndroidX.constraintLayout)
-    androidTestImplementation(Dependencies.Android.material)
+    androidTestImplementation(Dependency.Android.AndroidX.constraintLayout)
+    androidTestImplementation(Dependency.Android.material)
 
-    androidTestImplementation(Dependencies.Multiplatform.Kotlin.stdlibAndroid)
-    androidTestImplementation(Dependencies.Multiplatform.Coroutines.android)
+    androidTestImplementation(Dependency.Multiplatform.Kotlin.stdlibAndroid)
+    androidTestImplementation(Dependency.Multiplatform.Coroutines.android)
 
-    androidTestImplementation(Dependencies.Multiplatform.D4L.fhirHelperAndroid) {
+    androidTestImplementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "error-android")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
 
-    androidTestImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvm)
-    androidTestImplementation(Dependencies.Multiplatform.Test.Kotlin.testJvmJunit)
+    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
+    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
 
-    androidTestImplementation(Dependencies.Android.AndroidTest.runner)
-    androidTestImplementation(Dependencies.Android.AndroidTest.rules)
-    androidTestImplementation(Dependencies.Android.AndroidTest.orchestrator)
+    androidTestImplementation(Dependency.Android.AndroidTest.runner)
+    androidTestImplementation(Dependency.Android.AndroidTest.rules)
+    androidTestImplementation(Dependency.Android.AndroidTest.orchestrator)
 
-    androidTestImplementation(Dependencies.Android.AndroidTest.espressoCore)
-    androidTestImplementation(Dependencies.Android.AndroidTest.espressoIntents)
-    androidTestImplementation(Dependencies.Android.AndroidTest.espressoWeb)
+    androidTestImplementation(Dependency.Android.AndroidTest.espressoCore)
+    androidTestImplementation(Dependency.Android.AndroidTest.espressoIntents)
+    androidTestImplementation(Dependency.Android.AndroidTest.espressoWeb)
 
-    androidTestImplementation(Dependencies.Android.AndroidTest.uiAutomator)
-    androidTestImplementation(Dependencies.Android.AndroidTest.kakao)
+    androidTestImplementation(Dependency.Android.AndroidTest.uiAutomator)
+    androidTestImplementation(Dependency.Android.AndroidTest.kakao)
 
-    androidTestImplementation(Dependencies.Android.googlePlayServicesBase)
-    androidTestImplementation(Dependencies.Android.AndroidTest.truth)
+    androidTestImplementation(Dependency.Android.googlePlayServicesBase)
+    androidTestImplementation(Dependency.Android.AndroidTest.truth)
 
     compatibilityBase("care.data4life:hc-sdk-kmp:${LibraryConfig.referenceSdkVersion}") {
         isTransitive = false

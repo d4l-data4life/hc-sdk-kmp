@@ -24,6 +24,7 @@ toc::[]
 * Change Crypto to an external dependency link:https://github.com/d4l-data4life/hc-crypto-sdk-kmp/[Data4Life Crypto]
 * Change Securestore to an external dependency link:https://github.com/d4l-data4life/hc-securestore-sdk-kmp/[Data4Life Securestore]
 * DataRestrictionException is now a domain error of this SDK and got merged into DataValidationException
+* gradle version plugin to patched version with Gradle 7 and Git submodule support
 
 === Removed
 

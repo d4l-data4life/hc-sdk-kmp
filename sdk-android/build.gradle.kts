@@ -123,7 +123,7 @@ dependencies {
     implementation(Dependency.Android.retrofitConverterMoshi)
     implementation(Dependency.Android.retrofitAdapterRxJava)
 
-    implementation(Dependency.Android.appAuthPatch)
+    implementation(Dependency.Android.appAuth)
 
     implementation(Dependency.Android.bouncyCastleJdk15)
 

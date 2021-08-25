@@ -125,12 +125,7 @@ object Version {
     /**
      * [appAuth](https://github.com/openid/AppAuth-Android)
      */
-    const val appAuth = "0.7.1"
-
-    /**
-     * [appAuthPatch](https://github.com/gesundheitscloud/AppAuth-Android)
-     */
-    const val appAuthPatch = "9e3cc033ff"
+    const val appAuth = "0.10.0"
 
     // Network
     /**

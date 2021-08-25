@@ -34,6 +34,7 @@ toc::[]
 
 * Gradle 6.9 -> 6.9.1
 * HC Util SDK 1.9.0 -> 1.10.0
+* AppAuth custom patch -> 0.10.0
 
 === Migration
 

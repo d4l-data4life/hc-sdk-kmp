@@ -13,7 +13,7 @@ include(
 
 val includeAuth: String by settings
 if (includeAuth.toBoolean()) {
-    val version = "1.13.2"
+    val version = "1.14.0"
     includeBuild("../hc-auth-sdk-kmp") {
         dependencySubstitution {
             substitute(module("care.data4life.hc-auth-sdk-kmp:auth:$version"))

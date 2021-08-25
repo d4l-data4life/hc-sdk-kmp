@@ -57,7 +57,7 @@ object Version {
     /**
      *  https://github.com/Kotlin/kotlinx.coroutines
      */
-    const val kotlinCoroutines = "1.3.3"
+    const val kotlinCoroutines = "1.4.3"
 
     object GradlePlugin {
         const val kotlin = Version.kotlin
@@ -102,12 +102,13 @@ object Version {
     const val androidXBrowser = "1.3.0"
 
     const val androidXConstraintLayout = "1.1.3"
+    const val androidXSwipeRefreshLayout = "1.1.0"
 
     // Material
-    const val material = "1.1.0"
+    const val material = "1.4.0"
 
     // Google
-    const val googlePlayServices = "16.1.0"
+    const val googlePlayServices = "17.6.0"
 
     // Crypto
     /**
@@ -155,12 +156,12 @@ object Version {
     /**
      * [ThreeTen Backport](https://www.threeten.org/threetenbp)
      */
-    const val threeTenBP = "1.4.4"
+    const val threeTenBP = "1.5.1"
 
     /**
      * [ThreeTen Android Backport](https://github.com/JakeWharton/ThreeTenABP)
      */
-    const val threeTenABP = "1.2.4"
+    const val threeTenABP = "1.3.1"
 
     // Injection
     /**
@@ -172,7 +173,7 @@ object Version {
     /**
      * [RxJava](https://github.com/ReactiveX/RxJava)
      */
-    const val rxJava = "2.2.19"
+    const val rxJava = "2.2.21"
 
     /**
      * [RxAndroid](https://github.com/ReactiveX/RxAndroid)
@@ -188,7 +189,7 @@ object Version {
     /**
      * [photoView](https://github.com/chrisbanes/PhotoView)
      */
-    const val photoView = "2.0.0"
+    const val photoView = "2.3.0"
 
     /**
      * [pdfView](https://github.com/barteksc/AndroidPdfViewer)

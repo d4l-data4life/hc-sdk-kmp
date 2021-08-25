@@ -123,6 +123,7 @@ dependencies {
 
     implementation(Dependency.Android.AndroidX.appCompat)
     implementation(Dependency.Android.AndroidX.constraintLayout)
+    implementation(Dependency.Android.AndroidX.swipeRefreshLayout)
     implementation(Dependency.Android.material)
     implementation(Dependency.Android.photoView)
     implementation(Dependency.Android.pdfView)

@@ -93,6 +93,7 @@ object Dependency {
             const val appCompat = "androidx.appcompat:appcompat:${Version.androidXAppCompat}"
             const val browser = "androidx.browser:browser:${Version.androidXBrowser}"
             const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Version.androidXConstraintLayout}"
+            const val swipeRefreshLayout = "androidx.swiperefreshlayout:swiperefreshlayout:${Version.androidXSwipeRefreshLayout}"
         }
 
         // Material

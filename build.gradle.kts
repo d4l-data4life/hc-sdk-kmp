@@ -40,12 +40,12 @@ buildscript {
         classpath("me.champeau.gradle:japicmp-gradle-plugin:0.2.9")
 
         classpath(GradlePlugin.downloadTask)
-        classpath("org.apache.httpcomponents:httpclient:4.5.11")
+        classpath("org.apache.httpcomponents:httpclient:4.5.13")
 
         classpath(GradlePlugin.dokka)
 
         // https://github.com/jeremylong/dependency-check-gradle
-        classpath("org.owasp:dependency-check-gradle:5.3.0")
+        classpath("org.owasp:dependency-check-gradle:6.2.2")
     }
 }
 

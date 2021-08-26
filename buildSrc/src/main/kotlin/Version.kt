@@ -24,7 +24,7 @@ object Version {
     /**
      * [hc-result-sdk-kmp](https://github.com/d4l-data4life/hc-result-sdk-kmp)
      */
-    const val resultSdk = "0.1.1"
+    const val resultSdk = "0.2.0"
 
     /**
      * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)

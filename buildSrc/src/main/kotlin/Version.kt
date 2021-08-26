@@ -57,7 +57,7 @@ object Version {
     /**
      *  https://github.com/Kotlin/kotlinx.coroutines
      */
-    const val kotlinCoroutines = "1.4.3"
+    const val kotlinCoroutines = "1.4.3-native-mt"
 
     object GradlePlugin {
         const val kotlin = Version.kotlin

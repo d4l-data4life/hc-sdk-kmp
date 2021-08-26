@@ -24,7 +24,7 @@ object Version {
     /**
      * [hc-result-sdk-kmp](https://github.com/d4l-data4life/hc-result-sdk-kmp)
      */
-    const val resultSdk = "0.1.1"
+    const val resultSdk = "0.2.0"
 
     /**
      * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)
@@ -39,7 +39,7 @@ object Version {
     /**
      * [hc-auth-sdk-kmp](https://github.com/d4l-data4life/hc-auth-sdk-kmp)
      */
-    const val auth = "1.13.2"
+    const val auth = "1.14.0"
 
     /**
      * [hc-crypto-sdk-kmp](https://github.com/d4l-data4life/hc-crypto-sdk-kmp)
@@ -57,7 +57,7 @@ object Version {
     /**
      *  https://github.com/Kotlin/kotlinx.coroutines
      */
-    const val kotlinCoroutines = "1.3.3"
+    const val kotlinCoroutines = "1.4.3-native-mt"
 
     object GradlePlugin {
         const val kotlin = Version.kotlin
@@ -98,16 +98,17 @@ object Version {
 
     // AndroidX
     const val androidXKtx = "1.2.0"
-    const val androidXAppCompat = "1.1.0"
-    const val androidXBrowser = "1.2.0"
+    const val androidXAppCompat = "1.3.1"
+    const val androidXBrowser = "1.3.0"
 
     const val androidXConstraintLayout = "1.1.3"
+    const val androidXSwipeRefreshLayout = "1.1.0"
 
     // Material
-    const val material = "1.1.0"
+    const val material = "1.4.0"
 
     // Google
-    const val googlePlayServices = "16.1.0"
+    const val googlePlayServices = "17.6.0"
 
     // Crypto
     /**
@@ -125,12 +126,7 @@ object Version {
     /**
      * [appAuth](https://github.com/openid/AppAuth-Android)
      */
-    const val appAuth = "0.7.1"
-
-    /**
-     * [appAuthPatch](https://github.com/gesundheitscloud/AppAuth-Android)
-     */
-    const val appAuthPatch = "9e3cc033ff"
+    const val appAuth = "0.10.0"
 
     // Network
     /**
@@ -160,12 +156,12 @@ object Version {
     /**
      * [ThreeTen Backport](https://www.threeten.org/threetenbp)
      */
-    const val threeTenBP = "1.4.4"
+    const val threeTenBP = "1.5.1"
 
     /**
      * [ThreeTen Android Backport](https://github.com/JakeWharton/ThreeTenABP)
      */
-    const val threeTenABP = "1.2.4"
+    const val threeTenABP = "1.3.1"
 
     // Injection
     /**
@@ -177,7 +173,7 @@ object Version {
     /**
      * [RxJava](https://github.com/ReactiveX/RxJava)
      */
-    const val rxJava = "2.2.19"
+    const val rxJava = "2.2.21"
 
     /**
      * [RxAndroid](https://github.com/ReactiveX/RxAndroid)
@@ -193,7 +189,7 @@ object Version {
     /**
      * [photoView](https://github.com/chrisbanes/PhotoView)
      */
-    const val photoView = "2.0.0"
+    const val photoView = "2.3.0"
 
     /**
      * [pdfView](https://github.com/barteksc/AndroidPdfViewer)

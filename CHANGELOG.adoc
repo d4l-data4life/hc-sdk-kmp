@@ -24,7 +24,7 @@ toc::[]
 * Change Auth to an external dependency link:https://github.com/d4l-data4life/hc-auth-sdk-kmp/[Data4Life Auth]
 * Change Crypto to an external dependency link:https://github.com/d4l-data4life/hc-crypto-sdk-kmp/[Data4Life Crypto]
 * Change Securestore to an external dependency link:https://github.com/d4l-data4life/hc-securestore-sdk-kmp/[Data4Life Securestore]
-* DataRestrictionException is now a domain error of this SDK and got merged into DataValidationException
+* *_BREAKING_* DataRestrictionException is now a domain error of this SDK and got merged into DataValidationException
 * gradle version plugin to patched version with Gradle 7 and Git submodule support
 
 === Removed
@@ -49,6 +49,8 @@ toc::[]
 * RxJava 2.2.19 -> 2.2.21
 * PhotoView 2.0.0 -> 2.3.0
 * HC Result SDK KMP 0.1.1 -> 0.2.0
+* HC FHIR SDK JAVA 1.5.0 -> 1.6.2
+* HC FHIR-Helpers SDK KMP 1.6.0 -> 1.7.0
 
 === Migration
 

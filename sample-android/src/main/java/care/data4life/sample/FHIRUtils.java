@@ -22,7 +22,6 @@ import android.net.Uri;
 import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -36,10 +35,10 @@ import care.data4life.fhir.stu3.model.FhirDateTime;
 import care.data4life.fhir.stu3.model.FhirInstant;
 import care.data4life.fhir.stu3.model.Practitioner;
 import care.data4life.fhir.stu3.util.FhirDateTimeParser;
-import care.data4life.sdk.helpers.stu3.AttachmentBuilderPatched;
+import care.data4life.sdk.helpers.lang.DataRestrictionException;
+import care.data4life.sdk.helpers.stu3.AttachmentBuilder;
 import care.data4life.sdk.helpers.stu3.DocumentReferenceBuilder;
 import care.data4life.sdk.helpers.stu3.PractitionerBuilder;
-import care.data4life.sdk.lang.DataRestrictionException;
 
 final class FHIRUtils {
     private static final String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss[XXX]";
@@ -89,7 +88,7 @@ final class FHIRUtils {
         String contentType = ctx.getContentResolver().getType(assetUri);
         contentType = contentType != null ? contentType : "application/octet-stream";
         String attachmentTitle = FileUtils.getFileName(ctx, assetUri);
-        return AttachmentBuilderPatched.buildWith(attachmentTitle, fhirDateTimeNow, contentType, data);
+        return AttachmentBuilder.buildWith(attachmentTitle, fhirDateTimeNow, contentType, data);
     }
 
     static DocumentReference buildDocument(String title, List<Attachment> attachments) {

@@ -14,7 +14,7 @@ curl link -s -o filename
 
 == Badge sources
 
-:link-badge-release: https://img.shields.io/badge/Release-1.14.0-blueviolet.svg
+:link-badge-release: https://img.shields.io/badge/Release-1.15.0-blueviolet.svg
 Version image:{link-badge-release}[Latest release]::
 `curl {link-badge-release} -s -o badge-release-latest.svg`
 

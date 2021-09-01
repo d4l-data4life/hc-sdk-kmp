@@ -22,7 +22,11 @@ toc::[]
 
 === Fixed
 
+* Broken version of the ElementFactory caused NullPointers for Consent and ResearchSubject
+
 === Bumped
+
+* HC FHIR SDK JAVA 1.6.2 -> 1.6.3
 
 === Migration
 

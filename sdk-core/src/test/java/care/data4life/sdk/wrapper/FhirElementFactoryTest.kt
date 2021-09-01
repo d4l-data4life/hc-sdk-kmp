@@ -16,7 +16,6 @@
 
 package care.data4life.sdk.wrapper
 
-import care.data4life.fhir.r4.model.FhirElementFactory
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.test.util.TestResourceHelper.buildDocumentReferenceFhir3
@@ -212,6 +211,7 @@ class FhirElementFactoryTest {
     @Test
     fun `Given, getFhir4ClassForType is called, with any valid Fhir4Resource in string representation, it returns its resource class`() {
         val resources = listOf(
+            "allergyIntolerance",
             "specimen",
             "serviceRequest",
             "substance",

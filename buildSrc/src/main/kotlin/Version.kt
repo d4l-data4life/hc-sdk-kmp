@@ -34,7 +34,7 @@ object Version {
     /**
      * [hc-fhir-helper-sdk-kmp](https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp)
      */
-    const val fhirHelper = "1.7.0"
+    const val fhirHelper = "1.7.1"
 
     /**
      * [hc-auth-sdk-kmp](https://github.com/d4l-data4life/hc-auth-sdk-kmp)

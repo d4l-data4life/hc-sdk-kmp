@@ -12,7 +12,7 @@ and this project adheres to http://semver.org/spec/v2.0.0.html[Semantic Versioni
 ==== Versions
 toc::[]
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.15.0...main[Unreleased]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.15.1...main[Unreleased]
 
 === Added
 
@@ -22,14 +22,21 @@ toc::[]
 
 === Fixed
 
+=== Bumped
+
+=== Migration
+
+
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.15.0...v1.15.1[1.15.1]
+
+=== Fixed
+
 * Broken version of the ElementFactory caused NullPointers for Consent and ResearchSubject
 
 === Bumped
 
 * HC FHIR SDK JAVA 1.6.2 -> 1.6.3
 * HC FHIR-Helpers SDK KMP 1.7.0 -> 1.7.1
-
-=== Migration
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.14.0...v1.15.0[1.15.0]
 

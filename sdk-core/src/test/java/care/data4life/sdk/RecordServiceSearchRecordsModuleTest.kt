@@ -16,10 +16,10 @@
 
 package care.data4life.sdk
 
-import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
@@ -211,19 +211,30 @@ class RecordServiceSearchRecordsModuleTest {
         pageSize: Int = PAGE_SIZE,
         offset: Int = OFFSET
     ) {
-        val (encodedTags, legacyKMPTags, legacyJSTags) = flowHelper.prepareCompatibilityTags(tags)
-        val (encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations) = flowHelper.prepareCompatibilityAnnotations(
+        val (encodedTags, legacyKMPTags, legacyJSTags, legacyIOSTags) = flowHelper.prepareCompatibilityTags(
+            tags
+        )
+        val (encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations, legacyIOSAnnotations) = flowHelper.prepareCompatibilityAnnotations(
             annotations
         )
 
         val searchTags = SearchTagsBuilder.newBuilder()
-            .let { flowHelper.buildExpectedTagGroups(it, encodedTags, legacyKMPTags, legacyJSTags) }
-            .let {
+            .let { builder ->
                 flowHelper.buildExpectedTagGroups(
-                    it,
+                    builder,
+                    encodedTags,
+                    legacyKMPTags,
+                    legacyJSTags,
+                    legacyIOSTags
+                )
+            }
+            .let { builder ->
+                flowHelper.buildExpectedTagGroups(
+                    builder,
                     encodedAnnotations,
                     legacyKMPAnnotations,
-                    legacyJSAnnotations
+                    legacyJSAnnotations,
+                    legacyIOSAnnotations
                 )
             }
             .seal()
@@ -269,8 +280,18 @@ class RecordServiceSearchRecordsModuleTest {
             serializedResources,
             listOf(encryptedRecord, encryptedKMPLegacyRecord, encryptedJSLegacyRecord),
             searchTags,
-            flowHelper.mergeTags(encodedTags, legacyKMPTags, legacyJSTags),
-            flowHelper.mergeTags(encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations),
+            flowHelper.mergeTags(
+                encodedTags,
+                legacyKMPTags,
+                legacyJSTags,
+                legacyIOSTags
+            ),
+            flowHelper.mergeTags(
+                encodedAnnotations,
+                legacyKMPAnnotations,
+                legacyJSAnnotations,
+                legacyIOSAnnotations
+            ),
             tagEncryptionKeyCalls,
             useStoredCommonKey,
             commonKey,
@@ -312,18 +333,29 @@ class RecordServiceSearchRecordsModuleTest {
         pageSize: Int = PAGE_SIZE,
         offset: Int = OFFSET
     ) {
-        val (encodedTags, legacyKMPTags, legacyJSTags) = flowHelper.prepareCompatibilityTags(tags)
-        val (encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations) = flowHelper.prepareCompatibilityAnnotations(
+        val (encodedTags, legacyKMPTags, legacyJSTags, legacyIOSTags) = flowHelper.prepareCompatibilityTags(
+            tags
+        )
+        val (encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations, legacyIOSAnnotations) = flowHelper.prepareCompatibilityAnnotations(
             annotations
         )
         val searchTags = SearchTagsBuilder.newBuilder()
-            .let { flowHelper.buildExpectedTagGroups(it, encodedTags, legacyKMPTags, legacyJSTags) }
-            .let {
+            .let { builder ->
                 flowHelper.buildExpectedTagGroups(
-                    it,
+                    builder,
+                    encodedTags,
+                    legacyKMPTags,
+                    legacyJSTags,
+                    legacyIOSTags
+                )
+            }
+            .let { builder ->
+                flowHelper.buildExpectedTagGroups(
+                    builder,
                     encodedAnnotations,
                     legacyKMPAnnotations,
-                    legacyJSAnnotations
+                    legacyJSAnnotations,
+                    legacyIOSAnnotations
                 )
             }
             .seal()
@@ -369,8 +401,18 @@ class RecordServiceSearchRecordsModuleTest {
             serializedResources,
             listOf(encryptedRecord, encryptedKMPLegacyRecord, encryptedJSLegacyRecord),
             searchTags,
-            flowHelper.mergeTags(encodedTags, legacyKMPTags, legacyJSTags),
-            flowHelper.mergeTags(encodedAnnotations, legacyKMPAnnotations, legacyJSAnnotations),
+            flowHelper.mergeTags(
+                encodedTags,
+                legacyKMPTags,
+                legacyJSTags,
+                legacyIOSTags
+            ),
+            flowHelper.mergeTags(
+                encodedAnnotations,
+                legacyKMPAnnotations,
+                legacyJSAnnotations,
+                legacyIOSAnnotations
+            ),
             tagEncryptionKeyCalls,
             useStoredCommonKey,
             commonKey,

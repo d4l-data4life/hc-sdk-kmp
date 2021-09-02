@@ -16,8 +16,8 @@
 
 package care.data4life.sdk.network
 
-import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.auth.AuthorizationContract
+import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_SDK_VERSION

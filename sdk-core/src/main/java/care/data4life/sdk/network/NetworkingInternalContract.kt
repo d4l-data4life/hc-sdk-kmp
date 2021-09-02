@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.network
 
-import care.data4life.auth.AuthorizationContract
+import care.data4life.sdk.auth.AuthorizationContract
 import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
 import okhttp3.Response

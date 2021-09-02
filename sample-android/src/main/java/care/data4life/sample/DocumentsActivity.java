@@ -57,8 +57,8 @@ import care.data4life.sdk.Data4LifeClient;
 import care.data4life.sdk.SdkContract;
 import care.data4life.sdk.call.DataRecord;
 import care.data4life.sdk.call.Task;
-import care.data4life.sdk.config.DataRestrictionException;
 import care.data4life.sdk.data.DataResource;
+import care.data4life.sdk.helpers.lang.DataRestrictionException;
 import care.data4life.sdk.helpers.stu3.DocumentReferenceExtension;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.Callback;
@@ -171,7 +171,9 @@ public class DocumentsActivity extends AppCompatActivity {
                 try {
                     attachment = FHIRUtils.buildAttachmentFromUri(uri, this);
                 } catch (DataRestrictionException.UnsupportedFileType unsupportedFileType) {
+                    /* Do nothing */
                 } catch (DataRestrictionException.MaxDataSizeViolation maxDataSizeViolation) {
+                    /* Do nothing */
                 }
                 if (attachment == null) continue;
                 attachments.add(attachment);

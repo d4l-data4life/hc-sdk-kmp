@@ -45,34 +45,34 @@ dependencies {
         exclude(group = "care.data4life", module = "securestore-android")
         exclude(group = "care.data4life", module = "crypto-android")
         exclude(group = "care.data4life", module = "auth-android")
-        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util")
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
-    implementation(Dependencies.Multiplatform.Kotlin.stdlib)
+    implementation(Dependency.Multiplatform.Kotlin.stdlib)
 
-    implementation(project(":securestore-jvm"))
-    implementation(project(":crypto-jvm"))
-    implementation(project(":auth-jvm"))
-    implementation(Dependencies.Multiplatform.D4L.sdkUtil)
-    implementation(Dependencies.Multiplatform.D4L.fhirHelper) {
-        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util")
+    implementation(Dependency.Multiplatform.D4L.authJvm)
+    implementation(Dependency.Multiplatform.D4L.cryptoJvm)
+    implementation(Dependency.Multiplatform.D4L.securestoreJvm)
+    implementation(Dependency.Multiplatform.D4L.utilJvm)
+    implementation(Dependency.Multiplatform.D4L.fhirHelperJvm) {
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
-    implementation(Dependencies.Multiplatform.D4L.fhirSdk)
+    implementation(Dependency.Multiplatform.D4L.fhirSdk)
 
-    implementation(Dependencies.Java.threeTenBP)
-    implementation(Dependencies.Java.rxJava)
-    implementation(Dependencies.Java.moshi)
+    implementation(Dependency.Java.threeTenBP)
+    implementation(Dependency.Java.rxJava)
+    implementation(Dependency.Java.moshi)
 
-    kapt(Dependencies.Java.moshiCodeGen)
-    kaptTest(Dependencies.Java.moshiCodeGen)
+    kapt(Dependency.Java.moshiCodeGen)
+    kaptTest(Dependency.Java.moshiCodeGen)
 
-    compileOnly(Dependencies.Java.javaXAnnotation)
+    compileOnly(Dependency.Java.javaXAnnotation)
 
-    testImplementation(Dependencies.Java.Test.junit)
-    testImplementation(Dependencies.Java.Test.mockitoCore)
-    testImplementation(Dependencies.Java.Test.truth)
-    testImplementation(Dependencies.Java.Test.jsonAssert)
+    testImplementation(Dependency.Java.Test.junit)
+    testImplementation(Dependency.Java.Test.mockitoCore)
+    testImplementation(Dependency.Java.Test.truth)
+    testImplementation(Dependency.Java.Test.jsonAssert)
 }
 
 tasks {

@@ -36,17 +36,16 @@ internal object CompatibilityEncoder : MigrationInternalContract.CompatibilityEn
         return result
     }
 
-    override fun encode(tagValue: String): Triple<String, String, String> {
-        val validEncoding = tagEncoding.encode(tagValue)
+    override fun encode(tagValue: String): MigrationInternalContract.QueryCompatibilityTag {
         val kmpLegacyEncoding = tagEncoding.normalize(tagValue)
-        val jsLegacyEncoding = mapJSExceptions(
-            urlEncoding.encode(kmpLegacyEncoding)
-        )
 
-        return Triple(
-            validEncoding,
-            kmpLegacyEncoding, // aka KMPLegacyTags
-            jsLegacyEncoding
+        return MigrationInternalContract.QueryCompatibilityTag(
+            validEncoding = tagEncoding.encode(tagValue),
+            kmpLegacyEncoding = kmpLegacyEncoding,
+            jsLegacyEncoding = mapJSExceptions(
+                urlEncoding.encode(kmpLegacyEncoding)
+            ),
+            iosLegacyEncoding = urlEncoding.encode(kmpLegacyEncoding)
         )
     }
 

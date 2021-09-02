@@ -22,9 +22,9 @@ buildscript {
     }
 
     dependencies {
-        classpath(GradlePlugins.android)
-        classpath(GradlePlugins.kotlin)
-        classpath(GradlePlugins.kapt)
+        classpath(GradlePlugin.android)
+        classpath(GradlePlugin.kotlin)
+        classpath(GradlePlugin.kapt)
 
         // https://github.com/vanniktech/gradle-android-junit-jacoco-plugin
         classpath("com.vanniktech:gradle-android-junit-jacoco-plugin:0.16.0")
@@ -34,18 +34,18 @@ buildscript {
         // https://github.com/dcendents/android-maven-gradle-plugin
         classpath("com.github.dcendents:android-maven-gradle-plugin:2.1")
 
-        classpath(GradlePlugins.dexcount)
+        classpath(GradlePlugin.dexcount)
 
         // https://github.com/melix/japicmp-gradle-plugin
         classpath("me.champeau.gradle:japicmp-gradle-plugin:0.2.9")
 
-        classpath(GradlePlugins.downloadTask)
-        classpath("org.apache.httpcomponents:httpclient:4.5.11")
+        classpath(GradlePlugin.downloadTask)
+        classpath("org.apache.httpcomponents:httpclient:4.5.13")
 
-        classpath(GradlePlugins.dokka)
+        classpath(GradlePlugin.dokka)
 
         // https://github.com/jeremylong/dependency-check-gradle
-        classpath("org.owasp:dependency-check-gradle:5.3.0")
+        classpath("org.owasp:dependency-check-gradle:6.2.2")
     }
 }
 
@@ -60,11 +60,15 @@ plugins {
 allprojects {
     repositories {
         google()
-        jcenter()
-        maven("https://jitpack.io")
+        mavenCentral()
 
         gitHub(project)
+
         d4l()
+
+        jitPack()
+
+        bintray()
     }
 
     apply(plugin = "org.owasp.dependencycheck")
@@ -83,6 +87,12 @@ allprojects {
         from(dokka)
         dependsOn(dokka)
     }
+
+    configurations.all {
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android-debug")
+        exclude(group = "care.data4life.hc-securestore-sdk-kmp", module = "securestore-android-debug")
+        exclude(group = "care.data4life.hc-result-sdk-kmp", module = "error-android-debug")
+    }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -95,6 +105,6 @@ tasks.withType<JavaCompile> {
 }
 
 tasks.named<Wrapper>("wrapper") {
-    gradleVersion = "6.8.3"
+    gradleVersion = "6.9.1"
     distributionType = Wrapper.DistributionType.ALL
 }

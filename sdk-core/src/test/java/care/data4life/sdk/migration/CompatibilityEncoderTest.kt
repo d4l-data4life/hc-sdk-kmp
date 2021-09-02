@@ -63,7 +63,7 @@ class CompatibilityEncoderTest {
         every { UrlEncoding.encode(tagValue) } returns "notImportant"
 
         // When
-        val (encoded, _, _) = compatibilityEncoder.encode(tagValue)
+        val (encoded, _, _, _) = compatibilityEncoder.encode(tagValue)
 
         // Then
         assertEquals(
@@ -85,7 +85,7 @@ class CompatibilityEncoderTest {
         every { UrlEncoding.encode(tagValue) } returns "notImportant"
 
         // When
-        val (_, encoded, _) = compatibilityEncoder.encode(tagValue)
+        val (_, encoded, _, _) = compatibilityEncoder.encode(tagValue)
 
         // Then
         assertEquals(
@@ -108,7 +108,7 @@ class CompatibilityEncoderTest {
         every { UrlEncoding.encode(normalized) } returns expected
 
         // When
-        val (_, _, encoded) = compatibilityEncoder.encode(tagValue)
+        val (_, _, encoded, _) = compatibilityEncoder.encode(tagValue)
 
         // Then
         assertEquals(
@@ -117,30 +117,55 @@ class CompatibilityEncoderTest {
         )
 
         verify(exactly = 1) { TagEncoding.normalize(tagValue) }
-        verify(exactly = 1) { UrlEncoding.encode(normalized) }
+        verify(atLeast = 1) { UrlEncoding.encode(normalized) }
     }
 
     @Test
-    fun `Given encode is called with a String, it maps JS legacy encoding lowercases`() {
+    fun `Given encode is called with a String, it maps JS legacy encoding lowercased`() {
         // Given
-        val tagValue = "!'()*-_.~"
+        val tagValue = "Something"
+        val kmpTagValue = "!'()*-_.~"
+        val expected = "%21%27%28%29%2a%2d%5f%2e%7e"
+
+        every { TagEncoding.encode(tagValue) } returns "notImportant"
+        every { TagEncoding.normalize(tagValue) } returns kmpTagValue
+        every { UrlEncoding.encode(kmpTagValue) } returns expected.toUpperCase()
+
+        // When
+        val (_, _, encoded, _) = compatibilityEncoder.encode(tagValue)
+
+        // Then
+        assertEquals(
+            expected = expected,
+            actual = encoded
+        )
+
+        verify(exactly = 1) { TagEncoding.normalize(tagValue) }
+        verify(atLeast = 1) { UrlEncoding.encode(kmpTagValue) }
+    }
+
+    @Test
+    fun `Given encode is called with a String, it maps iOS legacy encoding uppercased`() {
+        // Given
+        val nonCased = "Test"
+        val tagValue = "!'()*-_.~$nonCased"
         val expected = "%21%27%28%29%2a%2d%5f%2e%7e"
 
         every { TagEncoding.encode(tagValue) } returns "notImportant"
         every { TagEncoding.normalize(tagValue) } returns tagValue
-        every { UrlEncoding.encode(tagValue) } returns expected.toUpperCase()
+        every { UrlEncoding.encode(tagValue) } returns expected.toUpperCase() + nonCased.toLowerCase()
 
         // When
-        val (_, _, encoded) = compatibilityEncoder.encode(tagValue)
+        val (_, _, _, encoded) = compatibilityEncoder.encode(tagValue)
 
         // Then
         assertEquals(
-            expected = expected,
+            expected = expected.toUpperCase() + nonCased.toLowerCase(),
             actual = encoded
         )
 
         verify(exactly = 1) { TagEncoding.normalize(tagValue) }
-        verify(exactly = 1) { UrlEncoding.encode(tagValue) }
+        verify(atLeast = 1) { UrlEncoding.encode(tagValue) }
     }
 
     @Test

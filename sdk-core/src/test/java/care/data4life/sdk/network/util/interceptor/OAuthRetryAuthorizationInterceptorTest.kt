@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.network.util.interceptor
 
-import care.data4life.auth.AuthorizationContract
+import care.data4life.sdk.auth.AuthorizationContract
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.NetworkingContract.Companion.HTTP_401_UNAUTHORIZED

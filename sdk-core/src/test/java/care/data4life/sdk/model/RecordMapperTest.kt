@@ -16,9 +16,9 @@
 
 package care.data4life.sdk.model
 
-import care.data4life.crypto.GCKey
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
+import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.date.SdkDateTimeFormatter
 import care.data4life.sdk.fhir.Fhir3Resource

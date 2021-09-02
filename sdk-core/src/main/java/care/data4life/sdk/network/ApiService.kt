@@ -15,7 +15,7 @@
  */
 package care.data4life.sdk.network
 
-import care.data4life.auth.AuthorizationContract
+import care.data4life.sdk.auth.AuthorizationContract
 import care.data4life.sdk.lang.D4LRuntimeException
 import care.data4life.sdk.network.NetworkingContract.Companion.MEDIA_TYPE_OCTET_STREAM
 import care.data4life.sdk.network.model.CommonKeyResponse

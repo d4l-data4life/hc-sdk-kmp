@@ -22,7 +22,7 @@ import android.net.Uri;
 import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -35,14 +35,12 @@ import care.data4life.fhir.stu3.model.FhirDateTime;
 import care.data4life.fhir.stu3.model.FhirInstant;
 import care.data4life.fhir.stu3.model.Practitioner;
 import care.data4life.fhir.stu3.util.FhirDateTimeParser;
-import care.data4life.sdk.config.DataRestrictionException;
+import care.data4life.sdk.helpers.lang.DataRestrictionException;
 import care.data4life.sdk.helpers.stu3.AttachmentBuilder;
 import care.data4life.sdk.helpers.stu3.DocumentReferenceBuilder;
 import care.data4life.sdk.helpers.stu3.PractitionerBuilder;
 
 final class FHIRUtils {
-    private static final String TAG = FHIRUtils.class.getSimpleName();
-
     private static final String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss[XXX]";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT, Locale.US);
 
@@ -66,7 +64,7 @@ final class FHIRUtils {
         coding.system = "http://www.ihe.net/xds/connectathon/practiceSettingCodes";
 
         CodeableConcept concept = new CodeableConcept();
-        concept.coding = Arrays.asList(coding);
+        concept.coding = Collections.singletonList(coding);
         return concept;
     }
 
@@ -77,7 +75,7 @@ final class FHIRUtils {
         coding.system = "http://loinc.org";
 
         CodeableConcept concept = new CodeableConcept();
-        concept.coding = Arrays.asList(coding);
+        concept.coding = Collections.singletonList(coding);
         return concept;
     }
 

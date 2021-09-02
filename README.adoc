@@ -1,5 +1,5 @@
 = Data4Life SDK
-:library_version: 1.14.0
+:library_version: 1.15.1
 :doctype: article
 :!showtitle:
 :toc: macro
@@ -36,12 +36,18 @@ For more information about the platform, visit our website <a href="https://www.
         ·
         <a href="https://github.com/d4l-data4life/hc-sdk-kmp/issues">Request Feature</a>
     </p>
-    <p><!-- PROJECT BADGES -->
-        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/actions">
-            <img src="https://github.com/d4l-data4life/hc-sdk-kmp/workflows/D4L%20CI%20KMP/badge.svg" alt="Build Status"/>
+    <p><!-- PROJECT BADGES see badges.adoc how to change them -->
+        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/releases">
+            <img src="assets/images/badge-release-latest.svg" alt="Latest version"/>
         </a>
-        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/blob/main/LICENSE">
-            <img src="https://img.shields.io/badge/license-PRIVATE-blue.svg"/>
+        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/actions">
+            <img src="https://github.com/d4l-data4life/hc-sdk-kmp/actions/workflows/d4l-ci-latest-version.yml/badge.svg" alt="Build Status"/>
+        </a>
+        <a>
+            <img src="assets/images/badge-platform-support.svg" alt="Platform"/>
+        </a>
+        <a href="LICENSE">
+            <img src="assets/images/badge-license.svg" alt="License"/>
         </a>
     </p>
 </div>
@@ -68,7 +74,7 @@ If you just want to explore the SDK you'll find a test configuration in `sample-
 * Android 6.0 (API 23) to Android 11 (API 30)
 * Kotlin 1.4.32
 * Java 8 link:https://developer.android.com/studio/write/java8-support[Limitations] link:https://jakewharton.com/d8-library-desugaring/[Desugaring]
-* Gradle 6.8.3
+* Gradle6.9.1
 
 === Dependencies
 
@@ -77,6 +83,11 @@ The SDK has the following dependencies:
 * link:https://github.com/square/retrofit[retrofit2]
 * link:https://github.com/ReactiveX/RxJava[rxjava2]
 * link:https://github.com/d4l-data4life/hc-fhir-sdk-java[D4L FHIR STU3]
+* link:https://github.com/d4l-data4life/hc-auth-sdk-kmp/[Data4Life Auth]
+* link:https://github.com/d4l-data4life/hc-crypto-sdk-kmp/[Data4Life Crypto]
+* link:https://github.com/d4l-data4life/hc-securestore-sdk-kmp/[Data4Life Securestore]
+* link:https://github.com/d4l-data4life/hc-result-sdk-kmp/[Data4Life Result]
+* link:https://github.com/d4l-data4life/hc-util-sdk-kmp/[Data4Life Util]
 * link:https://github.com/ThreeTen/threetenbp[ThreeTen Java 8 Time backport]
 * link:http://bouncycastle.org/[BouncyCastle] *
 * link:https://github.com/google/tink[Tink]
@@ -91,6 +102,7 @@ The SDK has the following dependencies:
 == Install Gradle
 
 === Setup maven repositories
+
 Add the following maven repository url to your root build.gradle:
 
 Please take a look over at Github https://docs.github.com/en/packages/publishing-and-managing-packages/about-github-packages#about-tokens[about-github-packages#tokens, window="_blank"] on how to generate your private token for accessing the Github Package Registry.
@@ -136,6 +148,42 @@ gpr.user=github-username
 gpr.key=github-token
 ----
 
+==== Setup Maven Repository
+
+We use GitHub Packages to distribute the SDK. In order to consume our dependencies you need to generate a GitHub Personal Access Token. Please follow the how to  link:https://docs.github.com/en/packages/learn-github-packages/introduction-to-github-packages#authenticating-to-github-packages[authenticate to GitHub Packages, window="_blank"].
+
+NOTICE:: You need to have _read_ access to this repository and generate a https://github.com/settings/tokens/new/[personal access token] with `repo` and `read:packages` scope.
+
+The token needs to be made available:
+
+1. Add `gpr.user = {GitHub username}` and `gpr.key = {GitHub Personal Access Token}` to your global Gradle properties `~/.gradle/gradle.properties`
+
+    ----
+    gpr.user=github-username
+    gpr.key=github-token
+    ----
+
+2. Or add following environment variables `PACKAGE_REGISTRY_USERNAME={GitHub username}` and `PACKAGE_REGISTRY_TOKEN={GitHub Personal Access Token}`
+
+Then add the following maven repository configuration to your root build.gradle:
+
+----
+
+allprojects {
+    repositories {
+        ...
+        maven {
+            url = URI("https://maven.pkg.github.com/d4l-data4life/hc-fhir-sdk-kmp")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+            }
+        }
+    }
+}
+
+----
+
 === Java SDK dependency
 
 Add the following dependencies to your app `build.gradle` file.
@@ -147,7 +195,8 @@ dependencies {
             exclude group: 'care.data4life.hc-sdk-kmp', module: 'securestore-android'
             exclude group: 'care.data4life.hc-sdk-kmp', module: 'crypto-android'
             exclude group: 'care.data4life.hc-sdk-kmp', module: 'auth-android'
-            exclude group: 'care.data4life.hc-util-sdk-kmp', module: 'util'
+            exclude group: 'care.data4life.hc-util-sdk-kmp', module: 'util-android'
+            exclude group: 'care.data4life.hc-result-sdk-kmp', module: 'error-android'
     }
 }
 ----
@@ -161,7 +210,8 @@ dependencies {
         exclude group: 'care.data4life.hc-sdk-kmp', module: 'securestore-jvm'
         exclude group: 'care.data4life.hc-sdk-kmp', module: 'crypto-jvm'
         exclude group: 'care.data4life.hc-sdk-kmp', module: 'auth-jvm'
-        exclude group: 'care.data4life.hc-util-sdk-kmp', module: 'util'
+        exclude group: 'care.data4life.hc-util-sdk-kmp', module: 'util-jvm'
+        exclude group: 'care.data4life.hc-result-sdk-kmp', module: 'error-jvm'
     }
 }
 ----
@@ -256,7 +306,7 @@ There are several requirements for building the SDK.
 * Kotlin 1.4.32
 * Java 8 link:https://developer.android.com/studio/write/java8-support[Limitations] link:https://jakewharton.com/d8-library-desugaring/[Desugaring]
 * Gradle 6.8.3
-* link:https://developer.android.com/studio#downloads[Android Studio 4.2.1]
+* link:https://developer.android.com/studio#downloads[Android Studio 4.2.2]
 * Android Emulator 23 - 30
 
 **Note:** Disable Instant Run in Android Studio, or the project fails to compile.

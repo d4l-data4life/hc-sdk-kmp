@@ -170,11 +170,16 @@ class FhirElementFactoryTest {
             "organization",
             "medicationRequest",
             "observation",
-            "provenance"
+            "provenance",
+            "researchSubject",
+            "consent"
         )
 
         for (type in resources) {
-            assertNotNull(SdkFhirElementFactory.getFhir3ClassForType(type))
+            assertNotNull(
+                SdkFhirElementFactory.getFhir3ClassForType(type),
+                message = "Did not find $type"
+            )
         }
     }
 
@@ -206,35 +211,41 @@ class FhirElementFactoryTest {
     @Test
     fun `Given, getFhir4ClassForType is called, with any valid Fhir4Resource in string representation, it returns its resource class`() {
         val resources = listOf(
-            "Specimen",
-            "ServiceRequest",
-            "Substance",
-            "ValueSet",
-            "DocumentReference",
-            "DiagnosticReport",
-            "Encounter",
-            "Medication",
-            "Questionnaire",
-            "Goal",
-            "CarePlan",
-            "CareTeam",
-            "QuestionnaireResponse",
-            "MedicationStatement",
-            "PractitionerRole",
-            "Practitioner",
-            "Patient",
-            "Procedure",
-            "Condition",
-            "FamilyMemberHistory",
-            "Organization",
-            "MedicationRequest",
-            "Observation",
-            "Location",
-            "Provenance"
+            "allergyIntolerance",
+            "specimen",
+            "serviceRequest",
+            "substance",
+            "valueSet",
+            "documentReference",
+            "diagnosticReport",
+            "encounter",
+            "medication",
+            "questionnaire",
+            "goal",
+            "carePlan",
+            "careTeam",
+            "questionnaireResponse",
+            "medicationStatement",
+            "practitionerRole",
+            "practitioner",
+            "patient",
+            "procedure",
+            "condition",
+            "familyMemberHistory",
+            "organization",
+            "medicationRequest",
+            "observation",
+            "location",
+            "provenance",
+            "researchSubject",
+            "consent"
         )
 
         for (type in resources) {
-            assertNotNull(SdkFhirElementFactory.getFhir4ClassForType(type))
+            assertNotNull(
+                SdkFhirElementFactory.getFhir4ClassForType(type),
+                message = "Did not find $type"
+            )
         }
     }
 }

@@ -16,7 +16,7 @@
 
 package care.data4life.sdk.network.model
 
-import care.data4life.crypto.GCKey
+import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedCustomDataRecord

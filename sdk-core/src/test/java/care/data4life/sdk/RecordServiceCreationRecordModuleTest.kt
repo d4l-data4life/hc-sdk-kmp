@@ -16,14 +16,13 @@
 
 package care.data4life.sdk
 
-import care.data4life.crypto.GCKey
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.attachment.FileService
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
-import care.data4life.sdk.config.DataRestrictionException
 import care.data4life.sdk.crypto.CryptoContract
+import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.date.SdkDateTimeFormatter
 import care.data4life.sdk.fhir.Fhir3Identifier
@@ -32,6 +31,7 @@ import care.data4life.sdk.fhir.Fhir4Identifier
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.fhir.ResourceCryptoService
+import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.Record
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.EncryptedKey
@@ -746,7 +746,7 @@ class RecordServiceCreationRecordModuleTest {
         )
 
         // Then
-        assertFailsWith<DataRestrictionException.MaxDataSizeViolation> {
+        assertFailsWith<DataValidationException.MaxDataSizeViolation> {
             // When
             recordService.createRecord(
                 USER_ID,
@@ -1338,7 +1338,7 @@ class RecordServiceCreationRecordModuleTest {
         )
 
         // Then
-        assertFailsWith<DataRestrictionException.MaxDataSizeViolation> {
+        assertFailsWith<DataValidationException.MaxDataSizeViolation> {
             // When
             recordService.createRecord(
                 USER_ID,

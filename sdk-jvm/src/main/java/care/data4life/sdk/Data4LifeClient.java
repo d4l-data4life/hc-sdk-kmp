@@ -19,12 +19,12 @@ package care.data4life.sdk;
 
 import java.util.Set;
 
-import care.data4life.auth.Authorization;
-import care.data4life.auth.AuthorizationConfiguration;
-import care.data4life.auth.AuthorizationContract;
-import care.data4life.auth.AuthorizationException;
-import care.data4life.auth.AuthorizationService;
-import care.data4life.auth.storage.InMemoryAuthStorage;
+import care.data4life.sdk.auth.Authorization;
+import care.data4life.sdk.auth.AuthorizationConfiguration;
+import care.data4life.sdk.auth.AuthorizationContract;
+import care.data4life.sdk.auth.AuthorizationException;
+import care.data4life.sdk.auth.AuthorizationService;
+import care.data4life.sdk.auth.storage.InMemoryAuthStorage;
 import care.data4life.sdk.attachment.AttachmentService;
 import care.data4life.sdk.attachment.FileService;
 import care.data4life.sdk.auth.UserService;
@@ -40,14 +40,13 @@ import care.data4life.sdk.network.Environment;
 import care.data4life.sdk.tag.TagCryptoService;
 import care.data4life.sdk.network.NetworkingContract;
 import care.data4life.sdk.tag.TaggingService;
-import care.data4life.securestore.SecureStore;
-import care.data4life.securestore.SecureStoreContract;
-import care.data4life.securestore.SecureStoreCryptor;
-import care.data4life.securestore.SecureStoreStorage;
+import care.data4life.sdk.securestore.SecureStore;
+import care.data4life.sdk.securestore.SecureStoreContract;
+import care.data4life.sdk.securestore.SecureStoreCryptor;
+import care.data4life.sdk.securestore.SecureStoreStorage;
 
 public final class Data4LifeClient extends BaseClient {
     private static final boolean DEBUG = true;
-
 
     private AuthorizationService authorizationService;
     private CryptoService cryptoService;

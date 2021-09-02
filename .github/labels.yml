@@ -76,9 +76,6 @@
 - name: crypto
   description: Crypto SDK changes
   color: 000080
-- name: securestore
-  description: Securestore SDK changes
-  color: 000080
 
 
 # Sample Apps

@@ -70,7 +70,7 @@ import care.data4life.fhir.stu3.model.FhirInstant;
 import care.data4life.fhir.stu3.model.FhirTime;
 import care.data4life.sdk.Data4LifeClient;
 import care.data4life.sdk.call.Task;
-import care.data4life.sdk.config.DataRestrictionException;
+import care.data4life.sdk.helpers.lang.DataRestrictionException;
 import care.data4life.sdk.helpers.stu3.AttachmentExtension;
 import care.data4life.sdk.helpers.stu3.DocumentReferenceExtension;
 import care.data4life.sdk.lang.D4LException;

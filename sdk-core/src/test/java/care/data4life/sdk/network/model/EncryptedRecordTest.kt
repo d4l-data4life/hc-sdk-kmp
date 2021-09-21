@@ -16,7 +16,9 @@
 
 package care.data4life.sdk.network.model
 
+import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter
+import care.data4life.sdk.network.typeadapter.RecordStatusAdapter
 import com.squareup.moshi.Moshi
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -36,6 +38,7 @@ class EncryptedRecordTest {
             identifier = "abc",
             encryptedTags = listOf("a", "b", "c"),
             encryptedBody = "test",
+            status = ModelContract.RecordStatus.Active,
             customCreationDate = "asdasd",
             encryptedDataKey = ENCRYPTED_DATA_KEY,
             encryptedAttachmentsKey = ENCRYPTED_ATTACHMENT_KEY,
@@ -53,6 +56,7 @@ class EncryptedRecordTest {
     fun `Given a EncryptedRecord is serialized, it transforms into a valid JSON`() {
         val moshi = Moshi.Builder()
             .add(EncryptedKeyTypeAdapter())
+            .add(RecordStatusAdapter())
             .build()
         val adapter = moshi.adapter(EncryptedRecord::class.java)
 
@@ -71,6 +75,7 @@ class EncryptedRecordTest {
     fun `Given a EncryptedRecord is deserialized it transforms into EncryptedRecord`() {
         val moshi = Moshi.Builder()
             .add(EncryptedKeyTypeAdapter())
+            .add(RecordStatusAdapter())
             .build()
         val adapter = moshi.adapter(EncryptedRecord::class.java)
 
@@ -90,13 +95,14 @@ class EncryptedRecordTest {
         private val ENCRYPTED_ATTACHMENT_KEY = EncryptedKey("gh")
 
         private const val ENCRYPTED_RECORD_JSON =
-            "{\"common_key_id\":\"asd\",\"record_id\":\"abc\",\"encrypted_tags\":[\"a\",\"b\",\"c\"],\"encrypted_body\":\"test\",\"date\":\"asdasd\",\"encrypted_key\":\"abc\",\"attachment_key\":\"gh\",\"model_version\":23,\"createdAt\":\"awqwe\",\"version\":0}"
+            "{\"common_key_id\":\"asd\",\"record_id\":\"abc\",\"encrypted_tags\":[\"a\",\"b\",\"c\"],\"encrypted_body\":\"test\",\"status\":\"Active\",\"date\":\"asdasd\",\"encrypted_key\":\"abc\",\"attachment_key\":\"gh\",\"model_version\":23,\"createdAt\":\"awqwe\",\"version\":0}"
         private val ENCRYPTED_RECORD = EncryptedRecord(
             _commonKeyId = "asd",
             identifier = "abc",
             encryptedTags = listOf("a", "b", "c"),
             encryptedBody = "test",
             customCreationDate = "asdasd",
+            status = ModelContract.RecordStatus.Active,
             encryptedDataKey = ENCRYPTED_DATA_KEY,
             encryptedAttachmentsKey = ENCRYPTED_ATTACHMENT_KEY,
             modelVersion = 23,
@@ -104,12 +110,13 @@ class EncryptedRecordTest {
         )
 
         private const val ENCRYPTED_RECORD_WITH_NULL_FIELDS_JSON =
-            "{\"common_key_id\":\"asd\",\"record_id\":\"abc\",\"encrypted_tags\":[\"a\",\"b\",\"c\"],\"encrypted_body\":\"test\",\"encrypted_key\":\"abc\",\"model_version\":23,\"version\":0}"
+            "{\"common_key_id\":\"asd\",\"record_id\":\"abc\",\"encrypted_tags\":[\"a\",\"b\",\"c\"],\"encrypted_body\":\"test\",\"status\":\"Active\",\"encrypted_key\":\"abc\",\"model_version\":23,\"version\":0}"
         private val ENCRYPTED_RECORD_WITH_NULL_FIELDS = EncryptedRecord(
             _commonKeyId = "asd",
             identifier = "abc",
             encryptedTags = listOf("a", "b", "c"),
             encryptedBody = "test",
+            status = ModelContract.RecordStatus.Active,
             customCreationDate = null,
             encryptedDataKey = ENCRYPTED_DATA_KEY,
             encryptedAttachmentsKey = null,

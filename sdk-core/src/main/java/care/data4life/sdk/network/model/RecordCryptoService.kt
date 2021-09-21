@@ -20,6 +20,7 @@ import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.crypto.KeyType
 import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.date.DateHelperContract
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
@@ -31,7 +32,6 @@ import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.Tags
-import care.data4life.sdk.wrapper.WrapperContract
 
 class RecordCryptoService(
     private val alias: String,
@@ -41,7 +41,7 @@ class RecordCryptoService(
     private val guard: NetworkModelContract.LimitGuard,
     private val cryptoService: CryptoContract.Service,
     private val resourceCryptoService: FhirContract.CryptoService,
-    private val dateTimeFormatter: WrapperContract.DateTimeFormatter,
+    private val dateTimeFormatter: DateHelperContract.DateTimeFormatter,
     private val modelVersion: ModelContract.ModelVersion
 ) : NetworkModelContract.CryptoService {
     private fun <T : Fhir3Resource> buildFhir3Record(
@@ -53,7 +53,8 @@ class RecordCryptoService(
         updateDate: String?,
         dataKey: GCKey,
         attachmentKey: GCKey?,
-        modelVersion: Int
+        modelVersion: Int,
+        status: ModelContract.RecordStatus
     ): NetworkModelInternalContract.DecryptedFhir3Record<T> {
         return DecryptedRecord(
             identifier,
@@ -64,7 +65,8 @@ class RecordCryptoService(
             updateDate,
             dataKey,
             attachmentKey,
-            modelVersion
+            modelVersion,
+            status
         )
     }
 
@@ -77,7 +79,8 @@ class RecordCryptoService(
         updateDate: String?,
         dataKey: GCKey,
         attachmentKey: GCKey?,
-        modelVersion: Int
+        modelVersion: Int,
+        status: ModelContract.RecordStatus
     ): NetworkModelInternalContract.DecryptedFhir4Record<T> {
         return DecryptedR4Record(
             identifier,
@@ -88,7 +91,8 @@ class RecordCryptoService(
             updateDate,
             dataKey,
             attachmentKey,
-            modelVersion
+            modelVersion,
+            status
         )
     }
 
@@ -100,7 +104,8 @@ class RecordCryptoService(
         creationDate: String?,
         updateDate: String?,
         dataKey: GCKey,
-        modelVersion: Int
+        modelVersion: Int,
+        status: ModelContract.RecordStatus
     ): NetworkModelInternalContract.DecryptedCustomDataRecord {
         guard.checkDataLimit(resource.value)
 
@@ -112,7 +117,8 @@ class RecordCryptoService(
             creationDate,
             updateDate,
             dataKey,
-            modelVersion
+            modelVersion,
+            status
         )
     }
 
@@ -125,7 +131,8 @@ class RecordCryptoService(
         updateDate: String? = null,
         dataKey: GCKey,
         attachmentKey: GCKey? = null,
-        modelVersion: Int = CURRENT
+        modelVersion: Int = CURRENT,
+        status: ModelContract.RecordStatus = ModelContract.RecordStatus.Active
     ): NetworkModelContract.DecryptedBaseRecord<T> {
         val record = when (resource) {
             is Fhir3Resource -> this.buildFhir3Record(
@@ -137,7 +144,8 @@ class RecordCryptoService(
                 updateDate,
                 dataKey,
                 attachmentKey,
-                modelVersion
+                modelVersion,
+                status
             )
             is Fhir4Resource -> this.buildFhir4Record(
                 identifier,
@@ -148,7 +156,8 @@ class RecordCryptoService(
                 updateDate,
                 dataKey,
                 attachmentKey,
-                modelVersion
+                modelVersion,
+                status
             )
             is DataResource -> this.buildCustomRecord(
                 identifier,
@@ -158,7 +167,8 @@ class RecordCryptoService(
                 creationDate,
                 updateDate,
                 dataKey,
-                modelVersion
+                modelVersion,
+                status
             )
             else -> throw CoreRuntimeException.UnsupportedOperation()
         }
@@ -238,6 +248,7 @@ class RecordCryptoService(
                 decryptedRecord.annotations
             ),
             resourceCryptoService.encryptResource(dataKey, decryptedRecord.resource),
+            decryptedRecord.status,
             decryptedRecord.customCreationDate,
             encryptedDataKey,
             encryptedAttachmentKey,
@@ -325,7 +336,8 @@ class RecordCryptoService(
             encryptedRecord.updatedDate,
             dataKey,
             attachmentKey,
-            encryptedRecord.modelVersion
+            encryptedRecord.modelVersion,
+            encryptedRecord.status
         )
     }
 }

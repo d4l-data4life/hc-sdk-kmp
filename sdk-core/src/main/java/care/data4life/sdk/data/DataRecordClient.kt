@@ -16,6 +16,7 @@
 
 package care.data4life.sdk.data
 
+import care.data4life.sdk.SdkContract
 import care.data4life.sdk.auth.AuthContract
 import care.data4life.sdk.call.CallHandler
 import care.data4life.sdk.call.Callback
@@ -24,7 +25,6 @@ import care.data4life.sdk.call.Task
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.tag.Annotations
 import io.reactivex.Single
-import org.threeten.bp.LocalDate
 
 internal class DataRecordClient(
     private val userService: AuthContract.UserService,
@@ -70,18 +70,20 @@ internal class DataRecordClient(
 
     override fun search(
         annotations: Annotations,
-        startDate: LocalDate?,
-        endDate: LocalDate?,
+        creationDateRange: SdkContract.CreationDateRange,
+        updateDateTimeRange: SdkContract.UpdateDateTimeRange,
+        includeDeletedRecords: Boolean,
         pageSize: Int,
         offset: Int,
         callback: Callback<List<DataRecord<DataResource>>>
     ): Task = executeOperationFlow(
         { userId ->
-            recordService.fetchDataRecords(
+            recordService.searchDataRecords(
                 userId,
                 annotations,
-                startDate,
-                endDate,
+                creationDateRange,
+                updateDateTimeRange,
+                includeDeletedRecords,
                 pageSize,
                 offset
             )

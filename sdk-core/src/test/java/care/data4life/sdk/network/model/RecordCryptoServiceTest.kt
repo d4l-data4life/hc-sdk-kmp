@@ -19,6 +19,7 @@ package care.data4life.sdk.network.model
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.date.DateHelperContract
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.fhir.FhirContract
@@ -29,7 +30,6 @@ import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.TaggingContract
 import care.data4life.sdk.tag.Tags
 import care.data4life.sdk.test.util.GenericTestDataProvider.ALIAS
-import care.data4life.sdk.wrapper.WrapperContract
 import io.mockk.Runs
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -51,7 +51,7 @@ class RecordCryptoServiceTest {
     private val taggingService: TaggingContract.Service = mockk()
     private val tagCryptoService: TaggingContract.CryptoService = mockk()
     private val resourceCryptoService: FhirContract.CryptoService = mockk()
-    private val dateTimeFormatter: WrapperContract.DateTimeFormatter = mockk()
+    private val dateTimeFormatter: DateHelperContract.DateTimeFormatter = mockk()
     private val limitGuard: NetworkModelContract.LimitGuard = mockk()
     private val modelVersion: ModelContract.ModelVersion = mockk()
 
@@ -276,6 +276,27 @@ class RecordCryptoServiceTest {
     }
 
     @Test
+    fun `Given, fromResource is called with a Fhir3 resource and Annotations, it sets the status to Active`() {
+        // Given
+        val annotations: Annotations = mockk()
+        val resource: Fhir3Resource = mockk()
+
+        runFromResourceFlow(
+            resource,
+            annotations
+        )
+
+        // When
+        val record = service.fromResource(resource, annotations)
+
+        // Then
+        assertEquals(
+            actual = record.status,
+            expected = ModelContract.RecordStatus.Active
+        )
+    }
+
+    @Test
     fun `Given, fromResource is called with a Fhir3 resource and Annotations, it sets the Identifier, AttachmentKey and UpdateDate null at the DecryptedFhir3Record`() {
         // Given
         val annotations: Annotations = mockk()
@@ -447,6 +468,27 @@ class RecordCryptoServiceTest {
         assertEquals(
             actual = record.modelVersion,
             expected = ModelContract.ModelVersion.CURRENT
+        )
+    }
+
+    @Test
+    fun `Given, fromResource is called with a Fhir4 resource and Annotations, it sets the status to Active`() {
+        // Given
+        val annotations: Annotations = mockk()
+        val resource: Fhir4Resource = mockk()
+
+        runFromResourceFlow(
+            resource,
+            annotations
+        )
+
+        // When
+        val record = service.fromResource(resource, annotations)
+
+        // Then
+        assertEquals(
+            actual = record.status,
+            expected = ModelContract.RecordStatus.Active
         )
     }
 
@@ -642,6 +684,27 @@ class RecordCryptoServiceTest {
         assertEquals(
             actual = record.modelVersion,
             expected = ModelContract.ModelVersion.CURRENT
+        )
+    }
+
+    @Test
+    fun `Given, fromResource is called with a DataResource and Annotations, it sets the status to Active`() {
+        // Given
+        val annotations: Annotations = mockk()
+        val resource: DataResource = mockk()
+
+        runFromResourceArbitraryDataFlow(
+            resource,
+            annotations
+        )
+
+        // When
+        val record = service.fromResource(resource, annotations)
+
+        // Then
+        assertEquals(
+            actual = record.status,
+            expected = ModelContract.RecordStatus.Active
         )
     }
 

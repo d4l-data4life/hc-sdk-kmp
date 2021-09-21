@@ -23,6 +23,7 @@ import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.D
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.model.Meta
+import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.model.ModelContract.ModelVersion.Companion.CURRENT
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.model.CommonKeyResponse
@@ -402,11 +403,12 @@ class RecordServiceModuleTestFlowHelper(
             .also { it.addAll(annotations) }
             .map { Base64.encodeToString(md5(it)) },
         body,
+        ModelContract.RecordStatus.Active,
         dates.first,
         keys.first,
         keys.second,
         CURRENT,
-        dates.second
+        dates.second,
     )
 
     private fun buildEncryptedRecord(
@@ -502,6 +504,7 @@ class RecordServiceModuleTestFlowHelper(
         updatedDate: String
     ): Meta = Meta(
         LocalDate.parse(customCreationDate, DATE_FORMATTER),
-        LocalDateTime.parse(updatedDate, DATE_TIME_FORMATTER)
+        LocalDateTime.parse(updatedDate, DATE_TIME_FORMATTER),
+        ModelContract.RecordStatus.Active,
     )
 }

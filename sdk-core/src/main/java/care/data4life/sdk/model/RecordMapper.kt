@@ -18,6 +18,7 @@ package care.data4life.sdk.model
 
 import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
+import care.data4life.sdk.date.SdkDateTimeFormatter
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
@@ -27,9 +28,15 @@ import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedCustomDataRecord
 import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedFhir3Record
 import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedFhir4Record
-import care.data4life.sdk.wrapper.SdkDateTimeFormatter
 
 internal object RecordMapper : RecordFactory {
+    private fun buildMeta(record: DecryptedBaseRecord<*>): Meta {
+        return Meta(
+            SdkDateTimeFormatter.parseDate(record.customCreationDate!!),
+            SdkDateTimeFormatter.parseDateTime(record.updatedDate!!),
+            record.status
+        )
+    }
 
     @Throws(CoreRuntimeException.InternalFailure::class)
     override fun <T : Any> getInstance(record: DecryptedBaseRecord<T>): BaseRecord<T> {
@@ -37,19 +44,19 @@ internal object RecordMapper : RecordFactory {
         return when (record) {
             is DecryptedFhir3Record -> Record(
                 record.resource as Fhir3Resource,
-                SdkDateTimeFormatter.buildMeta(record),
+                buildMeta(record),
                 record.annotations
             )
             is DecryptedFhir4Record -> Fhir4Record(
                 record.identifier ?: "", // FIXME
                 record.resource as Fhir4Resource,
-                SdkDateTimeFormatter.buildMeta(record),
+                buildMeta(record),
                 record.annotations
             )
             is DecryptedCustomDataRecord -> DataRecord(
                 record.identifier ?: "", // FIXME
                 record.resource,
-                SdkDateTimeFormatter.buildMeta(record),
+                buildMeta(record),
                 record.annotations
             )
             else -> throw CoreRuntimeException.InternalFailure()

@@ -23,11 +23,13 @@ import org.threeten.bp.LocalDateTime
  *
  * @param createdDate    date when resource was created and is set by the SDK in the moment when resource enters [care.data4life.sdk.RecordService.createRecord] method
  * @param updatedDate    date when record was last time updated on the server side.
+ * @param status         status of an record.
  * Creating new record is also considered as update operation and will result in
  * updating `updatedDate`.
  */
 // TODO add model number
 data class Meta(
     override val createdDate: LocalDate,
-    override val updatedDate: LocalDateTime
+    override val updatedDate: LocalDateTime,
+    override val status: ModelContract.RecordStatus
 ) : ModelContract.Meta

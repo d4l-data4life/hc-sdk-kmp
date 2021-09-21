@@ -141,30 +141,49 @@ public interface SdkContractLegacy {
          * Fetch records with filters
          *
          * @param resourceType The class type of the record to fetch
-         * @param startDate    the filtered records have a creation date after the start date
-         * @param endDate      the filtered records have a creation date before the endDate
+         * @param creationDateRange the filtered records have a creation date after the start date or before the endDate
+         * @param updateDateTimeRange the filtered records have a update dateTime after the start date or before the endDateTime
+         * @param includeDeletedRecords includes deleted records into the query
          * @param pageSize     define the size page result
          * @param offset       the offset of the records list
          * @param listener     either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
          * @param <T>          the type of {@link Record} as a subclass of {@link DomainResource}
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        <T extends DomainResource> Task fetchRecords(Class<T> resourceType, LocalDate startDate, LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<Record<T>>> listener);
+        <T extends DomainResource> Task fetchRecords(
+                Class<T> resourceType,
+                @Nullable SdkContract.CreationDateRange creationDateRange,
+                @Nullable SdkContract.UpdateDateTimeRange updateDateTimeRange,
+                Boolean includeDeletedRecords,
+                Integer pageSize,
+                Integer offset,
+                ResultListener<List<Record<T>>> listener
+        );
 
         /**
          * Fetch records with filters
          *
          * @param resourceType The class type of the record to fetch
          * @param annotations  custom annotations added as tags to the record
-         * @param startDate    the filtered records have a creation date after the start date
-         * @param endDate      the filtered records have a creation date before the endDate
+         * @param creationDateRange the filtered records have a creation Date after the start date or before the end Date
+         * @param updateDateTimeRange the filtered records have a update DateTime after the start DateTime or before the end DateTime
+         * @param includeDeletedRecords includes deleted records into the query
          * @param pageSize     define the size page result
          * @param offset       the offset of the records list
          * @param listener     either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
          * @param <T>          the type of {@link Record} as a subclass of {@link DomainResource}
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
          */
-        <T extends DomainResource> Task fetchRecords(Class<T> resourceType, List<String> annotations, LocalDate startDate, LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<Record<T>>> listener);
+        <T extends DomainResource> Task fetchRecords(
+                Class<T> resourceType,
+                List<String> annotations,
+                @Nullable SdkContract.CreationDateRange creationDateRange,
+                @Nullable SdkContract.UpdateDateTimeRange updateDateTimeRange,
+                Boolean includeDeletedRecords,
+                Integer pageSize,
+                Integer offset,
+                ResultListener<List<Record<T>>> listener
+        );
 
         /**
          * Download a record. All {@link Attachment}s will get downloaded of the requested record.

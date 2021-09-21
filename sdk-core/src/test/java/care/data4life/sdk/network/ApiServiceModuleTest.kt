@@ -17,6 +17,7 @@
 package care.data4life.sdk.network
 
 import care.data4life.sdk.auth.AuthorizationContract
+import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_SDK_VERSION
@@ -29,6 +30,7 @@ import care.data4life.sdk.network.model.UserInfo
 import care.data4life.sdk.network.model.Version
 import care.data4life.sdk.network.model.VersionList
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter
+import care.data4life.sdk.network.typeadapter.RecordStatusAdapter
 import care.data4life.sdk.network.util.CertificatePinnerFactory
 import care.data4life.sdk.network.util.HealthCloudApiFactory
 import care.data4life.sdk.network.util.SearchTagsBuilder
@@ -68,7 +70,10 @@ class ApiServiceModuleTest {
     private val env: NetworkingContract.Environment = mockk()
     private lateinit var server: MockWebServer
     private lateinit var service: NetworkingContract.Service
-    private val moshi = Moshi.Builder().add(EncryptedKeyTypeAdapter()).build()
+    private val moshi = Moshi.Builder()
+        .add(EncryptedKeyTypeAdapter())
+        .add(RecordStatusAdapter())
+        .build()
     private val clientName = "test"
     private val clientId = CLIENT_ID
     private val secret = "geheim"
@@ -207,6 +212,7 @@ class ApiServiceModuleTest {
             identifier = null,
             encryptedTags = listOf("tags"),
             encryptedBody = "body",
+            status = ModelContract.RecordStatus.Active,
             encryptedDataKey = EncryptedKey(Base64.encodeToString("test")),
             encryptedAttachmentsKey = null,
             customCreationDate = "today",
@@ -263,6 +269,7 @@ class ApiServiceModuleTest {
             identifier = null,
             encryptedTags = listOf("tags"),
             encryptedBody = "body",
+            status = ModelContract.RecordStatus.Pending,
             encryptedDataKey = EncryptedKey(Base64.encodeToString("test")),
             encryptedAttachmentsKey = null,
             customCreationDate = "today",
@@ -319,6 +326,7 @@ class ApiServiceModuleTest {
             identifier = null,
             encryptedTags = listOf("tags"),
             encryptedBody = "body",
+            status = ModelContract.RecordStatus.Active,
             encryptedDataKey = EncryptedKey(Base64.encodeToString("test")),
             encryptedAttachmentsKey = null,
             customCreationDate = "today",
@@ -370,6 +378,9 @@ class ApiServiceModuleTest {
         val userId = USER_ID
         val startDate = "somewhen"
         val endDate = "somewhen else"
+        val startUpdateDate = "range start"
+        val endUpdateDate = "range end"
+        val deletionFlag = true
         val pageSize = 23
         val offset = 42
         val formattedTags = "tag1,tag2,tag3"
@@ -384,6 +395,7 @@ class ApiServiceModuleTest {
             identifier = null,
             encryptedTags = listOf("tags"),
             encryptedBody = "body",
+            status = ModelContract.RecordStatus.Deleted,
             encryptedDataKey = EncryptedKey(Base64.encodeToString("test")),
             encryptedAttachmentsKey = null,
             customCreationDate = "today",
@@ -404,6 +416,9 @@ class ApiServiceModuleTest {
             userId,
             startDate,
             endDate,
+            startUpdateDate,
+            endUpdateDate,
+            deletionFlag,
             pageSize,
             offset,
             tags
@@ -437,6 +452,14 @@ class ApiServiceModuleTest {
         assertEquals(
             actual = request.requestUrl?.queryParameter("end_date"),
             expected = endDate
+        )
+        assertEquals(
+            actual = request.requestUrl?.queryParameter("start_updated_date"),
+            expected = startUpdateDate
+        )
+        assertEquals(
+            actual = request.requestUrl?.queryParameter("end_updated_date"),
+            expected = endUpdateDate
         )
         assertEquals(
             actual = request.requestUrl?.queryParameter("limit"),
@@ -836,6 +859,7 @@ class ApiServiceModuleTest {
             identifier = null,
             encryptedTags = listOf("tags"),
             encryptedBody = "body",
+            status = ModelContract.RecordStatus.Pending,
             encryptedDataKey = EncryptedKey(Base64.encodeToString("test")),
             encryptedAttachmentsKey = null,
             customCreationDate = "today",

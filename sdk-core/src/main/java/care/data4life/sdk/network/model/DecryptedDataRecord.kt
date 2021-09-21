@@ -18,6 +18,7 @@ package care.data4life.sdk.network.model
 
 import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.network.model.NetworkModelInternalContract.DecryptedCustomDataRecord
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.Tags
@@ -34,5 +35,6 @@ internal data class DecryptedDataRecord(
     override var customCreationDate: String?,
     override var updatedDate: String?,
     override var dataKey: GCKey,
-    override var modelVersion: Int
+    override var modelVersion: Int,
+    override var status: ModelContract.RecordStatus
 ) : DecryptedCustomDataRecord

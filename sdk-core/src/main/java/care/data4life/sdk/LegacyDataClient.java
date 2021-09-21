@@ -169,9 +169,28 @@ public class LegacyDataClient implements SdkContract.LegacyDataClient {
     }
 
     @Override
-    public <T extends DomainResource> Task fetchRecords(Class<T> resourceType, @Nullable LocalDate startDate, @Nullable LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<Record<T>>> listener) {
+    public <T extends DomainResource> Task fetchRecords(
+            Class<T> resourceType,
+            @Nullable SdkContract.CreationDateRange creationDateRange,
+            @Nullable SdkContract.UpdateDateTimeRange updateDateTimeRange,
+            Boolean includeDeletedRecords,
+            Integer pageSize,
+            Integer offset,
+            ResultListener<List<Record<T>>> listener
+    ) {
         Single<List<Record<T>>> operation = userService.getUserID()
-                .flatMap(uid -> recordService.fetchFhir3Records(uid, resourceType, startDate, endDate, pageSize, offset));
+                .flatMap(uid ->
+                        recordService.searchFhir3Records(
+                                uid,
+                                resourceType,
+                                new ArrayList<>(),
+                                creationDateRange,
+                                updateDateTimeRange,
+                                includeDeletedRecords,
+                                pageSize,
+                                offset
+                        )
+                );
         return handler.executeSingle(operation, listener);
     }
 
@@ -179,19 +198,21 @@ public class LegacyDataClient implements SdkContract.LegacyDataClient {
     public <T extends DomainResource> Task fetchRecords(
             Class<T> resourceType,
             List<String> annotations,
-            @Nullable LocalDate startDate,
-            @Nullable LocalDate endDate,
+            @Nullable SdkContract.CreationDateRange creationDateRange,
+            @Nullable SdkContract.UpdateDateTimeRange updateDateTimeRange,
+            Boolean includeDeletedRecords,
             Integer pageSize,
             Integer offset,
             ResultListener<List<Record<T>>> listener
     ) {
         Single<List<Record<T>>> operation = userService.getUserID()
-                .flatMap(uid -> recordService.fetchFhir3Records(
+                .flatMap(uid -> recordService.searchFhir3Records(
                         uid,
                         resourceType,
                         annotations,
-                        startDate,
-                        endDate,
+                        creationDateRange,
+                        updateDateTimeRange,
+                        includeDeletedRecords,
                         pageSize,
                         offset
                 ));

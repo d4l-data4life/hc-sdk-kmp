@@ -87,7 +87,6 @@ interface HealthCloudApi {
         @Path("recordId") recordId: String
     ): Single<EncryptedRecord>
 
-    // FIXME validate if startDate, endDate, pageSize and offset are nullable
     @GET("/users/{userId}/records")
     @Headers(AUTHORIZATION_WITH_ACCESS_TOKEN)
     fun searchRecords(
@@ -95,6 +94,9 @@ interface HealthCloudApi {
         @Path("userId") userId: String,
         @Query("start_date") startDate: String?,
         @Query("end_date") endDate: String?,
+        @Query("start_updated_date") startUpdatedDate: String?,
+        @Query("end_updated_date") endUpdatedDate: String?,
+        @Query("include_deleted") includeDeletedRecords: Boolean?,
         @Query("limit") pageSize: Int,
         @Query("offset") offset: Int,
         @Query("tags") tags: String

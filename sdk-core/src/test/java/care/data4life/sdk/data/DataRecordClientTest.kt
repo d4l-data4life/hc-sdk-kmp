@@ -32,7 +32,6 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
-import org.threeten.bp.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
@@ -174,12 +173,13 @@ class DataRecordClientTest {
     }
 
     @Test
-    fun `Given search is called, with a ResourceType, Annotations, a Startdate, a Enddate, Pagesize, Offset and a Callback it returns the corresponding Task`() {
+    fun `Given search is called, with a ResourceType, Annotations, a CreationDateRange, a UpdateDateTimeRange, Pagesize, Offset and a Callback it returns the corresponding Task`() {
         // Given
         val callback: Callback<List<DataRecord<DataResource>>> = mockk()
         val annotations: Annotations = mockk()
-        val startDate: LocalDate = mockk()
-        val endDate: LocalDate = mockk()
+        val creationDate = SdkContract.CreationDateRange(null, null)
+        val updateDateTime = SdkContract.UpdateDateTimeRange(null, null)
+        val includeDeletedRecords = true
         val pageSize = 23
         val offset = 42
 
@@ -192,11 +192,12 @@ class DataRecordClientTest {
         every { userService.finishLogin(true) } returns Single.just(true)
         every { userService.userID } returns Single.just(userId)
         every {
-            recordService.fetchDataRecords(
+            recordService.searchDataRecords(
                 userId,
                 annotations,
-                startDate,
-                endDate,
+                creationDate,
+                updateDateTime,
+                includeDeletedRecords,
                 pageSize,
                 offset
             )
@@ -214,8 +215,9 @@ class DataRecordClientTest {
         // When
         val actual = client.search(
             annotations,
-            startDate,
-            endDate,
+            creationDate,
+            updateDateTime,
+            includeDeletedRecords,
             pageSize,
             offset,
             callback

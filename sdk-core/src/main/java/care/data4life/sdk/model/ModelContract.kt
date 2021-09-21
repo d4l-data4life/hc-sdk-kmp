@@ -44,9 +44,16 @@ interface ModelContract {
         }
     }
 
+    enum class RecordStatus(val id: String) {
+        Active("Active"),
+        Pending("Pending"),
+        Deleted("Deleted")
+    }
+
     // TODO: model this platform independent
     interface Meta : Serializable {
         val createdDate: LocalDate
         val updatedDate: LocalDateTime
+        val status: RecordStatus
     }
 }

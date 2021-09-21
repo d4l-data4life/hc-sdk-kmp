@@ -26,10 +26,21 @@ import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.tag.Annotations
 import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 import care.data4life.sdk.listener.Callback as LegacyCallback
 import care.data4life.sdk.listener.ResultListener as LegacyListener
 
 interface SdkContract {
+
+    data class CreationDateRange(
+        val startDate: LocalDate?,
+        val endDate: LocalDate?,
+    )
+
+    data class UpdateDateTimeRange(
+        val startDateTime: LocalDateTime?,
+        val endDateTime: LocalDateTime?
+    )
 
     interface Client {
         val userId: String
@@ -104,7 +115,7 @@ interface SdkContract {
          * @param callback       either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
          * @return [Task] which can be used to cancel ongoing operation or to query operation status
          * @throws IllegalArgumentException if {@param recordId} is not FHIR4
-         * @throws care.data4life.sdk.config.DataValidationException if {@param resource} is DocumentReference and {@link Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
+         * @throws care.data4life.sdk.lang.DataValidationException if {@param resource} is DocumentReference and {@link Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
          </T> */
         fun <T : Fhir4Resource> download(recordId: String, callback: Callback<Fhir4Record<T>>): Task
 
@@ -131,8 +142,9 @@ interface SdkContract {
          *
          * @param resourceType class type of the searched resource
          * @param annotations custom annotations added as tags to the record
-         * @param startDate   the filtered records have a creation date after the start date
-         * @param endDate     the filtered records have a creation date before the endDate
+         * @param creationDateRange the filtered records have a creation Date after the start date or before the endDate
+         * @param updateDateTimeRange the filtered records have a update DateTime after the start DateTime or before the end DateTime
+         * @param includeDeletedRecords includes deleted records into the query
          * @param pageSize    define the size page result
          * @param offset      the offset of the records list
          * @param callback    either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
@@ -141,8 +153,9 @@ interface SdkContract {
         fun <T : Fhir4Resource> search(
             resourceType: Class<T>,
             annotations: Annotations,
-            startDate: LocalDate?,
-            endDate: LocalDate?,
+            creationDateRange: CreationDateRange,
+            updateDateTimeRange: UpdateDateTimeRange,
+            includeDeletedRecords: Boolean,
             pageSize: Int,
             offset: Int,
             callback: Callback<List<Fhir4Record<T>>>
@@ -264,8 +277,9 @@ interface SdkContract {
          * Search {@link DataRecord} with filters
          *
          * @param annotations custom annotations added as tags to the record
-         * @param startDate   the filtered records have a creation date after the start date
-         * @param endDate     the filtered records have a creation date before the endDate
+         * @param creationDateRange the filtered records have a creation date after the start date or before the endDate
+         * @param updateDateTimeRange the filtered records have a update dateTime DateTime after the start DateTime or before the end DateTime
+         * @param includeDeletedRecords includes deleted records into the query
          * @param pageSize    define the size page result
          * @param offset      the offset of the records list
          * @param callback    either {@link Callback#onSuccess(Object)} or {@link Callback#onError(D4LException)} will be called
@@ -273,8 +287,9 @@ interface SdkContract {
          */
         fun search(
             annotations: Annotations,
-            startDate: LocalDate?,
-            endDate: LocalDate?,
+            creationDateRange: CreationDateRange,
+            updateDateTimeRange: UpdateDateTimeRange,
+            includeDeletedRecords: Boolean,
             pageSize: Int,
             offset: Int,
             callback: Callback<List<DataRecord<DataResource>>>

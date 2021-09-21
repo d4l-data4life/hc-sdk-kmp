@@ -20,6 +20,7 @@ import care.data4life.sdk.call.DataRecord
 import care.data4life.sdk.call.Fhir4Record
 import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.data.DataResource
+import care.data4life.sdk.date.SdkDateTimeFormatter
 import care.data4life.sdk.fhir.Fhir3Resource
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.CoreRuntimeException
@@ -31,7 +32,6 @@ import care.data4life.sdk.network.model.DecryptedRecord
 import care.data4life.sdk.network.model.NetworkModelContract.DecryptedBaseRecord
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.Tags
-import care.data4life.sdk.wrapper.SdkDateTimeFormatter
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -39,6 +39,8 @@ import io.mockk.unmockkObject
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
@@ -47,7 +49,6 @@ class RecordMapperTest {
     private lateinit var id: String
     private lateinit var tags: Tags
     private lateinit var annotations: Annotations
-    private lateinit var meta: ModelContract.Meta
     private lateinit var dataKey: GCKey
     private lateinit var attachmentKey: GCKey
     private var modelVersion = 0
@@ -59,7 +60,6 @@ class RecordMapperTest {
         id = "id"
         tags = mockk()
         annotations = mockk()
-        meta = mockk()
         dataKey = mockk()
         attachmentKey = mockk()
         modelVersion = 42
@@ -72,7 +72,9 @@ class RecordMapperTest {
 
     @Test
     fun `it is a RecordFactory`() {
-        assertTrue(RecordMapper is RecordFactory)
+        val factory: Any = RecordMapper
+
+        assertTrue(factory is RecordFactory)
     }
 
     @Test
@@ -80,6 +82,11 @@ class RecordMapperTest {
         // Given
         val givenCreationDate = "2020-05-03"
         val givenUpdateDate = "2019-02-28T17:21:08.234123"
+
+        val expectedCreationDate = LocalDate.of(2020, 5, 3)
+        val expectedUpdateDate = LocalDateTime.of(2019, 2, 28, 21, 8, 23, 4123000)
+        val status = ModelContract.RecordStatus.Active
+
         val resource: Fhir3Resource = mockk()
 
         val decryptedRecord = DecryptedRecord(
@@ -91,10 +98,12 @@ class RecordMapperTest {
             givenUpdateDate,
             dataKey,
             attachmentKey,
-            modelVersion
+            modelVersion,
+            status
         )
 
-        every { SdkDateTimeFormatter.buildMeta(decryptedRecord) } returns meta
+        every { SdkDateTimeFormatter.parseDate(givenCreationDate) } returns expectedCreationDate
+        every { SdkDateTimeFormatter.parseDateTime(givenUpdateDate) } returns expectedUpdateDate
 
         // When
         val record = RecordMapper.getInstance(decryptedRecord)
@@ -111,7 +120,11 @@ class RecordMapperTest {
         )
         assertEquals(
             actual = record.meta,
-            expected = meta
+            expected = Meta(
+                expectedCreationDate,
+                expectedUpdateDate,
+                status
+            )
         )
         assertEquals(
             actual = record.annotations,
@@ -124,6 +137,11 @@ class RecordMapperTest {
         // Given
         val givenCreationDate = "2020-05-03"
         val givenUpdateDate = "2019-02-28T17:21:08.234123"
+
+        val expectedCreationDate = LocalDate.of(2020, 5, 3)
+        val expectedUpdateDate = LocalDateTime.of(2019, 2, 28, 21, 8, 23, 4123000)
+        val status = ModelContract.RecordStatus.Active
+
         val resource: Fhir4Resource = mockk()
 
         val decryptedRecord = DecryptedR4Record(
@@ -135,10 +153,12 @@ class RecordMapperTest {
             givenUpdateDate,
             dataKey,
             attachmentKey,
-            modelVersion
+            modelVersion,
+            status
         )
 
-        every { SdkDateTimeFormatter.buildMeta(decryptedRecord) } returns meta
+        every { SdkDateTimeFormatter.parseDate(givenCreationDate) } returns expectedCreationDate
+        every { SdkDateTimeFormatter.parseDateTime(givenUpdateDate) } returns expectedUpdateDate
 
         // When
         val record = RecordMapper.getInstance(decryptedRecord)
@@ -155,7 +175,11 @@ class RecordMapperTest {
         )
         assertEquals(
             actual = record.meta,
-            expected = meta
+            expected = Meta(
+                expectedCreationDate,
+                expectedUpdateDate,
+                status
+            )
         )
         assertEquals(
             actual = record.annotations,
@@ -168,6 +192,11 @@ class RecordMapperTest {
         // Given
         val givenCreationDate = "2020-05-03"
         val givenUpdateDate = "2019-02-28T17:21:08.234123"
+
+        val expectedCreationDate = LocalDate.of(2020, 5, 3)
+        val expectedUpdateDate = LocalDateTime.of(2019, 2, 28, 21, 8, 23, 4123000)
+        val status = ModelContract.RecordStatus.Active
+
         val resource: DataResource = mockk()
 
         val decryptedRecord = DecryptedDataRecord(
@@ -178,10 +207,12 @@ class RecordMapperTest {
             givenCreationDate,
             givenUpdateDate,
             dataKey,
-            modelVersion
+            modelVersion,
+            status
         )
 
-        every { SdkDateTimeFormatter.buildMeta(decryptedRecord) } returns meta
+        every { SdkDateTimeFormatter.parseDate(givenCreationDate) } returns expectedCreationDate
+        every { SdkDateTimeFormatter.parseDateTime(givenUpdateDate) } returns expectedUpdateDate
 
         // When
         val record = RecordMapper.getInstance(decryptedRecord)
@@ -198,7 +229,11 @@ class RecordMapperTest {
         )
         assertEquals(
             actual = record.meta,
-            expected = meta
+            expected = Meta(
+                expectedCreationDate,
+                expectedUpdateDate,
+                status
+            )
         )
         assertEquals(
             actual = record.annotations,
@@ -212,6 +247,10 @@ class RecordMapperTest {
         val givenCreationDate = "2020-05-03"
         val givenUpdateDate = "2019-02-28T17:21:08.234123"
 
+        val expectedCreationDate = LocalDate.of(2020, 5, 3)
+        val expectedUpdateDate = LocalDateTime.of(2019, 2, 28, 21, 8, 23, 4123000)
+        val status = ModelContract.RecordStatus.Active
+
         val decryptedRecord = DecryptedUnknownRecord(
             id,
             "fail",
@@ -221,10 +260,12 @@ class RecordMapperTest {
             givenUpdateDate,
             dataKey,
             attachmentKey,
-            modelVersion
+            modelVersion,
+            status
         )
 
-        every { SdkDateTimeFormatter.buildMeta(decryptedRecord) } returns meta
+        every { SdkDateTimeFormatter.parseDate(givenCreationDate) } returns expectedCreationDate
+        every { SdkDateTimeFormatter.parseDateTime(givenUpdateDate) } returns expectedUpdateDate
 
         // When
         assertFailsWith<CoreRuntimeException.InternalFailure> {
@@ -243,6 +284,7 @@ class RecordMapperTest {
         override var updatedDate: String?,
         override var dataKey: GCKey,
         override var attachmentsKey: GCKey?,
-        override var modelVersion: Int
+        override var modelVersion: Int,
+        override var status: ModelContract.RecordStatus
     ) : DecryptedBaseRecord<T>
 }

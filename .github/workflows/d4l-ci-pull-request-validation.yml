@@ -28,6 +28,10 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.head_ref }}
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt' # See 'Supported distributions' for available options
+          java-version: '11'
       - name: Start emulator and wait for it
         run: ./script/ci/android/prepare_start_and_wait_for_emulator.sh
       - name: Install Chrome Browser

@@ -23,6 +23,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt' # See 'Supported distributions' for available options
+          java-version: '11'
       - name: Start emulator and wait for it
         run: ./script/ci/android/prepare_start_and_wait_for_emulator.sh
       - name: Install Chrome Browser

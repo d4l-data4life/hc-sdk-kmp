@@ -132,6 +132,8 @@ dependencies {
     testImplementation(Dependency.Android.Test.junit)
     testImplementation(Dependency.Android.Test.truth)
 
+    testImplementation(Dependency.Multiplatform.Test.MockK.jdk)
+
     testImplementation("org.mockito:mockito-inline:2.9.0")
     testImplementation("org.powermock:powermock-core:1.7.3")
     testImplementation("org.powermock:powermock-module-junit4:1.7.3")

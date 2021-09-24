@@ -25,6 +25,7 @@ import care.data4life.sdk.network.model.EncryptedKey
 import care.data4life.sdk.util.Base64
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -43,6 +44,7 @@ import java.security.NoSuchProviderException
 import java.security.PrivateKey
 import java.security.PublicKey
 import java.security.SecureRandom
+import java.security.spec.AlgorithmParameterSpec
 import java.security.spec.InvalidKeySpecException
 import java.security.spec.KeySpec
 import java.security.spec.PKCS8EncodedKeySpec
@@ -53,7 +55,6 @@ import javax.crypto.IllegalBlockSizeException
 import javax.crypto.KeyGenerator
 import javax.crypto.NoSuchPaddingException
 import javax.crypto.SecretKey
-import javax.crypto.spec.IvParameterSpec
 
 class CryptoServiceTest {
 
@@ -76,36 +77,47 @@ class CryptoServiceTest {
         mockKeyFactory = mockk()
         mockCommonKeyService = mockk()
         adapter = mockk()
-        val cipher = mockk<Cipher>()
+
+        val cipher: Cipher = mockk()
         every { cipher.iv } returns ByteArray(1)
-        every { cipher.doFinal(any<ByteArray>()) } returns ByteArray(1)
+        every { cipher.doFinal(any()) } returns ByteArray(1)
         every { mockBase64.decode(any<ByteArray>()) } returns ByteArray(16)
         every { mockBase64.decode(any<String>()) } returns ByteArray(16)
         every { mockBase64.encodeToString(any<ByteArray>()) } returns "encoded"
         every { mockBase64.encodeToString(any<String>()) } returns "encoded"
 
         val keyGenerator = mockk<KeyGenerator>()
-        every { keyGenerator.generateKey() } returns mockk<SecretKey>()
+        every { keyGenerator.generateKey() } returns mockk()
         every { keyGenerator.init(256) } just runs
+
         val algorithm = createDataAlgorithm()
-        val key = GCSymmetricKey(mockk<SecretKey>())
+        val secretKey: SecretKey = mockk()
+        val key = GCSymmetricKey(secretKey)
         gcKey = GCKey(algorithm, key, 256)
+
         val rsaAlgorithm = mockk<GCRSAKeyAlgorithm>()
         val privateKey = mockk<GCAsymmetricKey>()
         val publicKey = mockk<GCAsymmetricKey>()
         val keysize = 2048
         keyPair = GCKeyPair(rsaAlgorithm, privateKey, publicKey, keysize)
+
         val mockKey = mockk<Key>()
         every { mockKey.encoded } returns ByteArray(1)
         every { privateKey.value } returns mockKey
         every { publicKey.value } returns mockKey
         every { rsaAlgorithm.transformation } returns ""
-        every { cipher.init(1, gcKey.getSymmetricKey().value, any<IvParameterSpec>()) } just runs
+
+        every {
+            cipher.init(1, any(), any<AlgorithmParameterSpec>())
+        } just Runs
         every { cipher.init(2, keyPair.privateKey?.value) } just runs
-        every { mockStorage.deleteSecret(any<String>()) } just runs
+
+        every { mockStorage.deleteSecret(any()) } just runs
+
         rnd = SecureRandom()
         adapter = mockk()
         every { mockMoshi.adapter(ExchangeKey::class.java) } returns adapter
+
         cryptoService = MockCryptoService(
             ALIAS,
             mockStorage,
@@ -318,12 +330,12 @@ class CryptoServiceTest {
     @Test
     fun saveGCKeyPair_shouldStoreKeysAndAlgorithm() {
 
-        every { mockStorage.storeKey(PREFIX + GC_KEYPAIR, any<GCKeyPair>()) } just runs
+        every { mockStorage.storeKey(PREFIX + GC_KEYPAIR, any()) } just runs
         // when
         cryptoService.saveGCKeyPair(keyPair)
 
         // then
-        verify { mockStorage.storeKey(PREFIX + GC_KEYPAIR, any<GCKeyPair>()) }
+        verify { mockStorage.storeKey(PREFIX + GC_KEYPAIR, any()) }
     }
 
     @Test

@@ -67,7 +67,7 @@ val releaseRepoName = "maven-releases"
 val basePath = "${rootProject.buildDir}/gitPublish"
 
 val gitHubToken = (project.findProperty("gpr.key")
-    ?: System.getenv("PACKAGE_REGISTRY_UPLOAD_TOKEN")).toString()
+    ?: System.getenv("PACKAGE_REGISTRY_TOKEN")).toString()
 
 
 task<Exec>("publishFeature") {

@@ -17,6 +17,7 @@
 import care.data4life.gradle.core.config.D4LConfigHelper
 import care.data4life.gradle.core.config.AndroidConfig
 import care.data4life.gradle.core.dependency.Dependency
+import care.data4life.gradle.core.config.Environment
 
 plugins {
     id("com.android.application")

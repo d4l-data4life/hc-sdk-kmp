@@ -14,6 +14,8 @@
  * contact D4L by email to help@data4life.care.
  */
 
+package care.data4life.gradle.core.config
+
 data class D4LClientConfig(
     val platform: String,
     val configs: Map<Environment, ClientConfig>

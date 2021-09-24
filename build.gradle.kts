@@ -14,8 +14,10 @@
  * contact D4L by email to help@data4life.care.
  */
 
+import care.data4life.gradle.core.dependency.bintray
 import care.data4life.gradle.core.dependency.d4l
 import care.data4life.gradle.core.dependency.gitHub
+import care.data4life.gradle.core.dependency.jitPack
 
 plugins {
     id("care.data4life.gradle.core.dependency")
@@ -36,9 +38,8 @@ allprojects {
 
         d4l()
 
-        jcenter()
-
-        maven("https://jitpack.io")
+        bintray()
+        jitPack()
     }
 
     apply(plugin = "org.owasp.dependencycheck")

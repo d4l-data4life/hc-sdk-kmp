@@ -87,3 +87,23 @@ fun RepositoryHandler.d4l() {
         }
     }
 }
+
+@Deprecated(message = "Should not be used if possible")
+fun RepositoryHandler.jitPack() {
+    maven("https://jitpack.io") {
+        content {
+            includeGroup("com.github.gesundheitscloud") // AppAuth
+            includeGroup("com.github.chrisbanes") // PhotoView 2.0.0
+            includeGroup("com.github.wmontwe") // Kakao 1.4.0-androidx
+        }
+    }
+}
+
+@Deprecated(message = "Warning: this repository is going to shut down soon")
+fun RepositoryHandler.bintray() {
+    jcenter() {
+        content {
+            includeGroup("com.github.barteksc") // android-pdf-viewer 3.1.0-beta.1
+        }
+    }
+}

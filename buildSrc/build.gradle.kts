@@ -55,7 +55,3 @@ dependencies {
     // versioning.gradle.kts
     implementation("care.data4life.gradle.gitversion:gradle-git-version:0.12.4-d4l")
 }
-
-kotlinDslPluginOptions {
-    experimentalWarning.set(false)
-}

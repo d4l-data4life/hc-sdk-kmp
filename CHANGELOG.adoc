@@ -55,7 +55,7 @@ toc::[]
 * HC Util SDK 1.10.0 -> 1.11.0
 * HC Securestore SDK 1.13.2 -> 1.14.0
 * HC Crypto SDK 1.13.2 -> 1.14.0
-* HC Result SDK KMP 0.1.1 -> 0.3.0
+* HC Result SDK KMP 0.2.0 -> 0.3.0
 * Android XKtx 1.2.0 -> 1.6.0
 * Android Desugar 1.0.5 -> 1.0.9
 * JUnit 4.12 -> 4.13.2

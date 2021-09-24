@@ -73,10 +73,10 @@ If you just want to explore the SDK you'll find a test configuration in `sample-
 
 === Software requirements
 
-* Android 6.0 (API 23) to Android 11 (API 30)
-* Kotlin 1.4.32
-* Java 8 link:https://developer.android.com/studio/write/java8-support[Limitations] link:https://jakewharton.com/d8-library-desugaring/[Desugaring]
-* Gradle6.9.1
+* link:https://adoptopenjdk.net/[Java 11] | link:https://developer.android.com/studio/write/java8-support[Limitations of Java language features and APIs] | https://jakewharton.com/d8-library-desugaring/[Desugaring]
+* link:https://kotlinlang.org/[Kotlin 1.5.21]
+* Android 6.0 (API 23) to Android 11.0 (API 30)
+* Gradle 7.2
 
 === Dependencies
 

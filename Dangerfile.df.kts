@@ -33,6 +33,10 @@ danger(args) {
             "(?:release\\/(?:\\d{1,3}\\.\\d{1,3}(?:\\.\\d{1,3})?)(?:\\/prepare-\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})?)"
                 .toRegex()
                 .matches(branchName)
+        val isDependabotBranch =
+            "dependabot/(.*)"
+                .toRegex()
+                .matches(branchName)
         val isFeatureTitle =
             "(?:(?:\\[[A-Z]{2,8}-\\d{1,6}\\]\\s)?(?:Add|Change|Remove|Fix|Bump|Security)\\s.*)"
                 .toRegex()
@@ -42,7 +46,7 @@ danger(args) {
             .matches(pullRequest.title)
 
 
-        if (!isFeatureBranch && !isReleaseBranch) {
+        if (!isFeatureBranch && !isReleaseBranch && !isDependabotBranch) {
             fail(
                 "Branch name is not following our pattern:\n" +
                     "\nrelease/1.2(.3)(/prepare-1.2.3)\n" +

@@ -35,6 +35,10 @@ allprojects {
         gitHub(project)
 
         d4l()
+
+        jcenter()
+
+        maven("https://jitpack.io")
     }
 
     apply(plugin = "org.owasp.dependencycheck")

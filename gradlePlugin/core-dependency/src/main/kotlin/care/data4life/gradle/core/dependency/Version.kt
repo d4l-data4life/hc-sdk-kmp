@@ -119,7 +119,6 @@ object Version {
          * [Gradle Android Jacoco](https://github.com/vanniktech/gradle-android-junit-jacoco-plugin)
          */
         const val androidJacoco = "0.16.0"
-
     }
 
     // Java

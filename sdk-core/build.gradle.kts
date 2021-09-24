@@ -15,6 +15,7 @@
  */
 
 import care.data4life.gradle.core.config.LibraryConfig
+import care.data4life.gradle.core.dependency.Dependency
 
 plugins {
     id("java-library")

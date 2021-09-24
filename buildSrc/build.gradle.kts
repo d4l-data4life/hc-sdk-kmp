@@ -13,22 +13,35 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
+import care.data4life.gradle.core.dependency.d4l
 
 plugins {
     `kotlin-dsl`
+
+    id("care.data4life.gradle.core.dependency")
 }
 
 repositories {
     gradlePluginPortal()
     mavenCentral()
-    maven("https://raw.github.com/d4l-data4life/maven-releases/main/releases") {
-        content {
-            includeGroup("care.data4life.gradle.gitversion")
-        }
-    }
+    google()
+    d4l()
 }
 
 dependencies {
+    implementation(care.data4life.gradle.core.dependency.GradlePlugin.kotlin)
+    implementation(care.data4life.gradle.core.dependency.GradlePlugin.android)
+    implementation(care.data4life.gradle.core.dependency.GradlePlugin.kapt)
+    implementation(care.data4life.gradle.core.dependency.GradlePlugin.groovyAll)
+    implementation(care.data4life.gradle.core.dependency.GradlePlugin.androidMaven)
+    implementation(care.data4life.gradle.core.dependency.GradlePlugin.androidJacoco)
+    implementation(care.data4life.gradle.core.dependency.GradlePlugin.dexcount)
+    implementation(care.data4life.gradle.core.dependency.GradlePlugin.japicmp)
+    implementation(care.data4life.gradle.core.dependency.GradlePlugin.downloadTask)
+    implementation(care.data4life.gradle.core.dependency.GradlePlugin.httpComponents)
+    implementation(care.data4life.gradle.core.dependency.GradlePlugin.dokka)
+    implementation(care.data4life.gradle.core.dependency.GradlePlugin.owasp)
+
     implementation("com.google.code.gson:gson:2.8.6")
 
     // dependency check

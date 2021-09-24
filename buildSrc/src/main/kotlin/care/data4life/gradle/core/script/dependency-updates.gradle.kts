@@ -14,15 +14,27 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package scripts
+package care.data4life.gradle.core.script
 
 /**
- * [DependencyUpdates](https://github.com/ben-manes/gradle-versions-plugin)
+ * Dependency update check task using [DependencyUpdates](https://github.com/ben-manes/gradle-versions-plugin)
+ *
+ * Install:
  *
  * You need to add following dependencies to the buildSrc/build.gradle.kts
  *
- * - implementation("com.github.ben-manes:gradle-versions-plugin:0.38.0")
+ * dependencies {
+ *     implementation("com.github.ben-manes:gradle-versions-plugin:0.38.0")
+ * }
  *
+ * Now just add id("care.data4life.gradle.core.script.dependency-updates") to your project module build.gradle.kts plugins section
+ *
+ * plugins {
+ *     id("care.data4life.gradle.core.script.dependency-updates")
+ * }
+ *
+ * Usage:
+ * - ./gradlew dependencyUpdates
  */
 plugins {
     id("com.github.ben-manes.versions")

@@ -50,11 +50,11 @@ buildscript {
 }
 
 plugins {
-    id("scripts.dependency-updates")
-    id("scripts.download-scripts")
-    id("scripts.versioning")
-    id("scripts.quality-spotless")
-    id("scripts.publishing")
+    id("care.data4life.gradle.core.script.dependency-updates")
+    id("care.data4life.gradle.core.script.download-scripts")
+    id("care.data4life.gradle.core.script.publishing")
+    id("care.data4life.gradle.core.script.quality-spotless")
+    id("care.data4life.gradle.core.script.versioning")
 }
 
 allprojects {

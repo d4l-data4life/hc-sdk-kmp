@@ -14,6 +14,8 @@
  * contact D4L by email to help@data4life.care.
  */
 
+import care.data4life.gradle.core.config.LibraryConfig
+
 plugins {
     id("com.github.johnrengelman.shadow") version "4.0.1"
     id("java-library")

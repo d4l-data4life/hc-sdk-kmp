@@ -17,49 +17,51 @@
 package care.data4life.gradle.core.dependency
 
 object Version {
-    // D4L
-    /**
-     * [hc-util-sdk-kmp](https://github.com/d4l-data4life/hc-util-sdk-kmp)
-     */
-    const val sdkUtil = "1.10.0"
-
-    /**
-     * [hc-result-sdk-kmp](https://github.com/d4l-data4life/hc-result-sdk-kmp)
-     */
-    const val resultSdk = "0.2.0"
-
-    /**
-     * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)
-     */
-    const val fhirSdk = "1.6.3"
-
-    /**
-     * [hc-fhir-helper-sdk-kmp](https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp)
-     */
-    const val fhirHelper = "1.7.1"
-
-    /**
-     * [hc-auth-sdk-kmp](https://github.com/d4l-data4life/hc-auth-sdk-kmp)
-     */
-    const val auth = "1.14.0"
-
-    /**
-     * [hc-crypto-sdk-kmp](https://github.com/d4l-data4life/hc-crypto-sdk-kmp)
-     */
-    const val crypto = "1.13.2"
-
-    /**
-     * [hc-securestore-sdk-kmp](https://github.com/d4l-data4life/hc-securestore-sdk-kmp)
-     */
-    const val securestore = "1.13.2"
-
     // kotlin
-    const val kotlin = "1.4.32"
+    const val kotlin = "1.5.21"
 
     /**
      *  https://github.com/Kotlin/kotlinx.coroutines
      */
-    const val kotlinCoroutines = "1.4.3-native-mt"
+    const val kotlinCoroutines = "1.5.1-native-mt"
+
+    val d4l = D4L
+    object D4L {
+        /**
+         * [hc-util-sdk-kmp](https://github.com/d4l-data4life/hc-util-sdk-kmp)
+         */
+        const val sdkUtil = "1.11.0"
+
+        /**
+         * [hc-result-sdk-kmp](https://github.com/d4l-data4life/hc-result-sdk-kmp)
+         */
+        const val resultSdk = "0.3.0"
+
+        /**
+         * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)
+         */
+        const val fhirSdk = "1.6.3"
+
+        /**
+         * [hc-fhir-helper-sdk-kmp](https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp)
+         */
+        const val fhirHelper = "1.7.1"
+
+        /**
+         * [hc-auth-sdk-kmp](https://github.com/d4l-data4life/hc-auth-sdk-kmp)
+         */
+        const val auth = "1.14.0-bump-updates-SNAPSHOT"
+
+        /**
+         * [hc-crypto-sdk-kmp](https://github.com/d4l-data4life/hc-crypto-sdk-kmp)
+         */
+        const val crypto = "1.13.2-SNAPSHOT"
+
+        /**
+         * [hc-securestore-sdk-kmp](https://github.com/d4l-data4life/hc-securestore-sdk-kmp)
+         */
+        const val securestore = "1.13.2-SNAPSHOT"
+    }
 
     object GradlePlugin {
         const val kotlin = Version.kotlin

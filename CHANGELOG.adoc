@@ -44,6 +44,16 @@ toc::[]
 
 === Bumped
 
+* *_BREAKING_* Kotlin 1.4.32 -> 1.5.21
+* Kotlin Coroutines 1.4.3-native-mt -> 1.5.1-native-mt
+* HC FHIR SDK JAVA 1.6.3 -> 1.7.0
+* HC FHIR-Helpers SDK KMP 1.7.0 -> 1.8.0
+* HC Auth SDK 1.13.2 -> 1.15.0
+* HC Util SDK 1.10.0 -> 1.11.0
+* HC Securestore SDK 1.13.2 -> 1.14.0
+* HC Crypto SDK 1.13.2 -> 1.14.0
+* HC Result SDK KMP 0.1.1 -> 0.3.0
+
 === Migration
 
 

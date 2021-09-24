@@ -190,9 +190,9 @@ class RecordCryptoServiceDecryptionTest {
         } returns resource
     }
 
-    private inline fun <reified T : DataResource> runDecryptDataFlow(
+    private fun runDecryptDataFlow(
         encryptedRecord: NetworkModelContract.EncryptedRecord,
-        resource: T = mockk(),
+        resource: DataResource = mockk(),
         resourceValue: ByteArray = ByteArray(0),
         userId: String = USER_ID,
         version: Int = CURRENT,
@@ -1137,7 +1137,7 @@ class RecordCryptoServiceDecryptionTest {
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
         val modelVersion = 23
 
-        runDecryptDataFlow<DataResource>(
+        runDecryptDataFlow(
             encryptedRecord,
             version = modelVersion,
             modelCheck = false
@@ -1160,7 +1160,7 @@ class RecordCryptoServiceDecryptionTest {
         // Given
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
 
-        runDecryptDataFlow<DataResource>(encryptedRecord)
+        runDecryptDataFlow(encryptedRecord)
 
         // When
         val decryptedRecord: Any = service.decrypt<DataResource>(encryptedRecord, USER_ID)
@@ -1174,7 +1174,7 @@ class RecordCryptoServiceDecryptionTest {
         // Given
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
 
-        runDecryptDataFlow<DataResource>(
+        runDecryptDataFlow(
             encryptedRecord,
             identifier = null
         )
@@ -1192,7 +1192,7 @@ class RecordCryptoServiceDecryptionTest {
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
         val id = "Something"
 
-        runDecryptDataFlow<DataResource>(
+        runDecryptDataFlow(
             encryptedRecord,
             identifier = id
         )
@@ -1208,11 +1208,11 @@ class RecordCryptoServiceDecryptionTest {
     }
 
     @Test
-    fun `Given, decrypt is called with a EncryptedRecord, it sets the CreationDate of EncryptedRecord to the  DecryptedRecord for a DataResource, if it is null`() {
+    fun `Given, decrypt is called with a EncryptedRecord, it sets the CreationDate of EncryptedRecord to the DecryptedRecord for a DataResource, if it is null`() {
         // Given
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
 
-        runDecryptDataFlow<DataResource>(
+        runDecryptDataFlow(
             encryptedRecord,
             creationDate = null
         )
@@ -1225,12 +1225,12 @@ class RecordCryptoServiceDecryptionTest {
     }
 
     @Test
-    fun `Given, decrypt is called with a EncryptedRecord, it sets the CreationDate of EncryptedRecord to the  DecryptedRecord for a DataResource, if it is not null`() {
+    fun `Given, decrypt is called with a EncryptedRecord, it sets the CreationDate of EncryptedRecord to the DecryptedRecord for a DataResource, if it is not null`() {
         // Given
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
         val creationDate = "some day"
 
-        runDecryptDataFlow<DataResource>(
+        runDecryptDataFlow(
             encryptedRecord,
             creationDate = creationDate
         )
@@ -1250,7 +1250,7 @@ class RecordCryptoServiceDecryptionTest {
         // Given
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
 
-        runDecryptDataFlow<DataResource>(
+        runDecryptDataFlow(
             encryptedRecord,
             updateDate = null
         )
@@ -1268,7 +1268,7 @@ class RecordCryptoServiceDecryptionTest {
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
         val updateDate = "some day"
 
-        runDecryptDataFlow<DataResource>(
+        runDecryptDataFlow(
             encryptedRecord,
             updateDate = updateDate
         )
@@ -1289,7 +1289,7 @@ class RecordCryptoServiceDecryptionTest {
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
         val version = 42
 
-        runDecryptDataFlow<DataResource>(
+        runDecryptDataFlow(
             encryptedRecord,
             version = version
         )
@@ -1310,7 +1310,7 @@ class RecordCryptoServiceDecryptionTest {
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
         val status = ModelContract.RecordStatus.Active
 
-        runDecryptDataFlow<DataResource>(
+        runDecryptDataFlow(
             encryptedRecord,
             status = status
         )
@@ -1333,7 +1333,7 @@ class RecordCryptoServiceDecryptionTest {
         val annotations: Annotations = mockk()
         val encryptedTagsAndAnnotations: EncryptedTagsAndAnnotations = mockk()
 
-        runDecryptDataFlow<DataResource>(
+        runDecryptDataFlow(
             encryptedRecord,
             tags = tags,
             annotations = annotations,
@@ -1372,7 +1372,7 @@ class RecordCryptoServiceDecryptionTest {
         val encryptedDataKey: EncryptedKey = mockk()
         val dataKey: GCKey = mockk()
 
-        runDecryptDataFlow<DataResource>(
+        runDecryptDataFlow(
             encryptedRecord,
             userId = userId,
             commonKey = commonKey,
@@ -1423,7 +1423,7 @@ class RecordCryptoServiceDecryptionTest {
         val encryptedDataKey: EncryptedKey = mockk()
         val dataKey: GCKey = mockk()
 
-        runDecryptDataFlow<DataResource>(
+        runDecryptDataFlow(
             encryptedRecord,
             commonKey = commonKey,
             commonKeyId = commonKeyId,
@@ -1455,7 +1455,7 @@ class RecordCryptoServiceDecryptionTest {
         // Given
         val encryptedRecord: NetworkModelContract.EncryptedRecord = mockk()
 
-        runDecryptDataFlow<DataResource>(
+        runDecryptDataFlow(
             encryptedRecord,
             encryptedResource = ""
         )

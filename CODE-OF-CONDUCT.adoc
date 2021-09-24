@@ -1,4 +1,23 @@
 = Contributor Covenant Code of Conduct
+:link-repository: https://github.com/d4l-data4life/hc-sdk-kmp
+:doctype: article
+:toc: macro
+:toclevels: 2
+:toc-title:
+:icons: font
+:imagesdir: assets/images
+ifdef::env-github[]
+:warning-caption: :warning:
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+endif::[]
+
+[discrete]
+==== Table Of Contents
+
+toc::[]
 
 == Our Pledge
 
@@ -23,13 +42,13 @@ include:
 Examples of unacceptable behavior by participants include:
 
 * The use of sexualized language or imagery and unwelcome sexual attention or
- advances
+advances
 * Trolling, insulting/derogatory comments, and personal or political attacks
 * Public or private harassment
 * Publishing others' private information, such as a physical or electronic
- address, without explicit permission
+address, without explicit permission
 * Other conduct which could reasonably be considered inappropriate in a
- professional setting
+professional setting
 
 == Our Responsibilities
 
@@ -67,5 +86,5 @@ members of the project's leadership.
 
 == Attribution
 
-This Code of Conduct is adapted from the https://contributor-covenant.org[Contributor Covenant], version 1.4,
-available at https://contributor-covenant.org/version/1/4/[https://contributor-covenant.org/version/1/4]
+This Code of Conduct is adapted from the link:https://contributor-covenant.org[Contributor Covenant], version 1.4,
+available at link:https://contributor-covenant.org/version/1/4/[https://contributor-covenant.org/version/1/4]

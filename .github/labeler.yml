@@ -1,6 +1,9 @@
 build:
   - .github/**/*
 
+scripts:
+  - buildSrc/src/main/kotlin/care/data4life/gradle/core/**/*.kts
+
 dependencies:
   - buildSrc/**/*
 

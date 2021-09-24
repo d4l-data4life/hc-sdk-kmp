@@ -46,7 +46,6 @@ import org.threeten.bp.LocalDateTime
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
-import javax.xml.bind.DatatypeConverter
 
 data class CompatibilityTags(
     val validEncoding: List<String>,
@@ -63,10 +62,9 @@ class RecordServiceModuleTestFlowHelper(
 
     fun md5(str: String): String {
         mdHandle.update(str.toByteArray())
-        return DatatypeConverter
-            .printHexBinary(mdHandle.digest())
-            .toUpperCase()
-            .also { mdHandle.reset() }
+        return mdHandle.digest().joinToString(separator = "") { byte ->
+            "%02x".format(byte)
+        }.toUpperCase().also { mdHandle.reset() }
     }
 
     private fun encode(tag: String): String {
@@ -131,7 +129,8 @@ class RecordServiceModuleTestFlowHelper(
 
     private fun prepareJSLegacyAnnotations(
         annotations: Annotations
-    ): List<String> = annotations.map { "custom=${JSLegacyTagConverter.convertTag(encode(it).toLowerCase())}" }
+    ): List<String> =
+        annotations.map { "custom=${JSLegacyTagConverter.convertTag(encode(it).toLowerCase())}" }
 
     private fun prepareIOSLegacyAnnotations(
         annotations: Annotations

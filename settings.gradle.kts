@@ -18,8 +18,6 @@ pluginManagement {
         gradlePluginPortal()
         google()
     }
-
-    includeBuild("./gradlePlugin/core-dependency")
 }
 
 plugins {
@@ -35,6 +33,8 @@ include(
 
     ":sdk-doc"
 )
+
+includeBuild("./gradlePlugin/core-dependency")
 
 val includeAuth: String by settings
 if (includeAuth.toBoolean()) {

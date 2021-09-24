@@ -32,8 +32,8 @@ import care.data4life.sdk.sample.presentation.View
 import care.data4life.sdk.sample.presentation.data.Message
 import care.data4life.sdk.sample.presentation.main.MultiMainView
 import care.data4life.sdk.sample.presentation.main.SingleMainView
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
 import java.net.URLConnection
 import java.nio.file.Files

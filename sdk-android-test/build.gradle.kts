@@ -47,7 +47,7 @@ android {
             )
         )
 
-        manifestPlaceholders(
+        manifestPlaceholders.putAll(
             mapOf<String, Any>(
                 "clientId" to d4lClientConfig[Environment.DEVELOPMENT].id,
                 "clientSecret" to d4lClientConfig[Environment.DEVELOPMENT].secret,

@@ -26,6 +26,7 @@ object Version {
     const val kotlinCoroutines = "1.5.1-native-mt"
 
     val d4l = D4L
+
     object D4L {
         /**
          * [hc-util-sdk-kmp](https://github.com/d4l-data4life/hc-util-sdk-kmp)
@@ -62,6 +63,8 @@ object Version {
          */
         const val securestore = "1.13.2-SNAPSHOT"
     }
+
+    val gradlePlugin = GradlePlugin
 
     object GradlePlugin {
         const val kotlin = Version.kotlin
@@ -127,16 +130,19 @@ object Version {
     const val javaXAnnotation = "3.0.2"
     const val jacocoVersion = "0.8.7"
 
-    // Android
-    const val androidDesugar = "1.0.5"
+    val android = Android
+    object Android {
+        // Android
+        const val desugar = "1.0.9"
 
-    // AndroidX
-    const val androidXKtx = "1.2.0"
-    const val androidXAppCompat = "1.3.1"
-    const val androidXBrowser = "1.3.0"
+        // AndroidX
+        const val ktx = "1.6.0"
+        const val appCompat = "1.3.1"
+        const val browser = "1.3.0"
 
-    const val androidXConstraintLayout = "1.1.3"
-    const val androidXSwipeRefreshLayout = "1.1.0"
+        const val constraintLayout = "1.1.3"
+        const val swipeRefreshLayout = "1.1.0"
+    }
 
     // Material
     const val material = "1.4.0"
@@ -201,7 +207,7 @@ object Version {
     /**
      * [Koin](https://github.com/InsertKoinIO/koin)
      */
-    const val koin = "2.0.1"
+    const val koin = "3.0.2"
 
     // Rx
     /**
@@ -231,7 +237,7 @@ object Version {
     const val pdfView = "3.1.0-beta.1"
 
     // Junit Test
-    const val testJUnit = "4.12"
+    const val testJUnit = "4.13.2"
 
     /**
      * [mockk](http://mockk.io)
@@ -251,7 +257,7 @@ object Version {
     /**
      * [robolectric](http://robolectric.org/)
      */
-    const val robolectric = "4.3.1"
+    const val robolectric = "4.6.1"
 
     // Android Test
     const val androidXTestCore = "1.3.0"

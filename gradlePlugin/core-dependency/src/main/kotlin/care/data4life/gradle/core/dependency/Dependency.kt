@@ -86,15 +86,15 @@ object Dependency {
         const val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:${Version.kotlin}"
 
         // Android
-        const val androidDesugar = "com.android.tools:desugar_jdk_libs:${Version.androidDesugar}"
+        const val androidDesugar = "com.android.tools:desugar_jdk_libs:${Version.android.desugar}"
 
         // Android X
         object AndroidX {
-            const val ktx = "androidx.core:core-ktx:${Version.androidXKtx}"
-            const val appCompat = "androidx.appcompat:appcompat:${Version.androidXAppCompat}"
-            const val browser = "androidx.browser:browser:${Version.androidXBrowser}"
-            const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Version.androidXConstraintLayout}"
-            const val swipeRefreshLayout = "androidx.swiperefreshlayout:swiperefreshlayout:${Version.androidXSwipeRefreshLayout}"
+            const val ktx = "androidx.core:core-ktx:${Version.android.ktx}"
+            const val appCompat = "androidx.appcompat:appcompat:${Version.android.appCompat}"
+            const val browser = "androidx.browser:browser:${Version.android.browser}"
+            const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Version.android.constraintLayout}"
+            const val swipeRefreshLayout = "androidx.swiperefreshlayout:swiperefreshlayout:${Version.android.swipeRefreshLayout}"
         }
 
         // Material

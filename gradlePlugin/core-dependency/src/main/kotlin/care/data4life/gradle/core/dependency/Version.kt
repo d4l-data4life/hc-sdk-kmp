@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+ * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
  *
  * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
@@ -13,6 +13,8 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
+
+package care.data4life.gradle.core.dependency
 
 object Version {
     // D4L
@@ -87,6 +89,36 @@ object Version {
          * [Gradle Git Publish](https://github.com/d4l-data4life/gradle-git-publish)
          */
         const val gitPublish = "3.2.0"
+
+        /**
+         * [Gradle Groovy](https://github.com/apache/groovy)
+         */
+        const val groovyAll = "3.0.7"
+
+        /**
+         * [Gradle OWASP](https://github.com/jeremylong/dependency-check-gradle)
+         */
+        const val owasp = "6.3.1"
+
+        /**
+         * [Gradle JApicmp](https://github.com/melix/japicmp-gradle-plugin)
+         */
+        const val japicmp = "0.3.0"
+
+        /**
+         * [Gradle HttpComponents](https://hc.apache.org/httpcomponents-client-4.5.x/current/httpclient/dependency-info.html)
+         */
+        const val httpComponents = "4.5.13"
+
+        /**
+         * [Gradle Android Maven](https://hc.apache.org/httpcomponents-client-4.5.x/current/httpclient/project-info.html)
+         */
+        const val androidMaven = "2.1"
+
+        /**
+         * [Gradle Android Jacoco](https://github.com/vanniktech/gradle-android-junit-jacoco-plugin)
+         */
+        const val androidJacoco = "0.16.0"
     }
 
     // Java

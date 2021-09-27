@@ -13,6 +13,9 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
+import care.data4life.gradle.core.config.D4LConfigHelper
+import care.data4life.gradle.core.config.LibraryConfig
+import care.data4life.gradle.core.dependency.Dependency
 
 plugins {
     id("com.android.library")
@@ -21,9 +24,9 @@ plugins {
     id("me.champeau.gradle.japicmp")
 }
 
-apply(from = "${project.rootDir}/gradle/deploy-android-sdk.gradle")
-
 group = LibraryConfig.group
+
+apply(from = "${project.rootDir}/gradle/deploy-android-sdk.gradle")
 
 val d4lClientConfig = D4LConfigHelper.loadClientConfigAndroid("$rootDir")
 val d4LTestConfig = D4LConfigHelper.loadTestConfigAndroid("$rootDir")

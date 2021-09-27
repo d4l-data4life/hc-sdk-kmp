@@ -1,12 +1,25 @@
 = Changelog
+:link-repository: https://github.com/d4l-data4life/hc-sdk-kmp
+:doctype: article
 :toc: macro
 :toclevels: 1
 :toc-title:
+:icons: font
+:imagesdir: assets/images
+ifdef::env-github[]
+:warning-caption: :warning:
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+endif::[]
 
 All notable changes to this project will be documented in this file.
 
 The format is based on http://keepachangelog.com/en/1.0.0/[Keep a Changelog]
 and this project adheres to http://semver.org/spec/v2.0.0.html[Semantic Versioning].
+
+Template could be found here: link:https://github.com/d4l-data4life/hc-readme-template/blob/main/TEMPLATE_CHANGELOG.adoc[CHANGELOG]
 
 [discrete]
 ==== Versions
@@ -22,6 +35,8 @@ toc::[]
 * RecordStatus
 
 === Changed
+
+=== Deprecated
 
 === Removed
 

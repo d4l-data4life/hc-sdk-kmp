@@ -14,8 +14,22 @@
  * contact D4L by email to help@data4life.care.
  */
 
-object AndroidConfig {
-    const val minSdkVersion = 23
-    const val compileSdkVersion = 30
-    const val targetSdkVersion = 30
-}
+package care.data4life.gradle.core.config
+
+data class D4LTestConfig(
+    val user: UserConfig,
+    val twillio: TwillioConfig
+)
+
+data class UserConfig(
+    val email: String,
+    val password: String,
+    val phoneCountryCode: String,
+    val phoneLocalNumber: String
+)
+
+data class TwillioConfig(
+    val accountSid: String,
+    val authSid: String,
+    val authToken: String
+)

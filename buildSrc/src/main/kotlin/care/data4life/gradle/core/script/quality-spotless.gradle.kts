@@ -14,14 +14,39 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package scripts
+package care.data4life.gradle.core.script
 
 /**
+ * Quality check to keep the code spotless using [Spotless](https://github.com/diffplug/spotless)
+ *
+ * It uses Ktlint to format and validate Kotlin code style.
+ *
+ * Install:
+ *
  * You need to add following dependencies to the buildSrc/build.gradle.kts
  *
- * - implementation("com.diffplug.spotless:spotless-plugin-gradle:5.10.2")
- * - implementation("com.pinterest:ktlint:0.41.0")
+ * dependencies {
+ *     implementation("com.diffplug.spotless:spotless-plugin-gradle:5.10.2")
+ *     implementation("com.pinterest:ktlint:0.41.0")
+ * }
  *
+ * and ensure that the gradlePluginPortal is available
+ *
+ * repositories {
+ *     gradlePluginPortal()
+ * }
+ *
+ * Now just add id("care.data4life.gradle.core.script.quality-spotless") to your rootProject build.gradle.kts plugins
+ *
+ * plugins {
+ *     id("care.data4life.gradle.core.script.quality-spotless")
+ * }
+ *
+ * Usage:
+ *
+ * Spotless integrates with the Gradle build command but could be triggered individually
+ * - ./gradlew spotlessCheck  |  to check for codestyle violations
+ * - ./gradlew spotlessApply  |  to fix codestyle violations automatically
  */
 plugins {
     id("com.diffplug.spotless")

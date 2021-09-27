@@ -1,7 +1,7 @@
 <component name="CopyrightManager">
-  <settings default="d4l">
+  <settings default="d4l-closed">
     <module2copyright>
-      <element module="Project Source Files" copyright="d4l" />
+      <element module="Project Source Files" copyright="d4l-closed" />
     </module2copyright>
   </settings>
 </component>

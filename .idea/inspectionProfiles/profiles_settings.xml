@@ -1,6 +1,6 @@
 <component name="InspectionProjectProfileManager">
   <settings>
-    <option name="PROJECT_PROFILE" value="ktlint" />
+    <option name="PROJECT_PROFILE" value="d4l-inspections" />
     <version value="1.0" />
   </settings>
 </component>

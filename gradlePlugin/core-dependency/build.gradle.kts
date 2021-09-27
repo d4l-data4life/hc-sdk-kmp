@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+ * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
  *
  * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
@@ -14,25 +14,22 @@
  * contact D4L by email to help@data4life.care.
  */
 
-data class D4LClientConfig(
-    val platform: String,
-    val configs: Map<Environment, ClientConfig>
-) {
-    operator fun get(environment: Environment): ClientConfig {
-        return configs.getValue(environment)
-    }
+plugins {
+    `kotlin-dsl`
+    `java-gradle-plugin`
 }
 
-data class ClientConfig(
-    val id: String,
-    val secret: String,
-    val redirectScheme: String
-)
+// To make it available as direct dependency
+group = "care.data4life.gradle.core.dependency"
+version = "1.0.0-SNAPSHOT"
 
-enum class Environment {
-    LOCAL,
-    DEVELOPMENT,
-    STAGING,
-    SANDBOX,
-    PRODUCTION
+repositories {
+    mavenCentral()
+}
+
+gradlePlugin {
+    plugins.register("care.data4life.gradle.core.dependency") {
+        id = "care.data4life.gradle.core.dependency"
+        implementationClass = "care.data4life.gradle.core.dependency.DependencyPlugin"
+    }
 }

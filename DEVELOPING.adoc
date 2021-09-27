@@ -1,0 +1,124 @@
+= Developing
+:link-repository: https://github.com/d4l-data4life/hc-sdk-kmp
+:doctype: article
+:toc: macro
+:toclevels: 2
+:toc-title:
+:icons: font
+:imagesdir: assets/images
+ifdef::env-github[]
+:warning-caption: :warning:
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+endif::[]
+
+Guide for our development process, project setup and how to write code.
+
+[discrete]
+==== Table Of Contents
+
+toc::[]
+
+== Prerequisites
+
+* link:https://developer.android.com/studio#downloads[Android Studio 4.2.2]
+* link:https://adoptopenjdk.net/?variant=openjdk8&jvmVariant=hotspot[Java81] | link:https://developer.android.com/studio/write/java8-support[Limitations of Java language features and APIs] | https://jakewharton.com/d8-library-desugaring/[Desugaring]
+* link:https://kotlinlang.org/[Kotlin 1.4.32]
+
+== Installation
+
+=== Install Java & Kotlin
+
+You could use link:https://brew.sh/[Homebrew] to install on mac
+
+[source,bash]
+----
+brew tap adoptopenjdk/openjdk
+brew install adoptopenjdk8
+brew install kotlin
+----
+
+OR The easiest way to install Java and Kotlin is to use link:https://sdkman.io/[SDK MAN]
+
+Just open your terminal and enter:
+
+[source,bash]
+----
+curl -s "https://get.sdkman.io" | bash
+----
+
+Follow the setup instructions and verify that your installation works:
+
+[source,bash]
+----
+sdk version
+----
+
+If it shows you something like `5.11.5+713` then your good to continue.
+
+Just install the mentioned dependencies:
+
+[source,bash]
+----
+sdk install java 8.0.292.hs-adpt
+sdk install kotlin 1.4.32
+----
+
+Check your installation by:
+
+[source,bash]
+----
+java -version
+kotlin -version
+----
+
+=== Android Studio
+
+For better interop with iOS you may install the link:https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform-mobile[Kotlin Multiplaform Mobile (KMM) plugin for Android Studio]. It let's you run, test and debug shared code on Android and iOS without switching the IDEs.
+
+== Development Process
+
+=== Features
+
+Every change has to branch of from `main` and use this branch naming convention:
+
+* `feature/{type_of_change}-{short_description}` or with ticket id `feature/{ticket_id}/{type_of_change}-{short_description}`
+
+`main` must be always in releasable state.
+
+==== Type Of Change
+
+- *add* for new features or functionality
+- *change* for changes in existing features or functionality
+- *remove* for removed features or functionality
+- *fix* for any bug fixes
+- *bump* for dependency updates
+- *security* in case of vulnerabilities
+
+Examples:
+
+- `feature/SDK-456/add-awesome-hashing-algorithm`
+- `feature/add-awesome-hashing-algorithm`
+- `feature/remove-not-so-awesome-algorithm`
+- `feature/fix-algorithm-corner-case`
+- `feature/bump-lib-to-1.3.0`
+
+== Release
+
+A release branches of from `main` branch with following pattern:
+
+* `release/{major}.{minor}(.{patch})/prepare-{major}.{minor}.{patch}` while patch is optional
+
+Add following changes:
+
+* Update CHANGELOG.adoc by creating a new Unreleased section and change current unreleased to release version
+* Update README.adoc `project-version` to release version
+* Update the latest release badge link:assets/images/badges.adoc[HowTo]
+
+Releases are automatically created when a tag in the form of `v{major}.{minor}.{patch}` is added.
+
+== Develop
+
+Coming soon

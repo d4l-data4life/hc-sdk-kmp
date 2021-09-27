@@ -1,5 +1,6 @@
 = Data4Life SDK
-:library_version: 1.15.1
+:link-repository: https://github.com/d4l-data4life/hc-sdk-kmp
+:project-version: 1.15.1
 :doctype: article
 :!showtitle:
 :toc: macro
@@ -19,8 +20,9 @@ endif::[]
 <div align="center">
     <!-- PROJECT LOGO -->
     <p>
-        <a><img src="assets/images/d4l-logo.svg" width="150"/></a>
-    </p>
+        <a href="https://github.com/d4l-data4life/hc-sdk-kmp">
+            <img src="assets/images/d4l-logo.svg" width="150"/>
+        </a>
     <!-- PROJECT HEADER -->
     <h1>The Data4Life Android and Java SDK</h1>
     <p><!-- PROJECT DESCRIPTION -->
@@ -38,10 +40,10 @@ For more information about the platform, visit our website <a href="https://www.
     </p>
     <p><!-- PROJECT BADGES see badges.adoc how to change them -->
         <a href="https://github.com/d4l-data4life/hc-sdk-kmp/releases">
-            <img src="assets/images/badge-release-latest.svg" alt="Latest version"/>
+            <img src="assets/images/badge-release-latest.svg" alt="Latest release"/>
         </a>
         <a href="https://github.com/d4l-data4life/hc-sdk-kmp/actions">
-            <img src="https://github.com/d4l-data4life/hc-sdk-kmp/actions/workflows/d4l-ci-latest-version.yml/badge.svg" alt="Build Status"/>
+            <img src="https://github.com/d4l-data4life/hc-sdk-kmp/actions/workflows/d4l-ci-latest-version.yml/badge.svg" alt="D4L CI - Latest Version"/>
         </a>
         <a>
             <img src="assets/images/badge-platform-support.svg" alt="Platform"/>

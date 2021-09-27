@@ -14,47 +14,19 @@
  * contact D4L by email to help@data4life.care.
  */
 
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-        jcenter()
-    }
-
-    dependencies {
-        classpath(GradlePlugin.android)
-        classpath(GradlePlugin.kotlin)
-        classpath(GradlePlugin.kapt)
-
-        // https://github.com/vanniktech/gradle-android-junit-jacoco-plugin
-        classpath("com.vanniktech:gradle-android-junit-jacoco-plugin:0.16.0")
-
-        classpath("org.codehaus.groovy:groovy-all:2.4.15")
-
-        // https://github.com/dcendents/android-maven-gradle-plugin
-        classpath("com.github.dcendents:android-maven-gradle-plugin:2.1")
-
-        classpath(GradlePlugin.dexcount)
-
-        // https://github.com/melix/japicmp-gradle-plugin
-        classpath("me.champeau.gradle:japicmp-gradle-plugin:0.2.9")
-
-        classpath(GradlePlugin.downloadTask)
-        classpath("org.apache.httpcomponents:httpclient:4.5.13")
-
-        classpath(GradlePlugin.dokka)
-
-        // https://github.com/jeremylong/dependency-check-gradle
-        classpath("org.owasp:dependency-check-gradle:6.2.2")
-    }
-}
+import care.data4life.gradle.core.dependency.bintray
+import care.data4life.gradle.core.dependency.d4l
+import care.data4life.gradle.core.dependency.gitHub
+import care.data4life.gradle.core.dependency.jitPack
 
 plugins {
-    id("scripts.dependency-updates")
-    id("scripts.download-scripts")
-    id("scripts.versioning")
-    id("scripts.quality-spotless")
-    id("scripts.publishing")
+    id("care.data4life.gradle.core.dependency")
+
+    id("care.data4life.gradle.core.script.dependency-updates")
+    id("care.data4life.gradle.core.script.download-scripts")
+    id("care.data4life.gradle.core.script.publishing")
+    id("care.data4life.gradle.core.script.quality-spotless")
+    id("care.data4life.gradle.core.script.versioning")
 }
 
 allprojects {
@@ -66,9 +38,8 @@ allprojects {
 
         d4l()
 
-        jitPack()
-
         bintray()
+        jitPack()
     }
 
     apply(plugin = "org.owasp.dependencycheck")

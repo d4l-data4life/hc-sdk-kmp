@@ -14,6 +14,8 @@
  * contact D4L by email to help@data4life.care.
  */
 
+package care.data4life.gradle.core.dependency
+
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.kotlin.dsl.maven
@@ -97,13 +99,11 @@ fun RepositoryHandler.jitPack() {
     }
 }
 
-@Deprecated("Warning: this repository is going to shut down soon")
+@Deprecated(message = "Warning: this repository is going to shut down soon")
 fun RepositoryHandler.bintray() {
     jcenter() {
         content {
-            includeGroup("com.linkedin.dexmaker") // required by mockK 1.10.0
             includeGroup("com.github.barteksc") // android-pdf-viewer 3.1.0-beta.1
-            includeGroup("org.koin") // koin 2.0.1
         }
     }
 }

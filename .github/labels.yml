@@ -10,6 +10,9 @@
 - name: dependencies
   description: Pull requests that update a dependency file
   color: dce775
+- name: scripts
+  description: Gradle script changes
+  color: ffc999
 - name: documentation
   description: Improvements or additions to documentation
   color: 0075ca

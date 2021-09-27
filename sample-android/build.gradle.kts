@@ -14,6 +14,11 @@
  * contact D4L by email to help@data4life.care.
  */
 
+import care.data4life.gradle.core.config.D4LConfigHelper
+import care.data4life.gradle.core.config.AndroidConfig
+import care.data4life.gradle.core.dependency.Dependency
+import care.data4life.gradle.core.config.Environment
+
 plugins {
     id("com.android.application")
     id("kotlin-android")

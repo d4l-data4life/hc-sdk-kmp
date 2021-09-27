@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+ * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
  *
  * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
@@ -14,20 +14,14 @@
  * contact D4L by email to help@data4life.care.
  */
 
-data class D4LTestConfig(
-    val user: UserConfig,
-    val twillio: TwillioConfig
-)
+package care.data4life.gradle.core.dependency
 
-data class UserConfig(
-    val email: String,
-    val password: String,
-    val phoneCountryCode: String,
-    val phoneLocalNumber: String
-)
+import org.gradle.api.Plugin
+import org.gradle.api.Project
 
-data class TwillioConfig(
-    val accountSid: String,
-    val authSid: String,
-    val authToken: String
-)
+class DependencyPlugin : Plugin<Project> {
+
+    override fun apply(target: Project) {
+        // nothing to do
+    }
+}

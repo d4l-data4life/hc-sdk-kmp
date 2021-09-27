@@ -14,9 +14,9 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package scripts
+package care.data4life.gradle.core.script
 
-import LibraryConfig
+import care.data4life.gradle.core.config.LibraryConfig
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.ResetCommand
 import org.eclipse.jgit.transport.PushResult
@@ -24,7 +24,9 @@ import org.eclipse.jgit.transport.RemoteRefUpdate
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 
 /**
- * Usage:
+ * Publish generated artefacts to our maven-repository using [jGit](https://www.eclipse.org/jgit/)
+ *
+ * Install:
  *
  * You need to add following dependencies to the buildSrc/build.gradle.kts
  *
@@ -38,11 +40,13 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
  *     mavenCentral()
  * }
  *
- * Now just add id("scripts.publishing") to your rootProject build.gradle.kts plugins
+ * Now just add id("care.data4life.gradle.core.script.publishing") to your rootProject build.gradle.kts plugins
  *
  * plugins {
- *     id("scripts.publishing")
+ *     id("care.data4life.gradle.core.script.publishing")
  * }
+ *
+ * Usage:
  *
  * To publish to to https://github.com/d4l-data4life/maven-features/ just run:
  * - ./gradlew publishFeature

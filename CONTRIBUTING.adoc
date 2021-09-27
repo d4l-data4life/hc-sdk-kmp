@@ -1,0 +1,105 @@
+= Contributing
+:link-repository: https://github.com/d4l-data4life/hc-sdk-kmp
+:doctype: article
+:toc: macro
+:toclevels: 2
+:toc-title:
+:icons: font
+:imagesdir: assets/images
+ifdef::env-github[]
+:warning-caption: :warning:
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+endif::[]
+
+When contributing to this project, this document should help you get started.
+
+[discrete]
+==== Table Of Contents
+
+toc::[]
+
+== Code Of Conduct
+
+This project adheres to the Contributor Covenant link:CODE-OF-CONDUCT.adoc[Code Of Conduct]. By participating, you are expected to uphold this code.
+
+== Issues
+
+We use GitHub issues to track bugs and enhancements.
+
+Issues are very valuable to this project, please feel free to open link:{link-repository}/issues[issues] for:
+
+* _**Questions**_ help us to improve the user experience
+* _**Ideas**_ are a great source for contributions
+* _**Problems**_ show where this project is lacking
+
+If you are reporting a problem, please help us by providing as much information as possible. Ideally, that includes a description or small sample project how to reproduce the problem.
+
+It’s also a good practice to search for existing or related issues before submitting your own. Thank you!
+
+== Contribute Code
+
+=== Pull Request
+
+link:{link-repository}/pulls[Pull requests] are a great way to improve the project. But please, discuss your contribution with us before making changes.
+
+If you contribute, you have:
+
+* signed Contributor License Agreement, see <<_licensing>>
+* made clear which problem you're trying to solve
+* followed our link:DEVELOPING.adoc[Development process]
+
+==== Create Pull Request
+
+Please use our title pattern: `[{ticket id}] {type of change} {short description}`:
+
+* Optional: Add `ticket id` in brackets if you have any, otherwise leave it out.
+* `type of change`:
+- *Add* for new features or functionality
+- *Change* for changes in existing features or functionality
+- *Remove* | for removed features or functionality
+- *Fix* for any bug fixes
+- *Security* in case of vulnerabilities
+- *Bump* for dependency updates
+* `short description` of your change
+
+Example:
+
+* Add awesome hashing algorithm
+* [SDK-156] Change thumbnail generation
+
+Pull requests must fill the provided template. Put N/A when a paragraph cannot be filled.
+
+*Labels* should be used (enhancement,bugfix, help wanted etc...) to categorise your contribution.
+
+Important:: Work in progress pull-requests should be created as a draft.
+
+==== Code Review
+
+At least 1 member of the link:https://github.com/orgs/d4l-data4life/teams/phdc-core[PHDC Core Team] will review
+your contribution and validate if these criteria are met:
+
+* [ ] Functional and fitting in the project
+* [ ] Code style and naming conventions followed
+* [ ] Test written and passing
+* [ ] Continuous Integration build passing
+* [ ] Cross platform testing done for all supported platforms
+* [ ] Documentation updated
+* [ ] Changelog updated
+
+[#_licensing]
+== Licensing
+
+Due to the private link:LICENSE[License] this repository is published under, external contributors need to sign a
+Contributor License Agreement. Please get in contact with mailto:&#109;o&#98;&#x69;&#x6c;&#x65;&#x40;&#100;&#x61;&#x74;a&#52;&#x6c;&#105;f&#101;&#46;&#99;a&#114;e[&#109;o&#98;&#x69;&#x6c;&#x65;&#x40;&#100;&#x61;&#x74;a&#52;&#x6c;&#105;f&#101;&#46;&#99;a&#114;e] before contributing to the project.
+
+=== Components Using Other Licenses
+
+Contributing code and introducing dependencies into the repository from other projects that use one of the following licenses is allowed.
+
+* link:https://opensource.org/licenses/MIT[MIT]
+* link:https://opensource.org/licenses/Apache-2.0[Apache 2.0]
+
+Any other contribution needs to be signed off by the project owners.

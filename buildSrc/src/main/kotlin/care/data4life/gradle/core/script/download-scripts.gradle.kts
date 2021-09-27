@@ -14,20 +14,41 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package scripts
+package care.data4life.gradle.core.script
 
 import de.undercouch.gradle.tasks.download.Download
 
 /**
- * [Gradle Download Task](https://github.com/michel-kraemer/gradle-download-task)
+ *
+ * Download task to retrieve the latest gradle scripts using [Gradle Download Task](https://github.com/michel-kraemer/gradle-download-task)
+ *
+ * Install:
  *
  * You need to add following dependencies to the buildSrc/build.gradle.kts
  *
- * - implementation("de.undercouch:gradle-download-task:4.1.1")
+ * dependencies {
+ *     implementation("de.undercouch:gradle-download-task:4.1.1")
+ * }
  *
+ * and ensure that the gradlePluginPortal is available
+ *
+ * repositories {
+ *     gradlePluginPortal()
+ * }
  *
  * It requires a Environment variable set for GITHUB_USERNAME and GITHUB_REPO_TOKEN, the token should have repo:read scope
  *
+ * Now just add id("care.data4life.gradle.core.script.download-scripts") to your project module build.gradle.kts plugins section
+ *
+ * plugins {
+ *     id("care.data4life.gradle.core.script.download-scripts")
+ * }
+ *
+ * Usage:
+ * - downloadAll will download all available configuration and scripts
+ * - downloadDanger
+ * - downloadDangerWorkflow
+ * - downloadGradleScripts
  */
 plugins {
     id("de.undercouch.download")
@@ -36,8 +57,9 @@ plugins {
 private val repository = "https://raw.githubusercontent.com/d4l-data4life/hc-gradle-scripts"
 private val branch = "main"
 val baseLink = "$repository/$branch"
-val scriptPath = "buildSrc/src/main/kotlin/scripts"
-val scriptLink = "$baseLink/$scriptPath"
+val scriptPathSource = "buildSrc/src/main/kotlin/care/data4life/gradle/scripts/script"
+val scriptPathTarget = "buildSrc/src/main/kotlin/care/data4life/gradle/core/script"
+val scriptLink = "$baseLink/$scriptPathSource"
 val workflowPath = ".github/workflows"
 val workflowLink = "$baseLink/$workflowPath"
 
@@ -45,6 +67,7 @@ val scriptFiles = listOf(
     "$scriptLink/dependency-updates.gradle.kts",
     "$scriptLink/download-scripts.gradle.kts",
     "$scriptLink/publishing.gradle.kts",
+    "$scriptLink/publishing-config.gradle.kts",
     "$scriptLink/quality-spotless.gradle.kts",
     "$scriptLink/versioning.gradle.kts"
 )
@@ -57,7 +80,7 @@ val downloadGradleScripts by tasks.creating(Download::class) {
     password(System.getenv("GITHUB_REPO_TOKEN"))
 
     src(scriptFiles)
-    dest("${rootProject.rootDir}/$scriptPath/")
+    dest("${rootProject.rootDir}/$scriptPathTarget/")
 
     overwrite(true)
 }

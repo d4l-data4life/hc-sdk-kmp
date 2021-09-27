@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+ * Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
  *
  * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
@@ -13,6 +13,8 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
+
+package care.data4life.gradle.core.dependency
 
 object Dependency {
 
@@ -64,8 +66,7 @@ object Dependency {
             object Kotlin {
                 const val testCommon = "org.jetbrains.kotlin:kotlin-test-common:${Version.kotlin}"
 
-                const val testAnnotationsCommon =
-                    "org.jetbrains.kotlin:kotlin-test-annotations-common:${Version.kotlin}"
+                const val testAnnotationsCommon = "org.jetbrains.kotlin:kotlin-test-annotations-common:${Version.kotlin}"
                 const val testJvm = "org.jetbrains.kotlin:kotlin-test:${Version.kotlin}"
 
                 const val testJvmJunit = "org.jetbrains.kotlin:kotlin-test-junit:${Version.kotlin}"
@@ -120,9 +121,8 @@ object Dependency {
         const val pdfView = "com.github.barteksc:android-pdf-viewer:${Version.pdfView}"
 
         // Injection
-        const val koinCore = "org.koin:koin-core:${Version.koin}"
-        const val koinJava = "org.koin:koin-java:${Version.koin}"
-        const val testKoin = "org.koin:koin-test:${Version.koin}"
+        const val koinCore = "io.insert-koin:koin-core:${Version.koin}"
+        const val testKoin = "io.insert-koin:koin-test:${Version.koin}"
 
         // Rx
         const val rxJava2 = "io.reactivex.rxjava2:rxandroid:${Version.rxAndroid}"
@@ -193,8 +193,8 @@ object Dependency {
         const val threeTenBP = "org.threeten:threetenbp:${Version.threeTenBP}"
 
         // Injection
-        const val koinCore = "org.koin:koin-core:${Version.koin}"
-        const val koinJava = "org.koin:koin-java:${Version.koin}"
+        const val koinCore = "io.insert-koin:koin-core:${Version.koin}"
+        const val koinJava = "io.insert-koin:koin-java:${Version.koin}"
 
         // Ui
         const val cmdClickt = "com.github.ajalt:clikt:${Version.clikt}"
@@ -223,7 +223,7 @@ object Dependency {
 
             const val jsonAssert = "org.skyscreamer:jsonassert:${Version.testJsonAssert}"
 
-            const val koin = "org.koin:koin-test:${Version.koin}"
+            const val koin = "io.insert-koin:koin-test:${Version.koin}"
 
             const val okHttpMockWebServer = "com.squareup.okhttp3:mockwebserver:${Version.okHttp}"
         }

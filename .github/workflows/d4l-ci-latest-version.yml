@@ -9,13 +9,15 @@ on:
 jobs:
   latest-version:
 
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     env:
       PACKAGE_REGISTRY_DOWNLOAD_USERNAME: ${{ secrets.PACKAGE_REGISTRY_DOWNLOAD_USERNAME }}
       PACKAGE_REGISTRY_DOWNLOAD_TOKEN: ${{ secrets.PACKAGE_REGISTRY_DOWNLOAD_TOKEN }}
       PACKAGE_REGISTRY_UPLOAD_USERNAME: ${{ secrets.PACKAGE_REGISTRY_UPLOAD_USERNAME }}
       PACKAGE_REGISTRY_UPLOAD_TOKEN: ${{ secrets.PACKAGE_REGISTRY_UPLOAD_TOKEN }}
+      D4L_CLIENT_CONFIG_ANDROID: ${{ secrets.D4L_CLIENT_CONFIG_ANDROID }}
+      D4L_TEST_CONFIG_ANDROID: ${{ secrets.D4L_TEST_CONFIG_ANDROID }}
 
     steps:
       - name: Display runner context
@@ -29,10 +31,10 @@ jobs:
         run: adb install ./script/ci/android/com.android.chrome_79.0.3945.93-394509315-x86-nodpi.apk
       - name: Cleanup
         run: ./gradlew clean
-      - name: Version
-        run: ./gradlew versionInfo
       - name: Configure project
         run: ./gradlew provideTestConfig
+      - name: Version
+        run: ./gradlew versionInfo
       - name: Build
         run: ./gradlew build
       - name: Run sdk android tests

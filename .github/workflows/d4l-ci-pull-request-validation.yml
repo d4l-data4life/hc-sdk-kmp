@@ -34,8 +34,6 @@ jobs:
         run: ./gradlew provideTestConfig
       - name: Version
         run: ./gradlew versionInfo
-      - name: Configure project
-        run: ./gradlew provideTestConfig
       - name: Build
         run: ./gradlew build
       - name: Run SDK Android tests

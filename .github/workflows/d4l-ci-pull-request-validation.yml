@@ -23,8 +23,9 @@ jobs:
 
     strategy:
       matrix:
-        api-level: [ 23, 30, 30 ]
+        api-level: [ 30 ]
         target: [ google_apis ]
+        arch: [ x86_64 ]
     steps:
       - name: Display runner context
         run: hostname -s
@@ -43,8 +44,8 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
-          arch: x86_64
-          profile: Nexus 4
+          arch: ${{ matrix.arch }}
+          profile: Nexus 6
           force-avd-creation: false
           emulator-options: -avd d4l-sdk \
             -no-snapshot \

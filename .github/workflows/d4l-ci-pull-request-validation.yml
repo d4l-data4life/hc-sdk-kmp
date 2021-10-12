@@ -21,11 +21,6 @@ jobs:
       PACKAGE_REGISTRY_UPLOAD_USERNAME: ${{ secrets.PACKAGE_REGISTRY_UPLOAD_USERNAME }}
       PACKAGE_REGISTRY_UPLOAD_TOKEN: ${{ secrets.PACKAGE_REGISTRY_UPLOAD_TOKEN }}
 
-    strategy:
-      matrix:
-        api-level: [ 30 ]
-        target: [ google_apis ]
-        arch: [ x86_64 ]
     steps:
       - name: Display runner context
         run: hostname -s
@@ -39,12 +34,12 @@ jobs:
         run: ./gradlew provideTestConfig
       - name: Build
         run: ./gradlew build
-      - name: Run sdk android tests
-        uses: ReactiveCircus/android-emulator-runner@v2.20.0
+      - name: Run SDK Android tests
+        uses: reactivecircus/android-emulator-runner@v2.20.0
         with:
-          api-level: ${{ matrix.api-level }}
-          target: ${{ matrix.target }}
-          arch: ${{ matrix.arch }}
+          api-level: 30
+          target: google_apis
+          arch: x86_64
           profile: Nexus 6
           force-avd-creation: false
           emulator-options: -avd d4l-sdk \

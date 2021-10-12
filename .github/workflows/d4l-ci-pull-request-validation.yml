@@ -20,12 +20,9 @@ jobs:
       PACKAGE_REGISTRY_DOWNLOAD_TOKEN: ${{ secrets.PACKAGE_REGISTRY_DOWNLOAD_TOKEN }}
       PACKAGE_REGISTRY_UPLOAD_USERNAME: ${{ secrets.PACKAGE_REGISTRY_UPLOAD_USERNAME }}
       PACKAGE_REGISTRY_UPLOAD_TOKEN: ${{ secrets.PACKAGE_REGISTRY_UPLOAD_TOKEN }}
+      D4L_CLIENT_CONFIG_ANDROID: ${{ secrets.D4L_CLIENT_CONFIG_ANDROID }}
+      D4L_TEST_CONFIG_ANDROID: ${{ secrets.D4L_TEST_CONFIG_ANDROID }}
 
-    strategy:
-      matrix:
-        api-level: [ 30 ]
-        target: [ google_apis ]
-        arch: [ x86_64 ]
     steps:
       - name: Display runner context
         run: hostname -s
@@ -33,6 +30,8 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.head_ref }}
+      - name: Configure project
+        run: ./gradlew provideTestConfig
       - name: Version
         run: ./gradlew versionInfo
       - name: Configure project
@@ -42,9 +41,9 @@ jobs:
       - name: Run SDK Android tests
         uses: reactivecircus/android-emulator-runner@v2.20.0
         with:
-          api-level: ${{ matrix.api-level }}
-          target: ${{ matrix.target }}
-          arch: ${{ matrix.arch }}
+          api-level: 30
+          target: google_apis
+          arch: x86_64
           profile: Nexus 4
           force-avd-creation: false
           emulator-options: -avd d4l-sdk \

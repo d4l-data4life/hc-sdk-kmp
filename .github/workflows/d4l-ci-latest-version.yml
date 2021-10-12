@@ -9,13 +9,13 @@ on:
 jobs:
   latest-version:
 
-    runs-on: [self-hosted, macos]
+    runs-on: ubuntu-latest
 
     env:
-      D4L_CLIENT_CONFIG_ANDROID: ${{ secrets.D4L_CLIENT_CONFIG_ANDROID }}
-      D4L_TEST_CONFIG_ANDROID: ${{ secrets.D4L_TEST_CONFIG_ANDROID }}
-      PACKAGE_REGISTRY_USERNAME: ${{ secrets.PACKAGE_REGISTRY_USERNAME }}
-      PACKAGE_REGISTRY_TOKEN: ${{ secrets.PACKAGE_REGISTRY_TOKEN }}
+      PACKAGE_REGISTRY_DOWNLOAD_USERNAME: ${{ secrets.PACKAGE_REGISTRY_DOWNLOAD_USERNAME }}
+      PACKAGE_REGISTRY_DOWNLOAD_TOKEN: ${{ secrets.PACKAGE_REGISTRY_DOWNLOAD_TOKEN }}
+      PACKAGE_REGISTRY_UPLOAD_USERNAME: ${{ secrets.PACKAGE_REGISTRY_UPLOAD_USERNAME }}
+      PACKAGE_REGISTRY_UPLOAD_TOKEN: ${{ secrets.PACKAGE_REGISTRY_UPLOAD_TOKEN }}
 
     steps:
       - name: Display runner context

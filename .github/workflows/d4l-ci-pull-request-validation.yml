@@ -13,13 +13,20 @@ on:
 jobs:
   pull-request-validation:
 
-    runs-on: [self-hosted, macos]
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        api-level: [ 23, 30, 30 ]
+
+    concurrency:
+      group: validation-${{ github.head_ref }}
+      cancel-in-progress: true
 
     env:
-      D4L_CLIENT_CONFIG_ANDROID: ${{ secrets.D4L_CLIENT_CONFIG_ANDROID }}
-      D4L_TEST_CONFIG_ANDROID: ${{ secrets.D4L_TEST_CONFIG_ANDROID }}
-      PACKAGE_REGISTRY_USERNAME: ${{ secrets.PACKAGE_REGISTRY_USERNAME }}
-      PACKAGE_REGISTRY_TOKEN: ${{ secrets.PACKAGE_REGISTRY_TOKEN }}
+      PACKAGE_REGISTRY_DOWNLOAD_USERNAME: ${{ secrets.PACKAGE_REGISTRY_DOWNLOAD_USERNAME }}
+      PACKAGE_REGISTRY_DOWNLOAD_TOKEN: ${{ secrets.PACKAGE_REGISTRY_DOWNLOAD_TOKEN }}
+      PACKAGE_REGISTRY_UPLOAD_USERNAME: ${{ secrets.PACKAGE_REGISTRY_UPLOAD_USERNAME }}
+      PACKAGE_REGISTRY_UPLOAD_TOKEN: ${{ secrets.PACKAGE_REGISTRY_UPLOAD_TOKEN }}
 
     steps:
       - name: Display runner context
@@ -28,9 +35,13 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.head_ref }}
-      - name: Start emulator and wait for it
-        run: ./script/ci/android/prepare_start_and_wait_for_emulator.sh
       - name: Install Chrome Browser
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
         run: adb install ./script/ci/android/com.android.chrome_79.0.3945.93-394509315-x86-nodpi.apk
       - name: Cleanup
         run: ./gradlew clean

@@ -34,23 +34,7 @@ jobs:
         run: ./gradlew provideTestConfig
       - name: Build
         run: ./gradlew build
-      - name: Run SDK Android tests
-        uses: reactivecircus/android-emulator-runner@v2.20.0
-        with:
-          api-level: 30
-          target: google_apis
-          arch: x86_64
-          profile: Nexus 6
-          force-avd-creation: false
-          emulator-options: -avd d4l-sdk \
-            -no-snapshot \
-            -no-audio \
-            -no-boot-anim \
-            -skin 768x1280 \
-            -camera-back none \
-            -camera-front none
-          disable-animations: true
-          script: ./gradlew :sdk-android:test
+
       - name: Run tests with code coverage
         run: ./gradlew jacocoTestReport
       - name: Publish Feature to Maven Repo

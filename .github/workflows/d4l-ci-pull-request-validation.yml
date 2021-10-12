@@ -12,21 +12,14 @@ on:
 
 jobs:
   pull-request-validation:
-    runs-on: macos-latest
 
-    concurrency:
-      group: validation-${{ github.head_ref }}
-      cancel-in-progress: true
+    runs-on: macos-latest
 
     env:
       PACKAGE_REGISTRY_DOWNLOAD_USERNAME: ${{ secrets.PACKAGE_REGISTRY_DOWNLOAD_USERNAME }}
       PACKAGE_REGISTRY_DOWNLOAD_TOKEN: ${{ secrets.PACKAGE_REGISTRY_DOWNLOAD_TOKEN }}
       PACKAGE_REGISTRY_UPLOAD_USERNAME: ${{ secrets.PACKAGE_REGISTRY_UPLOAD_USERNAME }}
       PACKAGE_REGISTRY_UPLOAD_TOKEN: ${{ secrets.PACKAGE_REGISTRY_UPLOAD_TOKEN }}
-
-    strategy:
-      matrix:
-        api-level: [ 23, 30, 30 ]
 
     steps:
       - name: Display runner context
@@ -35,20 +28,10 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.head_ref }}
+      - name: Start emulator and wait for it
+        run: ./script/ci/android/prepare_start_and_wait_for_emulator.sh
       - name: Install Chrome Browser
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          force-avd-creation: false
-          emulator-options: -avd d4l-sdk \
-            -no-snapshot \
-            -no-audio \
-            -no-boot-anim \
-            -skin 768x1280 \
-            -camera-back none \
-            -camera-front none
-          disable-animations: true
-          sctipt: adb install ./script/ci/android/com.android.chrome_79.0.3945.93-394509315-x86-nodpi.apk
+        run: adb install ./script/ci/android/com.android.chrome_79.0.3945.93-394509315-x86-nodpi.apk
       - name: Cleanup
         run: ./gradlew clean
       - name: Version

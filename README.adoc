@@ -24,11 +24,9 @@ endif::[]
             <img src="assets/images/d4l-logo.svg" width="150"/>
         </a>
     <!-- PROJECT HEADER -->
-    <h1>The Data4Life Android and Java SDK</h1>
+    <h1>Data4Life Android and Java SDK</h1>
     <p><!-- PROJECT DESCRIPTION -->
-        This is the Android and Java SDK of Data4Life.The SDK encapsulates the backend functionality of the Data4Life Personal Health Data Platform (PHDP) and enables end-to-end encryption of patient data.It allows users to store sensitive health data on the secure platform and share it to authorized people and applications.
-
-For more information about the platform, visit our website <a href="https://www.d4l.io/">www.d4l.io</a>.
+        Kotlin Multiplatform (KMP) client for the Personal Health Data Platform (PHDP)
     </p>
     <p><!-- PROJECT DOCUMENTATION -->
         <a href="https://github.com/d4l-data4life/hc-sdk-kmp"><strong>Explore the docs »</strong></a>
@@ -59,32 +57,25 @@ For more information about the platform, visit our website <a href="https://www.
 === Table Of Contents
 toc::[]
 
+== About the Project
 
-== Documentation
+This is the Android and Java SDK of Data4Life. The SDK encapsulates the backend functionality of the Data4Life Personal Health Data Platform (PHDP) and enables end-to-end encryption of health data. It allows users to store and access sensitive data on the secure platform and share it to authorized people and applications.
 
-For the current documentation, see link:https://www.d4l.io/[documentation]
+For more information about the platform, visit our link:http://www.data4life.care[website]
 
+=== Features
 
-== Before you start
+* Authorization/Authentication
+* End-to-End encryption
+* API client for PHDP
+* Data types support for custom, FHIR 3 and FHIR 4
 
-To use the Data4Life SDK, you must obtain a partner ID from Data4Life. To receive a partner ID, get in touch with us at contact@data4life.care.
+=== Build with
 
-If you just want to explore the SDK you'll find a test configuration in `sample-android` or `sample-java` to start with.
-
-=== Software requirements
-
-* Android 6.0 (API 23) to Android 11 (API 30)
-* Kotlin 1.4.32
-* Java 8 link:https://developer.android.com/studio/write/java8-support[Limitations] link:https://jakewharton.com/d8-library-desugaring/[Desugaring]
-* Gradle6.9.1
-
-=== Dependencies
-
-The SDK has the following dependencies:
-
+* link:https://kotlinlang.org/docs/reference/mpp-intro.html[Kotlin Multiplatform]
 * link:https://github.com/square/retrofit[retrofit2]
 * link:https://github.com/ReactiveX/RxJava[rxjava2]
-* link:https://github.com/d4l-data4life/hc-fhir-sdk-java[D4L FHIR STU3]
+* link:https://github.com/d4l-data4life/hc-fhir-sdk-java[D4L FHIR STU3 and R4]
 * link:https://github.com/d4l-data4life/hc-auth-sdk-kmp/[Data4Life Auth]
 * link:https://github.com/d4l-data4life/hc-crypto-sdk-kmp/[Data4Life Crypto]
 * link:https://github.com/d4l-data4life/hc-securestore-sdk-kmp/[Data4Life Securestore]
@@ -93,89 +84,64 @@ The SDK has the following dependencies:
 * link:https://github.com/ThreeTen/threetenbp[ThreeTen Java 8 Time backport]
 * link:http://bouncycastle.org/[BouncyCastle] *
 * link:https://github.com/google/tink[Tink]
-* link:https://github.com/openid/AppAuth-Android[AppAuth] **
+* link:https://github.com/openid/AppAuth-Android[AppAuth]
 
 **Notes:**
 
-* The SDK ships with BouncyCastle 1.64 and will replace the BouncyCastle version provided by the Android system.Ensure that if you're using or depend on BouncyCastle CryptoProvider, you're still compatible. <br />
-* The SDK ships with a forked version of the AppAuth lib which includes a compatibility fix for working with `androidx` libs and a synchronous token refresh call for better thread handling.
+* The SDK ships with BouncyCastle and will replace the BouncyCastle version provided by the Android system. Ensure that if you're using or depend on BouncyCastle CryptoProvider, you're still compatible.
 
+== Before you start
 
-== Install Gradle
+To use the SDK, you must have a Data4Life *partner ID*. To obtain a partner ID, get in touch with us at mobile.
 
-=== Setup maven repositories
+To use the Data4Life SDK, you must obtain a partner ID from Data4Life. To receive a partner ID, get in touch with us at we@data4life.care.
 
-Add the following maven repository url to your root build.gradle:
+== Getting started
 
-Please take a look over at Github https://docs.github.com/en/packages/publishing-and-managing-packages/about-github-packages#about-tokens[about-github-packages#tokens, window="_blank"] on how to generate your private token for accessing the Github Package Registry.
-Add `gpr.user = {your Github username}` and `gpr.key = {private github access token}` to your `gradle.properties`
+Once you have a partner ID, follow these steps to start working with the SDK:
 
-[source,gradle]
-----
-allprojects {
-    repositories {
-        ...
-        maven("https://jitpack.io")
-        maven {
-            url = uri("https://maven.pkg.github.com/d4l-data4life/hc-util-sdk-kmp")
-            credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
-            }
-        }
-        maven {
-            url = uri("https://maven.pkg.github.com/d4l-data4life/hc-fhir-sdk-java")
-            credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
-            }
-        }
-        maven {
-            url = uri("https://maven.pkg.github.com/d4l-data4life/hc-fhir-helper-sdk-kmp")
-            credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
-            }
-        }
-    }
-}
-----
+=== Software requirements
 
-Your GitHub **username** and **token** needs to be stored in your global Gradle properties: `~/.gradle/gradle.properties`
+* Android 6.0 (API 23) to Android 11 (API 30)
+* Kotlin 1.4.32
+* Java 8 link:https://developer.android.com/studio/write/java8-support[Limitations] link:https://jakewharton.com/d8-library-desugaring/[Desugaring]
+* Gradle 6.9.1
 
-NOTICE:: You need to have *read* access to this repository and generate a link:https://github.com/settings/tokens/new[personal access token] with `repo`, `write:packages` and `read:packages` scope.
+== Installation
+
+=== Consume GitHub Packages
+
+We use GitHub Packages to distribute the SDK. In order to consume our dependencies you need to generate a GitHub Personal Access Token. Please follow the how to link:https://docs.github.com/en/packages/learn-github-packages/introduction-to-github-packages#authenticating-to-github-packages[authenticate to GitHub Packages, window="_blank"].
+
+NOTICE:: You need to have _read_ access to this repository and generate a https://github.com/settings/tokens/new/[personal access token, window="_blank"] with `repo` and `read:packages` scope.
+
+==== GitHub Token
+
+The token needs to be made available.
+
+. Add `gpr.user = {GitHub username}` and `gpr.key = {GitHub Personal Access Token}` to your global Gradle properties `~/.gradle/gradle.properties`
 
 ----
 gpr.user=github-username
 gpr.key=github-token
 ----
 
+. Or add following environment variables `PACKAGE_REGISTRY_USERNAME={GitHub username}` and `PACKAGE_REGISTRY_TOKEN={GitHub Personal Access Token}`
+
 ==== Setup Maven Repository
 
-We use GitHub Packages to distribute the SDK. In order to consume our dependencies you need to generate a GitHub Personal Access Token. Please follow the how to  link:https://docs.github.com/en/packages/learn-github-packages/introduction-to-github-packages#authenticating-to-github-packages[authenticate to GitHub Packages, window="_blank"].
+Add the following maven repository configuration to your root `build.gradle/build.gradle.kts`:
 
-NOTICE:: You need to have _read_ access to this repository and generate a https://github.com/settings/tokens/new/[personal access token] with `repo` and `read:packages` scope.
-
-The token needs to be made available:
-
-1. Add `gpr.user = {GitHub username}` and `gpr.key = {GitHub Personal Access Token}` to your global Gradle properties `~/.gradle/gradle.properties`
-
-    ----
-    gpr.user=github-username
-    gpr.key=github-token
-    ----
-
-2. Or add following environment variables `PACKAGE_REGISTRY_USERNAME={GitHub username}` and `PACKAGE_REGISTRY_TOKEN={GitHub Personal Access Token}`
-
-Then add the following maven repository configuration to your root build.gradle:
-
+.Gradle KTS
+[%collapsible%open]
+====
+[source,Gradle]
 ----
-
 allprojects {
     repositories {
         ...
         maven {
-            url = URI("https://maven.pkg.github.com/d4l-data4life/hc-fhir-sdk-kmp")
+            url = uri("https://maven.pkg.github.com/d4l-data4life/hc-sdk-kmp")
             credentials {
                 username = project.findProperty("gpr.user") as String? ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
                 password = project.findProperty("gpr.key") as String? ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
@@ -183,44 +149,41 @@ allprojects {
         }
     }
 }
-
 ----
+====
 
-=== Java SDK dependency
-
-Add the following dependencies to your app `build.gradle` file.
-
-[source,gradle]
+.Gradle Groovy
+[%collapsible]
+====
+[source,Gradle]
 ----
-dependencies {
-    implementation('care.data4life.hc-sdk-kmp:sdk-jvm:${latestVersion}') {
-            exclude group: 'care.data4life.hc-sdk-kmp', module: 'securestore-android'
-            exclude group: 'care.data4life.hc-sdk-kmp', module: 'crypto-android'
-            exclude group: 'care.data4life.hc-sdk-kmp', module: 'auth-android'
-            exclude group: 'care.data4life.hc-util-sdk-kmp', module: 'util-android'
-            exclude group: 'care.data4life.hc-result-sdk-kmp', module: 'error-android'
+allprojects {
+    repositories {
+        ...
+        maven {
+            url = uri("https://maven.pkg.github.com/d4l-data4life/hc-sdk-kmp")
+            credentials {
+                username = project.findProperty("gpr.user") as ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
+                password = project.findProperty("gpr.key") as ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+            }
+        }
     }
 }
 ----
+====
 
 === Android SDK dependency
 
-[source,gradle]
+[source,Gradle]
 ----
 dependencies {
-    implementation('care.data4life.hc-sdk-kmp:sdk-android:${latestVersion}') {
-        exclude group: 'care.data4life.hc-sdk-kmp', module: 'securestore-jvm'
-        exclude group: 'care.data4life.hc-sdk-kmp', module: 'crypto-jvm'
-        exclude group: 'care.data4life.hc-sdk-kmp', module: 'auth-jvm'
-        exclude group: 'care.data4life.hc-util-sdk-kmp', module: 'util-jvm'
-        exclude group: 'care.data4life.hc-result-sdk-kmp', module: 'error-jvm'
-    }
+    implementation("care.data4life.hc-sdk-kmp:sdk-android:LATEST_VERSION")
 }
 ----
 
 The SDK is only published as release variant. So you need to add a `matchingFallbacks` config to all of your `buildTypes` and `flavors`. See link:https://developer.android.com/studio/build/dependencies#variant_aware[variant awareness] for more details.
 
-[source, gradle]
+[source,Gradle]
 ----
 android {
     buildTypes {
@@ -231,199 +194,211 @@ android {
 }
 ----
 
-The SDK ships with link:https://github.com/ThreeTen/threetenbp[ThreeTenBP] a Java 8 Time backport. For Android, its loading mechanism of time zone information is inefficient.So we recommend to provide your favorite Android ThreeTen library here, for example link:https://github.com/JakeWharton/ThreeTenABP[ThreeTenABP].
+The SDK ships with link:https://github.com/ThreeTen/threetenbp[ThreeTenBP] a Java 8 Time backport. For Android, its loading mechanism of time zone information is inefficient. So we recommend providing your favorite Android ThreeTen library here, for example link:https://github.com/JakeWharton/ThreeTenABP[ThreeTenABP].
 
-[source,gradle]
+[source,Gradle]
 ----
 dependencies {
-    implementation("care.data4life.hc-sdk-kmp:sdk-android:${latestVersion}") {
+    implementation("care.data4life.hc-sdk-kmp:sdk-android:LATEST_VERSION") {
         ...
         // exclude the threetenbp dependency from the `sdk`
-        exclude group: 'org.threeten', module: 'threetenbp'
+        exclude group: "org.threeten", module: "threetenbp"
     }
     // provide your favorite ThreeTen library here
-    implementation 'com.jakewharton.threetenabp:threetenabp:1.2.2'
+    implementation "com.jakewharton.threetenabp:threetenabp:1.3.1"
 }
 ----
 
-To ensure Java 8 compatibility, add compile options to app `build.gradle`:
+To ensure Java 8 compatibility, add compile options to app `build.gradle/build.gradle.kts`:
 
-[source,gradle]
+[source,Gradle]
 ----
 android {
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 }
 ----
 
-=== Client configuration
-After all the maven repositories and gradle dependencies are setup, the client needs to pass the configuration information to the SDK during initialization.
+=== Java SDK dependency
 
-==== Android
-On Android side the client can set manifest placeholder in their `build.gradle` to pass the configuration to the SDK.
+Add the following dependencies to your app `build.gradle/build.gradle.kts` file.
 
-[source,gradle,bulid.gradle]
+[source,gradle]
 ----
-// build.gradle
+dependencies {
+    implementation("care.data4life.hc-sdk-kmp:sdk-jvm:LATEST_VERSION")
+}
+----
 
+== Usage
+
+=== Android
+
+On Android manifest placeholders are used to pass the configuration to the SDK.
+
+. Add the `manifestPlaceholders` property with the `platform`, `environment`, `clientId`, `clientSecret`, and `redirectScheme` keys to your _build.gradle/build.gradle.kts_ file.
++
+.Gradle KTS
+[%collapsible%open]
+====
+[source,kotlin]
+----
 android {
     defaultConfig {
-        manifestPlaceholders = mapOf<String, Any>(
-            "clientId" to "CLIENT_ID",
-            "clientSecret" to "CLIENT_SECRET",
-            "redirectScheme" to "REDIRECT_SCHEME",
-            "environment" to "ENVIRONMENT",
-            "platform" to "D4L",
-            "debug" to "false"
-        )
-        ...
+        manifestPlaceholders(mapOf(
+                "platform" to "D4L",
+                "environment" to "production",
+                "clientId" to "clientId",
+                "clientSecret" to "clientSecret",
+                "redirectScheme" to "com.example",
+                "debug" to "true"
+        ))
     }
 }
-
 ----
+====
++
+.Gradle Groovy
+[%collapsible]
+====
+[source,groovy]
+----
+android {
+    defaultConfig {
+        manifestPlaceholders = [
+            platform      : "D4L",
+            environment   : "production",
+            clientId      : "clientId",
+            clientSecret  : "clientSecret",
+            redirectScheme: "com.example",
+            debug         : "false"
+        ]
+    }
+}
+----
+====
++
+NOTE: The `debug` flag is set to `false` if your app is not debuggable.
 
-==== Java
 
-On Java side the client config will be passed as arguments to the `init` function.
-
+. To log in, use the `startActivityForResult` method with login intent.
++
 [source,java]
 ----
-Data4LifeClient.init("userAlias",
-                    "CLIENT_ID",
-                    "CLIENT_SECRET",
-                    Environment.PRODUCTION,
-                    "REDIRECT_SCHEME",
-                    "D4L");
+Intent loginIntent = Data4LifeClient.getLoginIntent(context, null);
+----
++
+or with custom scopes
++
+[source,java]
+----
+Intent loginIntent = Data4LifeClient.getLoginIntent(
+    context,
+    new String[] {"scope:r", "scope:w"}
+);
+----
++
+and then
++
+[source,java]
+----
+startActivityForResult(loginIntent, Data4LifeClient.D4L_AUTH);
 ----
 
-== Building and Working with the SDK
-
-There are several requirements for building the SDK.
-
-=== Requirements
-
-* Android 6.0 (API 23) to Android 11 (API 30)
-* Kotlin 1.4.32
-* Java 8 link:https://developer.android.com/studio/write/java8-support[Limitations] link:https://jakewharton.com/d8-library-desugaring/[Desugaring]
-* Gradle 6.8.3
-* link:https://developer.android.com/studio#downloads[Android Studio 4.2.2]
-* Android Emulator 23 - 30
-
-**Note:** Disable Instant Run in Android Studio, or the project fails to compile.
-
-=== Config files
-
-Before you can start to compile the SDK you need to add `d4l-client-config-android.json` and `d4l-test-config-android.json` files in the project root folder and add following content.
-
-`d4l-client-config-android.json` needs to contain a config for every environment LOCAL, DEVELOPMENT, STAGING, SANDBOX, PRODUCTION.
-
-NOTE: The CI expects this configuration from environment variables stored in GitHub secrets: `D4L_CLIENT_CONFIG_ANDROID` and `D4L_CLIENT_CONFIG_IOS`
-
-[source,json,d4l-client-config-android.json]
+. Handle the login result in your `onActivityResult` method.
++
+[source,java]
 ----
-// d4l-client-config-android.json
-{
-  "platform": "d4l",
-  "configs": {
-    "LOCAL": {
-      "id": "{CLIENT_ID}",
-      "secret": "{CLIENT_SECRET}",
-      "redirectScheme": "{CLIENT_REDIRECT_SCHEME}"
-    },
-    "DEVELOPMENT": {
-      "id": "{CLIENT_ID}",
-      "secret": "{CLIENT_SECRET}",
-      "redirectScheme": "{CLIENT_REDIRECT_SCHEME}"
-    }
-  }
-}
-----
-
-[source,json,d4l-test-config-android.json]
-----
-// d4l-test-config-android.json
-{
-  "user": {
-    "email": "{USER_EMAIL}",
-    "password": "{USER_PASSWORD}",
-    "phoneCountryCode": "{USER_PHONE_COUNTRY_CODE}",
-    "phoneLocalNumber": "{USER_PHONE_LOCAL_NUMBER}"
-  },
-  "twillio": {
-    "accountSid": "{TWILLIO_ACCOUNT_SID}",
-    "authSid": "{TWILLIO_AUTH_SID}",
-    "authToken": "{TWILLIO_AUTH_TOKEN}"
-  }
-}
-----
-
-To provide the test config to the different modules run the following gradle task in the root directory of the project.
-[source,bash]
-----
-./gradlew provideTestConfig
-----
-
-
-=== SDK
-
-==== Releasing the SDK
-
-For release management, we use link:https://help.github.com/articles/creating-releases/[GitHub Releases].So just create a new release, set the tag according to link:https://semver.org/[Semantic Versioning] and publish.
-
-===== Java
-
-[source,gradle]
-----
-dependencies {
-    implementation("care.data4life.hc-sdk-kmp:sdk-jvm:{latestCommitHashOnMain}") {
-        ...
+@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    if (requestCode == D4L_AUTH){
+        if (resultCode == RESULT_OK){
+            // you are now logged in
+        }
     }
 }
 ----
 
-===== Android
-
-[source,gradle]
+. Get the {compname} client instance inside Activity or Fragment.
++
+[source,java]
 ----
-dependencies {
-    implementation("care.data4life.hc-sdk-kmp:sdk-android:{latestCommitHashOnMain}") {
-        ...
-    }
-}
+Data4LifeClient client = Data4LifeClient.getInstance();
 ----
 
-==== Maintainer
-Certificate pinning is done by providing a set of certificates by hash of the public key. To get the hash from certificate use the following:
+. Now you can use the available API for the 3 supported data types which will return results on background thread.
 
-[source,bash]
+=== Java
+
+. Instantiate the client with `alias`, `platform`, `environment`, `clientId`, `clientSecret`, and `redirectUrl` properties:
++
+[source,java]
 ----
-openssl x509 -inform der -in sandbox.hpihc.de.cer -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64
+Data4LifeClient client = Data4LifeClient.init(
+    "alias",
+    "clientId",
+    "clientSecret",
+    Environment.PRODUCTION,
+    "redirectUrl",
+    "platform"
+);
+----
++
+NOTE: The `alias`  is used to namespace the session that is bound to a client instance. This allows multiple instances of the client running with different sessions in parallel. Could be used to bind a client instance to a user in a multiuser environment.
+
+. To log in, you need to generate the authorization url and hand it over to a browser to trigger the login process
++
+[source,java]
+----
+client.getAuthorizationUrl();
 ----
 
-==== Certificate Pin
-To get the Base64 encoded sha256 of the HTTPS public key pinning use the following command in the terminal
-
-[source,bash]
+. After the browser session calls the previously registered `redirectUrl` pass the received url to the client instance
++
+[source,java]
 ----
-openssl s_client -servername api.data4life.care -connect app.data4life.care:443 | openssl x509 -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64
+client.finishLogin(receivedUrl);
 ----
-See link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Public_Key_Pinning[HTTP Public Key Pinning] for more information.
 
+. Now you can use the available API for the 3 supported data types which will return results on background thread.
 
-=== About Data4Life documentation
-We use link:https://asciidoctor.org/[AsciiDoctor], a fast, open source text processor and publishing toolchain for converting AsciiDoc content to HTML5, DocBook, PDF, and other formats.In this case HTML5.
+== Roadmap
 
-To build the project documentation we use the link:https://github.com/asciidoctor/asciidoctor-gradle-plugin[Asciidoctor Gradle Plugin] that fits our Gradle build chain.
+This project is work in progress. We are working on adding more functionality, guidelines, documentation and other improvements.
 
-Additionally, we use the link:https://github.com/asciidoctor/asciidoctor-diagram[AsciiDoctor Diagramm extension] which adds support for BlockDiag (BlockDiag, SeqDiag, ActDiag, NwDiag), Ditaa, Erd, GraphViz, Mermaid, Msc, PlantUML, Shaape, SvgBob, Syntrax, UMLet, Vega, Vega-Lite and WaveDrom.
+Also see the open link:{link-repository}/issues[issues] for a list of proposed features and known issues.
 
-==== Documentation structure
-The base for the documentation is located in the `sdk-doc` module.It's main purpose is to configure Asciidoctor and define the style and distribution.
-You will find a `index.adoc` under `sdk-doc/src/docs/asciidoc` which is used to include documentation of other modules in one single book documentation.
+== Changelog
 
-Every project module has a `{module-name}/src/docs/asciidoc` folder where all documentation files will be located.So every module will host it's own documentation.
+See link:CHANGELOG.adoc[changelog]
 
-==== Generating the documentation
-To generate the latest documentation just call `./gradlew asciidoctor` this will build the `sdk-doc` module and replace the documentation for the current SDK version in the `docs` folder.
+== Versioning
+
+We use http://semver.org/[Semantic Versioning] as a guideline for our versioning.
+
+Releases use this format: `{major}.{minor}.{patch}`
+
+* Breaking changes bump `{major}` and reset `{minor}` & `{patch}`
+* Backward compatible changes bump `{minor}` and reset `{patch}`
+* Bug fixes bump `{patch}`
+
+== Contributing
+
+You want to help or share a proposal? You have a specific problem? Read the following:
+
+* link:CODE-OF-CONDUCT.adoc[Code of conduct] for details on our code of conduct.
+* link:CONTRIBUTING.adoc[Contributing] for details about how to report bugs and propose features.
+* link:DEVELOPING.adoc[Developing] for details about our development process and how to build and test the project.
+
+== Copyright and License
+
+Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
+
+Please refer to our link:LICENSE[License] for further details.

@@ -355,6 +355,8 @@ Data4LifeClient client = Data4LifeClient.getInstance();
 
 === Java
 
+The Java SDK only supports a single-user use case. For every individual user, the SDK must be instantiated with the user alias.
+
 . Instantiate the client with `alias`, `platform`, `environment`, `clientId`, `clientSecret`, and `redirectUrl` properties:
 +
 [source,java]
@@ -371,20 +373,30 @@ Data4LifeClient client = Data4LifeClient.init(
 +
 NOTE: The `alias`  is used to namespace the session that is bound to a client instance. This allows multiple instances of the client running with different sessions in parallel. Could be used to bind a client instance to a user in a multiuser environment.
 
-. To log in, you need to generate the authorization url and hand it over to a browser to trigger the login process
+. To log in, you need start the OAuth 2.0 authorization flow by generating the authorization url and hand it over to a browser and let the user authorize.
 +
 [source,java]
 ----
-client.getAuthorizationUrl();
+String authorizationUrl = client.getAuthorizationUrl();
 ----
 
-. After the browser session calls the previously registered `redirectUrl` pass the received url to the client instance
+. After the browser auth session calls the previously registered `redirectUrl`, pass the received OAuth callback URL to the client instance
 +
 [source,java]
 ----
 String callbackUrl = "https://.../oauth/callback?code=12345&state=abcde"
 boolean authorized = client.finishLogin(callbackUrl);
 ----
+
+. If you're in a multiuser setup with multiple SDK instances, you could extract the alias from the callbackUrl (instance management needs to be done by you, e.g. Map or better suitable solution)
++
+[source,java]
+----
+UserIdExtractor extractor = new UserIdExtractor();
+String userId = extractor.extract(callbackUrl);
+----
++
+NOTE: Multiple instance management is not handled by the SDK and needs to be done by you, e.g. with a Map<String,Data4LifeClient> or better suitable solution
 
 . Now you can use the available API for the 3 supported data types which will return results on background thread.
 

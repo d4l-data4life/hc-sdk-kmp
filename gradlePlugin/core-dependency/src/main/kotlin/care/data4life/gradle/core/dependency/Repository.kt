@@ -53,9 +53,9 @@ fun RepositoryHandler.gitHub(project: Project) {
             setUrl("https://maven.pkg.github.com/$organization/$repository")
             credentials {
                 username = project.project.findProperty("gpr.user") as String?
-                    ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
+                    ?: System.getenv("PACKAGE_REGISTRY_DOWNLOAD_USERNAME")
                 password = project.project.findProperty("gpr.key") as String?
-                    ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+                    ?: System.getenv("PACKAGE_REGISTRY_DOWNLOAD_TOKEN")
             }
             content {
                 includeGroup(group)

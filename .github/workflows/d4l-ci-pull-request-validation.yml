@@ -15,6 +15,14 @@ jobs:
 
     runs-on: macos-latest
 
+    strategy:
+      matrix:
+        api-level: [ 30 ]
+
+    concurrency:
+      group: validation-${{ github.head_ref }}
+      cancel-in-progress: true
+
     env:
       PACKAGE_REGISTRY_DOWNLOAD_USERNAME: ${{ secrets.PACKAGE_REGISTRY_DOWNLOAD_USERNAME }}
       PACKAGE_REGISTRY_DOWNLOAD_TOKEN: ${{ secrets.PACKAGE_REGISTRY_DOWNLOAD_TOKEN }}
@@ -24,12 +32,17 @@ jobs:
       D4L_TEST_CONFIG_ANDROID: ${{ secrets.D4L_TEST_CONFIG_ANDROID }}
 
     steps:
-      - name: Display runner context
-        run: hostname -s
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
           ref: ${{ github.head_ref }}
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '8'
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
       - name: Configure project
         run: ./gradlew provideTestConfig
       - name: Version
@@ -39,19 +52,15 @@ jobs:
       - name: Run SDK Android tests
         uses: reactivecircus/android-emulator-runner@v2.20.0
         with:
-          api-level: 30
+          api-level: ${{ matrix.api-level }}
           target: google_apis
           arch: x86_64
-          profile: Nexus 4
+          profile: Nexus 5
           force-avd-creation: false
-          emulator-options: -avd d4l-sdk \
-            -no-snapshot \
-            -no-audio \
-            -no-boot-anim \
-            -skin 768x1280 \
-            -camera-back none \
-            -camera-front none
-          script: ./gradlew :sdk-android:test
+          avd-name: d4l-sdk-${{ matrix.api-level }}
+          emulator-options: -no-snapshot -no-audio -no-boot-anim -skin 768x1280 -camera-back none
+          disable-animations: true
+          script: ./gradlew --stacktrace :sdk-android:test
       - name: Run tests with code coverage
         run: ./gradlew jacocoTestReport
       - name: Publish Feature to Maven Repo

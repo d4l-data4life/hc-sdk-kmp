@@ -94,7 +94,7 @@ The token needs to be made available.
 
 . Add `gpr.user = {GitHub username}` and `gpr.key = {GitHub Personal Access Token}` to your global Gradle properties `~/.gradle/gradle.properties`
 +
-[source,Gradle]
+[source,bash]
 ----
 gpr.user=github-username
 gpr.key=github-token
@@ -109,7 +109,7 @@ Add the following maven repository configuration to your root `build.gradle/buil
 .Gradle KTS
 [%collapsible%open]
 ====
-[source,gradle]
+[source,kotlin]
 ----
 allprojects {
     repositories {
@@ -129,7 +129,7 @@ allprojects {
 .Gradle Groovy
 [%collapsible]
 ====
-[source,gradle]
+[source,groovy]
 ----
 allprojects {
     repositories {
@@ -148,7 +148,7 @@ allprojects {
 
 === Android SDK dependency
 
-[source,gradle]
+[source,kotlin]
 ----
 dependencies {
     implementation("care.data4life.hc-sdk-kmp:sdk-android:LATEST_VERSION")
@@ -157,7 +157,7 @@ dependencies {
 
 The SDK ships with link:https://github.com/ThreeTen/threetenbp[ThreeTenBP] a Java 8 Time backport. For Android, its loading mechanism of time zone information is inefficient. So we recommend providing your favorite Android ThreeTen library here, for example link:https://github.com/JakeWharton/ThreeTenABP[ThreeTenABP].
 
-[source,gradle]
+[source,kotlin]
 ----
 dependencies {
     implementation("care.data4life.hc-sdk-kmp:sdk-android:LATEST_VERSION") {
@@ -174,7 +174,7 @@ dependencies {
 
 The SDK is only published as release variant. So you need to add a `matchingFallbacks` config to all of your `buildTypes` and `flavors`. See link:https://developer.android.com/studio/build/dependencies#variant_aware[variant awareness] for more details.
 
-[source,gradle]
+[source,kotlin]
 ----
 android {
     buildTypes {
@@ -187,7 +187,7 @@ android {
 
 To ensure Java 8 compatibility, add compile options to app `build.gradle/build.gradle.kts`:
 
-[source,gradle]
+[source,kotlin]
 ----
 android {
     compileOptions {
@@ -205,7 +205,7 @@ android {
 
 Add the following dependencies to your app `build.gradle/build.gradle.kts` file.
 
-[source,gradle]
+[source,kotlin]
 ----
 dependencies {
     implementation("care.data4life.hc-sdk-kmp:sdk-jvm:LATEST_VERSION")
@@ -216,7 +216,7 @@ dependencies {
 
 To ensure Java 8 compatibility, add compile options to app `build.gradle/build.gradle.kts`:
 
-[source,gradle]
+[source,kotlin]
 ----
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8

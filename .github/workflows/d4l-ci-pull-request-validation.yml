@@ -41,6 +41,7 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '8'
+          cache: 'gradle'
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
       - name: Configure project
@@ -58,11 +59,10 @@ jobs:
           profile: Nexus 5
           force-avd-creation: false
           avd-name: d4l-sdk-${{ matrix.api-level }}
-          emulator-options: -no-snapshot -no-audio -no-boot-anim -skin 768x1280 -camera-back none
+          emulator-options: -no-snapshot -no-audio -no-boot-anim -camera-back none
           disable-animations: true
           script: ./gradlew --stacktrace :sdk-android:test
       - name: Run tests with code coverage
         run: ./gradlew jacocoTestReport
       - name: Publish Feature to Maven Repo
         run: ./gradlew publishFeature
-

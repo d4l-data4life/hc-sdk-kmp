@@ -1,0 +1,167 @@
+// Settings:
+:toc:
+:toclevels: 3
+:doctype: book
+:icons: font
+:source-highlighter: prettify
+:stylesdir: ..
+:imagesdir: images/
+:linkcss:
+:setanchors:
+:sectanchors:
+:setlinks:
+:sectlinks:
+
+// Variables:
+:compname-short: D4L
+:compname-legal: D4L data4life gGmbH
+:compname: Data4Life
+:email-contact: we@data4life.care
+:email-docs: docs@data4life.care
+:url-company: https://www.data4life.care
+:url-docs: https://d4l.io
+:prod-name: Data4Life
+:app-plat: KMP (Android/Java)
+:phdp-plat: Personal Health Data Platform (NEW)
+:sw-name: {compname} {prod-name}
+:sw-version: 1.30
+:pub-type: Internal
+:pub-version: 1.00
+:pub-status: draft
+:pub-title: {sw-name} {pub-type}
+:copyright-year: 2019-2022
+:copyright-statement: (C) {copyright-year} {compname-legal}. All rights reserved.
+
+= Models
+
+This section gives you an overview of data models used by the {app-plat} SDK.
+
+== Record
+
+The smallest unit of data that can be stored and referenced by the {compname} platform is called a _record_. A record contains the following:
+
+* *Payload* of either medical data in the form of an encrypted FHIR resource (Fast Healthcare Interoperability Resources) or generic data
+
+* *Metadata* that's needed to properly associate a record with a user
+
+* *Annotations* Custom tags saved as strings that the user can use in order to filter or identify the existing resources.
+
+=== Payload
+
+A record *payload* can contain:
+
+. Anything that can be modeled by a FHIR (STU3 or R4) resource. From a single vital sign measurement, such as body temperature, to a complex document linking to or containing multiple attachments and measuring many megabytes in size.
+. Generic Data (called App Data)
+
+For these cases we have three types of _records_: Fhir3Record, Fhir4Record and DataRecord.
+
+==== FHIR restrictions
+
+FHIR payload must be of type DomainResource.
+
+FHIR References are not actively resolved and stay as they are. Meaning they are not available in PHDP. In case referenced data points should be available, we recommend containing them in the FHIR resource, http://www.hl7.org/implement/standards/fhir/references.html#contained[see, window=_blank]. Otherwise, you need to maintain the FHIR references within the PHDP manually.
+
+FHIR payload that contains Attachment is limited to following file formats:
+
+- JPEG, including JPEG/JFIF
+- PNG – Portable Network Graphics
+- TIFF – Tagged Image File Format
+- DCM – Digital Imaging and Communications in Medicine
+- PDF – Portable Document Format
+
+and size is limited to 20 MB.
+
+Attachment.data needs to be base64 encoded.
+
+==== Fhir3Record
+
+The `Fhir3Record` model:
+
+[source,kotlin]
+----
+data class Fhir3Record<T : Fhir3Resource>(
+    override val identifier: String,
+    override val resource: T,
+    override val meta: ModelContract.Meta,
+    override val annotations: Annotations
+) : CallContract.Record<T>, Record()
+----
+
+==== Fhir4Record
+
+The `Fhir4Record` model:
+
+[source,kotlin]
+----
+class Fhir4Record<T : Fhir4Resource>(
+    override val identifier: String,
+    override val resource: T,
+    override val meta: ModelContract.Meta,
+    override val annotations: Annotations
+) : CallContract.Record<T>, Record()
+----
+
+==== Data restrictions
+
+Resource type is limited to ByteArray and needs to be base64 encoded.
+
+Size is limited to 1 MB.
+
+==== DataRecord
+
+The `DataRecord` model:
+
+[source,kotlin]
+----
+data class DataRecord<T : DataContract.Resource>(
+    override val identifier: String,
+    override val resource: T,
+    override val meta: ModelContract.Meta,
+    override val annotations: Annotations
+) : CallContract.Record<T>, Record()
+----
+
+=== Metadata
+
+The `Metadata` data model holds read-only information about records.
+
+[source,kotlin]
+----
+interface Meta : Serializable {
+    val createdDate: LocalDate
+    val updatedDate: LocalDateTime
+    val status: RecordStatus
+}
+----
+
+Status can be active, pending deletion or deleted.
+
+[source,kotlin]
+----
+enum class RecordStatus(val id: String) {
+    Active("Active"),
+    Pending("Pending"),
+    Deleted("Deleted")
+}
+----
+
+=== Annotations
+
+Annotations are saved as encrypted strings alongside the record to help filter or identify existing records.
+
+==== Custom
+
+Custom annotations could be freely selected to help identify your own data points. It is a good practise to prepend the annotation with a namespace to avoid name collisions.
+
+* The annotations cannot contain empty strings.
+* Uppercase characters will always be lowercased, due to internal requirements. So you should only use lowercase.
+
+==== System
+
+The system additionally manages its own set of annotations, which could be used to identify records.
+
+* resource type: is it a FHIR 3 Observation or FHIR 4 Observation or data record
+* version: version of FHIR used (not supported for DataRecord)
+* updatedAt: date of update
+* clientId: which client last changed the data, when new Record created clientId is set as owner
+* partnerId: which partner last changed the data, when new Record created partnerId is set as owner

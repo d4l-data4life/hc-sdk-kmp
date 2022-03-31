@@ -38,7 +38,7 @@ This section covers the authorization project features of the SDK.
 
 == Login
 
-The SDK automatically handles all authentication and user management tasks. The user login is managed by the {compname} auth app to ensure the safety of the user’s credentials. When the `login` functionality is invoked, the SDK opens a web view with the necessary pages. Or redirects in the case of a web-based app.
+The SDK automatically handles all authentication and user management tasks. The user login is managed by the {compname} auth app to ensure the safety of the user’s credentials. When the `login` functionality is invoked, the SDK opens a web view with the necessary pages or redirects in the case of a web-based app.
 
 It follows the https://datatracker.ietf.org/doc/html/rfc8252[OAuth 2.0 for Native Apps] flow and uses https://github.com/openid/AppAuth-Android[AppAuth Android client SDK] to implement it.
 

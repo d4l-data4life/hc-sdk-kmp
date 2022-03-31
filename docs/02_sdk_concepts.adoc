@@ -46,5 +46,5 @@ IMPORTANT: Client-side encryption lays in the hands of the integrator applicatio
 
 {compname} doesn't offer any client-side data storage solution. You can use the following:
 
-* icon:external-link[] http://realm.io[Realm] as an encrypted database
-* icon:external-link[] https://www.zetetic.net/sqlcipher/open-source/[SQLCipher] encryption for SQL databases
+* http://realm.io[Realm] as an encrypted database
+* https://www.zetetic.net/sqlcipher/open-source/[SQLCipher] encryption for SQL databases

@@ -60,7 +60,7 @@ Read operations are divided into a `fetch` and a full `download` of the record.
 
 - *Downloading* a record returns the record with all its attachments.
 
-A fetched record that just contains attachments without the binary data could load the binary data by using `donloadAttachment`.
+A fetched record that just contains attachments without the binary data could load the binary data by using `downloadAttachment`.
 
 ==== Create
 
@@ -68,9 +68,9 @@ Create a record and return the created record with populated metadata. In case o
 
 The SDK checks the following when creating a FHIR record:
 
-- *File format*: When users provide an unsupported file format for attachment content, the SDK throws an `DataRestrictionException.UnsupportedFileType` exception.
+- *File format*: When users provide an unsupported file format for attachment content, the SDK throws an `DataValidationException.UnsupportedFileType` exception.
 
-- *File size*: When the `Attachment.data` is larger than 20 MB, the SDK throws a `DataRestrictionException.MaxDataSizeViolation` exception.
+- *File size*: When the `Attachment.data` is larger than 20 MB, the SDK throws a `DataValidationException.MaxDataSizeViolation` exception.
 
 ===== FHIR 3
 
@@ -265,7 +265,7 @@ client.data.fetch(
 
 Download a record with given ID with all contained attachments. Only for available for FHIR records.
 
-NOTE: Could result in large download bandwidth usage. Use with care in mobile or bandwidth limited environments.
+NOTE: Could result in large download bandwidth usage. Use it with care in mobile or bandwidth limited environments.
 
 ===== FHIR 3
 

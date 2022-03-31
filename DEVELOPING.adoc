@@ -24,7 +24,7 @@ toc::[]
 == Prerequisites
 
 * link:https://developer.android.com/studio#downloads[Android Studio 4.2.2]
-* link:https://adoptopenjdk.net/?variant=openjdk8&jvmVariant=hotspot[Java81] | link:https://developer.android.com/studio/write/java8-support[Limitations of Java language features and APIs] | https://jakewharton.com/d8-library-desugaring/[Desugaring]
+* link:https://adoptopenjdk.net/?variant=openjdk8&jvmVariant=hotspot[Java8] | link:https://developer.android.com/studio/write/java8-support[Limitations of Java language features and APIs] | https://jakewharton.com/d8-library-desugaring/[Desugaring]
 * link:https://kotlinlang.org/[Kotlin 1.4.32]
 
 == Installation

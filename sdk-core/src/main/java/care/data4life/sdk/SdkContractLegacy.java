@@ -58,7 +58,6 @@ public interface SdkContractLegacy {
          * @param resource the resource that shall be created
          * @param listener result contains either record or Error
          * @param <T>      the type of the created {@link Record} as a subclass of {@link DomainResource}
-         * @throws D4LException if {@param resource} is DocumentReference and {@link Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
          */
         <T extends DomainResource> void createRecord(T resource, ResultListener<Record<T>> listener);
 
@@ -69,7 +68,6 @@ public interface SdkContractLegacy {
          * @param listener    result contains either record or Error
          * @param annotations custom annotations added as tags to the record
          * @param <T>         the type of the created {@link Record} as a subclass of {@link DomainResource}
-         * @throws D4LException if {@param resource} is DocumentReference and {@link care.data4life.fhir.stu3.model.Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
          */
         <T extends DomainResource> void createRecord(T resource, ResultListener<Record<T>> listener, List<String> annotations);
 
@@ -192,8 +190,7 @@ public interface SdkContractLegacy {
          * @param listener either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
          * @param <T>      the type of {@link Record} as a subclass of {@link DomainResource}
          * @return {@link Task} which can be used to cancel ongoing operation or to query operation status
-         * @throws care.data4life.sdk.lang.DataValidationException if {@param resource} is DocumentReference and {@link Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
-         * @throws IllegalArgumentException if {@param recordId} is not FHIR3
+         * @throws IllegalArgumentException if recordId is not FHIR3
          */
         <T extends DomainResource> Task downloadRecord(String recordId, ResultListener<Record<T>> listener);
 
@@ -213,7 +210,6 @@ public interface SdkContractLegacy {
          * @param resource the updated resource that shall be uploaded
          * @param listener either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
          * @param <T>      the type of {@link Record} as a subclass of {@link DomainResource}
-         * @throws care.data4life.sdk.lang.DataValidationException if {@param resource} is DocumentReference and {@link Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
          */
         <T extends DomainResource> void updateRecord(T resource, ResultListener<Record<T>> listener);
 
@@ -224,7 +220,6 @@ public interface SdkContractLegacy {
          * @param listener    either {@link ResultListener#onSuccess(Object)} or {@link ResultListener#onError(D4LException)} will be called
          * @param annotations custom annotations added as tags to the record
          * @param <T>         the type of {@link Record} as a subclass of {@link DomainResource}
-         * @throws care.data4life.sdk.lang.DataValidationException if {@param resource} is DocumentReference and {@link Attachment#data} is greater than 10MB or is not of type: JPEG, PNG, TIFF, PDF or DCM
          */
         <T extends DomainResource> void updateRecord(T resource, ResultListener<Record<T>> listener, List<String> annotations);
 

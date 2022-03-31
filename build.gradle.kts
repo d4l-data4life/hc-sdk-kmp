@@ -76,6 +76,6 @@ tasks.withType<JavaCompile> {
 }
 
 tasks.named<Wrapper>("wrapper") {
-    gradleVersion = "6.9.1"
+    gradleVersion = "7.4.1"
     distributionType = Wrapper.DistributionType.ALL
 }

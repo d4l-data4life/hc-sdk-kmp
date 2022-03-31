@@ -18,13 +18,9 @@ pluginManagement {
         gradlePluginPortal()
         google()
     }
-
-    includeBuild("./gradlePlugin/core-dependency")
 }
 
-plugins {
-    id("com.gradle.enterprise") version("3.4.1")
-}
+includeBuild("./gradlePlugin/core-dependency")
 
 include(
     ":sample-android", ":sample-jvm",

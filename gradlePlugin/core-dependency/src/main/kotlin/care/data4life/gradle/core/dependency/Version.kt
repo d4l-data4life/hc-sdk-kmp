@@ -188,12 +188,12 @@ object Version {
     /**
      * [ThreeTen Backport](https://www.threeten.org/threetenbp)
      */
-    const val threeTenBP = "1.5.1"
+    const val threeTenBP = "1.6.0"
 
     /**
      * [ThreeTen Android Backport](https://github.com/JakeWharton/ThreeTenABP)
      */
-    const val threeTenABP = "1.3.1"
+    const val threeTenABP = "1.4.0"
 
     // Injection
     /**

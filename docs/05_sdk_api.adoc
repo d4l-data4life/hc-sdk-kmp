@@ -509,7 +509,7 @@ client.data.delete(
 
 === Queries
 
-Query options are `search` and `count` with optional `annotations` to fine tune the result.
+Query options are `search` and `count` with optional `annotations` to fine-tune the result.
 
 ==== Search
 

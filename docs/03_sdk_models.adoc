@@ -57,7 +57,7 @@ For these cases we have three types of _records_: Fhir3Record, Fhir4Record and D
 
 ==== FHIR restrictions
 
-FHIR payload must be of type DomainResource.
+FHIR payload must be of type _DomainResource_.
 
 FHIR References are not actively resolved and stay as they are. Meaning they are not available in PHDP. In case referenced data points should be available, we recommend containing them in the FHIR resource, http://www.hl7.org/implement/standards/fhir/references.html#contained[see, window=_blank]. Otherwise, you need to maintain the FHIR references within the PHDP manually.
 
@@ -103,7 +103,7 @@ class Fhir4Record<T : Fhir4Resource>(
 
 ==== Data restrictions
 
-Resource type is limited to ByteArray and needs to be base64 encoded.
+Resource type is limited to _ByteArray_ and needs to be base64 encoded.
 
 Size is limited to 1 MB.
 

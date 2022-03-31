@@ -25,7 +25,7 @@
 :phdp-plat: Personal Health Data Platform
 :sw-name: {compname} {prod-name}
 :sw-version: 1.30
-:pub-type: Internal 
+:pub-type: Internal
 :pub-version: 1.00
 :pub-status: draft
 :pub-title: {sw-name} {pub-type}
@@ -129,4 +129,3 @@ client.logout(new Callback() {
     }
 });
 ----
-

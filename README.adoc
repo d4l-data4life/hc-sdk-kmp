@@ -430,6 +430,6 @@ You want to help or share a proposal? You have a specific problem? Read the foll
 
 == Copyright and License
 
-Copyright (c) 2021 D4L data4life gGmbH / All rights reserved.
+Copyright (c) 2022 D4L data4life gGmbH / All rights reserved.
 
 Please refer to our link:LICENSE[License] for further details.

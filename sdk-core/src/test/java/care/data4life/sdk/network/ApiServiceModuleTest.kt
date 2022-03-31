@@ -528,7 +528,6 @@ class ApiServiceModuleTest {
         )
     }
 
-
     @Test
     @Ignore("This should work, but it does not, figure out why!")
     fun `Given, deleteRecord is called with an Alias, UserId and a RecordId, it returns a completable action`() {

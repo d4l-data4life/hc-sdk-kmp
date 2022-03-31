@@ -9,34 +9,50 @@ on:
 jobs:
   latest-version:
 
-    runs-on: [self-hosted, macos]
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        api-level: [ 30 ]
 
     env:
+      PACKAGE_REGISTRY_DOWNLOAD_USERNAME: ${{ secrets.PACKAGE_REGISTRY_DOWNLOAD_USERNAME }}
+      PACKAGE_REGISTRY_DOWNLOAD_TOKEN: ${{ secrets.PACKAGE_REGISTRY_DOWNLOAD_TOKEN }}
+      PACKAGE_REGISTRY_UPLOAD_USERNAME: ${{ secrets.PACKAGE_REGISTRY_UPLOAD_USERNAME }}
+      PACKAGE_REGISTRY_UPLOAD_TOKEN: ${{ secrets.PACKAGE_REGISTRY_UPLOAD_TOKEN }}
       D4L_CLIENT_CONFIG_ANDROID: ${{ secrets.D4L_CLIENT_CONFIG_ANDROID }}
       D4L_TEST_CONFIG_ANDROID: ${{ secrets.D4L_TEST_CONFIG_ANDROID }}
-      PACKAGE_REGISTRY_USERNAME: ${{ secrets.PACKAGE_REGISTRY_USERNAME }}
-      PACKAGE_REGISTRY_TOKEN: ${{ secrets.PACKAGE_REGISTRY_TOKEN }}
 
     steps:
-      - name: Display runner context
-        run: hostname -s
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Start emulator and wait for it
-        run: ./script/ci/android/prepare_start_and_wait_for_emulator.sh
-      - name: Install Chrome Browser
-        run: adb install ./script/ci/android/com.android.chrome_79.0.3945.93-394509315-x86-nodpi.apk
-      - name: Cleanup
-        run: ./gradlew clean
-      - name: Version
-        run: ./gradlew versionInfo
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '8'
+          cache: 'gradle'
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
       - name: Configure project
         run: ./gradlew provideTestConfig
+      - name: Version
+        run: ./gradlew versionInfo
       - name: Build
         run: ./gradlew build
-      - name: Run sdk android tests
-        run: ./gradlew :sdk-android:test
+      - name: Run SDK Android tests
+        uses: reactivecircus/android-emulator-runner@v2.23.0
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: google_apis
+          arch: x86_64
+          profile: Nexus 5
+          force-avd-creation: false
+          avd-name: d4l-sdk-${{ matrix.api-level }}
+          emulator-options: -no-snapshot -no-audio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: ./gradlew --stacktrace :sdk-android:test
       - name: Run tests with code coverage
         run: ./gradlew jacocoTestReport
       - name: Publish Snapshot to Maven Repo

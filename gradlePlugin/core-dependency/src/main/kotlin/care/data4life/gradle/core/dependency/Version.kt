@@ -164,7 +164,7 @@ object Version {
     /**
      * [okHttp](https://github.com/square/okhttp)
      */
-    const val okHttp = "4.9.1"
+    const val okHttp = "4.9.3"
 
     /**
      *

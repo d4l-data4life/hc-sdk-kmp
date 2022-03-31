@@ -45,6 +45,7 @@ toc::[]
 === Bumped
 
 * Gradle 6.9.1 -> 7.4.1
+* OkHttp 4.9.1 -> 4.9.3
 
 === Migration
 

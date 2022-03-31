@@ -1,0 +1,50 @@
+// Settings:
+:toc:
+:doctype: book
+:icons: font
+:source-highlighter: prettify
+:stylesdir: ..
+:imagesdir: images/
+:linkcss:
+:setanchors:
+:sectanchors:
+:setlinks:
+:sectlinks:
+
+// Variables:
+:compname-short: D4L
+:compname-legal: D4L data4life gGmbH
+:compname: Data4Life
+:email-contact: we@data4life.care
+:email-docs: docs@data4life.care
+:url-company: https://www.data4life.care
+:url-docs: https://d4l.io
+:prod-name: Data4Life
+:app-plat: Android/Java
+:phdp-plat: Personal Health Data Platform
+:sw-name: {compname} {prod-name}
+:sw-version: 1.30
+:pub-type: Internal
+:pub-version: 1.00
+:pub-status: draft
+:pub-title: {sw-name} {pub-type}
+:copyright-year: 2019-2022
+:copyright-statement: (C) {copyright-year} {compname-legal}. All rights reserved.
+
+= Concepts
+
+The following section gives you an overview of how you can manage data with the {compname} {phdp-plat} (PHDP).
+
+== Encrypting and decrypting your data
+
+The {compname} SDK automatically handles data encryption.
+The {compname} {phdp-plat} uses the privacy by design approach, optimizing for the strictest possible privacy-preserving settings. Only you have access to the data which your application sends to the platform.
+
+IMPORTANT: Client-side encryption lays in the hands of the integrator application, so you must use a proper <<Provide local data storage, storage>>.
+
+=== Provide local data storage
+
+{compname} doesn't offer any client-side data storage solution. You can use the following:
+
+* http://realm.io[Realm] as an encrypted database
+* https://www.zetetic.net/sqlcipher/open-source/[SQLCipher] encryption for SQL databases

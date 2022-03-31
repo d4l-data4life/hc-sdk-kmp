@@ -1,0 +1,131 @@
+// Settings:
+:toc:
+:doctype: book
+:icons: font
+:source-highlighter: prettify
+:stylesdir: ..
+:imagesdir: images/
+:linkcss:
+:setanchors:
+:sectanchors:
+:setlinks:
+:sectlinks:
+
+// Variables:
+:compname-short: D4L
+:compname-legal: D4L data4life gGmbH
+:compname: Data4Life
+:email-contact: we@data4life.care
+:email-docs: docs@data4life.care
+:url-company: https://www.data4life.care
+:url-docs: https://d4l.io
+:prod-name: data4life
+:app-name: data4life
+:app-plat: KMP (Android/Java)
+:phdp-plat: Personal Health Data Platform
+:sw-name: {compname} {prod-name}
+:sw-version: 1.30
+:pub-type: Internal
+:pub-version: 1.00
+:pub-status: draft
+:pub-title: {sw-name} {pub-type}
+:copyright-year: 2019-2022
+:copyright-statement: (C) {copyright-year} {compname-legal}. All rights reserved.
+
+= Authentication/Authorization
+
+This section covers the authorization project features of the SDK.
+
+== Login
+
+The SDK automatically handles all authentication and user management tasks. The user login is managed by the {compname} auth app to ensure the safety of the user’s credentials. When the `login` functionality is invoked, the SDK opens a web view with the necessary pages or redirects in the case of a web-based app.
+
+It follows the https://datatracker.ietf.org/doc/html/rfc8252[OAuth 2.0 for Native Apps] flow and uses https://github.com/openid/AppAuth-Android[AppAuth Android client SDK] to implement it.
+
+=== Start
+
+The login is started with the following code which launches an `Activity`
+to present the login screen to the user for authentication.
+
+[source,java]
+-----
+Intent authIntent = Data4LifeClient.getInstance().getLoginIntent(MainActivity.this, null);
+startActivityForResult(authIntent, requestCode);
+-----
+
+You can pass along optional `scopes`, otherwise the SDK uses the default scopes for the authorization request.
+
+Scopes are a mechanism in the OAuth 2.0 protocol to limit an application's access to a user account.
+
+=== Finish
+
+Once the user is logged in, canceled the authorization request, or if an exception occurred during the authentication process, the SDK sends the response to the integrator application  in the `onActivityResult(…)` method. The authorization results can be the following:
+
+- `Activity.RESULT_OK` – when the login is successful.
+- `Activity.RESULT_CANCELED` – when the login fails, with additional payload in `data`, as shown in the example.
+
+[source,java]
+----
+@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    if (requestCode == D4L_AUTH) {
+        if (resultCode == RESULT_OK) {
+            loggedIn();
+        } else if (data.getExtras() != null) {
+            if (data.getExtras().containsKey("error")) {
+                Snackbar.make(mRootCL, "Failed to log in to data4life", Snackbar.LENGTH_SHORT).show();
+            } else if (data.getExtras().containsKey("canceled")) {
+                Snackbar.make(mRootCL, "User canceled authorization request", Snackbar.LENGTH_SHORT).show();
+            }
+        }
+    }
+}
+----
+
+== Validate login
+
+To check if a user is currently logged in, use the `isUserLoggedIn` method.
+
+[source,java]
+----
+public boolean isUserLoggedIn(ResultListener<Boolean> listener)
+----
+
+[source,java]
+----
+client.isUserLoggedIn(new ResultListener<Boolean>() {
+    @Override
+    public void onSuccess(Boolean isLoggedIn) {
+        // Login state is reflected in isLoggedIn
+    }
+
+    @Override
+    public void onError(D4LException exception) {
+        // Exception
+    }
+});
+----
+
+== Logout
+
+To log out the currently authenticated user, the `logout(listener)` is used where either the `onSuccess` method or the `onError(D4LException)` method is called.
+
+[source,java]
+----
+public void logout(Callback listener)
+----
+[source,java]
+----
+client.logout(new Callback() {
+    @Override
+    public void onSuccess() {
+        // User was logged out
+    }
+
+    @Override
+    public void onError(D4LException exception) {
+        // Failed to log out user
+    }
+});
+----

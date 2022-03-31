@@ -24,7 +24,7 @@ toc::[]
 == Prerequisites
 
 * link:https://developer.android.com/studio#downloads[Android Studio 4.2.2]
-* link:https://adoptopenjdk.net/?variant=openjdk8&jvmVariant=hotspot[Java81] | link:https://developer.android.com/studio/write/java8-support[Limitations of Java language features and APIs] | https://jakewharton.com/d8-library-desugaring/[Desugaring]
+* link:https://adoptopenjdk.net/?variant=openjdk8&jvmVariant=hotspot[Java8] | link:https://developer.android.com/studio/write/java8-support[Limitations of Java language features and APIs] | https://jakewharton.com/d8-library-desugaring/[Desugaring]
 * link:https://kotlinlang.org/[Kotlin 1.4.32]
 
 == Installation
@@ -119,6 +119,90 @@ Add following changes:
 
 Releases are automatically created when a tag in the form of `v{major}.{minor}.{patch}` is added.
 
+For release management, we use link:https://help.github.com/articles/creating-releases/[GitHub Releases]. So just create a new release, set the tag according to link:https://semver.org/[Semantic Versioning] and publish.
+
 == Develop
 
-Coming soon
+There are several requirements for building and developing the SDK.
+
+=== Config files
+
+Before you can start to compile the SDK you need to add `d4l-client-config-android.json` and `d4l-test-config-android.json` files in the project root folder and add following content.
+
+`d4l-client-config-android.json` needs to contain a config for every environment LOCAL, DEVELOPMENT, STAGING, SANDBOX, PRODUCTION.
+
+NOTE: The CI expects this configuration from environment variables stored in GitHub secrets: `D4L_CLIENT_CONFIG_ANDROID` and `D4L_CLIENT_CONFIG_IOS`
+
+[source,json,d4l-client-config-android.json]
+----
+// d4l-client-config-android.json
+{
+  "platform": "D4L",
+  "configs": {
+    "LOCAL": {
+      "id": "{CLIENT_ID}",
+      "secret": "{CLIENT_SECRET}",
+      "redirectScheme": "{CLIENT_REDIRECT_SCHEME}"
+    },
+    "DEVELOPMENT": {
+      "id": "{CLIENT_ID}",
+      "secret": "{CLIENT_SECRET}",
+      "redirectScheme": "{CLIENT_REDIRECT_SCHEME}"
+    }
+  }
+}
+----
+
+[source,json,d4l-test-config-android.json]
+----
+// d4l-test-config-android.json
+{
+  "user": {
+    "email": "{USER_EMAIL}",
+    "password": "{USER_PASSWORD}",
+    "phoneCountryCode": "{USER_PHONE_COUNTRY_CODE}",
+    "phoneLocalNumber": "{USER_PHONE_LOCAL_NUMBER}"
+  },
+  "twillio": {
+    "accountSid": "{TWILLIO_ACCOUNT_SID}",
+    "authSid": "{TWILLIO_AUTH_SID}",
+    "authToken": "{TWILLIO_AUTH_TOKEN}"
+  }
+}
+----
+
+To provide the test config to the different modules run the following gradle task in the root directory of the project.
+
+[source,bash]
+----
+./gradlew provideTestConfig
+----
+
+== Maintaining
+
+Certificate pinning is done by providing a set of certificates by hash of the public key. To get the hash from certificate use the following:
+
+[source,bash]
+----
+openssl x509 -inform der -in sandbox.hpihc.de.cer -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64
+----
+
+=== Certificate Pin
+
+To get the Base64 encoded sha256 of the HTTPS public key pinning use the following command in the terminal
+
+[source,bash]
+----
+openssl s_client -servername api.data4life.care -connect app.data4life.care:443 | openssl x509 -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64
+----
+
+See link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Public_Key_Pinning[HTTP Public Key Pinning] for more information.
+
+
+== Documentation
+
+We use link:https://asciidoctor.org/[AsciiDoctor] to write our documentation.
+
+The documentation is located in the `docs` folder. It's main purpose is to be easily copied to https://www.d4l.io[d4l.io].
+
+The `01_sdk_setup.adoc` is an exact copy of the README sections from `About the project` to `Usage`.

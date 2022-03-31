@@ -1,16 +1,18 @@
 // Settings:
-:doctype: book
 :toc:
-:toclevels: 4
+:toclevels: 3
+:doctype: book
 :icons: font
 :source-highlighter: prettify
-//:numbered:
-:stylesdir: styles/
+:stylesdir: ..
 :imagesdir: images/
 :linkcss:
+:setanchors:
+:sectanchors:
+:setlinks:
+:sectlinks:
+
 // Variables:
-:icons: font
-:toc:
 :compname-short: D4L
 :compname-legal: D4L data4life gGmbH
 :compname: Data4Life
@@ -19,19 +21,20 @@
 :url-company: https://www.data4life.care
 :url-docs: https://d4l.io
 :prod-name: Data4Life
-:app-name: Data4Life
-:app-plat: Android
-:phdp-plat: Personal Health Data Platform
+:app-plat: KMP (Android/Java)
+:phdp-plat: Personal Health Data Platform (NEW)
 :sw-name: {compname} {prod-name}
-:sw-version: 1.7.0
+:sw-version: 1.30
 :pub-type: Internal
 :pub-version: 1.00
 :pub-status: draft
-:pub-title: {software-name} {pub-type}
-:copyright-year: 2020
+:pub-title: {sw-name} {pub-type}
+:copyright-year: 2019-2022
 :copyright-statement: (C) {copyright-year} {compname-legal}. All rights reserved.
 
-== About SDK exceptions
+= Exceptions
+
+== About exceptions
 
 The following section gives you an overview of the exceptions the SDK can throw.
 All exceptions that are passed to one of the callbacks are a `D4LException`.

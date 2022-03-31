@@ -27,9 +27,7 @@ include(
 
     ":sdk-core", ":sdk-android", "sdk-jvm", "sdk-ingestion",
 
-    ":sdk-android-test",
-
-    ":sdk-doc"
+    ":sdk-android-test"
 )
 
 val includeAuth: String by settings

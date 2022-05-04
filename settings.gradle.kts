@@ -22,7 +22,6 @@ pluginManagement {
 
 includeBuild("./gradlePlugin/core-dependency")
 
-
 include(
     ":sample-android", ":sample-jvm",
 

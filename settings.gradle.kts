@@ -20,21 +20,16 @@ pluginManagement {
     }
 }
 
-plugins {
-    id("com.gradle.enterprise") version("3.7")
-}
+includeBuild("./gradlePlugin/core-dependency")
+
 
 include(
     ":sample-android", ":sample-jvm",
 
     ":sdk-core", ":sdk-android", "sdk-jvm", "sdk-ingestion",
 
-    ":sdk-android-test",
-
-    ":sdk-doc"
+    ":sdk-android-test"
 )
-
-includeBuild("./gradlePlugin/core-dependency")
 
 val includeAuth: String by settings
 if (includeAuth.toBoolean()) {

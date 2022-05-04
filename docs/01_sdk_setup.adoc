@@ -1,67 +1,45 @@
-= Data4Life SDK
-:link-repository: https://github.com/d4l-data4life/hc-sdk-kmp
-:project-version: 1.15.1
-:doctype: article
-:!showtitle:
-:toc: macro
-:toclevels: 2
-:toc-title:
+// Settings:
+:toc:
+:doctype: book
 :icons: font
-:imagesdir: assets/images
-ifdef::env-github[]
-:warning-caption: :warning:
-:caution-caption: :fire:
-:important-caption: :exclamation:
-:note-caption: :paperclip:
-:tip-caption: :bulb:
-endif::[]
+:source-highlighter: prettify
+:stylesdir: ..
+:imagesdir: images/
+:linkcss:
+:setanchors:
+:sectanchors:
+:setlinks:
+:sectlinks:
 
-++++
-<div align="center">
-    <!-- PROJECT LOGO -->
-    <p>
-        <a href="https://github.com/d4l-data4life/hc-sdk-kmp">
-            <img src="assets/images/d4l-logo.svg" width="150"/>
-        </a>
-    <!-- PROJECT HEADER -->
-    <h1>Data4Life Android and Java SDK</h1>
-    <p><!-- PROJECT DESCRIPTION -->
-        Kotlin Multiplatform (KMP) client for the Personal Health Data Platform (PHDP)
-    </p>
-    <p><!-- PROJECT DOCUMENTATION -->
-        <a href="https://github.com/d4l-data4life/hc-sdk-kmp"><strong>Explore the docs »</strong></a>
-    </p>
-    <p><!-- PROJECT ISSUES/FEATURES -->
-        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/issues">Report Bug</a>
-        ·
-        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/issues">Request Feature</a>
-    </p>
-    <p><!-- PROJECT BADGES see badges.adoc how to change them -->
-        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/releases">
-            <img src="assets/images/badge-release-latest.svg" alt="Latest release"/>
-        </a>
-        <a href="https://github.com/d4l-data4life/hc-sdk-kmp/actions">
-            <img src="https://github.com/d4l-data4life/hc-sdk-kmp/actions/workflows/d4l-ci-latest-version.yml/badge.svg" alt="D4L CI - Latest Version"/>
-        </a>
-        <a>
-            <img src="assets/images/badge-platform-support.svg" alt="Platform"/>
-        </a>
-        <a href="LICENSE">
-            <img src="assets/images/badge-license.svg" alt="License"/>
-        </a>
-    </p>
-</div>
-++++
+// Variables:
+:compname-short: D4L
+:compname-legal: D4L data4life gGmbH
+:compname: Data4Life
+:email-contact: we@data4life.care
+:email-docs: docs@data4life.care
+:url-company: https://www.data4life.care
+:url-docs: https://d4l.io
+:prod-name: Data4Life
+:app-plat: Android/Java
+:phdp-plat: Personal Health Data Platform (PHDP)
+:sw-name: {compname} {prod-name}
+:sw-version: 1.30
+:pub-type: Internal
+:pub-version: 1.00
+:pub-status: draft
+:pub-title: {sw-name} {pub-type}
+:copyright-year: 2019-2022
+:copyright-statement: (C) {copyright-year} {compname-legal}. All rights reserved.
 
-[discrete]
-=== Table Of Contents
-toc::[]
+= Using the {app-plat} SDK
 
 == About the Project
 
-This is the Android and Java SDK of Data4Life. The SDK encapsulates the backend functionality of the Data4Life Personal Health Data Platform (PHDP) and enables end-to-end encryption of health data. It allows users to store and access sensitive data on the secure platform and share it to authorized users and applications.
+This is the {app-plat} SDK of Data4Life. The SDK encapsulates the backend functionality of the {prod-name} Personal Health Data Platform (PHDP) and enables end-to-end encryption of health data. It allows users to store and access sensitive data on the secure platform and share it to authorized users and applications.
 
-For more information about the Data4Life platform, visit our http://www.data4life.care/[website].
+For more information about the {prod-name} platform, visit our http://www.data4life.care/[website].
+
+=== Features
 
 * Authorization/Authentication
 * End-to-End encryption
@@ -90,7 +68,7 @@ For more information about the Data4Life platform, visit our http://www.data4lif
 
 == Before you start
 
-To use the SDK, you must have a Data4Life *partner ID*. To obtain a partner ID, get in touch with us at we@data4life.care.
+To use the SDK, you must have a {prod-name} *partner ID*. To obtain a partner ID, get in touch with us at {email-contact}.
 
 == Getting started
 
@@ -342,7 +320,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 }
 ----
 
-. Get the Data4Life client instance inside Activity or Fragment.
+. Get the {compname} client instance inside Activity or Fragment.
 +
 [source,java]
 ----
@@ -397,37 +375,3 @@ String userId = extractor.extract(callbackUrl);
 NOTE: Multiple instance management is not handled by the SDK and needs to be done by you, e.g. with a Map<String,Data4LifeClient> or better suitable solution
 
 . Now you can use the available API for the 3 supported data types which will return results on background thread.
-
-== Roadmap
-
-This project is work in progress. We are working on adding more functionality, guidelines, documentation and other improvements.
-
-Also see the open link:{link-repository}/issues[issues] for a list of proposed features and known issues.
-
-== Changelog
-
-See link:CHANGELOG.adoc[changelog]
-
-== Versioning
-
-We use http://semver.org/[Semantic Versioning] as a guideline for our versioning.
-
-Releases use this format: `{major}.{minor}.{patch}`
-
-* Breaking changes bump `{major}` and reset `{minor}` & `{patch}`
-* Backward compatible changes bump `{minor}` and reset `{patch}`
-* Bug fixes bump `{patch}`
-
-== Contributing
-
-You want to help or share a proposal? You have a specific problem? Read the following:
-
-* link:CODE-OF-CONDUCT.adoc[Code of conduct] for details on our code of conduct.
-* link:CONTRIBUTING.adoc[Contributing] for details about how to report bugs and propose features.
-* link:DEVELOPING.adoc[Developing] for details about our development process and how to build and test the project.
-
-== Copyright and License
-
-Copyright (c) 2022 D4L data4life gGmbH / All rights reserved.
-
-Please refer to our link:LICENSE[License] for further details.

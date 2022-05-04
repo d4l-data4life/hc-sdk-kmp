@@ -60,6 +60,10 @@ toc::[]
 * Android Desugar 1.0.5 -> 1.0.9
 * JUnit 4.12 -> 4.13.2
 * Robolectric 4.5.1 -> 4.6.1
+* Gradle 6.9.1 -> 7.4.1
+* OkHttp 4.9.1 -> 4.9.3
+* ThreeTenBP 1.5.1 -> 1.6.0
+* ThreeTenABP 1.3.1 -> 1.4.0
 
 === Migration
 

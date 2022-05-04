@@ -1,0 +1,812 @@
+// Settings:
+:toc:
+:toclevels: 3
+:doctype: book
+:icons: font
+:source-highlighter: prettify
+:stylesdir: ..
+:imagesdir: images/
+:linkcss:
+:setanchors:
+:sectanchors:
+:setlinks:
+:sectlinks:
+
+// Variables:
+:compname-short: D4L
+:compname-legal: D4L data4life gGmbH
+:compname: Data4Life
+:email-contact: we@data4life.care
+:email-docs: docs@data4life.care
+:url-company: https://www.data4life.care
+:url-docs: https://d4l.io
+:prod-name: Data4Life
+:app-plat: KMP (Android/Java)
+:phdp-plat: Personal Health Data Platform (NEW)
+:sw-name: {compname} {prod-name}
+:sw-version: 1.30
+:pub-type: Internal
+:pub-version: 1.00
+:pub-status: draft
+:pub-title: {sw-name} {pub-type}
+:copyright-year: 2019-2022
+:copyright-statement: (C) {copyright-year} {compname-legal}. All rights reserved.
+
+= API
+
+The following section gives you an overview of the {compname} API.
+
+== General
+
+The SDK handles all communication with PDHP. This abstracts away much of the know-how needed to communicate with the servers and exposes a number of lean custom models.
+
+Only logged-in users can run queries and perform actions. When a request is made without a valid access token and a refresh token, the SDK throws an `unauthorized` exception.
+
+== Call
+
+Every API call returns a Task which can be used to cancel ongoing operation or to query operation status.
+
+== Records
+
+The following sections describes how you perform queries and actions for records.
+
+=== Actions
+
+The {compname} API follows the CRUD pattern (create, read, update, and delete).
+
+Read operations are divided into a `fetch` and a full `download` of the record.
+
+- *Fetching* a record returns only the record itself without attachments.
+
+- *Downloading* a record returns the record with all its attachments.
+
+A fetched record that just contains attachments without the binary data could load the binary data by using `downloadAttachment`.
+
+==== Create
+
+Create a record and return the created record with populated metadata. In case of FHIR records, attachments have been extracted and replaced by links pointing to the storage point. Use download or downloadAttachment to retrieve them afterwards.
+
+The SDK checks the following when creating a FHIR record:
+
+- *File format*: When users provide an unsupported file format for attachment content, the SDK throws an `DataValidationException.UnsupportedFileType` exception.
+
+- *File size*: When the `Attachment.data` is larger than 20 MB, the SDK throws a `DataValidationException.MaxDataSizeViolation` exception.
+
+===== FHIR 3
+
+[source,java]
+----
+public <T extends DomainResource> void createRecord(
+    T resource,
+    ResultListener<Record<T>> listener,
+    List<String> annotations
+)
+----
+
+Example:
+
+[source,java]
+----
+DocumentReference documentReference = DocumentReferenceBuilder.buildWith(
+        documentTitle,
+        creationDate,
+        DocumentReferenceStatus.CURRENT,
+        attachments,
+        documentType,
+        author)
+
+client.createRecord(
+    documentReference,
+    new ResultListener<Record<DocumentReference>>() {
+        @Override
+        public void onSuccess(Record<DocumentReference> record) {
+            // Created record
+        }
+        @Override
+        public void onError(D4LException exception) {
+            // Exception
+        }
+    },
+    annotations
+);
+----
+
+===== FHIR 4
+
+[source,kotlin]
+----
+fun <T : Fhir4Resource> create(
+    resource: T,
+    annotations: Annotations,
+    callback: Callback<Fhir4Record<T>>
+): Task
+----
+
+Example:
+
+[source,kotlin]
+----
+val fhir4Observation = Observation(
+    CodeSystemObservationStatus.FINAL,
+    CodeableConcept()
+)
+val annotations = listOf("namespace-my-annotation")
+
+client.fhir4.create(
+    fhir4DocumentReference,
+    annotations,
+    object : Callback<Fhir4Record<Fhir4Resource>> {
+        override fun onError(exception: D4LException) {
+            // Exception
+        }
+        override fun onSuccess(result: Fhir4Record<Fhir4Resource>) {
+            // Created record
+        }
+    }
+)
+----
+
+===== Data
+
+[source,kotlin]
+----
+fun create(
+    resource: DataResource,
+    annotations: Annotations,
+    callback: Callback<DataRecord<DataResource>>
+): Task
+----
+
+Example:
+
+[source,kotlin]
+----
+val dataResource = DataResource("data".toByteArray())
+val annotations = listOf("namespace-my-annotation")
+
+client.data.create(
+    dataResource,
+    annotations,
+    object : Callback<DataRecord<DataResource>> {
+        override fun onError(exception: D4LException) {
+            // Exception
+        }
+        override fun onSuccess(result: DataRecord<DataResource>) {
+            // Created record
+        }
+    }
+)
+----
+
+==== Fetch
+
+Fetch record with given ID
+
+===== FHIR 3
+
+[source,java]
+----
+public <T extends DomainResource> void fetchRecord(String recordId, ResultListener<Record<T>> listener)
+----
+
+Example:
+
+[source,java]
+----
+sdk.fetchRecord("recordId", new ResultListener<Record<DocumentReference>>() {
+    @Override
+    public void onSuccess(Record<DocumentReference> record) {
+        // Fetched record
+    }
+
+    @Override
+    public void onError(D4LException exception) {
+        // Exception
+    }
+});
+
+----
+
+===== FHIR 4
+
+[source,kotlin]
+----
+fun <T : Fhir4Resource> fetch(
+    recordId: String,
+    callback: Callback<Fhir4Record<T>>
+): Task
+----
+
+Example:
+
+[source,kotlin]
+----
+client.fhir4.fetch(
+    "recordId",
+    object : Callback<Fhir4Record<Fhir4Resource>> {
+        override fun onError(exception: D4LException) {
+            // Exception
+        }
+        override fun onSuccess(result: Fhir4Record<Fhir4Resource>) {
+            // Created record
+        }
+    }
+)
+----
+
+===== Data
+
+[source,kotlin]
+----
+fun fetch(
+    recordId: String,
+    callback: Callback<DataRecord<DataResource>>
+): Task
+----
+
+Example:
+
+[source,kotlin]
+----
+client.data.fetch(
+    "recordId",
+    object : Callback<DataRecord<DataResource>> {
+        override fun onError(exception: D4LException) {
+            // Exception
+        }
+        override fun onSuccess(result: DataRecord<DataResource>) {
+            // Created record
+        }
+    }
+)
+----
+
+==== Download
+
+Download a record with given ID with all contained attachments. Only for available for FHIR records.
+
+NOTE: Could result in large download bandwidth usage. Use it with care in mobile or bandwidth limited environments.
+
+===== FHIR 3
+
+To download one record for the given ID with all the contained references, use the `downloadRecords` method with the `recordId` parameter.
+
+[source,java]
+----
+public <T extends DomainResource> void downloadRecord(String recordId, ResultListener<Record<T>> listener)
+----
+
+[source,java]
+----
+sdk.downloadRecord("recordId", new ResultListener<Record<DocumentReference>>() {
+    @Override
+    public void onSuccess(Record<DocumentReference> record) {
+        // Downloaded record with all contained references
+    }
+
+    @Override
+    public void onError(D4LException exception) {
+        // Exception
+    }
+});
+----
+
+===== FHIR 4
+
+[source,kotlin]
+----
+fun <T : Fhir4Resource> download(
+    recordId: String,
+    callback: Callback<Fhir4Record<T>>
+): Task
+----
+
+Example:
+
+[source,kotlin]
+----
+client.fhir4.download(
+    "recordId",
+    object : Callback<Fhir4Record<Fhir4Resource>> {
+        override fun onError(exception: D4LException) {
+            // Exception
+        }
+        override fun onSuccess(result: Fhir4Record<Fhir4Resource>) {
+            // Created record
+        }
+    }
+)
+----
+
+==== Update
+
+Update a record with given record ID and updated resource.
+
+===== FHIR 3
+
+[source,java]
+----
+public <T extends DomainResource> void updateRecord(
+    T resource,
+    ResultListener<Record<T>> listener,
+    List<String> annotations
+)
+----
+
+Example:
+
+[source,java]
+----
+DocumentReference updatedDocument = ...;
+
+sdk.updateRecord(
+    updatedDocument,
+    new ResultListener<Record<DocumentReference>>() {
+        @Override
+        public void onSuccess(Record<DocumentReference> record) {
+            // Updated record
+        }
+
+        @Override
+        public void onError(D4LException exception) {
+            // Exception
+        }
+    },
+    annotations
+);
+----
+
+===== FHIR 4
+
+[source,kotlin]
+----
+fun <T : Fhir4Resource> update(
+    recordId: String,
+    resource: T,
+    annotations: Annotations,
+    callback: Callback<Fhir4Record<T>>
+): Task
+----
+
+Example:
+
+[source,kotlin]
+----
+val updatedFhir4Observation = Observation(
+    CodeSystemObservationStatus.FINAL,
+    CodeableConcept()
+)
+val annotations = listOf("namespace-my-annotation")
+
+client.fhir4.fetch(
+    "recordId",
+    updatedFhir4Observation,
+    annotations,
+    object : Callback<Fhir4Record<Fhir4Resource>> {
+        override fun onError(exception: D4LException) {
+            // Exception
+        }
+        override fun onSuccess(result: Fhir4Record<Fhir4Resource>) {
+            // Created record
+        }
+    }
+)
+----
+
+===== Data
+
+[source,kotlin]
+----
+fun fetch(
+    recordId: String,
+    callback: Callback<DataRecord<DataResource>>
+): Task
+----
+
+Example:
+
+[source,kotlin]
+----
+val updatedDataResource = DataResource("data".toByteArray())
+val annotations = listOf("namespace-my-annotation")
+
+client.data.update(
+    "recordId",
+    updatedDataResource,
+    annotations,
+    object : Callback<DataRecord<DataResource>> {
+        override fun onError(exception: D4LException) {
+            // Exception
+        }
+        override fun onSuccess(result: DataRecord<DataResource>) {
+            // Created record
+        }
+    }
+)
+----
+
+==== Delete
+
+Delete a record with a given record ID.
+
+===== FHIR 3
+
+[source,java]
+----
+public void deleteRecord(String recordId, Callback listener)
+----
+
+Example:
+
+[source,java]
+----
+sdk.deleteRecord("recordId", new Callback() {
+    @Override
+    public void onSuccess() {
+        // Record deleted
+    }
+
+    @Override
+    public void onError(D4LException exception) {
+        // Exception
+    }
+});
+----
+
+===== FHIR 4
+
+[source,kotlin]
+----
+fun delete(
+    recordId: String,
+    callback: Callback<Boolean>
+): Task
+----
+
+Example:
+
+[source,kotlin]
+----
+client.fhir4.delete(
+    "recordId",
+    object : Callback<Boolean> {
+        override fun onError(exception: D4LException) {
+            // Exception
+        }
+        override fun onSuccess(result: Boolean) {
+            // Created record
+        }
+    }
+)
+----
+
+===== Data
+
+[source,kotlin]
+----
+fun delete(
+    recordId: String,
+    callback: Callback<Boolean>
+): Task
+----
+
+Example:
+
+[source,kotlin]
+----
+client.data.delete(
+    "recordId",
+    object : Callback<Boolean> {
+        override fun onError(exception: D4LException) {
+            // Exception
+        }
+        override fun onSuccess(result: Boolean) {
+            // Created record
+        }
+    }
+)
+----
+
+=== Queries
+
+Query options are `search` and `count` with optional `annotations` to fine-tune the result.
+
+==== Search
+
+Search for records with following filter options:
+
+* resourceType - class type of the searched resource (not available for data)
+* annotations - custom annotations that had been added to the records (optional)
+* startDate - the filtered records have a creation date after the start date
+* endDate - the filtered records have a creation date before the endDate
+* pageSize - define the result page size, how many records should be returned
+* offset - the offset of the result list
+
+===== FHIR 3
+
+To search for records, use the the `fetchRecords` method. For example, when a client has no data and initially fetches records after a new login. The method lets you specify the following:
+
+- Fetch records by type
+- Order records by date
+- Paginate loaded records by providing the `pageSize` and an `offset`.
+
+[source,java]
+----
+public <T extends DomainResource> void fetchRecords(Class<T> resourceType, LocalDate startDate, LocalDate endDate, Integer pageSize, Integer offset, ResultListener<List<Record<T>>> listener)
+----
+
+Example:
+
+[source,java]
+----
+sdk.fetchRecords(
+    DocumentReference.class,
+    annotations,
+    fromDate,
+    toDate,
+    20,
+    offset,
+    new ResultListener<List<Record<DocumentReference>>>() {
+        @Override
+        public void onSuccess(List<Record<DocumentReference>> records) {
+            // Fetched records
+        }
+
+        @Override
+        public void onError(D4LException exception) {
+            // Exception
+        }
+    }
+);
+----
+
+===== FHIR 4
+
+[source,kotlin]
+----
+fun <T : Fhir4Resource> search(
+    resourceType: Class<T>,
+    annotations: Annotations,
+    startDate: LocalDate?,
+    endDate: LocalDate?,
+    pageSize: Int,
+    offset: Int,
+    callback: Callback<List<Fhir4Record<T>>>
+): Task
+----
+
+Example:
+
+[source,kotlin]
+----
+client.fhir4.search(
+    Observation::class.java,
+    annotations,
+    LocalDate.now(),
+    LocalDate.now(),
+    10,
+    0,
+    object : Callback<List<Fhir4Record<Observation>>> {
+        override fun onError(exception: D4LException) {
+            // Exception
+        }
+
+        override fun onSuccess(result: List<Fhir4Record<Observation>>) {
+            // List of found records
+        }
+    }
+)
+----
+
+===== Data
+
+[source,kotlin]
+----
+fun search(
+    annotations: Annotations,
+    startDate: LocalDate?,
+    endDate: LocalDate?,
+    pageSize: Int,
+    offset: Int,
+    callback: Callback<List<DataRecord<DataResource>>>
+): Task
+----
+
+Example:
+
+[source,kotlin]
+----
+client.data.search(
+    annotations,
+    LocalDate.now(),
+    LocalDate.now(),
+    10,
+    0,
+    object: Callback<List<DataRecord<DataResource>>> {
+        override fun onError(exception: D4LException) {
+            // Exception
+        }
+
+        override fun onSuccess(result: List<DataRecord<DataResource>>) {
+            // List of found records
+        }
+    }
+)
+----
+
+==== Count
+
+Count number of stored records.
+
+===== FHIR 3
+
+[source,java]
+----
+public <T extends DomainResource> void countRecords(
+    Class<T> clazz,
+    ResultListener<Integer> listener,
+    List<String> annotations
+)
+----
+
+Example:
+
+[source,java]
+----
+client.countRecords(
+    DocumentReference.class,
+    new ResultListener<Integer>() {
+        @Override
+        public void onSuccess(Integer count) {
+            // The count for the given class type
+        }
+        @Override
+        public void onError(D4LException exception) {
+            // Exception
+        }
+    },
+    annotations
+);
+----
+
+===== FHIR 4
+
+[source,kotlin]
+----
+fun <T : Fhir4Resource> count(
+    resourceType: Class<T>,
+    annotations: Annotations,
+    callback: Callback<Int>
+): Task
+----
+
+Example:
+
+[source,kotlin]
+----
+client.fhir4.count(
+    Observation::class.java,
+    annotations,
+    object: Callback<Int> {
+        override fun onError(exception: D4LException) {
+            // Exception
+        }
+        override fun onSuccess(result: Int) {
+            // Number of records for given resourceType and annotations
+        }
+    }
+)
+----
+
+===== Data
+
+[source,kotlin]
+----
+fun count(
+    annotations: Annotations,
+    callback: Callback<Int>
+): Task
+----
+
+Example:
+
+[source,kotlin]
+----
+client.data.count(
+    annotations,
+    object: Callback<Int> {
+        override fun onError(exception: D4LException) {
+            // Exception
+        }
+        override fun onSuccess(result: Int) {
+            // Number of records for given annotations
+        }
+    }
+)
+----
+
+=== Attachment
+
+==== Download
+
+For FHIR records it is possible to download attachment data.
+
+There is a DownloadType property that allows to choose from differently sized versions of the attachment. Default is DownloadType.Full.
+
+The following file formats support resizable attachments: PNG, TIFF, and JPEG.
+The SDK automatically generates the medium-size and the small-size versions of attachments during attachment creation for resizable attachments.
+
+When downloading a medium-size or small-size image, the downloaded attachment ID is a composed identifier of the original attachment and the thumbnail ID, separated by the `#` character. Please take that into account when updating a FHIR record that has attachments.
+
+[source,kotlin]
+----
+enum class DownloadType {
+    Full, Medium, Small
+}
+----
+
+===== FHIR 3
+
+[source,java]
+----
+public void downloadAttachment(
+    String recordId,
+    String attachmentId,
+    DownloadType type,
+    ResultListener<Attachment> listener
+)
+----
+
+Example:
+
+[source,java]
+----
+client.downloadAttachment(
+    recordId,
+    attachmentId,
+    DownloadType.Full,
+    new ResultListener<Attachment>() {
+        @Override
+        public void onSuccess(Attachment attachment) {
+            // Attachment with data populated
+        }
+
+        @Override
+        public void onError(D4LException exception) {
+            // Exception
+        }
+    }
+);
+----
+
+===== FHIR 4
+
+[source,kotlin]
+----
+fun downloadAttachment(
+    recordId: String,
+    attachmentId: String,
+    type: DownloadType,
+    callback: Callback<Fhir4Attachment>
+): Task
+----
+
+Example:
+
+[source,kotlin]
+----
+client.fhir4.downloadAttachment(
+    "recordId",
+    "attachmentId",
+    DownloadType.Full,
+    object: Callback<Fhir4Attachment> {
+        override fun onError(exception: D4LException) {
+            // Exception
+        }
+
+        override fun onSuccess(result: Fhir4Attachment) {
+            // Attachment with data populated
+        }
+    }
+)
+----

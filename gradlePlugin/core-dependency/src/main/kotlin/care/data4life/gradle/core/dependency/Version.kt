@@ -68,7 +68,7 @@ object Version {
         /**
          * [Dexcount](https://github.com/KeepSafe/dexcount-gradle-plugin)
          */
-        const val dexcount = "1.0.2"
+        const val dexcount = "3.1.0"
 
         /**
          * [Gradle DownloadTask](https://github.com/michel-kraemer/gradle-download-task)

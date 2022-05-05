@@ -73,7 +73,7 @@ object Version {
         /**
          * [Gradle DownloadTask](https://github.com/michel-kraemer/gradle-download-task)
          */
-        const val downloadTask = "3.4.3"
+        const val downloadTask = "5.1.0"
 
         /**
          * [Dokka - Documentation Engine for Kotlin](https://github.com/Kotlin/dokka)

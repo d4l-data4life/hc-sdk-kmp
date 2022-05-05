@@ -127,24 +127,32 @@ object Version {
     const val jacocoVersion = "0.8.8"
 
     val android = Android
+
     object Android {
         // Android
-        const val desugar = "1.0.9"
+        const val desugar = "1.1.5"
 
-        // AndroidX
-        const val ktx = "1.6.0"
-        const val appCompat = "1.3.1"
-        const val browser = "1.3.0"
+        /**
+         * [AndroidX](https://developer.android.com/jetpack/androidx)
+         */
+        const val core = "1.1.0"
+        const val ktx = "1.7.0"
+        const val appCompat = "1.4.1"
+        const val browser = "1.4.0"
 
-        const val constraintLayout = "1.1.3"
+        const val constraintLayout = "2.1.3"
         const val swipeRefreshLayout = "1.1.0"
     }
 
-    // Material
-    const val material = "1.4.0"
+    /**
+     * [Material Android](https://github.com/material-components/material-components-android)
+     */
+    const val material = "1.5.0"
 
-    // Google
-    const val googlePlayServices = "17.6.0"
+    /**
+     * [PlayService Base](https://developers.google.com/android/guides/setup)
+     */
+    const val googlePlayServices = "18.0.1"
 
     // Crypto
     /**

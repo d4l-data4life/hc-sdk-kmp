@@ -263,9 +263,13 @@ object Version {
      */
     const val robolectric = "4.8"
 
-    // Android Test
+    /**
+     * [AndroidXTest](https://developer.android.com/jetpack/androidx/releases/test)
+     */
     const val androidXTestCore = "1.4.0"
     const val androidXTestRunner = "1.4.0"
+    const val androidXTestOrchestrator = "1.4.1"
+    const val androidXTestRules = "1.4.0"
     const val androidXEspresso = "3.4.0"
     const val androidXUiAutomator = "2.2.0"
     const val androidXTestExtJUnit = "1.1.3"

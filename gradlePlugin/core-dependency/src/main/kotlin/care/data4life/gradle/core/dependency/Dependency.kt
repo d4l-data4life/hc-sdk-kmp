@@ -155,8 +155,8 @@ object Dependency {
         object AndroidTest {
             const val core = "androidx.test:core:${Version.androidXTestCore}"
             const val runner = "androidx.test:runner:${Version.androidXTestRunner}"
-            const val rules = "androidx.test:rules:${Version.androidXTestRunner}"
-            const val orchestrator = "androidx.test:orchestrator:${Version.androidXTestRunner}"
+            const val rules = "androidx.test:rules:${Version.androidXTestRules}"
+            const val orchestrator = "androidx.test:orchestrator:${Version.androidXTestOrchestrator}"
 
             const val extJUnit = "androidx.test.ext:junit:${Version.androidXTestExtJUnit}"
 

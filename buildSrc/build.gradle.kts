@@ -41,7 +41,7 @@ dependencies {
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.dokka)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.owasp)
 
-    implementation("com.google.code.gson:gson:2.8.6")
+    implementation("com.google.code.gson:gson:2.8.9")
 
     // dependency check
     implementation("com.github.ben-manes:gradle-versions-plugin:0.39.0")

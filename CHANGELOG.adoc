@@ -73,6 +73,7 @@ toc::[]
 * OkHttp 4.9.1 -> 4.9.3
 * ThreeTenBP 1.5.1 -> 1.6.0
 * ThreeTenABP 1.3.1 -> 1.4.0
+* Android Target SDK 30 -> 31
 
 === Migration
 

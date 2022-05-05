@@ -104,7 +104,7 @@ object Dependency {
         const val googlePlayServicesBase = "com.google.android.gms:play-services-base:${Version.googlePlayServices}"
 
         // Crypto
-        const val bouncyCastleJdk15 = "org.bouncycastle:bcprov-jdk15on:${Version.bouncyCastle}"
+        const val bouncyCastleJdk15 = "org.bouncycastle:bcprov-jdk18on:${Version.bouncyCastle}"
         const val tink = "com.google.crypto.tink:tink-android:${Version.tink}"
 
         // Authorization

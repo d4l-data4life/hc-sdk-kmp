@@ -18,7 +18,7 @@ package care.data4life.gradle.core.dependency
 
 object Version {
     // kotlin
-    const val kotlin = "1.5.21"
+    const val kotlin = "1.6.10"
 
     /**
      *  https://github.com/Kotlin/kotlinx.coroutines

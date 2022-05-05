@@ -98,7 +98,7 @@ object Version {
         /**
          * [Gradle OWASP](https://github.com/jeremylong/dependency-check-gradle)
          */
-        const val owasp = "6.3.1"
+        const val owasp = "7.1.0.1"
 
         /**
          * [Gradle JApicmp](https://github.com/melix/japicmp-gradle-plugin)

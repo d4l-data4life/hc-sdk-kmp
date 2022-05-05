@@ -65,7 +65,7 @@ allprojects {
     configurations.all {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android-debug")
         exclude(group = "care.data4life.hc-securestore-sdk-kmp", module = "securestore-android-debug")
-        exclude(group = "care.data4life.hc-result-sdk-kmp", module = "error-android-debug")
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "error-android-debug")
     }
 }
 

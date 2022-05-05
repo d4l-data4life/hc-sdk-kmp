@@ -105,7 +105,7 @@ dependencies {
         exclude(group = "care.data4life.hc-crypto-sdk-kmp", module = "crypto-jvm")
         exclude(group = "care.data4life.hc-auth-sdk-kmp", module = "auth-jvm")
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
-        exclude(group = "care.data4life.hc-result-sdk-kmp", module = "error-jvm")
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "error-jvm")
         exclude(group = "care.data4life.hc-fhir-helper-sdk-kmp", module = "fhir-helper-jvm")
     }
 

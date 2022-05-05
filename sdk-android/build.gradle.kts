@@ -109,7 +109,7 @@ dependencies {
         exclude(module = "crypto-jvm")
         exclude(module = "auth-jvm")
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
-        exclude(group = "care.data4life.hc-result-sdk-kmp", module = "error-jvm")
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "error-jvm")
     }
 
     implementation(Dependency.Multiplatform.D4L.authAndroid)

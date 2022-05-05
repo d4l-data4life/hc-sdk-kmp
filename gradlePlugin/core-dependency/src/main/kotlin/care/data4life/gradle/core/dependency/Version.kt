@@ -254,14 +254,14 @@ object Version {
     /**
      * [mockito](https://github.com/mockito/mockito)
      */
-    const val testMockito = "2.27.0"
+    const val testMockito = "4.5.1"
 
     const val testJsonAssert = "1.5.0"
 
     /**
      * [robolectric](http://robolectric.org/)
      */
-    const val robolectric = "4.6.1"
+    const val robolectric = "4.8"
 
     // Android Test
     const val androidXTestCore = "1.3.0"

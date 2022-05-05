@@ -264,11 +264,12 @@ object Version {
     const val robolectric = "4.8"
 
     // Android Test
-    const val androidXTestCore = "1.3.0"
-    const val androidXTest = "1.3.0"
-    const val androidXEspresso = "3.1.1"
+    const val androidXTestCore = "1.4.0"
+    const val androidXTestRunner = "1.4.0"
+    const val androidXEspresso = "3.4.0"
     const val androidXUiAutomator = "2.2.0"
-    const val androidXTestExtJUnit = "1.1.2"
+    const val androidXTestExtJUnit = "1.1.3"
 
+    // Out of life
     const val androidXKakao = "1.4.0-androidx"
 }

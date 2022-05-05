@@ -43,13 +43,9 @@ android {
         multiDexEnabled = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments(
-            mapOf(
-                "clearPackageData" to "true"
-            )
-        )
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
 
-        manifestPlaceholders(
+        manifestPlaceholders.putAll(
             mapOf<String, Any>(
                 "clientId" to d4lClientConfig[Environment.DEVELOPMENT].id,
                 "clientSecret" to d4lClientConfig[Environment.DEVELOPMENT].secret,
@@ -109,7 +105,7 @@ dependencies {
         exclude(group = "care.data4life.hc-crypto-sdk-kmp", module = "crypto-jvm")
         exclude(group = "care.data4life.hc-auth-sdk-kmp", module = "auth-jvm")
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
-        exclude(group = "care.data4life.hc-result-sdk-kmp", module = "error-jvm")
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "error-jvm")
         exclude(group = "care.data4life.hc-fhir-helper-sdk-kmp", module = "fhir-helper-jvm")
     }
 

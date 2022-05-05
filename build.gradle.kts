@@ -16,6 +16,7 @@
 
 import care.data4life.gradle.core.dependency.bintray
 import care.data4life.gradle.core.dependency.d4l
+import care.data4life.gradle.core.dependency.ensureKotlinVersion
 import care.data4life.gradle.core.dependency.gitHub
 import care.data4life.gradle.core.dependency.jitPack
 
@@ -42,6 +43,8 @@ allprojects {
         jitPack()
     }
 
+    ensureKotlinVersion()
+
     apply(plugin = "org.owasp.dependencycheck")
 
     apply(plugin = "org.jetbrains.dokka")
@@ -62,7 +65,7 @@ allprojects {
     configurations.all {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android-debug")
         exclude(group = "care.data4life.hc-securestore-sdk-kmp", module = "securestore-android-debug")
-        exclude(group = "care.data4life.hc-result-sdk-kmp", module = "error-android-debug")
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "error-android-debug")
     }
 }
 
@@ -76,6 +79,6 @@ tasks.withType<JavaCompile> {
 }
 
 tasks.named<Wrapper>("wrapper") {
-    gradleVersion = "7.4.1"
+    gradleVersion = "7.4.2"
     distributionType = Wrapper.DistributionType.ALL
 }

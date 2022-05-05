@@ -14,6 +14,7 @@
  * contact D4L by email to help@data4life.care.
  */
 import care.data4life.gradle.core.dependency.d4l
+import care.data4life.gradle.core.dependency.ensureKotlinVersion
 
 plugins {
     `kotlin-dsl`
@@ -28,10 +29,11 @@ repositories {
     d4l()
 }
 
+ensureKotlinVersion("1.5.31")
+
 dependencies {
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.kotlin)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.android)
-    implementation(care.data4life.gradle.core.dependency.GradlePlugin.kapt)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.groovyAll)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.androidMaven)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.androidJacoco)
@@ -42,21 +44,17 @@ dependencies {
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.dokka)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.owasp)
 
-    implementation("com.google.code.gson:gson:2.8.6")
+    implementation("com.google.code.gson:gson:2.8.9")
 
     // dependency check
-    implementation("com.github.ben-manes:gradle-versions-plugin:0.38.0")
+    implementation("com.github.ben-manes:gradle-versions-plugin:0.42.0")
     // download scripts
-    implementation("de.undercouch:gradle-download-task:4.1.1")
+    implementation("de.undercouch:gradle-download-task:5.1.0")
     // publishing.gradle.kts
-    implementation("org.eclipse.jgit:org.eclipse.jgit:5.11.0.202103091610-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:6.1.0.202203080745-r")
     // quality.gradle.kts
-    implementation("com.diffplug.spotless:spotless-plugin-gradle:5.10.2")
-    implementation("com.pinterest:ktlint:0.41.0")
+    implementation("com.diffplug.spotless:spotless-plugin-gradle:6.4.2")
+    implementation("com.pinterest:ktlint:0.44.0")
     // versioning.gradle.kts
     implementation("care.data4life.gradle.gitversion:gradle-git-version:0.12.4-d4l")
-}
-
-kotlinDslPluginOptions {
-    experimentalWarning.set(false)
 }

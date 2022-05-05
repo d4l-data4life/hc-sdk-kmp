@@ -21,8 +21,8 @@ import care.data4life.sdk.sample.presentation.BaseView
 import care.data4life.sdk.sample.presentation.View
 import care.data4life.sdk.sample.presentation.data.Message
 import care.data4life.sdk.sample.presentation.main.SingleMainView
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
 
 class LoginView(private val alias: String) : BaseView(), KoinComponent {

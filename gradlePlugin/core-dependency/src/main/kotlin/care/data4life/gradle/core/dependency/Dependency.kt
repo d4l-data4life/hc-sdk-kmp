@@ -35,31 +35,31 @@ object Dependency {
         }
 
         object D4L {
-            const val utilCommon = "care.data4life.hc-util-sdk-kmp:util:${Version.sdkUtil}"
-            const val utilJvm = "care.data4life.hc-util-sdk-kmp:util-jvm:${Version.sdkUtil}"
-            const val utilAndroid = "care.data4life.hc-util-sdk-kmp:util-android:${Version.sdkUtil}"
+            const val utilCommon = "care.data4life.hc-util-sdk-kmp:util:${Version.d4l.sdkUtil}"
+            const val utilJvm = "care.data4life.hc-util-sdk-kmp:util-jvm:${Version.d4l.sdkUtil}"
+            const val utilAndroid = "care.data4life.hc-util-sdk-kmp:util-android:${Version.d4l.sdkUtil}"
 
-            const val resultError = "care.data4life.hc-result-sdk-kmp:error:${Version.resultSdk}"
-            const val resultErrorAndroid = "care.data4life.hc-result-sdk-kmp:error-android:${Version.resultSdk}"
-            const val resultErrorJvm = "care.data4life.hc-result-sdk-kmp:error-jvm:${Version.resultSdk}"
+            const val resultError = "care.data4life.hc-util-sdk-kmp:error:${Version.d4l.sdkUtil}"
+            const val resultErrorAndroid = "care.data4life.hc-util-sdk-kmp:error-android:${Version.d4l.sdkUtil}"
+            const val resultErrorJvm = "care.data4life.hc-util-sdk-kmp:error-jvm:${Version.d4l.sdkUtil}"
 
-            const val fhirSdk = "care.data4life.hc-fhir-sdk-java:fhir-java:${Version.fhirSdk}"
+            const val fhirSdk = "care.data4life.hc-fhir-sdk-java:fhir-java:${Version.d4l.fhirSdk}"
 
-            const val fhirHelperCommon = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-metadata:${Version.fhirHelper}"
-            const val fhirHelperAndroid = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-android:${Version.fhirHelper}"
-            const val fhirHelperJvm = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-jvm:${Version.fhirHelper}"
+            const val fhirHelperCommon = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-metadata:${Version.d4l.fhirHelper}"
+            const val fhirHelperAndroid = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-android:${Version.d4l.fhirHelper}"
+            const val fhirHelperJvm = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-jvm:${Version.d4l.fhirHelper}"
 
-            const val auth = "care.data4life.hc-auth-sdk-kmp:auth:${Version.auth}"
-            const val authAndroid = "care.data4life.hc-auth-sdk-kmp:auth-android:${Version.auth}"
-            const val authJvm = "care.data4life.hc-auth-sdk-kmp:auth-jvm:${Version.auth}"
+            const val auth = "care.data4life.hc-auth-sdk-kmp:auth:${Version.d4l.auth}"
+            const val authAndroid = "care.data4life.hc-auth-sdk-kmp:auth-android:${Version.d4l.auth}"
+            const val authJvm = "care.data4life.hc-auth-sdk-kmp:auth-jvm:${Version.d4l.auth}"
 
-            const val crypto = "care.data4life.hc-crypto-sdk-kmp:crypto:${Version.crypto}"
-            const val cryptoAndroid = "care.data4life.hc-crypto-sdk-kmp:crypto-android:${Version.crypto}"
-            const val cryptoJvm = "care.data4life.hc-crypto-sdk-kmp:crypto-jvm:${Version.crypto}"
+            const val crypto = "care.data4life.hc-crypto-sdk-kmp:crypto:${Version.d4l.crypto}"
+            const val cryptoAndroid = "care.data4life.hc-crypto-sdk-kmp:crypto-android:${Version.d4l.crypto}"
+            const val cryptoJvm = "care.data4life.hc-crypto-sdk-kmp:crypto-jvm:${Version.d4l.crypto}"
 
-            const val securestore = "care.data4life.hc-securestore-sdk-kmp:securestore:${Version.securestore}"
-            const val securestoreAndroid = "care.data4life.hc-securestore-sdk-kmp:securestore-android:${Version.securestore}"
-            const val securestoreJvm = "care.data4life.hc-securestore-sdk-kmp:securestore-jvm:${Version.securestore}"
+            const val securestore = "care.data4life.hc-securestore-sdk-kmp:securestore:${Version.d4l.securestore}"
+            const val securestoreAndroid = "care.data4life.hc-securestore-sdk-kmp:securestore-android:${Version.d4l.securestore}"
+            const val securestoreJvm = "care.data4life.hc-securestore-sdk-kmp:securestore-jvm:${Version.d4l.securestore}"
         }
 
         object Test {
@@ -86,15 +86,15 @@ object Dependency {
         const val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:${Version.kotlin}"
 
         // Android
-        const val androidDesugar = "com.android.tools:desugar_jdk_libs:${Version.androidDesugar}"
+        const val androidDesugar = "com.android.tools:desugar_jdk_libs:${Version.android.desugar}"
 
         // Android X
         object AndroidX {
-            const val ktx = "androidx.core:core-ktx:${Version.androidXKtx}"
-            const val appCompat = "androidx.appcompat:appcompat:${Version.androidXAppCompat}"
-            const val browser = "androidx.browser:browser:${Version.androidXBrowser}"
-            const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Version.androidXConstraintLayout}"
-            const val swipeRefreshLayout = "androidx.swiperefreshlayout:swiperefreshlayout:${Version.androidXSwipeRefreshLayout}"
+            const val ktx = "androidx.core:core-ktx:${Version.android.ktx}"
+            const val appCompat = "androidx.appcompat:appcompat:${Version.android.appCompat}"
+            const val browser = "androidx.browser:browser:${Version.android.browser}"
+            const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Version.android.constraintLayout}"
+            const val swipeRefreshLayout = "androidx.swiperefreshlayout:swiperefreshlayout:${Version.android.swipeRefreshLayout}"
         }
 
         // Material
@@ -104,7 +104,7 @@ object Dependency {
         const val googlePlayServicesBase = "com.google.android.gms:play-services-base:${Version.googlePlayServices}"
 
         // Crypto
-        const val bouncyCastleJdk15 = "org.bouncycastle:bcprov-jdk15on:${Version.bouncyCastle}"
+        const val bouncyCastleJdk15 = "org.bouncycastle:bcprov-jdk18on:${Version.bouncyCastle}"
         const val tink = "com.google.crypto.tink:tink-android:${Version.tink}"
 
         // Authorization
@@ -154,9 +154,9 @@ object Dependency {
         // AndroidTest
         object AndroidTest {
             const val core = "androidx.test:core:${Version.androidXTestCore}"
-            const val runner = "androidx.test:runner:${Version.androidXTest}"
-            const val rules = "androidx.test:rules:${Version.androidXTest}"
-            const val orchestrator = "androidx.test:orchestrator:${Version.androidXTest}"
+            const val runner = "androidx.test:runner:${Version.androidXTestRunner}"
+            const val rules = "androidx.test:rules:${Version.androidXTestRunner}"
+            const val orchestrator = "androidx.test:orchestrator:${Version.androidXTestRunner}"
 
             const val extJUnit = "androidx.test.ext:junit:${Version.androidXTestExtJUnit}"
 

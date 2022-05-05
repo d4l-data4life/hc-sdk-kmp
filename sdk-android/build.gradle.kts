@@ -54,6 +54,13 @@ android {
     buildTypes {
         getByName("debug") {
             setMatchingFallbacks("debug", "release")
+
+            manifestPlaceholders["redirectScheme"] = "com.redirectScheme.comm"
+            manifestPlaceholders["clientId"] = "com.redirectScheme.comm"
+            manifestPlaceholders["clientSecret"] = "com.redirectScheme.comm"
+            manifestPlaceholders["debug"] = "com.redirectScheme.comm"
+            manifestPlaceholders["environment"] = "com.redirectScheme.comm"
+            manifestPlaceholders["platform"] = "com.redirectScheme.comm"
         }
         getByName("release") {
             isMinifyEnabled = false
@@ -102,7 +109,7 @@ dependencies {
         exclude(module = "crypto-jvm")
         exclude(module = "auth-jvm")
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
-        exclude(group = "care.data4life.hc-result-sdk-kmp", module = "error-jvm")
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "error-jvm")
     }
 
     implementation(Dependency.Multiplatform.D4L.authAndroid)

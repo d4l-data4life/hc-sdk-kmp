@@ -47,7 +47,7 @@ android {
             )
         )
 
-        manifestPlaceholders(
+        manifestPlaceholders.putAll(
             mapOf<String, Any>(
                 "clientId" to d4lClientConfig[Environment.DEVELOPMENT].id,
                 "clientSecret" to d4lClientConfig[Environment.DEVELOPMENT].secret,
@@ -109,7 +109,7 @@ dependencies {
         exclude(group = "care.data4life", module = "crypto-jvm")
         exclude(group = "care.data4life", module = "auth-jvm")
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util")
-        exclude(group = "care.data4life.hc-result-sdk-kmp", module = "error-jvm")
+        exclude(group = "care.data4life.hc-util-sdk-kmp", module = "error-jvm")
         exclude(group = "care.data4life.hc-fhir-helper-sdk-kmp", module = "fhir-helper")
     }
 

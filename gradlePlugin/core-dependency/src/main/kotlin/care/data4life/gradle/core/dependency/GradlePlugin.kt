@@ -17,26 +17,24 @@
 package care.data4life.gradle.core.dependency
 
 object GradlePlugin {
-    const val android = "com.android.tools.build:gradle:${Version.GradlePlugin.android}"
-    const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Version.GradlePlugin.kotlin}"
+    const val android = "com.android.tools.build:gradle:${Version.gradlePlugin.android}"
+    const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Version.gradlePlugin.kotlin}"
 
-    const val kapt = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Version.GradlePlugin.kotlin}"
+    const val dexcount = "com.getkeepsafe.dexcount:dexcount-gradle-plugin:${Version.gradlePlugin.dexcount}"
 
-    const val dexcount = "com.getkeepsafe.dexcount:dexcount-gradle-plugin:${Version.GradlePlugin.dexcount}"
+    const val downloadTask = "de.undercouch:gradle-download-task:${Version.gradlePlugin.downloadTask}"
 
-    const val downloadTask = "de.undercouch:gradle-download-task:${Version.GradlePlugin.downloadTask}"
+    const val dokka = "org.jetbrains.dokka:dokka-gradle-plugin:${Version.gradlePlugin.dokka}"
 
-    const val dokka = "org.jetbrains.dokka:dokka-gradle-plugin:${Version.GradlePlugin.dokka}"
+    const val groovyAll = "org.codehaus.groovy:groovy-all:${Version.gradlePlugin.groovyAll}"
 
-    const val groovyAll = "org.codehaus.groovy:groovy-all:${Version.GradlePlugin.groovyAll}"
+    const val owasp = "org.owasp:dependency-check-gradle:${Version.gradlePlugin.owasp}"
 
-    const val owasp = "org.owasp:dependency-check-gradle:${Version.GradlePlugin.owasp}"
+    const val japicmp = "me.champeau.gradle:japicmp-gradle-plugin:${Version.gradlePlugin.japicmp}"
 
-    const val japicmp = "me.champeau.gradle:japicmp-gradle-plugin:${Version.GradlePlugin.japicmp}"
+    const val httpComponents = "org.apache.httpcomponents:httpclient:${Version.gradlePlugin.httpComponents}"
 
-    const val httpComponents = "org.apache.httpcomponents:httpclient:${Version.GradlePlugin.httpComponents}"
+    const val androidMaven = "com.github.dcendents:android-maven-gradle-plugin:${Version.gradlePlugin.androidMaven}"
 
-    const val androidMaven = "com.github.dcendents:android-maven-gradle-plugin:${Version.GradlePlugin.androidMaven}"
-
-    const val androidJacoco = "com.vanniktech:gradle-android-junit-jacoco-plugin:${Version.GradlePlugin.androidJacoco}"
+    const val androidJacoco = "com.vanniktech:gradle-android-junit-jacoco-plugin:${Version.gradlePlugin.androidJacoco}"
 }

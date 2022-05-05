@@ -17,63 +17,63 @@
 package care.data4life.gradle.core.dependency
 
 object Version {
-    // D4L
-    /**
-     * [hc-util-sdk-kmp](https://github.com/d4l-data4life/hc-util-sdk-kmp)
-     */
-    const val sdkUtil = "1.10.0"
-
-    /**
-     * [hc-result-sdk-kmp](https://github.com/d4l-data4life/hc-result-sdk-kmp)
-     */
-    const val resultSdk = "0.2.0"
-
-    /**
-     * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)
-     */
-    const val fhirSdk = "1.6.3"
-
-    /**
-     * [hc-fhir-helper-sdk-kmp](https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp)
-     */
-    const val fhirHelper = "1.7.1"
-
-    /**
-     * [hc-auth-sdk-kmp](https://github.com/d4l-data4life/hc-auth-sdk-kmp)
-     */
-    const val auth = "1.14.0"
-
-    /**
-     * [hc-crypto-sdk-kmp](https://github.com/d4l-data4life/hc-crypto-sdk-kmp)
-     */
-    const val crypto = "1.13.2"
-
-    /**
-     * [hc-securestore-sdk-kmp](https://github.com/d4l-data4life/hc-securestore-sdk-kmp)
-     */
-    const val securestore = "1.13.2"
-
     // kotlin
-    const val kotlin = "1.4.32"
+    const val kotlin = "1.6.10"
 
     /**
      *  https://github.com/Kotlin/kotlinx.coroutines
      */
-    const val kotlinCoroutines = "1.4.3-native-mt"
+    const val kotlinCoroutines = "1.6.0-native-mt"
+
+    val d4l = D4L
+
+    object D4L {
+        /**
+         * [hc-util-sdk-kmp](https://github.com/d4l-data4life/hc-util-sdk-kmp)
+         */
+        const val sdkUtil = "1.13.0"
+
+        /**
+         * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)
+         */
+        const val fhirSdk = "1.8.0"
+
+        /**
+         * [hc-fhir-helper-sdk-kmp](https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp)
+         */
+        const val fhirHelper = "1.9.0"
+
+        /**
+         * [hc-auth-sdk-kmp](https://github.com/d4l-data4life/hc-auth-sdk-kmp)
+         */
+        const val auth = "1.15.0"
+
+        /**
+         * [hc-crypto-sdk-kmp](https://github.com/d4l-data4life/hc-crypto-sdk-kmp)
+         */
+        const val crypto = "1.15.0"
+
+        /**
+         * [hc-securestore-sdk-kmp](https://github.com/d4l-data4life/hc-securestore-sdk-kmp)
+         */
+        const val securestore = "1.15.0"
+    }
+
+    val gradlePlugin = GradlePlugin
 
     object GradlePlugin {
         const val kotlin = Version.kotlin
-        const val android = "4.2.2"
+        const val android = "7.1.3"
 
         /**
          * [Dexcount](https://github.com/KeepSafe/dexcount-gradle-plugin)
          */
-        const val dexcount = "1.0.2"
+        const val dexcount = "3.1.0"
 
         /**
          * [Gradle DownloadTask](https://github.com/michel-kraemer/gradle-download-task)
          */
-        const val downloadTask = "3.4.3"
+        const val downloadTask = "5.1.0"
 
         /**
          * [Dokka - Documentation Engine for Kotlin](https://github.com/Kotlin/dokka)
@@ -93,12 +93,12 @@ object Version {
         /**
          * [Gradle Groovy](https://github.com/apache/groovy)
          */
-        const val groovyAll = "3.0.7"
+        const val groovyAll = "3.0.9"
 
         /**
          * [Gradle OWASP](https://github.com/jeremylong/dependency-check-gradle)
          */
-        const val owasp = "6.3.1"
+        const val owasp = "7.1.0.1"
 
         /**
          * [Gradle JApicmp](https://github.com/melix/japicmp-gradle-plugin)
@@ -112,6 +112,7 @@ object Version {
 
         /**
          * [Gradle Android Maven](https://hc.apache.org/httpcomponents-client-4.5.x/current/httpclient/project-info.html)
+         * Abandoned!!!
          */
         const val androidMaven = "2.1"
 
@@ -123,42 +124,53 @@ object Version {
 
     // Java
     const val javaXAnnotation = "3.0.2"
-    const val jacocoVersion = "0.8.7"
+    const val jacocoVersion = "0.8.8"
 
-    // Android
-    const val androidDesugar = "1.0.5"
+    val android = Android
 
-    // AndroidX
-    const val androidXKtx = "1.2.0"
-    const val androidXAppCompat = "1.3.1"
-    const val androidXBrowser = "1.3.0"
+    object Android {
+        // Android
+        const val desugar = "1.1.5"
 
-    const val androidXConstraintLayout = "1.1.3"
-    const val androidXSwipeRefreshLayout = "1.1.0"
+        /**
+         * [AndroidX](https://developer.android.com/jetpack/androidx)
+         */
+        const val core = "1.1.0"
+        const val ktx = "1.7.0"
+        const val appCompat = "1.4.1"
+        const val browser = "1.4.0"
 
-    // Material
-    const val material = "1.4.0"
+        const val constraintLayout = "2.1.3"
+        const val swipeRefreshLayout = "1.1.0"
+    }
 
-    // Google
-    const val googlePlayServices = "17.6.0"
+    /**
+     * [Material Android](https://github.com/material-components/material-components-android)
+     */
+    const val material = "1.5.0"
+
+    /**
+     * [PlayService Base](https://developers.google.com/android/guides/setup)
+     */
+    const val googlePlayServices = "18.0.1"
 
     // Crypto
     /**
      * [BouncyCastle](http://www.bouncycastle.org/java.html)
      */
-    const val bouncyCastle = "1.64"
+    const val bouncyCastle = "1.71"
 
     // Tink
     /**
      * [tink](https://github.com/google/tink)
      */
-    const val tink = "1.2.2"
+    const val tink = "1.4.0"
 
     // Authorization
     /**
      * [appAuth](https://github.com/openid/AppAuth-Android)
      */
-    const val appAuth = "0.10.0"
+    const val appAuth = "0.11.1"
 
     // Network
     /**
@@ -176,7 +188,7 @@ object Version {
     /**
      * [moshi](https://github.com/square/moshi)
      */
-    const val moshi = "1.12.0"
+    const val moshi = "1.13.0"
 
     /**
      *
@@ -199,7 +211,7 @@ object Version {
     /**
      * [Koin](https://github.com/InsertKoinIO/koin)
      */
-    const val koin = "2.0.1"
+    const val koin = "3.1.6"
 
     // Rx
     /**
@@ -229,7 +241,7 @@ object Version {
     const val pdfView = "3.1.0-beta.1"
 
     // Junit Test
-    const val testJUnit = "4.12"
+    const val testJUnit = "4.13.2"
 
     /**
      * [mockk](http://mockk.io)
@@ -242,21 +254,22 @@ object Version {
     /**
      * [mockito](https://github.com/mockito/mockito)
      */
-    const val testMockito = "2.27.0"
+    const val testMockito = "4.5.1"
 
     const val testJsonAssert = "1.5.0"
 
     /**
      * [robolectric](http://robolectric.org/)
      */
-    const val robolectric = "4.3.1"
+    const val robolectric = "4.8"
 
     // Android Test
-    const val androidXTestCore = "1.3.0"
-    const val androidXTest = "1.3.0"
-    const val androidXEspresso = "3.1.1"
+    const val androidXTestCore = "1.4.0"
+    const val androidXTestRunner = "1.4.0"
+    const val androidXEspresso = "3.4.0"
     const val androidXUiAutomator = "2.2.0"
-    const val androidXTestExtJUnit = "1.1.2"
+    const val androidXTestExtJUnit = "1.1.3"
 
+    // Out of life
     const val androidXKakao = "1.4.0-androidx"
 }

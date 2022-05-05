@@ -18,6 +18,6 @@ package care.data4life.gradle.core.config
 
 object AndroidConfig {
     const val minSdkVersion = 23
-    const val compileSdkVersion = 30
-    const val targetSdkVersion = 30
+    const val compileSdkVersion = 31
+    const val targetSdkVersion = 31
 }

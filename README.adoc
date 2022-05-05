@@ -63,8 +63,6 @@ This is the Android and Java SDK of Data4Life. The SDK encapsulates the backend 
 
 For more information about the Data4Life platform, visit our http://www.data4life.care/[website].
 
-=== Features
-
 * Authorization/Authentication
 * End-to-End encryption
 * API client for PHDP

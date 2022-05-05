@@ -40,14 +40,42 @@ toc::[]
 
 === Removed
 
+* HC Result
+
 === Fixed
 
 === Bumped
 
-* Gradle 6.9.1 -> 7.4.1
+* Gradle 6.9 -> 7.4.2
+* *_BREAKING_* Android Gradle Plugin 4.2.2 -> 7.1.3
+* *_BREAKING_* Kotlin 1.4.32 -> 1.6.10
+* *_BREAKING_* Kotlin Coroutines 1.5.1 -> 1.6.0
+* *_BREAKING_* Koin 3.0.1 -> 3.1.6
+* HC FHIR SDK JAVA 1.6.3 -> 1.8.0
+* HC FHIR-Helpers SDK KMP 1.7.0 -> 1.9.0
+* HC Auth SDK 1.13.2 -> 1.15.0
+* HC Secured Store SDK 1.13.2 -> 1.15.0
+* HC Crypto SDK 1.13.2 -> 1.15.0
+* HC Util SDK 1.10.0 -> 1.13.0
+* HC Securestore SDK 1.13.2 -> 1.14.0
+* HC Crypto SDK 1.13.2 -> 1.14.0
+* BouncyCastle 1.64 -> 1.71
+* Tink 1.2.2 -> 1.4.0
+* Bump AppAuth 0.10.0 -> 0.11.1
+* DexCount 1.0.2 -> 3.1.0
+* Desugar 1.0.4 -> 1.1.5
+* Android Ktx 1.3.2 -> 1.7.0
+* Android AppCompat 1.3.0 -> 1.4.1
+* Android Browser 1.2.0 -> 1.4.0
+* Android ConstraintLayout 2.0.1 -> 2.1.3
+* Android Material 1.4.0 -> 1.5.0
+* Google Play Services 17.6.0 -> 18.0.1
+* JUnit 4.12 -> 4.13.2
+* Robolectric 4.5.1 -> 4.6.1
 * OkHttp 4.9.1 -> 4.9.3
 * ThreeTenBP 1.5.1 -> 1.6.0
 * ThreeTenABP 1.3.1 -> 1.4.0
+* Android Target SDK 30 -> 31
 
 === Migration
 

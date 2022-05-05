@@ -517,8 +517,9 @@ Search for records with following filter options:
 
 * resourceType - class type of the searched resource (not available for data)
 * annotations - custom annotations that had been added to the records (optional)
-* startDate - the filtered records have a creation date after the start date
-* endDate - the filtered records have a creation date before the endDate
+* CreationDateRange - the filtered records have a creation date in the given range
+* UpdateDateTimeRange - the filtered records was updated during the given range
+* includeDeletedRecords - the filtered records include deleted records as well
 * pageSize - define the result page size, how many records should be returned
 * offset - the offset of the result list
 
@@ -542,8 +543,15 @@ Example:
 sdk.fetchRecords(
     DocumentReference.class,
     annotations,
-    fromDate,
-    toDate,
+    new SdkContract.CreationDateRange(
+        fromDate,
+        toDate
+    ),
+    new SdkContract.UpdateDateTimeRange(
+        fromDateTime,
+        toDateTime
+    ),
+    false,
     20,
     offset,
     new ResultListener<List<Record<DocumentReference>>>() {
@@ -567,8 +575,9 @@ sdk.fetchRecords(
 fun <T : Fhir4Resource> search(
     resourceType: Class<T>,
     annotations: Annotations,
-    startDate: LocalDate?,
-    endDate: LocalDate?,
+    creationDateRange: SdkContract.CreationDateRange?,
+    updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
+    includeDeletedRecords: Boolean,
     pageSize: Int,
     offset: Int,
     callback: Callback<List<Fhir4Record<T>>>
@@ -582,8 +591,15 @@ Example:
 client.fhir4.search(
     Observation::class.java,
     annotations,
-    LocalDate.now(),
-    LocalDate.now(),
+    SdkContract.CreationDateRange(
+        LocalDate.now(),
+        LocalDate.now(),
+    ),
+    SdkContract.UpdateDateTimeRange(
+        LocalDateTime.now(),
+        LocalDateTime.now(),
+    ),
+    false,
     10,
     0,
     object : Callback<List<Fhir4Record<Observation>>> {
@@ -604,8 +620,9 @@ client.fhir4.search(
 ----
 fun search(
     annotations: Annotations,
-    startDate: LocalDate?,
-    endDate: LocalDate?,
+    creationDateRange: SdkContract.CreationDateRange?,
+    updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
+    includeDeletedRecords: Boolean,
     pageSize: Int,
     offset: Int,
     callback: Callback<List<DataRecord<DataResource>>>
@@ -618,8 +635,15 @@ Example:
 ----
 client.data.search(
     annotations,
-    LocalDate.now(),
-    LocalDate.now(),
+    SdkContract.CreationDateRange(
+        LocalDate.now(),
+        LocalDate.now(),
+    ),
+    SdkContract.UpdateDateTimeRange(
+        LocalDateTime.now(),
+        LocalDateTime.now(),
+    ),
+    false,
     10,
     0,
     object: Callback<List<DataRecord<DataResource>>> {

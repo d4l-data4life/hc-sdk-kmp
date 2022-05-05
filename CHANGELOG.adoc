@@ -25,7 +25,24 @@ Template could be found here: link:https://github.com/d4l-data4life/hc-readme-te
 ==== Versions
 toc::[]
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.15.1...main[Unreleased]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.16.0\...main[Unreleased]
+
+=== Added
+
+=== Changed
+
+=== Deprecated
+
+=== Removed
+
+=== Fixed
+
+=== Bumped
+
+=== Migration
+
+
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.15.1\...v1.16.0[1.16.0]
 
 === Added
 
@@ -34,15 +51,9 @@ toc::[]
 * status field for Meta
 * RecordStatus
 
-=== Changed
-
-=== Deprecated
-
 === Removed
 
 * HC Result
-
-=== Fixed
 
 === Bumped
 
@@ -77,10 +88,7 @@ toc::[]
 * ThreeTenABP 1.3.1 -> 1.4.0
 * Android Target SDK 30 -> 31
 
-=== Migration
-
-
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.15.0...v1.15.1[1.15.1]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.15.0\...v1.15.1[1.15.1]
 
 === Fixed
 
@@ -91,7 +99,7 @@ toc::[]
 * HC FHIR SDK JAVA 1.6.2 -> 1.6.3
 * HC FHIR-Helpers SDK KMP 1.7.0 -> 1.7.1
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.14.0...v1.15.0[1.15.0]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.14.0\...v1.15.0[1.15.0]
 
 === Added
 
@@ -127,7 +135,7 @@ toc::[]
 * HC FHIR SDK JAVA 1.5.0 -> 1.6.2
 * HC FHIR-Helpers SDK KMP 1.6.0 -> 1.7.0
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.13.2...v1.14.0[1.14.0]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.13.2\...v1.14.0[1.14.0]
 
 === Bumped
 
@@ -136,7 +144,7 @@ toc::[]
 * HC Util SDK 1.6.1 -> 1.9.0
 * FHIR-Helper-SDK 1.4.1 -> 1.6.0
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.13.1...v1.13.2[1.13.2]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.13.1\...v1.13.2[1.13.2]
 
 === Fixed
 
@@ -148,10 +156,10 @@ toc::[]
 * Gradle 6.8.3 -> 6.9
 * HC Util SDK 1.6.0 -> 1.8.0
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.13.0...v1.13.1[1.13.1]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.13.0\...v1.13.1[1.13.1]
 Re release of 1.13.0 due to some publishing issues.
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.12.0...v1.13.0[1.13.0]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.12.0\...v1.13.0[1.13.0]
 
 === Added
 
@@ -169,7 +177,7 @@ Re release of 1.13.0 due to some publishing issues.
 
 === Migration
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.11.0...v1.12.0[1.12.0]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.11.0\...v1.12.0[1.12.0]
 
 === Added
 
@@ -187,7 +195,7 @@ Re release of 1.13.0 due to some publishing issues.
 
 * Android Gradle Plugin 4.1.3 -> 4.2.1
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.10.0...v1.11.0[1.11.0]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.10.0\...v1.11.0[1.11.0]
 
 === Added
 
@@ -214,7 +222,7 @@ Re release of 1.13.0 due to some publishing issues.
 
 * Change Android support to min Android 6.0 (API 23) to use this version of the SDK.
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.2...v1.10.0[1.10.0]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.2\...v1.10.0[1.10.0]
 
 === Changed
 
@@ -231,7 +239,7 @@ Re release of 1.13.0 due to some publishing issues.
 * HC-FHIR-SDK 1.2.1 -> 1.3.1
 
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.1...v1.9.2[1.9.2]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.1\...v1.9.2[1.9.2]
 
 === Added
 
@@ -253,7 +261,7 @@ Re release of 1.13.0 due to some publishing issues.
 * RecordService did not respect legacy tags/annotations.
 * RecordService called on fetch/search DATE_FORMAT instead DATE_FORMATTER.
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.0...v1.9.1[1.9.1]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.9.0\...v1.9.1[1.9.1]
 
 === Fixed
 
@@ -266,7 +274,7 @@ Re release of 1.13.0 due to some publishing issues.
 * HC-FHIR-SDK 1.1.0 -> 1.2.1
 
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.8.0...v1.9.0[1.9.0]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.8.0\...v1.9.0[1.9.0]
 
 === Added
 
@@ -295,14 +303,14 @@ Re release of 1.13.0 due to some publishing issues.
 * https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp/releases/tag/v1.4.0[FHIR Helper SDK 1.4.0 -> BREAKING change]
 
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.7.3...v1.8.0[1.8.0]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.7.3\...v1.8.0[1.8.0]
 
 === Added
 
 * Add ingestion SDK client (relies on external OAuth handling).
 
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.7.2...v1.7.3[1.7.3]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.7.2\...v1.7.3[1.7.3]
 
 === Added
 

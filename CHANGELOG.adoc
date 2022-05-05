@@ -54,6 +54,8 @@ toc::[]
 * HC FHIR SDK JAVA 1.6.3 -> 1.8.0
 * HC FHIR-Helpers SDK KMP 1.7.0 -> 1.9.0
 * HC Auth SDK 1.13.2 -> 1.15.0
+* HC Secured Store SDK 1.13.2 -> 1.15.0
+* HC Crypto SDK 1.13.2 -> 1.15.0
 * HC Util SDK 1.10.0 -> 1.13.0
 * HC Securestore SDK 1.13.2 -> 1.14.0
 * HC Crypto SDK 1.13.2 -> 1.14.0

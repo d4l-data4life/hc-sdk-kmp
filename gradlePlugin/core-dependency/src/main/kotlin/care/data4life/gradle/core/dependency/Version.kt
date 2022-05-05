@@ -46,17 +46,17 @@ object Version {
         /**
          * [hc-auth-sdk-kmp](https://github.com/d4l-data4life/hc-auth-sdk-kmp)
          */
-        const val auth = "1.14.0-SNAPSHOT"
+        const val auth = "1.15.0"
 
         /**
          * [hc-crypto-sdk-kmp](https://github.com/d4l-data4life/hc-crypto-sdk-kmp)
          */
-        const val crypto = "1.14.0"
+        const val crypto = "1.15.0"
 
         /**
          * [hc-securestore-sdk-kmp](https://github.com/d4l-data4life/hc-securestore-sdk-kmp)
          */
-        const val securestore = "1.14.0"
+        const val securestore = "1.15.0"
     }
 
     val gradlePlugin = GradlePlugin

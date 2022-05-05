@@ -170,7 +170,7 @@ object Version {
     /**
      * [appAuth](https://github.com/openid/AppAuth-Android)
      */
-    const val appAuth = "0.10.0"
+    const val appAuth = "0.11.1"
 
     // Network
     /**
@@ -188,7 +188,7 @@ object Version {
     /**
      * [moshi](https://github.com/square/moshi)
      */
-    const val moshi = "1.12.0"
+    const val moshi = "1.13.0"
 
     /**
      *

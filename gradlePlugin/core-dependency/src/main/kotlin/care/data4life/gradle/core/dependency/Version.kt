@@ -164,7 +164,7 @@ object Version {
     /**
      * [tink](https://github.com/google/tink)
      */
-    const val tink = "1.2.2"
+    const val tink = "1.4.0"
 
     // Authorization
     /**

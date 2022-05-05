@@ -23,7 +23,7 @@ object Version {
     /**
      *  https://github.com/Kotlin/kotlinx.coroutines
      */
-    const val kotlinCoroutines = "1.5.1-native-mt"
+    const val kotlinCoroutines = "1.6.0-native-mt"
 
     val d4l = D4L
 

@@ -93,7 +93,7 @@ object Version {
         /**
          * [Gradle Groovy](https://github.com/apache/groovy)
          */
-        const val groovyAll = "3.0.7"
+        const val groovyAll = "4.0.2"
 
         /**
          * [Gradle OWASP](https://github.com/jeremylong/dependency-check-gradle)

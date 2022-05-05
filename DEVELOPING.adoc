@@ -23,9 +23,9 @@ toc::[]
 
 == Prerequisites
 
-* link:https://developer.android.com/studio#downloads[Android Studio 7.0.2]
+* link:https://developer.android.com/studio#downloads[Android Studio 7.1.3]
 * link:https://adoptopenjdk.net/?variant=openjdk11&jvmVariant=hotspot[Java 11] | link:https://developer.android.com/studio/write/java8-support[Limitations of Java language features and APIs] | https://jakewharton.com/d8-library-desugaring/[Desugaring]
-* link:https://kotlinlang.org/[Kotlin 1.5.21]
+* link:https://kotlinlang.org/[Kotlin 1.6.10]
 
 == Installation
 
@@ -63,7 +63,7 @@ Just install the mentioned dependencies:
 [source,bash]
 ----
 sdk install java 11.0.11.hs-adpt
-sdk install kotlin 1.5.21
+sdk install kotlin 1.6.10
 ----
 
 Check your installation by:

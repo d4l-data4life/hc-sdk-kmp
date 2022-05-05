@@ -1,6 +1,6 @@
 = Data4Life SDK
 :link-repository: https://github.com/d4l-data4life/hc-sdk-kmp
-:project-version: 1.15.1
+:project-version: 1.16.0
 :doctype: article
 :!showtitle:
 :toc: macro
@@ -63,6 +63,8 @@ This is the Android and Java SDK of Data4Life. The SDK encapsulates the backend 
 
 For more information about the Data4Life platform, visit our http://www.data4life.care/[website].
 
+=== Features
+
 * Authorization/Authentication
 * End-to-End encryption
 * API client for PHDP
@@ -77,7 +79,6 @@ For more information about the Data4Life platform, visit our http://www.data4lif
 * link:https://github.com/d4l-data4life/hc-auth-sdk-kmp/[Data4Life Auth]
 * link:https://github.com/d4l-data4life/hc-crypto-sdk-kmp/[Data4Life Crypto]
 * link:https://github.com/d4l-data4life/hc-securestore-sdk-kmp/[Data4Life Securestore]
-* link:https://github.com/d4l-data4life/hc-result-sdk-kmp/[Data4Life Result]
 * link:https://github.com/d4l-data4life/hc-util-sdk-kmp/[Data4Life Util]
 * link:https://github.com/ThreeTen/threetenbp[ThreeTen Java 8 Time backport]
 * link:http://bouncycastle.org/[BouncyCastle] *
@@ -98,9 +99,9 @@ Once you have a partner ID, follow these steps to start working with the SDK:
 
 === Software requirements
 
-* Android 6.0 (API 23) to Android 11 (API 30)
+* Android 6.0 (API 23) to Android 11 (API 31)
 * Java 8 link:https://developer.android.com/studio/write/java8-support[Limitations] link:https://jakewharton.com/d8-library-desugaring/[Desugaring]
-* Kotlin 1.4.32
+* Kotlin 1.6.10
 
 == Installation
 

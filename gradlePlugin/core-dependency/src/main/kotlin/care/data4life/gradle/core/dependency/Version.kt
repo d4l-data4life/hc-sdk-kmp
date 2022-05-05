@@ -78,7 +78,7 @@ object Version {
         /**
          * [Dokka - Documentation Engine for Kotlin](https://github.com/Kotlin/dokka)
          */
-        const val dokka = "1.6.10"
+        const val dokka = "0.10.1"
 
         /**
          * [Git-Version](https://github.com/palantir/gradle-git-version)
@@ -103,7 +103,7 @@ object Version {
         /**
          * [Gradle JApicmp](https://github.com/melix/japicmp-gradle-plugin)
          */
-        const val japicmp = "0.4.0"
+        const val japicmp = "0.3.0"
 
         /**
          * [Gradle HttpComponents](https://hc.apache.org/httpcomponents-client-4.5.x/current/httpclient/dependency-info.html)

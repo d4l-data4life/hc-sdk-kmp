@@ -46,7 +46,7 @@ dependencies {
     // dependency check
     implementation("com.github.ben-manes:gradle-versions-plugin:0.42.0")
     // download scripts
-    implementation("de.undercouch:gradle-download-task:4.1.2")
+    implementation("de.undercouch:gradle-download-task:5.1.0")
     // publishing.gradle.kts
     implementation("org.eclipse.jgit:org.eclipse.jgit:5.11.0.202103091610-r")
     // quality.gradle.kts

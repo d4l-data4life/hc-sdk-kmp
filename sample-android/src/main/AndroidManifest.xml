@@ -30,13 +30,15 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning"
+        tools:ignore="GoogleAppIndexingWarning,RtlEnabled"
         tools:replace="android:allowBackup"
+        tools:targetApi="donut"
         >
 
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullSensor"
+            android:exported="true"
             >
 
             <intent-filter>
@@ -48,15 +50,18 @@
 
         <activity
             android:name=".DocumentsActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullSensor"
+            android:exported="false"
             />
         <activity
             android:name=".DocumentDetailsActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullSensor"
+            android:exported="false"
             />
         <activity
             android:name=".AttachmentPreviewActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullSensor"
+            android:exported="false"
             />
 
     </application>

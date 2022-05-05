@@ -27,7 +27,10 @@
         tools:ignore="GoogleAppIndexingWarning"
         >
 
-        <activity android:name="care.data4life.sdk.e2e.CrossSDKActivity">
+        <activity
+            android:name="care.data4life.sdk.e2e.CrossSDKActivity"
+            android:exported="true"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

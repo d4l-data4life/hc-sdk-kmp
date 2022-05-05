@@ -43,11 +43,7 @@ android {
         multiDexEnabled = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArguments(
-            mapOf(
-                "clearPackageData" to "true"
-            )
-        )
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
 
         manifestPlaceholders.putAll(
             mapOf<String, Any>(

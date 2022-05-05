@@ -16,6 +16,7 @@
 
 import care.data4life.gradle.core.dependency.bintray
 import care.data4life.gradle.core.dependency.d4l
+import care.data4life.gradle.core.dependency.ensureKotlinVersion
 import care.data4life.gradle.core.dependency.gitHub
 import care.data4life.gradle.core.dependency.jitPack
 
@@ -41,6 +42,8 @@ allprojects {
         bintray()
         jitPack()
     }
+
+    ensureKotlinVersion()
 
     apply(plugin = "org.owasp.dependencycheck")
 

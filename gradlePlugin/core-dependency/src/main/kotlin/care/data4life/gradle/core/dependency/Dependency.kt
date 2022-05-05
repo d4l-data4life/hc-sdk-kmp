@@ -39,9 +39,9 @@ object Dependency {
             const val utilJvm = "care.data4life.hc-util-sdk-kmp:util-jvm:${Version.d4l.sdkUtil}"
             const val utilAndroid = "care.data4life.hc-util-sdk-kmp:util-android:${Version.d4l.sdkUtil}"
 
-            const val resultError = "care.data4life.hc-result-sdk-kmp:error:${Version.d4l.resultSdk}"
-            const val resultErrorAndroid = "care.data4life.hc-result-sdk-kmp:error-android:${Version.d4l.resultSdk}"
-            const val resultErrorJvm = "care.data4life.hc-result-sdk-kmp:error-jvm:${Version.d4l.resultSdk}"
+            const val resultError = "care.data4life.hc-util-sdk-kmp:error:${Version.d4l.sdkUtil}"
+            const val resultErrorAndroid = "care.data4life.hc-util-sdk-kmp:error-android:${Version.d4l.sdkUtil}"
+            const val resultErrorJvm = "care.data4life.hc-util-sdk-kmp:error-jvm:${Version.d4l.sdkUtil}"
 
             const val fhirSdk = "care.data4life.hc-fhir-sdk-java:fhir-java:${Version.d4l.fhirSdk}"
 

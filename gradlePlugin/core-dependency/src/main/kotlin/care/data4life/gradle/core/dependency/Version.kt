@@ -34,11 +34,6 @@ object Version {
         const val sdkUtil = "1.11.0"
 
         /**
-         * [hc-result-sdk-kmp](https://github.com/d4l-data4life/hc-result-sdk-kmp)
-         */
-        const val resultSdk = "0.3.0"
-
-        /**
          * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)
          */
         const val fhirSdk = "1.6.3"

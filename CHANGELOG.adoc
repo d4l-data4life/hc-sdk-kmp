@@ -40,6 +40,8 @@ toc::[]
 
 === Removed
 
+* HC Result
+
 === Fixed
 
 === Bumped

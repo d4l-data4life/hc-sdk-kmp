@@ -78,7 +78,7 @@ object Version {
         /**
          * [Dokka - Documentation Engine for Kotlin](https://github.com/Kotlin/dokka)
          */
-        const val dokka = "0.10.1"
+        const val dokka = "1.6.10"
 
         /**
          * [Git-Version](https://github.com/palantir/gradle-git-version)

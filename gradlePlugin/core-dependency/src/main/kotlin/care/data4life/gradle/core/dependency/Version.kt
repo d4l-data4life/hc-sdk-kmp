@@ -112,6 +112,7 @@ object Version {
 
         /**
          * [Gradle Android Maven](https://hc.apache.org/httpcomponents-client-4.5.x/current/httpclient/project-info.html)
+         * Abandoned!!!
          */
         const val androidMaven = "2.1"
 
@@ -123,7 +124,7 @@ object Version {
 
     // Java
     const val javaXAnnotation = "3.0.2"
-    const val jacocoVersion = "0.8.7"
+    const val jacocoVersion = "0.8.8"
 
     val android = Android
     object Android {

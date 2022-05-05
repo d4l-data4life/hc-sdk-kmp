@@ -48,7 +48,7 @@ dependencies {
     // download scripts
     implementation("de.undercouch:gradle-download-task:5.1.0")
     // publishing.gradle.kts
-    implementation("org.eclipse.jgit:org.eclipse.jgit:5.11.0.202103091610-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:6.1.0.202203080745-r")
     // quality.gradle.kts
     implementation("com.diffplug.spotless:spotless-plugin-gradle:5.14.3")
     implementation("com.pinterest:ktlint:0.42.1")

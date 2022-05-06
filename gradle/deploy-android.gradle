@@ -54,8 +54,8 @@ afterEvaluate {
                 name = "GithubPackages"
                 url = uri("https://maven.pkg.github.com/d4l-data4life/hc-sdk-kmp")
                 credentials {
-                    username = project.findProperty("gpr.user") ?: System.getenv("PACKAGE_REGISTRY_USERNAME")
-                    password = project.findProperty("gpr.key") ?: System.getenv("PACKAGE_REGISTRY_TOKEN")
+                    username = project.findProperty("gpr.user") ?: System.getenv("PACKAGE_REGISTRY_UPLOAD_USERNAME")
+                    password = project.findProperty("gpr.key") ?: System.getenv("PACKAGE_REGISTRY_UPLOAD_TOKEN")
                 }
             }
 

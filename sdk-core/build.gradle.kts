@@ -21,6 +21,9 @@ plugins {
     id("java-library")
     id("kotlin")
     kotlin("kapt")
+
+    // Publish
+    id("care.data4life.gradle.core.script.publishing-config")
 }
 
 apply(from = "${project.rootDir}/gradle/jacoco-java.gradle.kts")

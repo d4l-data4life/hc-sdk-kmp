@@ -20,9 +20,11 @@ import care.data4life.gradle.core.dependency.Dependency
 plugins {
     id("com.github.johnrengelman.shadow") version "4.0.1"
     id("java-library")
-    id("maven-publish")
     id("kotlin")
     kotlin("kapt")
+
+    // Publish
+    id("care.data4life.gradle.core.script.publishing-config")
 }
 
 apply(from = "${project.rootDir}/gradle/jacoco-java.gradle.kts")

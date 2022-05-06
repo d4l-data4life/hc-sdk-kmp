@@ -22,6 +22,9 @@ plugins {
     id("kotlin-android")
     id("com.vanniktech.android.junit.jacoco")
     id("me.champeau.gradle.japicmp")
+
+    // Publish
+    id("care.data4life.gradle.core.script.publishing-config")
 }
 
 group = LibraryConfig.group

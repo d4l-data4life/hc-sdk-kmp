@@ -28,7 +28,7 @@ object LibraryConfig {
 
     object PublishConfig {
         const val name = LibraryConfig.name
-        const val groupId = "care.data4life.hc-sdk-kmp"
+        const val groupId = "care.data4life"
         const val description = "Android SDK for interacting with the Data4Life Personal Health Data Platform."
 
         const val year = "2021"

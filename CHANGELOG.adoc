@@ -35,6 +35,8 @@ toc::[]
 
 === Removed
 
+* jApiCmp Gradle plugin as it's not needed anymore
+
 === Fixed
 
 === Bumped

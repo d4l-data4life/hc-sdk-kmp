@@ -38,7 +38,6 @@ dependencies {
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.androidMaven)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.androidJacoco)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.dexcount)
-    implementation(care.data4life.gradle.core.dependency.GradlePlugin.japicmp)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.downloadTask)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.httpComponents)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.dokka)

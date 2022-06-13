@@ -30,8 +30,6 @@ object GradlePlugin {
 
     const val owasp = "org.owasp:dependency-check-gradle:${Version.gradlePlugin.owasp}"
 
-    const val japicmp = "me.champeau.gradle:japicmp-gradle-plugin:${Version.gradlePlugin.japicmp}"
-
     const val httpComponents = "org.apache.httpcomponents:httpclient:${Version.gradlePlugin.httpComponents}"
 
     const val androidMaven = "com.github.dcendents:android-maven-gradle-plugin:${Version.gradlePlugin.androidMaven}"

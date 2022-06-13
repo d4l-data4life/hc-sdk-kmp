@@ -21,7 +21,6 @@ plugins {
     id("com.android.library")
     id("kotlin-android")
     id("com.vanniktech.android.junit.jacoco")
-    id("me.champeau.gradle.japicmp")
 }
 
 group = LibraryConfig.group
@@ -191,51 +190,6 @@ dependencies {
         isTransitive = false
         isForce = true
     }
-}
-
-val clearJar by tasks.registering(Delete::class) {
-    delete("build/outputs/ProjectName.jar")
-}
-
-val genCurrentJar by tasks.creating(Jar::class) {
-    dependsOn("assemble")
-    from("build/intermediates/classes/release/")
-    archiveFileName.set("sdk-api.jar")
-}
-
-val genReferenceJar by tasks.creating {
-    doLast {
-        copy {
-            from(compatibilityBase)
-            into("$buildDir/outputs/jar/")
-            rename("hc-sdk-kmp-${LibraryConfig.referenceSdkVersion}.jar", "reference-sdk.zip")
-        }
-
-        copy {
-            from(zipTree("$buildDir/outputs/jar/reference-sdk.zip"))
-            into("$buildDir/outputs/jar/")
-            include("classes.jar")
-            rename("classes.jar", "reference-sdk.jar")
-        }
-    }
-}
-
-val generateSdkCompatibilityReport by tasks.creating(me.champeau.gradle.japicmp.JapicmpTask::class) {
-    dependsOn(genCurrentJar, genReferenceJar)
-
-    oldClasspath = files("$buildDir/outputs/jar/reference-sdk.zip")
-    newClasspath = files(genCurrentJar.archivePath)
-    isOnlyModified = true
-    isFailOnModification = true
-    txtOutputFile = file("$buildDir/reports/compatibility/japi.txt")
-    isIgnoreMissingClasses = true
-    packageIncludes = listOf("care.data4life.*")
-    classExcludes = listOf(
-        "care.data4life.crypto.R",
-        "care.data4life.auth.R",
-        "care.data4life.securestore.R",
-        "care.data4life.sdk.R"
-    )
 }
 
 apply(from = "$projectDir/gradle/downloadFromDevDocs.gradle")

@@ -101,11 +101,6 @@ object Version {
         const val owasp = "7.1.0.1"
 
         /**
-         * [Gradle JApicmp](https://github.com/melix/japicmp-gradle-plugin)
-         */
-        const val japicmp = "0.3.0"
-
-        /**
          * [Gradle HttpComponents](https://hc.apache.org/httpcomponents-client-4.5.x/current/httpclient/dependency-info.html)
          */
         const val httpComponents = "4.5.13"

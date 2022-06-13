@@ -18,12 +18,12 @@ package care.data4life.gradle.core.dependency
 
 object Version {
     // kotlin
-    const val kotlin = "1.6.10"
+    const val kotlin = "1.6.21"
 
     /**
      *  https://github.com/Kotlin/kotlinx.coroutines
      */
-    const val kotlinCoroutines = "1.6.0-native-mt"
+    const val kotlinCoroutines = "1.6.2"
 
     val d4l = D4L
 
@@ -140,14 +140,14 @@ object Version {
         const val appCompat = "1.4.1"
         const val browser = "1.4.0"
 
-        const val constraintLayout = "2.1.3"
+        const val constraintLayout = "2.1.4"
         const val swipeRefreshLayout = "1.1.0"
     }
 
     /**
      * [Material Android](https://github.com/material-components/material-components-android)
      */
-    const val material = "1.5.0"
+    const val material = "1.6.1"
 
     /**
      * [PlayService Base](https://developers.google.com/android/guides/setup)

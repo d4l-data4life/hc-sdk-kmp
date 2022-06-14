@@ -46,7 +46,7 @@ object Version {
         /**
          * [hc-auth-sdk-kmp](https://github.com/d4l-data4life/hc-auth-sdk-kmp)
          */
-        const val auth = "1.15.0"
+        const val auth = "1.15.0-fix-auth-SNAPSHOT"
 
         /**
          * [hc-crypto-sdk-kmp](https://github.com/d4l-data4life/hc-crypto-sdk-kmp)

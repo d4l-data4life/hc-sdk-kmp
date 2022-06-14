@@ -26,7 +26,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 
 // TODO add internal
-class AttachmentService internal constructor(
+class AttachmentService constructor(
     private val fileService: AttachmentContract.FileService,
     resizer: AttachmentContract.ImageResizer
 ) : AttachmentContract.Service {

@@ -53,4 +53,4 @@ jobs:
       - name: Publish to GitHub Packages
         run: ./gradlew publishAllPublicationToGitHubPackagesRepository
       - name: Publish Release to Maven Repo
-        run: ./gradlew publishRelease
+        run: ./gradlew publishRelease -Dorg.gradle.parallel=false

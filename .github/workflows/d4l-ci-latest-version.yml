@@ -56,4 +56,4 @@ jobs:
       - name: Run tests with code coverage
         run: ./gradlew jacocoTestReport
       - name: Publish Snapshot to Maven Repo
-        run: ./gradlew publishSnapshot
+        run: ./gradlew publishSnapshot -Dorg.gradle.parallel=false

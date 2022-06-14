@@ -53,13 +53,6 @@ android {
     buildTypes {
         getByName("debug") {
             setMatchingFallbacks("debug", "release")
-
-            manifestPlaceholders["redirectScheme"] = "com.redirectScheme.comm"
-            manifestPlaceholders["clientId"] = "com.redirectScheme.comm"
-            manifestPlaceholders["clientSecret"] = "com.redirectScheme.comm"
-            manifestPlaceholders["debug"] = "com.redirectScheme.comm"
-            manifestPlaceholders["environment"] = "com.redirectScheme.comm"
-            manifestPlaceholders["platform"] = "com.redirectScheme.comm"
         }
         getByName("release") {
             isMinifyEnabled = false

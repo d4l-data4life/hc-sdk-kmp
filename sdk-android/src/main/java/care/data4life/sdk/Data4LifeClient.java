@@ -28,7 +28,6 @@ import java.util.Set;
 
 import care.data4life.sdk.auth.AuthorizationConfiguration;
 import care.data4life.sdk.auth.AuthorizationService;
-import care.data4life.sdk.auth.AuthorizationService.AuthorizationListener;
 import care.data4life.sdk.auth.storage.SharedPrefsAuthStorage;
 import care.data4life.sdk.crypto.GCKeyPair;
 import care.data4life.sdk.attachment.AttachmentService;
@@ -40,7 +39,6 @@ import care.data4life.sdk.crypto.CryptoSecureStore;
 import care.data4life.sdk.crypto.CryptoService;
 import care.data4life.sdk.fhir.ResourceCryptoService;
 import care.data4life.sdk.lang.CoreRuntimeException;
-import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.Callback;
 import care.data4life.sdk.network.ApiService;
 import care.data4life.sdk.network.Environment;
@@ -208,39 +206,17 @@ public final class Data4LifeClient extends BaseClient {
         return instance;
     }
 
-    public Intent getLoginIntent(Context context, Set<String> scopes) {
+    public Intent getLoginIntent(Set<String> scopes) {
         String publicKey = cryptoService
                 .generateGCKeyPair()
                 .map(GCKeyPair::getPublicKey)
                 .flatMap(cryptoService::convertAsymmetricKeyToBase64ExchangeKey)
                 .blockingGet();
 
-        return authorizationService.loginIntent(context, scopes, publicKey, authListener);
+        return authorizationService.loginIntent(scopes, publicKey);
     }
 
-    private final AuthorizationListener authListener = new AuthorizationListener() {
-        @Override
-        public void onSuccess(Intent authData, @NonNull AuthorizationService.Callback loginFinishedCbk) { //callback is called from the main thread
-            finishLogin(authData, new Callback() {
-                @Override
-                public void onSuccess() {
-                    loginFinishedCbk.onSuccess();
-                }
-
-                @Override
-                public void onError(@NonNull D4LException exception) {
-                    loginFinishedCbk.onError(exception);
-                }
-            });
-        }
-
-        @Override
-        public void onError(@NonNull Throwable error, AuthorizationService.Callback callback) {
-            callback.onError(error);
-        }
-    };
-
-    private void finishLogin(Intent authData, Callback listener) {
+    public void finishLogin(Intent authData, Callback listener) {
         authorizationService.finishLogin(authData, new AuthorizationService.Callback() { //callback is called from the main thread
             @SuppressLint("CheckResult")
             @Override

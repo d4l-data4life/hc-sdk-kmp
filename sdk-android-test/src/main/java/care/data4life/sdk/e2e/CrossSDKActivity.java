@@ -86,7 +86,7 @@ public class CrossSDKActivity extends AppCompatActivity {
     };
 
     private void loginUser() {
-        Intent loginIntent = Data4LifeClient.getInstance().getLoginIntent(CrossSDKActivity.this, null);
+        Intent loginIntent = Data4LifeClient.getInstance().getLoginIntent(null);
         startActivityForResult(loginIntent, Data4LifeClient.D4L_AUTH);
     }
 

@@ -73,7 +73,7 @@ public class MainActivity extends Activity {
         mRootCL = findViewById(R.id.rootCL);
         mLoginBTN = findViewById(R.id.hcLoginBTN);
         mLoginBTN.setOnClickListener(view -> {
-            Intent loginIntent = Data4LifeClient.getInstance().getLoginIntent(MainActivity.this, null);
+            Intent loginIntent = Data4LifeClient.getInstance().getLoginIntent(null);
             startActivityForResult(loginIntent, D4L_AUTH);
         });
     }

@@ -63,7 +63,7 @@ object Version {
 
     object GradlePlugin {
         const val kotlin = Version.kotlin
-        const val android = "7.3.0-beta02"
+        const val android = "7.3.0-beta03"
 
         /**
          * [Dexcount](https://github.com/KeepSafe/dexcount-gradle-plugin)

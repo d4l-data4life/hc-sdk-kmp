@@ -86,12 +86,12 @@ public class CrossSDKActivity extends AppCompatActivity {
     };
 
     private void loginUser() {
-        Intent loginIntent = Data4LifeClient.getInstance().getLoginIntent(null);
+        Intent loginIntent = Data4LifeClient.Companion.getInstance().getLoginIntent(null);
         startActivityForResult(loginIntent, Data4LifeClient.D4L_AUTH);
     }
 
     private void logoutUser() {
-        Data4LifeClient.getInstance().logout(new Callback() {
+        Data4LifeClient.Companion.getInstance().logout(new Callback() {
             @Override
             public void onSuccess() {
                 showSnackMsg(R.string.d4l_sdk_successful_logout);

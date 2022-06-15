@@ -80,7 +80,7 @@ public class AttachmentPreviewActivity extends AppCompatActivity {
         photoView = findViewById(R.id.photoView);
         pdfView = findViewById(R.id.pdfView);
 
-        client = Data4LifeClient.getInstance();
+        client = Data4LifeClient.Companion.getInstance();
         downloadAttachment();
     }
 

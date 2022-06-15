@@ -92,7 +92,7 @@ public class DocumentsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_documents);
 
-        client = Data4LifeClient.getInstance();
+        client = Data4LifeClient.Companion.getInstance();
         benchmark = new CRUDBenchmark(client, this);
 
         mAddFAB = findViewById(R.id.addFAB);

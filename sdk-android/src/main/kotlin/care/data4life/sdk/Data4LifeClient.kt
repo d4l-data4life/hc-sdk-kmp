@@ -184,6 +184,24 @@ class Data4LifeClient private constructor(
             )
         }
 
+        fun init(
+            alias: String,
+            cryptoService: CryptoService,
+            authorizationService: AuthorizationService,
+            userService: UserService,
+            recordService: RecordService,
+            callHandler: CallHandler
+        ): Data4LifeClient {
+            return Data4LifeClient(
+                alias,
+                cryptoService,
+                authorizationService,
+                userService,
+                recordService,
+                callHandler
+            )
+        }
+
         private fun loadSdkConfig(context: Context): SdkConfig {
             val applicationInfo = try {
                 context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)

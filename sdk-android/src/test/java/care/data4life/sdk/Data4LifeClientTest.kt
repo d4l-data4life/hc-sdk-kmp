@@ -42,7 +42,7 @@ class Data4LifeClientTest {
     fun setUp() {
         clearAllMocks()
 
-        instance = Data4LifeClient(
+        instance = Data4LifeClient.init(
             ALIAS,
             cryptoService,
             authorizationService,
@@ -86,15 +86,13 @@ class Data4LifeClientTest {
 
         every {
             authorizationService.loginIntent(
-                any(),
                 scopes,
                 pubKey,
-                any()
             )
         } returns intent
 
         // When
-        val loginIntent = instance.getLoginIntent(null, scopes)
+        val loginIntent = instance.getLoginIntent(scopes)
 
         // Then
         Truth.assertThat(loginIntent).isEqualTo(intent)

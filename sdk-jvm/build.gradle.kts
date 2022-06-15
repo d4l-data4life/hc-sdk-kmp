@@ -18,8 +18,9 @@ import care.data4life.gradle.core.config.LibraryConfig
 import care.data4life.gradle.core.dependency.Dependency
 
 plugins {
-    id("com.github.johnrengelman.shadow") version "4.0.1"
+    id("com.github.johnrengelman.shadow") version "5.2.0"
     id("java-library")
+    id("kotlin")
     id("maven-publish")
 }
 

@@ -42,7 +42,7 @@ import care.data4life.sdk.securestore.SecureStoreStorage
 import care.data4life.sdk.tag.TagCryptoService
 import care.data4life.sdk.tag.TaggingService
 
-class Data4LifeClient private constructor(
+class Data4LifeClient(
     alias: String,
     private val authorizationService: AuthorizationService,
     private val cryptoService: CryptoService,

@@ -20,7 +20,7 @@ import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.lang.ImageResizeException
 import care.data4life.sdk.log.Log
 
-class SDKImageResizer(
+class SdkImageResizer(
     private val resizer: AttachmentContract.ImageResizer
 ) : WrapperContract.SDKImageResizer {
     override fun isResizable(data: ByteArray): Boolean = resizer.isResizable(data)

@@ -13,22 +13,16 @@
  * applications and/or if you’d like to contribute to the development of the SDK, please
  * contact D4L by email to help@data4life.care.
  */
+package care.data4life.sdk
 
-package care.data4life.sdk;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
+import java.io.UnsupportedEncodingException
+import java.net.URLDecoder
 
 /**
- * Wrapper around the {@link java.net.URLDecoder}
+ * Wrapper around the [java.net.URLDecoder]
  */
-public class UrlDecoder {
-
-    private static final String CHARSET = "UTF-8";
-    public static UrlDecoder INSTANCE = new UrlDecoder();
-
-    private UrlDecoder() {
-    }
+object UrlDecoder {
+    private const val CHARSET = "UTF-8"
 
     /**
      * Decodes the given encoded url
@@ -36,12 +30,11 @@ public class UrlDecoder {
      * @param encodedUrl the encoded url
      * @return the decoded url or the input when the decoder could't not
      */
-    public String decode(String encodedUrl) {
-        try {
-            return URLDecoder.decode(encodedUrl, CHARSET);
-        } catch (UnsupportedEncodingException e) {
-            return encodedUrl;
+    fun decode(encodedUrl: String): String {
+        return try {
+            URLDecoder.decode(encodedUrl, CHARSET)
+        } catch (e: UnsupportedEncodingException) {
+            encodedUrl
         }
     }
-
 }

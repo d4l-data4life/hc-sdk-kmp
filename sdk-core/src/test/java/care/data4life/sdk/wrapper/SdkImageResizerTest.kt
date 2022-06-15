@@ -29,18 +29,18 @@ import org.junit.Test
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
-class SDKResizerTest {
+class SdkImageResizerTest {
     private val actualResizer: AttachmentContract.ImageResizer = mockk()
     private lateinit var wrapper: WrapperContract.SDKImageResizer
 
     @Before
     fun setUp() {
-        wrapper = SDKImageResizer(actualResizer)
+        wrapper = SdkImageResizer(actualResizer)
     }
 
     @Test
     fun `It fulfils SDKImageResizer`() {
-        val wrapper: Any = SDKImageResizer(mockk())
+        val wrapper: Any = SdkImageResizer(mockk())
 
         assertTrue(wrapper is WrapperContract.SDKImageResizer)
     }

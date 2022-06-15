@@ -17,15 +17,12 @@
 package care.data4life.sdk
 
 import android.graphics.Bitmap.CompressFormat
-import care.data4life.sdk.util.MimeType.Companion.recognizeMimeType
-import care.data4life.sdk.AndroidImageResizer
 import android.graphics.BitmapFactory
 import android.graphics.BitmapFactory.Options
 import care.data4life.sdk.AndroidImageResizer.ResizeDimension.Height
 import care.data4life.sdk.AndroidImageResizer.ResizeDimension.Width
 import care.data4life.sdk.attachment.AttachmentContract.ImageResizer
-import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion
-import care.data4life.sdk.lang.CoreRuntimeException.UnsupportedOperation
+import care.data4life.sdk.util.MimeType.Companion.recognizeMimeType
 import care.data4life.sdk.util.MimeType.JPEG
 import care.data4life.sdk.util.MimeType.PNG
 import java.io.ByteArrayOutputStream

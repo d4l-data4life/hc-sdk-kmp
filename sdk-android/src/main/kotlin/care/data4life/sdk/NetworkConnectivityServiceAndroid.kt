@@ -17,7 +17,6 @@ package care.data4life.sdk
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import care.data4life.sdk.network.NetworkingContract.NetworkConnectivityService
 
 class NetworkConnectivityServiceAndroid(private val context: Context) : NetworkConnectivityService {

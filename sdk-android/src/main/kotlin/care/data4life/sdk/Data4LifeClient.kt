@@ -69,19 +69,23 @@ class Data4LifeClient private constructor(
     }
 
     fun finishLogin(authData: Intent, callback: Callback) {
-        authorizationService.finishLogin(authData, object : AuthorizationService.Callback {
-            override fun onSuccess() {
-                userService.finishLogin(true)
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(
-                        { isLoggedIn: Boolean? -> callback.onSuccess() },
-                        { error -> callback.onError(callHandler.errorHandler.handleError(error)) })
-            }
+        authorizationService.finishLogin(
+            authData,
+            object : AuthorizationService.Callback {
+                override fun onSuccess() {
+                    userService.finishLogin(true)
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(
+                            { isLoggedIn: Boolean? -> callback.onSuccess() },
+                            { error -> callback.onError(callHandler.errorHandler.handleError(error)) }
+                        )
+                }
 
-            override fun onError(error: Throwable) {
-                callback.onError(callHandler.errorHandler.handleError(error))
+                override fun onError(error: Throwable) {
+                    callback.onError(callHandler.errorHandler.handleError(error))
+                }
             }
-        })
+        )
     }
 
     companion object {
@@ -97,6 +101,8 @@ class Data4LifeClient private constructor(
         private const val UNKNOWN = "unknown"
 
         private lateinit var INSTANCE: Data4LifeClient
+
+        const val D4L_AUTH = 9905
 
         fun getInstance(): Data4LifeClient {
             return INSTANCE

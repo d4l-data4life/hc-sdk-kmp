@@ -19,20 +19,20 @@ import care.data4life.sdk.JvmImageResizer.ResizeDimension.Height
 import care.data4life.sdk.JvmImageResizer.ResizeDimension.Width
 import care.data4life.sdk.attachment.AttachmentContract.ImageResizer
 import care.data4life.sdk.lang.ImageResizeException.JpegWriterMissing
+import care.data4life.sdk.log.Log
 import care.data4life.sdk.util.MimeType.Companion.recognizeMimeType
 import care.data4life.sdk.util.MimeType.JPEG
 import care.data4life.sdk.util.MimeType.PNG
-import care.data4life.sdk.log.Log
-import java.awt.image.BufferedImage
-import javax.imageio.ImageIO
-import java.awt.Transparency
 import java.awt.RenderingHints
-import javax.imageio.ImageWriteParam
-import javax.imageio.stream.MemoryCacheImageOutputStream
-import javax.imageio.IIOImage
+import java.awt.Transparency
+import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import javax.imageio.IIOImage
+import javax.imageio.ImageIO
+import javax.imageio.ImageWriteParam
+import javax.imageio.stream.MemoryCacheImageOutputStream
 
 class JvmImageResizer : ImageResizer {
 

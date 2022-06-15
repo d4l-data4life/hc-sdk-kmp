@@ -17,8 +17,6 @@ package care.data4life.sdk
 
 import care.data4life.fhir.util.Preconditions
 import care.data4life.sdk.auth.Authorization.Companion.defaultScopes
-import care.data4life.sdk.InitializationConfig
-import care.data4life.sdk.auth.Authorization
 
 class InitializationConfig private constructor(
     val alias: String,

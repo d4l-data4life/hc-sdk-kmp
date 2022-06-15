@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 D4L data4life gGmbH / All rights reserved.
+ * Copyright (c) 2022 D4L data4life gGmbH / All rights reserved.
  *
  * D4L owns all legal rights, title and interest in and to the Software Development Kit ("SDK"),
  * including any intellectual property rights that subsist in the SDK.
@@ -14,20 +14,16 @@
  * contact D4L by email to help@data4life.care.
  */
 
-package care.data4life.sample;
+package care.data4life.sample
 
-import android.app.Application;
+import android.app.Application
+import care.data4life.sdk.Data4LifeClient
+import com.jakewharton.threetenabp.AndroidThreeTen
 
-import com.jakewharton.threetenabp.AndroidThreeTen;
-
-import care.data4life.sdk.Data4LifeClient;
-
-public class SampleApplication extends Application {
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        AndroidThreeTen.init(this);
-        Data4LifeClient.init(this);
+class SampleApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        AndroidThreeTen.init(this)
+        Data4LifeClient.init(this)
     }
 }

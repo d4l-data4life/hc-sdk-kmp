@@ -71,6 +71,12 @@ android {
             }
         }
 
+        testVariants.forEach {
+            it.mergedFlavor.manifestPlaceholders.putAll(
+                d4lClientConfig.toConfigMap(care.data4life.gradle.core.config.Environment.DEVELOPMENT, true)
+            )
+        }
+
         execution = "ANDROID_TEST_ORCHESTRATOR"
     }
 

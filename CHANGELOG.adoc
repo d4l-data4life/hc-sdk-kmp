@@ -29,6 +29,8 @@ toc::[]
 
 === Added
 
+* Add ScribeJava dependency to java client
+
 === Changed
 
 === Deprecated

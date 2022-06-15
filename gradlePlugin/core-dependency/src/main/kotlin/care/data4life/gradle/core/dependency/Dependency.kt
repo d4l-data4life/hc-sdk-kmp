@@ -182,6 +182,9 @@ object Dependency {
         // Kotlin
         const val kotlinStdlibJdk8 = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Version.kotlin}"
 
+        // Authorization
+        const val scribeCore = "com.github.scribejava:scribejava-core:${Version.jvm.scribe}"
+
         // Crypto
         const val bouncyCastleJdk15 = "org.bouncycastle:bcprov-jdk15on:${Version.bouncyCastle}"
 

@@ -108,6 +108,16 @@ object Version {
     }
 
     // Java
+    val jvm = Jvm
+
+    object Jvm {
+        // Authorization
+        /**
+         * [scribe](https://github.com/scribejava/scribejava)
+         */
+        const val scribe = "6.3.0"
+    }
+
     const val javaXAnnotation = "3.0.2"
     const val jacocoVersion = "0.8.8"
 

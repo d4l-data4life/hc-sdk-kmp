@@ -52,6 +52,7 @@ dependencies {
     implementation(Dependency.Java.threeTenBP)
     implementation(Dependency.Java.rxJava)
     implementation(Dependency.Java.moshi)
+    implementation(Dependency.Java.scribeCore)
 
     compileOnly(Dependency.Java.javaXAnnotation)
 

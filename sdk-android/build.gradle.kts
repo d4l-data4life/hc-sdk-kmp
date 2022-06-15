@@ -86,11 +86,6 @@ android {
     }
 }
 
-val compatibilityBase by configurations.creating {
-    description =
-        "Configuration for the base version of the SDK we want to verify compatibility against"
-}
-
 dependencies {
     coreLibraryDesugaring(Dependency.Android.androidDesugar)
 
@@ -178,11 +173,6 @@ dependencies {
 
     androidTestImplementation(Dependency.Android.googlePlayServicesBase)
     androidTestImplementation(Dependency.Android.AndroidTest.truth)
-
-    compatibilityBase("care.data4life:hc-sdk-kmp:${LibraryConfig.referenceSdkVersion}") {
-        isTransitive = false
-        isForce = true
-    }
 }
 
 apply(from = "$projectDir/gradle/downloadFromDevDocs.gradle")

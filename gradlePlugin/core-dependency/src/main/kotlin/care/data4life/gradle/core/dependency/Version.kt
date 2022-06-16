@@ -132,7 +132,7 @@ object Version {
          */
         const val core = "1.1.0"
         const val ktx = "1.7.0"
-        const val appCompat = "1.4.1"
+        const val appCompat = "1.4.2"
         const val browser = "1.4.0"
 
         const val constraintLayout = "2.1.4"

@@ -16,6 +16,7 @@
 
 package care.data4life.sdk.test.util
 
+import care.data4life.fhir.r4.model.CodeSystemDocumentReferenceStatus
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.util.Base64
@@ -102,7 +103,7 @@ object TestResourceHelper {
         val contents: MutableList<Fhir3DocumentReference.DocumentReferenceContent> = mutableListOf()
         contents.add(content)
         return Fhir3DocumentReference(
-            null,
+            care.data4life.fhir.stu3.model.CodeSystemDocumentReferenceStatus.CURRENT,
             null,
             null,
             contents
@@ -125,7 +126,7 @@ object TestResourceHelper {
         val contents: MutableList<Fhir4DocumentReference.DocumentReferenceContent> = mutableListOf()
         contents.add(content)
         return Fhir4DocumentReference(
-            null,
+            CodeSystemDocumentReferenceStatus.CURRENT,
             contents
         )
     }

@@ -181,13 +181,13 @@ class FhirAttachmentHelperTest {
         // Given
         val resource: Fhir3DocumentReference = mockk()
 
-        every { Fhir3AttachmentHelper.updateAttachmentData(resource, null) } just Runs
+        every { Fhir3AttachmentHelper.updateAttachmentData(resource, hashMapOf()) } just Runs
 
         // When
         SdkFhirAttachmentHelper.updateAttachmentData(resource, null)
 
         // Then
-        verify(exactly = 1) { Fhir3AttachmentHelper.updateAttachmentData(resource, null) }
+        verify(exactly = 1) { Fhir3AttachmentHelper.updateAttachmentData(resource, hashMapOf()) }
     }
 
     @Test
@@ -235,13 +235,13 @@ class FhirAttachmentHelperTest {
         // Given
         val resource: Fhir4DocumentReference = mockk()
 
-        every { Fhir4AttachmentHelper.updateAttachmentData(resource, null) } just Runs
+        every { Fhir4AttachmentHelper.updateAttachmentData(resource, hashMapOf()) } just Runs
 
         // When
         SdkFhirAttachmentHelper.updateAttachmentData(resource, null)
 
         // Then
-        verify(exactly = 1) { Fhir4AttachmentHelper.updateAttachmentData(resource, null) }
+        verify(exactly = 1) { Fhir4AttachmentHelper.updateAttachmentData(resource, hashMapOf()) }
     }
 
     @Test

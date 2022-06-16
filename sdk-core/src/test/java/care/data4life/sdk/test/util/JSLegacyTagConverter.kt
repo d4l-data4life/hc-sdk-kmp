@@ -35,7 +35,7 @@ object JSLegacyTagConverter {
         var alignedTag = tag
 
         cleanedEncodings.forEach { encoding ->
-            alignedTag = alignedTag.replace(encoding, encoding.toUpperCase(Locale.US))
+            alignedTag = alignedTag.replace(encoding, encoding.uppercase(Locale.US))
         }
 
         return alignedTag

@@ -179,10 +179,10 @@ class CryptoServiceFake : CryptoContract.Service {
     override fun encryptSymmetricKey(
         key: GCKey,
         keyType: KeyType,
-        gckey: GCKey
+        gcKey: GCKey
     ): Single<NetworkModelContract.EncryptedKey> {
         return if (isCommonKey(key)) {
-            Single.just(matchEncryptSymKey(keyType, gckey))
+            Single.just(matchEncryptSymKey(keyType, gcKey))
         } else {
             throw RuntimeException("Expected commonKey as parameter in encryptSymmetricKey and got $key.")
         }

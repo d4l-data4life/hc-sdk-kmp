@@ -113,10 +113,10 @@ dependencies {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
-    implementation(Dependency.Multiplatform.D4L.fhirSdk)
+    implementation(Dependency.jvm.fhirSdk)
 
-    implementation(Dependency.Multiplatform.D4L.utilAndroid)
-    implementation(Dependency.Multiplatform.D4L.resultErrorAndroid)
+    implementation(Dependency.Multiplatform.D4L.util)
+    implementation(Dependency.Multiplatform.D4L.error)
 
     implementation(Dependency.Android.threeTenABP)
 
@@ -133,7 +133,7 @@ dependencies {
 
     implementation(Dependency.Android.moshi)
 
-    testImplementation(Dependency.Android.Test.junit)
+    testImplementation(Dependency.JvmTest.junit)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.runner)
+    androidTestImplementation(Dependency.AndroidTest.runner)
 }

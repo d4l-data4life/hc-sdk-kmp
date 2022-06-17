@@ -105,13 +105,13 @@ dependencies {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "error-jvm")
     }
 
-    implementation(Dependency.Multiplatform.D4L.authAndroid)
-    implementation(Dependency.Multiplatform.D4L.cryptoAndroid)
-    implementation(Dependency.Multiplatform.D4L.securestoreAndroid)
-    api(Dependency.Multiplatform.D4L.utilAndroid)
-    api(Dependency.Multiplatform.D4L.resultErrorAndroid)
+    implementation(Dependency.Multiplatform.D4L.auth)
+    implementation(Dependency.Multiplatform.D4L.crypto)
+    implementation(Dependency.Multiplatform.D4L.securestore)
+    api(Dependency.Multiplatform.D4L.util)
+    api(Dependency.Multiplatform.D4L.error)
 
-    implementation(Dependency.Multiplatform.D4L.fhirSdk)
+    implementation(Dependency.Jvm.fhirSdk)
     implementation(Dependency.Android.threeTenABP)
 
     implementation(Dependency.Android.AndroidX.appCompat)
@@ -130,20 +130,22 @@ dependencies {
 
     implementation(Dependency.Android.bouncyCastleJdk15)
 
-    compileOnly(Dependency.Java.javaXAnnotation)
+    // FIXME could be removed
+    compileOnly(Dependency.Jvm.javaXAnnotation)
 
-    testImplementation(Dependency.Android.Test.junit)
-    testImplementation(Dependency.Android.Test.truth)
+    testImplementation(Dependency.JvmTest.junit)
+    testImplementation(Dependency.AndroidTest.truth)
 
-    testImplementation(Dependency.Multiplatform.Test.MockK.jdk)
+    testImplementation(Dependency.MultiplatformTest.mockK)
 
+    // FIXME
     testImplementation("org.mockito:mockito-inline:2.9.0")
     testImplementation("org.powermock:powermock-core:1.7.3")
     testImplementation("org.powermock:powermock-module-junit4:1.7.3")
     testImplementation("org.powermock:powermock-api-mockito2:1.7.3")
 
-    testImplementation(Dependency.Android.Test.okHttpMockWebServer)
-    testImplementation(Dependency.Android.Test.jsonAssert)
+    testImplementation(Dependency.JvmTest.okHttpMockWebServer)
+    testImplementation(Dependency.JvmTest.jsonAssert)
 
     testImplementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
@@ -155,7 +157,7 @@ dependencies {
     androidTestImplementation(Dependency.Android.material)
 
     androidTestImplementation(Dependency.Multiplatform.Kotlin.stdlibAndroid)
-    androidTestImplementation(Dependency.Multiplatform.Coroutines.android)
+    androidTestImplementation(Dependency.Multiplatform.coroutinesCore)
 
     androidTestImplementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
@@ -163,22 +165,22 @@ dependencies {
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
 
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
+    androidTestImplementation(Dependency.MultiplatformTest.Kotlin.testJvm)
+    androidTestImplementation(Dependency.MultiplatformTest.Kotlin.testJvmJunit)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.runner)
-    androidTestImplementation(Dependency.Android.AndroidTest.rules)
-    androidTestImplementation(Dependency.Android.AndroidTest.orchestrator)
+    androidTestImplementation(Dependency.AndroidTest.runner)
+    androidTestImplementation(Dependency.AndroidTest.rules)
+    androidTestImplementation(Dependency.AndroidTest.orchestrator)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoCore)
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoIntents)
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoWeb)
+    androidTestImplementation(Dependency.AndroidTest.espressoCore)
+    androidTestImplementation(Dependency.AndroidTest.espressoIntents)
+    androidTestImplementation(Dependency.AndroidTest.espressoWeb)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.uiAutomator)
-    androidTestImplementation(Dependency.Android.AndroidTest.kakao)
+    androidTestImplementation(Dependency.AndroidTest.uiAutomator)
+    androidTestImplementation(Dependency.AndroidTest.kakao)
 
     androidTestImplementation(Dependency.Android.googlePlayServicesBase)
-    androidTestImplementation(Dependency.Android.AndroidTest.truth)
+    androidTestImplementation(Dependency.AndroidTest.truth)
 }
 
 apply(from = "$projectDir/gradle/downloadFromDevDocs.gradle")

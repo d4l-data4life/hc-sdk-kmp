@@ -118,37 +118,37 @@ dependencies {
     implementation(Dependency.Android.AndroidX.browser)
     implementation(Dependency.Android.material)
 
-    implementation(Dependency.Multiplatform.D4L.utilAndroid)
-    implementation(Dependency.Multiplatform.D4L.resultErrorAndroid)
+    implementation(Dependency.Multiplatform.D4L.util)
+    implementation(Dependency.Multiplatform.D4L.error)
 
     implementation(Dependency.Android.googlePlayServicesBase)
 
 
-    testImplementation(Dependency.Android.Test.junit)
+    testImplementation(Dependency.JvmTest.junit)
 
-    androidTestUtil(Dependency.Android.AndroidTest.orchestrator)
+    androidTestUtil(Dependency.AndroidTest.orchestrator)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.core)
-    androidTestImplementation(Dependency.Android.AndroidTest.runner)
-    androidTestImplementation(Dependency.Android.AndroidTest.rules)
-    androidTestImplementation(Dependency.Android.AndroidTest.extJUnit)
+    androidTestImplementation(Dependency.AndroidTest.core)
+    androidTestImplementation(Dependency.AndroidTest.runner)
+    androidTestImplementation(Dependency.AndroidTest.rules)
+    androidTestImplementation(Dependency.AndroidTest.extJUnit)
 
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
+    androidTestImplementation(Dependency.MultiplatformTest.Kotlin.testJvm)
+    androidTestImplementation(Dependency.MultiplatformTest.Kotlin.testJvmJunit)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoCore)
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoIntents)
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoWeb)
+    androidTestImplementation(Dependency.AndroidTest.espressoCore)
+    androidTestImplementation(Dependency.AndroidTest.espressoIntents)
+    androidTestImplementation(Dependency.AndroidTest.espressoWeb)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.uiAutomator)
-    androidTestImplementation(Dependency.Android.AndroidTest.kakao)
+    androidTestImplementation(Dependency.AndroidTest.uiAutomator)
+    androidTestImplementation(Dependency.AndroidTest.kakao)
 
-    androidTestImplementation(Dependency.Android.okHttp)
-    androidTestImplementation(Dependency.Android.okHttpLoggingInterceptor)
-    androidTestImplementation(Dependency.Android.retrofit)
+    androidTestImplementation(Dependency.Jvm.okHttp)
+    androidTestImplementation(Dependency.Jvm.okHttpLoggingInterceptor)
+    androidTestImplementation(Dependency.Jvm.retrofit)
 
-    androidTestImplementation(Dependency.Android.moshi)
-    androidTestImplementation(Dependency.Android.gson)
+    androidTestImplementation(Dependency.Jvm.moshi)
+    androidTestImplementation(Dependency.Jvm.gson)
 
     androidTestImplementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util")

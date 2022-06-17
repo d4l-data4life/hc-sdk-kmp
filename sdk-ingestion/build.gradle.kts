@@ -53,29 +53,29 @@ dependencies {
     }
     implementation(Dependency.Multiplatform.Kotlin.stdlib)
 
-    implementation(Dependency.Multiplatform.D4L.authJvm)
-    implementation(Dependency.Multiplatform.D4L.cryptoJvm)
-    implementation(Dependency.Multiplatform.D4L.securestoreJvm)
-    implementation(Dependency.Multiplatform.D4L.utilJvm)
+    implementation(Dependency.Multiplatform.D4L.auth)
+    implementation(Dependency.Multiplatform.D4L.crypto)
+    implementation(Dependency.Multiplatform.D4L.securestore)
+    implementation(Dependency.Multiplatform.D4L.util)
     implementation(Dependency.Multiplatform.D4L.fhirHelperJvm) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-jvm")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
-    implementation(Dependency.Multiplatform.D4L.fhirSdk)
+    implementation(Dependency.Jvm.fhirSdk)
 
-    implementation(Dependency.Java.threeTenBP)
-    implementation(Dependency.Java.rxJava)
-    implementation(Dependency.Java.moshi)
+    implementation(Dependency.Jvm.threeTenBP)
+    implementation(Dependency.Jvm.rxJava)
+    implementation(Dependency.Jvm.moshi)
 
-    kapt(Dependency.Java.moshiCodeGen)
-    kaptTest(Dependency.Java.moshiCodeGen)
+    kapt(Dependency.Jvm.moshiCodeGen)
+    kaptTest(Dependency.Jvm.moshiCodeGen)
 
-    compileOnly(Dependency.Java.javaXAnnotation)
+    compileOnly(Dependency.Jvm.javaXAnnotation)
 
-    testImplementation(Dependency.Java.Test.junit)
-    testImplementation(Dependency.Java.Test.mockitoCore)
-    testImplementation(Dependency.Java.Test.truth)
-    testImplementation(Dependency.Java.Test.jsonAssert)
+    testImplementation(Dependency.JvmTest.junit)
+    testImplementation(Dependency.JvmTest.mockitoCore)
+    testImplementation(Dependency.JvmTest.truth)
+    testImplementation(Dependency.JvmTest.jsonAssert)
 }
 
 tasks {

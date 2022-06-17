@@ -40,45 +40,45 @@ kotlin {
 }
 
 dependencies {
-    api(Dependency.Multiplatform.D4L.utilJvm)
-    api(Dependency.Multiplatform.D4L.resultErrorJvm)
+    api(Dependency.Multiplatform.D4L.util)
+    api(Dependency.Multiplatform.D4L.error)
     implementation(Dependency.Multiplatform.Kotlin.stdlib)
 
-    implementation(Dependency.Multiplatform.D4L.authJvm)
-    implementation(Dependency.Multiplatform.D4L.cryptoJvm)
-    implementation(Dependency.Multiplatform.D4L.securestoreJvm)
-    implementation(Dependency.Multiplatform.D4L.fhirSdk)
-    implementation(Dependency.Java.threeTenBP)
+    implementation(Dependency.Multiplatform.D4L.auth)
+    implementation(Dependency.Multiplatform.D4L.crypto)
+    implementation(Dependency.Multiplatform.D4L.securestore)
+    implementation(Dependency.Jvm.fhirSdk)
+    implementation(Dependency.Jvm.threeTenBP)
 
-    compileOnly(Dependency.Java.javaXAnnotation)
+    compileOnly(Dependency.Jvm.javaXAnnotation)
 
-    implementation(Dependency.Java.rxJava)
+    implementation(Dependency.Jvm.rxJava)
 
-    implementation(Dependency.Java.okHttp)
-    implementation(Dependency.Java.okHttpLoggingInterceptor)
+    implementation(Dependency.Jvm.okHttp)
+    implementation(Dependency.Jvm.okHttpLoggingInterceptor)
 
-    implementation(Dependency.Java.retrofit)
-    implementation(Dependency.Java.retrofitConverterMoshi)
-    implementation(Dependency.Java.retrofitAdapterRxJava)
+    implementation(Dependency.Jvm.retrofit)
+    implementation(Dependency.Jvm.retrofitConverterMoshi)
+    implementation(Dependency.Jvm.retrofitAdapterRxJava)
 
-    implementation(Dependency.Java.moshi)
+    implementation(Dependency.Jvm.moshi)
 
-    kapt(Dependency.Java.moshiCodeGen)
-    kaptTest(Dependency.Java.moshiCodeGen)
+    kapt(Dependency.Jvm.moshiCodeGen)
+    kaptTest(Dependency.Jvm.moshiCodeGen)
 
     testImplementation(Dependency.Multiplatform.D4L.fhirHelperJvm) {
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
-    testImplementation(Dependency.Java.Test.junit)
-    testImplementation(Dependency.Java.Test.kotlinTest)
+    testImplementation(Dependency.JvmTest.junit)
+    testImplementation(Dependency.JvmTest.kotlinTest)
 
-    testImplementation(Dependency.Java.Test.mockitoInline)
-    testImplementation(Dependency.Java.Test.truth)
+    testImplementation(Dependency.JvmTest.mockitoInline)
+    testImplementation(Dependency.JvmTest.truth)
 
-    testImplementation(Dependency.Multiplatform.Test.MockK.jdk)
+    testImplementation(Dependency.MultiplatformTest.mockK)
 
-    testImplementation(Dependency.Java.Test.okHttpMockWebServer)
-    testImplementation(Dependency.Java.Test.jsonAssert)
+    testImplementation(Dependency.JvmTest.okHttpMockWebServer)
+    testImplementation(Dependency.JvmTest.jsonAssert)
 }
 
 configure<SourceSetContainer> {

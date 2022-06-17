@@ -43,10 +43,11 @@ dependencies {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
-    implementation(Dependency.Multiplatform.D4L.auth)
-    implementation(Dependency.Multiplatform.D4L.crypto)
-    implementation(Dependency.Multiplatform.D4L.securestore)
-    implementation(Dependency.Multiplatform.D4L.util)
+    implementation(Dependency.Multiplatform.D4L.authJvm)
+    implementation(Dependency.Multiplatform.D4L.cryptoJvm)
+    implementation(Dependency.Multiplatform.D4L.securestoreJvm)
+    implementation(Dependency.Multiplatform.D4L.utilJvm)
+    implementation(Dependency.Multiplatform.D4L.errorJvm)
     implementation(Dependency.jvm.fhirSdk)
 
     implementation(Dependency.Jvm.threeTenBP)

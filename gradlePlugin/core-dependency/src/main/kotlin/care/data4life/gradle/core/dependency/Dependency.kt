@@ -49,9 +49,11 @@ object Dependency {
         object D4L {
             const val util = "care.data4life.hc-util-sdk-kmp:util:${Version.multiplatform.d4l.util}"
             const val utilAndroid = "care.data4life.hc-util-sdk-kmp:util-android:${Version.multiplatform.d4l.util}"
+            const val utilJvm = "care.data4life.hc-util-sdk-kmp:util-jvm:${Version.multiplatform.d4l.util}"
 
             const val error = "care.data4life.hc-util-sdk-kmp:error:${Version.multiplatform.d4l.util}"
             const val errorAndroid = "care.data4life.hc-util-sdk-kmp:error-android:${Version.multiplatform.d4l.util}"
+            const val errorJvm = "care.data4life.hc-util-sdk-kmp:error-jvm:${Version.multiplatform.d4l.util}"
 
             // FIXME
             const val fhirHelperCommon =
@@ -61,13 +63,19 @@ object Dependency {
             const val fhirHelperJvm = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-jvm:${Version.d4l.fhirHelper}"
 
             const val auth = "care.data4life.hc-auth-sdk-kmp:auth:${Version.multiplatform.d4l.auth}"
+            const val authAndroid = "care.data4life.hc-auth-sdk-kmp:auth-android:${Version.multiplatform.d4l.auth}"
+            const val authJvm = "care.data4life.hc-auth-sdk-kmp:auth-jvm:${Version.multiplatform.d4l.auth}"
 
             const val crypto = "care.data4life.hc-crypto-sdk-kmp:crypto:${Version.multiplatform.d4l.crypto}"
+            const val cryptoAndroid = "care.data4life.hc-crypto-sdk-kmp:crypto-android:${Version.multiplatform.d4l.crypto}"
+            const val cryptoJvm = "care.data4life.hc-crypto-sdk-kmp:crypto-jvm:${Version.multiplatform.d4l.crypto}"
 
             const val securestore =
                 "care.data4life.hc-securestore-sdk-kmp:securestore:${Version.multiplatform.d4l.securestore}"
             const val securestoreAndroid =
                 "care.data4life.hc-securestore-sdk-kmp:securestore-android:${Version.multiplatform.d4l.securestore}"
+            const val securestoreJvm =
+                "care.data4life.hc-securestore-sdk-kmp:securestore-jvm:${Version.multiplatform.d4l.securestore}"
         }
 
         const val koinCore = "io.insert-koin:koin-core:${Version.multiplatform.koin}"

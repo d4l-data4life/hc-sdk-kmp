@@ -108,15 +108,17 @@ dependencies {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "error-jvm")
         exclude(group = "care.data4life.hc-fhir-helper-sdk-kmp", module = "fhir-helper-jvm")
     }
+    implementation(Dependency.Multiplatform.D4L.utilAndroid)
+    implementation(Dependency.Multiplatform.D4L.errorAndroid)
 
     implementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
+
+
     implementation(Dependency.jvm.fhirSdk)
 
-    implementation(Dependency.Multiplatform.D4L.util)
-    implementation(Dependency.Multiplatform.D4L.error)
 
     implementation(Dependency.Android.threeTenABP)
 

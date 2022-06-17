@@ -40,14 +40,15 @@ kotlin {
 }
 
 dependencies {
-    implementation(Dependency.Multiplatform.D4L.util)
-    implementation(Dependency.Multiplatform.D4L.error)
     implementation(Dependency.Multiplatform.Kotlin.stdlib)
 
-    implementation(Dependency.Multiplatform.D4L.auth)
-    implementation(Dependency.Multiplatform.D4L.crypto)
-    implementation(Dependency.Multiplatform.D4L.securestore)
-    implementation(Dependency.Jvm.fhirSdk)
+    api(Dependency.Multiplatform.D4L.authJvm)
+    api(Dependency.Multiplatform.D4L.cryptoJvm)
+    api(Dependency.Multiplatform.D4L.securestoreJvm)
+    api(Dependency.Multiplatform.D4L.utilJvm)
+    api(Dependency.Multiplatform.D4L.errorJvm)
+
+    api(Dependency.Jvm.fhirSdk)
     implementation(Dependency.Jvm.threeTenBP)
 
     compileOnly(Dependency.Jvm.javaXAnnotation)

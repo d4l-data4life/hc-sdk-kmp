@@ -95,7 +95,7 @@ android {
 dependencies {
     coreLibraryDesugaring(Dependency.Android.androidDesugar)
 
-    implementation(project(":sdk-core")) {
+    api(project(":sdk-core")) {
         // TODO
         exclude(group = "org.threeten", module = "threetenbp")
         exclude(module = "securestore-jvm")
@@ -105,8 +105,8 @@ dependencies {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "error-jvm")
     }
 
-    implementation(Dependency.Multiplatform.D4L.auth)
-    implementation(Dependency.Multiplatform.D4L.crypto)
+    implementation(Dependency.Multiplatform.D4L.authAndroid)
+    implementation(Dependency.Multiplatform.D4L.cryptoAndroid)
     implementation(Dependency.Multiplatform.D4L.securestoreAndroid)
     implementation(Dependency.Multiplatform.D4L.utilAndroid)
     implementation(Dependency.Multiplatform.D4L.errorAndroid)

@@ -133,7 +133,6 @@ class JvmImageResizer : ImageResizer {
         return scaledImage
     }
 
-    @Throws(JpegWriterMissing::class)
     private fun compressImage(image: BufferedImage, quality: Int): ByteArray? {
         val qualityPercent =
             (if (quality == VALUE_UNKNOWN) ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT else quality) / HUNDRED_PERCENT

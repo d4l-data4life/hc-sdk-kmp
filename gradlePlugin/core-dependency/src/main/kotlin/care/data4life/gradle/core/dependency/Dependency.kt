@@ -16,8 +16,6 @@
 
 package care.data4life.gradle.core.dependency
 
-import care.data4life.gradle.core.dependency.Version
-
 object Dependency {
 
     val gradlePlugin = GradlePlugin
@@ -29,6 +27,10 @@ object Dependency {
     val androidTest = AndroidTest
 
     object Multiplatform {
+
+        val kotlin = Kotlin
+        val kotlinX = KotlinX
+
         object Kotlin {
             const val stdlibCommon = "org.jetbrains.kotlin:kotlin-stdlib-common:${Version.kotlin}"
             const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:${Version.kotlin}"
@@ -36,7 +38,13 @@ object Dependency {
             const val stdlibAndroid = "org.jetbrains.kotlin:kotlin-stdlib:${Version.kotlin}"
         }
 
-        const val coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Version.multiplatform.kotlin.coroutines}"
+        object KotlinX {
+            const val coroutinesCore =
+                "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Version.multiplatform.kotlin.coroutines}"
+            const val serializationJson =
+                "org.jetbrains.kotlinx:kotlinx-serialization-json:${Version.multiplatform.kotlin.serialization}"
+            const val dateTime = "org.jetbrains.kotlinx:kotlinx-datetime:${Version.multiplatform.kotlin.dateTime}"
+        }
 
         object D4L {
             const val util = "care.data4life.hc-util-sdk-kmp:util:${Version.multiplatform.d4l.util}"
@@ -44,19 +52,21 @@ object Dependency {
             const val error = "care.data4life.hc-util-sdk-kmp:error:${Version.multiplatform.d4l.util}"
 
             // FIXME
-            const val fhirHelperCommon = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-metadata:${Version.d4l.fhirHelper}"
-            const val fhirHelperAndroid = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-android:${Version.d4l.fhirHelper}"
+            const val fhirHelperCommon =
+                "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-metadata:${Version.d4l.fhirHelper}"
+            const val fhirHelperAndroid =
+                "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-android:${Version.d4l.fhirHelper}"
             const val fhirHelperJvm = "care.data4life.hc-fhir-helper-sdk-kmp:fhir-helper-jvm:${Version.d4l.fhirHelper}"
 
             const val auth = "care.data4life.hc-auth-sdk-kmp:auth:${Version.multiplatform.d4l.auth}"
 
             const val crypto = "care.data4life.hc-crypto-sdk-kmp:crypto:${Version.multiplatform.d4l.crypto}"
 
-            const val securestore = "care.data4life.hc-securestore-sdk-kmp:securestore:${Version.multiplatform.d4l.securestore}"
+            const val securestore =
+                "care.data4life.hc-securestore-sdk-kmp:securestore:${Version.multiplatform.d4l.securestore}"
         }
 
         const val koinCore = "io.insert-koin:koin-core:${Version.multiplatform.koin}"
-
     }
 
     object MultiplatformTest {
@@ -71,7 +81,8 @@ object Dependency {
 
         const val mockK = "io.mockk:mockk:${Version.multiplatformTest.mockK}"
 
-        const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Version.multiplatform.kotlin.coroutines}"
+        const val coroutines =
+            "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Version.multiplatform.kotlin.coroutines}"
 
         const val koin = "io.insert-koin:koin-test:${Version.multiplatform.koin}"
     }
@@ -144,15 +155,18 @@ object Dependency {
             const val ktx = "androidx.core:core-ktx:${Version.android.androidX.ktx}"
             const val appCompat = "androidx.appcompat:appcompat:${Version.android.androidX.appCompat}"
             const val browser = "androidx.browser:browser:${Version.android.androidX.browser}"
-            const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Version.android.androidX.constraintLayout}"
-            const val swipeRefreshLayout = "androidx.swiperefreshlayout:swiperefreshlayout:${Version.android.androidX.swipeRefreshLayout}"
+            const val constraintLayout =
+                "androidx.constraintlayout:constraintlayout:${Version.android.androidX.constraintLayout}"
+            const val swipeRefreshLayout =
+                "androidx.swiperefreshlayout:swiperefreshlayout:${Version.android.androidX.swipeRefreshLayout}"
         }
 
         // Material
         const val material = "com.google.android.material:material:${Version.android.material}"
 
         // Google
-        const val googlePlayServicesBase = "com.google.android.gms:play-services-base:${Version.android.googlePlayServices}"
+        const val googlePlayServicesBase =
+            "com.google.android.gms:play-services-base:${Version.android.googlePlayServices}"
 
         // Crypto
         const val bouncyCastleJdk15 = "org.bouncycastle:bcprov-jdk18on:${Version.jvm.bouncyCastle}"

@@ -157,7 +157,7 @@ dependencies {
     androidTestImplementation(Dependency.Android.material)
 
     androidTestImplementation(Dependency.Multiplatform.Kotlin.stdlibAndroid)
-    androidTestImplementation(Dependency.Multiplatform.coroutinesCore)
+    androidTestImplementation(Dependency.Multiplatform.KotlinX.coroutinesCore)
 
     androidTestImplementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")

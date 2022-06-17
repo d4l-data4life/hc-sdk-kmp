@@ -30,6 +30,7 @@ toc::[]
 === Added
 
 * Add ScribeJava dependency to java client
+* Kotlin Serialization 1.3.3
 
 === Changed
 

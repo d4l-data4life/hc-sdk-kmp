@@ -68,7 +68,7 @@ dependencies {
     implementation(Dependency.Jvm.fhirSdk)
 
     implementation(Dependency.Multiplatform.Kotlin.stdlibJdk8)
-    implementation(Dependency.Multiplatform.coroutinesCore)
+    implementation(Dependency.Multiplatform.KotlinX.coroutinesCore)
 
     implementation(Dependency.Multiplatform.koinCore)
     implementation(Dependency.Jvm.moshi)

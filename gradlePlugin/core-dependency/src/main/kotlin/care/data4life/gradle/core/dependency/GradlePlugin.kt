@@ -19,6 +19,8 @@ package care.data4life.gradle.core.dependency
 object GradlePlugin {
     const val android = "com.android.tools.build:gradle:${Version.gradlePlugin.android}"
     const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Version.gradlePlugin.kotlin}"
+    const val serialization = "org.jetbrains.kotlin:kotlin-serialization:${Version.gradlePlugin.kotlin}"
+    const val kover = "org.jetbrains.kotlinx.kover:${Version.gradlePlugin.kover}"
 
     const val dexcount = "com.getkeepsafe.dexcount:dexcount-gradle-plugin:${Version.gradlePlugin.dexcount}"
 

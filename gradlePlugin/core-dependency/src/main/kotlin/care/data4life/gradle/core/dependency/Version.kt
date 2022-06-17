@@ -50,6 +50,11 @@ object Version {
         const val android = "7.3.0-beta02"
 
         /**
+         * [Kover]()https://github.com/Kotlin/kotlinx-kover)
+         */
+        const val kover = "0.5.0"
+
+        /**
          * [Dexcount](https://github.com/KeepSafe/dexcount-gradle-plugin)
          */
         const val dexcount = "3.1.0"
@@ -93,10 +98,10 @@ object Version {
 
     object Multiplatform {
 
-        val kotlin = Kotlin
+        val kotlin = KotlinX
         val d4l = D4L
 
-        object Kotlin {
+        object KotlinX {
             /**
              *  https://github.com/Kotlin/kotlinx.coroutines
              */
@@ -111,11 +116,6 @@ object Version {
              * [DateTime](https://github.com/Kotlin/kotlinx-datetime)
              */
             const val dateTime = "0.2.1"
-
-            /**
-             * [Kover]()https://github.com/Kotlin/kotlinx-kover)
-             */
-            const val kover = "0.5.0"
         }
 
         object D4L {

@@ -34,6 +34,7 @@ ensureKotlinVersion("1.5.31")
 dependencies {
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.kotlin)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.android)
+    implementation(care.data4life.gradle.core.dependency.GradlePlugin.serialization)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.groovyAll)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.androidMaven)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.androidJacoco)

@@ -253,8 +253,7 @@ class FhirAttachmentHelperTest {
         every { Fhir4AttachmentHelper.updateAttachmentData(resource, data) } just Runs
 
         // When
-        @Suppress("UNCHECKED_CAST")
-        SdkFhirAttachmentHelper.updateAttachmentData(resource, data as HashMap<Any, String?>)
+        SdkFhirAttachmentHelper.updateAttachmentData(resource, data as java.util.HashMap<Any, String?>?)
 
         // Then
         verify(exactly = 1) { Fhir4AttachmentHelper.updateAttachmentData(resource, data) }

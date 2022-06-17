@@ -77,3 +77,9 @@ dependencies {
     testImplementation(Dependency.Java.Test.truth)
     testImplementation(Dependency.Java.Test.jsonAssert)
 }
+
+tasks {
+    named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+        exclude("bcprov-jdk18on-1.71.jar")
+    }
+}

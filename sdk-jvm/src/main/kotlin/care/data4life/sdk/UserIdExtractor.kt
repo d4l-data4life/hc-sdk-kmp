@@ -15,7 +15,6 @@
  */
 package care.data4life.sdk
 
-import care.data4life.sdk.UrlDecoder.decode
 import care.data4life.sdk.auth.AuthState
 import care.data4life.sdk.util.Base64
 import com.squareup.moshi.JsonAdapter

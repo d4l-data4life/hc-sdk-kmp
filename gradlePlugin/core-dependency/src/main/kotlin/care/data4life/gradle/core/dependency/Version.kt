@@ -146,6 +146,11 @@ object Version {
         const val koin = "3.1.6"
 
         /**
+         * [Ktor](https://ktor.io)
+         */
+        const val ktor = "2.0.2"
+
+        /**
          * [tink](https://github.com/google/tink)
          */
         const val tink = "1.4.0"

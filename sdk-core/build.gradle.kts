@@ -55,6 +55,13 @@ dependencies {
 
     implementation(Dependency.Jvm.rxJava)
 
+    implementation(Dependency.multiplatform.ktorCore)
+    implementation(Dependency.multiplatform.ktorCio)
+    implementation(Dependency.multiplatform.ktorClientAuth)
+    implementation(Dependency.multiplatform.ktorClientLogging)
+    implementation(Dependency.multiplatform.ktorClientContentNegotiation)
+    implementation(Dependency.multiplatform.ktorSerializationJson)
+
     implementation(Dependency.Jvm.okHttp)
     implementation(Dependency.Jvm.okHttpLoggingInterceptor)
 
@@ -79,6 +86,7 @@ dependencies {
     testImplementation(Dependency.MultiplatformTest.mockK)
 
     testImplementation(Dependency.JvmTest.okHttpMockWebServer)
+    testImplementation(Dependency.multiplatformTest.ktorClientMock)
     testImplementation(Dependency.JvmTest.jsonAssert)
 }
 
@@ -101,7 +109,7 @@ val provideConfig: Task by tasks.creating {
             .replace("SDK_VERSION", version.toString())
 
         if (!configs.exists()) {
-            if(!configs.mkdir()) {
+            if (!configs.mkdir()) {
                 System.err.println("The script not able to create the config directory")
             }
         }

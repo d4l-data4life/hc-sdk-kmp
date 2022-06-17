@@ -67,7 +67,8 @@ object Dependency {
             const val authJvm = "care.data4life.hc-auth-sdk-kmp:auth-jvm:${Version.multiplatform.d4l.auth}"
 
             const val crypto = "care.data4life.hc-crypto-sdk-kmp:crypto:${Version.multiplatform.d4l.crypto}"
-            const val cryptoAndroid = "care.data4life.hc-crypto-sdk-kmp:crypto-android:${Version.multiplatform.d4l.crypto}"
+            const val cryptoAndroid =
+                "care.data4life.hc-crypto-sdk-kmp:crypto-android:${Version.multiplatform.d4l.crypto}"
             const val cryptoJvm = "care.data4life.hc-crypto-sdk-kmp:crypto-jvm:${Version.multiplatform.d4l.crypto}"
 
             const val securestore =
@@ -79,6 +80,13 @@ object Dependency {
         }
 
         const val koinCore = "io.insert-koin:koin-core:${Version.multiplatform.koin}"
+
+        const val ktorCore = "io.ktor:ktor-client-core:${Version.multiplatform.ktor}"
+        const val ktorCio = "io.ktor:ktor-client-cio:${Version.multiplatform.ktor}"
+        const val ktorClientAuth = "io.ktor:ktor-client-auth:${Version.multiplatform.ktor}"
+        const val ktorClientLogging = "io.ktor:ktor-client-logging:${Version.multiplatform.ktor}"
+        const val ktorClientContentNegotiation = "io.ktor:ktor-client-content-negotiation:${Version.multiplatform.ktor}"
+        const val ktorSerializationJson = "io.ktor:ktor-serialization-kotlinx-json:${Version.multiplatform.ktor}"
     }
 
     object MultiplatformTest {
@@ -97,6 +105,8 @@ object Dependency {
             "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Version.multiplatform.kotlin.coroutines}"
 
         const val koin = "io.insert-koin:koin-test:${Version.multiplatform.koin}"
+
+        const val ktorClientMock = "io.ktor:ktor-client-mock:${Version.multiplatform.ktor}"
     }
 
     object Jvm {

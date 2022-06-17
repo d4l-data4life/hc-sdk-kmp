@@ -40,8 +40,8 @@ kotlin {
 }
 
 dependencies {
-    api(Dependency.Multiplatform.D4L.util)
-    api(Dependency.Multiplatform.D4L.error)
+    implementation(Dependency.Multiplatform.D4L.util)
+    implementation(Dependency.Multiplatform.D4L.error)
     implementation(Dependency.Multiplatform.Kotlin.stdlib)
 
     implementation(Dependency.Multiplatform.D4L.auth)

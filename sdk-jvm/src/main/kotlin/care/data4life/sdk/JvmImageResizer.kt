@@ -40,12 +40,10 @@ class JvmImageResizer : ImageResizer {
         Width, Height
     }
 
-    @Throws(JpegWriterMissing::class)
     override fun resizeToWidth(originalImage: ByteArray, targetWidth: Int, targetQuality: Int): ByteArray? {
         return resize(Width, originalImage, targetWidth, targetQuality)
     }
 
-    @Throws(JpegWriterMissing::class)
     override fun resizeToHeight(originalImage: ByteArray, targetHeight: Int, targetQuality: Int): ByteArray? {
         return resize(Height, originalImage, targetHeight, targetQuality)
     }
@@ -55,7 +53,6 @@ class JvmImageResizer : ImageResizer {
         return dataMimeType == JPEG || dataMimeType == PNG
     }
 
-    @Throws(JpegWriterMissing::class)
     private fun resize(
         resizeType: ResizeDimension,
         originalImage: ByteArray,
@@ -136,7 +133,6 @@ class JvmImageResizer : ImageResizer {
         return scaledImage
     }
 
-    @Throws(JpegWriterMissing::class)
     private fun compressImage(image: BufferedImage, quality: Int): ByteArray? {
         val qualityPercent =
             (if (quality == VALUE_UNKNOWN) ImageResizer.DEFAULT_JPEG_QUALITY_PERCENT else quality) / HUNDRED_PERCENT

@@ -240,7 +240,6 @@ object Version {
          */
         const val desugar = "1.1.5"
 
-
         object AndroidX {
             /**
              * [AndroidX](https://developer.android.com/jetpack/androidx)

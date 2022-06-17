@@ -48,8 +48,10 @@ object Dependency {
 
         object D4L {
             const val util = "care.data4life.hc-util-sdk-kmp:util:${Version.multiplatform.d4l.util}"
+            const val utilAndroid = "care.data4life.hc-util-sdk-kmp:util-android:${Version.multiplatform.d4l.util}"
 
             const val error = "care.data4life.hc-util-sdk-kmp:error:${Version.multiplatform.d4l.util}"
+            const val errorAndroid = "care.data4life.hc-util-sdk-kmp:error-android:${Version.multiplatform.d4l.util}"
 
             // FIXME
             const val fhirHelperCommon =
@@ -64,6 +66,8 @@ object Dependency {
 
             const val securestore =
                 "care.data4life.hc-securestore-sdk-kmp:securestore:${Version.multiplatform.d4l.securestore}"
+            const val securestoreAndroid =
+                "care.data4life.hc-securestore-sdk-kmp:securestore-android:${Version.multiplatform.d4l.securestore}"
         }
 
         const val koinCore = "io.insert-koin:koin-core:${Version.multiplatform.koin}"

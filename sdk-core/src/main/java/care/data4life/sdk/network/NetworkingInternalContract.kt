@@ -61,7 +61,7 @@ internal class NetworkingInternalContract {
     }
 
     interface ClientFactory {
-        fun getInstance(
+        fun getInstanceLegacy(
             authService: AuthorizationContract.Service,
             environment: NetworkingContract.Environment,
             clientId: String,

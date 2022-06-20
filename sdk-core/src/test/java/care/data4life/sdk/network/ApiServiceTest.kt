@@ -81,7 +81,7 @@ class ApiServiceTest {
 
         every { HealthCloudApiFactory.getInstance(client, platform, env) } returns healthCloudApi
         every {
-            ClientFactory.getInstance(
+            ClientFactory.getInstanceLegacy(
                 authService,
                 env,
                 clientId,

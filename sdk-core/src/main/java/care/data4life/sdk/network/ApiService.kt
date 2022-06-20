@@ -68,7 +68,7 @@ class ApiService @JvmOverloads constructor(
     debug: Boolean
 ) : NetworkingContract.Service {
     private val service = HealthCloudApiFactory.getInstance(
-        ClientFactory.getInstance(
+        ClientFactory.getInstanceLegacy(
             authService,
             environment,
             clientId,

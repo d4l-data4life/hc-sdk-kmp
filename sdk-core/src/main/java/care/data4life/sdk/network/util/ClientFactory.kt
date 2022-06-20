@@ -95,13 +95,13 @@ object ClientFactory : NetworkingInternalContract.ClientFactory {
 
     private fun setTimeouts(builder: OkHttpClient.Builder): OkHttpClient.Builder {
         return builder
-            .connectTimeout(NetworkingContract.REQUEST_TIMEOUT, TimeUnit.MINUTES)
-            .readTimeout(NetworkingContract.REQUEST_TIMEOUT, TimeUnit.MINUTES)
-            .writeTimeout(NetworkingContract.REQUEST_TIMEOUT, TimeUnit.MINUTES)
-            .callTimeout(NetworkingContract.REQUEST_TIMEOUT, TimeUnit.MINUTES)
+            .connectTimeout(NetworkingContract.REQUEST_TIMEOUT, TimeUnit.MILLISECONDS)
+            .readTimeout(NetworkingContract.REQUEST_TIMEOUT, TimeUnit.MILLISECONDS)
+            .writeTimeout(NetworkingContract.REQUEST_TIMEOUT, TimeUnit.MILLISECONDS)
+            .callTimeout(NetworkingContract.REQUEST_TIMEOUT, TimeUnit.MILLISECONDS)
     }
 
-    override fun getInstance(
+    override fun getInstanceLegacy(
         authService: AuthorizationContract.Service,
         environment: NetworkingContract.Environment,
         clientId: String,

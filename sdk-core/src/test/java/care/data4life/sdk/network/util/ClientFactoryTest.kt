@@ -117,7 +117,7 @@ class ClientFactoryTest {
         every { CertificatePinnerFactory.getInstance(platform, environment) } returns pinner
 
         // When
-        val client: Any = ClientFactory.getInstance(
+        val client: Any = ClientFactory.getInstanceLegacy(
             authService,
             environment,
             clientID,
@@ -216,7 +216,7 @@ class ClientFactoryTest {
         every { CertificatePinnerFactory.getInstance(platform, environment) } returns pinner
 
         // When
-        val client: Any = ClientFactory.getInstance(
+        val client: Any = ClientFactory.getInstanceLegacy(
             authService,
             environment,
             clientID,
@@ -296,7 +296,7 @@ class ClientFactoryTest {
         every { CertificatePinnerFactory.getInstance(platform, environment) } returns pinner
 
         // When
-        val client: Any = ClientFactory.getInstance(
+        val client: Any = ClientFactory.getInstanceLegacy(
             authService,
             environment,
             clientID,

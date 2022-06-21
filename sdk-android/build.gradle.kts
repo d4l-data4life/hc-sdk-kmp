@@ -108,8 +108,8 @@ dependencies {
     implementation(Dependency.Multiplatform.D4L.authAndroid)
     implementation(Dependency.Multiplatform.D4L.cryptoAndroid)
     implementation(Dependency.Multiplatform.D4L.securestoreAndroid)
-    implementation(Dependency.Multiplatform.D4L.utilAndroid)
-    implementation(Dependency.Multiplatform.D4L.errorAndroid)
+    api(Dependency.Multiplatform.D4L.utilAndroid)
+    api(Dependency.Multiplatform.D4L.errorAndroid)
 
     implementation(Dependency.Jvm.fhirSdk)
     implementation(Dependency.Android.threeTenABP)

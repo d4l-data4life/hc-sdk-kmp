@@ -90,10 +90,10 @@ interface NetworkingContract {
         fun fetchVersionInfo(): Single<VersionList>
     }
 
-    enum class Clients(val identifier: String) {
+    enum class Client(val identifier: String) {
         ANDROID("android"),
         JAVA("jvm"),
-        INGESTION("ingestion")
+        INGESTION("ingestion"),
     }
 
     fun interface NetworkConnectivityService {

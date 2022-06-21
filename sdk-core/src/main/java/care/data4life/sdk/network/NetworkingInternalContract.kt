@@ -68,7 +68,7 @@ internal class NetworkingInternalContract {
             clientSecret: String,
             platform: String,
             connectivityService: NetworkingContract.NetworkConnectivityService,
-            clientName: NetworkingContract.Clients,
+            clientName: NetworkingContract.Client,
             clientVersion: String,
             staticAccessToken: ByteArray?,
             debugFlag: Boolean

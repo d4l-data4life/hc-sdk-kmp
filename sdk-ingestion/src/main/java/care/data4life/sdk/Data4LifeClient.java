@@ -139,7 +139,7 @@ public final class Data4LifeClient extends BaseClient {
                 DUMMY_CLIENT_SECRET,
                 platform,
                 networkConnectivityService,
-                NetworkingContract.Clients.INGESTION,
+                NetworkingContract.Client.INGESTION,
                 SDKConfig.version,
                 accessToken,
                 DEBUG

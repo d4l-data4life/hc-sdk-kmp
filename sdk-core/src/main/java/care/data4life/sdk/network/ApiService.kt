@@ -62,7 +62,7 @@ class ApiService @JvmOverloads constructor(
     clientSecret: String,
     platform: String,
     connectivityService: NetworkingContract.NetworkConnectivityService,
-    agent: NetworkingContract.Clients,
+    agent: NetworkingContract.Client,
     agentVersion: String,
     private val staticAccessToken: ByteArray? = null,
     debug: Boolean

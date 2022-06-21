@@ -126,7 +126,7 @@ class Data4LifeClient(
                 clientSecret,
                 platform,
                 networkConnectivityService,
-                NetworkingContract.Clients.JAVA,
+                NetworkingContract.Client.JAVA,
                 SDKConfig.version,
                 null,
                 DEBUG

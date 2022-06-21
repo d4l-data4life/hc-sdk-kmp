@@ -150,7 +150,7 @@ class Data4LifeClient private constructor(
                 clientSecret = sdkConfig.clientSecret,
                 platform = sdkConfig.platform,
                 connectivityService = connectivityService,
-                agent = NetworkingContract.Clients.ANDROID,
+                agent = NetworkingContract.Client.ANDROID,
                 agentVersion = SDKConfig.version,
                 debug = sdkConfig.debug
             )

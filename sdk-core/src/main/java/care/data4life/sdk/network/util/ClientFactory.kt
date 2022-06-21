@@ -18,6 +18,7 @@ package care.data4life.sdk.network.util
 
 import care.data4life.sdk.auth.AuthorizationContract
 import care.data4life.sdk.network.NetworkingContract
+import care.data4life.sdk.network.NetworkingContract.Client
 import care.data4life.sdk.network.NetworkingContract.Companion.PLATFORM_S4H
 import care.data4life.sdk.network.NetworkingInternalContract
 import care.data4life.sdk.network.util.interceptor.BasicAuthorizationInterceptor
@@ -76,7 +77,7 @@ object ClientFactory : NetworkingInternalContract.ClientFactory {
         clientId: String,
         clientSecret: String,
         connectivityService: NetworkingContract.NetworkConnectivityService,
-        agent: NetworkingContract.Clients,
+        agent: NetworkingContract.Client,
         clientVersion: String,
         staticAccessToken: ByteArray?,
         debugFlag: Boolean
@@ -108,7 +109,7 @@ object ClientFactory : NetworkingInternalContract.ClientFactory {
         clientSecret: String,
         platform: String,
         connectivityService: NetworkingContract.NetworkConnectivityService,
-        clientName: NetworkingContract.Clients,
+        clientName: NetworkingContract.Client,
         clientVersion: String,
         staticAccessToken: ByteArray?,
         debugFlag: Boolean

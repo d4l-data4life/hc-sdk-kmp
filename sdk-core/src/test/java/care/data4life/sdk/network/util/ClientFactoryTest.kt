@@ -46,7 +46,7 @@ class ClientFactoryTest {
     private val authService: AuthorizationContract.Service = mockk()
     private val environment: NetworkingContract.Environment = mockk()
     private val connectivityService: NetworkingContract.NetworkConnectivityService = mockk()
-    private val clientName: NetworkingContract.Clients = mockk()
+    private val clientName: NetworkingContract.Client = mockk()
 
     @Before
     fun setUp() {

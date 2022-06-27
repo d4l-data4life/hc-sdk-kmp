@@ -131,10 +131,10 @@ class ApiServiceModuleTest {
         additionalInterceptor: Interceptor?
     ): OkHttpClient {
         return client.newBuilder()
-            .connectTimeout(100, TimeUnit.MILLISECONDS)
-            .readTimeout(100, TimeUnit.MILLISECONDS)
-            .writeTimeout(100, TimeUnit.MILLISECONDS)
-            .callTimeout(100, TimeUnit.MILLISECONDS)
+            .connectTimeout(1000, TimeUnit.MILLISECONDS)
+            .readTimeout(1000, TimeUnit.MILLISECONDS)
+            .writeTimeout(1000, TimeUnit.MILLISECONDS)
+            .callTimeout(1000, TimeUnit.MILLISECONDS)
             .let {
                 if (additionalInterceptor is Interceptor) {
                     it.addNetworkInterceptor(additionalInterceptor)
@@ -529,9 +529,7 @@ class ApiServiceModuleTest {
     }
 
     @Test
-    @Ignore("This should work, but it does not, figure out why!")
     fun `Given, deleteRecord is called with an Alias, UserId and a RecordId, it returns a completable action`() {
-        // TODO: FIX this, test disabled
         // Given
         val alias = ALIAS
         val userId = USER_ID

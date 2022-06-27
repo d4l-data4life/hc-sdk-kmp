@@ -151,15 +151,15 @@ class ClientFactoryTest {
         )
 
         assertEquals(
-            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            actual = client.callTimeoutMillis.toLong(),
             expected = REQUEST_TIMEOUT
         )
         assertEquals(
-            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            actual = client.callTimeoutMillis.toLong(),
             expected = REQUEST_TIMEOUT
         )
         assertEquals(
-            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            actual = client.callTimeoutMillis.toLong(),
             expected = REQUEST_TIMEOUT
         )
 
@@ -250,15 +250,15 @@ class ClientFactoryTest {
         )
 
         assertEquals(
-            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            actual = client.callTimeoutMillis.toLong(),
             expected = REQUEST_TIMEOUT
         )
         assertEquals(
-            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            actual = client.callTimeoutMillis.toLong(),
             expected = REQUEST_TIMEOUT
         )
         assertEquals(
-            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            actual = client.callTimeoutMillis.toLong(),
             expected = REQUEST_TIMEOUT
         )
 
@@ -329,15 +329,15 @@ class ClientFactoryTest {
         )
 
         assertEquals(
-            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            actual = client.callTimeoutMillis.toLong(),
             expected = REQUEST_TIMEOUT
         )
         assertEquals(
-            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            actual = client.callTimeoutMillis.toLong(),
             expected = REQUEST_TIMEOUT
         )
         assertEquals(
-            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            actual = client.callTimeoutMillis.toLong(),
             expected = REQUEST_TIMEOUT
         )
 

@@ -35,6 +35,8 @@ toc::[]
 
 === Changed
 
+* Android target SDK 31 -> 32
+
 === Deprecated
 
 === Removed

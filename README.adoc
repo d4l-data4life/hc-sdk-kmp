@@ -99,9 +99,9 @@ Once you have a partner ID, follow these steps to start working with the SDK:
 
 === Software requirements
 
-* Android 6.0 (API 23) to Android 11 (API 31)
+* Android 6.0 (API 23) to Android 12L (API 32)
 * Java 8 link:https://developer.android.com/studio/write/java8-support[Limitations] link:https://jakewharton.com/d8-library-desugaring/[Desugaring]
-* Kotlin 1.6.10
+* Kotlin 1.6.21
 
 == Installation
 

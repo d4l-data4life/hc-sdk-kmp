@@ -47,7 +47,7 @@ object Version {
 
     object GradlePlugin {
         const val kotlin = Version.kotlin
-        const val android = "7.3.0-beta02"
+        const val android = "7.2.0"
 
         /**
          * [Kover]()https://github.com/Kotlin/kotlinx-kover)

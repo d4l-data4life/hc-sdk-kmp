@@ -55,6 +55,7 @@ toc::[]
 * Spotless Gradle plugin 6.4.2 -> 6.5.1
 * Ktlint 0.44.0 -> 0.45.2
 * AndroidX AppCompat 1.4.1 -> 1.4.2
+* HC Auth SDK 1.15.0 -> 1.16.0
 
 === Migration
 

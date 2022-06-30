@@ -36,12 +36,14 @@ toc::[]
 === Changed
 
 * Android target SDK 31 -> 32
+* Change client implementation from Java to Kotlin to aid integration project
 
 === Deprecated
 
 === Removed
 
 * jApiCmp Gradle plugin as it's not needed anymore
+* test suite project as it is outdated, alternative will be available in the [integration project](https://github.com/d4l-data4life/hc-sdk-kmp-integration/)
 
 === Fixed
 

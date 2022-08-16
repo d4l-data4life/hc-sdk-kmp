@@ -51,10 +51,10 @@ abstract class BaseView : View {
         TermUi.echo(message.text)
     }
 
-    fun renderPrompt(): String? {
+    fun renderPrompt(): String {
         renderEmptyLine()
 
-        return TermUi.prompt(text = "")
+        return TermUi.prompt(text = "").orEmpty()
     }
 
     fun renderEmptyLine() {

@@ -29,15 +29,35 @@ toc::[]
 
 === Added
 
+* Add ScribeJava dependency to java client
+* Kotlin Serialization 1.3.3
+* Ktor 2.0.2
+
 === Changed
+
+* Android target SDK 31 -> 32
+* Change client implementation from Java to Kotlin to aid integration project
 
 === Deprecated
 
 === Removed
 
+* jApiCmp Gradle plugin as it's not needed anymore
+* test suite project as it is outdated, alternative will be available in the [integration project](https://github.com/d4l-data4life/hc-sdk-kmp-integration/)
+
 === Fixed
 
 === Bumped
+
+* *_BREAKING_* Android Gradle Plugin 7.1.3 -> 7.2.0
+* Kotlin 1.6.10 -> 1.6.21
+* Kotlin Coroutines 1.6.0 -> 1.6.2
+* Material 1.5.0 -> 1.6.1
+* AndroidX ConstraintLayout 2.1.3 -> 2.1.4
+* Spotless Gradle plugin 6.4.2 -> 6.5.1
+* Ktlint 0.44.0 -> 0.45.2
+* AndroidX AppCompat 1.4.1 -> 1.4.2
+* HC Auth SDK 1.15.0 -> 1.16.0
 
 === Migration
 

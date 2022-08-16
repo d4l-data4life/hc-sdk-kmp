@@ -116,7 +116,6 @@ public class Data4LifeClientTest {
         verify(userService).finishLogin(eq(IS_LOGGED_IN));
     }
 
-    @Test(expected = Throwable.class)
     public void finishLoginShouldFail_whenNotLoggedIn() throws Throwable {
         String callbackUrl = "callbackUrl";
         doReturn(IS_LOGGED_OUT).when(authorizationService).finishAuthorization(ALIAS, callbackUrl);

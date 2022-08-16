@@ -20,17 +20,17 @@ import care.data4life.sdk.attachment.AttachmentContract.ImageResizer.Companion.D
 import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.util.Base64.decode
-import care.data4life.sdk.wrapper.SDKImageResizer
+import care.data4life.sdk.wrapper.SdkImageResizer
 import care.data4life.sdk.wrapper.WrapperContract
 import io.reactivex.Observable
 import io.reactivex.Single
 
 // TODO add internal
-class AttachmentService internal constructor(
+class AttachmentService constructor(
     private val fileService: AttachmentContract.FileService,
     resizer: AttachmentContract.ImageResizer
 ) : AttachmentContract.Service {
-    private val imageResizer = SDKImageResizer(resizer)
+    private val imageResizer = SdkImageResizer(resizer)
 
     override fun delete(
         attachmentId: String,

@@ -177,11 +177,14 @@ class FhirAttachmentHelperTest {
     }
 
     @Test
+    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     fun `Given, updateAttachmentData is called with a Fhir3Resource and null as Attachment, it delegates it to the Fhir3AttachmentHelper`() {
         // Given
         val resource: Fhir3DocumentReference = mockk()
 
-        every { Fhir3AttachmentHelper.updateAttachmentData(resource, null) } just Runs
+        every {
+            Fhir3AttachmentHelper.updateAttachmentData(resource, null)
+        } just Runs
 
         // When
         SdkFhirAttachmentHelper.updateAttachmentData(resource, null)
@@ -231,11 +234,15 @@ class FhirAttachmentHelperTest {
     }
 
     @Test
+    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+
     fun `Given, updateAttachmentData is called with a Fhir4Resource and null as Attachment, it delegates it to the Fhir4AttachmentHelper`() {
         // Given
         val resource: Fhir4DocumentReference = mockk()
 
-        every { Fhir4AttachmentHelper.updateAttachmentData(resource, null) } just Runs
+        every {
+            Fhir4AttachmentHelper.updateAttachmentData(resource, null)
+        } just Runs
 
         // When
         SdkFhirAttachmentHelper.updateAttachmentData(resource, null)
@@ -253,8 +260,7 @@ class FhirAttachmentHelperTest {
         every { Fhir4AttachmentHelper.updateAttachmentData(resource, data) } just Runs
 
         // When
-        @Suppress("UNCHECKED_CAST")
-        SdkFhirAttachmentHelper.updateAttachmentData(resource, data as HashMap<Any, String?>)
+        SdkFhirAttachmentHelper.updateAttachmentData(resource, data as java.util.HashMap<Any, String?>?)
 
         // Then
         verify(exactly = 1) { Fhir4AttachmentHelper.updateAttachmentData(resource, data) }

@@ -45,7 +45,7 @@ class VersionInterceptorTest {
         // When
         val interceptor: Any = VersionInterceptor.getInstance(
             Pair(
-                NetworkingContract.Clients.ANDROID,
+                NetworkingContract.Client.ANDROID,
                 clientName
             )
         )
@@ -81,7 +81,7 @@ class VersionInterceptorTest {
         // When
         val interceptor = VersionInterceptor.getInstance(
             Pair(
-                NetworkingContract.Clients.ANDROID,
+                NetworkingContract.Client.ANDROID,
                 clientName
             )
         )
@@ -131,7 +131,7 @@ class VersionInterceptorTest {
         // When
         val interceptor = VersionInterceptor.getInstance(
             Pair(
-                NetworkingContract.Clients.JAVA,
+                NetworkingContract.Client.JAVA,
                 clientName
             )
         )
@@ -180,7 +180,7 @@ class VersionInterceptorTest {
         // When
         val interceptor = VersionInterceptor.getInstance(
             Pair(
-                NetworkingContract.Clients.INGESTION,
+                NetworkingContract.Client.INGESTION,
                 clientName
             )
         )

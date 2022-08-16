@@ -21,7 +21,6 @@ plugins {
     id("com.android.library")
     id("kotlin-android")
     id("com.vanniktech.android.junit.jacoco")
-    id("me.champeau.gradle.japicmp")
 }
 
 group = LibraryConfig.group
@@ -54,13 +53,6 @@ android {
     buildTypes {
         getByName("debug") {
             setMatchingFallbacks("debug", "release")
-
-            manifestPlaceholders["redirectScheme"] = "com.redirectScheme.comm"
-            manifestPlaceholders["clientId"] = "com.redirectScheme.comm"
-            manifestPlaceholders["clientSecret"] = "com.redirectScheme.comm"
-            manifestPlaceholders["debug"] = "com.redirectScheme.comm"
-            manifestPlaceholders["environment"] = "com.redirectScheme.comm"
-            manifestPlaceholders["platform"] = "com.redirectScheme.comm"
         }
         getByName("release") {
             isMinifyEnabled = false
@@ -79,6 +71,12 @@ android {
             }
         }
 
+        testVariants.forEach {
+            it.mergedFlavor.manifestPlaceholders.putAll(
+                d4lClientConfig.toConfigMap(care.data4life.gradle.core.config.Environment.DEVELOPMENT, true)
+            )
+        }
+
         execution = "ANDROID_TEST_ORCHESTRATOR"
     }
 
@@ -92,11 +90,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-}
-
-val compatibilityBase by configurations.creating {
-    description =
-        "Configuration for the base version of the SDK we want to verify compatibility against"
 }
 
 dependencies {
@@ -116,9 +109,9 @@ dependencies {
     implementation(Dependency.Multiplatform.D4L.cryptoAndroid)
     implementation(Dependency.Multiplatform.D4L.securestoreAndroid)
     api(Dependency.Multiplatform.D4L.utilAndroid)
-    api(Dependency.Multiplatform.D4L.resultErrorAndroid)
+    api(Dependency.Multiplatform.D4L.errorAndroid)
 
-    implementation(Dependency.Multiplatform.D4L.fhirSdk)
+    implementation(Dependency.Jvm.fhirSdk)
     implementation(Dependency.Android.threeTenABP)
 
     implementation(Dependency.Android.AndroidX.appCompat)
@@ -137,20 +130,22 @@ dependencies {
 
     implementation(Dependency.Android.bouncyCastleJdk15)
 
-    compileOnly(Dependency.Java.javaXAnnotation)
+    // FIXME could be removed
+    compileOnly(Dependency.Jvm.javaXAnnotation)
 
-    testImplementation(Dependency.Android.Test.junit)
-    testImplementation(Dependency.Android.Test.truth)
+    testImplementation(Dependency.JvmTest.junit)
+    testImplementation(Dependency.AndroidTest.truth)
 
-    testImplementation(Dependency.Multiplatform.Test.MockK.jdk)
+    testImplementation(Dependency.MultiplatformTest.mockK)
 
+    // FIXME
     testImplementation("org.mockito:mockito-inline:2.9.0")
     testImplementation("org.powermock:powermock-core:1.7.3")
     testImplementation("org.powermock:powermock-module-junit4:1.7.3")
     testImplementation("org.powermock:powermock-api-mockito2:1.7.3")
 
-    testImplementation(Dependency.Android.Test.okHttpMockWebServer)
-    testImplementation(Dependency.Android.Test.jsonAssert)
+    testImplementation(Dependency.JvmTest.okHttpMockWebServer)
+    testImplementation(Dependency.JvmTest.jsonAssert)
 
     testImplementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
@@ -162,7 +157,7 @@ dependencies {
     androidTestImplementation(Dependency.Android.material)
 
     androidTestImplementation(Dependency.Multiplatform.Kotlin.stdlibAndroid)
-    androidTestImplementation(Dependency.Multiplatform.Coroutines.android)
+    androidTestImplementation(Dependency.Multiplatform.KotlinX.coroutinesCore)
 
     androidTestImplementation(Dependency.Multiplatform.D4L.fhirHelperAndroid) {
         exclude(group = "care.data4life.hc-util-sdk-kmp", module = "util-android")
@@ -170,72 +165,22 @@ dependencies {
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
 
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvm)
-    androidTestImplementation(Dependency.Multiplatform.Test.Kotlin.testJvmJunit)
+    androidTestImplementation(Dependency.MultiplatformTest.Kotlin.testJvm)
+    androidTestImplementation(Dependency.MultiplatformTest.Kotlin.testJvmJunit)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.runner)
-    androidTestImplementation(Dependency.Android.AndroidTest.rules)
-    androidTestImplementation(Dependency.Android.AndroidTest.orchestrator)
+    androidTestImplementation(Dependency.AndroidTest.runner)
+    androidTestImplementation(Dependency.AndroidTest.rules)
+    androidTestImplementation(Dependency.AndroidTest.orchestrator)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoCore)
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoIntents)
-    androidTestImplementation(Dependency.Android.AndroidTest.espressoWeb)
+    androidTestImplementation(Dependency.AndroidTest.espressoCore)
+    androidTestImplementation(Dependency.AndroidTest.espressoIntents)
+    androidTestImplementation(Dependency.AndroidTest.espressoWeb)
 
-    androidTestImplementation(Dependency.Android.AndroidTest.uiAutomator)
-    androidTestImplementation(Dependency.Android.AndroidTest.kakao)
+    androidTestImplementation(Dependency.AndroidTest.uiAutomator)
+    androidTestImplementation(Dependency.AndroidTest.kakao)
 
     androidTestImplementation(Dependency.Android.googlePlayServicesBase)
-    androidTestImplementation(Dependency.Android.AndroidTest.truth)
-
-    compatibilityBase("care.data4life:hc-sdk-kmp:${LibraryConfig.referenceSdkVersion}") {
-        isTransitive = false
-        isForce = true
-    }
-}
-
-val clearJar by tasks.registering(Delete::class) {
-    delete("build/outputs/ProjectName.jar")
-}
-
-val genCurrentJar by tasks.creating(Jar::class) {
-    dependsOn("assemble")
-    from("build/intermediates/classes/release/")
-    archiveFileName.set("sdk-api.jar")
-}
-
-val genReferenceJar by tasks.creating {
-    doLast {
-        copy {
-            from(compatibilityBase)
-            into("$buildDir/outputs/jar/")
-            rename("hc-sdk-kmp-${LibraryConfig.referenceSdkVersion}.jar", "reference-sdk.zip")
-        }
-
-        copy {
-            from(zipTree("$buildDir/outputs/jar/reference-sdk.zip"))
-            into("$buildDir/outputs/jar/")
-            include("classes.jar")
-            rename("classes.jar", "reference-sdk.jar")
-        }
-    }
-}
-
-val generateSdkCompatibilityReport by tasks.creating(me.champeau.gradle.japicmp.JapicmpTask::class) {
-    dependsOn(genCurrentJar, genReferenceJar)
-
-    oldClasspath = files("$buildDir/outputs/jar/reference-sdk.zip")
-    newClasspath = files(genCurrentJar.archivePath)
-    isOnlyModified = true
-    isFailOnModification = true
-    txtOutputFile = file("$buildDir/reports/compatibility/japi.txt")
-    isIgnoreMissingClasses = true
-    packageIncludes = listOf("care.data4life.*")
-    classExcludes = listOf(
-        "care.data4life.crypto.R",
-        "care.data4life.auth.R",
-        "care.data4life.securestore.R",
-        "care.data4life.sdk.R"
-    )
+    androidTestImplementation(Dependency.AndroidTest.truth)
 }
 
 apply(from = "$projectDir/gradle/downloadFromDevDocs.gradle")

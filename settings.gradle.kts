@@ -26,20 +26,17 @@ include(
     ":sample-android", ":sample-jvm",
 
     ":sdk-core", ":sdk-android", "sdk-jvm", "sdk-ingestion",
-
-    ":sdk-android-test"
 )
 
 val includeAuth: String by settings
 if (includeAuth.toBoolean()) {
-    val version = "1.14.0"
     includeBuild("../hc-auth-sdk-kmp") {
         dependencySubstitution {
-            substitute(module("care.data4life.hc-auth-sdk-kmp:auth:$version"))
+            substitute(module("care.data4life.hc-auth-sdk-kmp:auth"))
                 .using(project(":auth"))
-            substitute(module("care.data4life.hc-auth-sdk-kmp:auth-jvm:$version"))
+            substitute(module("care.data4life.hc-auth-sdk-kmp:auth-jvm"))
                 .using(project(":auth"))
-            substitute(module("care.data4life.hc-auth-sdk-kmp:auth-android:$version"))
+            substitute(module("care.data4life.hc-auth-sdk-kmp:auth-android"))
                 .using(project(":auth"))
         }
     }
@@ -47,14 +44,13 @@ if (includeAuth.toBoolean()) {
 
 val includeCrypto: String by settings
 if (includeCrypto.toBoolean()) {
-    val version = "1.13.2"
     includeBuild("../hc-crypto-sdk-kmp") {
         dependencySubstitution {
-            substitute(module("care.data4life.hc-crypto-sdk-kmp:crypto:$version"))
+            substitute(module("care.data4life.hc-crypto-sdk-kmp:crypto"))
                 .using(project(":crypto"))
-            substitute(module("care.data4life.hc-crypto-sdk-kmp:crypto-jvm:$version"))
+            substitute(module("care.data4life.hc-crypto-sdk-kmp:crypto-jvm"))
                 .using(project(":crypto"))
-            substitute(module("care.data4life.hc-crypto-sdk-kmp:crypto-android:$version"))
+            substitute(module("care.data4life.hc-crypto-sdk-kmp:crypto-android"))
                 .using(project(":crypto"))
         }
     }
@@ -62,18 +58,17 @@ if (includeCrypto.toBoolean()) {
 
 val includeSecurestore: String by settings
 if (includeSecurestore.toBoolean()) {
-    val version = "1.13.2"
     includeBuild("../hc-securestore-sdk-kmp") {
         dependencySubstitution {
-            substitute(module("care.data4life.hc-securestore-sdk-kmp:securestore:$version"))
+            substitute(module("care.data4life.hc-securestore-sdk-kmp:securestore"))
                 .using(
                     project(":securestore")
                 )
-            substitute(module("care.data4life.hc-securestore-sdk-kmp:securestore-jvm:$version"))
+            substitute(module("care.data4life.hc-securestore-sdk-kmp:securestore-jvm"))
                 .using(
                     project(":securestore")
                 )
-            substitute(module("care.data4life.hc-securestore-sdk-kmp:securestore-android:$version"))
+            substitute(module("care.data4life.hc-securestore-sdk-kmp:securestore-android"))
                 .using(
                     project(":securestore")
                 )

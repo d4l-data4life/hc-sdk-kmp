@@ -61,14 +61,14 @@ internal class NetworkingInternalContract {
     }
 
     interface ClientFactory {
-        fun getInstance(
+        fun getInstanceLegacy(
             authService: AuthorizationContract.Service,
             environment: NetworkingContract.Environment,
             clientId: String,
             clientSecret: String,
             platform: String,
             connectivityService: NetworkingContract.NetworkConnectivityService,
-            clientName: NetworkingContract.Clients,
+            clientName: NetworkingContract.Client,
             clientVersion: String,
             staticAccessToken: ByteArray?,
             debugFlag: Boolean

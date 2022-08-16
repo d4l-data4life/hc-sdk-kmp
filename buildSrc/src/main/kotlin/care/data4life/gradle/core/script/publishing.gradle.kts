@@ -79,7 +79,8 @@ task<Exec>("publishFeature") {
         "gitPublishFeatureUpdate",
         "publishAllPublicationsToFeaturePackagesRepository",
         "gitPublishFeatureCommit",
-        "gitPublishFeaturePush"
+        "gitPublishFeaturePush",
+        "-Dorg.gradle.parallel=false",
     )
 }
 
@@ -92,7 +93,8 @@ task<Exec>("publishSnapshot") {
         "gitPublishSnapshotUpdate",
         "publishAllPublicationsToSnapshotPackagesRepository",
         "gitPublishSnapshotCommit",
-        "gitPublishSnapshotPush"
+        "gitPublishSnapshotPush",
+        "-Dorg.gradle.parallel=false",
     )
 }
 
@@ -105,7 +107,8 @@ task<Exec>("publishRelease") {
         "gitPublishReleaseUpdate",
         "publishAllPublicationsToReleasePackagesRepository",
         "gitPublishReleaseCommit",
-        "gitPublishReleasePush"
+        "gitPublishReleasePush",
+        "-Dorg.gradle.parallel=false",
     )
 }
 

@@ -72,7 +72,6 @@ public class DocumentsActivity extends AppCompatActivity {
     private static final int INTENT_FILE_PICKER = 434;
     public List<Record<DomainResource>> records = new ArrayList<>();
     private Data4LifeClient client;
-    private CRUDBenchmark benchmark;
     private FloatingActionButton mAddFAB;
     private CoordinatorLayout mRootCL;
     private TextView mLogout;
@@ -92,8 +91,7 @@ public class DocumentsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_documents);
 
-        client = Data4LifeClient.getInstance();
-        benchmark = new CRUDBenchmark(client, this);
+        client = Data4LifeClient.Companion.getInstance();
 
         mAddFAB = findViewById(R.id.addFAB);
         mRootCL = findViewById(R.id.documentsRootCL);

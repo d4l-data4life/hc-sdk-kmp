@@ -81,14 +81,14 @@ class ApiServiceTest {
 
         every { HealthCloudApiFactory.getInstance(client, platform, env) } returns healthCloudApi
         every {
-            ClientFactory.getInstance(
+            ClientFactory.getInstanceLegacy(
                 authService,
                 env,
                 clientId,
                 secret,
                 platform,
                 connection,
-                NetworkingContract.Clients.JAVA,
+                NetworkingContract.Client.JAVA,
                 version,
                 any(),
                 false
@@ -102,7 +102,7 @@ class ApiServiceTest {
             secret,
             platform,
             connection,
-            NetworkingContract.Clients.JAVA,
+            NetworkingContract.Client.JAVA,
             version,
             debug = false
         )
@@ -124,7 +124,7 @@ class ApiServiceTest {
             secret,
             platform,
             connection,
-            NetworkingContract.Clients.JAVA,
+            NetworkingContract.Client.JAVA,
             version,
             debug = false
         )
@@ -533,7 +533,7 @@ class ApiServiceTest {
             secret,
             platform,
             connection,
-            NetworkingContract.Clients.JAVA,
+            NetworkingContract.Client.JAVA,
             version,
             "token".toByteArray(),
             false

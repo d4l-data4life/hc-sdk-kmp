@@ -37,9 +37,9 @@ internal class VersionInterceptor private constructor(
     }
 
     companion object Factory :
-        NetworkingInternalContract.InterceptorFactory<Pair<NetworkingContract.Clients, String>> {
+        NetworkingInternalContract.InterceptorFactory<Pair<NetworkingContract.Client, String>> {
         private fun format(
-            platform: NetworkingContract.Clients,
+            platform: NetworkingContract.Client,
             version: String
         ): String {
             return String.format(
@@ -49,7 +49,7 @@ internal class VersionInterceptor private constructor(
             )
         }
 
-        override fun getInstance(payload: Pair<NetworkingContract.Clients, String>): NetworkingInternalContract.Interceptor {
+        override fun getInstance(payload: Pair<NetworkingContract.Client, String>): NetworkingInternalContract.Interceptor {
             val (platform, version) = payload
 
             return VersionInterceptor(

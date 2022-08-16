@@ -124,7 +124,7 @@ public class DocumentDetailsActivity extends AppCompatActivity {
             throw new RuntimeException("Failed to deserialize passed object!");
         }
 
-        client = Data4LifeClient.getInstance();
+        client = Data4LifeClient.Companion.getInstance();
 
         setSupportActionBar(findViewById(R.id.toolbar));
         actionBar = getSupportActionBar();

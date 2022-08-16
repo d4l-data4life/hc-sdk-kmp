@@ -115,7 +115,7 @@ class ApiServiceModuleTest {
             secret,
             platform,
             { true },
-            NetworkingContract.Clients.ANDROID,
+            NetworkingContract.Client.ANDROID,
             clientName,
             debug = false
         )
@@ -131,10 +131,10 @@ class ApiServiceModuleTest {
         additionalInterceptor: Interceptor?
     ): OkHttpClient {
         return client.newBuilder()
-            .connectTimeout(100, TimeUnit.MILLISECONDS)
-            .readTimeout(100, TimeUnit.MILLISECONDS)
-            .writeTimeout(100, TimeUnit.MILLISECONDS)
-            .callTimeout(100, TimeUnit.MILLISECONDS)
+            .connectTimeout(1000, TimeUnit.MILLISECONDS)
+            .readTimeout(1000, TimeUnit.MILLISECONDS)
+            .writeTimeout(1000, TimeUnit.MILLISECONDS)
+            .callTimeout(1000, TimeUnit.MILLISECONDS)
             .let {
                 if (additionalInterceptor is Interceptor) {
                     it.addNetworkInterceptor(additionalInterceptor)
@@ -194,7 +194,7 @@ class ApiServiceModuleTest {
         )
         assertEquals(
             actual = request.headers[HEADER_SDK_VERSION],
-            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+            expected = "${NetworkingContract.Client.ANDROID.identifier}-$clientName"
         )
         assertEquals(
             actual = request.method,
@@ -250,7 +250,7 @@ class ApiServiceModuleTest {
         )
         assertEquals(
             actual = request.headers[HEADER_SDK_VERSION],
-            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+            expected = "${NetworkingContract.Client.ANDROID.identifier}-$clientName"
         )
         assertEquals(
             actual = request.method,
@@ -303,7 +303,7 @@ class ApiServiceModuleTest {
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
             actual = request.headers[HEADER_SDK_VERSION],
-            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+            expected = "${NetworkingContract.Client.ANDROID.identifier}-$clientName"
         )
         assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],
@@ -359,7 +359,7 @@ class ApiServiceModuleTest {
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
             actual = request.headers[HEADER_SDK_VERSION],
-            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+            expected = "${NetworkingContract.Client.ANDROID.identifier}-$clientName"
         )
         assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],
@@ -439,7 +439,7 @@ class ApiServiceModuleTest {
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
             actual = request.headers[HEADER_SDK_VERSION],
-            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+            expected = "${NetworkingContract.Client.ANDROID.identifier}-$clientName"
         )
         assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],
@@ -516,7 +516,7 @@ class ApiServiceModuleTest {
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
             actual = request.headers[HEADER_SDK_VERSION],
-            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+            expected = "${NetworkingContract.Client.ANDROID.identifier}-$clientName"
         )
         assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],
@@ -529,9 +529,7 @@ class ApiServiceModuleTest {
     }
 
     @Test
-    @Ignore("This should work, but it does not, figure out why!")
     fun `Given, deleteRecord is called with an Alias, UserId and a RecordId, it returns a completable action`() {
-        // TODO: FIX this, test disabled
         // Given
         val alias = ALIAS
         val userId = USER_ID
@@ -558,7 +556,7 @@ class ApiServiceModuleTest {
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
             actual = request.headers[HEADER_SDK_VERSION],
-            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+            expected = "${NetworkingContract.Client.ANDROID.identifier}-$clientName"
         )
         assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],
@@ -605,7 +603,7 @@ class ApiServiceModuleTest {
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
             actual = request.headers[HEADER_SDK_VERSION],
-            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+            expected = "${NetworkingContract.Client.ANDROID.identifier}-$clientName"
         )
         assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],
@@ -646,7 +644,7 @@ class ApiServiceModuleTest {
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
             actual = request.headers[HEADER_SDK_VERSION],
-            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+            expected = "${NetworkingContract.Client.ANDROID.identifier}-$clientName"
         )
         assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],
@@ -734,7 +732,7 @@ class ApiServiceModuleTest {
         assertNull(request.headers[HEADER_ALIAS])
         assertEquals(
             actual = request.headers[HEADER_SDK_VERSION],
-            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+            expected = "${NetworkingContract.Client.ANDROID.identifier}-$clientName"
         )
         assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],
@@ -782,7 +780,7 @@ class ApiServiceModuleTest {
         assertNull(request.headers[HEADER_AUTHORIZATION])
         assertEquals(
             actual = request.headers[HEADER_SDK_VERSION],
-            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+            expected = "${NetworkingContract.Client.ANDROID.identifier}-$clientName"
         )
         assertEquals(
             actual = request.method,
@@ -824,7 +822,7 @@ class ApiServiceModuleTest {
         )
         assertEquals(
             actual = request.headers[HEADER_SDK_VERSION],
-            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+            expected = "${NetworkingContract.Client.ANDROID.identifier}-$clientName"
         )
         assertEquals(
             actual = request.headers[HEADER_AUTHORIZATION],
@@ -899,7 +897,7 @@ class ApiServiceModuleTest {
         )
         assertEquals(
             actual = request.headers[HEADER_SDK_VERSION],
-            expected = "${NetworkingContract.Clients.ANDROID.identifier}-$clientName"
+            expected = "${NetworkingContract.Client.ANDROID.identifier}-$clientName"
         )
         assertEquals(
             actual = request.method,

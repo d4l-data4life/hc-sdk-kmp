@@ -40,45 +40,54 @@ kotlin {
 }
 
 dependencies {
-    api(Dependency.Multiplatform.D4L.utilJvm)
-    api(Dependency.Multiplatform.D4L.resultErrorJvm)
     implementation(Dependency.Multiplatform.Kotlin.stdlib)
 
-    implementation(Dependency.Multiplatform.D4L.authJvm)
-    implementation(Dependency.Multiplatform.D4L.cryptoJvm)
-    implementation(Dependency.Multiplatform.D4L.securestoreJvm)
-    implementation(Dependency.Multiplatform.D4L.fhirSdk)
-    implementation(Dependency.Java.threeTenBP)
+    api(Dependency.Multiplatform.D4L.authJvm)
+    api(Dependency.Multiplatform.D4L.cryptoJvm)
+    api(Dependency.Multiplatform.D4L.securestoreJvm)
+    api(Dependency.Multiplatform.D4L.utilJvm)
+    api(Dependency.Multiplatform.D4L.errorJvm)
 
-    compileOnly(Dependency.Java.javaXAnnotation)
+    api(Dependency.Jvm.fhirSdk)
+    implementation(Dependency.Jvm.threeTenBP)
 
-    implementation(Dependency.Java.rxJava)
+    compileOnly(Dependency.Jvm.javaXAnnotation)
 
-    implementation(Dependency.Java.okHttp)
-    implementation(Dependency.Java.okHttpLoggingInterceptor)
+    implementation(Dependency.Jvm.rxJava)
 
-    implementation(Dependency.Java.retrofit)
-    implementation(Dependency.Java.retrofitConverterMoshi)
-    implementation(Dependency.Java.retrofitAdapterRxJava)
+    implementation(Dependency.multiplatform.ktorCore)
+    implementation(Dependency.multiplatform.ktorCio)
+    implementation(Dependency.multiplatform.ktorClientAuth)
+    implementation(Dependency.multiplatform.ktorClientLogging)
+    implementation(Dependency.multiplatform.ktorClientContentNegotiation)
+    implementation(Dependency.multiplatform.ktorSerializationJson)
 
-    implementation(Dependency.Java.moshi)
+    implementation(Dependency.Jvm.okHttp)
+    implementation(Dependency.Jvm.okHttpLoggingInterceptor)
 
-    kapt(Dependency.Java.moshiCodeGen)
-    kaptTest(Dependency.Java.moshiCodeGen)
+    implementation(Dependency.Jvm.retrofit)
+    implementation(Dependency.Jvm.retrofitConverterMoshi)
+    implementation(Dependency.Jvm.retrofitAdapterRxJava)
+
+    implementation(Dependency.Jvm.moshi)
+
+    kapt(Dependency.Jvm.moshiCodeGen)
+    kaptTest(Dependency.Jvm.moshiCodeGen)
 
     testImplementation(Dependency.Multiplatform.D4L.fhirHelperJvm) {
         exclude(group = "care.data4life.hc-fhir-sdk-java", module = "hc-fhir-sdk-java")
     }
-    testImplementation(Dependency.Java.Test.junit)
-    testImplementation(Dependency.Java.Test.kotlinTest)
+    testImplementation(Dependency.JvmTest.junit)
+    testImplementation(Dependency.JvmTest.kotlinTest)
 
-    testImplementation(Dependency.Java.Test.mockitoInline)
-    testImplementation(Dependency.Java.Test.truth)
+    testImplementation(Dependency.JvmTest.mockitoInline)
+    testImplementation(Dependency.JvmTest.truth)
 
-    testImplementation(Dependency.Multiplatform.Test.MockK.jdk)
+    testImplementation(Dependency.MultiplatformTest.mockK)
 
-    testImplementation(Dependency.Java.Test.okHttpMockWebServer)
-    testImplementation(Dependency.Java.Test.jsonAssert)
+    testImplementation(Dependency.JvmTest.okHttpMockWebServer)
+    testImplementation(Dependency.multiplatformTest.ktorClientMock)
+    testImplementation(Dependency.JvmTest.jsonAssert)
 }
 
 configure<SourceSetContainer> {
@@ -100,7 +109,7 @@ val provideConfig: Task by tasks.creating {
             .replace("SDK_VERSION", version.toString())
 
         if (!configs.exists()) {
-            if(!configs.mkdir()) {
+            if (!configs.mkdir()) {
                 System.err.println("The script not able to create the config directory")
             }
         }

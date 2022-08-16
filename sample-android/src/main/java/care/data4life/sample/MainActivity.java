@@ -32,8 +32,6 @@ import care.data4life.sdk.Data4LifeClient;
 import care.data4life.sdk.lang.D4LException;
 import care.data4life.sdk.listener.ResultListener;
 
-import static care.data4life.sdk.Data4LifeClient.D4L_AUTH;
-
 public class MainActivity extends Activity {
 
     private Data4LifeClient client;
@@ -54,7 +52,7 @@ public class MainActivity extends Activity {
         }
 
 
-        client = Data4LifeClient.getInstance();
+        client = Data4LifeClient.Companion.getInstance();
 
         client.isUserLoggedIn(new ResultListener<Boolean>() {
             @Override
@@ -73,15 +71,15 @@ public class MainActivity extends Activity {
         mRootCL = findViewById(R.id.rootCL);
         mLoginBTN = findViewById(R.id.hcLoginBTN);
         mLoginBTN.setOnClickListener(view -> {
-            Intent loginIntent = Data4LifeClient.getInstance().getLoginIntent(MainActivity.this, null);
-            startActivityForResult(loginIntent, D4L_AUTH);
+            Intent loginIntent = Data4LifeClient.Companion.getInstance().getLoginIntent(null);
+            startActivityForResult(loginIntent, Data4LifeClient.D4L_AUTH);
         });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == D4L_AUTH) {
+        if (requestCode == Data4LifeClient.D4L_AUTH) {
             if (resultCode == RESULT_OK) {
                 loggedIn();
             } else if (data.getExtras() != null) {

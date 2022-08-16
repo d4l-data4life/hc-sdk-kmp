@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import care.data4life.sdk.auth.AuthState;
 import care.data4life.sdk.util.Base64;
 
 import static org.junit.Assert.assertEquals;
@@ -51,7 +52,7 @@ public class UserIdExtractorTest {
     @Before
     public void setUp() {
         initMocks(this);
-        extractor = new UserIdExtractor(mockUrlDecoder, Base64.INSTANCE, new Moshi.Builder().build());
+        extractor = new UserIdExtractor(mockUrlDecoder, Base64.INSTANCE, new Moshi.Builder().build().adapter(AuthState.class));
 
     }
 
@@ -79,6 +80,4 @@ public class UserIdExtractorTest {
 
         assertNull(actual);
     }
-
-
 }

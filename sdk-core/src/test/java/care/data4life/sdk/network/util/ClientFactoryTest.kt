@@ -46,7 +46,7 @@ class ClientFactoryTest {
     private val authService: AuthorizationContract.Service = mockk()
     private val environment: NetworkingContract.Environment = mockk()
     private val connectivityService: NetworkingContract.NetworkConnectivityService = mockk()
-    private val clientName: NetworkingContract.Clients = mockk()
+    private val clientName: NetworkingContract.Client = mockk()
 
     @Before
     fun setUp() {
@@ -117,7 +117,7 @@ class ClientFactoryTest {
         every { CertificatePinnerFactory.getInstance(platform, environment) } returns pinner
 
         // When
-        val client: Any = ClientFactory.getInstance(
+        val client: Any = ClientFactory.getInstanceLegacy(
             authService,
             environment,
             clientID,
@@ -151,15 +151,15 @@ class ClientFactoryTest {
         )
 
         assertEquals(
-            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            actual = client.callTimeoutMillis.toLong(),
             expected = REQUEST_TIMEOUT
         )
         assertEquals(
-            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            actual = client.callTimeoutMillis.toLong(),
             expected = REQUEST_TIMEOUT
         )
         assertEquals(
-            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            actual = client.callTimeoutMillis.toLong(),
             expected = REQUEST_TIMEOUT
         )
 
@@ -216,7 +216,7 @@ class ClientFactoryTest {
         every { CertificatePinnerFactory.getInstance(platform, environment) } returns pinner
 
         // When
-        val client: Any = ClientFactory.getInstance(
+        val client: Any = ClientFactory.getInstanceLegacy(
             authService,
             environment,
             clientID,
@@ -250,15 +250,15 @@ class ClientFactoryTest {
         )
 
         assertEquals(
-            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            actual = client.callTimeoutMillis.toLong(),
             expected = REQUEST_TIMEOUT
         )
         assertEquals(
-            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            actual = client.callTimeoutMillis.toLong(),
             expected = REQUEST_TIMEOUT
         )
         assertEquals(
-            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            actual = client.callTimeoutMillis.toLong(),
             expected = REQUEST_TIMEOUT
         )
 
@@ -296,7 +296,7 @@ class ClientFactoryTest {
         every { CertificatePinnerFactory.getInstance(platform, environment) } returns pinner
 
         // When
-        val client: Any = ClientFactory.getInstance(
+        val client: Any = ClientFactory.getInstanceLegacy(
             authService,
             environment,
             clientID,
@@ -329,15 +329,15 @@ class ClientFactoryTest {
         )
 
         assertEquals(
-            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            actual = client.callTimeoutMillis.toLong(),
             expected = REQUEST_TIMEOUT
         )
         assertEquals(
-            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            actual = client.callTimeoutMillis.toLong(),
             expected = REQUEST_TIMEOUT
         )
         assertEquals(
-            actual = ((client.callTimeoutMillis / 1000) / 60).toLong(),
+            actual = client.callTimeoutMillis.toLong(),
             expected = REQUEST_TIMEOUT
         )
 

@@ -20,7 +20,7 @@ import care.data4life.sdk.crypto.GCKey
 import care.data4life.sdk.test.util.GenericTestDataProvider.ATTACHMENT_ID
 import care.data4life.sdk.test.util.GenericTestDataProvider.USER_ID
 import care.data4life.sdk.util.Base64.encodeToString
-import care.data4life.sdk.wrapper.SDKImageResizer
+import care.data4life.sdk.wrapper.SdkImageResizer
 import care.data4life.sdk.wrapper.WrapperContract
 import io.mockk.Runs
 import io.mockk.clearAllMocks
@@ -49,7 +49,7 @@ class AttachmentServiceTest {
     @Before
     fun setUp() {
         clearAllMocks()
-        mockkConstructor(SDKImageResizer::class)
+        mockkConstructor(SdkImageResizer::class)
 
         service = AttachmentService(fileService, resizer)
     }
@@ -197,7 +197,7 @@ class AttachmentServiceTest {
             fileService.uploadFile(attachmentKey, userId, data)
         } returns Single.just(receivedId)
 
-        every { anyConstructed<SDKImageResizer>().isResizable(data) } returns false
+        every { anyConstructed<SdkImageResizer>().isResizable(data) } returns false
 
         // When
         val uploaded = service.upload(listOf(attachment), attachmentKey, userId).blockingGet()
@@ -242,9 +242,9 @@ class AttachmentServiceTest {
             fileService.uploadFile(attachmentKey, userId, data)
         } returns Single.just(receivedId)
 
-        every { anyConstructed<SDKImageResizer>().isResizable(data) } returns true
+        every { anyConstructed<SdkImageResizer>().isResizable(data) } returns true
         every {
-            anyConstructed<SDKImageResizer>().resize(capture(originalData), any())
+            anyConstructed<SdkImageResizer>().resize(capture(originalData), any())
         } answers { originalData.captured }
 
         // When
@@ -291,9 +291,9 @@ class AttachmentServiceTest {
             fileService.uploadFile(attachmentKey, userId, data)
         } returns Single.just(receivedId)
 
-        every { anyConstructed<SDKImageResizer>().isResizable(data) } returns true
+        every { anyConstructed<SdkImageResizer>().isResizable(data) } returns true
         every {
-            anyConstructed<SDKImageResizer>().resize(
+            anyConstructed<SdkImageResizer>().resize(
                 data,
                 AttachmentContract.ImageResizer.DEFAULT_PREVIEW_SIZE_PX,
             )
@@ -304,7 +304,7 @@ class AttachmentServiceTest {
         } returns Single.just(previewId)
 
         every {
-            anyConstructed<SDKImageResizer>().resize(
+            anyConstructed<SdkImageResizer>().resize(
                 data,
                 AttachmentContract.ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX,
             )
@@ -371,9 +371,9 @@ class AttachmentServiceTest {
             fileService.uploadFile(attachmentKey, userId, data)
         } returns Single.just(receivedId)
 
-        every { anyConstructed<SDKImageResizer>().isResizable(data) } returns true
+        every { anyConstructed<SdkImageResizer>().isResizable(data) } returns true
         every {
-            anyConstructed<SDKImageResizer>().resize(
+            anyConstructed<SdkImageResizer>().resize(
                 data,
                 AttachmentContract.ImageResizer.DEFAULT_PREVIEW_SIZE_PX,
             )
@@ -384,7 +384,7 @@ class AttachmentServiceTest {
         } returns Single.just(previewId)
 
         every {
-            anyConstructed<SDKImageResizer>().resize(
+            anyConstructed<SdkImageResizer>().resize(
                 data,
                 AttachmentContract.ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX,
             )

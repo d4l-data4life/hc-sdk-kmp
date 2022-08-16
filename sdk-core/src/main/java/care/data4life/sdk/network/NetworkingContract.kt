@@ -90,10 +90,10 @@ interface NetworkingContract {
         fun fetchVersionInfo(): Single<VersionList>
     }
 
-    enum class Clients(val identifier: String) {
+    enum class Client(val identifier: String) {
         ANDROID("android"),
         JAVA("jvm"),
-        INGESTION("ingestion")
+        INGESTION("ingestion"),
     }
 
     fun interface NetworkConnectivityService {
@@ -127,7 +127,7 @@ interface NetworkingContract {
         const val PLATFORM_S4H = "s4h"
         const val DATA4LIFE_CARE = "sha256/AJvjswWs1n4m1KDmFNnTqBit2RHFvXsrVU3Uhxcoe4Y="
         const val HPSGC_DE = "sha256/3f81qEv2rjHvcrwof2egbKo5MjjSHaN/4DOl7R+pH0E="
-        const val REQUEST_TIMEOUT: Long = 2
+        const val REQUEST_TIMEOUT: Long = 2 * 1000 * 60
         const val HEADER_ALIAS = "gc_alias"
         const val HEADER_AUTHORIZATION = "Authorization"
         const val ACCESS_TOKEN_MARKER = "access_token"
@@ -143,5 +143,7 @@ interface NetworkingContract {
         const val AUTHORIZATION_WITH_ACCESS_TOKEN = "$HEADER_AUTHORIZATION: $ACCESS_TOKEN_MARKER"
         const val AUTHORIZATION_WITH_BASIC_AUTH = "$HEADER_AUTHORIZATION: $BASIC_AUTH_MARKER"
         const val HEADER_CONTENT_TYPE_OCTET_STREAM = "content-type: $MEDIA_TYPE_OCTET_STREAM"
+        const val RETRY_MAX = 3
+        const val RETRY_BACKOFF = 3000 * 1L
     }
 }

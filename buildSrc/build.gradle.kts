@@ -34,11 +34,11 @@ ensureKotlinVersion("1.5.31")
 dependencies {
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.kotlin)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.android)
+    implementation(care.data4life.gradle.core.dependency.GradlePlugin.serialization)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.groovyAll)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.androidMaven)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.androidJacoco)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.dexcount)
-    implementation(care.data4life.gradle.core.dependency.GradlePlugin.japicmp)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.downloadTask)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.httpComponents)
     implementation(care.data4life.gradle.core.dependency.GradlePlugin.dokka)
@@ -53,8 +53,8 @@ dependencies {
     // publishing.gradle.kts
     implementation("org.eclipse.jgit:org.eclipse.jgit:6.1.0.202203080745-r")
     // quality.gradle.kts
-    implementation("com.diffplug.spotless:spotless-plugin-gradle:6.4.2")
-    implementation("com.pinterest:ktlint:0.44.0")
+    implementation("com.diffplug.spotless:spotless-plugin-gradle:6.5.1")
+    implementation("com.pinterest:ktlint:0.45.2")
     // versioning.gradle.kts
     implementation("care.data4life.gradle.gitversion:gradle-git-version:0.12.4-d4l")
 }

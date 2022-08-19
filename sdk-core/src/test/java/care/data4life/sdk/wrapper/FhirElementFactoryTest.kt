@@ -16,18 +16,18 @@
 
 package care.data4life.sdk.wrapper
 
+import care.data4life.fhir.r4.model.DocumentReference as DocumentReferenceFhir4
+import care.data4life.fhir.stu3.model.DocumentReference as DocumentReferenceFhir3
 import care.data4life.sdk.fhir.FhirContract
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.test.util.TestResourceHelper.buildDocumentReferenceFhir3
 import care.data4life.sdk.test.util.TestResourceHelper.buildDocumentReferenceFhir4
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import care.data4life.fhir.r4.model.DocumentReference as DocumentReferenceFhir4
-import care.data4life.fhir.stu3.model.DocumentReference as DocumentReferenceFhir3
+import org.junit.Test
 
 class FhirElementFactoryTest {
 

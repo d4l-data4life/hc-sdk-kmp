@@ -35,10 +35,10 @@ import io.mockk.mockkConstructor
 import io.mockk.spyk
 import io.mockk.unmockkConstructor
 import io.mockk.verify
+import kotlin.test.assertSame
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import kotlin.test.assertSame
 
 class RecordServiceCryptoTest {
     private lateinit var recordService: RecordService

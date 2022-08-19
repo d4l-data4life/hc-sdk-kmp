@@ -41,11 +41,11 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.reactivex.Single
-import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalDateTime
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 
 data class CompatibilityTags(
     val validEncoding: List<String>,
@@ -168,7 +168,7 @@ class RecordServiceModuleTestFlowHelper(
         validGroup: List<String>,
         kmpLegacyGroup: List<String>,
         jsLegacyGroup: List<String>,
-        iosLegacyGroup: List<String>,
+        iosLegacyGroup: List<String>
     ): NetworkingContract.SearchTagsBuilder {
         validGroup.indices.forEach { idx ->
             if (!validGroup[idx].startsWith("client") && !validGroup[idx].startsWith("partner")) {
@@ -407,7 +407,7 @@ class RecordServiceModuleTestFlowHelper(
         keys.first,
         keys.second,
         CURRENT,
-        dates.second,
+        dates.second
     )
 
     private fun buildEncryptedRecord(
@@ -504,6 +504,6 @@ class RecordServiceModuleTestFlowHelper(
     ): Meta = Meta(
         LocalDate.parse(customCreationDate, DATE_FORMATTER),
         LocalDateTime.parse(updatedDate, DATE_TIME_FORMATTER),
-        ModelContract.RecordStatus.Active,
+        ModelContract.RecordStatus.Active
     )
 }

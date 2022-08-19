@@ -23,12 +23,12 @@ import care.data4life.sdk.network.NetworkingInternalContract
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verifyOrder
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
 import org.junit.Test
-import kotlin.test.assertSame
-import kotlin.test.assertTrue
 
 class StaticAuthorizationInterceptorTest {
     @Test

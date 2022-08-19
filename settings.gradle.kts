@@ -23,9 +23,13 @@ pluginManagement {
 includeBuild("./gradlePlugin/core-dependency")
 
 include(
-    ":sample-android", ":sample-jvm",
+    ":sample-android",
+    ":sample-jvm",
 
-    ":sdk-core", ":sdk-android", "sdk-jvm", "sdk-ingestion",
+    ":sdk-core",
+    ":sdk-android",
+    "sdk-jvm",
+    "sdk-ingestion"
 )
 
 val includeAuth: String by settings

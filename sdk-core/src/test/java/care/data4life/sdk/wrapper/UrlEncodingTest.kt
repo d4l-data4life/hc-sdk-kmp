@@ -16,9 +16,9 @@
 
 package care.data4life.sdk.wrapper
 
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.junit.Test
 
 class UrlEncodingTest {
     @Test

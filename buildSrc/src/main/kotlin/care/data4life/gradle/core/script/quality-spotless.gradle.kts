@@ -52,13 +52,13 @@ plugins {
     id("com.diffplug.spotless")
 }
 
-val ktlintVersion = "0.44.0"
+val ktlintVersion = "0.46.1"
 
 spotless {
     kotlin {
         target("**/*.kt")
         targetExclude("buildSrc/build/", "**/buildSrc/build/")
-        ktlint(ktlintVersion).userData(
+        ktlint(ktlintVersion).editorConfigOverride(
             mapOf(
                 "disabled_rules" to "no-wildcard-imports",
                 "ij_kotlin_imports_layout" to "*"

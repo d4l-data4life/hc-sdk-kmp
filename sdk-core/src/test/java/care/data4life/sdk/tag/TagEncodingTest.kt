@@ -17,10 +17,10 @@ package care.data4life.sdk.tag
 
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.DataValidationException
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import org.junit.Test
 
 class TagEncodingTest {
     @Test

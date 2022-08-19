@@ -20,9 +20,9 @@ import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.lang.CoreRuntimeException
 import io.mockk.mockk
-import org.junit.Test
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import org.junit.Test
 
 class AttachmentFactoryTest {
     @Test

@@ -18,11 +18,11 @@ package care.data4life.sdk.network.util
 
 import care.data4life.sdk.network.NetworkingContract
 import io.mockk.mockk
-import org.junit.Before
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import org.junit.Before
+import org.junit.Test
 
 class SearchTagsBuilderTest {
     private lateinit var builder: NetworkingContract.SearchTagsBuilder
@@ -71,7 +71,7 @@ class SearchTagsBuilderTest {
             listOf("b"),
             listOf("c"),
             listOf("d"),
-            listOf("e"),
+            listOf("e")
         )
 
         // When
@@ -95,7 +95,7 @@ class SearchTagsBuilderTest {
             listOf("b"),
             listOf("a"),
             listOf("d"),
-            listOf("a"),
+            listOf("a")
         )
 
         // When

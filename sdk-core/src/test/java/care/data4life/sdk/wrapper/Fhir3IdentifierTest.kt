@@ -16,11 +16,11 @@
 
 package care.data4life.sdk.wrapper
 
-import org.junit.Test
+import care.data4life.fhir.stu3.model.Identifier as Fhir3Identifier
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
-import care.data4life.fhir.stu3.model.Identifier as Fhir3Identifier
+import org.junit.Test
 
 class Fhir3IdentifierTest {
     @Test

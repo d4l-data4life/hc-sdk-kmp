@@ -32,7 +32,7 @@ data class D4LClientConfig(
             "environment" to environment.toString(),
             "clientId" to get(environment).id,
             "clientSecret" to get(environment).secret,
-            "redirectScheme" to get(environment).redirectScheme,
+            "redirectScheme" to get(environment).redirectScheme
         ).also {
             if (environment == PRODUCTION && debug == null) {
                 it["debug"] = "false"

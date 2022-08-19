@@ -18,9 +18,9 @@ package care.data4life.sdk.model
 
 import care.data4life.fhir.stu3.model.DomainResource
 import care.data4life.sdk.tag.Annotations
+import java.io.Serializable
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
-import java.io.Serializable
 
 interface ModelContract {
     interface BaseRecord<T> {

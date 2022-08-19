@@ -44,6 +44,11 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
 import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -54,11 +59,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertNull
-import kotlin.test.assertSame
-import kotlin.test.assertTrue
 
 class ApiServiceTest {
     private lateinit var service: NetworkingContract.Service
@@ -116,7 +116,6 @@ class ApiServiceTest {
 
     @Test
     fun `It fulfils NetworkingContractService`() {
-
         val service: Any = ApiService(
             authService,
             env,

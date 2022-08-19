@@ -16,6 +16,8 @@
 
 package care.data4life.sdk.wrapper
 
+import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
+import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3AttachmentHelper
 import care.data4life.sdk.fhir.Fhir3Identifier
@@ -32,16 +34,14 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
 import io.mockk.verify
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
-import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
-import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 
 class FhirAttachmentHelperTest {
     @Before
@@ -235,7 +235,6 @@ class FhirAttachmentHelperTest {
 
     @Test
     @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-
     fun `Given, updateAttachmentData is called with a Fhir4Resource and null as Attachment, it delegates it to the Fhir4AttachmentHelper`() {
         // Given
         val resource: Fhir4DocumentReference = mockk()

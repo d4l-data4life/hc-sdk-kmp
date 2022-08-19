@@ -19,9 +19,9 @@ package care.data4life.sdk.wrapper
 import care.data4life.sdk.fhir.Fhir3AttachmentHelper
 import care.data4life.sdk.fhir.Fhir4Identifier
 import care.data4life.sdk.lang.CoreRuntimeException
-import org.junit.Test
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import org.junit.Test
 
 class IdentifierFactoryTest {
     @Test

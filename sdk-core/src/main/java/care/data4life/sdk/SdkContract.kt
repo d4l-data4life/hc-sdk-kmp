@@ -23,18 +23,18 @@ import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir4Attachment
 import care.data4life.sdk.fhir.Fhir4Resource
 import care.data4life.sdk.lang.D4LException
+import care.data4life.sdk.listener.Callback as LegacyCallback
+import care.data4life.sdk.listener.ResultListener as LegacyListener
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.tag.Annotations
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
-import care.data4life.sdk.listener.Callback as LegacyCallback
-import care.data4life.sdk.listener.ResultListener as LegacyListener
 
 interface SdkContract {
 
     data class CreationDateRange(
         val startDate: LocalDate?,
-        val endDate: LocalDate?,
+        val endDate: LocalDate?
     )
 
     data class UpdateDateTimeRange(

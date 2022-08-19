@@ -20,13 +20,13 @@ import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
 import io.mockk.verify
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class DateTimeFormatterTest {
     @Before

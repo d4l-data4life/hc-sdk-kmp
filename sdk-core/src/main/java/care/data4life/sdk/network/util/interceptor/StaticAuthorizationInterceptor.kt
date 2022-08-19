@@ -20,9 +20,9 @@ import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
 import care.data4life.sdk.network.NetworkingInternalContract
+import java.io.IOException
 import okhttp3.Interceptor
 import okhttp3.Response
-import java.io.IOException
 
 internal class StaticAuthorizationInterceptor private constructor(
     token: String

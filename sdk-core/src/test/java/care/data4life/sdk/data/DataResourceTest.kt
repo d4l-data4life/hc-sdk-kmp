@@ -16,12 +16,12 @@
 
 package care.data4life.sdk.data
 
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotSame
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import org.junit.Test
 
 class DataResourceTest {
     @Test
@@ -116,6 +116,7 @@ class DataResourceTest {
             DataResource(value)
         )
     }
+
     @Test
     fun `It equals if the values are equal and the given Resource is derived from Resource`() {
         @Suppress("ArrayInDataClass")

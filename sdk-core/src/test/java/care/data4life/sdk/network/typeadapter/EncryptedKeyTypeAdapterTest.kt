@@ -17,9 +17,9 @@
 package care.data4life.sdk.network.typeadapter
 
 import care.data4life.sdk.network.model.EncryptedKey
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import org.junit.Test
 
 class EncryptedKeyTypeAdapterTest {
     @Test

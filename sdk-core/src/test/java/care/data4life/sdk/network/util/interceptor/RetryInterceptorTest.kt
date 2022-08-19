@@ -22,14 +22,14 @@ import care.data4life.sdk.network.NetworkingInternalContract
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import okhttp3.Interceptor
-import okhttp3.Request
-import okhttp3.Response
-import org.junit.Test
 import java.net.SocketTimeoutException
 import kotlin.test.assertFailsWith
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import okhttp3.Interceptor
+import okhttp3.Request
+import okhttp3.Response
+import org.junit.Test
 
 class RetryInterceptorTest {
     @Test

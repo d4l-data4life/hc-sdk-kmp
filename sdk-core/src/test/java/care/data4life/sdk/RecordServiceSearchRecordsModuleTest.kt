@@ -16,6 +16,8 @@
 
 package care.data4life.sdk
 
+import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
+import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.crypto.CryptoContract
@@ -55,14 +57,12 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.reactivex.Observable
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
-import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
-import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
 
 class RecordServiceSearchRecordsModuleTest {
     private val dataKey: GCKey = mockk()
@@ -720,7 +720,7 @@ class RecordServiceSearchRecordsModuleTest {
             serializedResources = Triple(
                 SdkFhirParser.fromResource(resource),
                 SdkFhirParser.fromResource(legacyKMPResource),
-                SdkFhirParser.fromResource(legacyJSResource),
+                SdkFhirParser.fromResource(legacyJSResource)
             ),
             tags = tags,
             annotations = annotations,
@@ -1070,7 +1070,7 @@ class RecordServiceSearchRecordsModuleTest {
             serializedResources = Triple(
                 SdkFhirParser.fromResource(resource),
                 SdkFhirParser.fromResource(legacyKMPResource),
-                SdkFhirParser.fromResource(legacyJSResource),
+                SdkFhirParser.fromResource(legacyJSResource)
             ),
             tags = tags,
             annotations = annotations,

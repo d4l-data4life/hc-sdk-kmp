@@ -22,11 +22,11 @@ import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class CompatibilityEncoderTest {
     private lateinit var compatibilityEncoder: MigrationInternalContract.CompatibilityEncoder

@@ -32,9 +32,6 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.slot
 import io.mockk.verify
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
 import java.io.IOException
 import java.security.InvalidAlgorithmParameterException
 import java.security.InvalidKeyException
@@ -55,6 +52,9 @@ import javax.crypto.IllegalBlockSizeException
 import javax.crypto.KeyGenerator
 import javax.crypto.NoSuchPaddingException
 import javax.crypto.SecretKey
+import org.junit.Assert
+import org.junit.Before
+import org.junit.Test
 
 class CryptoServiceTest {
 
@@ -329,7 +329,6 @@ class CryptoServiceTest {
 
     @Test
     fun saveGCKeyPair_shouldStoreKeysAndAlgorithm() {
-
         every { mockStorage.storeKey(PREFIX + GC_KEYPAIR, any()) } just runs
         // when
         cryptoService.saveGCKeyPair(keyPair)

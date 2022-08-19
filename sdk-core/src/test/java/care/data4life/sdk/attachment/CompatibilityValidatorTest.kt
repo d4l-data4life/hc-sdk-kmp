@@ -16,6 +16,8 @@
 
 package care.data4life.sdk.attachment
 
+import care.data4life.fhir.stu3.model.FhirDate as Fhir3Date
+import care.data4life.fhir.stu3.model.FhirDateTime as Fhir3DateTime
 import care.data4life.sdk.fhir.Fhir3Attachment
 import care.data4life.sdk.fhir.Fhir3DateTimeParser
 import care.data4life.sdk.fhir.Fhir4Attachment
@@ -27,8 +29,6 @@ import io.mockk.spyk
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import care.data4life.fhir.stu3.model.FhirDate as Fhir3Date
-import care.data4life.fhir.stu3.model.FhirDateTime as Fhir3DateTime
 
 class CompatibilityValidatorTest {
     @Test

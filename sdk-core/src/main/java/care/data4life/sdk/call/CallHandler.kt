@@ -18,12 +18,12 @@ package care.data4life.sdk.call
 import care.data4life.sdk.SdkContract
 import care.data4life.sdk.lang.D4LException
 import care.data4life.sdk.lang.TaskException
+import care.data4life.sdk.listener.Callback as LegacyCallback
+import care.data4life.sdk.listener.ResultListener as LegacyListener
 import care.data4life.sdk.log.Log
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import care.data4life.sdk.listener.Callback as LegacyCallback
-import care.data4life.sdk.listener.ResultListener as LegacyListener
 
 class CallHandler(
     var errorHandler: SdkContract.ErrorHandler
@@ -72,7 +72,8 @@ class CallHandler(
             .doOnDispose { if (task.isCanceled) onError(prepareError(TaskException.CancelException())) }
             .doFinally { task.finish() }
             .subscribeOn(Schedulers.io())
-            .subscribe({ t: T -> onSuccess(t) }
+            .subscribe(
+                { t: T -> onSuccess(t) }
             ) { error ->
                 if (!task.isActive) return@subscribe
                 onError(prepareError(error))

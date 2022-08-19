@@ -16,9 +16,9 @@
 
 package care.data4life.sdk.tag
 
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.junit.Test
 
 class TagConverterTest {
     @Test

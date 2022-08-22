@@ -37,12 +37,12 @@ object Version {
         /**
          * [hc-fhir-sdk-java](https://github.com/d4l-data4life/hc-fhir-sdk-java)
          */
-        const val fhirSdk = "1.8.0"
+        const val fhirSdk = "1.9.0"
 
         /**
          * [hc-fhir-helper-sdk-kmp](https://github.com/d4l-data4life/hc-fhir-helper-sdk-kmp)
          */
-        const val fhirHelper = "1.9.0"
+        const val fhirHelper = "1.10.0"
     }
 
     object GradlePlugin {
@@ -122,22 +122,22 @@ object Version {
             /**
              * [hc-util-sdk-kmp](https://github.com/d4l-data4life/hc-util-sdk-kmp)
              */
-            const val util = "1.13.0"
+            const val util = "1.14.0"
 
             /**
              * [hc-auth-sdk-kmp](https://github.com/d4l-data4life/hc-auth-sdk-kmp)
              */
-            const val auth = "1.16.0"
+            const val auth = "1.17.0"
 
             /**
              * [hc-crypto-sdk-kmp](https://github.com/d4l-data4life/hc-crypto-sdk-kmp)
              */
-            const val crypto = "1.15.0"
+            const val crypto = "1.16.0"
 
             /**
              * [hc-securestore-sdk-kmp](https://github.com/d4l-data4life/hc-securestore-sdk-kmp)
              */
-            const val securestore = "1.15.0"
+            const val securestore = "1.16.0"
         }
 
         /**

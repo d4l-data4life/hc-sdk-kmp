@@ -64,6 +64,12 @@ toc::[]
 * ThreeTenBP 1.6.0 -> 1.6.1
 * OkHttp 4.9.3 -> 4.10.0
 * Kotlin DateTime 0.2.1 -> 0.4.0
+* HC FHIR SDK JAVA 1.8.0 -> 1.9.0
+* HC FHIR-Helpers SDK KMP 1.9.0 -> 1.10.0
+* HC Auth SDK 1.15.0 -> 1.17.0
+* HC Secured Store SDK 1.15.0 -> 1.16.0
+* HC Crypto SDK 1.15.0 -> 1.16.0
+* HC Util SDK 1.13.0 -> 1.14.0
 
 === Migration
 
@@ -94,8 +100,6 @@ toc::[]
 * HC Secured Store SDK 1.13.2 -> 1.15.0
 * HC Crypto SDK 1.13.2 -> 1.15.0
 * HC Util SDK 1.10.0 -> 1.13.0
-* HC Securestore SDK 1.13.2 -> 1.14.0
-* HC Crypto SDK 1.13.2 -> 1.14.0
 * BouncyCastle 1.64 -> 1.71
 * Tink 1.2.2 -> 1.4.0
 * Bump AppAuth 0.10.0 -> 0.11.1

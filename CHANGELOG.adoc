@@ -25,7 +25,23 @@ Template could be found here: link:https://github.com/d4l-data4life/hc-readme-te
 ==== Versions
 toc::[]
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.16.0\...main[Unreleased]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.17.0\...main[Unreleased]
+
+=== Added
+
+=== Changed
+
+=== Deprecated
+
+=== Removed
+
+=== Fixed
+
+=== Bumped
+
+=== Migration
+
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.16.0\...v1.17.0[1.17.0]
 
 === Added
 
@@ -38,14 +54,10 @@ toc::[]
 * Android target SDK 31 -> 33
 * Change client implementation from Java to Kotlin to aid integration project
 
-=== Deprecated
-
 === Removed
 
 * jApiCmp Gradle plugin as it's not needed anymore
 * test suite project as it is outdated, alternative will be available in the [integration project](https://github.com/d4l-data4life/hc-sdk-kmp-integration/)
-
-=== Fixed
 
 === Bumped
 
@@ -70,9 +82,6 @@ toc::[]
 * HC Secured Store SDK 1.15.0 -> 1.16.0
 * HC Crypto SDK 1.15.0 -> 1.16.0
 * HC Util SDK 1.13.0 -> 1.14.0
-
-=== Migration
-
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.15.1\...v1.16.0[1.16.0]
 

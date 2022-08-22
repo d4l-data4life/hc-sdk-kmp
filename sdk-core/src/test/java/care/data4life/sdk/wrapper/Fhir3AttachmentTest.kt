@@ -16,11 +16,11 @@
 
 package care.data4life.sdk.wrapper
 
-import org.junit.Test
+import care.data4life.fhir.stu3.model.Attachment as Fhir3Attachment
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
-import care.data4life.fhir.stu3.model.Attachment as Fhir3Attachment
+import org.junit.Test
 
 class Fhir3AttachmentTest {
     @Test

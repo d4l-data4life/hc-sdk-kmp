@@ -16,9 +16,9 @@
 
 package care.data4life.sdk.network.util.interceptor
 
+import kotlin.test.assertEquals
 import okhttp3.Request
 import org.junit.Test
-import kotlin.test.assertEquals
 
 class InterceptorHelperTest {
     @Test

@@ -93,7 +93,7 @@ interface RecordContract {
             updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
             includeDeletedRecords: Boolean,
             pageSize: Int,
-            offset: Int,
+            offset: Int
         ): Single<List<Record<T>>>
 
         fun <T : Fhir4Resource> searchFhir4Records(
@@ -104,7 +104,7 @@ interface RecordContract {
             updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
             includeDeletedRecords: Boolean,
             pageSize: Int,
-            offset: Int,
+            offset: Int
         ): Single<List<Fhir4Record<T>>>
 
         fun searchDataRecords(
@@ -114,7 +114,7 @@ interface RecordContract {
             updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
             includeDeletedRecords: Boolean,
             pageSize: Int,
-            offset: Int,
+            offset: Int
         ): Single<List<DataRecord<DataResource>>>
 
         fun countFhir3Records(

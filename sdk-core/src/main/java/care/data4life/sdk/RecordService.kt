@@ -340,7 +340,7 @@ class RecordService internal constructor(
         updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
         includeDeletedRecords: Boolean,
         pageSize: Int,
-        offset: Int,
+        offset: Int
     ): Single<List<Record<T>>> = searchRecords(
         userId,
         resourceType,
@@ -361,7 +361,7 @@ class RecordService internal constructor(
         updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
         includeDeletedRecords: Boolean,
         pageSize: Int,
-        offset: Int,
+        offset: Int
     ): Single<List<Fhir4Record<T>>> = searchRecords(
         userId,
         resourceType,
@@ -381,7 +381,7 @@ class RecordService internal constructor(
         updateDateTimeRange: SdkContract.UpdateDateTimeRange?,
         includeDeletedRecords: Boolean,
         pageSize: Int,
-        offset: Int,
+        offset: Int
     ): Single<List<DataRecord<DataResource>>> = searchRecords(
         userId,
         DataResource::class.java,
@@ -739,8 +739,9 @@ class RecordService internal constructor(
                 }
             }
 
-            if (validAttachments.size != attachmentIds.size)
+            if (validAttachments.size != attachmentIds.size) {
                 throw DataValidationException.IdUsageViolation("Please provide correct attachment ids!")
+            }
 
             setAttachmentIdForDownloadType(
                 validAttachments,
@@ -877,7 +878,6 @@ class RecordService internal constructor(
     ) {
         for (rawAttachment in rawAttachments) {
             if (rawAttachment != null) {
-
                 val attachment = attachmentFactory.wrap(rawAttachment)
                 attachmentGuardian.guardId(attachment)
                 attachmentGuardian.guardSize(attachment)

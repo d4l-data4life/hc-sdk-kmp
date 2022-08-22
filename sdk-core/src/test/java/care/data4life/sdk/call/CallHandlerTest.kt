@@ -16,14 +16,14 @@
 package care.data4life.sdk.call
 
 import care.data4life.sdk.SdkContract
+import care.data4life.sdk.listener.Callback as LegacyCallback
+import care.data4life.sdk.listener.ResultListener as LegacyListener
 import io.mockk.mockk
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import care.data4life.sdk.listener.Callback as LegacyCallback
-import care.data4life.sdk.listener.ResultListener as LegacyListener
 
 class CallHandlerTest {
 

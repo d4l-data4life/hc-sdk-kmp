@@ -18,9 +18,9 @@ package care.data4life.sdk.network.model
 
 import com.squareup.moshi.Moshi
 import io.mockk.mockk
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.junit.Test
 
 class VersionListTest {
     private val moshi = Moshi.Builder().build()

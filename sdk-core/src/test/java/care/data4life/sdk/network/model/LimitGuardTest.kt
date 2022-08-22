@@ -19,10 +19,10 @@ package care.data4life.sdk.network.model
 import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.tag.Annotations
 import care.data4life.sdk.tag.Tags
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import org.junit.Test
 
 class LimitGuardTest {
     private fun buildMap(numberOfEntries: Int): Tags {

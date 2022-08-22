@@ -29,7 +29,7 @@ object Version {
     /**
      * [Kotlin](https://github.com/JetBrains/kotlin)
      */
-    const val kotlin = "1.6.21"
+    const val kotlin = "1.7.10"
 
     val d4l = D4L
 
@@ -47,12 +47,12 @@ object Version {
 
     object GradlePlugin {
         const val kotlin = Version.kotlin
-        const val android = "7.2.0"
+        const val android = "7.2.2"
 
         /**
-         * [Kover]()https://github.com/Kotlin/kotlinx-kover)
+         * [Kover](https://github.com/Kotlin/kotlinx-kover)
          */
-        const val kover = "0.5.0"
+        const val kover = "0.5.1"
 
         /**
          * [Dexcount](https://github.com/KeepSafe/dexcount-gradle-plugin)
@@ -62,7 +62,7 @@ object Version {
         /**
          * [Gradle DownloadTask](https://github.com/michel-kraemer/gradle-download-task)
          */
-        const val downloadTask = "5.1.0"
+        const val downloadTask = "5.1.1"
 
         /**
          * [Dokka - Documentation Engine for Kotlin](https://github.com/Kotlin/dokka)
@@ -72,12 +72,12 @@ object Version {
         /**
          * [Gradle Groovy](https://github.com/apache/groovy)
          */
-        const val groovyAll = "3.0.9"
+        const val groovyAll = "3.0.12"
 
         /**
          * [Gradle OWASP](https://github.com/jeremylong/dependency-check-gradle)
          */
-        const val owasp = "7.1.0.1"
+        const val owasp = "7.1.1"
 
         /**
          * [Gradle HttpComponents](https://hc.apache.org/httpcomponents-client-4.5.x/current/httpclient/dependency-info.html)
@@ -105,7 +105,7 @@ object Version {
             /**
              *  https://github.com/Kotlin/kotlinx.coroutines
              */
-            const val coroutines = "1.6.2"
+            const val coroutines = "1.6.3"
 
             /**
              * [Serialization](https://github.com/Kotlin/kotlinx.serialization)
@@ -115,7 +115,7 @@ object Version {
             /**
              * [DateTime](https://github.com/Kotlin/kotlinx-datetime)
              */
-            const val dateTime = "0.2.1"
+            const val dateTime = "0.4.0"
         }
 
         object D4L {
@@ -148,7 +148,7 @@ object Version {
         /**
          * [Ktor](https://ktor.io)
          */
-        const val ktor = "2.0.2"
+        const val ktor = "2.1.0"
 
         /**
          * [tink](https://github.com/google/tink)
@@ -182,7 +182,7 @@ object Version {
         /**
          * [okHttp](https://github.com/square/okhttp)
          */
-        const val okHttp = "4.9.3"
+        const val okHttp = "4.10.0"
 
         /**
          *
@@ -206,7 +206,7 @@ object Version {
         /**
          * [ThreeTen Backport](https://www.threeten.org/threetenbp)
          */
-        const val threeTenBP = "1.6.0"
+        const val threeTenBP = "1.6.1"
 
         /**
          * [RxJava](https://github.com/ReactiveX/RxJava)
@@ -226,14 +226,12 @@ object Version {
 
         const val truth = "0.44"
 
-        const val jacoco = "0.8.8"
-
-        const val jsonAssert = "1.5.0"
+        const val jsonAssert = "1.5.1"
 
         /**
          * [mockito](https://github.com/mockito/mockito)
          */
-        const val mockito = "4.5.1"
+        const val mockito = "4.7.0"
     }
 
     object Android {
@@ -249,9 +247,8 @@ object Version {
             /**
              * [AndroidX](https://developer.android.com/jetpack/androidx)
              */
-            const val core = "1.1.0"
-            const val ktx = "1.7.0"
-            const val appCompat = "1.4.2"
+            const val ktx = "1.8.0"
+            const val appCompat = "1.5.0"
             const val browser = "1.4.0"
 
             const val constraintLayout = "2.1.4"
@@ -314,7 +311,7 @@ object Version {
         /**
          * [robolectric](http://robolectric.org/)
          */
-        const val robolectric = "4.8"
+        const val robolectric = "4.8.1"
 
         const val truthAndroid = "0.44"
     }

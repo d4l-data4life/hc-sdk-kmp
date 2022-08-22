@@ -16,6 +16,19 @@
 package care.data4life.sdk
 
 import care.data4life.fhir.r4.model.Extension
+import care.data4life.fhir.r4.model.Identifier as Fhir4Identifier
+import care.data4life.fhir.r4.model.Observation as Fhir4Observation
+import care.data4life.fhir.r4.model.Patient as Fhir4Patient
+import care.data4life.fhir.r4.model.Questionnaire as Fhir4Questionnaire
+import care.data4life.fhir.r4.model.QuestionnaireResponse as Fhir4QuestionnaireResponse
+import care.data4life.fhir.r4.util.FhirAttachmentHelper as Fhir4AttachmentHelper
+import care.data4life.fhir.stu3.model.Identifier as Fhir3Identifier
+import care.data4life.fhir.stu3.model.Medication as Fhir3Medication
+import care.data4life.fhir.stu3.model.Observation as Fhir3Observation
+import care.data4life.fhir.stu3.model.Patient as Fhir3Patient
+import care.data4life.fhir.stu3.model.Questionnaire as Fhir3Questionnaire
+import care.data4life.fhir.stu3.model.QuestionnaireResponse as Fhir3QuestionnaireResponse
+import care.data4life.fhir.stu3.util.FhirAttachmentHelper as Fhir3AttachmentHelper
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.crypto.CryptoContract
 import care.data4life.sdk.crypto.GCKey
@@ -60,28 +73,15 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.reactivex.Single
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import org.junit.Assume
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
-import care.data4life.fhir.r4.model.Identifier as Fhir4Identifier
-import care.data4life.fhir.r4.model.Observation as Fhir4Observation
-import care.data4life.fhir.r4.model.Patient as Fhir4Patient
-import care.data4life.fhir.r4.model.Questionnaire as Fhir4Questionnaire
-import care.data4life.fhir.r4.model.QuestionnaireResponse as Fhir4QuestionnaireResponse
-import care.data4life.fhir.r4.util.FhirAttachmentHelper as Fhir4AttachmentHelper
-import care.data4life.fhir.stu3.model.Identifier as Fhir3Identifier
-import care.data4life.fhir.stu3.model.Medication as Fhir3Medication
-import care.data4life.fhir.stu3.model.Observation as Fhir3Observation
-import care.data4life.fhir.stu3.model.Patient as Fhir3Patient
-import care.data4life.fhir.stu3.model.Questionnaire as Fhir3Questionnaire
-import care.data4life.fhir.stu3.model.QuestionnaireResponse as Fhir3QuestionnaireResponse
-import care.data4life.fhir.stu3.util.FhirAttachmentHelper as Fhir3AttachmentHelper
 
 @RunWith(Parameterized::class)
 class RecordServiceAdditionalResourceTypeModuleTest {

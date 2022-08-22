@@ -21,9 +21,9 @@ import care.data4life.sdk.config.DataRestriction
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.util.Base64
 import care.data4life.sdk.util.MimeType
+import java.util.Locale
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.DateTimeFormatterBuilder
-import java.util.Locale
 
 object GenericTestDataProvider {
     val UNKNOWN = TestAttachmentHelper.makeAttachmentData(

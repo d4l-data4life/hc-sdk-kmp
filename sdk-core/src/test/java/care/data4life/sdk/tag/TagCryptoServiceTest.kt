@@ -26,11 +26,11 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.junit.Before
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import org.junit.Before
+import org.junit.Test
 
 class TagCryptoServiceTest {
     private val cryptoService: CryptoContract.Service = mockk()

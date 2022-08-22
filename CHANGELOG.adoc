@@ -31,11 +31,11 @@ toc::[]
 
 * Add ScribeJava dependency to java client
 * Kotlin Serialization 1.3.3
-* Ktor 2.0.2
+* Ktor 2.1.0
 
 === Changed
 
-* Android target SDK 31 -> 32
+* Android target SDK 31 -> 33
 * Change client implementation from Java to Kotlin to aid integration project
 
 === Deprecated
@@ -49,15 +49,21 @@ toc::[]
 
 === Bumped
 
-* *_BREAKING_* Android Gradle Plugin 7.1.3 -> 7.2.0
-* Kotlin 1.6.10 -> 1.6.21
-* Kotlin Coroutines 1.6.0 -> 1.6.2
+* Gradle 7.4.2 -> 7.5.1
+* *_BREAKING_* Android Gradle Plugin 7.2.0 -> 7.2.2
+* Kotlin 1.6.10 -> 1.7.10
+* Kotlin Coroutines 1.6.0 -> 1.6.3
 * Material 1.5.0 -> 1.6.1
+* AndroidX Ktx 1.7.0 -> 1.8.0
 * AndroidX ConstraintLayout 2.1.3 -> 2.1.4
-* Spotless Gradle plugin 6.4.2 -> 6.5.1
-* Ktlint 0.44.0 -> 0.45.2
-* AndroidX AppCompat 1.4.1 -> 1.4.2
+* Spotless Gradle plugin 6.4.2 -> 6.9.0
+* Ktlint 0.44.0 -> 0.46.1
+* AndroidX AppCompat 1.4.1 -> 1.5.0
 * HC Auth SDK 1.15.0 -> 1.16.0
+* Gson 2.8.9. -> 2.9.1
+* ThreeTenBP 1.6.0 -> 1.6.1
+* OkHttp 4.9.3 -> 4.10.0
+* Kotlin DateTime 0.2.1 -> 0.4.0
 
 === Migration
 

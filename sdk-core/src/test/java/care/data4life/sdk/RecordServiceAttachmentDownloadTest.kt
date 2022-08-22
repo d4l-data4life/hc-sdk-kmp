@@ -47,10 +47,10 @@ import io.mockk.unmockkObject
 import io.mockk.verify
 import io.mockk.verifyOrder
 import io.reactivex.Single
+import kotlin.test.assertSame
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import kotlin.test.assertSame
 
 class RecordServiceAttachmentDownloadTest {
     private lateinit var recordService: RecordService

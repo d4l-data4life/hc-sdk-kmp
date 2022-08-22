@@ -19,10 +19,10 @@ package care.data4life.sdk.network.util.interceptor
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.NetworkingInternalContract
+import java.net.SocketTimeoutException
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
-import java.net.SocketTimeoutException
 
 internal class RetryInterceptor private constructor(
     private val connection: NetworkingContract.NetworkConnectivityService

@@ -21,10 +21,10 @@ import care.data4life.sdk.network.NetworkingContract.Companion.FORMAT_BASIC_AUTH
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
 import care.data4life.sdk.network.NetworkingInternalContract
 import care.data4life.sdk.util.Base64
+import java.io.IOException
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
-import java.io.IOException
 
 internal class BasicAuthorizationInterceptor private constructor(
     private val credentials: String

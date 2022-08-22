@@ -16,6 +16,8 @@
 
 import care.data4life.gradle.core.config.LibraryConfig
 import care.data4life.gradle.core.dependency.Dependency
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile as KotlinTaskCompile
+
 
 plugins {
     id("java-library")
@@ -117,7 +119,7 @@ val provideConfig: Task by tasks.creating {
     }
 }
 
-tasks.named("compileKotlin") {
+tasks.withType<KotlinTaskCompile> {
     dependsOn(provideConfig)
 }
 

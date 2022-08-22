@@ -27,8 +27,6 @@ import care.data4life.sdk.test.util.GenericTestDataProvider.IV
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.Before
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
 import kotlin.test.assertFailsWith
@@ -36,6 +34,8 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import org.junit.Before
+import org.junit.Test
 
 class CryptoServiceFakeTest {
     private lateinit var fake: CryptoServiceFake

@@ -16,9 +16,9 @@
 
 package care.data4life.sdk.attachment
 
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.junit.Test
 
 class AttachmentHasherTest {
     @Test

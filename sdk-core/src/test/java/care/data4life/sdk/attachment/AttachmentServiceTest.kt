@@ -34,12 +34,12 @@ import io.mockk.unmockkObject
 import io.mockk.verify
 import io.mockk.verifyOrder
 import io.reactivex.Single
-import org.junit.Before
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import org.junit.Before
+import org.junit.Test
 
 class AttachmentServiceTest {
     private val fileService: AttachmentContract.FileService = mockk()
@@ -295,7 +295,7 @@ class AttachmentServiceTest {
         every {
             anyConstructed<SdkImageResizer>().resize(
                 data,
-                AttachmentContract.ImageResizer.DEFAULT_PREVIEW_SIZE_PX,
+                AttachmentContract.ImageResizer.DEFAULT_PREVIEW_SIZE_PX
             )
         } returns preview
 
@@ -306,7 +306,7 @@ class AttachmentServiceTest {
         every {
             anyConstructed<SdkImageResizer>().resize(
                 data,
-                AttachmentContract.ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX,
+                AttachmentContract.ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX
             )
         } returns thumbnail
 
@@ -375,7 +375,7 @@ class AttachmentServiceTest {
         every {
             anyConstructed<SdkImageResizer>().resize(
                 data,
-                AttachmentContract.ImageResizer.DEFAULT_PREVIEW_SIZE_PX,
+                AttachmentContract.ImageResizer.DEFAULT_PREVIEW_SIZE_PX
             )
         } returns preview
 
@@ -386,7 +386,7 @@ class AttachmentServiceTest {
         every {
             anyConstructed<SdkImageResizer>().resize(
                 data,
-                AttachmentContract.ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX,
+                AttachmentContract.ImageResizer.DEFAULT_THUMBNAIL_SIZE_PX
             )
         } returns null
 

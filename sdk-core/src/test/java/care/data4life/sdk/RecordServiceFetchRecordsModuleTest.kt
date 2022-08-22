@@ -16,6 +16,8 @@
 
 package care.data4life.sdk
 
+import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
+import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.call.DataRecord
@@ -54,12 +56,10 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.reactivex.Observable
 import io.reactivex.Single
-import org.junit.Before
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import care.data4life.fhir.r4.model.DocumentReference as Fhir4DocumentReference
-import care.data4life.fhir.stu3.model.DocumentReference as Fhir3DocumentReference
+import org.junit.Before
+import org.junit.Test
 
 class RecordServiceFetchRecordsModuleTest {
     private val dataKey: GCKey = mockk()

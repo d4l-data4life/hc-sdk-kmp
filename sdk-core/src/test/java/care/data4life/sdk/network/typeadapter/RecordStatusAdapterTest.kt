@@ -18,9 +18,9 @@ package care.data4life.sdk.network.typeadapter
 
 import care.data4life.sdk.lang.CoreRuntimeException
 import care.data4life.sdk.model.ModelContract
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import org.junit.Test
 
 class RecordStatusAdapterTest {
     @Test

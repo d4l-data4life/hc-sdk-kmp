@@ -16,7 +16,7 @@
 
 package care.data4life.gradle.core.script
 
-import care.data4life.gradle.gitversion.VersionDetails
+import com.palantir.gradle.gitversion.VersionDetails
 
 /**
  * Versioning task to calculate the version based on git tags and branch names using [Gradle Git Version](https://github.com/d4l-data4life/gradle-git-version)
@@ -54,7 +54,7 @@ import care.data4life.gradle.gitversion.VersionDetails
  * - ./gradlew versionInfo
  */
 plugins {
-    id("care.data4life.git-version")
+    id("com.palantir.git-version")
 }
 
 val versionDetails: groovy.lang.Closure<VersionDetails> by extra

@@ -15,6 +15,7 @@
  */
 package care.data4life.sdk.tag
 
+import care.data4life.fhir.r4.model.Patient as R4Patient
 import care.data4life.fhir.stu3.model.Patient
 import care.data4life.sdk.data.DataResource
 import care.data4life.sdk.fhir.Fhir3Resource
@@ -35,12 +36,11 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
-import org.junit.Before
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import care.data4life.fhir.r4.model.Patient as R4Patient
+import org.junit.Before
+import org.junit.Test
 
 class TaggingServiceTest {
     // SUT

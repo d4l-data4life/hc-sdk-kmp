@@ -27,10 +27,10 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.spyk
 import io.mockk.verify
-import org.junit.Before
-import org.junit.Test
 import java.io.IOException
 import kotlin.test.assertEquals
+import org.junit.Before
+import org.junit.Test
 
 class CryptoSecureStoreTest {
     private var secureStore: SecureStoreContract.SecureStore = mockk()

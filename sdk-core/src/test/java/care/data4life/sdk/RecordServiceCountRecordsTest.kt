@@ -37,10 +37,10 @@ import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
 import io.reactivex.Single
-import org.junit.Before
-import org.junit.Test
 import java.io.IOException
 import kotlin.test.assertEquals
+import org.junit.Before
+import org.junit.Test
 
 class RecordServiceCountRecordsTest {
     private lateinit var recordService: RecordService

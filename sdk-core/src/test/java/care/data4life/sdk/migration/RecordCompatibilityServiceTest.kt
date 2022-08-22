@@ -25,10 +25,10 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.junit.Before
-import org.junit.Test
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import org.junit.Before
+import org.junit.Test
 
 class RecordCompatibilityServiceTest {
     private val cryptoService: CryptoContract.Service = mockk()
@@ -148,7 +148,7 @@ class RecordCompatibilityServiceTest {
                 "encodedAndroidLegacyTag3Value",
                 "encodedJSLegacyTag3Value",
                 "encodedIOSLegacyTag3Value"
-            ),
+            )
         )
 
         every { compatibilityEncoder.encode(tags["tag1"]!!) } returns encodedTags[0]
@@ -268,7 +268,7 @@ class RecordCompatibilityServiceTest {
                 "encodedAndroidLegacyTag3Value",
                 "encodedJSLegacyTag3Value",
                 "encodedIOSLegacyTag3Value"
-            ),
+            )
         )
         val encryptedGroups = listOf<MutableList<String>>(mockk(), mockk(), mockk())
 
@@ -391,7 +391,7 @@ class RecordCompatibilityServiceTest {
                 "encodedAndroidLegacyTag3Value",
                 "encodedJSLegacyTag3Value",
                 "encodedIOSLegacyTag3Value"
-            ),
+            )
         )
 
         every { compatibilityEncoder.encode(annotations[0]) } returns encodedTags[0]
@@ -511,7 +511,7 @@ class RecordCompatibilityServiceTest {
                 "encodedAndroidLegacyTag3Value",
                 "encodedJSLegacyTag3Value",
                 "encodedIOSLegacyTag3Value"
-            ),
+            )
         )
         val encryptedGroups = listOf<MutableList<String>>(mockk(), mockk(), mockk())
 

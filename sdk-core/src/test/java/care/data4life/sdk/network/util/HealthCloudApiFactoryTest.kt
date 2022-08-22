@@ -29,13 +29,13 @@ import io.mockk.slot
 import io.mockk.unmockkConstructor
 import io.mockk.unmockkStatic
 import io.mockk.verify
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
 import okhttp3.OkHttpClient
 import org.junit.Test
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
-import kotlin.test.assertSame
-import kotlin.test.assertTrue
 
 class HealthCloudApiFactoryTest {
     @Test

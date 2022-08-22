@@ -35,14 +35,14 @@ import io.mockk.unmockkObject
 import io.mockk.verify
 import io.reactivex.Completable
 import io.reactivex.Single
-import org.junit.Before
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import org.junit.Before
+import org.junit.Test
 
 class UserServiceTest {
     private lateinit var service: AuthContract.UserService

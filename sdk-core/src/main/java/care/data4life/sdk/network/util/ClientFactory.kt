@@ -27,14 +27,14 @@ import care.data4life.sdk.network.util.interceptor.OAuthAuthorizationInterceptor
 import care.data4life.sdk.network.util.interceptor.RetryInterceptor
 import care.data4life.sdk.network.util.interceptor.StaticAuthorizationInterceptor
 import care.data4life.sdk.network.util.interceptor.VersionInterceptor
-import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
+import okhttp3.OkHttpClient
 
 object ClientFactory : NetworkingInternalContract.ClientFactory {
     private fun setCertificationPinner(
         builder: OkHttpClient.Builder,
         environment: NetworkingContract.Environment,
-        platform: String,
+        platform: String
     ): OkHttpClient.Builder {
         return if (platform == PLATFORM_S4H) {
             builder // do nothing for S4H

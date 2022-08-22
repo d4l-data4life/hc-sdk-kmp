@@ -20,9 +20,9 @@ import care.data4life.sdk.model.ModelContract
 import care.data4life.sdk.network.typeadapter.EncryptedKeyTypeAdapter
 import care.data4life.sdk.network.typeadapter.RecordStatusAdapter
 import com.squareup.moshi.Moshi
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.junit.Test
 
 class EncryptedRecordTest {
     @Test

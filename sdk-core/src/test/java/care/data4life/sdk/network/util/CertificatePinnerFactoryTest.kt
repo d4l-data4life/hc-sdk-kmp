@@ -20,10 +20,10 @@ import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.network.NetworkingInternalContract
 import io.mockk.every
 import io.mockk.mockk
-import okhttp3.CertificatePinner
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import okhttp3.CertificatePinner
+import org.junit.Test
 
 class CertificatePinnerFactoryTest {
     @Test

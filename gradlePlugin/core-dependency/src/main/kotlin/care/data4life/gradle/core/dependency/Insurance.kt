@@ -1,3 +1,4 @@
+/* ktlint-disable filename */
 /*
  * Copyright (c) 2022 D4L data4life gGmbH / All rights reserved.
  *

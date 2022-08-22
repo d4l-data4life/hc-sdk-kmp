@@ -34,13 +34,13 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class ClientFactoryTest {
     private val authService: AuthorizationContract.Service = mockk()

@@ -30,9 +30,9 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import java.util.HashMap
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.util.HashMap
 
 /**
  * Full constructor.
@@ -177,7 +177,7 @@ class ApiService @JvmOverloads constructor(
         return service.uploadDocument(
             alias,
             userId,
-            encryptedAttachment.toRequestBody(MEDIA_TYPE_OCTET_STREAM.toMediaType()),
+            encryptedAttachment.toRequestBody(MEDIA_TYPE_OCTET_STREAM.toMediaType())
         ).map(DocumentUploadResponse::documentId)
     }
 

@@ -43,12 +43,12 @@ import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyOrder
 import io.reactivex.Single
-import org.junit.Before
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import org.junit.Before
+import org.junit.Test
 
 class RecordCryptoServiceDecryptionTest {
     private lateinit var service: NetworkModelContract.CryptoService

@@ -16,6 +16,8 @@
 
 package care.data4life.sdk
 
+import care.data4life.fhir.r4.model.DocumentReference as Fhir4Reference
+import care.data4life.fhir.stu3.model.DocumentReference as Fhir3Reference
 import care.data4life.sdk.attachment.AttachmentContract
 import care.data4life.sdk.attachment.AttachmentService
 import care.data4life.sdk.crypto.CryptoContract
@@ -41,11 +43,9 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.reactivex.Single
+import kotlin.test.assertEquals
 import org.junit.Before
 import org.junit.Test
-import kotlin.test.assertEquals
-import care.data4life.fhir.r4.model.DocumentReference as Fhir4Reference
-import care.data4life.fhir.stu3.model.DocumentReference as Fhir3Reference
 
 class RecordServiceCountRecordsModuleTest {
     private val tagEncryptionKey: GCKey = mockk()

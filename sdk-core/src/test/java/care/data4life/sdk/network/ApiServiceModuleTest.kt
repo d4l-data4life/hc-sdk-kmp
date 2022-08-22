@@ -48,6 +48,13 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.slot
 import io.mockk.unmockkObject
+import java.net.SocketTimeoutException
+import java.util.concurrent.TimeUnit
+import java.util.logging.Level
+import java.util.logging.Logger
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -57,13 +64,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
-import java.net.SocketTimeoutException
-import java.util.concurrent.TimeUnit
-import java.util.logging.Level
-import java.util.logging.Logger
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 class ApiServiceModuleTest {
     private val authService: AuthorizationContract.Service = mockk()

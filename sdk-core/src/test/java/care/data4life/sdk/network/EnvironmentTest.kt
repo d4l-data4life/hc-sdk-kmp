@@ -16,10 +16,10 @@
 
 package care.data4life.sdk.network
 
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import org.junit.Test
 
 class EnvironmentTest {
     @Test

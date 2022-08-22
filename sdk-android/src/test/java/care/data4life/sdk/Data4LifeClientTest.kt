@@ -87,7 +87,7 @@ class Data4LifeClientTest {
         every {
             authorizationService.loginIntent(
                 scopes,
-                pubKey,
+                pubKey
             )
         } returns intent
 

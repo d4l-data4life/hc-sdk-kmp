@@ -24,10 +24,10 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
-import org.junit.Before
-import org.junit.Test
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import org.junit.Before
+import org.junit.Test
 
 class SdkImageResizerTest {
     private val actualResizer: AttachmentContract.ImageResizer = mockk()

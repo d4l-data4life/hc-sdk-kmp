@@ -9,10 +9,10 @@ import io.mockk.every
 import io.mockk.mockk
 import io.reactivex.Completable
 import io.reactivex.Single
-import org.junit.Before
-import org.junit.Test
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import org.junit.Before
+import org.junit.Test
 
 class AuthClientTest {
     private val userService: AuthContract.UserService = mockk()
@@ -48,7 +48,7 @@ class AuthClientTest {
         // Then
         assertSame(
             actual = task,
-            expected = expected,
+            expected = expected
         )
     }
 
@@ -69,7 +69,7 @@ class AuthClientTest {
         // Then
         assertSame(
             actual = task,
-            expected = expected,
+            expected = expected
         )
     }
 
@@ -91,7 +91,7 @@ class AuthClientTest {
         // Then
         assertSame(
             actual = task,
-            expected = expected,
+            expected = expected
         )
     }
 }

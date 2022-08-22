@@ -22,14 +22,14 @@ import care.data4life.sdk.network.NetworkingContract.Companion.ACCESS_TOKEN_MARK
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_ALIAS
 import care.data4life.sdk.network.NetworkingContract.Companion.HEADER_AUTHORIZATION
 import care.data4life.sdk.network.NetworkingInternalContract
+import java.io.IOException
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
-import java.io.IOException
 
 internal class OAuthAuthorizationInterceptor private constructor(
     private val fetchInterceptor: NetworkingInternalContract.PartialInterceptor<Pair<String, Request>>,
-    private val retryInterceptor: NetworkingInternalContract.PartialInterceptor<Triple<String, Request, Response>>,
+    private val retryInterceptor: NetworkingInternalContract.PartialInterceptor<Triple<String, Request, Response>>
 ) : NetworkingInternalContract.Interceptor {
 
     private fun purgeAlias(request: Request): Request {

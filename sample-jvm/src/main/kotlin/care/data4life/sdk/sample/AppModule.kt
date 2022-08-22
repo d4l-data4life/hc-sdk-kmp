@@ -27,8 +27,8 @@ import care.data4life.sdk.securestore.SecureStore
 import care.data4life.sdk.securestore.SecureStoreContract
 import care.data4life.sdk.securestore.SecureStoreCryptor
 import care.data4life.sdk.securestore.SecureStoreStorage
-import org.koin.dsl.module
 import java.util.concurrent.ConcurrentHashMap
+import org.koin.dsl.module
 
 val storage: AuthorizationContract.Storage = InMemoryAuthStorage()
 val secureStorage: SecureStoreContract.SecureStore = SecureStore(

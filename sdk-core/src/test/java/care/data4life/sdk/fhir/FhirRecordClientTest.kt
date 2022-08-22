@@ -33,11 +33,11 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.reactivex.Completable
 import io.reactivex.Single
-import org.junit.Before
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import org.junit.Before
+import org.junit.Test
 
 class FhirRecordClientTest {
     private val recordService: RecordContract.Service = mockk()

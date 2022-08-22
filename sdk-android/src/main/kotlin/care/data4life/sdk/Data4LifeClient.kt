@@ -45,16 +45,24 @@ class Data4LifeClient private constructor(
     recordService,
     callHandler,
     createAuthClient(
-        alias, userService, callHandler
+        alias,
+        userService,
+        callHandler
     ),
     createDataClient(
-        userService, recordService, callHandler
+        userService,
+        recordService,
+        callHandler
     ),
     createFhir4Client(
-        userService, recordService, callHandler
+        userService,
+        recordService,
+        callHandler
     ),
     createLegacyDataClient(
-        userService, recordService, callHandler
+        userService,
+        recordService,
+        callHandler
     )
 ) {
 

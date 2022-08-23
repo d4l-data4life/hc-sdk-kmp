@@ -1,6 +1,6 @@
 = Data4Life SDK
 :link-repository: https://github.com/d4l-data4life/hc-sdk-kmp
-:project-version: 1.16.0
+:project-version: 1.17.0
 :doctype: article
 :!showtitle:
 :toc: macro
@@ -99,9 +99,9 @@ Once you have a partner ID, follow these steps to start working with the SDK:
 
 === Software requirements
 
-* Android 6.0 (API 23) to Android 12L (API 32)
+* Android 6.0 (API 23) to Android 13 (API 33)
 * Java 8 link:https://developer.android.com/studio/write/java8-support[Limitations] link:https://jakewharton.com/d8-library-desugaring/[Desugaring]
-* Kotlin 1.6.21
+* Kotlin 1.7.10
 
 == Installation
 

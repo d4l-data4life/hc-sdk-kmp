@@ -54,5 +54,5 @@ dependencies {
     implementation("com.diffplug.spotless:spotless-plugin-gradle:6.9.0")
     implementation("com.pinterest:ktlint:0.46.1")
     // versioning.gradle.kts
-    implementation("com.palantir.gradle.gitversion:gradle-git-version:0.15.0")
+    implementation("care.data4life.gradle.gitversion:gradle-git-version:0.12.4-d4l")
 }

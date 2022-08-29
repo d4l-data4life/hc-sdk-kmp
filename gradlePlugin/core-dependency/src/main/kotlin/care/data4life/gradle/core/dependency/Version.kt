@@ -132,7 +132,7 @@ object Version {
             /**
              * [hc-crypto-sdk-kmp](https://github.com/d4l-data4life/hc-crypto-sdk-kmp)
              */
-            const val crypto = "1.16.0"
+            const val crypto = "1.16.1"
 
             /**
              * [hc-securestore-sdk-kmp](https://github.com/d4l-data4life/hc-securestore-sdk-kmp)

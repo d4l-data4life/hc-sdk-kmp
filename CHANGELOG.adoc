@@ -25,7 +25,7 @@ Template could be found here: link:https://github.com/d4l-data4life/hc-readme-te
 ==== Versions
 toc::[]
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.17.0\...main[Unreleased]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.17.1\...main[Unreleased]
 
 === Added
 
@@ -40,6 +40,13 @@ toc::[]
 === Bumped
 
 === Migration
+
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.17.0\...v1.17.1[1.17.1]
+
+=== Fixed
+
+* CryptoService missed Android JsonAdapter
+
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.16.0\...v1.17.0[1.17.0]
 

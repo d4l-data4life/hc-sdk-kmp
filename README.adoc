@@ -1,6 +1,6 @@
 = Data4Life SDK
 :link-repository: https://github.com/d4l-data4life/hc-sdk-kmp
-:project-version: 1.17.0
+:project-version: 1.17.1
 :doctype: article
 :!showtitle:
 :toc: macro

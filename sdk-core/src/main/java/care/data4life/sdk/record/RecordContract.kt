@@ -185,6 +185,7 @@ interface RecordContract {
             // d4l -> namespace, f-> full, p -> preview, t -> thumbnail
             const val DOWNSCALED_ATTACHMENT_IDS_FMT = "d4l_f_p_t"
             const val DOWNSCALED_ATTACHMENT_IDS_SIZE = 4
+            const val DOWNSCALED_ATTACHMENT_IDS_SIZE_WITHOUT_PREVIEW = 2
             const val FULL_ATTACHMENT_ID_POS = 1
             const val PREVIEW_ID_POS = 2
             const val THUMBNAIL_ID_POS = 3

@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -30,6 +31,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import care.data4life.sdk.Data4LifeClient;
 import care.data4life.sdk.lang.D4LException;
+import care.data4life.sdk.listener.Callback;
 import care.data4life.sdk.listener.ResultListener;
 
 public class MainActivity extends Activity {
@@ -81,7 +83,17 @@ public class MainActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Data4LifeClient.D4L_AUTH) {
             if (resultCode == RESULT_OK) {
-                loggedIn();
+                client.finishLogin(data, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        loggedIn();
+                    }
+
+                    @Override
+                    public void onError(@NonNull D4LException exception) {
+                        Snackbar.make(mRootCL, "Failed to login with Data4Life", Snackbar.LENGTH_SHORT).show();
+                    }
+                });
             } else if (data.getExtras() != null) {
                 if (data.getExtras().containsKey("error")) {
                     Snackbar.make(mRootCL, "Failed to login with Data4Life", Snackbar.LENGTH_SHORT).show();

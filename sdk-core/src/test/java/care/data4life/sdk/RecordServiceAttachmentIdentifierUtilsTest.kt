@@ -32,6 +32,7 @@ import care.data4life.sdk.lang.DataValidationException
 import care.data4life.sdk.model.DownloadType
 import care.data4life.sdk.network.NetworkingContract
 import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_FMT
+import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_SIZE_WITHOUT_PREVIEW
 import care.data4life.sdk.record.RecordContract.Service.Companion.PREVIEW_ID_POS
 import care.data4life.sdk.record.RecordContract.Service.Companion.THUMBNAIL_ID_POS
 import care.data4life.sdk.tag.TaggingContract
@@ -168,6 +169,24 @@ class RecordServiceAttachmentIdentifierUtilsTest {
         assertEquals(
             actual = parts,
             expected = value
+        )
+    }
+
+    @Test
+    fun `Given, splitAdditionalAttachmentId is called, with a shortend WrappedIdentifier, it succeeds, if the parts of the Identifiers value match DOWNSCALED_ATTACHMENT_IDS_SIZE_WITHOUT_PREVIEW`() {
+        // Given
+        val identifier = "$DOWNSCALED_ATTACHMENT_IDS_FMT#ATTACHMENT_ID"
+        val additionalIdentifier: WrapperInternalContract.Identifier = mockk()
+
+        every { additionalIdentifier.value } returns identifier
+
+        // Then
+        val result = recordService.splitAdditionalAttachmentId(additionalIdentifier)
+
+        // When
+        assertEquals(
+            actual = result?.size ?: 0,
+            expected = DOWNSCALED_ATTACHMENT_IDS_SIZE_WITHOUT_PREVIEW
         )
     }
 

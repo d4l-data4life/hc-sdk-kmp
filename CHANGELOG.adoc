@@ -25,13 +25,11 @@ Template could be found here: link:https://github.com/d4l-data4life/hc-readme-te
 ==== Versions
 toc::[]
 
-== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.17.1\...main[Unreleased]
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.17.2\...main[Unreleased]
 
 === Added
 
 === Changed
-
-- Auth documentation to reflect latest HC Auth SDK changes
 
 === Deprecated
 
@@ -39,11 +37,19 @@ toc::[]
 
 === Fixed
 
-- Fix update failing for PDF files because of missing preview
-
 === Bumped
 
 === Migration
+
+== https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.17.1\...v1.17.2[1.17.2]
+
+=== Changed
+
+- Auth documentation to reflect latest HC Auth SDK changes
+
+=== Fixed
+
+- Fix update failing for PDF files because of missing preview
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.17.0\...v1.17.1[1.17.1]
 

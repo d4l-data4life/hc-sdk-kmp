@@ -99,7 +99,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 }
 ----
 
-In case your using Jetpack Compose you need to use StartActivityForResult. See the following example for a complete login using coroutines.
+In case you are using Jetpack Compose you need to use StartActivityForResult. See the following example for a complete login using coroutines.
 
 [source, kotlin]
 ----

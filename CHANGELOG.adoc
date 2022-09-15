@@ -31,7 +31,7 @@ toc::[]
 
 === Changed
 
-- auth documentation to reflect latest HC Auth SDK changes
+- Auth documentation to reflect latest HC Auth SDK changes
 
 === Deprecated
 

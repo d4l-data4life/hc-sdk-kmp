@@ -60,6 +60,7 @@ import care.data4life.sdk.network.model.RecordCryptoService
 import care.data4life.sdk.record.RecordContract
 import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_FMT
 import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_SIZE
+import care.data4life.sdk.record.RecordContract.Service.Companion.DOWNSCALED_ATTACHMENT_IDS_SIZE_WITHOUT_PREVIEW
 import care.data4life.sdk.record.RecordContract.Service.Companion.EMPTY_RECORD_ID
 import care.data4life.sdk.record.RecordContract.Service.Companion.FULL_ATTACHMENT_ID_POS
 import care.data4life.sdk.record.RecordContract.Service.Companion.PREVIEW_ID_POS
@@ -1151,7 +1152,7 @@ class RecordService internal constructor(
         }
         val parts = identifier.value!!.split(ThumbnailService.SPLIT_CHAR.toRegex())
 
-        if (parts.size != DOWNSCALED_ATTACHMENT_IDS_SIZE) {
+        if (parts.size != DOWNSCALED_ATTACHMENT_IDS_SIZE && parts.size != DOWNSCALED_ATTACHMENT_IDS_SIZE_WITHOUT_PREVIEW) {
             throw DataValidationException.IdUsageViolation(identifier.value)
         }
         return parts

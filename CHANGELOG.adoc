@@ -39,6 +39,8 @@ toc::[]
 
 === Fixed
 
+- Fix update failing for PDF files because of missing preview
+
 === Bumped
 
 === Migration

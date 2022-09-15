@@ -38,7 +38,9 @@ This section covers the authorization project features of the SDK.
 
 == Login
 
-The SDK automatically handles all authentication and user management tasks. The user login is managed by the {compname} auth app to ensure the safety of the user’s credentials. When the `login` functionality is invoked, the SDK opens a web view with the necessary pages or redirects in the case of a web-based app.
+The SDK automatically handles all authentication and user management tasks.
+The user login is managed by the {compname} auth app to ensure the safety of the user’s credentials.
+When the `login` functionality is invoked, the SDK opens a web view with the necessary pages or redirects in the case of a web-based app.
 
 It follows the https://datatracker.ietf.org/doc/html/rfc8252[OAuth 2.0 for Native Apps] flow and uses https://github.com/openid/AppAuth-Android[AppAuth Android client SDK] to implement it.
 
@@ -59,25 +61,69 @@ Scopes are a mechanism in the OAuth 2.0 protocol to limit an application's acces
 
 === Finish
 
-Once the user is logged in, canceled the authorization request, or if an exception occurred during the authentication process, the SDK sends the response to the integrator application  in the `onActivityResult(…)` method. The authorization results can be the following:
+Once the user is logged in, canceled the authorization request, or if an exception occurred during the authentication process, the SDK sends the response to the integrator application in the `onActivityResult(…)` method.
+The authorization results can be the following:
 
-- `Activity.RESULT_OK` – when the login is successful.
+- `Activity.RESULT_OK` – when the 1st login step is successful.
 - `Activity.RESULT_CANCELED` – when the login fails, with additional payload in `data`, as shown in the example.
+
+In case `Activity.RESULT_OK` is received the login is not fully finished.
+You need to hand the `data` to the SDK `finishLogin(result.data, callback)` method and react to it's callback.
 
 [source,java]
 ----
 @Override
 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
-    if (requestCode == D4L_AUTH) {
+    if (requestCode == Data4LifeClient.D4L_AUTH) {
         if (resultCode == RESULT_OK) {
-            loggedIn();
+            Data4LifeClient.Companion.getInstance().finishLogin(data, new Callback() {
+                @Override
+                public void onSuccess() {
+                    loggedIn();
+                }
+
+                @Override
+                public void onError(@NonNull D4LException exception) {
+                    Snackbar.make(mRootCL, "Failed to login with Data4Life", Snackbar.LENGTH_SHORT).show();
+                }
+            });
         } else if (data.getExtras() != null) {
             if (data.getExtras().containsKey("error")) {
-                Snackbar.make(mRootCL, "Failed to log in to data4life", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mRootCL, "Failed to login with Data4Life", Snackbar.LENGTH_SHORT).show();
             } else if (data.getExtras().containsKey("canceled")) {
-                Snackbar.make(mRootCL, "User canceled authorization request", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mRootCL, "User canceled auth request", Snackbar.LENGTH_SHORT).show();
             }
+        }
+    }
+}
+----
+
+In case you are using Jetpack Compose you need to use StartActivityForResult. See the following example for a complete login using coroutines.
+
+[source, kotlin]
+----
+val coroutineScope = rememberCoroutineScope()
+val loginLauncher = rememberLauncherForActivityResult(
+    contract = StartActivityForResult(),
+) { result ->
+    when (result.resultCode) {
+        Activity.RESULT_OK -> {
+            val data = result.data
+            if (data != null) {
+                Data4LifeClient.getInstance().finishLogin(data, object : Callback {
+                    override fun onSuccess() {
+                        loggedIn()
+                    }
+
+                    override fun onError(exception: D4LException) {
+                        Log.debug("Failed to login: $exception")
+                    }
+                })
+            }
+        }
+        else -> {
+            Log.debug("Failed to login: $result")
         }
     }
 }
@@ -115,6 +161,7 @@ To log out the currently authenticated user, the `logout(listener)` is used wher
 ----
 public void logout(Callback listener)
 ----
+
 [source,java]
 ----
 client.logout(new Callback() {

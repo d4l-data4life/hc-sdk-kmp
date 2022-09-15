@@ -31,6 +31,8 @@ toc::[]
 
 === Changed
 
+- Auth documentation to reflect latest HC Auth SDK changes
+
 === Deprecated
 
 === Removed
@@ -91,6 +93,12 @@ toc::[]
 * HC Secured Store SDK 1.15.0 -> 1.16.0
 * HC Crypto SDK 1.15.0 -> 1.16.0
 * HC Util SDK 1.13.0 -> 1.14.0
+
+=== Migration
+
+The HC-Auth-SDK introduced a breaking change and you need to update how you handle logins. It is now instead of a one step a 2 step process. First using ActivityOnResult and then finishLogin to hand of login data to the SDK.
+
+See link:docs/04_sdk_auth.adoc[auth documentation] for more details.
 
 == https://github.com/d4l-data4life/hc-sdk-kmp/compare/v1.15.1\...v1.16.0[1.16.0]
 

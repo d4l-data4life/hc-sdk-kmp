@@ -2,7 +2,7 @@ name: D4L CI - Pull-Request Validation
 
 on:
   pull_request:
-    types: [opened, synchronize, edited, reopened]
+    types: [opened, synchronize, reopened]
     branches:
       - main
       - release/*
